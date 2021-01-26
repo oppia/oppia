@@ -167,9 +167,13 @@ class ExplorationHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
 
         preferred_audio_language_code = None
+        preferred_language_codes = None
+
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
+            preferred_language_codes = (
+                user_settings.preferred_language_codes)
 
         self.values.update({
             'can_edit': (
@@ -181,6 +185,7 @@ class ExplorationHandler(base.BaseHandler):
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
             'preferred_audio_language_code': preferred_audio_language_code,
+            'preferred_language_codes': preferred_language_codes,
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
@@ -295,7 +300,7 @@ class StatsEventsHandler(base.BaseHandler):
         try:
             self._require_aggregated_stats_are_valid(aggregated_stats)
         except self.InvalidInputException as e:
-            logging.error(e)
+            logging.exception(e)
         event_services.StatsEventsHandler.record(
             exploration_id, exp_version, aggregated_stats)
         self.render_json({})

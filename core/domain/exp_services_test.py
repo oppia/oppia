@@ -347,13 +347,13 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summaries_with_no_query(self):
         # An empty query should return all explorations.
-        (exp_ids, search_cursor) = (
+        (exp_ids, search_offset) = (
             exp_services.get_exploration_ids_matching_query('', [], []))
         self.assertEqual(sorted(exp_ids), [
             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
         ])
-        self.assertIsNone(search_cursor)
+        self.assertIsNone(search_offset)
 
     def test_get_exploration_summaries_with_deleted_explorations(self):
         # Ensure a deleted exploration does not show up in search results.
@@ -467,27 +467,27 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             found_exp_ids = []
 
             # Page 1: 3 initial explorations.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
                     '', [], []))
             self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_exp_ids += exp_ids
 
             # Page 2: 3 more explorations.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', [], [], cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_exp_ids += exp_ids
 
             # Page 3: 1 final exploration.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', [], [], cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(exp_ids), 1)
-            self.assertIsNone(search_cursor)
+            self.assertIsNone(search_offset)
             found_exp_ids += exp_ids
 
             # Validate all explorations were seen.
@@ -2542,8 +2542,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_delete_state_cmd(self):
         """Test deleting a state name."""
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -2586,11 +2584,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             r'The parameter with name \'myParam\' .* does not exist .*'
-            ):
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.owner_id,
+                self.EXP_0_ID,
+                _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                ''
+            )
 
     def test_update_reserved_param_changes(self):
         param_changes = [{
@@ -2603,11 +2604,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             r'The parameter name \'all\' is reserved. Please choose '
-            'a different name for the parameter being set in'):
+            'a different name for the parameter being set in'
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.owner_id,
+                self.EXP_0_ID,
+                _get_change_list(
                     self.init_state_name, 'param_changes', param_changes),
-                '')
+                ''
+            )
 
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
@@ -2618,13 +2623,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid generator id fake'
-            ):
+            utils.ValidationError, 'Invalid generator ID'
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
+                self.owner_id,
+                self.EXP_0_ID,
                 _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                ''
+            )
 
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""

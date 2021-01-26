@@ -18,7 +18,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').factory('TranslationFileHashLoaderService', [
+angular.module('oppia').factory('TranslationFileHashLoaderBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   function($http, $q, UrlInterpolationService) {
     /* Options object contains:
