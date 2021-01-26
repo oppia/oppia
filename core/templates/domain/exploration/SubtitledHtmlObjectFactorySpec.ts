@@ -32,24 +32,24 @@ describe('SubtitledHtml object factory', () => {
   });
 
   it('should get and set HTML correctly', () => {
-    expect(subtitledHtml.getHtml()).toEqual('<p>some html</p>');
-    subtitledHtml.setHtml('new html');
-    expect(subtitledHtml.getHtml()).toEqual('new html');
+    expect(subtitledHtml.html).toEqual('<p>some html</p>');
+    subtitledHtml.html = 'new html';
+    expect(subtitledHtml.html).toEqual('new html');
   });
 
   it('should get and set contentId correctly', () => {
-    expect(subtitledHtml.getContentId()).toEqual('content_id');
-    subtitledHtml.setContentId('new_content_id');
-    expect(subtitledHtml.getContentId()).toEqual('new_content_id');
+    expect(subtitledHtml.contentId).toEqual('content_id');
+    subtitledHtml.contentId = 'new_content_id';
+    expect(subtitledHtml.contentId).toEqual('new_content_id');
   });
 
   it('should correctly check emptiness', () => {
     expect(subtitledHtml.isEmpty()).toBe(false);
 
-    subtitledHtml.setHtml('');
+    subtitledHtml.html = '';
     expect(subtitledHtml.isEmpty()).toBe(true);
 
-    subtitledHtml.setHtml('hello');
+    subtitledHtml.html = 'hello';
     expect(subtitledHtml.isEmpty()).toBe(false);
   });
 
@@ -62,7 +62,7 @@ describe('SubtitledHtml object factory', () => {
 
   it('should create default object', () => {
     const defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
-    expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
-    expect(defaultSubtitledHtml.getContentId()).toEqual('content_id');
+    expect(defaultSubtitledHtml.html).toEqual('test html');
+    expect(defaultSubtitledHtml.contentId).toEqual('content_id');
   });
 });

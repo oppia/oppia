@@ -178,6 +178,7 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
+  await waitFor.elementToBeClickable(elem.all(by.css('.oppia-rte')).first());
   await (await elem.all(by.css('.oppia-rte')).first()).click();
 
   var _appendContentText = async function(text) {
