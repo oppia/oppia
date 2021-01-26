@@ -36,29 +36,6 @@ import python_utils
 ])
 
 
-def require_non_negative(
-        exp_id, exp_version, property_name, value,
-        require_non_negative_messages, state_name=None):
-    """Ensures that all the statistical data is non-negative.
-
-    Args:
-        exp_id: str. ID of the exploration.
-        exp_version: str. Version of the exploration.
-        property_name: str. The property name whose value is to be checked.
-        value: int. The value of property_name which is to be checked.
-        require_non_negative_messages: list(str). A list in which the
-            error messages are to be appended.
-        state_name: str|None. The name of the state whose statistics should
-            be checked. It is None when exploration-wide stats models are
-            passed in.
-    """
-    state_name = state_name if state_name else ''
-    if value < 0:
-        require_non_negative_messages.append(
-            'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
-                exp_id, exp_version, state_name, property_name, value))
-
-
 class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for recomputing creator statistics from the events
     in the datastore. Should only be run in events of data corruption.
