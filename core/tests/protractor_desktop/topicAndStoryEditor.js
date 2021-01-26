@@ -97,6 +97,13 @@ describe('Topic editor functionality', function() {
       'Skill 1', 'Topic 1');
 
     await topicEditorPage.get(topicId);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
     await topicEditorPage.moveToQuestionsTab();
     await topicEditorPage.createQuestionForSkillWithName('Skill 1');
     await explorationEditorMainTab.setContent(
@@ -108,6 +115,9 @@ describe('Topic editor functionality', function() {
       'FuzzyEquals', ['correct']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
