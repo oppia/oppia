@@ -36,6 +36,10 @@ You can also append the following options to the above command:
     --generate_coverage_report generates a coverage report as part of the final
         test output (but it makes the tests slower).
 
+    --ignore_coverage only has an affect when --generate_coverage_report
+        is specified. In that case, the tests will not fail just because
+        code coverage is not 100%.
+
 Note: If you've made some changes and tests are failing to run at all, this
 might mean that you have introduced a circular dependency (e.g. module A
 imports module B, which imports module C, which imports module A). This needs
@@ -125,6 +129,10 @@ _EXCLUSIVE_GROUP.add_argument(
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
+    action='store_true')
+_PARSER.add_argument(
+    '--ignore_coverage',
+    help='optional; if specified, tests will not fail due to coverage',
     action='store_true')
 _PARSER.add_argument(
     '--exclude_load_tests',
@@ -458,7 +466,8 @@ def main(args=None):
 
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
-        if coverage_result.group('total') != '100':
+        if (coverage_result.group('total') != '100'
+                and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
 
     python_utils.PRINT('')
