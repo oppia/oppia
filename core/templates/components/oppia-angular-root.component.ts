@@ -359,12 +359,13 @@ import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 import { SearchExplorationsBackendApiService } from
   'domain/collection/search-explorations-backend-api.service';
+import { SearchBackendApiService } from 'services/search-backend-api.service';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
@@ -702,6 +703,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static schemaUndefinedLastElementService: SchemaUndefinedLastElementService;
   static searchExplorationsBackendApiService:
     SearchExplorationsBackendApiService;
+  static searchBackendApiService: SearchBackendApiService;
   static setInputRulesService: SetInputRulesService;
   static setInputValidationService: SetInputValidationService;
   static shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
@@ -997,6 +999,7 @@ private schemaFormSubmittedService: SchemaFormSubmittedService,
 private schemaUndefinedLastElementService: SchemaUndefinedLastElementService,
 private searchExplorationsBackendApiService:
   SearchExplorationsBackendApiService,
+private searchBackendApiService: SearchBackendApiService,
 private setInputRulesService: SetInputRulesService,
 private setInputValidationService: SetInputValidationService,
 private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
