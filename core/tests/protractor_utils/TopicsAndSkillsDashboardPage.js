@@ -157,6 +157,8 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.navigateToTopicWithIndex = async function(index) {
     await this.waitForTopicsToLoad();
+    await waitFor.visibilityOf(topicEditOptions,
+      'Topic edit options taking to long to appear');
     await action.click(
       'Topic edit option', topicEditOptions.get(index));
     await action.click(
@@ -353,7 +355,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.elementToBeClickable(
       unassignSkillButon,
       'Unassign Skill button takes too long to be clickable');
-    await unassignSkillButon.click();
+    await action.click('Unassign Skill Button', unassignSkillButon);
 
     await waitFor.modalPopupToAppear();
     await waitFor.visibilityOf(
@@ -367,7 +369,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.elementToBeClickable(
       assignedTopicInput,
       'Assigned topic checkbox takes too long to be clickable');
-    await assignedTopicInput.click();
+    await action.click('Assigned Topic Input', assignedTopicInput);
 
     await waitFor.elementToBeClickable(
       confirmUnassignSkillButton,
