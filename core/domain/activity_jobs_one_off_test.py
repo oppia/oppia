@@ -2130,8 +2130,10 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
         return [ast.literal_eval(stringified_item) for
                 stringified_item in results]
 
-    def test_message_truncated_correctly(self):
-        """Ensures the job corretly shrinks commit message lengths."""
+    def test_message_truncated_correctly_base_snapshot_metadata(self):
+        """Ensures the job corretly shrinks commit message lengths for
+        BaseSnapshotMetadataModel.
+        """
         model_class = config_models.ConfigPropertySnapshotMetadataModel
         model_class(
             id='model_id-0',
@@ -2142,39 +2144,11 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
         self.assertEqual(
             len(model_class.get_by_id('model_id-0').commit_message),
             375)
-
-
-class CommitLogEntryCommitMsgShrinkOneOffJobTests(
-        test_utils.GenericTestBase):
-    """Tests for the one-off commit message shrinking job for
-    BaseCommitLogEntryModel classes.
-    """
-
-    def _count_one_off_jobs_in_queue(self):
-        """Counts one off jobs in the taskqueue."""
-        return self.count_jobs_in_mapreduce_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            activity_jobs_one_off
-            .CommitLogEntryCommitMsgShrinkOneOffJob.create_new())
-        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
-        (
-            activity_jobs_one_off
-            .CommitLogEntryCommitMsgShrinkOneOffJob.enqueue(job_id))
-        self.assertEqual(self._count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
-        results = (
-            activity_jobs_one_off
-            .CommitLogEntryCommitMsgShrinkOneOffJob.get_output(job_id))
-        return [ast.literal_eval(stringified_item) for
-                stringified_item in results]
-
-    def test_message_truncated_correctly(self):
-        """Ensures the job corretly shrinks commit message lengths."""
+    
+    def test_message_truncated_correctly_commit_log_entry(self):
+        """Ensures the job corretly shrinks commit message lengths for
+        CommitLogEntryModel.
+        """
         commit = collection_models.CollectionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'a', 'a' * 400, [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)

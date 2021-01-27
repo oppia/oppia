@@ -616,6 +616,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
+            # BaseSnapshotMetadata models.
             config_models.ConfigPropertySnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionSnapshotMetadataModel,
@@ -627,6 +628,14 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
             topic_models.TopicRightsSnapshotMetadataModel,
             topic_models.TopicSnapshotMetadataModel,
             question_models.QuestionSnapshotMetadataModel,
+            # CommitLogEntry models.
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            subtopic_models.SubtopicPageCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
         ]
 
     @staticmethod
@@ -663,6 +672,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
+            # BaseSnapshotMetadata models.
             config_models.ConfigPropertySnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionSnapshotMetadataModel,
@@ -674,45 +684,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
             topic_models.TopicRightsSnapshotMetadataModel,
             topic_models.TopicSnapshotMetadataModel,
             question_models.QuestionSnapshotMetadataModel,
-        ]
-
-    @staticmethod
-    def map(item):
-        model_name = item.__class__.__name__
-        model_id = item.id
-        identifier_message = (
-            '%s with id %s. Message: %s' % (
-                model_name, model_id, item.commit_message))
-        if item.commit_message and len(item.commit_message) > 375:
-            item.commit_message = item.commit_message[:375]
-            item.update_timestamps(update_last_updated_time=False)
-            item.put()
-            yield ('TRUNCATED', identifier_message.encode('utf-8'))
-        else:
-            yield ('NOT_TRUNCATED', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == 'NOT_TRUNCATED':
-            yield (key, len(values))
-        else:
-            yield (key, values)
-
-
-class CommitLogEntryCommitMsgShrinkOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that truncates the length of commit messages to ensure that they do
-    not exceed the limit of 375 characters.
-    """
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        super(CommitLogEntryCommitMsgShrinkOneOffJob, cls).enqueue(
-            job_id, shard_count=16)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [
+            # CommitLogEntry models.
             collection_models.CollectionCommitLogEntryModel,
             exp_models.ExplorationCommitLogEntryModel,
             skill_models.SkillCommitLogEntryModel,
