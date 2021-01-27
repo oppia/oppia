@@ -250,7 +250,7 @@ def _get_all_test_targets_from_shard(shard_name):
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
-    with python_utils.open(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     return shards_spec[shard_name]
 
