@@ -1084,10 +1084,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError as e:
+        except cls.EntityNotFoundError:
             if not strict:
                 return None
-            raise e
+            python_utils.reraise_exception()
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):
