@@ -1733,7 +1733,8 @@ def send_account_deleted_email(user_id, user_email):
 
 
 def send_account_deletion_failed_email(user_id, user_email):
-    """Sends an email to admin about the failure of deletion of the user.
+    """Sends an email to admin about the failure of the job that is supposed to
+    delete the user.
 
     Args:
         user_id: str. The id of the user whose account failed to get deleted.
@@ -1742,8 +1743,8 @@ def send_account_deletion_failed_email(user_id, user_email):
     """
     email_subject = 'WIPEOUT: Account deletion failed'
     email_body_template = (
-        'The Wipeout of the user with ID \'%s\' and email \'%s\' failed.'
-        % (user_id, user_email)
+        'The Wipeout process failed for the user '
+        'with ID \'%s\' and email \'%s\'.' % (user_id, user_email)
     )
     send_mail_to_admin(email_subject, email_body_template)
 

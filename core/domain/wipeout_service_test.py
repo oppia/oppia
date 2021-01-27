@@ -563,8 +563,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         ).put()
 
         email_content = (
-            'The Wipeout of the user with ID \'%s\' and email \'%s\' failed.'
-            % (self.user_1_id, self.USER_1_EMAIL)
+            'The Wipeout process failed for the user with ID \'%s\' '
+            'and email \'%s\'.' % (self.user_1_id, self.USER_1_EMAIL)
         )
         send_email_swap = self.swap_with_checks(
             email_manager,
