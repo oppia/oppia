@@ -24,6 +24,7 @@
  * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
 import 'hammerjs';
+import 'firebase/auth';
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.directive.ts');

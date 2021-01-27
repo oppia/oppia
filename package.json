@@ -141,7 +141,7 @@
     "fabric": "^4.1.0",
     "firebase": "^8.0.0",
     "firebase-tools": "^9.1.0",
-    "firebaseui": "4.7.1",
+    "firebaseui": "https://github.com/oppia/firebaseui-web/releases/download/v4.7.1-PATCH/firebaseui-4.7.1-PATCH.tgz",
     "firebaseui-angular": "^5.1.1",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
