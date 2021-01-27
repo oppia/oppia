@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the signup page component.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -130,7 +131,7 @@ describe('Signup page', function() {
       });
 
     it('should successfully signup when user opts to receive email updates',
-      function() {
+      fakeAsync(() => {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
           return_url: '/expected_url'
         });
@@ -145,13 +146,14 @@ describe('Signup page', function() {
           .respond(200);
         ctrl.submitPrerequisitesForm(true, '', 'yes');
         $httpBackend.flush();
+        tick(200);
 
         expect(SiteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
         expect(mockWindow.location.href).toBe('/expected_url');
-      });
+      }));
 
     it('should successfully signup when user opts to not receive email updates',
-      function() {
+      fakeAsync(() => {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
           return_url: '/expected_url'
         });
@@ -166,10 +168,11 @@ describe('Signup page', function() {
           .respond(200);
         ctrl.submitPrerequisitesForm(true, '', 'no');
         $httpBackend.flush();
+        tick(200);
 
         expect(SiteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
         expect(mockWindow.location.href).toBe('/expected_url');
-      });
+      }));
 
     it('should throw an error when email preferences is invalid', function() {
       expect(() => {
@@ -236,7 +239,7 @@ describe('Signup page', function() {
     });
 
     it('should submit prerequisites form when return url is creator dashboard',
-      function() {
+      fakeAsync(() => {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
           return_url: '/creator-dashboard'
         });
@@ -244,12 +247,13 @@ describe('Signup page', function() {
         $httpBackend.expect('POST', '/signuphandler/data').respond(200);
         ctrl.submitPrerequisitesForm(true, 'myUsername', true);
         $httpBackend.flush();
+        tick(200);
 
         expect(mockWindow.location.href).toBe('/creator-dashboard');
-      });
+      }));
 
     it('should submit prerequisites form when return url is not creator ' +
-      'dashboard', function() {
+      'dashboard', fakeAsync(() => {
       spyOn(UrlService, 'getUrlParams').and.returnValue({
         return_url: '/another_url'
       });
@@ -257,9 +261,10 @@ describe('Signup page', function() {
       $httpBackend.expect('POST', '/signuphandler/data').respond(200);
       ctrl.submitPrerequisitesForm(true, 'myUsername', true);
       $httpBackend.flush();
+      tick(200);
 
       expect(mockWindow.location.href).toBe('/another_url');
-    });
+    }));
 
     it('should get user data correctly from backend', function() {
       $httpBackend.flush();
