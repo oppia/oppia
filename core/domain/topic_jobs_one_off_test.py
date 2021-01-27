@@ -23,8 +23,13 @@ import ast
 import logging
 
 from constants import constants
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
@@ -177,12 +182,6 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_fails_with_invalid_topic(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-two',
@@ -193,13 +192,15 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
             self.process_and_flush_pending_mapreduce_tasks()
 
-        self.assertEqual(
-            observed_log_messages,
-            ['Topic topic_id failed validation: Invalid language code: '
-             'invalid_language_code'])
+        self.assertEqual(len(captured_logs), 1)
+        self.assertIn(
+            'Topic topic_id failed validation: Invalid language code: '
+            'invalid_language_code',
+            captured_logs[0]
+        )
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'validation_error',
@@ -486,3 +487,169 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
             self.assertRegexpMatches(
                 message,
                 'object has no attribute \'canonical_story_references\'')
+
+
+class InteractionsInStoriesAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    def _create_dummy_skill(self, skill_id, skill_description, explanation):
+        """Creates a dummy skill object with the given values.
+
+        Args:
+            skill_id: str. The ID of the skill to be created.
+            skill_description: str. The description of the skill.
+            explanation: str. The review material for the skill.
+
+        Returns:
+            Skill. The dummy skill with given values.
+        """
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, skill_description, rubrics)
+        skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
+        return skill
+
+    def setUp(self):
+        super(InteractionsInStoriesAuditOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.user_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.set_admins([self.ALBERT_NAME])
+        self.login(self.ALBERT_EMAIL, is_super_admin=True)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_interactions_are_reported_correctly(self):
+        topic_id_1 = 'topicid1'
+        topic_id_2 = 'topicid2'
+        story_id = story_services.get_new_story_id()
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        skill_id_3 = skill_services.get_new_skill_id()
+
+        skill_1 = self._create_dummy_skill(
+            skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+        skill_2 = self._create_dummy_skill(
+            skill_id_2, 'Dummy Skill 2', '<p>Dummy Explanation 2</p>')
+        skill_3 = self._create_dummy_skill(
+            skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
+
+        topic_1 = topic_domain.Topic.create_default_topic(
+            topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
+        topic_2 = topic_domain.Topic.create_default_topic(
+            topic_id_2, 'Empty Topic', 'empty-topic', 'description')
+
+        topic_1.add_canonical_story(story_id)
+        topic_1.add_uncategorized_skill_id(skill_id_1)
+        topic_1.add_uncategorized_skill_id(skill_id_2)
+        topic_1.add_uncategorized_skill_id(skill_id_3)
+        topic_1.add_subtopic(1, 'Dummy Subtopic Title')
+        topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
+        topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
+
+        # These explorations were chosen since they pass the validations
+        # for published stories.
+        exp_services.load_demo('15')
+        exp_services.load_demo('25')
+        exp_services.load_demo('13')
+        exp_services.update_exploration(
+            self.user_id, '15', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': True
+            })], 'Changed correctness_feedback_enabled.')
+        exp_services.update_exploration(
+            self.user_id, '25', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': True
+            })], 'Changed correctness_feedback_enabled.')
+        exp_services.update_exploration(
+            self.user_id, '13', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': True
+            })], 'Changed correctness_feedback_enabled.')
+
+        story = story_domain.Story.create_default_story(
+            story_id, 'Help Jaime win the Arcade', 'Description',
+            topic_id_1, 'help-jamie-win-arcade')
+
+        story_node_dicts = [{
+            'exp_id': '15',
+            'title': 'What are the place values?',
+            'description': 'a'
+        }, {
+            'exp_id': '25',
+            'title': 'Finding the value of a number',
+            'description': 'b'
+        }, {
+            'exp_id': '13',
+            'title': 'Comparing Numbers',
+            'description': 'c'
+        }]
+
+        def generate_dummy_story_nodes(node_id, exp_id, title, description):
+            """Generates and connects sequential story nodes.
+
+            Args:
+                node_id: int. The node id.
+                exp_id: str. The exploration id.
+                title: str. The title of the story node.
+                description: str. The description of the story node.
+            """
+
+            story.add_node(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                title)
+            story.update_node_description(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                description)
+            story.update_node_exploration_id(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+            if node_id != len(story_node_dicts):
+                story.update_node_destination_node_ids(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+
+            exp_services.update_exploration(
+                self.user_id, exp_id, [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'category',
+                    'new_value': 'Astronomy'
+                })], 'Change category')
+
+        for i, story_node_dict in enumerate(story_node_dicts):
+            generate_dummy_story_nodes(i + 1, **story_node_dict)
+
+        skill_services.save_new_skill(self.user_id, skill_1)
+        skill_services.save_new_skill(self.user_id, skill_2)
+        skill_services.save_new_skill(self.user_id, skill_3)
+        story_services.save_new_story(self.user_id, story)
+        topic_services.save_new_topic(self.user_id, topic_1)
+        topic_services.save_new_topic(self.user_id, topic_2)
+
+        topic_services.publish_story(topic_id_1, story_id, self.user_id)
+        job_id = (
+            topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.create_new())
+        topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.get_output(
+                job_id))
+
+        expected = [
+            ['%s (%s)' % ('Dummy Topic 1', topic_id_1), [
+                u'[u\'EndExploration\', u\'ImageClickInput\', u\'Continue\', '
+                u'u\'MultipleChoiceInput\', u\'TextInput\']']],
+            ['%s (%s)' % ('Empty Topic', topic_id_2), [u'[]']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
