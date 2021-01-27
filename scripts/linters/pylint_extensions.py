@@ -1484,6 +1484,17 @@ class RestrictedImportChecker(checkers.BaseChecker):
             'domain layer and controller layer respectively.'),
     }
 
+    options = (
+        (
+            'forbidden-imports',
+            {
+                'default': ('int', 'str', 'float', 'bool', 'v'),
+                'type': 'csv', 'metavar': '<comma separated list>',
+                'help': 'List of allowed prefixes in a comment.'
+            }
+        )
+    )
+
     # Mapping between modules and imports that are forbidden in these modules.
     # The key part needs to be absolute path to the module for which we want to
     # forbid the imports. Both import formats ('import xyz [as klm]' and
