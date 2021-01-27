@@ -35,6 +35,7 @@ angular.module('oppia').controller('DeleteSkillModalController', [
           skillId).then((response) => {
           $scope.topicsAssignments = response;
           $scope.topicsAssignmentsAreFetched = true;
+          $scope.$applyAsync();
         });
     };
     $scope.init = function() {
