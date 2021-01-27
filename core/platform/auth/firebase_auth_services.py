@@ -59,6 +59,7 @@ import logging
 
 from core.domain import auth_domain
 from core.platform import models
+import feconf
 import python_utils
 
 import firebase_admin
@@ -66,6 +67,7 @@ from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 
 auth_models, = models.Registry.import_models([models.NAMES.auth])
+
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -80,10 +82,10 @@ def _acquire_firebase_context():
             firebase_admin.delete_app(app)
 
 
-def authenticate_request(request):
-    """Authenticates the request and returns the user who authorized it, if any.
+def _verify_id_token(auth_header):
+    """Verifies whether the auth_header has a valid Firebase-provided ID token.
 
-    Oppia follows the OAuth Bearer authentication scheme.
+    Oppia's authorization headers use OAuth 2.0's Bearer authentication scheme.
 
     Bearer authentication (a.k.a. token authentication) is an HTTP
     authentication scheme based on "bearer tokens", an encrypted JWT generated
@@ -92,9 +94,6 @@ def authenticate_request(request):
     The name "Bearer authentication" can be understood as: "give access to the
     bearer of this token." These tokens _must_ be sent in the `Authorization`
     header of HTTP requests, and _must_ have the format: `Bearer <token>`.
-
-    Oppia specifically expects the token to have a Subject Identifier for the
-    user (Claim Name: 'sub').
 
     Learn more about:
         HTTP authentication schemes:
@@ -105,60 +104,156 @@ def authenticate_request(request):
             https://openid.net/specs/openid-connect-core-1_0.html#IDToken
 
     Args:
-        request: webapp2.Request. The HTTP request to inspect.
+        auth_header: str. The Authorization header taken from the request.
 
     Returns:
-        AuthClaims|None. Claims of the user who authorized the request, or None
-        if the request could not be authenticated.
+        dict(str: *). The Claims embedded into the Authorization header if
+        valid. Otherwise, returns an empty dict.
     """
-    scheme, _, token = request.headers.get('Authorization', '').partition(' ')
+    scheme, _, token = auth_header.partition(' ')
     if scheme != 'Bearer':
-        return None
+        return {}
+    try:
+        with _acquire_firebase_context():
+            return firebase_auth.verify_id_token(token)
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        logging.exception(e)
+        return {}
+
+
+def get_auth_claims_from_request(request):
+    """Authenticates the request and returns claims about its authorizer.
+
+    Oppia specifically expects the request to have a Subject Identifier for the
+    user (Claim Name: 'sub'), and an optional custom claim for super-admin users
+    (Claim Name: 'role').
+
+    Args:
+        request: webapp2.Request. The HTTP request to authenticate.
+
+    Returns:
+        AuthClaims|None. Claims about the currently signed in user. If no user
+        is signed in, then returns None.
+    """
+    claims = _verify_id_token(request.headers.get('Authorization', ''))
+    auth_id = claims.get('sub', None)
+    email = claims.get('email', None)
+    role_is_super_admin = (
+        claims.get('role', None) == feconf.FIREBASE_ROLE_SUPER_ADMIN)
+    if auth_id:
+        return auth_domain.AuthClaims(auth_id, email, role_is_super_admin)
+    return None
+
+
+def mark_user_for_deletion(user_id):
+    """Marks the user, and all of their auth associations, as deleted.
+
+    This function also disables the user's Firebase account so that they cannot
+    be used to sign in.
+
+    Args:
+        user_id: str. The unique ID of the user whose associations should be
+            deleted.
+    """
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+
+    if assoc_by_user_id_model is not None:
+        assoc_by_user_id_model.deleted = True
+        assoc_by_user_id_model.update_timestamps()
+        assoc_by_user_id_model.put()
+
+    assoc_by_auth_id_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
+        if assoc_by_user_id_model is None else
+        auth_models.UserIdByFirebaseAuthIdModel.get(
+            assoc_by_user_id_model.firebase_auth_id, strict=False))
+
+    if assoc_by_auth_id_model is not None:
+        assoc_by_auth_id_model.deleted = True
+        assoc_by_auth_id_model.update_timestamps()
+        assoc_by_auth_id_model.put()
 
     try:
         with _acquire_firebase_context():
-            claims = firebase_auth.verify_id_token(token)
+            firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
-        return None
-
-    auth_id = claims.get('sub', None)
-    email = claims.get('email', None)
-    # Auth ID is a required Claim, so return None when it is missing.
-    return None if not auth_id else auth_domain.AuthClaims(auth_id, email)
 
 
-def delete_auth_associations(user_id):
-    """Deletes associations referring to the given user_id.
+def delete_external_auth_associations(user_id):
+    """Deletes all associations that refer to the user outside of Oppia.
 
     Args:
-        user_id: str. The ID of the user being deleted.
+        user_id: str. The unique ID of the user whose associations should be
+            deleted.
     """
-    assoc_model = (
-        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
-    if assoc_model is None:
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
         return
     try:
         with _acquire_firebase_context():
-            firebase_auth.delete_user(assoc_model.id)
+            firebase_auth.delete_user(auth_id)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
 
 
-def are_auth_associations_deleted(user_id):
-    """Returns whether the Firebase account of the given user ID is deleted."""
-    assoc_model = (
-        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
-    if assoc_model is None:
+def verify_external_auth_associations_are_deleted(user_id):
+    """Returns true if and only if we have successfully verified that all
+    external associations have been deleted.
+
+    Args:
+        user_id: str. The unique ID of the user whose associations should be
+            checked.
+
+    Returns:
+        bool. True if and only if we have successfully verified that all
+        external associations have been deleted.
+    """
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
         return True
     try:
         with _acquire_firebase_context():
-            firebase_auth.get_user(assoc_model.id)
+            firebase_auth.get_user(auth_id)
     except firebase_auth.UserNotFoundError:
         return True
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
     return False
+
+
+def get_auth_id_from_user_id(user_id):
+    """Returns the auth ID associated with the given user ID.
+
+    Args:
+        user_id: str. The user ID.
+
+    Returns:
+        str|None. The auth ID associated with the given user ID, or None if no
+        association exists.
+    """
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+    return (
+        None if assoc_by_user_id_model is None else
+        assoc_by_user_id_model.firebase_auth_id)
+
+
+def get_multi_auth_ids_from_user_ids(user_ids):
+    """Returns the auth IDs associated with the given user IDs.
+
+    Args:
+        user_ids: list(str). The user IDs.
+
+    Returns:
+        list(str|None). The auth IDs associated with each of the given user IDs,
+        or None for associations which don't exist.
+    """
+    return [
+        None if model is None else model.firebase_auth_id
+        for model in auth_models.UserAuthDetailsModel.get_multi(user_ids)
+    ]
 
 
 def get_user_id_from_auth_id(auth_id):
@@ -171,9 +266,11 @@ def get_user_id_from_auth_id(auth_id):
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    assoc_model = (
+    assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
-    return None if assoc_model is None else assoc_model.user_id
+    return (
+        None if assoc_by_auth_id_model is None else
+        assoc_by_auth_id_model.user_id)
 
 
 def get_multi_user_ids_from_auth_ids(auth_ids):
@@ -192,8 +289,7 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     ]
 
 
-@transaction_services.run_in_transaction_wrapper
-def associate_auth_id_to_user_id(auth_id_user_id_pair):
+def associate_auth_id_with_user_id(auth_id_user_id_pair):
     """Commits the association between auth ID and user ID.
 
     Args:
@@ -201,23 +297,44 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
             commit.
 
     Raises:
-        Exception. The auth ID is already associated with a user ID.
+        Exception. The IDs are already associated with a value.
     """
     auth_id, user_id = auth_id_user_id_pair
 
-    collision = get_user_id_from_auth_id(auth_id)
-    if collision is not None:
-        raise Exception('auth_id=%r is already associated to user_id=%r' % (
-            auth_id, collision))
+    user_id_collision = get_user_id_from_auth_id(auth_id)
+    if user_id_collision is not None:
+        raise Exception('auth_id=%r is already associated with user_id=%r' % (
+            auth_id, user_id_collision))
 
-    assoc_model = (
+    auth_id_collision = get_auth_id_from_user_id(user_id)
+    if auth_id_collision is not None:
+        raise Exception('user_id=%r is already associated with auth_id=%r' % (
+            user_id, auth_id_collision))
+
+    # A new {auth_id: user_id} mapping needs to be created. We know the model
+    # doesn't exist because get_auth_id_from_user_id returned None.
+    assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id))
-    assoc_model.update_timestamps()
-    assoc_model.put()
+    assoc_by_auth_id_model.update_timestamps()
+    assoc_by_auth_id_model.put()
+
+    # The {user_id: auth_id} mapping needs to be created, but the model used to
+    # store the relationship might already exist because other services use it
+    # as well (e.g. user_services uses UserAuthDetailsModel.parent_user_id). In
+    # such situations, the return value of get_auth_id_from_user_id would be
+    # None, so that isn't strong enough to determine whether we need to create a
+    # new model rather than update an existing one.
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+    if (assoc_by_user_id_model is None or
+            assoc_by_user_id_model.firebase_auth_id is None):
+        assoc_by_user_id_model = auth_models.UserAuthDetailsModel(
+            id=user_id, firebase_auth_id=auth_id)
+        assoc_by_user_id_model.update_timestamps()
+        assoc_by_user_id_model.put()
 
 
-@transaction_services.run_in_transaction_wrapper
-def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
+def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
     """Commits the associations between auth IDs and user IDs.
 
     Args:
@@ -225,23 +342,54 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
             associations to commit.
 
     Raises:
-        Exception. One or more auth ID associations already exist.
+        Exception. One or more auth associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
     auth_ids, user_ids = python_utils.ZIP(*auth_id_user_id_pairs)
 
-    collisions = get_multi_user_ids_from_auth_ids(auth_ids)
-    if any(user_id is not None for user_id in collisions):
-        collisions = ', '.join(
+    user_id_collisions = get_multi_user_ids_from_auth_ids(auth_ids)
+    if any(user_id is not None for user_id in user_id_collisions):
+        user_id_collisions = ', '.join(
             '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
-            for auth_id, user_id in python_utils.ZIP(auth_ids, collisions)
+            for auth_id, user_id in python_utils.ZIP(
+                auth_ids, user_id_collisions)
             if user_id is not None)
-        raise Exception('already associated: %s' % collisions)
+        raise Exception('already associated: %s' % user_id_collisions)
 
-    assoc_models = [
+    auth_id_collisions = get_multi_auth_ids_from_user_ids(user_ids)
+    if any(auth_id is not None for auth_id in auth_id_collisions):
+        auth_id_collisions = ', '.join(
+            '{user_id=%r: auth_id=%r}' % (user_id, auth_id)
+            for user_id, auth_id in python_utils.ZIP(
+                user_ids, auth_id_collisions)
+            if auth_id is not None)
+        raise Exception('already associated: %s' % auth_id_collisions)
+
+    # A new {auth_id: user_id} mapping needs to be created. We know the model
+    # doesn't exist because get_auth_id_from_user_id returned None.
+    assoc_by_auth_id_models = [
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
     auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(
-        assoc_models)
-    auth_models.UserIdByFirebaseAuthIdModel.put_multi(assoc_models)
+        assoc_by_auth_id_models)
+    auth_models.UserIdByFirebaseAuthIdModel.put_multi(assoc_by_auth_id_models)
+
+    # The {user_id: auth_id} mapping needs to be created, but the model used to
+    # store the relationship might already exist because other services use it
+    # as well (e.g. user_services uses UserAuthDetailsModel.parent_user_id). In
+    # such situations, the return value of get_multi_auth_ids_from_user_ids
+    # would be None, so that isn't strong enough to determine whether we need to
+    # create a new model rather than update an existing one.
+    assoc_by_user_id_models = [
+        auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id)
+        for auth_id, user_id, assoc_by_user_id_model in python_utils.ZIP(
+            auth_ids, user_ids,
+            auth_models.UserAuthDetailsModel.get_multi(user_ids))
+        if (assoc_by_user_id_model is None or
+            assoc_by_user_id_model.firebase_auth_id is None)
+    ]
+    if assoc_by_user_id_models:
+        auth_models.UserAuthDetailsModel.update_timestamps_multi(
+            assoc_by_user_id_models)
+        auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
