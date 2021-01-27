@@ -396,6 +396,7 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
+/core/domain/subtopic_*.py @aks68
 /core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
