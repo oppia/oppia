@@ -30,22 +30,24 @@ export class SelectSkillComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
-  @Input() sortedSkillSummaries: Array<string>;
-  @Input() selectedSkillId: string;  // type???
+  @Input() sortedSkillSummaries: string[];
+  @Input() selectedSkillId: string; // Check type.
   @Input() countOfSkillsToPrioritize: number;
-  @Input() categorizedSkills: {};
-  @Input() untriagedSkillSummaries: Array<string>;
+  @Input('categorizedSkills') inputCategorizedSkills: {};
+  @Input() untriagedSkillSummaries: string[];
   @Input() allowSkillsFromOtherTopics: boolean;
+  categorizedSkills = null;
   selectedSkill = null;
   topicFilterList = [];
   subTopicFilterDict = {};
   intialSubTopicFilterDict = {};
 
   constructor() {
-    this.selectedSkill = null
+    this.selectedSkill = null;
+    this.categorizedSkills = this.inputCategorizedSkills
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     for (var topicName in this.categorizedSkills) {
       var topicNameDict = {
         topicName: topicName,
@@ -65,11 +67,11 @@ export class SelectSkillComponent implements OnInit {
     this.intialSubTopicFilterDict = angular.copy(this.subTopicFilterDict);
   }
 
-  checkIfEmpty(skills): boolean {
+  checkIfEmpty(skills: any): boolean {
     return skills.length === 0;
   }
 
-  checkIfTopicIsEmpty(topicName): boolean {
+  checkIfTopicIsEmpty(topicName: any): boolean {
     for (let key in this.categorizedSkills[topicName]) {
       if (Object.keys(this.categorizedSkills[topicName][key]).length) {
         return true;
@@ -78,13 +80,13 @@ export class SelectSkillComponent implements OnInit {
     return false;
   }
 
-  setSelectedSkillId() {
+  setSelectedSkillId(): void {
     this.selectedSkillId = this.selectedSkill;
-  };
-    
+  }
+  
   // The folowing function is called when the subtopic filter changes.
   // This updates the list of Skills displayed in the selector.
-  updateSkillsListOnSubtopicFilterChange() {
+  updateSkillsListOnSubtopicFilterChange(): void {
     var updatedSkillsDict = {};
     var isAnySubTopicChecked = false;
     for (var topicName in this.subTopicFilterDict) {
@@ -94,10 +96,10 @@ export class SelectSkillComponent implements OnInit {
           if (!updatedSkillsDict.hasOwnProperty(topicName)) {
             updatedSkillsDict[topicName] = {};
           }
-          var categorizedSkills = this.categorizedSkills;
+          var tempCategorizedSkills = this.inputCategorizedSkills;
           var subTopicName = subTopics[i].subTopicName;
-          updatedSkillsDict[topicName][subTopicName] = (
-            categorizedSkills[topicName][subTopicName]);
+          updatedSkillsDict[topicName][subTopicName] =
+            tempCategorizedSkills[topicName][subTopicName];
           isAnySubTopicChecked = true;
         }
       }
@@ -108,10 +110,9 @@ export class SelectSkillComponent implements OnInit {
       var isAnyTopicChecked = false;
       for (var i = 0; i < this.topicFilterList.length; i++) {
         if (this.topicFilterList[i].checked) {
-          var categorizedSkills = this.categorizedSkills;
+          var tempCategorizedSkills = this.inputCategorizedSkills;
           var topicName:string = this.topicFilterList[i].topicName;
-          updatedSkillsDict[topicName] = (
-            categorizedSkills[topicName]);
+          updatedSkillsDict[topicName] = tempCategorizedSkills[topicName];
           isAnyTopicChecked = true;
         }
       }
@@ -120,7 +121,7 @@ export class SelectSkillComponent implements OnInit {
       } else {
         // If no filter is applied on both subtopics and topics, we
         // need to display all the skills (the original list).
-        this.categorizedSkills = this.categorizedSkills;
+        this.categorizedSkills = this.inputCategorizedSkills
       }
     } else {
       this.categorizedSkills = angular.copy(updatedSkillsDict);
