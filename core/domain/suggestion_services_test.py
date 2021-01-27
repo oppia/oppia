@@ -1327,8 +1327,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'new_value': recorded_voiceovers_dict,
         })
-        exp_services.update_exploration(self.editor_id, exploration.id,
-            [content_change, recorded_voiceovers_change] , '')
+        exp_services.update_exploration(
+            self.editor_id, exploration.id,
+            [content_change, recorded_voiceovers_change], '')
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
