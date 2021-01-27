@@ -135,6 +135,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
+  // Adding this comment so I can create a draft PR
   it('should prevent going back when help card is shown', async function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
