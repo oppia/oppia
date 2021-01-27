@@ -152,7 +152,7 @@
         "core.domain.email_jobs_one_off_test",
         "core.domain.platform_parameter_list_test",
         "core.domain.exp_fetchers_test",
-        "core.domain.rule_registry_test",
+        "core.domain.rules_registry_test",
         "core.domain.collection_domain_test",
         "core.domain.topic_fetchers_test",
         "core.domain.stats_domain_test",
