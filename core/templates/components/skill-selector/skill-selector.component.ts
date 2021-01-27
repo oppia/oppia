@@ -23,7 +23,7 @@ require('domain/utilities/url-interpolation.service.ts');
 
 @Component({
   selector: 'select-skill',
-  templateUrl: './skill-selector.directive.html',
+  templateUrl: './skill-selector.component.html',
   styleUrls: []
 })
 export class SelectSkillComponent implements OnInit {
@@ -36,7 +36,7 @@ export class SelectSkillComponent implements OnInit {
   @Input() categorizedSkills: {};
   @Input() untriagedSkillSummaries: Array<string>;
   @Input() allowSkillsFromOtherTopics: boolean;
-  selectedSkill: any;
+  selectedSkill = null;
   topicFilterList = [];
   subTopicFilterDict = {};
   intialSubTopicFilterDict = {};
@@ -62,8 +62,7 @@ export class SelectSkillComponent implements OnInit {
         this.subTopicFilterDict[topicName].push(subTopicNameDict);
       }
     }
-    this.intialSubTopicFilterDict = angular.copy(
-      this.subTopicFilterDict);
+    this.intialSubTopicFilterDict = angular.copy(this.subTopicFilterDict);
   }
 
   checkIfEmpty(skills): boolean {
