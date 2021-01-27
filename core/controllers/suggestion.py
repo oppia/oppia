@@ -154,6 +154,12 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
+        """Handles PUT requests.
+
+        Args:
+            target_id: str. The ID of the suggestion target.
+            suggestion_id: str. The ID of the suggestion.
+        """
         if (
                 suggestion_id.split('.')[0] !=
                 feconf.ENTITY_TYPE_EXPLORATION):
@@ -197,6 +203,11 @@ class ResubmitSuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
+        """Handles PUT requests.
+
+        Args:
+            suggestion_id: str. The ID of the suggestion.
+        """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         new_change = self.payload.get('change')
         change_cls = type(suggestion.change)
@@ -213,6 +224,12 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
+        """Handles PUT requests.
+
+        Args:
+            target_id: str. The ID of the suggestion target.
+            suggestion_id: str. The ID of the suggestion.
+        """
         if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_SKILL:
             raise self.InvalidInputException(
                 'This handler allows actions only on suggestions to skills.')
@@ -317,7 +334,12 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
 
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            target_type: str. The type of the suggestion target.
+            suggestion_type: str. The type of the suggestion.
+        """
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
         suggestions = suggestion_services.get_submitted_suggestions(
