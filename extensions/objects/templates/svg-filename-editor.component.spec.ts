@@ -492,6 +492,16 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('circle');
   });
 
+  it('should set title with onOpen color picker function', function() {
+    setTimeout(() => {
+      svgFilenameCtrl.bgPicker.onOpen();
+      let alphaSliders = document.querySelectorAll(
+        '.picker_alpha .picker_selector');
+      alphaSliders.forEach(function(element) {
+        expect(element.getAttribute('title')).toBe('Transparency Slider');
+      });
+    }, 1000);
+  });
 
   it('should trigger object selection and scaling events', function() {
     svgFilenameCtrl.createRect();
