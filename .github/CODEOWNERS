@@ -395,6 +395,7 @@
 
 # Story project.
 /core/controllers/story*.py @aks681
+core/domain/subtopic_*.py @aks681
 /core/domain/story*.py @aks681
 /core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
@@ -444,7 +445,6 @@
 /core/domain/job_validators*.py @vojtechjelinek
 /core/domain/prod_validators*.py @vojtechjelinek
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
-/core/domain/subtopic_validators*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
 /core/jobs*.py @seanlip
 /core/platform/ @seanlip
