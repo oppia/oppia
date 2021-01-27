@@ -63,7 +63,7 @@ class MockEditableStoryBackendApiService {
   changeStoryPublicationStatus() {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
-        resolve();
+        resolve({});
       } else {
         reject();
       }
