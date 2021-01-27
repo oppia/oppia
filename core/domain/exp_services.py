@@ -465,7 +465,7 @@ def apply_change_list(exploration_id, change_list):
                             'Expected written_translations to be a dict, '
                             'received %s' % change.new_value)
                     cleaned_written_translations_dict = (
-                        state_domain.WrittenTranslations.from_dict
+                        state_domain.WrittenTranslations
                         .convert_html_in_written_translations(
                             change.new_value, html_cleaner.clean))
                     written_translations = (
