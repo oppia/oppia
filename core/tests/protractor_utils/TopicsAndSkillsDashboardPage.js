@@ -157,8 +157,8 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.navigateToTopicWithIndex = async function(index) {
     await this.waitForTopicsToLoad();
-    await waitFor.visibilityOf(topicEditOptions,
-      'Topic edit options taking to long to appear');
+    await waitFor.visibilityOf(
+      topicEditOptions, 'Topic edit options taking to long to appear');
     await action.click(
       'Topic edit option', topicEditOptions.get(index));
     await action.click(
