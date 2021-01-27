@@ -2144,7 +2144,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
         self.assertEqual(
             len(model_class.get_by_id('model_id-0').commit_message),
             375)
-    
+
     def test_message_truncated_correctly_commit_log_entry(self):
         """Ensures the job corretly shrinks commit message lengths for
         CommitLogEntryModel.
