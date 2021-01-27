@@ -25,18 +25,16 @@ import re
 import sys
 
 import python_utils
+from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+_PYLINT_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'pylint-%s' % common.PYLINT_VERSION)
 sys.path.insert(0, _PYLINT_PATH)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid # isort:skip
-from pylint.checkers import utils # isort:skip
-from pylint.extensions import _check_docs_utils # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
+import astroid # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def space_indentation(s):
@@ -59,7 +57,7 @@ def get_setters_property_name(node):
 
     Returns:
         str|None. The name of the property that the node is a setter for,
-            or None if one could not be found.
+        or None if one could not be found.
     """
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
@@ -78,9 +76,9 @@ def get_setters_property(node):
 
     Returns:
         astroid.FunctionDef|None. The node relating to the property of
-            the given setter node, or None if one could not be found.
+        the given setter node, or None if one could not be found.
     """
-    property_ = None
+    setters_property = None
 
     property_name = get_setters_property_name(node)
     class_node = utils.node_frame_class(node)
@@ -88,10 +86,10 @@ def get_setters_property(node):
         class_attrs = class_node.getattr(node.name)
         for attr in class_attrs:
             if utils.decorated_with_property(attr):
-                property_ = attr
+                setters_property = attr
                 break
 
-    return property_
+    return setters_property
 
 
 def returns_something(return_node):
@@ -101,8 +99,8 @@ def returns_something(return_node):
         return_node: astroid.Return. The return node to check.
 
     Returns:
-        bool. True if the return node returns a value
-            other than None, False otherwise.
+        bool. True if the return node returns a value other than None, False
+        otherwise.
     """
     returns = return_node.value
 
@@ -150,9 +148,9 @@ def possible_exc_types(node):
 
         if handler and handler.type:
             inferred_excs = astroid.unpack_infer(handler.type)
-            excs = (exc.name for exc in inferred_excs
-                    if exc is not astroid.Uninferable)
-
+            excs = (
+                exc.name for exc in inferred_excs
+                if exc is not astroid.Uninferable)
 
     try:
         return set(
@@ -171,7 +169,7 @@ def docstringify(docstring):
 
     Returns:
         Docstring. Pylint Docstring class instance representing
-            a node's docstring.
+        a node's docstring.
     """
     for docstring_type in [GoogleDocstring]:
         instance = docstring_type(docstring)
@@ -185,8 +183,10 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """Class for checking whether docstrings follow the Google Python Style
     Guide.
     """
+
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
-    re_param_line = re.compile(r"""
+    re_param_line = re.compile(
+        r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
         \s*  ( [:]
             \s*
@@ -198,7 +198,8 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
-    re_returns_line = re.compile(r"""
+    re_returns_line = re.compile(
+        r"""
         \s* (({type}|\S*).)?              # identifier
         \s* (.*)                          # beginning of description
     """.format(
@@ -206,6 +207,14 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     ), flags=re.X | re.S | re.M)
 
     re_yields_line = re_returns_line
+
+    re_raise_line = re.compile(
+        r"""
+        \s* ({type}|\S*)?[.:]                    # identifier
+        \s* (.*)                         # beginning of description
+    """.format(
+        type=re_multiple_type,
+    ), flags=re.X | re.S | re.M)
 
 
 class ASTDocStringChecker(python_utils.OBJECT):
@@ -265,7 +274,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
 
         Returns:
             list(str). Each str contains an error message. If no linting
-                errors were found, the list will be empty.
+            errors were found, the list will be empty.
         """
         results = []
 
@@ -301,7 +310,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
             function_node: ast node object. Represents a function.
 
         Returns:
-            func_result: list(str). List of docstring errors associated with
+            list(str). List of docstring errors associated with
             the function. If the function has no errors, the list is empty.
         """
         func_def_args = cls.get_args_list_from_function_definition(

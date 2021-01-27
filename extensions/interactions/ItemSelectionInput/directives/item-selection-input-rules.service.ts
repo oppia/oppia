@@ -15,11 +15,13 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
-
 import { RemoveDuplicatesInArrayPipe } from
   'filters/remove-duplicates-in-array.pipe';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { ItemSelectionAnswer } from 'interactions/answer-defs';
+import { ItemSelectionRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,39 +30,43 @@ export class ItemSelectionInputRulesService {
   private removeDuplicatesInArrayPipe: RemoveDuplicatesInArrayPipe = (
     new RemoveDuplicatesInArrayPipe());
 
-  Equals(answer: string[], inputs: {x: string[]}): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
+  Equals(
+      answer: ItemSelectionAnswer,
+      inputs: ItemSelectionRuleInputs): boolean {
+    const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
+    const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
+      inputs.x);
     return normalizedAnswer.length === normalizedInput.length &&
-        normalizedAnswer.every((val) => {
-          return normalizedInput.indexOf(val) !== -1;
-        });
+    normalizedAnswer.every(val => normalizedInput.includes(val));
   }
-  ContainsAtLeastOneOf(answer: string[], inputs: {x: string[]}): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
-    return normalizedAnswer.some((val) => {
-      return normalizedInput.indexOf(val) !== -1;
-    });
+  ContainsAtLeastOneOf(
+      answer: ItemSelectionAnswer,
+      inputs: ItemSelectionRuleInputs): boolean {
+    const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
+    const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
+      inputs.x);
+    return normalizedAnswer.some(val => normalizedInput.includes(val));
   }
   // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
   // in sync with the backend migration of the same rule.
-  DoesNotContainAtLeastOneOf(answer: string[], inputs: {x: string[]}): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
-    return normalizedInput.some((val) => {
-      return normalizedAnswer.indexOf(val) === -1;
-    });
+  DoesNotContainAtLeastOneOf(
+      answer: ItemSelectionAnswer,
+      inputs: ItemSelectionRuleInputs): boolean {
+    const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
+    const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
+      inputs.x);
+    return normalizedInput.some(val => !normalizedAnswer.includes(val));
   }
   // This function checks if the answer
   // given by the user is a subset of the correct answers.
-  IsProperSubsetOf(answer: string[], inputs: {x: string[]}): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
+  IsProperSubsetOf(
+      answer: ItemSelectionAnswer,
+      inputs: ItemSelectionRuleInputs): boolean {
+    const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
+    const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
+      inputs.x);
     return normalizedAnswer.length < normalizedInput.length &&
-        normalizedAnswer.every((val) => {
-          return normalizedInput.indexOf(val) !== -1;
-        });
+    normalizedAnswer.every(val => normalizedInput.includes(val));
   }
 }
 

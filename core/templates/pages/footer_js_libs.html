@@ -1,0 +1,17 @@
+@load('base-components/no-script.template.html')
+
+<!-- This code is used for inserting webpack bundles
+    https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+<% for (var chunk in htmlWebpackPlugin.files.js) { %>
+  <% if (webpackConfig.mode == 'production') { %>
+    <script src="/build/webpack_bundles/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } else { %>
+    <script src="/webpack_bundles/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } %>
+<% } %>
+
+<% if (webpackConfig.mode == 'production') { %>
+  <script src="/third_party/generated/js/third_party.min.js"></script>
+<% } else { %>
+  <script src="/third_party/generated/js/third_party.js"></script>
+<% } %>

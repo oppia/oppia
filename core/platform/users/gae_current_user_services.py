@@ -14,19 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides a seam for user-related services."""
+"""Provides a seam for user-related services.
+
+TODO(#11462): Remove this file and its clients once we've migrated to Firebase.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 import feconf
-import python_utils
 import utils
 
 from google.appengine.api import users
-from google.appengine.ext import ndb
 
 
 def create_login_url(slug):
@@ -41,66 +40,3 @@ def create_login_url(slug):
     return users.create_login_url(
         dest_url=utils.set_url_query_parameter(
             feconf.SIGNUP_URL, 'return_url', slug))
-
-
-def get_current_user():
-    """Returns the current user."""
-    return users.get_current_user()
-
-
-def is_current_user_super_admin():
-    """Checks whether the current user owns this app."""
-    return users.is_current_user_admin()
-
-
-def get_gae_id_from_email(email):
-    """Given an email address, returns a gae id.
-
-    Returns None if the email address does not correspond to a valid user id.
-    """
-    class _FakeUser(ndb.Model):
-        """A fake user class."""
-        _use_memcache = False
-        _use_cache = False
-        user = ndb.UserProperty(required=True)
-
-    try:
-        fake_user = users.User(email)
-    except users.UserNotFoundError:
-        logging.error(
-            'The email address %s does not correspond to a valid user_id'
-            % email)
-        return None
-
-    key = _FakeUser(id=email, user=fake_user).put()
-    obj = _FakeUser.get_by_id(key.id())
-    # GAE uses the naming 'user_id' internally, we call the GAE user_id just a
-    # gae_id in our code.
-    gae_id = obj.user.user_id()
-    return python_utils.convert_to_bytes(gae_id) if gae_id else None
-
-
-def get_current_gae_id():
-    """Gets the user_id of current user.
-
-    Returns:
-        str or None. User id for the current user.
-    """
-    user = get_current_user()
-    if user is None:
-        return None
-    else:
-        return user.user_id()
-
-
-def get_current_user_email():
-    """Get the email for current user.
-
-    Returns:
-        str or None. Email for the current user.
-    """
-    user = get_current_user()
-    if user is None:
-        return None
-    else:
-        return user.email()

@@ -24,28 +24,59 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Text Input rules service', () => {
-  var tirs: TextInputRulesService = null;
+  let tirs: TextInputRulesService;
+
+  let RULE_INPUT, RULE_INPUT_PLURAL, RULE_INPUT_EMPTY;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
     });
     tirs = TestBed.get(TextInputRulesService);
+
+    RULE_INPUT = {
+      x: {
+        contentId: 'rule_input',
+        normalizedStrSet: ['abc def']
+      }
+    };
+
+    RULE_INPUT_PLURAL = {
+      x: {
+        contentId: 'rule_input',
+        normalizedStrSet: ['testing', 'abc def']
+      }
+    };
+
+    RULE_INPUT_EMPTY = {
+      x: {
+        contentId: 'rule_input',
+        normalizedStrSet: []
+      }
+    };
   });
 
-  var RULE_INPUT = {
-    x: 'abc def'
-  };
-
   it('should have a correct \'equals\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.Equals('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('ABC def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('abc DeF', RULE_INPUT)).toBe(true);
     expect(tirs.Equals(' abc   DeF ', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('', RULE_INPUT)).toBe(false);
     expect(tirs.Equals('abc', RULE_INPUT)).toBe(false);
+
+    expect(tirs.Equals('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals('ABC def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals('abc DeF', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals(' abc   DeF ', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals('', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.Equals('abc', RULE_INPUT_PLURAL)).toBe(false);
   });
 
   it('should have a correct \'fuzzy equals\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.FuzzyEquals('ABC DEF', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('acc def', RULE_INPUT)).toBe(true);
@@ -59,27 +90,43 @@ describe('Text Input rules service', () => {
     expect(tirs.FuzzyEquals('abc', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('dbc deg', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT)).toBe(false);
-  });
 
-  it('should have a correct \'case sensitive equals\' rule', () => {
-    expect(tirs.CaseSensitiveEquals('abc def', RULE_INPUT)).toBe(true);
-    expect(tirs.CaseSensitiveEquals('abc   def ', RULE_INPUT)).toBe(true);
-    expect(tirs.CaseSensitiveEquals('ABC def', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('abc DeF', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('abc', RULE_INPUT)).toBe(false);
+    expect(tirs.FuzzyEquals('ABC DEF', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('acc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('ab def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('cbc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abcd def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abc defg', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('aBC DEfg', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('aabc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals(' aBC  DEfg  ', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abc', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.FuzzyEquals('dbc deg', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT_PLURAL)).toBe(false);
   });
 
   it('should have a correct \'starts with\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc defghi', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('ABC DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('fabc defghi', RULE_INPUT)).toBe(false);
     expect(tirs.StartsWith('cde', RULE_INPUT)).toBe(false);
+
+    expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('abc defghi', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('ABC DEFGHI', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('fabc defghi', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.StartsWith('cde', RULE_INPUT_PLURAL)).toBe(false);
   });
 
   it('should have a correct \'contains\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.Contains(' abc  def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('ghabc defjk', RULE_INPUT)).toBe(true);
@@ -87,5 +134,13 @@ describe('Text Input rules service', () => {
     expect(tirs.Contains('abcdef', RULE_INPUT)).toBe(false);
     expect(tirs.Contains('fabcd', RULE_INPUT)).toBe(false);
     expect(tirs.Contains('ab', RULE_INPUT)).toBe(false);
+
+    expect(tirs.Contains(' abc  def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('ghabc defjk', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('GHABC DEFJK', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('abcdef', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.Contains('fabcd', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.Contains('ab', RULE_INPUT_PLURAL)).toBe(false);
   });
 });

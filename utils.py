@@ -30,6 +30,7 @@ import string
 import sys
 import time
 import unicodedata
+import zlib
 
 from constants import constants
 import feconf
@@ -40,14 +41,21 @@ sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
+DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
+SECONDS_IN_HOUR = 60 * 60
+SECONDS_IN_MINUTE = 60
+
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
+
     pass
 
 
 class ValidationError(Exception):
     """Error class for when a domain object fails validation."""
+
     pass
 
 
@@ -55,6 +63,7 @@ class ExplorationConversionError(Exception):
     """Error class for when an exploration fails to convert from a certain
     version to a certain version.
     """
+
     pass
 
 
@@ -62,8 +71,8 @@ def create_enum(*sequential, **names):
     """Creates a enumerated constant.
 
     Args:
-        sequential: *. Sequence List to generate the enumerations.
-        names: *. Names of the enumerration.
+        *sequential: *. Sequence List to generate the enumerations.
+        **names: *. Names of the enumerration.
 
     Returns:
         dict. Dictionary containing the enumerated constants.
@@ -82,17 +91,23 @@ def get_file_contents(filepath, raw_bytes=False, mode='r'):
 
     Returns:
         *. Either the raw_bytes stream if the flag is set or the
-            decoded stream in utf-8 format.
+        decoded stream in utf-8 format.
     """
-    with open(filepath, mode) as f:
-        return f.read() if raw_bytes else f.read().decode('utf-8')
+    if raw_bytes:
+        mode = 'rb'
+        encoding = None
+    else:
+        encoding = 'utf-8'
+
+    with python_utils.open_file(filepath, mode, encoding=encoding) as f:
+        return f.read()
 
 
 def get_exploration_components_from_dir(dir_path):
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
-        dir_path: str. a full path to the exploration root directory.
+        dir_path: str. A full path to the exploration root directory.
 
     Returns:
         *. A 2-tuple, the first element of which is a yaml string, and the
@@ -100,8 +115,9 @@ def get_exploration_components_from_dir(dir_path):
         The filepath does not include the assets/ prefix.
 
     Raises:
-      Exception: if the following condition doesn't hold: "There is exactly one
-        file not in assets/, and this file has a .yaml suffix".
+        Exception. If the following condition doesn't hold: "There
+            is exactly one file not in assets/, and this file has a
+            .yaml suffix".
     """
     yaml_content = None
     assets_list = []
@@ -151,7 +167,7 @@ def get_comma_sep_string_from_list(items):
     """Turns a list of items into a comma-separated string.
 
     Args:
-        items: list. List of the items.
+        items: list(str). List of the items.
 
     Returns:
         str. String containing the items in the list separated by commas.
@@ -189,7 +205,7 @@ def dict_from_yaml(yaml_str):
         dict. Parsed dict representation of the yaml string.
 
     Raises:
-        InavlidInputException: If the yaml string sent as the
+        InavlidInputException. If the yaml string sent as the
             parameter is unable to get parsed, them this error gets
             raised.
     """
@@ -197,7 +213,7 @@ def dict_from_yaml(yaml_str):
         retrieved_dict = yaml.safe_load(yaml_str)
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
-    except yaml.YAMLError as e:
+    except (AssertionError, yaml.YAMLError) as e:
         raise InvalidInputException(e)
 
 
@@ -242,10 +258,10 @@ def get_random_choice(alist):
     """Gets a random element from a list.
 
     Args:
-       alist: list(*). Input to get a random choice.
+        alist: list(*). Input to get a random choice.
 
     Returns:
-       *. Random element choosen from the passed input list.
+        *. Random element choosen from the passed input list.
     """
     assert isinstance(alist, list) and len(alist) > 0
 
@@ -253,21 +269,44 @@ def get_random_choice(alist):
     return alist[index]
 
 
+def convert_png_data_url_to_binary(image_data_url):
+    """Converts a PNG base64 data URL to a PNG binary data.
+
+    Args:
+        image_data_url: str. A string that is to be interpreted as a PNG
+            data URL.
+
+    Returns:
+        str. Binary content of the PNG created from the data URL.
+
+    Raises:
+        Exception. The given string does not represent a PNG data URL.
+    """
+    if image_data_url.startswith(PNG_DATA_URL_PREFIX):
+        return base64.b64decode(
+            python_utils.urllib_unquote(
+                image_data_url[len(PNG_DATA_URL_PREFIX):]))
+    else:
+        raise Exception('The given string does not represent a PNG data URL.')
+
+
 def convert_png_binary_to_data_url(content):
-    """Converts a png image string (represented by 'content') to a data URL.
+    """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
         content: str. PNG binary file content.
 
     Returns:
-        str. Data url created from the binary content of the PNG.
+        str. Data URL created from the binary content of the PNG.
 
     Raises:
-        Exception: If the given binary string is not of a PNG image.
+        Exception. The given binary string does not represent a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % python_utils.url_quote(
-            base64.b64encode(content))
+        return '%s%s' % (
+            PNG_DATA_URL_PREFIX,
+            python_utils.url_quote(base64.b64encode(content))
+        )
     else:
         raise Exception('The given string does not represent a PNG image.')
 
@@ -323,7 +362,7 @@ def set_url_query_parameter(url, param_name, param_value):
         str. Formated URL that has query parameter set or replaced.
 
     Raises:
-        Exception: If the query parameter sent is not of string type,
+        Exception. If the query parameter sent is not of string type,
             them this exception is raised.
     """
     if not isinstance(param_name, python_utils.BASESTRING):
@@ -365,10 +404,10 @@ def convert_to_hash(input_string, max_length):
 
     Returns:
         str. Hash Value generated from the input_String of the
-            specified length.
+        specified length.
 
     Raises:
-        Exception: If the input string is not the instance of the str,
+        Exception. If the input string is not the instance of the str,
             them this exception is raised.
     """
     if not isinstance(input_string, python_utils.BASESTRING):
@@ -408,8 +447,36 @@ def get_time_in_millisecs(datetime_obj):
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    seconds = time.mktime(datetime_obj.utctimetuple()) * 1000
-    return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
+    msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
+    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
+
+
+def convert_naive_datetime_to_string(datetime_obj):
+    """Returns a human-readable string representing the naive datetime object.
+
+    Args:
+        datetime_obj: datetime. An object of type datetime.datetime. Must be a
+            naive datetime object.
+
+    Returns:
+        str. The string representing the naive datetime object.
+    """
+    return datetime_obj.strftime(DATETIME_FORMAT)
+
+
+def convert_string_to_naive_datetime_object(date_time_string):
+    """Returns the naive datetime object equivalent of the date string.
+
+    Args:
+        date_time_string: str. The string format representing the datetime
+            object in the format: Month/Day/Year,
+            Hour:Minute:Second:MicroSecond.
+
+    Returns:
+        datetime. An object of type naive datetime.datetime corresponding to
+        that string.
+    """
+    return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
 
 
 def get_current_time_in_millisecs():
@@ -435,6 +502,45 @@ def get_human_readable_time_string(time_msec):
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
 
 
+def create_string_from_largest_unit_in_timedelta(timedelta_obj):
+    """Given the timedelta object, find the largest nonzero time unit and
+    return that value, along with the time unit, as a human readable string.
+    The returned string is not localized.
+
+    Args:
+        timedelta_obj: datetime.timedelta. A datetime timedelta object. Datetime
+            timedelta objects are created when you subtract two datetime
+            objects.
+
+    Returns:
+        str. A human readable string representing the value of the largest
+        nonzero time unit, along with the time units. If the largest time unit
+        is seconds, 1 minute is returned. The value is represented as an integer
+        in the string.
+
+    Raises:
+        Exception. If the provided timedelta is not positive.
+    """
+    total_seconds = timedelta_obj.total_seconds()
+    if total_seconds <= 0:
+        raise Exception(
+            'Expected a positive timedelta, received: %s.' % total_seconds)
+    elif timedelta_obj.days != 0:
+        return '%s day%s' % (
+            int(timedelta_obj.days), 's' if timedelta_obj.days > 1 else '')
+    else:
+        number_of_hours, remainder = divmod(total_seconds, SECONDS_IN_HOUR)
+        number_of_minutes, _ = divmod(remainder, SECONDS_IN_MINUTE)
+        if number_of_hours != 0:
+            return '%s hour%s' % (
+                int(number_of_hours), 's' if number_of_hours > 1 else '')
+        elif number_of_minutes > 1:
+            return '%s minutes' % int(number_of_minutes)
+        # Round any seconds up to one minute.
+        else:
+            return '1 minute'
+
+
 def are_datetimes_close(later_datetime, earlier_datetime):
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
@@ -445,7 +551,7 @@ def are_datetimes_close(later_datetime, earlier_datetime):
 
     Returns:
         bool. True if difference between two datetimes is less than
-            feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
+        feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -477,7 +583,7 @@ def vfs_construct_path(base_path, *path_components):
 
     Args:
         base_path: str. The initial path upon which components would be added.
-        path_components: list(str). Components that would be added to the path.
+        *path_components: list(str). Components that would be added to the path.
 
     Returns:
         str. The path that is obtained after adding the components.
@@ -507,12 +613,12 @@ def require_valid_name(name, name_type, allow_empty=False):
         allow_empty: bool. If True, empty strings are allowed.
 
     Raises:
-        Exception: Name isn't a string.
-        Exception: The length of the name_type isn't between
+        Exception. Name isn't a string.
+        Exception. The length of the name_type isn't between
             1 and 50.
-        Exception: Name starts or ends with whitespace.
-        Exception: Adjacent whitespace in name_type isn't collapsed.
-        Exception: Invalid character is present in name.
+        Exception. Name starts or ends with whitespace.
+        Exception. Adjacent whitespace in name_type isn't collapsed.
+        Exception. Invalid character is present in name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
@@ -540,6 +646,109 @@ def require_valid_name(name, name_type, allow_empty=False):
             raise ValidationError(
                 'Invalid character %s in %s: %s' %
                 (character, name_type, name))
+
+
+def require_valid_url_fragment(name, name_type, allowed_length):
+    """Generic URL fragment validation.
+
+    Args:
+        name: str. The name to validate.
+        name_type: str. A human-readable string, like 'topic url fragment'.
+            This will be shown in error messages.
+        allowed_length: int. Allowed length for the name.
+
+    Raises:
+        Exception. Name is not a string.
+        Exception. Name is empty.
+        Exception. The length of the name_type is not correct.
+        Exception. Invalid character is present in the name.
+    """
+    if not isinstance(name, python_utils.BASESTRING):
+        raise ValidationError(
+            '%s field must be a string. Received %s.' % (name_type, name))
+
+    if name == '':
+        raise ValidationError(
+            '%s field should not be empty.' % name_type)
+
+    if len(name) > allowed_length:
+        raise ValidationError(
+            '%s field should not exceed %d characters, '
+            'received %s.' % (name_type, allowed_length, name))
+
+    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
+        raise ValidationError(
+            '%s field contains invalid characters. Only lowercase words'
+            ' separated by hyphens are allowed. Received %s.' % (
+                name_type, name))
+
+
+def require_valid_thumbnail_filename(thumbnail_filename):
+    """Generic thumbnail filename validation.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+    if thumbnail_filename is not None:
+        if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+            raise ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % thumbnail_filename)
+        if thumbnail_filename.rfind('.') == 0:
+            raise ValidationError(
+                'Thumbnail filename should not start with a dot.')
+        if '/' in thumbnail_filename or '..' in thumbnail_filename:
+            raise ValidationError(
+                'Thumbnail filename should not include slashes or '
+                'consecutive dot characters.')
+        if '.' not in thumbnail_filename:
+            raise ValidationError(
+                'Thumbnail filename should include an extension.')
+
+        dot_index = thumbnail_filename.rfind('.')
+        extension = thumbnail_filename[dot_index + 1:].lower()
+        if extension != 'svg':
+            raise ValidationError(
+                'Expected a filename ending in svg, received %s' %
+                thumbnail_filename)
+
+
+def require_valid_meta_tag_content(meta_tag_content):
+    """Generic meta tag content validation.
+
+        Args:
+            meta_tag_content: str. The meta tag content to validate.
+        """
+    if not isinstance(meta_tag_content, python_utils.BASESTRING):
+        raise ValidationError(
+            'Expected meta tag content to be a string, received %s'
+            % meta_tag_content)
+    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
+        raise ValidationError(
+            'Meta tag content should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+
+
+def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
+    """Generic page title fragment validation.
+
+    Args:
+        page_title_fragment_for_web: str. The page title fragment to validate.
+
+    Raises:
+        Exception. Page title fragment is not a string.
+        Exception. Page title fragment is too lengthy.
+    """
+    max_chars_in_page_title_frag_for_web = (
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
+        raise ValidationError(
+            'Expected page title fragment to be a string, received %s'
+            % page_title_fragment_for_web)
+    if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
+        raise ValidationError(
+            'Page title fragment should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
 
 
 def capitalize_string(input_string):
@@ -630,12 +839,27 @@ def get_supported_audio_language_description(language_code):
         str. The language description for the given language code.
 
     Raises:
-        Exception: If the given language code is unsupported.
+        Exception. If the given language code is unsupported.
     """
     for language in constants.SUPPORTED_AUDIO_LANGUAGES:
         if language['id'] == language_code:
             return language['description']
     raise Exception('Unsupported audio language code: %s' % language_code)
+
+
+def is_pseudonymous_id(user_id):
+    """Check that the ID is a pseudonymous one.
+
+    Args:
+        user_id: str. The ID to be checked.
+
+    Returns:
+        bool. Whether the ID represents a pseudonymous user.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('pid_'),
+        len(user_id) == feconf.USER_ID_LENGTH))
 
 
 def unescape_encoded_uri_component(escaped_string):
@@ -645,8 +869,7 @@ def unescape_encoded_uri_component(escaped_string):
         escaped_string: str. String that is encoded with encodeURIComponent.
 
     Returns:
-        str. Decoded string that was initially encoded with
-            encodeURIComponent.
+        str. Decoded string that was initially encoded with encodeURIComponent.
     """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
@@ -672,7 +895,7 @@ def get_asset_dir_prefix():
 
     Returns:
         str. Prefix '/build' if constants.DEV_MODE is false, otherwise
-            null string.
+        null string.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
@@ -695,8 +918,8 @@ def get_hashable_value(value):
             each other.
 
     Returns:
-        hashed_value: *. A new object that will always have the same hash for
-            "equivalent" values.
+        *. A new object that will always have the same hash for "equivalent"
+        values.
     """
     if isinstance(value, list):
         return tuple(get_hashable_value(e) for e in value)
@@ -708,6 +931,109 @@ def get_hashable_value(value):
         return value
 
 
+def compress_to_zlib(data):
+    """Compress the data to zlib format for efficient storage and communication.
+
+    Args:
+        data: str. Data to be compressed.
+
+    Returns:
+        str. Compressed data string.
+    """
+    return zlib.compress(data)
+
+
+def decompress_from_zlib(data):
+    """Decompress the zlib compressed data.
+
+    Args:
+        data: str. Data to be decompressed.
+
+    Returns:
+        str. Decompressed data string.
+    """
+    return zlib.decompress(data)
+
+
+def compute_list_difference(list_a, list_b):
+    """Returns the set difference of two lists.
+
+    Args:
+        list_a: list. The first list.
+        list_b: list. The second list.
+
+    Returns:
+        list. List of the set difference of list_a - list_b.
+    """
+    return list(set(list_a) - set(list_b))
+
+
+def is_local_server_environment():
+    """Returns wheter the app is being run locally in a development server.
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running locally on a developer's
+        computer.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Development/' in os.environ['SERVER_SOFTWARE'])
+
+
+def is_appengine_cloud_environment():
+    """Returns whether the app is being run in production in the Google App
+    Engine Cloud.
+
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running in production.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Google App Engine/' in os.environ['SERVER_SOFTWARE'])
+
+
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
+
     pass
+
+
+def is_user_id_valid(user_id):
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
+    """
+    return (
+        user_id in feconf.SYSTEM_USERS.keys() or
+        re.match(feconf.USER_ID_REGEX, user_id) is not None)

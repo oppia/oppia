@@ -25,15 +25,18 @@ require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   'AssetsBackendApiService', 'ContextService',
-  'HtmlEscaperService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'LOADING_INDICATOR_URL',
+  'HtmlEscaperService', 'ImageLocalStorageService', 'ImagePreloaderService',
+  'UrlInterpolationService', 'ENTITY_TYPE',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
-      HtmlEscaperService, ImagePreloaderService,
-      UrlInterpolationService, LOADING_INDICATOR_URL) {
+      HtmlEscaperService, ImageLocalStorageService, ImagePreloaderService,
+      UrlInterpolationService, ENTITY_TYPE,
+      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -50,17 +53,27 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             LOADING_INDICATOR_URL);
           ctrl.isLoadingIndicatorShown = false;
           ctrl.isTryAgainShown = false;
+          ctrl.dimensions = (
+            ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
+          ctrl.imageContainerStyle = {
+            height: ctrl.dimensions.height + 'px',
+            width: ctrl.dimensions.width + 'px'
+          };
 
-          if (ImagePreloaderService.inExplorationPlayer()) {
+          // If viewing a concept card in the exploration player, don't use the
+          // preloader service. Since, in that service, the image file names are
+          // extracted from the state contents to be preloaded, but when
+          // viewing a concept, the names are not available until the link is
+          // clicked, at which point an API call is done to get the skill
+          // details. So, the image file name will not be available to the
+          // preloader service beforehand.
+          if (
+            ImagePreloaderService.inExplorationPlayer() &&
+            !ContextService.getEntityType() === ENTITY_TYPE.SKILL) {
             ctrl.isLoadingIndicatorShown = true;
-            ctrl.dimensions = (
-              ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
-            // For aligning the gif to the center of it's container
+            // For aligning the gif to the center of it's container.
             var loadingIndicatorSize = (
               (ctrl.dimensions.height < 124) ? 24 : 120);
-            ctrl.imageContainerStyle = {
-              height: ctrl.dimensions.height + 'px'
-            };
             ctrl.loadingIndicatorStyle = {
               height: loadingIndicatorSize + 'px',
               width: loadingIndicatorSize + 'px'
@@ -81,14 +94,27 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             };
             ctrl.loadImage();
           } else {
-            // This is the case when user is in exploration editor or in
-            // preview mode. We don't have loading indicator or try again for
-            // showing images in the exploration editor or in preview mode. So
-            // we directly assign the url to the imageUrl.
+            // This is the case when user is not in the exploration player. We
+            // don't have loading indicator or try again for showing images in
+            // this case. So we directly assign the url to the imageUrl.
             try {
-              ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-                ContextService.getEntityType(), ContextService.getEntityId(),
-                ctrl.filepath);
+              // For IMAGE_SAVE_DESTINATION_LOCAL_STORAGE mode we first try to
+              // fetch images through the storage and if it doesn't exist we try
+              // fetching it through server.
+              // This is required for the translation suggestion as there can be
+              // target entity's images in the translatable content which needs
+              // to be fetched from the server.
+              if (
+                ContextService.getImageSaveDestination() ===
+                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
+                  ImageLocalStorageService.isInStorage(ctrl.filepath))) {
+                ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
+                  ctrl.filepath);
+              } else {
+                ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+                  ContextService.getEntityType(), ContextService.getEntityId(),
+                  ctrl.filepath);
+              }
             } catch (e) {
               var additionalInfo = (
                 '\nEntity type: ' + ContextService.getEntityType() +

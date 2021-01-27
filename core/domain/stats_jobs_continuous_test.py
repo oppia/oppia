@@ -24,8 +24,8 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import stats_jobs_continuous
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -39,16 +39,6 @@ EMPTY_STATE_HIT_COUNTS_DICT = {
         'first_entry_count': 0,
     }
 }
-
-
-class MockInteractionAnswerSummariesAggregator(
-        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
-    """A modified InteractionAnswerSummariesAggregator that does not start
-    a new batch job when the previous one has finished.
-    """
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
 
 
 class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
@@ -71,11 +61,61 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         return stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
 
-    def test_one_answer(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
+    def _disable_batch_continuation(self):
+        """Context manager that stops jobs from continuously batching tasks."""
+        class NonContinuousInteractionAnswerSummariesAggregator(
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator):
+            """A modified InteractionAnswerSummariesAggregator which does not
+            start a new batch job when the previous one has finished.
+            """
 
+            @classmethod
+            def _kickoff_batch_job_after_previous_one_ends(cls):
+                pass
+        return self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            NonContinuousInteractionAnswerSummariesAggregator)
+
+    def test_answers_for_states_with_unicode_names(self):
+        exp_id = 'eid'
+        exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
+        # State names used by our test server to confirm unicode support.
+        unicode_state_names = [
+            'ÐšÐ°ÐºÐ¸Ðµ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸? Ð¤Ñ€Ð°Ð·Ñ‹ Ð½Ð° Ð´Ð¸Ð°Ð',
+            'SadrÅ¾aj 1'
+        ]
+        exp = self.save_new_linear_exp_with_state_names_and_interactions(
+            exp_id, 'author@website.com', unicode_state_names,
+            ['MultipleChoiceInput'])
+
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exp.version, unicode_state_names[0], 'MultipleChoiceInput',
+            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
+            5.0, {}, 'answer1')
+
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exp.version, unicode_state_names[1], 'MultipleChoiceInput',
+            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
+            5.0, {}, 'answer2')
+
+        with self._disable_batch_continuation():
+            job_class, job_manager = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator,
+                stats_jobs_continuous.InteractionAnswerSummariesMRJobManager)
+            job_id = job_class.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_mapreduce_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_mapreduce_tasks()
+            self.assertEqual(
+                self.count_jobs_in_mapreduce_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+        # A successful job should output nothing.
+        self.assertEqual(job_manager.get_output(job_id), [])
+
+    def test_one_answer(self):
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -88,6 +128,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': first_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -95,6 +149,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': second_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
                 })], 'Add new state')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -106,7 +174,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 exp_id, exp_version, first_state_name, 'session1')
             self._record_start(
                 exp_id, exp_version, first_state_name, 'session2')
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             # Add some answers.
             event_services.AnswerSubmissionEventHandler.record(
@@ -131,11 +199,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
@@ -177,10 +245,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(calculation_output, expected_calculation_output)
 
     def test_one_answer_ignored_for_deleted_exploration(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -191,6 +256,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': first_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': first_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
                 })], 'Update interaction type')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -200,7 +279,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             self._record_start(
                 exp_id, exp_version, first_state_name, 'session1')
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             # Add an answer.
             event_services.AnswerSubmissionEventHandler.record(
@@ -216,11 +295,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # There should be no job output corresponding to all versions since
@@ -232,10 +311,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertIsNone(calc_output_model)
 
     def test_answers_across_multiple_exploration_versions(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -248,6 +324,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': first_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -255,6 +345,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': second_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
                 })], 'Add new state')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -273,11 +377,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
@@ -333,11 +437,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Extract the output from the job.
@@ -390,10 +494,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         aggregation job should not include answers corresponding to exploration
         versions which do not match the latest version's interaction ID.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -416,13 +517,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'verb')
 
-            # Change the interaction ID.
+            # Change the interaction.
             exp_services.update_exploration('fake@user.com', exp_id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'NumericInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {},
                 })], 'Change to NumericInput')
 
             exp = exp_fetchers.get_exploration_by_id(exp_id)
@@ -433,11 +540,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
@@ -486,10 +593,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         answers are submitted to the new version, but the interaction ID is the
         same then old answers should still be aggregated.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -532,11 +636,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
@@ -574,10 +678,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         interaction type with answers submitted to both versions of the
         exploration.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -607,6 +708,12 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'NumericInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {},
                 })], 'Change to NumericInput')
 
             # Submit an answer to the numeric interaction.
@@ -622,6 +729,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': init_state_name,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
                 })], 'Change to TextInput')
 
             # Submit another number-like answer.
@@ -664,11 +785,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
@@ -719,10 +840,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 expected_calculation_all_versions_output)
 
     def test_multiple_computations_in_one_job(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -735,6 +853,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'SetInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'ca_buttonText_0',
+                                'unicode_str': 'Enter here'
+                            }
+                        },
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -742,6 +873,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'SetInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'ca_buttonText_0',
+                                'unicode_str': 'Enter here'
+                            }
+                        },
+                    }
                 })], 'Add new state')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -760,11 +904,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Retrieve outputs for all of the computations running on this
@@ -802,10 +946,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     def test_computation_with_different_interaction_id_for_same_exp_passes(
             self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'fake@user.com')
 
@@ -828,9 +969,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)

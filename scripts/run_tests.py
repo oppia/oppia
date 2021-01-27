@@ -36,7 +36,8 @@ from . import run_frontend_tests
 from . import setup
 from . import setup_gae
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.run_tests
 This script runs all the tests, in this order:

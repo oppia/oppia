@@ -20,34 +20,25 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
-from google.appengine.ext import ndb
-
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill snapshot."""
 
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
 
     @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    def get_deletion_policy():
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class SkillModel(base_models.VersionedModel):
@@ -56,70 +47,60 @@ class SkillModel(base_models.VersionedModel):
     This class should only be imported by the skill services file
     and the skill model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = SkillSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SkillSnapshotContentModel
     ALLOW_REVERT = False
 
     # The description of the skill.
-    description = ndb.StringProperty(required=True, indexed=True)
+    description = datastore_services.StringProperty(required=True, indexed=True)
     # The schema version for each of the misconception dicts.
-    misconceptions_schema_version = ndb.IntegerProperty(
+    misconceptions_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The schema version for each of the rubric dicts.
-    rubric_schema_version = ndb.IntegerProperty(
+    rubric_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # A list of misconceptions associated with the skill, in which each
     # element is a dict.
-    misconceptions = ndb.JsonProperty(repeated=True, indexed=False)
+    misconceptions = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
     # The rubrics for the skill that explain each difficulty level.
-    rubrics = ndb.JsonProperty(repeated=True, indexed=False)
+    rubrics = datastore_services.JsonProperty(repeated=True, indexed=False)
     # The ISO 639-1 code for the language this skill is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The schema version for the skill_contents.
-    skill_contents_schema_version = ndb.IntegerProperty(
+    skill_contents_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # A dict representing the skill contents.
-    skill_contents = ndb.JsonProperty(indexed=False)
+    skill_contents = datastore_services.JsonProperty(indexed=False)
     # The prerequisite skills for the skill.
-    prerequisite_skill_ids = ndb.StringProperty(repeated=True, indexed=False)
+    prerequisite_skill_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # The id to be used by the next misconception added.
-    next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
+    next_misconception_id = (
+        datastore_services.IntegerProperty(required=True, indexed=False))
     # The id that the skill is merged into, in case the skill has been
     # marked as duplicate to another one and needs to be merged.
     # This is an optional field.
-    superseding_skill_id = ndb.StringProperty(indexed=True)
+    superseding_skill_id = datastore_services.StringProperty(indexed=True)
     # A flag indicating whether deduplication is complete for this skill.
     # It will initially be False, and set to true only when there is a value
     # for superseding_skill_id and the merge was completed.
-    all_questions_merged = ndb.BooleanProperty(indexed=True, required=True)
+    all_questions_merged = (
+        datastore_services.BooleanProperty(indexed=True, required=True))
 
     @staticmethod
     def get_deletion_policy():
-        """Skill should be kept if it is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether SkillModel snapshots references the given user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_merged_skills(cls):
         """Returns the skill models which have been merged.
 
-        Returns: list(SkillModel). List of skill models which have been merged.
+        Returns:
+            list(SkillModel). List of skill models which have been merged.
         """
 
         return [skill for skill in cls.query() if (
@@ -147,24 +128,38 @@ class SkillModel(base_models.VersionedModel):
         super(SkillModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
+        skill_commit_log_entry.update_timestamps()
         skill_commit_log_entry.put()
 
     @staticmethod
-    def get_export_policy():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconceptions_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubric_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconceptions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubrics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'prerequisite_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_misconception_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'superseding_skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -173,18 +168,11 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     SkillModel occurs.
 
-    The id for this model is of the form
-    'skill-{{SKILL_ID}}-{{SKILL_VERSION}}'.
+    The id for this model is of the form 'skill-[skill_id]-[version]'.
     """
-    # The id of the skill being edited.
-    skill_id = ndb.StringProperty(indexed=True, required=True)
 
-    @staticmethod
-    def get_deletion_policy():
-        """Skill commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+    # The id of the skill being edited.
+    skill_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @classmethod
     def _get_instance_id(cls, skill_id, version):
@@ -201,11 +189,21 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'skill-%s-%s' % (skill_id, version)
 
     @staticmethod
-    def get_export_policy():
+    def get_model_association_to_user():
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SkillSummaryModel(base_models.BaseModel):
@@ -222,47 +220,90 @@ class SkillSummaryModel(base_models.BaseModel):
     """
 
     # The description of the skill.
-    description = ndb.StringProperty(required=True, indexed=True)
+    description = datastore_services.StringProperty(required=True, indexed=True)
     # The number of misconceptions associated with the skill.
-    misconception_count = ndb.IntegerProperty(required=True, indexed=True)
+    misconception_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of worked examples in the skill.
-    worked_examples_count = ndb.IntegerProperty(required=True, indexed=True)
+    worked_examples_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The ISO 639-1 code for the language this skill is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # Time when the skill model was last updated (not to be
     # confused with last_updated, which is the time when the
     # skill *summary* model was last updated).
-    skill_model_last_updated = ndb.DateTimeProperty(required=True, indexed=True)
+    skill_model_last_updated = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # Time when the skill model was created (not to be confused
     # with created_on, which is the time when the skill *summary*
     # model was created).
-    skill_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
-    version = ndb.IntegerProperty(required=True)
+    skill_model_created_on = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
+    version = datastore_services.IntegerProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Skill summary should be kept if associated skill is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether SkillSummaryModel references the given user.
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'worked_examples_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def fetch_page(cls, page_size, urlsafe_start_cursor, sort_by):
+        """Returns the models according to values specified.
 
         Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+            page_size: int. Number of skills to fetch.
+            urlsafe_start_cursor: str. The cursor to the next page.
+            sort_by: str. A string indicating how to sort the result.
 
         Returns:
-            bool. Whether any models refer to the given user ID.
+            3-tuple(query_models, urlsafe_start_cursor, more). where:
+                query_models: list(SkillSummary). The list of summaries
+                    of skills starting at the given cursor.
+                urlsafe_start_cursor: str or None. A query cursor pointing to
+                    the next batch of results. If there are no more results,
+                    this might be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
         """
-        return False
+        cursor = (
+            datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor))
+        sort = -cls.skill_model_created_on
+        if sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingCreatedOn']):
+            sort = cls.skill_model_created_on
+        elif sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'IncreasingUpdatedOn']):
+            sort = -cls.skill_model_last_updated
+        elif sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingUpdatedOn']):
+            sort = cls.skill_model_last_updated
 
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillSummaryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+        query_models, next_cursor, more = (
+            cls.query().order(sort).fetch_page(page_size, start_cursor=cursor))
+        new_urlsafe_start_cursor = (
+            next_cursor.urlsafe() if (next_cursor and more) else None)
+        return query_models, new_urlsafe_start_cursor, more

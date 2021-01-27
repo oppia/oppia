@@ -19,20 +19,23 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
 import os
 
 from constants import constants
 from core import jobs
+from core.domain import auth_domain
 from core.domain import param_domain
-from core.domain import user_services
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
+
+import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
+email_services = models.Registry.import_email_services()
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -57,9 +60,10 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                         with the mock names.
 
                 Raises:
-                    AssertionError: The argument doesn't match with the mock
+                    AssertionError. The argument doesn't match with the mock
                         name.
                 """
+
                 order.append('before')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
@@ -73,7 +77,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                     result: str. The string to be checked with the mock name.
 
                 Raises:
-                    AssertionError: The argument doesn't match with the mock
+                    AssertionError. The argument doesn't match with the mock
                         name.
                 """
                 order.append('after')
@@ -163,6 +167,144 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         self.assertIsNone(wrapped.pre_call_hook('args'))
 
 
+class AuthServicesStubTests(test_utils.GenericTestBase):
+
+    EMAIL = 'user@test.com'
+
+    def setUp(self):
+        super(AuthServicesStubTests, self).setUp()
+        self.stub = test_utils.AuthServicesStub()
+
+    def test_get_auth_claims_from_request(self):
+        request = webapp2.Request.blank('/')
+
+        self.assertIsNone(self.stub.get_auth_claims_from_request(request))
+
+        with self.login_context(self.EMAIL):
+            self.assertEqual(
+                self.stub.get_auth_claims_from_request(request),
+                auth_domain.AuthClaims(
+                    self.get_auth_id_from_email(self.EMAIL), self.EMAIL, False))
+
+        with self.super_admin_context():
+            self.assertEqual(
+                self.stub.get_auth_claims_from_request(request),
+                auth_domain.AuthClaims(
+                    self.get_auth_id_from_email(self.SUPER_ADMIN_EMAIL),
+                    self.SUPER_ADMIN_EMAIL,
+                    True))
+
+        self.assertIsNone(self.stub.get_auth_claims_from_request(request))
+
+    def test_get_association_that_is_present(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
+
+    def test_get_association_that_is_missing(self):
+        self.assertIsNone(self.stub.get_user_id_from_auth_id('does_not_exist'))
+        self.assertIsNone(self.stub.get_auth_id_from_user_id('does_not_exist'))
+
+    def test_get_multi_associations_with_all_present(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid2', 'uid2'))
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']),
+            ['uid1', 'uid2', 'uid3'])
+        self.assertEqual(
+            self.stub.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', 'aid2', 'aid3'])
+
+    def test_get_multi_associations_with_one_missing(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+        # The aid2 <-> uid2 association is missing.
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']),
+            ['uid1', None, 'uid3'])
+        self.assertEqual(
+            self.stub.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', None, 'aid3'])
+
+    def test_associate_auth_id_with_user_id_without_collision(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
+
+    def test_associate_auth_id_with_user_id_with_collision_raises(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('aid', 'uid'))
+
+    def test_associate_multi_auth_ids_with_user_ids_without_collisions(self):
+        self.stub.associate_multi_auth_ids_with_user_ids(
+            [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+             auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+             auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+        self.assertEqual(
+            [self.stub.get_user_id_from_auth_id('aid1'),
+             self.stub.get_user_id_from_auth_id('aid2'),
+             self.stub.get_user_id_from_auth_id('aid3')],
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate_multi_auth_ids_with_user_ids(
+                [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+                 auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+                 auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+    def test_present_association_is_not_considered_to_be_deleted(self):
+        # This operation creates the external auth association.
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.assertFalse(
+            self.stub.verify_external_auth_associations_are_deleted('uid'))
+
+    def test_missing_association_is_considered_to_be_deleted(self):
+        self.assertTrue(self.stub.verify_external_auth_associations_are_deleted(
+            'does_not_exist'))
+
+    def test_delete_association_when_it_is_present(self):
+        # This operation creates the external auth association.
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+        self.assertFalse(
+            self.stub.verify_external_auth_associations_are_deleted('uid'))
+
+        self.stub.delete_external_auth_associations('uid')
+
+        self.assertTrue(
+            self.stub.verify_external_auth_associations_are_deleted('uid'))
+
+    def test_delete_association_when_it_is_missing_does_not_raise(self):
+        # Should not raise.
+        self.stub.delete_external_auth_associations('does_not_exist')
+
+
 class CallCounterTests(test_utils.GenericTestBase):
     def test_call_counter_counts_the_number_of_times_a_function_gets_called(
             self):
@@ -186,10 +328,11 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         function = lambda x: x ** 2
 
         failing_func = test_utils.FailingFunction(
-            function, MockError, test_utils.FailingFunction.INFINITY)
+            function, MockError('Dummy Exception'),
+            test_utils.FailingFunction.INFINITY)
 
         for i in python_utils.RANGE(20):
-            with self.assertRaises(MockError):
+            with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 
     def test_failing_function_raises_error_with_invalid_num_tries(self):
@@ -226,10 +369,10 @@ class TestUtilsTests(test_utils.GenericTestBase):
         FailingMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(None), 1)
-        with self.assertRaisesRegexp(
-            RuntimeError, 'MapReduce task to URL .+ failed'):
-            self.process_and_flush_pending_tasks()
+            self.count_jobs_in_mapreduce_taskqueue(None), 1)
+        self.assertRaisesRegexp(
+            RuntimeError, 'MapReduce task failed: Task<.*>',
+            self.process_and_flush_pending_mapreduce_tasks)
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
@@ -288,23 +431,97 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
 
-    def test_fetch_gravatar_with_headers(self):
-        user_email = 'user@example.com'
-        expected_gravatar_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'gravatar_example.png')
-        with python_utils.open_file(
-            expected_gravatar_filepath, 'rb', encoding=None) as f:
-            gravatar = f.read()
+    def test_capture_logging(self):
+        logging.info('0')
+        with self.capture_logging() as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.info('6')
 
-        headers_dict = {
-            'content_type': 'application/json; charset=utf-8'
-        }
-        with self.urlfetch_mock(content=gravatar, headers=headers_dict):
-            profile_picture = user_services.fetch_gravatar(user_email)
-            gravatar_data_url = utils.convert_png_to_data_url(
-                expected_gravatar_filepath)
-            self.assertEqual(profile_picture, gravatar_data_url)
+        self.assertEqual(logs, ['1', '2', '3', '4'])
+
+    def test_capture_logging_with_min_level(self):
+        logging.info('0')
+        with self.capture_logging(min_level=logging.WARN) as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.info('6')
+
+        self.assertEqual(logs, ['3', '4'])
+
+    def test_swap_to_always_return_uses_none_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return self
+
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_return(mock, 'method'):
+            self.assertIsNone(mock.method())
+
+    def test_swap_to_always_return_with_value(self):
+        right_obj = python_utils.OBJECT()
+        wrong_obj = python_utils.OBJECT()
+        self.assertIsNot(right_obj, wrong_obj)
+
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return wrong_obj
+
+        mock = MockClass()
+        self.assertIs(mock.method(), wrong_obj)
+
+        with self.swap_to_always_return(mock, 'method', value=right_obj):
+            self.assertIs(mock.method(), right_obj)
+
+    def test_swap_to_always_raise_empty_exception_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return self
+
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_raise(mock, 'method'):
+            try:
+                mock.method()
+            except Exception:
+                pass
+            else:
+                self.fail(msg='Exception was not raise as expected')
+
+    def test_swap_to_always_raise_with_error(self):
+        right_error = Exception('right error')
+        wrong_error = Exception('wrong error')
+
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                raise wrong_error
+
+        mock = MockClass()
+        self.assertRaisesRegexp(Exception, 'wrong error', mock.method)
+
+        with self.swap_to_always_raise(mock, 'method', error=right_error):
+            self.assertRaisesRegexp(Exception, 'right error', mock.method)
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
@@ -382,24 +599,19 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_kwargs(self):
-        # pylint: disable=unused-argument
-        def mock_getenv(key, default):
+        def mock_getenv(key, default): # pylint: disable=unused-argument
             return
-        # pylint: enable=unused-argument
         getenv_swap = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_kwargs=[
-                {'key': '123', 'default': '456'},
-                {'key': '678', 'default': '900'},
-            ])
+            os, 'getenv', mock_getenv,
+            expected_args=[('123',), ('678',)],
+            expected_kwargs=[{'default': '456'}, {'default': '900'}])
 
         with getenv_swap:
             SwapWithCheckTestClass.functions_with_kwargs()
 
     def test_swap_with_check_on_expected_kwargs_failed_on_wrong_numbers(self):
-        # pylint: disable=unused-argument
-        def mock_getenv(key, default):
+        def mock_getenv(key, default): # pylint: disable=unused-argument
             return
-        # pylint: enable=unused-argument
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_kwargs=[
                 {'key': '123', 'default': '456'},
@@ -414,14 +626,81 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_capature_exception_raised_by_tested_function(
             self):
         def mock_getcwd():
-            raise ValueError()
-
+            raise ValueError('Exception raised from getcwd()')
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError, r'Exception raised from getcwd\(\)'):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
+
+    def test_assert_raises_with_error_message(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.'):
+            self.assertRaises(Exception, mock_exception_func)
+
+    def test_assert_raises_regexp_with_empty_string(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please provide a sufficiently strong regexp string to '
+            'validate that the correct error is being raised.'):
+            self.assertRaisesRegexp(Exception, '', mock_exception_func)
+
+
+class EmailMockTests(test_utils.EmailTestBase):
+    """Class for testing EmailTestBase."""
+
+    def test_override_run_swaps_contexts(self):
+        """Test that the current_function
+        email_services.send_email_to_recipients() is correctly swapped to its
+        mock version when the testbase extends EmailTestBase.
+        """
+        referenced_function = getattr(
+            email_services, 'send_email_to_recipients')
+        correct_function = getattr(self, '_send_email_to_recipients')
+        self.assertEqual(referenced_function, correct_function)
+
+    def test_mock_send_email_to_recipients_sends_correct_emails(self):
+        """Test sending email to recipients using mock adds the correct objects
+        to emails_dict.
+        """
+        self._send_email_to_recipients(
+            'a@a.com',
+            ['b@b.com'],
+            (
+                'Hola 😂 - invitation to collaborate'
+                .encode(encoding='utf-8')),
+            'plaintext_body 😂'.encode(encoding='utf-8'),
+            'Hi abc,<br> 😂'.encode(encoding='utf-8'),
+            bcc=['c@c.com'],
+            reply_to='abc',
+            recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
+        messages = self._get_sent_email_messages(
+            'b@b.com')
+        all_messages = self._get_all_sent_email_messages()
+
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(len(all_messages), 1)
+        self.assertEqual(all_messages['b@b.com'], messages)
+        self.assertEqual(
+            messages[0].subject,
+            'Hola 😂 - invitation to collaborate'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].body,
+            'plaintext_body 😂'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].html,
+            'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+        self.assertEqual(messages[0].bcc, 'c@c.com')
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):
@@ -449,5 +728,5 @@ class SwapWithCheckTestClass(python_utils.OBJECT):
     @classmethod
     def functions_with_kwargs(cls):
         """Run a few functions with kwargs."""
-        os.getenv(key='123', default='456')
-        os.getenv(key='678', default='900')
+        os.getenv('123', default='456')
+        os.getenv('678', default='900')

@@ -22,12 +22,15 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
-require('services/html-escaper.service.ts');
-require('services/contextual/url.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
-  'DragAndDropSortInputRulesService', 'HtmlEscaperService',
-  function(DragAndDropSortInputRulesService, HtmlEscaperService) {
+  'DragAndDropSortInputRulesService',
+  'InteractionAttributesExtractorService',
+  function(
+      DragAndDropSortInputRulesService,
+      InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,19 +39,32 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
         './drag-and-drop-sort-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'UrlService', 'CurrentInteractionService',
+        '$attrs', 'CurrentInteractionService',
         function(
-            $attrs, UrlService, CurrentInteractionService) {
+            $attrs, CurrentInteractionService) {
           var ctrl = this;
           var answers = [];
+
+          const getContentIdOfHtml = function(html) {
+            const {
+              choices
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'DragAndDropSortInput',
+              $attrs
+            );
+
+            return choices[ctrl.choices.indexOf(html)].contentId;
+          };
+
           ctrl.submitAnswer = function() {
             // Converting list of dicts to list of lists to make it consistent
-            // with the ListOfSetsOfHtmlStrings object.
+            // with the ListOfSetsOfTranslatableHtmlContentIds object.
             answers = [];
             for (var i = 0; i < ctrl.list.length; i++) {
-              answers.push([ctrl.list[i].title]);
+              answers.push([getContentIdOfHtml(ctrl.list[i].title)]);
               for (var j = 0; j < ctrl.list[i].items.length; j++) {
-                answers[i].push(ctrl.list[i].items[j].title);
+                answers[i].push(
+                  getContentIdOfHtml(ctrl.list[i].items[j].title));
               }
             }
 
@@ -56,14 +72,20 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               answers, DragAndDropSortInputRulesService);
           };
           ctrl.$onInit = function() {
-            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
-              $attrs.choicesWithValue);
+            const {
+              choices,
+              allowMultipleItemsInSamePosition
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'DragAndDropSortInput',
+              $attrs
+            );
+            ctrl.choices = choices.map(choice => choice.html);
 
             ctrl.list = [];
             ctrl.dataMaxDepth = 1;
 
             ctrl.allowMultipleItemsInSamePosition = (
-              $attrs.allowMultipleItemsInSamePositionWithValue === 'true');
+              allowMultipleItemsInSamePosition);
 
             if (ctrl.allowMultipleItemsInSamePosition) {
               ctrl.dataMaxDepth = 2;

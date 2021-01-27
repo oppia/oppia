@@ -21,14 +21,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
+from constants import constants
+from core.domain import caching_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -36,10 +38,10 @@ from core.tests import test_utils
 import python_utils
 
 
-memcache_services = models.Registry.import_memcache_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ExplorationOpportunitySummaryModelRegenerationJobTest(
@@ -49,9 +51,13 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def setUp(self):
         super(
             ExplorationOpportunitySummaryModelRegenerationJobTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.topic_id_1 = 'topic1'
         self.topic_id_2 = 'topic2'
@@ -59,34 +65,80 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         story_id_1 = 'story1'
         story_id_2 = 'story2'
 
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            topic_id=self.topic_id_1, name='topic1', abbreviated_name='abbrev')
+            self.topic_id_1, 'topic', 'abbrev-one', 'description')
+        topic_1.thumbnail_filename = 'thumbnail.svg'
+        topic_1.thumbnail_bg_color = '#C6DCDA'
+        topic_1.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic_1.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.topic_id_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
         topic_services.save_new_topic(self.owner_id, topic_1)
+        topic_services.publish_topic(self.topic_id_1, self.admin_id)
 
         topic_2 = topic_domain.Topic.create_default_topic(
-            topic_id=self.topic_id_2, name='topic2', abbreviated_name='abbrev')
+            self.topic_id_2, 'topic2', 'abbrev-two', 'description')
+        topic_2.thumbnail_filename = 'thumbnail.svg'
+        topic_2.thumbnail_bg_color = '#C6DCDA'
+        topic_2.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.topic_id_2))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_2.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic_2)
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
 
         story_1 = story_domain.Story.create_default_story(
-            story_id_1, title='A story', corresponding_topic_id=self.topic_id_1)
+            story_id_1, 'A story', 'description', self.topic_id_1,
+            'story-one')
         story_2 = story_domain.Story.create_default_story(
-            story_id_2, title='A story', corresponding_topic_id=self.topic_id_2)
+            story_id_2, 'A story', 'description', self.topic_id_2,
+            'story-two')
 
         story_services.save_new_story(self.owner_id, story_1)
         story_services.save_new_story(self.owner_id, story_2)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_1, story_id_1)
+        topic_services.publish_story(self.topic_id_1, story_id_1, self.admin_id)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_2, story_id_2)
+        topic_services.publish_story(self.topic_id_2, story_id_2, self.admin_id)
         story_services.update_story(
             self.owner_id, story_id_1, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
@@ -128,9 +180,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -163,9 +215,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -186,9 +238,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -215,9 +267,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['SUCCESS', 2]]
@@ -249,9 +301,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (2)', [
@@ -286,9 +338,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (1)', [
@@ -306,9 +358,8 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def test_regeneration_job_with_no_exp_model_for_some_topics(self):
         exp_models.ExplorationModel.get('0').delete(
             self.owner_id, 'Delete exploration', force_deletion=True)
-        exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
-            '0')
-        memcache_services.delete(exploration_memcache_key)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['0'])
 
         exp_opp_summary_model_regen_job_class = (
             opportunity_jobs_one_off
@@ -323,9 +374,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (1)', [
@@ -352,9 +403,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])
@@ -395,9 +446,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
 
@@ -430,9 +481,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
         expected = [['SUCCESS', 2]]
@@ -457,9 +508,123 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])
+
+
+class MockExplorationOpportunitySummaryModel(
+        opportunity_models.ExplorationOpportunitySummaryModel):
+    need_voice_artist_in_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    assigned_voice_artist_in_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+
+
+class RenameExplorationOpportunitySummaryModelPropertiesJobTest(
+        test_utils.GenericTestBase):
+    """Tests for the exploration opportunity summary model rename attributes
+    job.
+    """
+
+    def test_job_replaces_value_correctly_to_renamed_properties(self):
+        with self.swap(
+            opportunity_models, 'ExplorationOpportunitySummaryModel',
+            MockExplorationOpportunitySummaryModel):
+            old_model = opportunity_models.ExplorationOpportunitySummaryModel(
+                id='opportunity_id',
+                topic_id='topic1',
+                topic_name='The Topic!',
+                story_id='story1',
+                story_title='The story!',
+                chapter_title='The content!',
+                content_count=5,
+                incomplete_translation_language_codes=['hi'],
+                translation_counts={'en': 5},
+                need_voice_artist_in_language_codes=['hi'],
+                assigned_voice_artist_in_language_codes=['en'])
+            old_model.put()
+
+            self.assertEqual(
+                old_model.language_codes_with_assigned_voice_artists, [])
+            self.assertEqual(
+                old_model.language_codes_needing_voice_artists, [])
+
+            job_class = (
+                opportunity_jobs_one_off.
+                RenameExplorationOpportunitySummaryModelPropertiesJob)
+
+            job_id = job_class.create_new()
+            job_class.enqueue(job_id)
+
+            self.assertEqual(
+                self.count_jobs_in_mapreduce_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+            output = job_class.get_output(job_id)
+            self.assertEqual(
+                output, [
+                    u'[u\'SUCCESS_RENAMED['
+                    'assigned_voice_artist_in_language_codes]\', 1]', u'['
+                    'u\'SUCCESS_RENAMED[need_voice_artist_in_language_codes]\','
+                    ' 1]'])
+
+            new_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                    'opportunity_id'))
+
+            self.assertEqual(
+                old_model.assigned_voice_artist_in_language_codes,
+                new_model.language_codes_with_assigned_voice_artists)
+            self.assertEqual(
+                old_model.need_voice_artist_in_language_codes,
+                new_model.language_codes_needing_voice_artists)
+
+            self.assertFalse(
+                'assigned_voice_artist_in_language_codes'
+                in new_model._properties) # pylint: disable=protected-access
+            self.assertFalse(
+                'need_voice_artist_in_language_codes' in new_model._properties) # pylint: disable=protected-access
+
+    def test_job_for_new_models_with_updated_properties_works_correctly(self):
+        old_model = opportunity_models.ExplorationOpportunitySummaryModel(
+            id='opportunity_id',
+            topic_id='topic1',
+            topic_name='The Topic!',
+            story_id='story1',
+            story_title='The story!',
+            chapter_title='The content!',
+            content_count=5,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'en': 5},
+            language_codes_with_assigned_voice_artists=['hi'],
+            language_codes_needing_voice_artists=['en'])
+        old_model.put()
+
+        job_class = (
+            opportunity_jobs_one_off.
+            RenameExplorationOpportunitySummaryModelPropertiesJob)
+
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(output, [])
+
+        new_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                'opportunity_id'))
+
+        self.assertEqual(
+            new_model.language_codes_with_assigned_voice_artists, ['hi'])
+        self.assertEqual(
+            new_model.language_codes_needing_voice_artists, ['en'])

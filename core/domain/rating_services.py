@@ -56,10 +56,10 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     if new_rating not in ALLOWED_RATINGS:
         raise ValueError('Expected a rating 1-5, received %s.' % new_rating)
 
-    try:
-        exp_fetchers.get_exploration_by_id(exploration_id)
-    except:
-        raise Exception('Invalid exploration id %s' % exploration_id)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False)
+    if exploration is None:
+        raise ValueError('Invalid exploration id %s' % exploration_id)
 
     def _update_user_rating():
         """Updates the user rating of the exploration. Returns the old rating
@@ -75,6 +75,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
                 user_id, exploration_id)
         exp_user_data_model.rating = new_rating
         exp_user_data_model.rated_on = datetime.datetime.utcnow()
+        exp_user_data_model.update_timestamps()
         exp_user_data_model.put()
         return old_rating
     old_rating = transaction_services.run_in_transaction(_update_user_rating)
@@ -141,7 +142,7 @@ def get_overall_ratings_for_exploration(exploration_id):
         exploration_id: str. The id of the exploration.
 
     Returns:
-        a dict whose keys are '1', '2', '3', '4', '5' and whose
+        dict. A dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing the frequency counts
         of each rating.
     """

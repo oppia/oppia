@@ -103,18 +103,22 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_with_metaclass(self):
         class BaseForm(python_utils.OBJECT):
             """Test baseclass."""
+
             pass
 
         class FormType1(type):
             """Test metaclass."""
+
             pass
 
         class FormType2(type):
             """Test metaclass."""
+
             pass
 
         class Form(python_utils.with_metaclass(FormType1, BaseForm)): # pylint: disable=inherit-non-class
             """Test class."""
+
             pass
 
         self.assertTrue(isinstance(Form, FormType1))
@@ -246,6 +250,7 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
             'core/tests/data/unicode_and_str_handler.py', 'r') as f:
             file_content = f.read()
             self.assertIsInstance(file_content, python_utils.UNICODE)
+
 
 @unittest.skipUnless(
     sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')

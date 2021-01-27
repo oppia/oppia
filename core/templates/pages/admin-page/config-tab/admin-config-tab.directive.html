@@ -1,0 +1,36 @@
+<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>Configuration properties</h3>
+  <div class="container ml-0" ng-if="$ctrl.isNonemptyObject($ctrl.configProperties)">
+    <div ng-repeat="(configPropertyId, configPropertyData) in $ctrl.configProperties">
+      <div class="row protractor-test-config-property oppia-description-text-container">
+        <span class="col-lg-2 col-md-2 col-sm-2">
+          <em class="protractor-test-config-title"><[configPropertyData.description]></em>
+        </span>
+        <span class="col-lg-6 col-md-6 col-sm-6">
+          <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
+          </schema-based-editor>
+        </span>
+        <span class="col-lg-2 col-md-2 col-sm-2">
+          <button type="button" class="btn btn-secondary oppia-revert-button" ng-click="$ctrl.revertToDefaultConfigPropertyValue(configPropertyId)">
+            Revert to default
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <button ng-click="$ctrl.saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
+    <button ng-click="$ctrl.reloadConfigProperties()">Undo changes</button>
+  </div>
+
+  <div ng-if="!$ctrl.isNonemptyObject($ctrl.configProperties)">
+    No configuration properties are available.
+  </div>
+</md-card>
+<style>
+  admin-config-tab .oppia-long-text-card {
+    max-width: 1050px;
+  }
+  admin-config-tab .oppia-description-text-container {
+    padding-bottom: 10px;
+  }
+</style>

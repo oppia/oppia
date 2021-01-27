@@ -52,7 +52,7 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'min_value': 1
             }],
             'items': {
-                'type': 'html',
+                'type': 'SubtitledHtml',
                 'ui_config': {
                     'hide_complex_extensions': True,
                     'placeholder': 'Enter an option for the learner to drag' +
@@ -63,7 +63,10 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'add_element_text': 'Add a new item',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': None,
+            'html': ''
+        }],
     }]
 
     _answer_visualization_specs = []

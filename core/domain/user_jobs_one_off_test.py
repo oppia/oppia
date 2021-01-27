@@ -29,25 +29,34 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import learner_progress_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from core.tests.data import image_constants
 import feconf
 import python_utils
+import utils
 
-(user_models, feedback_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
-taskqueue_services = models.Registry.import_taskqueue_services()
+auth_models, user_models, feedback_models, exp_models = (
+    models.Registry.import_models(
+        [models.NAMES.auth, models.NAMES.user, models.NAMES.feedback,
+         models.NAMES.exploration]))
+
+datastore_services = models.Registry.import_datastore_services()
 search_services = models.Registry.import_search_services()
 
 
 class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -64,9 +73,9 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         job_id = user_jobs_one_off.UserContributionsOneOffJob.create_new()
         user_jobs_one_off.UserContributionsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def setUp(self):
         super(UserContributionsOneOffJobTests, self).setUp()
@@ -157,6 +166,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.user_a_id, commit_type='create')
+        model1.update_timestamps()
         model1.put()
         user_models.UserContributionsModel(
             id=self.user_a_id,
@@ -180,6 +190,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     def test_user_contributions_get_created_after_running_the_job(self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id='new_user', commit_type='create')
+        model1.update_timestamps()
         model1.put()
 
         user_contributions_model = user_models.UserContributionsModel.get(
@@ -197,6 +208,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'ab@example.com'
@@ -212,13 +224,12 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.create_new())
         user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
                 job_id))
-
         output = {}
         for stringified_distribution in stringified_output:
             value = re.findall(r'\d+', stringified_distribution)
@@ -271,8 +282,48 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output['1'], 1)
 
 
+class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length limit job."""
+
+    USER_1_EMAIL = '1@example.com'
+    USER_1_USERNAME = '123456789123456789123'
+    USER_2_EMAIL = '2@example.com'
+    USER_2_USERNAME = '123456789123456789124'
+    USER_3_EMAIL = '3@example.com'
+    USER_3_USERNAME = 'a' * 30
+    USER_4_EMAIL = '4@example.com'
+    # Username 4 length is 20, so it shouldn't be in the output.
+    USER_4_USERNAME = '12345678912345678912'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UsernameLengthAuditOneOffJob.create_new())
+        user_jobs_one_off.UsernameLengthAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        return user_jobs_one_off.UsernameLengthAuditOneOffJob.get_output(job_id)
+
+    def test_username_length_limit(self):
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
+
+        expected_output = [u'[u\'Length: 21\', u"Usernames: [\'%s\', \'%s\']"]'
+                           % (self.USER_1_USERNAME, self.USER_2_USERNAME),
+                           u'[u\'Length: 30\', u"Usernames: [\'%s\']"]'
+                           % self.USER_3_USERNAME]
+
+        actual_output = self._run_one_off_job()
+
+        self.assertEqual(actual_output, expected_output)
+
+
 class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off long userbio length job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_A_BIO = 'I am less than 500'
@@ -292,9 +343,9 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.LongUserBiosOneOffJob.create_new())
         user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         stringified_output = (
             user_jobs_one_off.LongUserBiosOneOffJob.get_output(
@@ -358,8 +409,8 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
         model1 = user_models.UserSettingsModel(
             id=user_id_a,
-            gae_id='gae_' + user_id_a,
             email=self.USER_A_EMAIL)
+        model1.update_timestamps()
         model1.put()
 
         result = self._run_one_off_job()
@@ -369,6 +420,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     COLLECTION_ID_1 = 'col_id_1'
@@ -386,9 +438,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         job_id = user_jobs_one_off.DashboardSubscriptionsOneOffJob.create_new()
         user_jobs_one_off.DashboardSubscriptionsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def _null_fn(self, *args, **kwargs):
         """A mock for functions of the form subscribe_to_*() to represent
@@ -459,8 +511,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_c_id)
 
-        self.assertEqual(user_b_subscriptions_model.activity_ids, [])
-        self.assertEqual(user_c_subscriptions_model.activity_ids, [])
+        self.assertEqual(user_b_subscriptions_model.exploration_ids, [])
+        self.assertEqual(user_c_subscriptions_model.exploration_ids, [])
         self.assertEqual(
             user_b_subscriptions_model.general_feedback_thread_ids, [thread_id])
         self.assertEqual(
@@ -475,11 +527,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -492,11 +544,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_c_id, strict=False)
 
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_a_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
+            user_b_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_two_explorations(self):
@@ -515,7 +565,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_a_id)
 
         self.assertEqual(
-            sorted(user_a_subscriptions_model.activity_ids),
+            sorted(user_a_subscriptions_model.exploration_ids),
             sorted([self.EXP_ID_1, self.EXP_ID_2]))
 
     def test_community_owned_exploration(self):
@@ -527,7 +577,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # The exploration becomes community-owned.
             rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
@@ -547,9 +597,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_c_id, strict=False)
 
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_a_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_b_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_deleted_exploration(self):
@@ -561,7 +611,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self._run_one_off_job()
 
@@ -586,11 +636,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -607,12 +657,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         # User A is also subscribed to the exploration within the collection
         # because they created both.
         self.assertEqual(
-            sorted(user_a_subscriptions_model.activity_ids), [
+            sorted(user_a_subscriptions_model.exploration_ids), [
                 self.EXP_ID_1, self.EXP_ID_FOR_COLLECTION_1])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_two_collections(self):
@@ -661,7 +709,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration from earlier.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self._run_one_off_job()
 
@@ -706,11 +754,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         # User B should be subscribed to the collection and user A to the
         # exploration.
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_a_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
             user_a_subscriptions_model.collection_ids, [])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [])
+            user_b_subscriptions_model.exploration_ids, [])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
@@ -730,7 +778,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
 
             # The collection becomes community-owned.
             rights_manager.publish_collection(self.user_a, self.COLLECTION_ID_1)
@@ -768,6 +816,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -804,9 +853,9 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         job_id = user_jobs_one_off.DashboardStatsOneOffJob.create_new()
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def setUp(self):
         super(DashboardStatsOneOffJobTests, self).setUp()
@@ -875,7 +924,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_weekly_stats_if_no_explorations(self):
         MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -908,8 +957,10 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
+
+        MockUserStatsAggregator.start_computation()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -946,8 +997,9 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
+        MockUserStatsAggregator.start_computation()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -981,8 +1033,9 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
+        MockUserStatsAggregator.start_computation()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -1001,12 +1054,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             }])
 
         MockUserStatsAggregator.stop_computation(self.owner_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self._rate_exploration('user2', exp_id, 2)
 
         MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         def _mock_get_date_after_one_week():
             """Returns the date of the next week."""
@@ -1069,7 +1122,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertIsNone(
             user_services.get_user_settings(
                 self.admin_id).first_contribution_msec)
@@ -1086,11 +1139,24 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
@@ -1107,7 +1173,6 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # exploration and does not reset the user's first_contribution_msec.
         user_models.UserSettingsModel(
             id=self.owner_id,
-            gae_id='gae_id',
             email='email@email.com',
             username='username',
             first_contribution_msec=None
@@ -1119,7 +1184,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
 
@@ -1127,6 +1192,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self):
         model1 = exp_models.ExplorationRightsSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.owner_id, commit_type='create')
+        model1.update_timestamps()
         model1.put()
 
         self.assertIsNone(user_services.get_user_settings(
@@ -1135,68 +1201,10 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
-
-
-class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
-
-    FETCHED_GRAVATAR = 'fetched_gravatar'
-
-    def setUp(self):
-        super(UserProfilePictureOneOffJobTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def _mock_fetch_gravatar(self, unused_email):
-        """Mocks user_services.fetch_gravatar()."""
-        return self.FETCHED_GRAVATAR
-
-    def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
-        user_services.update_profile_picture_data_url(self.owner_id, None)
-
-        # Before the job runs, the data URL is None.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertIsNone(user_settings.profile_picture_data_url)
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL has been updated.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url, self.FETCHED_GRAVATAR)
-
-    def test_profile_picture_is_not_regenerated_if_it_already_exists(self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, 'manually_added_data_url')
-
-        # Before the job runs, the data URL is the manually-added one.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url, 'manually_added_data_url')
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL is still the manually-added one.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url,
-            'manually_added_data_url')
 
 
 class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
@@ -1215,9 +1223,9 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserLastExplorationActivityOneOffJob.create_new())
         user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_that_last_created_time_is_updated(self):
         self.login(self.OWNER_EMAIL)
@@ -1227,7 +1235,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.owner_id,
-            gae_id='gae_' + self.owner_id,
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None
         ).put()
@@ -1258,7 +1265,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.editor_id,
-            gae_id='gae_' + self.editor_id,
             email=self.EDITOR_EMAIL,
             last_edited_an_exploration=None
         ).put()
@@ -1297,7 +1303,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.owner_id,
-            gae_id='gae_' + self.owner_id,
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None,
             last_edited_an_exploration=None
@@ -1305,7 +1310,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.editor_id,
-            gae_id='gae_' + self.editor_id,
             email=self.EDITOR_EMAIL,
             last_edited_an_exploration=None
         ).put()
@@ -1331,7 +1335,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
     def test_that_last_edited_and_created_time_are_not_updated(self):
         user_models.UserSettingsModel(
             id=self.owner_id,
-            gae_id='gae_' + self.owner_id,
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None,
             last_edited_an_exploration=None
@@ -1373,34 +1376,39 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         for exp in explorations:
             subscription_services.subscribe_to_exploration(
                 self.user_id, exp.id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         for exp_id in python_utils.RANGE(3):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 3)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 3)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.exploration_ids), 3)
 
-        job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.exploration_ids), 3)
+
+        job = (
+            user_jobs_one_off
+            .CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob
+        )
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 0)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 0)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.exploration_ids), 0)
+
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.exploration_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
             u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '
@@ -1410,3 +1418,1381 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             'removed explorations 0, 1, 2\', 1]' %
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class MockUserSettingsModelWithGaeUserId(user_models.UserSettingsModel):
+    """Mock UserSettingsModel so that it allows to set `gae_user_id`."""
+
+    gae_user_id = (
+        datastore_services.StringProperty(indexed=True, required=False))
+
+
+class MockUserSettingsModelWithGaeId(user_models.UserSettingsModel):
+    """Mock UserSettingsModel so that it allows to set `gae_id`."""
+
+    gae_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+
+class MockUserSubscriptionsModelWithActivityIDs(
+        user_models.UserSubscriptionsModel):
+    """Mock UserSubscriptionsModel so that it allows to set 'activity_ids'. """
+
+    activity_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
+
+
+class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.RemoveActivityIDsOneOffJob.create_new())
+        user_jobs_one_off.RemoveActivityIDsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.RemoveActivityIDsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_subscription_model_with_activity_ids(self):
+        with self.swap(
+            user_models, 'UserSubscriptionsModel',
+            MockUserSubscriptionsModelWithActivityIDs):
+            original_subscription_model = (
+                user_models.UserSubscriptionsModel(
+                    id='id',
+                    activity_ids=['exp_1', 'exp_2', 'exp_3']
+                )
+            )
+            original_subscription_model.update_timestamps()
+            original_subscription_model.put()
+
+            self.assertIsNotNone(
+                original_subscription_model.activity_ids)
+            self.assertIn(
+                'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
+            self.assertIn(
+                'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - UserSubscriptionsModel', 1]], output)
+
+            migrated_subscription_model = (
+                user_models.UserSubscriptionsModel.get_by_id('id'))
+
+            self.assertNotIn(
+                'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_subscription_model.last_updated,
+                migrated_subscription_model.last_updated)
+
+    def test_one_subscription_model_without_activity_ids(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='id'
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
+    def test_rerun(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='id'
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
+
+class MockUserSubscriptionsModelWithFeedbackThreadIDs(
+        user_models.UserSubscriptionsModel):
+    """Mock UserSubscriptionsModel so that it allows to set
+    `feedback_thread_ids`.
+    """
+
+    feedback_thread_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
+
+
+class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob.create_new())
+        user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_subscription_model_with_feedback_thread_ids(self):
+        with self.swap(
+            user_models, 'UserSubscriptionsModel',
+            MockUserSubscriptionsModelWithFeedbackThreadIDs):
+            original_subscription_model = (
+                user_models.UserSubscriptionsModel(
+                    id='id',
+                    feedback_thread_ids=['some_id']
+                )
+            )
+            original_subscription_model.update_timestamps()
+            original_subscription_model.put()
+
+            self.assertIsNotNone(
+                original_subscription_model.feedback_thread_ids)
+            self.assertIn(
+                'feedback_thread_ids', original_subscription_model._values)  # pylint: disable=protected-access
+            self.assertIn(
+                'feedback_thread_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - UserSubscriptionsModel', 1]], output)
+
+            migrated_subscription_model = (
+                user_models.UserSubscriptionsModel.get_by_id('id'))
+
+            self.assertNotIn(
+                'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'feedback_thread_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_subscription_model.last_updated,
+                migrated_subscription_model.last_updated)
+
+    def test_one_subscription_model_without_feedback_thread_ids(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='id'
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        self.assertNotIn(
+            'feedback_thread_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'feedback_thread_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'feedback_thread_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
+
+class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
+
+    USER_ID_1 = 'user_id'
+    USER_ID_2 = 'user_id_2'
+    EMAIL_1 = 'test@email.com'
+    EMAIL_2 = 'test2@email.com'
+    SKILL_ID_1 = 'skill_id_1'
+    SKILL_ID_2 = 'skill_id_2'
+    DEGREE_OF_MASTERY = 0.5
+    EXPLORATION_IDS = ['exp_1', 'exp_2', 'exp_3']
+    COLLECTION_IDS = ['col_1', 'col_2', 'col_3']
+    EXP_ID_ONE = 'exp_id_one'
+    EXP_ID_TWO = 'exp_id_two'
+    EXP_ID_THREE = 'exp_id_three'
+
+    def setUp(self):
+
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(FixUserSettingsCreatedOnOneOffJobTests, self).setUp()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob.create_new())
+        user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        sorted_eval_output = []
+        for key, values in eval_output:
+            if key == 'ERROR_NOT_UP_TO_DATE_USER':
+                values.sort()
+            sorted_eval_output.append([key, values])
+        return sorted_eval_output
+
+    def test_update_user_model_using_all_user_settings_model_attributes(self):
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        original_created_on_timestamp = user_settings_model.created_on
+        # last_agreed_to_terms is set to have the absolute minimum
+        # timestamp value.
+        user_settings_model.last_agreed_to_terms = (
+            original_created_on_timestamp + datetime.timedelta(hours=2))
+        final_created_on_timestamp = user_settings_model.last_agreed_to_terms
+        user_settings_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(days=10))
+        user_settings_model.last_logged_in = (
+            final_created_on_timestamp + datetime.timedelta(minutes=1))
+        user_settings_model.last_started_state_editor_tutorial = (
+            final_created_on_timestamp + datetime.timedelta(minutes=3))
+        user_settings_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=12))
+        user_settings_model.last_started_state_translation_tutorial = (
+            final_created_on_timestamp + datetime.timedelta(hours=14))
+        user_settings_model.last_edited_an_exploration = (
+            final_created_on_timestamp + datetime.timedelta(hours=15))
+        user_settings_model.last_created_an_exploration = (
+            final_created_on_timestamp + datetime.timedelta(hours=16))
+        user_settings_model.first_contribution_msec = (
+            utils.get_time_in_millisecs(
+                final_created_on_timestamp + datetime.timedelta(hours=10))
+        )
+        user_settings_model.put()
+
+        expected_output = [
+            [
+                'SUCCESS_UPDATED_USING_UserSettingsModel_last_agreed_to_terms',
+                1
+            ],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+        ]
+        self.assertLess(
+            final_created_on_timestamp, user_settings_model.created_on)
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+        migrated_user_model = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+        self.assertEqual(
+            migrated_user_model.created_on, final_created_on_timestamp)
+
+    def test_update_using_datetime_attributes_of_all_other_models(self):
+        user_subscriptions_model = user_models.UserSubscriptionsModel(
+            id=self.USER_ID_1)
+        user_subscriptions_model.update_timestamps()
+        # We are sequentially creating the models, so the timestamps will
+        # be in increasing order, and hence created_on attribute for
+        # user_subscriptions_model will have the smallest timestamp value.
+        final_created_on_timestamp = user_subscriptions_model.created_on
+        user_subscriptions_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=2)
+        )
+        user_subscriptions_model.last_checked = (
+            final_created_on_timestamp + datetime.timedelta(hours=3)
+        )
+        user_subscriptions_model.put()
+
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_settings_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_settings_model.put()
+
+        exploration_user_data_model = user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_ONE),
+            user_id=self.USER_ID_1,
+            exploration_id=self.EXP_ID_ONE,
+            rating=2,
+            rated_on=final_created_on_timestamp + datetime.timedelta(hours=1),
+            draft_change_list={'new_content': {}},
+            draft_change_list_last_updated=(
+                final_created_on_timestamp + datetime.timedelta(hours=2)),
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1
+        )
+        exploration_user_data_model.update_timestamps()
+        exploration_user_data_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(hours=5)
+        )
+        exploration_user_data_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=5)
+        )
+        exploration_user_data_model.put()
+
+        user_contributions_model = user_models.UserContributionsModel(
+            id=self.USER_ID_1)
+        user_contributions_model.update_timestamps()
+        user_contributions_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=5)
+        )
+        user_contributions_model.put()
+
+        user_email_preferences_model = user_models.UserEmailPreferencesModel(
+            id=self.USER_ID_1)
+        user_email_preferences_model.update_timestamps()
+        user_email_preferences_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=6)
+        )
+        user_email_preferences_model.put()
+
+        user_stats_model = user_models.UserStatsModel(
+            id=self.USER_ID_1)
+        user_stats_model.update_timestamps()
+        user_stats_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_stats_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_stats_model.put()
+
+        expected_output = [
+            [
+                'SUCCESS_UPDATED_USING_UserSubscriptionsModel_created_on', 1
+            ],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+        ]
+        self.assertLess(
+            final_created_on_timestamp, user_settings_model.created_on)
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+        migrated_user_model = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+        self.assertEqual(
+            migrated_user_model.created_on, final_created_on_timestamp)
+
+    def test_time_difference_less_than_time_delta_does_not_update(self):
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        user_auth_details_model = (
+            auth_models.UserAuthDetailsModel.get(user_id))
+        user_auth_details_model.update_timestamps()
+        user_auth_details_model.put()
+
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=user_id,
+                email=self.NEW_USER_EMAIL,
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        # UserAuthDetails model was created before UserSettingsModel, but the
+        # time difference is less than the time_delta required (will be less
+        # than a second here), hence created_on will not be updated.
+        self.assertLess(
+            user_auth_details_model.created_on, user_settings_model.created_on)
+
+        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+        migrated_user_model = (
+            user_models.UserSettingsModel.get_by_id(user_id))
+        self.assertNotEqual(
+            migrated_user_model.created_on, user_auth_details_model.created_on)
+
+    def test_update_for_multiple_users_works_correctly(self):
+        user_settings_model_1 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model_1.update_timestamps()
+        user_settings_model_1.created_on += datetime.timedelta(hours=10)
+        final_created_on_timestamp_1 = user_settings_model_1.last_updated
+        user_settings_model_1.put()
+
+        user_settings_model_2 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_2,
+                email=self.EMAIL_2,
+            )
+        )
+        user_settings_model_2.update_timestamps()
+        original_created_on_timestamp_2 = user_settings_model_2.created_on
+        user_settings_model_2.created_on = (
+            original_created_on_timestamp_2 + datetime.timedelta(hours=5))
+        user_settings_model_2.last_updated = (
+            original_created_on_timestamp_2 + datetime.timedelta(hours=6))
+        user_settings_model_2.last_logged_in = (
+            original_created_on_timestamp_2 + datetime.timedelta(hours=1))
+        final_created_on_timestamp_2 = user_settings_model_2.last_logged_in
+        user_settings_model_2.put()
+
+        expected_output = [
+            ['SUCCESS_UPDATED_USING_UserSettingsModel_last_updated', 1],
+            ['SUCCESS_UPDATED_USING_UserSettingsModel_last_logged_in', 1],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1, self.USER_ID_2]]
+        ]
+        self.assertLess(
+            final_created_on_timestamp_1, user_settings_model_1.created_on)
+        self.assertLess(
+            final_created_on_timestamp_2, user_settings_model_2.created_on)
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(actual_output, expected_output)
+        migrated_user_model_1 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+        migrated_user_model_2 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_2))
+        self.assertEqual(
+            migrated_user_model_1.created_on, final_created_on_timestamp_1)
+        self.assertEqual(
+            migrated_user_model_2.created_on, final_created_on_timestamp_2)
+
+    def test_multiple_runs_of_one_off_job_works_correctly(self):
+        user_settings_model_1 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model_1.update_timestamps()
+        user_settings_model_1.created_on += datetime.timedelta(hours=10)
+        final_created_on_timestamp_1 = user_settings_model_1.last_updated
+        user_settings_model_1.put()
+
+        user_settings_model_2 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_2,
+                email=self.EMAIL_2,
+            )
+        )
+        user_settings_model_2.update_timestamps()
+        user_settings_model_2.created_on += datetime.timedelta(hours=5)
+        final_created_on_timestamp_2 = user_settings_model_2.last_updated
+        user_settings_model_2.put()
+
+        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 2]]
+        self.assertLess(
+            final_created_on_timestamp_1, user_settings_model_1.created_on)
+        self.assertLess(
+            final_created_on_timestamp_2, user_settings_model_2.created_on)
+        actual_output = self._run_one_off_job()
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(actual_output, expected_output)
+        migrated_user_model_1 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+        migrated_user_model_2 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_2))
+        self.assertEqual(
+            migrated_user_model_1.created_on, final_created_on_timestamp_1)
+        self.assertEqual(
+            migrated_user_model_2.created_on, final_created_on_timestamp_2)
+
+
+class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    USER_ID_1 = 'user_id'
+    USER_ID_2 = 'user_id_2'
+    EMAIL_1 = 'test@email.com'
+    EMAIL_2 = 'test2@email.com'
+    SKILL_ID_1 = 'skill_id_1'
+    SKILL_ID_2 = 'skill_id_2'
+    DEGREE_OF_MASTERY = 0.5
+    EXPLORATION_IDS = ['exp_1', 'exp_2', 'exp_3']
+    COLLECTION_IDS = ['col_1', 'col_2', 'col_3']
+    EXP_ID_ONE = 'exp_id_one'
+    EXP_ID_TWO = 'exp_id_two'
+    EXP_ID_THREE = 'exp_id_three'
+
+    def setUp(self):
+
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(UserSettingsCreatedOnAuditOneOffJobTests, self).setUp()
+
+        self.user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        self.user_settings_model.update_timestamps()
+        self.lowest_timestamp = self.user_settings_model.created_on
+        self.user_settings_model.last_agreed_to_terms = (
+            self.lowest_timestamp + datetime.timedelta(hours=2))
+        self.user_settings_model.last_logged_in = (
+            self.lowest_timestamp + datetime.timedelta(minutes=1))
+        self.user_settings_model.last_started_state_editor_tutorial = (
+            self.lowest_timestamp + datetime.timedelta(minutes=3))
+        self.user_settings_model.last_started_state_translation_tutorial = (
+            self.lowest_timestamp + datetime.timedelta(hours=14))
+        self.user_settings_model.last_edited_an_exploration = (
+            self.lowest_timestamp + datetime.timedelta(hours=15))
+        self.user_settings_model.last_created_an_exploration = (
+            self.lowest_timestamp + datetime.timedelta(hours=16))
+        self.user_settings_model.first_contribution_msec = (
+            utils.get_time_in_millisecs(
+                self.lowest_timestamp + datetime.timedelta(
+                    hours=10)
+            )
+        )
+        self.user_settings_model.put()
+
+        self.user_subscriptions_model = user_models.UserSubscriptionsModel(
+            id=self.USER_ID_1)
+        self.user_subscriptions_model.update_timestamps()
+        self.user_subscriptions_model.last_checked = (
+            self.lowest_timestamp + datetime.timedelta(hours=1)
+        )
+        self.user_subscriptions_model.put()
+
+        self.exploration_user_data_model = user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_ONE),
+            user_id=self.USER_ID_1,
+            exploration_id=self.EXP_ID_ONE,
+            rating=2,
+            rated_on=self.lowest_timestamp + datetime.timedelta(hours=1),
+            draft_change_list={'new_content': {}},
+            draft_change_list_last_updated=(
+                self.lowest_timestamp + datetime.timedelta(hours=2)),
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1
+        )
+        self.exploration_user_data_model.update_timestamps()
+        self.exploration_user_data_model.put()
+
+        self.user_contributions_model = user_models.UserContributionsModel(
+            id=self.USER_ID_1)
+        self.user_contributions_model.update_timestamps()
+        self.user_contributions_model.put()
+
+        self.user_email_preferences_model = (
+            user_models.UserEmailPreferencesModel(id=self.USER_ID_1))
+        self.user_email_preferences_model.update_timestamps()
+        self.user_email_preferences_model.put()
+
+        self.user_stats_model = user_models.UserStatsModel(
+            id=self.USER_ID_1)
+        self.user_stats_model.update_timestamps()
+        self.user_stats_model.put()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob.create_new())
+        user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_created_on_having_lowest_value_timestamp_yields_success(self):
+        self.assertEqual(
+            self.lowest_timestamp, self.user_settings_model.created_on)
+        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_created_on_within_delta_from_lowest_value_yields_success(self):
+        self.user_settings_model.update_timestamps(
+            update_last_updated_time=False)
+        self.user_settings_model.created_on += datetime.timedelta(minutes=5)
+        self.user_settings_model.put()
+        self.assertLess(
+            self.lowest_timestamp, self.user_settings_model.created_on)
+        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_created_on_greater_than_delta_from_lowest_value_yields_error(self):
+        self.user_settings_model.update_timestamps(
+            update_last_updated_time=False)
+        self.user_settings_model.created_on += datetime.timedelta(minutes=6)
+        self.user_settings_model.put()
+        # Since last_updated of user_settings_model was never changed, hence
+        # it remains the lowest timestamp value among all attributes.
+        self.lowest_timestamp = self.user_settings_model.last_updated
+        self.assertLess(
+            self.lowest_timestamp,
+            self.user_settings_model.created_on - datetime.timedelta(minutes=5))
+        expected_output = [
+            [
+                'ERROR_NEED_TO_UPDATE_USING_UserSettingsModel_last_updated',
+                [self.USER_ID_1]
+            ]]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_update_for_multiple_users_works_correctly(self):
+        user_settings_model_2 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_2,
+                email=self.EMAIL_2,
+            )
+        )
+        user_settings_model_2.update_timestamps()
+        user_settings_model_2.created_on += datetime.timedelta(hours=10)
+        user_settings_model_2.put()
+
+        expected_output = [
+            ['SUCCESS_ALREADY_UP_TO_DATE', 1],
+            [
+                'ERROR_NEED_TO_UPDATE_USING_UserSettingsModel_last_updated',
+                [self.USER_ID_2]
+            ]
+        ]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(actual_output, expected_output)
+
+
+class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CleanUpUserSubscribersModelOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup('user@email', 'user')
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        subscription_services.subscribe_to_creator(self.user_id, self.owner_id)
+
+        self.model_instance = user_models.UserSubscribersModel.get_by_id(
+            self.owner_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance.subscriber_ids.append(self.owner_id)
+        self.model_instance.deleted = True
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+
+        job_id = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
+    def test_job_removes_user_id_from_subscriber_ids(self):
+        self.model_instance.subscriber_ids.append(self.owner_id)
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        job_id = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Removed user from their own subscribers list\', '
+                '[u\'%s\']]' % self.owner_id])
+        self.model_instance = user_models.UserSubscribersModel.get_by_id(
+            self.owner_id)
+        self.assertTrue(self.user_id in self.model_instance.subscriber_ids)
+        self.assertTrue(self.owner_id not in self.model_instance.subscriber_ids)
+
+
+class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CleanUpCollectionProgressModelOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.OWNER_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i
+        ) for i in python_utils.RANGE(3)]
+
+        collection = collection_domain.Collection.create_default_collection(
+            'col')
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+            rights_manager.publish_exploration(self.owner, exp.id)
+            collection.add_node(exp.id)
+
+        collection_services.save_new_collection(self.owner_id, collection)
+        rights_manager.publish_collection(self.owner, 'col')
+
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, '0')
+        collection_services.record_played_exploration_in_collection_context(
+            self.user_id, 'col', '0')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, '1')
+        collection_services.record_played_exploration_in_collection_context(
+            self.user_id, 'col', '1')
+
+        self.model_instance = user_models.CollectionProgressModel.get_by_id(
+            '%s.col' % self.user_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance.completed_explorations.append('3')
+        self.model_instance.deleted = True
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_job_cleans_up_exploration_ids_not_present_in_collection(self):
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+        self.model_instance.completed_explorations.append('3')
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1', '3'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        expected_output = [(
+            '[u\'Added missing exp ids in CompletedActivitiesModel\', '
+            '[u\'%s.col\']]' % self.user_id
+        ), (
+            '[u\'Invalid Exploration IDs cleaned from '
+            'CollectionProgressModel\', '
+            '[u"Model id: %s.col, Collection id: col, Removed exploration ids: '
+            '[u\'3\']"]]' % self.user_id)]
+        self.assertEqual(output, expected_output)
+        self.model_instance = user_models.CollectionProgressModel.get_by_id(
+            '%s.col' % self.user_id)
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1', '3'])
+
+    def test_job_creates_completed_activities_model_if_it_is_missing(self):
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+        completed_activities_model.delete()
+
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Missing CompletedActivitiesModel\', '
+                '[u\'%s.col\']]' % self.user_id])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+
+    def test_job_updates_completed_activities_model_if_exp_ids_do_not_match(
+            self):
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, '2')
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1', '2'])
+        completed_activities_model.exploration_ids = ['0', '2']
+        completed_activities_model.update_timestamps()
+        completed_activities_model.put()
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '2'])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Added missing exp ids in CompletedActivitiesModel\', '
+                '[u\'%s.col\']]' % self.user_id])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '2', '1'])
+
+
+class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CleanUpUserContributionsModelOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup('user@email', 'user')
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.user = user_services.UserActionsInfo(self.user_id)
+
+        self.save_new_valid_exploration(
+            'exp0', self.user_id, end_state_name='End')
+        self.save_new_valid_exploration(
+            'exp1', self.owner_id, end_state_name='End')
+        exp_services.update_exploration(
+            self.user_id, 'exp1', [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+        rights_manager.publish_exploration(self.user, 'exp0')
+        rights_manager.publish_exploration(self.owner, 'exp1')
+
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            user_jobs_one_off
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(
+            model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+    def test_migration_job_skips_deleted_model(self):
+        model_instance = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        model_instance.deleted = True
+        model_instance.update_timestamps()
+        model_instance.put()
+        exp_services.delete_exploration(self.user_id, 'exp0')
+        job_id = (
+            user_jobs_one_off
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
+    def test_job_removes_deleted_exp_from_created_explorations(self):
+        exp_services.delete_exploration(self.user_id, 'exp0')
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(
+            model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Removed deleted exp ids from UserContributionsModel\', '
+                '[u"Model id: %s, Removed exploration ids: [u\'exp0\', '
+                'u\'exp0\']"]]' % self.user_id])
+
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, [])
+        self.assertEqual(model_instance_1.edited_exploration_ids, ['exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+    def test_job_removes_deleted_exp_from_edited_explorations(self):
+        exp_services.delete_exploration(self.owner_id, 'exp1')
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(
+            model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
+                job_id))
+        removed_exp_list = [
+            'Model id: %s, Removed exploration ids: '
+            '[u\'exp1\', u\'exp1\']' % self.owner_id,
+            'Model id: %s, Removed exploration ids: '
+            '[u\'exp1\']' % self.user_id]
+        removed_exp_list.sort()
+        self.assertEqual(
+            output, [
+                '[u\'Removed deleted exp ids from UserContributionsModel\', '
+                '[u"%s", u"%s"]]' % (removed_exp_list[0], removed_exp_list[1])])
+
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(model_instance_1.edited_exploration_ids, ['exp0'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, [])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, [])
+
+
+class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.ProfilePictureAuditOneOffJob.create_new()
+        user_jobs_one_off.ProfilePictureAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.ProfilePictureAuditOneOffJob.get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(ProfilePictureAuditOneOffJobTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.generate_initial_profile_picture(self.owner_id)
+
+    def test_correct_profile_picture_has_success_value(self):
+        user_services.generate_initial_profile_picture(self.owner_id)
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+    def test_resized_image_has_profile_picture_non_standard_dimensions_error(
+            self):
+        user_services.update_profile_picture_data_url(
+            self.owner_id, image_constants.PNG_IMAGE_WRONG_DIMENSIONS_BASE64)
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [[
+                'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - 150,160',
+                [self.OWNER_USERNAME]
+            ]]
+        )
+
+    def test_invalid_image_has_cannot_load_picture_error(self):
+        user_services.update_profile_picture_data_url(
+            self.owner_id, image_constants.PNG_IMAGE_BROKEN_BASE64)
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['FAILURE - CANNOT LOAD PROFILE PICTURE', [self.OWNER_USERNAME]]]
+        )
+
+    def test_non_png_image_has_profile_picture_not_png_error(self):
+        user_services.update_profile_picture_data_url(
+            self.owner_id, image_constants.JPG_IMAGE_BASE64)
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['FAILURE - PROFILE PICTURE NOT PNG', [self.OWNER_USERNAME]]]
+        )
+
+    def test_broken_base64_data_url_has_invalid_profile_picture_data_url_error(
+            self):
+        user_services.update_profile_picture_data_url(
+            self.owner_id, image_constants.BROKEN_BASE64)
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [[
+                'FAILURE - INVALID PROFILE PICTURE DATA URL',
+                [self.OWNER_USERNAME]
+            ]]
+        )
+
+    def test_user_without_profile_picture_has_missing_profile_picture_error(
+            self):
+        user_services.update_profile_picture_data_url(self.owner_id, None)
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['FAILURE - MISSING PROFILE PICTURE', [self.OWNER_USERNAME]]]
+        )
+
+    def test_not_registered_user_has_not_registered_value(self):
+        user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(self.owner_id))
+        user_settings_model.username = None
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS - NOT REGISTERED', 1]])
+
+    def test_deleted_user_has_deleted_value(self):
+        user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(self.owner_id))
+        user_settings_model.deleted = True
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS - DELETED', 1]])
+
+    def test_zero_users_has_no_output(self):
+        user_models.UserSettingsModel.delete_by_id(self.owner_id)
+        output = self._run_one_off_job()
+        self.assertEqual(output, [])
+
+    def test_multiple_users_have_correct_values(self):
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+
+        user_services.update_profile_picture_data_url(
+            new_user_id, image_constants.JPG_IMAGE_BASE64)
+        user_services.update_profile_picture_data_url(editor_id, None)
+
+        user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(moderator_id))
+        user_settings_model.deleted = True
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['SUCCESS', 1],
+                ['FAILURE - MISSING PROFILE PICTURE', [self.EDITOR_USERNAME]],
+                ['SUCCESS - DELETED', 1],
+                ['FAILURE - PROFILE PICTURE NOT PNG', [self.NEW_USER_USERNAME]]
+            ]
+        )
+
+
+class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob
+            .create_new())
+        user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        for item in eval_output:
+            if item[0] == 'FAILURE':
+                item[1] = sorted(item[1])
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(UniqueHashedNormalizedUsernameAuditJobTests, self).setUp()
+
+    def test_audit_user_with_username_is_successful(self):
+        model = user_models.UserSettingsModel(id='id', email='email@email.com')
+        model.update_timestamps()
+        model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS USERNAME NONE', 1]])
+
+    def test_audit_users_with_different_usernames_is_successful(self):
+        # Generate 4 different users.
+        for i in python_utils.RANGE(4):
+            model = user_models.UserSettingsModel(
+                id='id%s' % i,
+                email='email%s@email.com' % i,
+                normalized_username='username%s' % i
+            )
+            model.update_timestamps()
+            model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [])
+
+    def test_audit_users_with_different_usernames_all_hashes_same_fails(self):
+        # Generate 4 different users.
+        for i in python_utils.RANGE(4):
+            model = user_models.UserSettingsModel(
+                id='id%s' % i,
+                email='email%s@email.com' % i,
+                normalized_username='username%s' % i
+            )
+            model.update_timestamps()
+            model.put()
+
+        def mock_convert_to_hash(*_):
+            """Function that takes any number of arguments and returns the
+            same hash for all inputs.
+            """
+            return 'hashhash'
+
+        with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            output = self._run_one_off_job()
+
+        self.assertEqual(
+            output,
+            [['FAILURE', ['username%s' % i for i in python_utils.RANGE(4)]]])
+
+    def test_audit_users_with_different_usernames_some_hashes_same_fails(self):
+        # Generate 5 different users.
+        for i in python_utils.RANGE(5):
+            model = user_models.UserSettingsModel(
+                id='id%s' % i,
+                email='email%s@email.com' % i,
+                normalized_username='username%s' % i
+            )
+            model.update_timestamps()
+            model.put()
+
+        def mock_convert_to_hash(username, _):
+            """Function that takes username and returns the same hash for some
+            usernames and unique hash for others.
+            """
+            if username in ('username1', 'username2'):
+                return 'hashhash'
+            return hash(username)
+
+        with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            output = self._run_one_off_job()
+
+        self.assertEqual(output, [['FAILURE', ['username1', 'username2']]])

@@ -27,6 +27,7 @@ import python_utils
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
     """Tests for PARENT_ROLES and ROLE_ACTIONS."""
+
     PARENT_ROLES = role_services.PARENT_ROLES
     ACTIONS = role_services.ROLE_ACTIONS
 
@@ -113,6 +114,106 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
             set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_COLLECTION_EDITOR]))
 
         # Sets are compared as their element order don't need to be same.
-        self.assertEqual(set(collection_editor_actions),
-                         set(role_services.get_all_actions(
-                             feconf.ROLE_ID_COLLECTION_EDITOR)))
+        self.assertEqual(
+            set(collection_editor_actions),
+            set(role_services.get_all_actions(
+                feconf.ROLE_ID_COLLECTION_EDITOR)))
+
+    def test_check_path_exists_in_roles_graph_invalid_source_raises_error(self):
+        invalid_role = 'role_x'
+        error_msg = (
+            'Role %s defined by the source node does not exist.'
+            % invalid_role)
+        with self.assertRaisesRegexp(Exception, error_msg):
+            role_services.check_if_path_exists_in_roles_graph(
+                invalid_role, feconf.ROLE_ID_LEARNER)
+
+    def test_check_path_exists_in_roles_graph_invalid_dest_raises_error(self):
+        invalid_role = 'role_x'
+        error_msg = (
+            'Role %s defined by the destination node does not exist.'
+            % invalid_role)
+        with self.assertRaisesRegexp(Exception, error_msg):
+            role_services.check_if_path_exists_in_roles_graph(
+                feconf.ROLE_ID_LEARNER, invalid_role)
+
+    def test_check_path_exists_in_roles_graph_same_source_and_destination(self):
+        self.assertTrue(
+            role_services.check_if_path_exists_in_roles_graph(
+                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_LEARNER))
+
+    def test_check_path_exists_in_roles_graph_for_true_cases(self):
+        superior_roles_dict = {
+            feconf.ROLE_ID_GUEST: [
+                feconf.ROLE_ID_BANNED_USER, feconf.ROLE_ID_LEARNER,
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
+                feconf.ROLE_ID_MODERATOR, feconf.ROLE_ID_ADMIN
+            ],
+            feconf.ROLE_ID_BANNED_USER: [],
+            feconf.ROLE_ID_EXPLORATION_EDITOR: [
+                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
+                feconf.ROLE_ID_MODERATOR, feconf.ROLE_ID_ADMIN
+            ],
+            feconf.ROLE_ID_COLLECTION_EDITOR: [
+                feconf.ROLE_ID_TOPIC_MANAGER, feconf.ROLE_ID_MODERATOR,
+                feconf.ROLE_ID_ADMIN
+            ],
+            feconf.ROLE_ID_TOPIC_MANAGER: [
+                feconf.ROLE_ID_MODERATOR, feconf.ROLE_ID_ADMIN
+            ],
+            feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_ADMIN],
+            feconf.ROLE_ID_ADMIN: []
+        }
+
+        for source_node, target_nodes in superior_roles_dict.items():
+            for target_node in target_nodes:
+                self.assertTrue(
+                    role_services.check_if_path_exists_in_roles_graph(
+                        source_node, target_node)
+                )
+
+    def test_check_path_exists_in_roles_graph_for_false_cases(self):
+        inferior_roles_dict = {
+            feconf.ROLE_ID_GUEST: [],
+            feconf.ROLE_ID_BANNED_USER: [
+                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_LEARNER,
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
+                feconf.ROLE_ID_MODERATOR
+            ],
+            feconf.ROLE_ID_LEARNER: [
+                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER
+            ],
+            feconf.ROLE_ID_EXPLORATION_EDITOR: [
+                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
+                feconf.ROLE_ID_LEARNER
+            ],
+            feconf.ROLE_ID_COLLECTION_EDITOR: [
+                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
+                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR
+            ],
+            feconf.ROLE_ID_TOPIC_MANAGER: [
+                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
+                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR
+            ],
+            feconf.ROLE_ID_MODERATOR: [
+                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
+                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER
+            ],
+            feconf.ROLE_ID_ADMIN: [
+                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
+                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
+                feconf.ROLE_ID_MODERATOR
+            ]
+        }
+
+        for source_node, target_nodes in inferior_roles_dict.items():
+            for target_node in target_nodes:
+                self.assertFalse(
+                    role_services.check_if_path_exists_in_roles_graph(
+                        source_node, target_node)
+                )

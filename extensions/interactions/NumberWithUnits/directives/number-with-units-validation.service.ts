@@ -22,11 +22,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { unit } from 'mathjs';
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-import { baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { NumberWithUnitsCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -35,15 +40,17 @@ export class NumberWithUnitsValidationService {
   constructor(
     private unitObjectFactory: NumberWithUnitsObjectFactory,
     private baseInteraction: baseInteractionValidationService) {}
-  // TODO(#7165): Replace 'any' with the exact type.
-  getCustomizationArgsWarnings(customizationArgs: any): any {
+
+  getCustomizationArgsWarnings(
+      customizationArgs: NumberWithUnitsCustomizationArgs): Warning[] {
     return [];
   }
-  // TODO(#7165): Replace 'any' with the exact type.
+
   getAllWarnings(
-      stateName: any,
-      customizationArgs: any, answerGroups: any, defaultOutcome: any): any {
-    var warningsList = [];
+      stateName: string,
+      customizationArgs: NumberWithUnitsCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -103,13 +110,13 @@ export class NumberWithUnitsValidationService {
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
         };
 
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
-            rules[ranges[k].ruleIndex - 1];
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex].
+            rules[ranges[k].ruleIndex];
           if (earlierRule.type === 'IsEqualTo' &&
             rule.type === 'IsEqualTo') {
             if (checkEquality.call(this, earlierRule, rule)) {
@@ -118,8 +125,8 @@ export class NumberWithUnitsValidationService {
                 message: (
                   'Rule ' + (j + 1) + ' from answer group ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
+                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }
@@ -132,8 +139,8 @@ export class NumberWithUnitsValidationService {
                 message: (
                   'Rule ' + (j + 1) + ' from answer group ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
+                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }
@@ -155,4 +162,3 @@ export class NumberWithUnitsValidationService {
 angular.module('oppia').factory(
   'NumberWithUnitsValidationService', downgradeInjectable(
     NumberWithUnitsValidationService));
-

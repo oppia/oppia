@@ -1,0 +1,154 @@
+<div class="oppia-lost-changes">
+  <ul>
+    <li ng-repeat="lostChange in $ctrl.lostChanges">
+      <span ng-if="lostChange.cmd === 'add_state'">
+        Added state: <[lostChange.stateName]>
+      </span>
+      <span ng-if="lostChange.cmd === 'rename_state'">
+        Renamed state: <[lostChange.oldStateName]> to <[lostChange.newStateName]>
+      </span>
+      <span ng-if="lostChange.cmd === 'delete_state'">
+        Deleted state: <[lostChange.stateName]>
+      </span>
+      <div ng-if="lostChange.cmd === 'edit_state_property'">
+        Edits to state: <[lostChange.stateName]>
+        <ng-content ng-switch="lostChange.propertyName">
+          <div ng-switch-when="content">
+            <div ng-if="!lostChange.isNewValueEmpty()" class="state-edit-desc">
+              <strong>Edited content: </strong>
+              <div class="content" ng-bind-html="lostChange.newValue.html">
+              </div>
+            </div>
+          </div>
+
+          <div ng-switch-when="widget_id" class="state-edit-desc">
+            <span ng-if="lostChange.isAddingInteraction()">
+              <strong>Added Interaction: </strong>
+              <[lostChange.newValue]>
+            </span>
+
+            <span ng-if="lostChange.isEndingExploration()">
+              Ended Exploration
+            </span>
+
+            <span ng-if="!lostChange.isOldValueEmpty()">
+              <strong>Deleted Interaction: </strong>
+              <[lostChange.oldValue]>
+            </span>
+          </div>
+
+          <div ng-switch-when="widget_customization_args" class="state-edit-desc">
+            <span ng-if="lostChange.isOldValueEmpty()">
+              Added Interaction Customizations
+            </span>
+            <span ng-if="!lostChange.isOldValueEmpty() && lostChange.isNewValueEmpty()">
+              Removed Interaction Customizations
+            </span>
+            <span ng-if="!lostChange.isOldValueEmpty() && !lostChange.isNewValueEmpty()">
+              Edited Interaction Customizations
+            </span>
+          </div>
+
+          <div ng-switch-when="answer_groups">
+            <div ng-if="lostChange.getRelativeChangeToGroups() === 'added'" class="state-edit-desc answer-group">
+              <strong>Added answer group: </strong>
+              <p class="sub-edit">
+                <i>Destination: </i><[lostChange.newValue.outcome.dest]>
+              </p>
+
+              <div class="sub-edit">
+                <i>Feedback: </i>
+                <div class="feedback">
+                  <[lostChange.newValue.outcome.feedback.html]>
+                </div>
+              </div>
+
+              <div class="sub-edit" ng-if="lostChange.newValue.rules.length > 0">
+                <i>Rules: </i>
+                <ol class="rules-list">
+                  <li ng-repeat="rule in lostChange.newValue.rules">
+                    <p>Type: <[rule.type]></p>
+                    <p>Value:
+                      <span> </span>
+                      <ng-content ng-repeat="input in rule.inputs">
+                        <[ $last ? input : (input + ',')]>
+                      </ng-content>
+                    </p>
+                  </li>
+                </ol>
+              </div>
+
+            </div>
+
+            <div ng-if="lostChange.getRelativeChangeToGroups() === 'edited'" class="state-edit-desc answer-group">
+              <strong>Edited answer group: </strong>
+              <p class="sub-edit" ng-if="!isOutcomeDestEqual()">
+                <i>Destination: </i>
+                <[lostChange.newValue.outcome.dest]>
+              </p>
+
+              <div class="sub-edit" ng-if="lostChange.isOutcomeFeedbackEqual()">
+                <i>Feedback: </i>
+                <div class="feedback">
+                  <[lostChange.newValue.outcome.feedback.html]>
+                </div>
+              </div>
+
+              <div class="sub-edit" ng-if="lostChange.isRulesEqual()">
+                <i>Rules: </i>
+                <ol class="rules-list">
+                  <li ng-repeat="rule in lostChange.newValue.rules track by $index">
+                    <p>Type: <[rule.type]></p>
+                    <p>Value:
+                      <span> </span>
+                      <ng-content ng-repeat="input in rule.inputs">
+                        <[ $last ? input : (input + ',')]>
+                      </ng-content>
+                    </p>
+                  </li>
+                </ol>
+              </div>
+            </div>
+
+            <div ng-if="lostChange.getRelativeChangeToGroups() === 'deleted'" class="state-edit-desc">
+              Deleted answer group
+            </div>
+          </div>
+
+          <div ng-switch-when="default_outcome">
+            <div ng-if="lostChange.getRelativeChangeToGroups() === 'added'" class="state-edit-desc default-outcome">
+              Added default outcome:
+              <p class="sub-edit">
+                <i>Destination: </i><[lostChange.newValue.dest]>
+              </p>
+              <div class="sub-edit">
+                <i>Feedback: </i>
+                <div class="feedback">
+                  <[lostChange.newValue.feedback.html]>
+                </div>
+              </div>
+            </div>
+
+            <div ng-if="lostChange.getRelativeChangeToGroups() === 'edited'" class="state-edit-desc default-outcome">
+              Edited default outcome:
+              <p class="sub-edit" ng-if="!isDestEqual()">
+                <i>Destination: </i><[lostChange.newValue.dest]>
+              </p>
+
+              <div class="sub-edit" ng-if="lostChange.isFeedbackEqual()">
+                <i>Feedback: </i>
+                <div class="feedback">
+                  <[lostChange.newValue.feedback.html]>
+                </div>
+              </div>
+            </div>
+
+            <div ng-if="lostChange.getRelativeChangeToGroups() === 'deleted'" class="state-edit-desc">
+              Deleted default outcome
+            </div>
+          </div>
+        </ng-content>
+      </div>
+    </li>
+  </ul>
+</div>

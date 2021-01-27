@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import tarfile
-import zipfile
 
 from core.tests import test_utils
 
@@ -63,12 +62,10 @@ class SetupGaeTests(test_utils.GenericTestBase):
         self.print_arr = []
         def mock_print(msg):
             self.print_arr.append(msg)
-        # pylint: disable=unused-argument
-        def mock_url_retrieve(unused_url, filename):
+        def mock_url_retrieve(unused_url, filename):  # pylint: disable=unused-argument
             self.check_function_calls['url_retrieve_is_called'] = True
             if self.raise_error:
                 raise Exception
-        # pylint: enable=unused-argument
         self.walk_swap = self.swap(os, 'walk', mock_walk)
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
@@ -99,52 +96,6 @@ class SetupGaeTests(test_utils.GenericTestBase):
             setup_gae.main(args=[])
         self.assertEqual(check_file_removals, expected_check_file_removals)
 
-    def test_gae_install_without_errors(self):
-        self.check_function_calls['extractall_is_called'] = False
-        self.expected_check_function_calls['extractall_is_called'] = True
-        def mock_exists(path):
-            if path == common.GOOGLE_APP_ENGINE_HOME:
-                return False
-            return True
-        # pylint: disable=unused-argument
-        def mock_extractall(unused_self, path):
-            self.check_function_calls['extractall_is_called'] = True
-        # pylint: enable=unused-argument
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        zipfile_swap = self.swap(
-            setup_gae, 'GAE_DOWNLOAD_ZIP_PATH', MOCK_TMP_UNZIP_PATH)
-        extractall_swap = self.swap(
-            zipfile.ZipFile, 'extractall', mock_extractall)
-
-        with self.walk_swap, self.remove_swap, self.makedirs_swap:
-            with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with zipfile_swap, extractall_swap:
-                    setup_gae.main(args=[])
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls)
-        self.assertTrue(
-            'Download complete. Installing Google App Engine...'
-            in self.print_arr)
-
-    def test_gae_install_with_errors(self):
-        self.expected_check_function_calls['remove_is_called'] = False
-        self.raise_error = True
-        def mock_exists(path):
-            if path == common.GOOGLE_APP_ENGINE_HOME:
-                return False
-            return True
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-
-        with self.walk_swap, self.remove_swap, self.makedirs_swap:
-            with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with self.assertRaises(Exception):
-                    setup_gae.main(args=[])
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls)
-        self.assertTrue(
-            'Error downloading Google App Engine. Exiting.'
-            in self.print_arr)
-
     def test_gcloud_install_without_errors(self):
         self.check_function_calls['open_is_called'] = False
         self.check_function_calls['extractall_is_called'] = False
@@ -157,13 +108,11 @@ class SetupGaeTests(test_utils.GenericTestBase):
                 return False
             return True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        # pylint: disable=unused-argument
-        def mock_open(name):
+        def mock_open(name):  # pylint: disable=unused-argument
             self.check_function_calls['open_is_called'] = True
             return temp_file
-        def mock_extractall(unused_self, path):
+        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
-        # pylint: enable=unused-argument
         def mock_close(unused_self):
             self.check_function_calls['close_is_called'] = True
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -193,7 +142,8 @@ class SetupGaeTests(test_utils.GenericTestBase):
 
         with self.walk_swap, self.remove_swap, self.makedirs_swap:
             with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with self.assertRaises(Exception):
+                with self.assertRaisesRegexp(
+                    Exception, 'Error downloading Google Cloud SDK.'):
                     setup_gae.main(args=[])
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)

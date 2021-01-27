@@ -28,6 +28,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
@@ -177,6 +178,16 @@ class ExplorationDisplayableSummariesTest(
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
 
+    def test_get_human_readable_contributors_summary_with_deleted_user(self):
+        contributors_summary = {self.albert_id: 10}
+        user_services.mark_user_for_deletion(self.albert_id)
+        self.assertEqual(
+            {'[User being deleted]': {'num_commits': 10}},
+            summary_services.get_human_readable_contributors_summary(
+                contributors_summary
+            )
+        )
+
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
         # EXP_ID_1 -- private exploration owned by Albert.
@@ -229,7 +240,7 @@ class ExplorationDisplayableSummariesTest(
         # then Albert has access to the corresponding summary.
         rights_manager.assign_role_for_exploration(
             self.bob, self.EXP_ID_5, self.albert_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(

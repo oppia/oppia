@@ -19,13 +19,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
+(exp_models, feedback_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback])
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
@@ -43,12 +47,12 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.enqueue(job_id)
         self.assertEqual(
             1,
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
             0,
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
         job_output = (
             feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.get_output(
@@ -90,6 +94,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -102,6 +107,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -113,6 +119,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = 'Non-empty'
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -125,6 +132,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = 'Non-empty'
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -137,6 +145,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -149,6 +158,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -160,6 +170,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -172,6 +183,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -183,6 +195,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(None, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -195,6 +208,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -207,6 +221,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -219,6 +234,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -231,6 +247,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -243,6 +260,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
+        model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
@@ -373,159 +391,166 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self.assertIsNone(model.last_nonempty_message_author_id)
 
 
-class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
-    """Tests for GeneralFeedbackThreadUserOneOffJob."""
+class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
+        test_utils.GenericTestBase):
+    """Tests for one-off job to clean up feedback analytics model."""
 
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob]
+    def setUp(self):
+        super(CleanUpFeedbackAnalyticsModelModelOneOffJobTest, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
 
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+
+        feedback_models.FeedbackAnalyticsModel(id='0').put()
+
+    def test_standard_operation(self):
         job_id = (
-            feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
-            .create_new())
-        feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        stringified_output = (
-            feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
-            .get_output(job_id))
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
 
-        eval_output = [ast.literal_eval(stringified_item)
-                       for stringified_item in stringified_output]
-        return eval_output
+        output = (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
 
-    def _check_model_validity(
-            self, user_id, thread_id, original_user_feedback_model):
-        """Checks if the model was migrated correctly."""
-        migrated_user_feedback_model = (
-            feedback_models.GeneralFeedbackThreadUserModel
-            .get(user_id, thread_id))
-        self.assertEqual(migrated_user_feedback_model.user_id, user_id)
-        self.assertEqual(migrated_user_feedback_model.thread_id, thread_id)
-        # Check that the other values didn't change.
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        self.assertFalse(model_instance is None)
+
+    def test_migration_job_skips_deleted_model(self):
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        model_instance.deleted = True
+        model_instance.update_timestamps()
+        model_instance.put()
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_job_removes_analytics_model_for_deleted_explorations(self):
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        self.assertFalse(model_instance is None)
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
         self.assertEqual(
-            migrated_user_feedback_model.created_on,
-            original_user_feedback_model.created_on
+            output, ['[u\'Deleted Feedback Analytics Model\', [u\'0\']]'])
+
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        self.assertIsNone(model_instance)
+
+
+class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
+        test_utils.GenericTestBase):
+    """Tests for one-off job to clean up general feedback thread model."""
+
+    def setUp(self):
+        super(CleanUpGeneralFeedbackThreadModelOneOffJobTest, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
         )
+        exp_services.save_new_exploration(self.user_id, exp)
+
+        self.thread_id = feedback_services.create_thread(
+            'exploration', '0', self.user_id, 'Subject', 'Text',
+            has_suggestion=False)
+
+    def test_standard_operation(self):
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_migration_job_skips_deleted_model(self):
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        model_instance.deleted = True
+        model_instance.update_timestamps()
+        model_instance.put()
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_job_removes_thread_model_for_deleted_explorations(self):
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        self.assertFalse(model_instance is None)
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
         self.assertEqual(
-            migrated_user_feedback_model.last_updated,
-            original_user_feedback_model.last_updated
-        )
-        self.assertEqual(
-            migrated_user_feedback_model.message_ids_read_by_user,
-            original_user_feedback_model.message_ids_read_by_user,
-        )
+            output, [
+                '[u\'Deleted GeneralFeedbackThreadModel\', [u\'%s\']]' % (
+                    self.thread_id)])
 
-    def test_successful_migration_deleted_none(self):
-        user_id = None
-        thread_id = 'exploration.exp_id.thread_id'
-        instance_id = '%s.%s' % (user_id, thread_id)
-        user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id, user_id=user_id, thread_id=thread_id)
-        user_feedback_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output,
-            [['SUCCESS-DELETED-NONE', ['None.exploration.exp_id.thread_id']]])
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id))
-
-    def test_successful_migration_deleted_string(self):
-        user_id = 'None'
-        thread_id = 'exploration.exp_id.thread_id'
-        instance_id = '%s.%s' % (user_id, thread_id)
-        user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id, user_id=user_id, thread_id=thread_id)
-        user_feedback_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output,
-            [['SUCCESS-DELETED-STRING', ['None.exploration.exp_id.thread_id']]])
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id))
-
-    def test_successful_migration_not_deleted(self):
-        user_id = 'user_id'
-        thread_id = 'exploration.exp_id.thread_id'
-        instance_id = '%s.%s' % (user_id, thread_id)
-        user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id, user_id=user_id, thread_id=thread_id)
-        user_feedback_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(output, [['SUCCESS-NOT_DELETED', 1]])
-        self._check_model_validity(user_id, thread_id, user_feedback_model)
-
-    def test_successful_migration_not_deleted_multiple(self):
-        user_id1 = 'user1'
-        thread_id1 = 'exploration.exp_id.thread_id1'
-        instance_id1 = '%s.%s' % (user_id1, thread_id1)
-        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id1, user_id=user_id1, thread_id=thread_id1)
-        user_feedback_model1.put()
-
-        user_id2 = 'user2'
-        thread_id2 = 'exploration.exp_id.thread_id2'
-        instance_id2 = '%s.%s' % (user_id2, thread_id2)
-        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id2, user_id=user_id2, thread_id=thread_id2)
-        user_feedback_model2.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(output, [['SUCCESS-NOT_DELETED', 2]])
-        self._check_model_validity(user_id1, thread_id1, user_feedback_model1)
-        self._check_model_validity(user_id2, thread_id2, user_feedback_model2)
-
-
-    def test_successful_migration_combined(self):
-        user_id1 = None
-        thread_id1 = 'exploration.exp_id.thread_id1'
-        instance_id1 = '%s.%s' % (user_id1, thread_id1)
-        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id1, user_id=user_id1, thread_id=thread_id1)
-        user_feedback_model1.put()
-
-        user_id2 = 'None'
-        thread_id2 = 'exploration.exp_id.thread_id2'
-        instance_id2 = '%s.%s' % (user_id2, thread_id2)
-        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id2, user_id=user_id2, thread_id=thread_id2)
-        user_feedback_model2.put()
-
-        user_id3 = 'user1'
-        thread_id3 = 'exploration.exp_id.thread_id1'
-        instance_id3 = '%s.%s' % (user_id3, thread_id3)
-        user_feedback_model3 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id3, user_id=user_id3, thread_id=thread_id3)
-        user_feedback_model3.put()
-
-        user_id4 = 'user4'
-        thread_id4 = 'exploration.exp_id.thread_id4'
-        instance_id4 = '%s.%s' % (user_id4, thread_id4)
-        user_feedback_model4 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id4, user_id=user_id4, thread_id=thread_id4)
-        user_feedback_model4.put()
-
-        output = self._run_one_off_job()
-        self.assertIn(['SUCCESS-NOT_DELETED', 2], output)
-        self.assertIn(
-            ['SUCCESS-DELETED-NONE', ['None.exploration.exp_id.thread_id1']],
-            output)
-        self.assertIn(
-            ['SUCCESS-DELETED-STRING', ['None.exploration.exp_id.thread_id2']],
-            output)
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id1))
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id2))
-        self._check_model_validity(user_id3, thread_id3, user_feedback_model3)
-        self._check_model_validity(user_id4, thread_id4, user_feedback_model4)
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        self.assertIsNone(model_instance)

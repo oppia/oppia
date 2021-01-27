@@ -38,7 +38,7 @@ class PencilCodeEditor(base.BaseInteraction):
     show_generic_submit_button = False
 
     _customization_arg_specs = [{
-        'name': 'initial_code',
+        'name': 'initialCode',
         'description': 'The initial code',
         'schema': {
             'type': 'unicode',

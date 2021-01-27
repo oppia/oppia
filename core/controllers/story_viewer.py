@@ -20,10 +20,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import question_services
+from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
+from core.domain import topic_fetchers
 import feconf
+import utils
 
 
 class StoryPage(base.BaseHandler):
@@ -32,9 +36,6 @@ class StoryPage(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, _):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         self.render_template('story-viewer-page.mainpage.html')
 
 
@@ -42,15 +43,15 @@ class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         story = story_fetchers.get_story_by_id(story_id)
+        topic_id = story.corresponding_topic_id
+        topic_name = topic_fetchers.get_topic_by_id(topic_id).name
 
         completed_node_ids = [
             completed_node.id for completed_node in
@@ -74,9 +75,12 @@ class StoryPageDataHandler(base.BaseHandler):
             node['exp_summary_dict'] = exp_summary_dicts[ind]
 
         self.values.update({
+            'story_id': story.id,
             'story_title': story.title,
             'story_description': story.description,
-            'story_nodes': ordered_node_dicts
+            'story_nodes': ordered_node_dicts,
+            'topic_name': topic_name,
+            'meta_tag_content': story.meta_tag_content
         })
         self.render_json(self.values)
 
@@ -85,10 +89,12 @@ class StoryProgressHandler(base.BaseHandler):
     """Marks a story node as completed after completing and returns exp ID of
     next chapter (if applicable).
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_story_viewer_page
-    def post(self, story_id, node_id):
+    def _record_node_completion(
+            self, story_id, node_id, completed_node_ids, ordered_nodes):
+        """Records node completion."""
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
 
@@ -98,19 +104,9 @@ class StoryProgressHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        story = story_fetchers.get_story_by_id(story_id)
-        completed_nodes = story_fetchers.get_completed_nodes_in_story(
-            self.user_id, story_id)
-        completed_node_ids = [
-            completed_node.id for completed_node in completed_nodes]
-
-        ordered_nodes = [
-            node for node in story.story_contents.get_ordered_nodes()
-        ]
-
         next_exp_ids = []
         next_node_id = None
-        if not node_id in completed_node_ids:
+        if node_id not in completed_node_ids:
             story_services.record_completed_node_in_story_context(
                 self.user_id, story_id, node_id)
 
@@ -124,17 +120,91 @@ class StoryProgressHandler(base.BaseHandler):
                     next_exp_ids = [node.exploration_id]
                     next_node_id = node.id
                     break
+        return (next_exp_ids, next_node_id, completed_node_ids)
+
+    @acl_decorators.can_access_story_viewer_page
+    def get(self, story_id, node_id):
+        """Handles GET requests."""
+        (
+            _, _, classroom_url_fragment, topic_url_fragment,
+            story_url_fragment, node_id) = self.request.path.split('/')
+        story = story_fetchers.get_story_by_id(story_id)
+        completed_nodes = story_fetchers.get_completed_nodes_in_story(
+            self.user_id, story_id)
+        ordered_nodes = story.story_contents.get_ordered_nodes()
+
+        # In case the user is a returning user and has completed nodes in the
+        # past, redirect to the story page so that the user can continue from
+        # where they had left off.
+        # If the node id is not the first node in the story, redirect to
+        # the story page.
+        if completed_nodes or node_id != ordered_nodes[0].id:
+            self.redirect(
+                '/learn/%s/%s/story/%s' % (
+                    classroom_url_fragment, topic_url_fragment,
+                    story_url_fragment))
+            return
+
+        (next_exp_ids, next_node_id, _) = (
+            self._record_node_completion(story_id, node_id, [], ordered_nodes))
+        if next_node_id is None:
+            self.redirect(
+                '/learn/%s/%s/story/%s' % (
+                    classroom_url_fragment, topic_url_fragment,
+                    story_url_fragment))
+            return
+
+        redirect_url = '%s/%s' % (
+            feconf.EXPLORATION_URL_PREFIX, next_exp_ids[0])
+        redirect_url = utils.set_url_query_parameter(
+            redirect_url, 'classroom_url_fragment', classroom_url_fragment)
+        redirect_url = utils.set_url_query_parameter(
+            redirect_url, 'topic_url_fragment', topic_url_fragment)
+        redirect_url = utils.set_url_query_parameter(
+            redirect_url, 'story_url_fragment', story_url_fragment)
+        redirect_url = utils.set_url_query_parameter(
+            redirect_url, 'node_id', next_node_id)
+
+        self.redirect(redirect_url)
+
+    @acl_decorators.can_access_story_viewer_page
+    def post(self, story_id, node_id):
+        story = story_fetchers.get_story_by_id(story_id)
+        completed_nodes = story_fetchers.get_completed_nodes_in_story(
+            self.user_id, story_id)
+        completed_node_ids = [
+            completed_node.id for completed_node in completed_nodes]
+        ordered_nodes = story.story_contents.get_ordered_nodes()
+
+        (next_exp_ids, next_node_id, completed_node_ids) = (
+            self._record_node_completion(
+                story_id, node_id, completed_node_ids, ordered_nodes))
 
         ready_for_review_test = False
         exp_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 next_exp_ids))
 
-        if (
-                (len(exp_summaries) != 0 and
-                 len(completed_nodes) %
-                 constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0) or
-                (len(completed_nodes) == len(ordered_nodes))):
+        # If there are no questions for any of the acquired skills that the
+        # learner has completed, do not show review tests.
+        acquired_skills = skill_fetchers.get_multi_skills(
+            story.get_acquired_skill_ids_for_node_ids(
+                completed_node_ids
+            ))
+
+        acquired_skill_ids = [skill.id for skill in acquired_skills]
+        questions_available = len(
+            question_services.get_questions_by_skill_ids(
+                1, acquired_skill_ids, False)) > 0
+
+        learner_completed_story = len(completed_node_ids) == len(ordered_nodes)
+        learner_at_review_point_in_story = (
+            len(exp_summaries) != 0 and (
+                len(completed_node_ids) &
+                constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0)
+        )
+        if questions_available and (
+                learner_at_review_point_in_story or learner_completed_story):
             ready_for_review_test = True
 
         return self.render_json({

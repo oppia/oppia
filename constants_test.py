@@ -40,6 +40,23 @@ class ConstantsTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
 
+    def test_difficulty_values_are_matched(self):
+        """Tests that the difficulty values and strings are matched in the
+        various constants.
+        """
+        self.assertEqual(
+            constants.constants.SKILL_DIFFICULTIES, [
+                constants.constants.SKILL_DIFFICULTY_EASY,
+                constants.constants.SKILL_DIFFICULTY_MEDIUM,
+                constants.constants.SKILL_DIFFICULTY_HARD])
+        self.assertItemsEqual(
+            list(constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.keys()),
+            constants.constants.SKILL_DIFFICULTIES)
+        self.assertEqual(
+            constants.constants.DEFAULT_SKILL_DIFFICULTY,
+            constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                constants.constants.SKILL_DIFFICULTY_EASY])
+
     def test_constants_and_feconf_are_consistent(self):
         """Test if constants that are related are consistent between feconf and
         constants.js.
@@ -69,3 +86,39 @@ class ConstantsTests(test_utils.GenericTestBase):
 
             self.assertEqual(
                 actual_text_without_comments, expected_text_without_comments)
+
+    def test_language_constants_are_in_sync(self):
+        """Test if SUPPORTED_CONTENT_LANGUAGES and SUPPORTED_AUDIO_LANGUAGES
+        constants have any conflicting values.
+        """
+        # TODO(#11737): Remove this once language constants are consolidated.
+        rtl_content_languages = [
+            language[u'code']
+            for language
+            in constants.constants.SUPPORTED_CONTENT_LANGUAGES
+            if language[u'direction'] == 'rtl'
+        ]
+        ltr_content_languages = [
+            language[u'code']
+            for language
+            in constants.constants.SUPPORTED_CONTENT_LANGUAGES
+            if language[u'direction'] == 'ltr'
+        ]
+        rtl_audio_languages = [
+            language[u'id']
+            for language
+            in constants.constants.SUPPORTED_AUDIO_LANGUAGES
+            if language[u'direction'] == 'rtl'
+        ]
+        ltr_audio_languages = [
+            language[u'id']
+            for language
+            in constants.constants.SUPPORTED_AUDIO_LANGUAGES
+            if language[u'direction'] == 'ltr'
+        ]
+        conflicts = list(
+            set(rtl_content_languages) & set(ltr_audio_languages)
+        ) + list(
+            set(rtl_audio_languages) & set(ltr_content_languages)
+        )
+        self.assertFalse(conflicts)

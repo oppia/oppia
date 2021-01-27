@@ -23,11 +23,13 @@ from core import jobs
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import activity_jobs_one_off
+from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
 from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
+from core.domain import user_services
 from core.domain import wipeout_jobs_one_off
 from core.platform import models
 import feconf
@@ -35,8 +37,7 @@ import utils
 
 from pipeline import pipeline
 
-(job_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.suggestion])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
@@ -103,14 +104,16 @@ class CronUserDeletionHandler(base.BaseHandler):
             wipeout_jobs_one_off.UserDeletionOneOffJob.create_new())
 
 
-class CronVerifyUserDeletionHandler(base.BaseHandler):
-    """Handler for running the user deletion verification one off job."""
+class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
+    """Handler for running the fully complete user deletion one off job."""
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.create_new())
+        wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(
+            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
+            .create_new()
+        )
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
@@ -194,6 +197,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
                 if pipeline_id in pipeline_id_to_job_instance:
                     job_instance = pipeline_id_to_job_instance[pipeline_id]
                     job_instance.has_been_cleaned_up = True
+                    job_instance.update_timestamps()
                     job_instance.put()
 
                 # This enqueues a deferred cleanup item.
@@ -205,28 +209,117 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         logging.warning('%s MR jobs cleaned up.' % num_cleaned)
 
         if job_models.JobModel.do_unfinished_jobs_exist(
-                cron_services.JobCleanupManager.__name__):
+                cron_services.MapReduceStateModelsCleanupManager.__name__):
             logging.warning('A previous cleanup job is still running.')
         else:
-            cron_services.JobCleanupManager.enqueue(
-                cron_services.JobCleanupManager.create_new(),
+            cron_services.MapReduceStateModelsCleanupManager.enqueue(
+                cron_services.MapReduceStateModelsCleanupManager.create_new(),
                 additional_job_params={
                     jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
-            logging.warning('Deletion jobs for auxiliary entities kicked off.')
+            logging.warning(
+                'Deletion jobs for auxiliary MapReduce entities kicked off.')
+
+        if job_models.JobModel.do_unfinished_jobs_exist(
+                cron_services.JobModelsCleanupManager.__name__):
+            logging.warning(
+                'A previous JobModels cleanup job is still running.')
+        else:
+            cron_services.JobModelsCleanupManager.enqueue(
+                cron_services.JobModelsCleanupManager.create_new())
+            logging.warning('Deletion jobs for JobModels entities kicked off.')
 
 
-class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
-    """Handler to accept suggestions that have no activity on them for
-    THRESHOLD_TIME_BEFORE_ACCEPT time.
+class CronModelsCleanupHandler(base.BaseHandler):
+    """Handler for cleaning up models that are marked as deleted and marking
+    specific types of models as deleted.
     """
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
-        """Handles get requests."""
-        if feconf.ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS:
-            suggestions = suggestion_services.get_all_stale_suggestions()
-            for suggestion in suggestions:
-                suggestion_services.accept_suggestion(
-                    suggestion, feconf.SUGGESTION_BOT_USER_ID,
-                    suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
+        """Cron handler that hard-deletes all models that were marked as deleted
+        (have deleted field set to True) more than some period of time ago.
+        Also, for some types of models (that we shouldn't keep for long time)
+        mark them as deleted if they were last updated more than some period
+        of time ago.
+
+        The time periods are specified in the cron_services as a constant.
+        """
+        cron_services.delete_models_marked_as_deleted()
+        cron_services.mark_outdated_models_as_deleted()
+
+
+class CronMailReviewersContributorDashboardSuggestionsHandler(
+        base.BaseHandler):
+    """Handler for mailing reviewers suggestions on the Contributor
+    Dashboard that need review.
+    """
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Sends each reviewer an email with up to
+        suggestion_services.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER
+        suggestions that have been waiting the longest for review, based on
+        their reviewing permissions.
+        """
+        # Only execute this job if it's possible to send the emails and there
+        # are reviewers to notify.
+        if not feconf.CAN_SEND_EMAILS:
+            return
+        if not (config_domain
+                .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+            return
+        reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
+        if not reviewer_ids:
+            return
+        reviewers_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                reviewer_ids))
+        email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+            reviewer_ids, reviewers_suggestion_email_infos)
+
+
+class CronMailAdminContributorDashboardBottlenecksHandler(
+        base.BaseHandler):
+    """Handler for mailing admins if there are bottlenecks that are causing a
+    longer reviewer turnaround time on the Contributor Dashboard.
+    """
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Sends each admin up to two emails: an email to alert the admins that
+        there are suggestion types that need more reviewers and/or an email
+        to alert the admins that specific suggestions have been waiting too long
+        to get reviewed.
+        """
+        if not feconf.CAN_SEND_EMAILS:
+            return
+
+        if (
+                config_domain
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            suggestion_types_needing_reviewers = (
+                suggestion_services
+                .get_suggestion_types_that_need_reviewers()
+            )
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
+                admin_ids, suggestion_types_needing_reviewers)
+        if (
+                config_domain
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
+                .value):
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            info_about_suggestions_waiting_too_long_for_review = (
+                suggestion_services
+                .get_info_about_suggestions_waiting_too_long_for_review()
+            )
+            (
+                email_manager
+                .send_mail_to_notify_admins_suggestions_waiting_long(
+                    admin_ids,
+                    info_about_suggestions_waiting_too_long_for_review)
+            )

@@ -34,21 +34,6 @@ import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 
-// TODO(#7165): Replace 'any' with the exact type
-/* eslint-disable camelcase */
-export interface IKNN {
-  fingerprint_data: any;
-  occurrence: any;
-  top: any;
-  K?: any;
-  T?: any;
-  token_to_id?:any;
-}
-export interface IClassifierData {
-  KNN: IKNN
-  cv_vocabulary: object;
-  SVM: object;
-}
 @Injectable({
   providedIn: 'root'
 })
@@ -79,7 +64,7 @@ export class CodeReplPredictionService {
   ];
 
   getTokenizedProgram(
-      programTokens: Array<string[]>, tokenToId: object): string[] {
+      programTokens: string[][], tokenToId: object): string[] {
     // Tokenize Python programs in dataset for winnowing.
     const tokenizedProgram = [];
 
@@ -109,7 +94,7 @@ export class CodeReplPredictionService {
     return tokenizedProgram;
   }
 
-  getTokenizedProgramForCV(programTokens: Array<string[]>): string[] {
+  getTokenizedProgramForCV(programTokens: string[][]): string[] {
     // Tokenize Python programs in dataset for winnowing.
     const tokenizedProgram = [];
 
@@ -136,7 +121,7 @@ export class CodeReplPredictionService {
   }
 
   calcJaccardIndex(
-      multisetA: Array<number>, multisetB: Array<number>): number {
+      multisetA: number[], multisetB: number[]): number {
     // Calculate jaccard index between two multisets.
     multisetA.sort((x, y) => {
       return x > y ? 1 : -1;
@@ -187,7 +172,7 @@ export class CodeReplPredictionService {
   }
 
   getProgramSimilarity(
-      fingerprintA: Array<number[]>, fingerprintB: Array<number[]>): number {
+      fingerprintA: number[][], fingerprintB: number[][]): number {
     // Calculate similarity between two programs' fingerprints.
     const multisetA = [];
     const multisetB = [];
@@ -203,7 +188,7 @@ export class CodeReplPredictionService {
     return this.calcJaccardIndex(multisetA, multisetB);
   }
 
-  findNearestNeighborsIndexes(knnData: IKNN, program: string): Array<number[]> {
+  findNearestNeighborsIndexes(knnData: KNN, program: string): number[][] {
     // Find index of nearest neighbor programs to given program.
     const K = knnData.K;
     const T = knnData.T;
@@ -256,7 +241,7 @@ export class CodeReplPredictionService {
     return nearestNeighborsIndexes;
   }
 
-  predict(classifierData: IClassifierData, answer: {code: string}): number {
+  predict(classifierData: ClassifierData, answer: {code: string}): number {
     // Get python code from the input answer.
     const program = answer.code;
     const knnData = classifierData.KNN;
@@ -264,12 +249,11 @@ export class CodeReplPredictionService {
     const cvVocabulary = classifierData.cv_vocabulary;
 
     const fingerprintData = knnData.fingerprint_data;
-    const top = knnData.top;
     const occurrence = knnData.occurrence;
 
     const nearestNeighborsIndexes = (
       this.findNearestNeighborsIndexes(knnData, program));
-    const nearesNeighborsClasses = [];
+    const nearesNeighborsClasses: number[][] = [];
 
     // Find classes of nearest neighbor programs.
     nearestNeighborsIndexes.forEach((neighbor: number[]) => {
@@ -282,7 +266,7 @@ export class CodeReplPredictionService {
 
     // Count how many times a class appears in nearest neighbors.
     const classCount = {};
-    nearesNeighborsClasses.forEach((neighbor: any[]) => {
+    nearesNeighborsClasses.forEach(neighbor => {
       const outputClass = neighbor[0];
       if (classCount.hasOwnProperty(outputClass)) {
         classCount[outputClass] += 1;

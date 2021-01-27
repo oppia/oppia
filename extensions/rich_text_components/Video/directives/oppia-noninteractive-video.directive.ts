@@ -20,26 +20,26 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+
 require('services/autoplayed-videos.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveVideo', [
-  '$sce', '$timeout', 'HtmlEscaperService', 'UrlInterpolationService',
-  function($sce, $timeout, HtmlEscaperService, UrlInterpolationService) {
+  '$sce', '$timeout', 'HtmlEscaperService',
+  function($sce, $timeout, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Video/directives/video.directive.html'),
+      template: require('./video.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'ContextService', '$element',
-        'AutoplayedVideosService', 'PAGE_CONTEXT', '$window',
-        function($attrs, ContextService, $element,
-            AutoplayedVideosService, PAGE_CONTEXT, $window) {
+        '$attrs', '$element', '$window', 'AutoplayedVideosService',
+        'ContextService', 'PAGE_CONTEXT',
+        function(
+            $attrs, $element, $window, AutoplayedVideosService,
+            ContextService, PAGE_CONTEXT) {
           var ctrl = this;
           ctrl.$onInit = function() {
             var start = (
@@ -52,7 +52,7 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
             ctrl.autoplaySuffix = '&autoplay=0';
 
             $timeout(function() {
-              // Check whether creator wants to autoplay this video or not
+              // Check whether creator wants to autoplay this video or not.
               var autoplayVal = HtmlEscaperService.escapedJsonToObj(
                 $attrs.autoplayWithValue);
 
@@ -61,7 +61,8 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
               var rect = angular.element($element)[0].getBoundingClientRect();
               var clientHeight = $window.innerHeight;
               var clientWidth = $window.innerWidth;
-              var isVisible = ((rect.left + rect.right) / 2 < clientWidth &&
+              var isVisible = (
+                (rect.left + rect.right) / 2 < clientWidth &&
                 (rect.top + rect.bottom) / 2 < clientHeight) &&
                 (rect.left > 0 && rect.right > 0);
 

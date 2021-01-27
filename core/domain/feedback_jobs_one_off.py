@@ -19,9 +19,11 @@ from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_services
+from core.domain import prod_validators
 from core.platform import models
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(exp_models, feedback_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback])
 
 
 class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -49,7 +51,8 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 thread_model, last_nonempty_message),
         ])
         if cache_updated:
-            thread_model.put(update_last_updated_time=False)
+            thread_model.update_timestamps(update_last_updated_time=False)
+            thread_model.put()
             yield ('Updated', 1)
         else:
             yield ('Already up-to-date', 1)
@@ -102,31 +105,58 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return False
 
 
-class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for deleting GeneralFeedbackThreadUserModels with user_id
-    equal to None or 'None'.
+class CleanUpFeedbackAnalyticsModelModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to remove feedback analytics models for
+    deleted explorations.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [feedback_models.GeneralFeedbackThreadUserModel]
+        return [feedback_models.FeedbackAnalyticsModel]
 
     @staticmethod
-    def map(model_instance):
-        """Implements the map function for this job."""
-        if model_instance.user_id is None:
-            model_instance.delete()
-            yield ('SUCCESS-DELETED-NONE', model_instance.id)
-        elif model_instance.user_id == 'None':
-            model_instance.delete()
-            yield ('SUCCESS-DELETED-STRING', model_instance.id)
-        else:
-            yield ('SUCCESS-NOT_DELETED', model_instance.id)
+    def map(item):
+        if item.deleted:
+            return
+        exp_model = exp_models.ExplorationModel.get_by_id(
+            item.id)
+        if exp_model is None or exp_model.deleted:
+            yield ('Deleted Feedback Analytics Model', item.id)
+            item.delete()
 
     @staticmethod
     def reduce(key, values):
-        if key == 'SUCCESS-NOT_DELETED':
-            yield (key, len(values))
-        else:
-            yield (key, values)
+        yield (key, values)
+
+
+class CleanUpGeneralFeedbackThreadModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to clean up GeneralFeedbackThreadModel by removing
+    the model if the target model for which feedback was created is
+    deleted. Target model can be exploration, question, skill or topic.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.GeneralFeedbackThreadModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        target_model = (
+            prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
+                item.entity_type].get_by_id(item.entity_id))
+        if target_model is None or target_model.deleted:
+            yield ('Deleted GeneralFeedbackThreadModel', item.id)
+            item.delete()
+            return
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

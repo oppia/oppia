@@ -1,0 +1,16 @@
+name: Oppiabot
+
+on:
+  issues:
+    types:
+      - labeled
+
+jobs:
+  oppiabot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Ensure that appropriate labels are added to issues
+        uses: oppia/oppiabot@1.1.0
+        with:
+          repo-token: ${{secrets.GITHUB_TOKEN}}

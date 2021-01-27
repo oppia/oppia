@@ -17,10 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import skill_services
+from core.domain import skill_fetchers
 import feconf
 
 
@@ -33,11 +32,8 @@ class ConceptCardDataHandler(base.BaseHandler):
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         skill_ids = comma_separated_skill_ids.split(',')
-        skills = skill_services.get_multi_skills(skill_ids)
+        skills = skill_fetchers.get_multi_skills(skill_ids)
 
         concept_card_dicts = []
         for skill in skills:

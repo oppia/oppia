@@ -25,14 +25,18 @@ require('interactions/GraphInput/directives/graph-viz.directive.ts');
 require('interactions/GraphInput/directives/graph-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/html-escaper.service.ts');
-require('services/contextual/url.service.ts');
-require('services/contextual/window-dimensions.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveGraphInput', [
-  'GraphInputRulesService', 'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
+  'GraphInputRulesService', 'InteractionAttributesExtractorService',
+  'PlayerPositionService',
   function(
-      GraphInputRulesService, HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
+      GraphInputRulesService, InteractionAttributesExtractorService,
+      PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -42,12 +46,11 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
       template: require('./graph-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        'CurrentInteractionService',
+        '$attrs', 'CurrentInteractionService',
         function(
-            $scope, $element, $attrs, WindowDimensionsService,
-            CurrentInteractionService) {
+            $attrs, CurrentInteractionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
             CurrentInteractionService.onSubmit(
@@ -55,41 +58,20 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
           };
 
           ctrl.resetGraph = function() {
-            var newGraph = HtmlEscaperService.escapedJsonToObj(
-              $attrs.graphWithValue);
-            if (checkValidGraph(newGraph)) {
-              ctrl.graph = newGraph;
+            const {
+              graph
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'GraphInput',
+              $attrs
+            );
+            if (checkValidGraph(graph)) {
+              ctrl.graph = graph;
             } else {
               ctrl.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
             }
           };
 
-          var init = function() {
-            if (ctrl.interactionIsActive) {
-              ctrl.resetGraph();
-            } else {
-              ctrl.graph = ctrl.getLastAnswer();
-            }
-            var stringToBool = function(str) {
-              return (str === 'true');
-            };
-            ctrl.canAddVertex = ctrl.interactionIsActive ?
-              stringToBool($attrs.canAddVertexWithValue) : false;
-            ctrl.canDeleteVertex = ctrl.interactionIsActive ?
-              stringToBool($attrs.canDeleteVertexWithValue) : false;
-            ctrl.canEditVertexLabel = ctrl.interactionIsActive ?
-              stringToBool($attrs.canEditVertexLabelWithValue) : false;
-            ctrl.canMoveVertex = ctrl.interactionIsActive ?
-              stringToBool($attrs.canMoveVertexWithValue) : false;
-            ctrl.canAddEdge = ctrl.interactionIsActive ?
-              stringToBool($attrs.canAddEdgeWithValue) : false;
-            ctrl.canDeleteEdge = ctrl.interactionIsActive ?
-              stringToBool($attrs.canDeleteEdgeWithValue) : false;
-            ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
-              stringToBool($attrs.canEditEdgeWeightWithValue) : false;
-          };
-
-          // TODO(czxcjx): Write this function
+          // TODO(czxcjx): Write this function.
           var checkValidGraph = function(graph) {
             return Boolean(graph);
           };
@@ -98,17 +80,22 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             return checkValidGraph(ctrl.graph);
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
 
-              ctrl.canAddVertex = false;
-              ctrl.canDeleteVertex = false;
-              ctrl.canEditVertexLabel = false;
-              ctrl.canMoveVertex = false;
-              ctrl.canAddEdge = false;
-              ctrl.canDeleteEdge = false;
-              ctrl.canEditEdgeWeight = false;
-            });
+                  ctrl.canAddVertex = false;
+                  ctrl.canDeleteVertex = false;
+                  ctrl.canEditVertexLabel = false;
+                  ctrl.canMoveVertex = false;
+                  ctrl.canAddEdge = false;
+                  ctrl.canDeleteEdge = false;
+                  ctrl.canEditEdgeWeight = false;
+                }
+              )
+            );
+
             ctrl.errorMessage = '';
             ctrl.graph = {
               vertices: [],
@@ -128,23 +115,35 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             } else {
               ctrl.graph = ctrl.getLastAnswer();
             }
-            var stringToBool = function(str) {
-              return (str === 'true');
-            };
-            ctrl.canAddVertex = ctrl.interactionIsActive ?
-              stringToBool($attrs.canAddVertexWithValue) : false;
+            const {
+              canAddVertex,
+              canDeleteVertex,
+              canEditVertexLabel,
+              canMoveVertex,
+              canAddEdge,
+              canDeleteEdge,
+              canEditEdgeWeight
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'GraphInput',
+              $attrs
+            );
+
+            ctrl.canAddVertex = ctrl.interactionIsActive ? canAddVertex : false;
             ctrl.canDeleteVertex = ctrl.interactionIsActive ?
-              stringToBool($attrs.canDeleteVertexWithValue) : false;
+              canDeleteVertex : false;
             ctrl.canEditVertexLabel = ctrl.interactionIsActive ?
-              stringToBool($attrs.canEditVertexLabelWithValue) : false;
+              canEditVertexLabel : false;
             ctrl.canMoveVertex = ctrl.interactionIsActive ?
-              stringToBool($attrs.canMoveVertexWithValue) : false;
+              canMoveVertex : false;
             ctrl.canAddEdge = ctrl.interactionIsActive ?
-              stringToBool($attrs.canAddEdgeWithValue) : false;
+              canAddEdge : false;
             ctrl.canDeleteEdge = ctrl.interactionIsActive ?
-              stringToBool($attrs.canDeleteEdgeWithValue) : false;
+              canDeleteEdge : false;
             ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
-              stringToBool($attrs.canEditEdgeWeightWithValue) : false;
+              canEditEdgeWeight : false;
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

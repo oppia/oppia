@@ -1,0 +1,16 @@
+{
+  "core/templates/mathjaxConfig.ts": [
+    "skipStartupTypeset: true,"
+  ],
+  "core/templates/services/request-interceptor.service.ts": [
+    "request.body = body;",
+    "request.body = {"
+  ],
+  "core/templates/Polyfills.ts": [
+    "navigator.mediaDevices = {};",
+    "navigator.webkitGetUserMedia || navigator.mozGetUserMedia);"
+  ],
+  "core/templates/tests/unit-test-utils.ts": [
+    "element, [failHardModule, ng1Module.name]));"
+  ]
+}

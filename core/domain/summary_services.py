@@ -25,6 +25,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
@@ -85,7 +86,7 @@ def get_human_readable_contributors_summary(contributors_summary):
     """
     contributor_ids = list(contributors_summary.keys())
     contributor_usernames = user_services.get_human_readable_user_ids(
-        contributor_ids)
+        contributor_ids, strict=False)
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
@@ -119,7 +120,7 @@ def get_learner_collection_dict_by_id(
         collection, and a slightly nicer data structure for frontend work.
 
     Raises:
-        ValidationError: If the collection retrieved using the given
+        ValidationError. If the collection retrieved using the given
             ID references non-existent explorations.
     """
     collection = collection_services.get_collection_by_id(
@@ -195,7 +196,7 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     Args:
         collection_ids: list(str). A list of collection ids.
 
-    Return:
+    Returns:
         list(dict). Each element in this list is a collection summary dict.
         These elements are returned in the same order as that given
         in collection_ids.
@@ -206,32 +207,33 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
-def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user):
-    """Given a query string and a search cursor, returns a list of exploration
+def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
+    """Given a query string and a search offset, returns a list of exploration
     metadata dicts that satisfy the search query.
 
     Args:
         query_string: str. The search query for which the search is to be
             performed.
-        search_cursor: str or None. The cursor location to start the search
+        search_offset: str or None. The offset location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
 
     Returns:
-        exploration_list: list(dict). A list of metadata dicts for explorations
-            matching the query.
-        new_search_cursor: str. New search cursor location.
+        2-tuple of (exploration_list, new_search_offset). Where:
+            - exploration_list list(dict). A list of metadata dicts for
+                explorations matching the query.
+            - new_search_offset (str). New search offset location.
     """
-    exp_ids, new_search_cursor = (
+    exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(
-            query_string, cursor=search_cursor))
+            query_string, [], [], offset=search_offset))
 
     exploration_list = get_exploration_metadata_dicts(
         exp_ids, user)
 
-    return exploration_list, new_search_cursor
+    return exploration_list, new_search_offset
 
 
 def get_exploration_metadata_dicts(exploration_ids, user):
@@ -264,7 +266,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
                 exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
-                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                    rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user.user_id is None:
                     continue
 
@@ -296,7 +298,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
         user: UserActionsInfo or None. Object having user_id, role and actions
             for given user.
 
-    Return:
+    Returns:
         list(dict). A list of exploration summary dicts in human readable form.
         Example:
 
@@ -326,7 +328,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
                 exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
-                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                    rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user is None:
                     continue
                 if not rights_manager.check_can_edit_activity(
@@ -349,9 +351,9 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
 
     Args:
         exploration_summaries: list(ExplorationSummary). List of exploration
-        summary objects.
+            summary objects.
 
-    Return:
+    Returns:
         list(dict). A list of exploration summary dicts in human readable form.
         Example:
 
@@ -418,9 +420,9 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
 
     Args:
         collection_summaries: list(CollectionSummary). List of collection
-        summary domain object.
+            summary domain object.
 
-    Return:
+    Returns:
         list(dict). A list of exploration summary dicts in human readable form.
         Example:
 
@@ -442,7 +444,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
     displayable_collection_summaries = []
     for collection_summary in collection_summaries:
         if collection_summary and collection_summary.status != (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
+                rights_domain.ACTIVITY_STATUS_PRIVATE):
             displayable_collection_summaries.append({
                 'id': collection_summary.id,
                 'title': collection_summary.title,
@@ -470,7 +472,7 @@ def get_library_groups(language_codes):
         language_codes: list(str). A list of language codes. Only explorations
             with these languages will be returned.
 
-    Return:
+    Returns:
         list(dict). A list of groups for the library index page. Each group is
         represented by a dict with the following keys and values:
             - activity_summary_dicts: list(dict). A list of dicts representing
@@ -483,31 +485,13 @@ def get_library_groups(language_codes):
             - full_results_url: str. The URL to the corresponding "full results"
                 page.
     """
-    language_codes_suffix = ''
-    if language_codes:
-        language_codes_suffix = ' language_code=("%s")' % (
-            '" OR "'.join(language_codes))
-
-    def _generate_query(categories):
-        """Generates query based on the categories and language codes.
-
-        Args:
-            categories: list(str). List of categories.
-
-        Returns:
-            str. Generated query.
-        """
-        # This assumes that 'categories' is non-empty.
-        return 'category=("%s")%s' % (
-            '" OR "'.join(categories), language_codes_suffix)
-
     # Collect all collection ids so that the summary details can be retrieved
     # with a single get_multi() call.
     all_collection_ids = []
     header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         collection_ids = search_services.search_collections(
-            _generate_query(group['search_categories']), 8)[0]
+            '', group['search_categories'], language_codes, 8)[0]
         header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
 
@@ -528,7 +512,7 @@ def get_library_groups(language_codes):
     header_to_exp_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         exp_ids = search_services.search_explorations(
-            _generate_query(group['search_categories']), 8)[0]
+            '', group['search_categories'], language_codes, 8)[0]
         header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids
 
@@ -580,7 +564,7 @@ def require_activities_to_be_public(activity_references):
             ActivityReference domain objects.
 
     Raises:
-        Exception: Any activity reference in the list does not
+        Exception. Any activity reference in the list does not
             exist, or is not public.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
@@ -604,7 +588,7 @@ def require_activities_to_be_public(activity_references):
                 raise Exception(
                     'Cannot feature non-existent %s with id %s' %
                     (activities_info['type'], activities_info['ids'][index]))
-            if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                 raise Exception(
                     'Cannot feature private %s with id %s' %
                     (activities_info['type'], activities_info['ids'][index]))
@@ -618,7 +602,7 @@ def get_featured_activity_summary_dicts(language_codes):
         language_codes: list(str). A list of language codes. Only explorations
             with these languages will be returned.
 
-    Return:
+    Returns:
         list(dict). Each dict in this list represents a featured activity.
         For example:
 
@@ -676,7 +660,7 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
             with these languages will be returned.
         limit: int. The maximum number of explorations to return.
 
-    Return:
+    Returns:
         list(dict). Each dict in this list represents a exploration summary in
         human readable form. The list is sorted in decreasing order of average
         rating. For example:
@@ -716,7 +700,7 @@ def get_recently_published_exp_summary_dicts(limit):
     Args:
         limit: int. The maximum number of explorations to return.
 
-    Return:
+    Returns:
         list(dict). Each dict in this list represents a featured activity in
         human readable form. For example:
 

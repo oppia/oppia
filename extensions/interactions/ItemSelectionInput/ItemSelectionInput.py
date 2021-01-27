@@ -30,7 +30,7 @@ class ItemSelectionInput(base.BaseInteraction):
         'Allows learners to select various options.')
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    answer_type = 'SetOfHtmlString'
+    answer_type = 'SetOfTranslatableHtmlContentIds'
     # Radio buttons get unselected when specifying a solution. This needs to be
     # fixed before solution feature can support this interaction.
     can_have_solution = False
@@ -66,17 +66,23 @@ class ItemSelectionInput(base.BaseInteraction):
         'schema': {
             'type': 'list',
             'items': {
-                'type': 'html',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Sample item answer',
-                },
+                'type': 'custom',
+                'obj_type': 'SubtitledHtml',
+                'replacement_ui_config': {
+                    'html': {
+                        'hide_complex_extensions': True,
+                        'placeholder': 'Sample item answer',
+                    }
+                }
             },
             'ui_config': {
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': None,
+            'html': ''
+        }],
     }]
 
     _answer_visualization_specs = [{

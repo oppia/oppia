@@ -20,13 +20,20 @@
  * followed by the name of the arg.
  */
 
-require('directives/mathjax-bind.directive.ts');
-
+require('pages/exploration-player-page/services/image-preloader.service.ts');
+require('services/assets-backend-api.service.ts');
+require('services/context.service.ts');
 require('services/html-escaper.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveMath', [
-  'HtmlEscaperService',
-  function(HtmlEscaperService) {
+  'AssetsBackendApiService', 'ContextService', 'HtmlEscaperService',
+  'ImageLocalStorageService', 'ImagePreloaderService', 'ENTITY_TYPE',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  function(
+      AssetsBackendApiService, ContextService, HtmlEscaperService,
+      ImageLocalStorageService, ImagePreloaderService, ENTITY_TYPE,
+      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,8 +43,63 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.$onInit = function() {
-          ctrl.rawLatex = HtmlEscaperService.escapedJsonToObj(
-            $attrs.rawLatexWithValue);
+          var mathExpressionContent = HtmlEscaperService.escapedJsonToObj(
+            $attrs.mathContentWithValue);
+          if (mathExpressionContent.hasOwnProperty('raw_latex')) {
+            var svgFilename = mathExpressionContent.svg_filename;
+            var dimensions = ImagePreloaderService.getDimensionsOfMathSvg(
+              svgFilename);
+            ctrl.imageContainerStyle = {
+              height: dimensions.height + 'ex',
+              width: dimensions.width + 'ex',
+              'vertical-align': '-' + dimensions.verticalPadding + 'ex'
+            };
+          }
+          // If viewing a concept card in the exploration player, don't use the
+          // preloader service. Since, in that service, the image file names are
+          // extracted from the state contents to be preloaded, but when
+          // viewing a concept, the names are not available until the link is
+          // clicked, at which point an API call is done to get the skill
+          // details. So, the image file name will not be available to the
+          // preloader service beforehand.
+          if (
+            ImagePreloaderService.inExplorationPlayer() &&
+            !(ContextService.getEntityType() === ENTITY_TYPE.SKILL)) {
+            ImagePreloaderService.getImageUrl(svgFilename)
+              .then(function(objectUrl) {
+                ctrl.imageUrl = objectUrl;
+              });
+          } else {
+            // This is the case when user is not in the exploration player. We
+            // don't pre-load the images in this case. So we directly assign
+            // the url to the imageUrl.
+            try {
+              // For IMAGE_SAVE_DESTINATION_LOCAL_STORAGE mode we first try to
+              // fetch images through the storage and if it doesn't exist we try
+              // fetching it through server.
+              // This is required for the translation suggestion as there can be
+              // target entity's images in the translatable content which needs
+              // to be fetched from the server.
+              if (
+                ContextService.getImageSaveDestination() ===
+                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
+                  ImageLocalStorageService.isInStorage(svgFilename))) {
+                ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
+                  svgFilename);
+              } else {
+                ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+                  ContextService.getEntityType(), ContextService.getEntityId(),
+                  svgFilename);
+              }
+            } catch (e) {
+              var additionalInfo = (
+                '\nEntity type: ' + ContextService.getEntityType() +
+                '\nEntity ID: ' + ContextService.getEntityId() +
+                '\nFilepath: ' + svgFilename);
+              e.message += additionalInfo;
+              throw e;
+            }
+          }
         };
       }]
     };

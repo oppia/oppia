@@ -35,11 +35,9 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-# pylint: disable=wrong-import-position
-import esprima # isort:skip
-# pylint: enable=wrong-import-position
+import esprima # isort:skip  pylint: disable=wrong-import-position
 
-DIRECTORY_NAMES = ['core/templates/dev/head', 'extensions']
+DIRECTORY_NAMES = ['core/templates', 'extensions']
 SERVICE_FILES_SUFFICES = ('.service.ts', 'Service.ts', 'Factory.ts')
 
 

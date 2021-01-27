@@ -1,0 +1,41 @@
+<div *ngIf="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-subtopic-viewer-nav-breadcrumb">
+  <div class="oppia-subtopic-viewer-nav-separator"></div>
+  <div class="oppia-subtopic-viewer-nav-labels-container">
+    <p class="oppia-subtopic-title-text">{{ subtopicTitle }}</p>
+    <a class="topic-name oppia-topic-name-text" [href]="getTopicUrl()">{{ topicName }}</a>
+  </div>
+</div>
+
+<style>
+  .oppia-subtopic-viewer-nav-breadcrumb {
+    align-items: center;
+    height: 56px;
+    padding-top: 0;
+  }
+
+  .oppia-subtopic-viewer-nav-labels-container .topic-name {
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+
+  .oppia-subtopic-viewer-nav-separator {
+    background-color: white;
+    height: 80%;
+    margin-right: 12px;
+    width: 1px;
+  }
+
+  .oppia-subtopic-viewer-nav-labels-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .oppia-subtopic-title-text {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .oppia-topic-name-text {
+    color: white;
+    font-size: 12px;
+  }
+</style>

@@ -24,6 +24,7 @@ should therefore be independent of the specific storage models used.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import re
 import string
 
@@ -109,49 +110,60 @@ class CollectionChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['category', 'title'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_COLLECTION_NODE,
         'required_attribute_names': ['exploration_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_COLLECTION_NODE,
         'required_attribute_names': ['exploration_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_SWAP_COLLECTION_NODES,
         'required_attribute_names': ['first_index', 'second_index'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_EDIT_COLLECTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': COLLECTION_PROPERTIES}
     }, {
         'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
         'required_attribute_names': [
             'exploration_id', 'property_name', 'new_value'],
-        'optional_attribute_names': ['old_value']
+        'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_COLLECTION_SKILL,
         'required_attribute_names': ['name'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_COLLECTION_SKILL,
         'required_attribute_names': ['skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_QUESTION_ID_TO_SKILL,
         'required_attribute_names': ['question_id', 'skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
         'required_attribute_names': ['question_id', 'skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -174,8 +186,9 @@ class CollectionNode(python_utils.OBJECT):
         """Returns a dict representing this CollectionNode domain object.
 
         Returns:
-            A dict, mapping all fields (exploration_id, prerequisite_skill_ids,
-            acquired_skill_ids) of CollectionNode instance.
+            dict. A dict, mapping all fields (exploration_id,
+            prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
+            instance.
         """
         return {
             'exploration_id': self.exploration_id
@@ -197,8 +210,8 @@ class CollectionNode(python_utils.OBJECT):
         """Validates various properties of the collection node.
 
         Raises:
-            ValidationError: One or more attributes of the collection node are
-            invalid.
+            ValidationError. One or more attributes of the collection node are
+                invalid.
         """
         if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -274,7 +287,7 @@ class Collection(python_utils.OBJECT):
         """Returns a dict representing this Collection domain object.
 
         Returns:
-            A dict, mapping all fields of Collection instance.
+            dict. A dict, mapping all fields of Collection instance.
         """
         return {
             'id': self.id,
@@ -320,7 +333,7 @@ class Collection(python_utils.OBJECT):
         """Return a Collection domain object from a dict.
 
         Args:
-            collection_dict: dict. The dictionary representation of  the
+            collection_dict: dict. The dictionary representation of the
                 collection.
             collection_version: int. The version of the collection.
             collection_created_on: datetime.datetime. Date and time when the
@@ -343,6 +356,64 @@ class Collection(python_utils.OBJECT):
             collection_created_on, collection_last_updated)
 
         return collection
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns a Collection domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded utf-8 string that can be
+                decoded into a dictionary representing a Collection. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Collection. The corresponding Collection domain object.
+        """
+        collection_dict = json.loads(json_string.decode('utf-8'))
+
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                collection_dict['created_on'])
+            if 'created_on' in collection_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                collection_dict['last_updated'])
+            if 'last_updated' in collection_dict else None)
+        collection = cls.from_dict(
+            collection_dict,
+            collection_version=collection_dict['version'],
+            collection_created_on=created_on,
+            collection_last_updated=last_updated)
+
+        return collection
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded utf-8 string encoding all of the information
+            composing the object.
+        """
+        collection_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        collection_dict['version'] = self.version
+
+        if self.created_on:
+            collection_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
+
+        if self.last_updated:
+            collection_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.last_updated))
+
+        return json.dumps(collection_dict).encode('utf-8')
 
     def to_yaml(self):
         """Convert the Collection domain object into YAML.
@@ -405,7 +476,6 @@ class Collection(python_utils.OBJECT):
         new_collection_dict = (
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
-        collection_dict['nodes'] = new_collection_dict['nodes']
         collection_dict['skills'] = new_collection_dict['skills']
         collection_dict['next_skill_id'] = (
             new_collection_dict['next_skill_id'])
@@ -432,10 +502,6 @@ class Collection(python_utils.OBJECT):
         This changes the structure of each node to not include skills as well
         as remove skills from the Collection model itself.
         """
-        new_collection_dict = (
-            cls._convert_collection_contents_v5_dict_to_v6_dict(
-                collection_dict))
-        collection_dict['nodes'] = new_collection_dict['nodes']
         del collection_dict['skills']
         del collection_dict['next_skill_index']
 
@@ -452,23 +518,25 @@ class Collection(python_utils.OBJECT):
 
         Returns:
             str. The YAML representation of the collection, in the latest
-                schema format.
+            schema format.
 
         Raises:
-            Exception: 'yaml_content' or the collection schema version is not
-            valid.
+            InvalidInputException. The 'yaml_content' or the schema version
+                is not specified.
+            Exception. The collection schema version is not valid.
         """
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
-        except Exception as e:
-            raise Exception(
+        except utils.InvalidInputException as e:
+            raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '
                 'a zip file. The YAML parser returned the following error: %s'
                 % e)
 
         collection_schema_version = collection_dict.get('schema_version')
         if collection_schema_version is None:
-            raise Exception('Invalid YAML file: no schema version specified.')
+            raise utils.InvalidInputException(
+                'Invalid YAML file: no schema version specified.')
         if not (1 <= collection_schema_version
                 <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             raise Exception(
@@ -637,15 +705,16 @@ class Collection(python_utils.OBJECT):
             current_version: int. The current collection schema version.
 
         Raises:
-            Exception: The value of the key 'schema_version' in
-            versioned_collection_contents is not valid.
+            Exception. The value of the key 'schema_version' in
+                versioned_collection_contents is not valid.
         """
         if (versioned_collection_contents['schema_version'] + 1 >
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
-            raise Exception('Collection is version %d but current collection'
-                            ' schema version is %d' % (
-                                versioned_collection_contents['schema_version'],
-                                feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
+            raise Exception(
+                'Collection is version %d but current collection'
+                ' schema version is %d' % (
+                    versioned_collection_contents['schema_version'],
+                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
 
         versioned_collection_contents['schema_version'] = (
             current_version + 1)
@@ -673,8 +742,8 @@ class Collection(python_utils.OBJECT):
            the collection is empty, returns None.
 
         Returns:
-            str|None. The exploration ID of the first node,
-                or None if the collection is empty.
+            str|None. The exploration ID of the first node, or None if the
+            collection is empty.
         """
         if len(self.nodes) > 0:
             return self.nodes[0].exploration_id
@@ -692,7 +761,7 @@ class Collection(python_utils.OBJECT):
 
         Returns:
             str|None. The exploration ID of the next node,
-                or None if the collection is completed.
+            or None if the collection is completed.
         """
         for exp_id in self.exploration_ids:
             if exp_id not in completed_exp_ids:
@@ -710,7 +779,7 @@ class Collection(python_utils.OBJECT):
 
         Returns:
             str|None. The exploration ID of the next node,
-                or None if the passed id is the last one in the collection.
+            or None if the passed id is the last one in the collection.
         """
         exploration_just_unlocked = None
 
@@ -822,7 +891,7 @@ class Collection(python_utils.OBJECT):
             exploration_id: str. The id of the exploration.
 
         Raises:
-            ValueError: The exploration is already part of the colletion.
+            ValueError. The exploration is already part of the colletion.
         """
         if self.get_node(exploration_id) is not None:
             raise ValueError(
@@ -838,7 +907,7 @@ class Collection(python_utils.OBJECT):
             second_index: int. Index of the other node to be swapped.
 
         Raises:
-            ValueError: Both indices are the same number.
+            ValueError. Both indices are the same number.
         """
         if first_index == second_index:
             raise ValueError(
@@ -856,7 +925,7 @@ class Collection(python_utils.OBJECT):
             exploration_id: str. The id of the exploration.
 
         Raises:
-            ValueError: The exploration is not part of the collection.
+            ValueError. The exploration is not part of the collection.
         """
         node_index = self._find_node(exploration_id)
         if node_index is None:
@@ -869,8 +938,8 @@ class Collection(python_utils.OBJECT):
         """Validates all properties of this collection and its constituents.
 
         Raises:
-            ValidationError: One or more attributes of the Collection are not
-            valid.
+            ValidationError. One or more attributes of the Collection are not
+                valid.
         """
 
         # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
@@ -1007,7 +1076,7 @@ class CollectionSummary(python_utils.OBJECT):
                 this collection.
             editor_ids: list(str). List of the user ids of the users who have
                 access to edit this collection.
-            viewer_ids: lsit(str). List of the user ids of the users who have
+            viewer_ids: list(str). List of the user ids of the users who have
                 view this collection.
             contributor_ids: list(str). List of the user ids of the user who
                 have contributed to  this collection.
@@ -1042,7 +1111,7 @@ class CollectionSummary(python_utils.OBJECT):
         """Returns a dict representing this CollectionSummary domain object.
 
         Returns:
-            A dict, mapping all fields of CollectionSummary instance.
+            dict. A dict, mapping all fields of CollectionSummary instance.
         """
         return {
             'id': self.id,
@@ -1067,7 +1136,7 @@ class CollectionSummary(python_utils.OBJECT):
         """Validates various properties of the CollectionSummary.
 
         Raises:
-            ValidationError: One or more attributes of the CollectionSummary
+            ValidationError. One or more attributes of the CollectionSummary
                 are invalid.
         """
         if not isinstance(self.title, python_utils.BASESTRING):
@@ -1216,3 +1285,31 @@ class CollectionSummary(python_utils.OBJECT):
             bool. Whether the collection is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
+
+    def does_user_have_any_role(self, user_id):
+        """Checks if a given user has any role within the collection.
+
+        Args:
+            user_id: str. User id of the user.
+
+        Returns:
+            bool. Whether the given user has any role in the collection.
+        """
+        return (
+            user_id in self.owner_ids or
+            user_id in self.editor_ids or
+            user_id in self.viewer_ids
+        )
+
+    def add_contribution_by_user(self, contributor_id):
+        """Add a new contributor to the contributors summary.
+
+        Args:
+            contributor_id: str. ID of the contributor to be added.
+        """
+        # We don't want to record the contributions of system users.
+        if contributor_id not in constants.SYSTEM_USER_IDS:
+            self.contributors_summary[contributor_id] = (
+                self.contributors_summary.get(contributor_id, 0) + 1)
+
+        self.contributor_ids = list(self.contributors_summary.keys())

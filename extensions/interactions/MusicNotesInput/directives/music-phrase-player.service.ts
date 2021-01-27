@@ -61,7 +61,7 @@ export class MusicPhrasePlayerService {
     }
   }
 
-  playMusicPhrase(notes: Note[]) {
+  playMusicPhrase(notes: Note[]): void {
     this._playMusicPhrase(notes);
   }
 }

@@ -25,11 +25,11 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (base_models, feedback_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.feedback, models.NAMES.exploration
 ])
+
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -39,8 +39,9 @@ class FeedbackAnalyticsRealtimeModel(
     and the total number of threads to the default integer value of zero
     in the realtime layer.
     """
-    num_open_threads = ndb.IntegerProperty(default=0)
-    num_total_threads = ndb.IntegerProperty(default=0)
+
+    num_open_threads = datastore_services.IntegerProperty(default=0)
+    num_total_threads = datastore_services.IntegerProperty(default=0)
 
 
 class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
@@ -63,9 +64,9 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         """Get the realtime datastore class used by the realtime layer.
 
         Returns:
-            ndb.model.MetaModel. Datastore class used by the
-                realtime layer, which should be a subclass of
-                BaseRealtimeDatastoreClassForContinuousComputations.
+            datastore_services.MetaModel. Datastore class used by the realtime
+            layer, which should be a subclass of
+            BaseRealtimeDatastoreClassForContinuousComputations.
         """
         return FeedbackAnalyticsRealtimeModel
 
@@ -105,6 +106,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_layer=active_realtime_layer).put()
             else:
                 model.num_open_threads += 1
+                model.update_timestamps()
                 model.put()
 
         def _increment_total_threads_count():
@@ -120,6 +122,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_layer=active_realtime_layer).put()
             else:
                 model.num_total_threads += 1
+                model.update_timestamps()
                 model.put()
 
         def _decrement_open_threads_count():
@@ -135,6 +138,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_layer=active_realtime_layer).put()
             else:
                 model.num_open_threads -= 1
+                model.update_timestamps()
                 model.put()
 
         if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
@@ -183,14 +187,18 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             feedback_models.FeedbackAnalyticsModel.get_multi(exploration_ids))
         return [feedback_domain.FeedbackAnalytics(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_ids[i],
-            (realtime_models[i].num_open_threads
-             if realtime_models[i] is not None else 0) +
-            (feedback_thread_analytics_models[i].num_open_threads
-             if feedback_thread_analytics_models[i] is not None else 0),
-            (realtime_models[i].num_total_threads
-             if realtime_models[i] is not None else 0) +
-            (feedback_thread_analytics_models[i].num_total_threads
-             if feedback_thread_analytics_models[i] is not None else 0)
+            (
+                realtime_models[i].num_open_threads
+                if realtime_models[i] is not None else 0) +
+            (
+                feedback_thread_analytics_models[i].num_open_threads
+                if feedback_thread_analytics_models[i] is not None else 0),
+            (
+                realtime_models[i].num_total_threads
+                if realtime_models[i] is not None else 0) +
+            (
+                feedback_thread_analytics_models[i].num_total_threads
+                if feedback_thread_analytics_models[i] is not None else 0)
         ) for i in python_utils.RANGE(len(exploration_ids))]
 
     @classmethod
@@ -201,11 +209,11 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             exploration_id: str. ID of the exploration to get analytics for.
 
         Returns:
-            dict with two keys:
-            - num_open_threads: int. The count of open feedback threads for
-              this exploration.
-            - num_total_threads: int. The count of all feedback
-              threads for this exploration.
+            dict. Contains two keys:
+                - num_open_threads: int. The count of open feedback threads for
+                    this exploration.
+                - num_total_threads: int. The count of all feedback
+                    threads for this exploration.
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
             [exploration_id])[0]
@@ -249,9 +257,10 @@ class FeedbackAnalyticsMRJobManager(
                 instance.
 
         Yields:
-            A tuple of two elements:
-              - str. The exploration id associated to the feedback thread.
-              - str. The feedback thread's status.
+            2-tuple of (entity_id, status). Where:
+                - entity_id: str. The exploration id associated to the feedback
+                    thread.
+                - status: str. The feedback thread's status.
         """
         yield (item.entity_id, item.status)
 

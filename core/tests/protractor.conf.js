@@ -1,6 +1,8 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
-var glob = require('glob')
-var path = require('path')
+var glob = require('glob');
+var path = require('path');
+var Constants = require('./protractor_utils/ProtractorConstants');
+var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -41,8 +43,8 @@ var suites = {
       'protractor_desktop/collections.js'
     ],
 
-    communityDashboard: [
-      'protractor_desktop/communityDashboard.js'
+    contributorDashboard: [
+      'protractor_desktop/contributorDashboard.js'
     ],
 
     coreEditorAndPlayerFeatures: [
@@ -57,16 +59,16 @@ var suites = {
       'protractor_desktop/embedding.js'
     ],
 
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
+    ],
+
     explorationFeedbackTab: [
       'protractor_desktop/explorationFeedbackTab.js'
     ],
 
     explorationHistoryTab: [
       'protractor_desktop/explorationHistoryTab.js'
-    ],
-
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
     ],
 
     explorationStatisticsTab: [
@@ -81,8 +83,16 @@ var suites = {
       'protractor_desktop/extensions.js'
     ],
 
+    featureGating: [
+      'protractor/featureGatingFlow.js'
+    ],
+
     fileUploadFeatures: [
       'protractor_desktop/voiceoverUploadFeatures.js'
+    ],
+
+    fileUploadExtensions: [
+      'protractor_desktop/fileUploadExtensions.js'
     ],
 
     learnerDashboard: [
@@ -99,6 +109,10 @@ var suites = {
 
     navigation: [
       'protractor_desktop/navigation.js'
+    ],
+
+    playVoiceovers: [
+      'protractor_desktop/playVoiceovers.js'
     ],
 
     preferences: [
@@ -137,9 +151,17 @@ var suites = {
       'protractor_desktop/skillEditor.js'
     ],
 
+    topicAndStoryViewer: [
+      'protractor_desktop/topicAndStoryViewer.js'
+    ],
+
     users: [
       'protractor_desktop/userJourneys.js',
     ],
+
+    wipeout: [
+      'protractor_desktop/wipeout.js',
+    ]
   };
 
 // A reference configuration file.
@@ -156,7 +178,7 @@ exports.config = {
   //
   // If the chromeOnly option is specified, no Selenium server will be started,
   // and chromeDriver will be used directly (from the location specified in
-  // chromeDriver)
+  // chromeDriver).
 
   // The location of the selenium standalone server .jar file, relative
   // to the location of this config. If no other method of starting selenium
@@ -192,7 +214,7 @@ exports.config = {
           } else {
             errorMessage = pattern + ' does not exist.';
           }
-          throw Error(errorMessage)
+          throw new Error(errorMessage)
         }
       }
     });
@@ -209,7 +231,7 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  // (Note that the hint tooltip has a 60-second timeout.)
+  // (Note that the hint tooltip has a 60-second timeout).
   allScriptsTimeout: 180000,
 
 
@@ -230,15 +252,31 @@ exports.config = {
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
     browserName: 'chrome',
-    chromeOptions: {
+    'goog:chromeOptions': {
+      // Chromedriver versions 75+ sets w3c mode to true by default.
+      // see https://chromedriver.storage.googleapis.com/75.0.3770.8/notes.txt
+      // This causes certain legacy APIs to fail eg. sendKeysToActiveElement.
+      // The workaround is to set this property to false per discussion on
+      // this thread: https://github.com/angular/protractor/issues/5274
+      w3c: false,
       args: [
         '--lang=en-EN',
         '--window-size=1285x1000',
-        // These arguments let us simulate recording from a microphone
+        // These arguments let us simulate recording from a microphone.
         '--use-fake-device-for-media-stream',
         '--use-fake-ui-for-media-stream',
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
-      ]
+        // These arguments are required to run the tests on GitHub
+        // Actions.
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      ],
+      prefs: {
+        download: {
+            'prompt_for_download': false,
+            'default_directory': DOWNLOAD_PATH,
+          }
+      }
     },
     prefs: {
       intl: {
@@ -263,7 +301,7 @@ exports.config = {
   baseUrl: 'http://localhost:9001',
 
   // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>
+  // body, but is necessary if ng-app is on a descendant of <body>.
   rootElement: 'body',
 
   // A callback function called once protractor is ready and available, and
@@ -276,31 +314,27 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-
-    // This is currently pulled out into a flag because it sometimes obscures
-    // the actual protractor error logs and does not close the browser after
-    // a failed run.
-    // TODO(sll): Switch this option on by default, once the above issues are
-    // fixed.
-    var _ADD_SCREENSHOT_REPORTER = false;
+    var _ADD_SCREENSHOT_REPORTER = true;
 
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots
+        // Directory for screenshots.
         dest: '../protractor-screenshots',
-        // Function to build filenames of screenshots
-        filename: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
+        // Function to build filenames of screenshots.
+        pathBuilder: function(currentSpec) {
+          return currentSpec.fullName;
         },
-        captureOnlyFailedSpecs: true
+        captureOnlyFailedSpecs: true,
+        reportFailedUrl: true,
+        preserveDirectory: true
       }));
     }
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
-      displayStacktrace: 'all',
+      displayStacktrace: 'pretty',
       displaySpecDuration: true
     }));
 
@@ -359,9 +393,11 @@ exports.config = {
     // Only execute the features or scenarios with tags matching @dev.
     // This may be an array of strings to specify multiple tags to include.
     tags: '@dev',
-    // How to format features (default: progress)
+    // How to format features (default: progress).
     format: 'summary'
   },
+
+  SELENIUM_PROMISE_MANAGER: false,
 
   // ----- The cleanup step -----
   //

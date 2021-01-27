@@ -34,6 +34,9 @@ ALLOWED_ENTITY_NAMES = [
     feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_TOPIC,
     feconf.ENTITY_TYPE_SKILL, feconf.ENTITY_TYPE_STORY,
     feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
+ALLOWED_SUGGESTION_IMAGE_CONTEXTS = [
+    feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
+    feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
 
 
 class FileStream(python_utils.OBJECT):
@@ -69,6 +72,7 @@ class GeneralFileSystem(python_utils.OBJECT):
         entity_name: str. The name of the entity (eg: exploration, topic etc).
         entity_id: str. The ID of the corresponding entity.
     """
+
     def __init__(self, entity_name, entity_id):
         """Constructs a GeneralFileSystem object.
 
@@ -91,7 +95,8 @@ class GeneralFileSystem(python_utils.OBJECT):
         Raises:
             ValidationError. When parameters passed in are invalid.
         """
-        if entity_name not in ALLOWED_ENTITY_NAMES:
+        if entity_name not in ALLOWED_ENTITY_NAMES and (
+                entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS):
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
         if not isinstance(entity_id, python_utils.BASESTRING):
@@ -146,8 +151,8 @@ class GcsFileSystem(GeneralFileSystem):
                 assets folder.
 
         Returns:
-            FileStream or None. It returns FileStream
-                domain object if the file exists. Otherwise, it returns None.
+            FileStream or None. It returns FileStream domain object if the file
+            exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
             bucket_name = app_identity_services.get_gcs_resource_bucket_name()
@@ -162,7 +167,9 @@ class GcsFileSystem(GeneralFileSystem):
             return None
 
     def commit(self, filepath, raw_bytes, mimetype):
-        """Args:
+        """Commit raw_bytes to the relevant file in the entity's assets folder.
+
+        Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
@@ -196,6 +203,24 @@ class GcsFileSystem(GeneralFileSystem):
         except cloudstorage.NotFoundError:
             raise IOError('Image does not exist: %s' % filepath)
 
+    def copy(self, source_assets_path, filepath):
+        """Copy images from source_path.
+
+        Args:
+            source_assets_path: str. The path to the source entity's assets
+                folder.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+        """
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        source_file_url = (
+            '/%s/%s/%s' % (bucket_name, source_assets_path, filepath))
+        destination_file_url = (
+            '/%s/%s/%s' % (bucket_name, self._assets_path, filepath))
+
+        # The cloudstorage.copy2 method copies the file from the source URL to
+        # the destination URL.
+        cloudstorage.copy2(source_file_url, destination_file_url)
 
     def listdir(self, dir_name):
         """Lists all files in a directory.
@@ -258,7 +283,7 @@ class AbstractFileSystem(python_utils.OBJECT):
                 assets folder.
 
         Raises:
-            IOError: Invalid filepath.
+            IOError. Invalid filepath.
         """
         base_dir = utils.vfs_construct_path(
             '/', self.impl.assets_path, 'assets')
@@ -306,7 +331,7 @@ class AbstractFileSystem(python_utils.OBJECT):
             FileStream. The file stream domain object.
 
         Raises:
-            IOError: The given file stream does not exist.
+            IOError. The given file stream does not exist.
         """
         file_stream = self.open(filepath)
         if file_stream is None:
@@ -320,11 +345,20 @@ class AbstractFileSystem(python_utils.OBJECT):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
-            mimetype: str. The content-type of the file.
+            mimetype: str. The content-type of the file. If mimetype is set to
+                'application/octet-stream' then raw_bytes is expected to
+                contain binary data. In all other cases, raw_bytes is expected
+                to be textual data.
         """
-        raw_bytes = python_utils.convert_to_bytes(raw_bytes)
+        # Note that textual data needs to be converted to bytes so that it can
+        # be stored in a file opened in binary mode. However, it is not
+        # required for binary data (i.e. when mimetype is set to
+        # 'application/octet-stream').
+        file_content = (
+            python_utils.convert_to_bytes(raw_bytes)
+            if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
-        self._impl.commit(filepath, raw_bytes, mimetype)
+        self._impl.commit(filepath, file_content, mimetype)
 
     def delete(self, filepath):
         """Deletes a file and the metadata associated with it.
@@ -349,3 +383,14 @@ class AbstractFileSystem(python_utils.OBJECT):
         """
         self._check_filepath(dir_name)
         return self._impl.listdir(dir_name)
+
+    def copy(self, source_assets_path, filepath):
+        """Copy images from source.
+
+        Args:
+            source_assets_path: str. The path to the source entity's assets
+                folder.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+        """
+        self._impl.copy(source_assets_path, filepath)
