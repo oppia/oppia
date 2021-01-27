@@ -19,8 +19,10 @@
 import { ComponentFixture, TestBed, async} from
   '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
+import { MockAngularFireAuth } from 'tests/unit-test-utils';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -32,6 +34,9 @@ describe('OppiaAngularRootComponent', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [OppiaAngularRootComponent],
+      providers: [
+        {provide: AngularFireAuth, useValue: new MockAngularFireAuth()},
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(OppiaAngularRootComponent);
