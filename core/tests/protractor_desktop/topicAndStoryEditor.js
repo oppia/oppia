@@ -96,14 +96,12 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
       'Skill 1', 'Topic 1');
 
-    await topicEditorPage.get(topicId);
+    await skillEditorPage.get(skillId);
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-    var url = await browser.getCurrentUrl();
-    skillId = url.split('/')[4];
-    await skillEditorPage.get(skillId);
 
+    await topicEditorPage.get(topicId);
     await topicEditorPage.moveToQuestionsTab();
     await topicEditorPage.createQuestionForSkillWithName('Skill 1');
     await explorationEditorMainTab.setContent(
