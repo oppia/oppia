@@ -2982,7 +2982,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             written_translations_dict)
 
     def test_update_written_translations_cleans_html_translations(self):
-        """Test update content translations."""
         written_translations_dict = {
             'translations_mapping': {
                 'content': {
