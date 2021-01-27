@@ -336,6 +336,13 @@ describe('Site Analytics Service', () => {
       'send', 'event', 'PlayerFinishExploration', 'engage', '123');
   });
 
+  it('should register finish curated lesson event', () => {
+    sas.registerCuratedLessonCompleted('123');
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'CuratedLessonCompleted', 'engage', '123');
+  });
+
   it('should register open collection from landing page event', () => {
     const collectionId = 'abc1';
     sas.registerOpenCollectionFromLandingPageEvent(collectionId);
