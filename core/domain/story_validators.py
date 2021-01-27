@@ -196,7 +196,7 @@ class StorySummaryModelValidator(
                         item.id, model_id, model_class.__name__, model_id))
                 continue
             nodes = story_model.story_contents['nodes']
-            node_titles = [node.title for node in nodes]
+            node_titles = [node['title'] for node in nodes]
             if item.node_titles != node_titles:
                 cls._add_error(
                     'node titles check',

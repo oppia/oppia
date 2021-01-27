@@ -19,7 +19,7 @@
  */
 
 require('domain/classroom/classroom-backend-api.service');
-require('domain/sidebar/sidebar-status.service.ts');
+require('services/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
 require('services/navigation.service.ts');
@@ -142,6 +142,13 @@ angular.module('oppia').directive('topNavigationBar', [
           };
           ctrl.toggleSidebar = function() {
             SidebarStatusService.toggleSidebar();
+          };
+
+          ctrl.navigateToClassroomPage = function(classroomUrl) {
+            SiteAnalyticsService.registerClassoomHeaderClickEvent();
+            $timeout(function() {
+              $window.location = classroomUrl;
+            }, 150);
           };
 
           /**
