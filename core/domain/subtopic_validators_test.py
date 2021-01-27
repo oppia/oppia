@@ -213,7 +213,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id 0-1: based on field topic_ids having value '
                 '0, expected model TopicModel with id 0 but it '
                 'doesn\'t exist"]]'),
-            u'[u\'fully-validated SubtopicPageModel\', 2]']
+            u"[u\'fully-validated SubtopicPageModel\', 2]"]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
