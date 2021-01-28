@@ -128,7 +128,7 @@ jobs:
           path: coverage/.coverage.11
       - name: Combine coverage reports
         shell: bash
-        run: coverage combine coverage/coverage_*
+        run: coverage combine coverage/.coverage.*
       - name: Check coverage
         shell: bash
         run: coverage report --fail_under 100
