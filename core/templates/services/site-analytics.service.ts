@@ -67,7 +67,8 @@ export class SiteAnalyticsService {
       this.windowRef.nativeWindow.location.pathname + ' ' + srcElement);
   }
   registerNewSignupEvent(): void {
-    this._sendEventToGoogleAnalytics('SignupButton', 'click', '');
+    this._sendEventToGoogleAnalytics(
+      'OnboardingEngagement', 'signup', 'AccountSignUp');
   }
   registerClickBrowseLessonsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
@@ -206,9 +207,6 @@ export class SiteAnalyticsService {
         'PlayerNewCard', 'click', cardNum.toString());
     }
   }
-  registerFinishExploration(): void {
-    this._sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
-  }
   registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
     this._sendEventToGoogleAnalytics(
       'OpenFractionsFromLandingPage', 'click', collectionId);
@@ -252,6 +250,41 @@ export class SiteAnalyticsService {
   registerContributorDashboardRejectSuggestion(contributionType: string): void {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardRejectSuggestion', 'click', contributionType);
+  }
+
+  registerLessonActiveUse(): void {
+    this._sendEventToGoogleAnalytics(
+      'ActiveUserStartAndSawCards', 'engage', '');
+  }
+
+  registerStartExploration(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'PlayerStartExploration', 'engage', explorationId);
+  }
+
+  registerFinishExploration(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'PlayerFinishExploration', 'engage', explorationId);
+  }
+
+  registerClassroomLessonActiveUse(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomActiveUserStartAndSawCards', 'engage', '');
+  }
+
+  registerClassoomHeaderClickEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomEngagement', 'click', 'ClickOnClassroom');
+  }
+
+  registerClassroomPageViewed(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomEngagement', 'impression', 'ViewClassroom');
+  }
+
+  registerAccountDeletion(): void {
+    this._sendEventToGoogleAnalytics(
+      'OnboardingEngagement', 'delete', 'AccountDeletion');
   }
 }
 

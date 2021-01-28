@@ -2293,9 +2293,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-rule-block {
   background-color: white;
-  border-left: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  border-top: 1px solid #ccc;
+  border: 1px solid #ccc;
 }
 
 .oppia-rule-block.active {
