@@ -276,7 +276,7 @@ describe('Preferences Controller', function() {
     function() {
       const preventReloadEventaddSpy = spyOn(
         PreventReloadEventService, 'addListener').and.callThrough();
-      ctrl.checkBioChanged();
+      ctrl.registerBioChanged();
       expect(preventReloadEventaddSpy).toHaveBeenCalled();
     });
 });
