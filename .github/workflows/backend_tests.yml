@@ -129,10 +129,23 @@ jobs:
       - name: Move coverage reports from artifact folders to coverage folder
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
-        run: for i in {1..11}; do cp coverage/coverage_$i/.coverage coverage/.coverage.$i; done
+        run: |
+          cp coverage/coverage_1/.coverage coverage/.coverage.1
+          cp coverage/coverage_2/.coverage coverage/.coverage.2
+          cp coverage/coverage_3/.coverage coverage/.coverage.3
+          cp coverage/coverage_4/.coverage coverage/.coverage.4
+          cp coverage/coverage_5/.coverage coverage/.coverage.5
+          cp coverage/coverage_6/.coverage coverage/.coverage.6
+          cp coverage/coverage_7/.coverage coverage/.coverage.7
+          cp coverage/coverage_8/.coverage coverage/.coverage.8
+          cp coverage/coverage_9/.coverage coverage/.coverage.9
+          cp coverage/coverage_10/.coverage coverage/.coverage.10
+          cp coverage/coverage_11/.coverage coverage/.coverage.11
       - name: Combine coverage reports
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
         run: coverage combine coverage/.coverage.*
       - name: Check coverage
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
         run: coverage report --fail_under 100
