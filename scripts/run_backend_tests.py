@@ -263,6 +263,28 @@ def _get_all_test_targets_from_shard(shard_name):
     return shards_spec[shard_name]
 
 
+def _check_shards_cover_all_tests(include_load_tests=True):
+    """Check whether the test shards cover all test classes.
+
+    Args:
+        include_load_tests: bool. Whether to include load tests.
+
+    Returns:
+        str. The dotted name of a test class not included in the shards,
+        or an empty string if all tests are included.
+    """
+    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+        shards_spec = json.load(shards_file)
+    test_modules = tuple(
+        module for shard in shards_spec.values() for module in shard)
+    test_classes = _get_all_test_targets_from_path(
+        include_load_tests=include_load_tests)
+    for test_class in test_classes:
+        if not test_class.startswith(test_modules):
+            return test_class
+    return ''
+
+
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -327,6 +349,10 @@ def main(args=None):
             python_utils.PRINT('Redirecting to its corresponding test file...')
             all_test_targets = [parsed_args.test_target + '_test']
     elif parsed_args.test_shard:
+        missing_test = _check_shards_cover_all_tests(include_load_tests=False)
+        if missing_test:
+            raise Exception(
+                'The test %s is not in any shard.' % missing_test)
         all_test_targets = _get_all_test_targets_from_shard(
             parsed_args.test_shard)
     else:
