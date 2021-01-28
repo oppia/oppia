@@ -25,7 +25,7 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
     var PREVIEW_TAB = 'preview';
     var activeTab = MAIN_TAB;
     var ctrl = this;
-    ctrl.createQuestion = false;
+    ctrl.questionIsBeingCreated = false;
     // When the URL path changes, reroute to the appropriate tab in the
     // skill editor page.
     $rootScope.$watch(function() {
@@ -67,15 +67,16 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
       },
       // To navigate directly to question-editor interface
       // from skill editor page.
-      createNewQuestion: function() {
-        ctrl.createQuestion = true;
+      creatingNewQuestion: function(editorIsOpen:boolean) {
+        if (editorIsOpen) {
+          ctrl.questionIsBeingCreated = true;
+        } else {
+          ctrl.questionIsBeingCreated = false;
+        }
       },
-      createQuestion: function() {
-        return ctrl.createQuestion;
+      navigateToQuestionEditor: function() {
+        return ctrl.questionIsBeingCreated;
       },
-      backToQuestionList: function() {
-        ctrl.createQuestion = false;
-      }
     };
 
     return SkillEditorRouterService;

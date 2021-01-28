@@ -65,7 +65,7 @@ describe('Skill editor main tab directive', function() {
       $scope.createQuestion(),
       expect(routingSpy).toHaveBeenCalled();
       var createQuestionEventSpyon = spyOn(
-        SkillEditorRoutingService, 'createNewQuestion')
+        SkillEditorRoutingService, 'creatingNewQuestion')
         .and.callThrough();
       $scope.createQuestion();
       expect(createQuestionEventSpyon).toHaveBeenCalled();

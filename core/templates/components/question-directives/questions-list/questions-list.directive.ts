@@ -133,7 +133,7 @@ angular.module('oppia').directive('questionsList', [
                 $rootScope.$apply();
               });
             }
-            if (SkillEditorRoutingService.createQuestion()) {
+            if (SkillEditorRoutingService.navigateToQuestionEditor()) {
               ctrl.createQuestion();
             }
           };
@@ -570,11 +570,11 @@ angular.module('oppia').directive('questionsList', [
             } else {
               if (ctrl.skillLinkageModificationsArray.length > 0) {
                 ctrl.updateSkillLinkage(null);
-                SkillEditorRoutingService.backToQuestionList();
+                SkillEditorRoutingService.creatingNewQuestion(false);
               } else {
                 ContextService.resetImageSaveDestination();
                 ctrl.saveAndPublishQuestion(null);
-                SkillEditorRoutingService.backToQuestionList();
+                SkillEditorRoutingService.creatingNewQuestion(false);
               }
             }
           };
