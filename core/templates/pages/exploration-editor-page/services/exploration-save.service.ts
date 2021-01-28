@@ -74,7 +74,6 @@ require('services/editability.service.ts');
 angular.module('oppia').factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
-  'EditabilityService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
@@ -87,7 +86,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
   function(
       $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
-      EditabilityService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
       ExplorationLanguageCodeService, ExplorationObjectiveService,
@@ -188,7 +186,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
           ExplorationDataService.explorationId);
       }
       saveIsInProgress = true;
-      EditabilityService.markNotEditable();
 
       ExplorationDataService.save(
         changeList, commitMessage,
@@ -207,11 +204,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
             });
             AlertsService.addSuccessMessage('Changes saved.');
             saveIsInProgress = false;
-            EditabilityService.markEditable();
             whenSavingDone.resolve();
             $rootScope.$applyAsync();
           }, () => {
-            EditabilityService.markEditable();
             whenSavingDone.resolve();
             $rootScope.$applyAsync();
           });
