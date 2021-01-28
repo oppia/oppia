@@ -24,7 +24,6 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { FirebaseUIModule } from 'firebaseui-angular';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -71,7 +70,6 @@ import { AuthService } from 'services/auth.service';
     FormsModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
-    FirebaseUIModule.forRoot(AuthService.firebaseUiAuthConfig),
   ],
 
   providers: [

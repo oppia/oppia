@@ -115,10 +115,10 @@ the <body> of every page:
 */
 .firebase-emulator-warning {
   /* Enhance the contrast of the text to improve accessibility. We need to use
-   `!important` here because inline style rules have a higher priority over CSS
+   `!important` here because inline style rules have a higher priority than CSS
    style rules, but we only want these CSS rules to be respected. */
-  color: #CC0000 !important;
   background-color: #FFFFFF !important;
+  color: #CC0000 !important;
   /* Do not allow the element to swallow pointer/mouse events. */
   pointer-events: none;
 }

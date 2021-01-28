@@ -18,7 +18,6 @@
 
 import { TestBed } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { firebase } from 'firebaseui-angular';
 import { of } from 'rxjs';
 import { marbles } from 'rxjs-marbles';
 
@@ -142,31 +141,5 @@ describe('Auth service', () => {
       .and.returnValue(false);
 
     expect(AuthService.firebaseEmulatorConfig).toBeUndefined();
-  });
-
-  it('should return email link as the auth provider in emulator mode', () => {
-    spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
-      .and.returnValue(true);
-
-    expect(AuthService.firebaseUiAuthConfig.signInOptions).toEqual([
-      jasmine.objectContaining({
-        provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        requireDisplayName: false,
-        signInMethod: firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
-      })
-    ]);
-  });
-
-  it('should return Google as the auth provider in production mode', () => {
-    spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
-      .and.returnValue(false);
-
-    expect(AuthService.firebaseUiAuthConfig.signInOptions).toEqual([
-      jasmine.objectContaining({
-        provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        scopes: ['https://www.googleapis.com/auth/userinfo.email'],
-        customParameters: {prompt: 'select_account'},
-      })
-    ]);
   });
 });

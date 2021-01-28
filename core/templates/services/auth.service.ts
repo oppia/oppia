@@ -20,7 +20,6 @@ import { Injectable } from '@angular/core';
 import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { firebase, firebaseui } from 'firebaseui-angular';
 import { Observable } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
@@ -57,36 +56,6 @@ export class AuthService {
   static get firebaseEmulatorConfig(): readonly [string, number] {
     return AuthService.firebaseEmulatorIsEnabled ?
       ['localhost', 9099] : undefined;
-  }
-
-  static get firebaseUiAuthConfig(): firebaseui.auth.Config {
-    return {
-      signInFlow: 'redirect',
-      signInSuccessUrl: '/signup',
-      queryParameterForSignInSuccessUrl: 'return_url',
-      tosUrl: '/terms',
-      privacyPolicyUrl: '/privacy-policy',
-      signInOptions: AuthService.firebaseEmulatorIsEnabled ?
-        [ // EMULATOR SIGN IN OPTIONS: Email links offer the most developer-
-          // friendly interface (links are printed directly to the terminal).
-          {
-            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            requireDisplayName: false,
-            signInMethod: (
-              firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD),
-          },
-        ] : [
-          // PRODUCTION SIGN IN OPTIONS: Require an authentic Google Account.
-          {
-            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-            clientId: AppConstants.FIREBASE_CONFIG_GOOGLE_CLIENT_ID,
-            // We only need the user's email address.
-            scopes: ['https://www.googleapis.com/auth/userinfo.email'],
-            // Force account selection even when just one account is available.
-            customParameters: {prompt: 'select_account'},
-          },
-        ],
-    };
   }
 }
 
