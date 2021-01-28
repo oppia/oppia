@@ -42,7 +42,7 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: actions/upload-artifact@v2
         with:
-          name: {{ format('{{backend_test_coverage_shard_{0}}}', matrix.shard) }}
+          name: ${{ format('{{backend_test_coverage_shard_{0}}}', matrix.shard) }}
           path: .coverage
   check_combined_coverage:
     name: Check combined backend test coverage
