@@ -47,7 +47,7 @@ export class TranslateTextBackendApiService {
       }).toPromise();
   }
 
-  async putTranslatedTextSuggestion(
+  async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string,
       stateWiseContents:StateNamesToContentIdMappingBackendDict,
