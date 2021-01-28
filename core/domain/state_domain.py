@@ -1449,9 +1449,6 @@ class WrittenTranslation(python_utils.OBJECT):
         self.translation = translation
         self.needs_update = needs_update
 
-        if data_format == self.DATA_FORMAT_HTML:
-            self.translation = html_cleaner.clean(self.translation)
-
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
 
