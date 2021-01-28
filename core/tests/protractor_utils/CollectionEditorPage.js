@@ -79,7 +79,11 @@ var CollectionEditorPage = function() {
 
     var matchingSearchResult = element(by.cssContainingText(
       '.uib-typeahead-match', new RegExp(query)));
-    await action.click('Matching search result', matchingSearchResult);
+    if (await matchingSearchResult.isDisplayed()) {
+      // The user has typed in a title, rather than an exploration ID. We need
+      // to select the correct exploration from the dropdown in this case.
+      await action.click('Matching search result', matchingSearchResult);
+    }
 
     var isEnabled = await addExplorationButton.isEnabled();
     if (isEnabled) {
