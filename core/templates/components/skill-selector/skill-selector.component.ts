@@ -30,21 +30,20 @@ export class SelectSkillComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
-  @Input() sortedSkillSummaries: string[];
-  @Input() selectedSkillId: string; // Check type.
+  @Input() sortedSkillSummaries: [];
+  @Input() selectedSkillId: string; // Type?
   @Input() countOfSkillsToPrioritize: number;
   @Input('categorizedSkills') inputCategorizedSkills: {};
-  @Input() untriagedSkillSummaries: string[];
+  @Input() untriagedSkillSummaries: [];
   @Input() allowSkillsFromOtherTopics: boolean;
-  categorizedSkills = null;
+  categorizedSkills = null; // Does this need to be an output?
   selectedSkill = null;
   topicFilterList = [];
   subTopicFilterDict = {};
   intialSubTopicFilterDict = {};
 
   constructor() {
-    this.selectedSkill = null;
-    this.categorizedSkills = this.inputCategorizedSkills
+    this.categorizedSkills = this.inputCategorizedSkills;
   }
 
   ngOnInit(): void {
@@ -67,11 +66,11 @@ export class SelectSkillComponent implements OnInit {
     this.intialSubTopicFilterDict = angular.copy(this.subTopicFilterDict);
   }
 
-  checkIfEmpty(skills: any): boolean {
+  checkIfEmpty(skills: string[]): boolean {
     return skills.length === 0;
   }
 
-  checkIfTopicIsEmpty(topicName: any): boolean {
+  checkIfTopicIsEmpty(topicName: string): boolean {
     for (let key in this.categorizedSkills[topicName]) {
       if (Object.keys(this.categorizedSkills[topicName][key]).length) {
         return true;
@@ -131,7 +130,7 @@ export class SelectSkillComponent implements OnInit {
   // The folowing function is called when the topic filter changes.
   // First, the subtopic filter is updated according to the changed
   // topic filter list. Then the main Skills list is updated.
-  updateSkillsListOnTopicFilterChange() {
+  updateSkillsListOnTopicFilterChange(): void {
     var updatedSubTopicFilterList = {};
     var isAnyTopicChecked = false;
     for (var i = 0; i < this.topicFilterList.length; i++) {
@@ -171,7 +170,7 @@ export class SelectSkillComponent implements OnInit {
       }
     }
     this.updateSkillsListOnTopicFilterChange();
-  };
+  }
 }
 
 angular.module('oppia').directive(
