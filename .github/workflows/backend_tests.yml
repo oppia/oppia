@@ -148,4 +148,4 @@ jobs:
       - name: Check coverage
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
-        run: coverage report --fail_under 100
+        run: coverage report --fail-under 100
