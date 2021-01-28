@@ -92,7 +92,7 @@ angular.module('oppia').component('preferencesPage', {
         _saveDataItem('user_bio', userBio);
       };
 
-      ctrl.checkBioChanged = function() {
+      ctrl.registerBioChanged = function() {
         PreventReloadEvent.addListener();
       };
 
