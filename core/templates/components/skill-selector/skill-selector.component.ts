@@ -31,12 +31,12 @@ export class SelectSkillComponent implements OnInit {
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
   @Input() sortedSkillSummaries: [];
-  @Input() selectedSkillId: string; // Type?
+  @Input() selectedSkillId: string; // Type? Also an output?
   @Input() countOfSkillsToPrioritize: number;
   @Input('categorizedSkills') inputCategorizedSkills: {};
   @Input() untriagedSkillSummaries: [];
   @Input() allowSkillsFromOtherTopics: boolean;
-  categorizedSkills = null; // Does this need to be an output?
+  categorizedSkills = null; // Does this need to be an output? Combined with Input above?
   selectedSkill = null;
   topicFilterList = [];
   subTopicFilterDict = {};

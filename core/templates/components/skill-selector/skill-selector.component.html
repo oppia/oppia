@@ -13,7 +13,7 @@
           <div *ngIf="!checkIfEmpty(skills)" *ngFor="(subtopicName, skills) in subtopics" class="list-view-item ">
             <md-card class="list-view-item">
               <label class="oppia-subtopic-name-text">{{ subtopicName }}</label>
-              <md-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in skills | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
+              <md-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in skills | filter:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
                 {{ skill.description }}
               </md-radio-button>
             </md-card>
@@ -25,8 +25,8 @@
           </md-card>
           <div *ngIf="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
             <md-card class="list-view-item">
-              <md-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in untriagedSkillSummaries | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
-                <[skill.description]>
+              <md-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in untriagedSkillSummaries | filter:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
+                {{ skill.description }}
               </md-radio-button>
             </md-card>
           </div>
@@ -40,7 +40,7 @@
     </md-card>
     <div *ngIf="canAllowSkillsFromOtherTopics()" class="oppia-list-view-item-container">
       <md-card class="list-view-item ">
-        <md-checkbox class="oppia-skills-list-item" *ngFor="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
+        <md-checkbox class="oppia-skills-list-item" *ngFor="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()">{{ topic.topicName }}</md-checkbox>
       </md-card>
     </div>
     <br>
@@ -52,7 +52,7 @@
         <div *ngFor="(topicName, subtopics) in subTopicFilterDict">
           <h3><label class="list-group-item-heading oppia-heading-text">{{ topicName }}</label></h3>
           <md-card class="list-view-item">
-            <md-checkbox class="oppia-skills-list-item" *ngFor="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()"><[subtopic.subTopicName]></md-checkbox>
+            <md-checkbox class="oppia-skills-list-item" *ngFor="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()">{{ subtopic.subTopicName }}</md-checkbox>
           </md-card>
         </div>
       </md-card>
