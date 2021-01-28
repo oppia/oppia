@@ -24,8 +24,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './admin-prod-mode-activities-tab.component.html',
   styleUrls: []
 })
-export class AdminProdModeActivitiesTabComponent {}
+export class oppiaAdminProdModeActivitiesTabComponent {}
 
 angular.module('oppia').directive(
   'adminProdModeActivitiesTab', downgradeComponent(
-    {component: AdminProdModeActivitiesTabComponent}));
+    {component: oppiaAdminProdModeActivitiesTabComponent}));
