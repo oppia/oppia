@@ -33,6 +33,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/prevent-reload-event.service.ts');
 require('services/user.service.ts');
 require('services/utils.service.ts');
 
@@ -47,18 +48,18 @@ angular.module('oppia').component('preferencesPage', {
   controller: [
     '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
     '$window', 'AlertsService', 'I18nLanguageCodeService',
-    'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
-    'UserService', 'WindowRef', 'DASHBOARD_TYPE_CREATOR',
-    'DASHBOARD_TYPE_LEARNER', 'ENABLE_ACCOUNT_DELETION',
-    'ENABLE_ACCOUNT_EXPORT', 'SUPPORTED_AUDIO_LANGUAGES',
-    'SUPPORTED_SITE_LANGUAGES', function(
+    'LanguageUtilService', 'LoaderService', 'PreventReloadEvent',
+    'UrlInterpolationService', 'UserService',
+    'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
+    'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
+    'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES', function(
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
         $window, AlertsService, I18nLanguageCodeService,
-        LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserService, WindowRef, DASHBOARD_TYPE_CREATOR,
-        DASHBOARD_TYPE_LEARNER, ENABLE_ACCOUNT_DELETION,
-        ENABLE_ACCOUNT_EXPORT, SUPPORTED_AUDIO_LANGUAGES,
-        SUPPORTED_SITE_LANGUAGES) {
+        LanguageUtilService, LoaderService, PreventReloadEvent,
+        UrlInterpolationService, UserService,
+        DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
+        ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
+        SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
       var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -66,12 +67,12 @@ angular.module('oppia').component('preferencesPage', {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       var _saveDataItem = function(updateType, data) {
-        ctrl.allowreload = false;
+        PreventReloadEvent.addListener();
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
         }).then(() => {
-          ctrl.allowreload = true;
+          PreventReloadEvent.removeListener();
           AlertsService.addInfoMessage('Saved!', 1000);
         });
       };
@@ -92,21 +93,7 @@ angular.module('oppia').component('preferencesPage', {
       };
 
       ctrl.checkBioChanged = function() {
-        ctrl.allowreload = false;
-      };
-
-      ctrl.saveBeforeUnload = function() {
-        WindowRef.nativeWindow.addEventListener(
-          'beforeunload', ctrl.confirmBeforeLeaving);
-      };
-
-      ctrl.confirmBeforeLeaving = function(e) {
-        if (!ctrl.allowreload) {
-          // This message is irrelevant, but is needed to trigger the
-          // confirmation before leaving.
-          e.returnValue = 'Sure?';
-          return false;
-        }
+        PreventReloadEvent.addListener();
       };
 
       ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
@@ -239,7 +226,6 @@ angular.module('oppia').component('preferencesPage', {
             data.preferred_audio_language_code;
           ctrl.subscriptionList = data.subscription_list;
           ctrl.hasPageLoaded = true;
-          ctrl.allowreload = true;
           _forceSelect2Refresh();
         });
 
@@ -253,7 +239,6 @@ angular.module('oppia').component('preferencesPage', {
         ctrl.LANGUAGE_CHOICES =
         LanguageUtilService.getLanguageIdsAndTexts();
         ctrl.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
-        ctrl.saveBeforeUnload();
       };
     }
   ]
