@@ -82,6 +82,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         # Load a public demo exploration.
         exp_services.load_demo('0')
+        self.process_and_flush_pending_tasks()
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -109,6 +110,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'new_value': 'A new category'
             })],
             'Change title and category')
+        self.process_and_flush_pending_tasks()
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
