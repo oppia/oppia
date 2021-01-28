@@ -778,6 +778,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
     def test_for_recently_published_explorations(self):
         """Tests for recently published explorations."""
 
+        self.process_and_flush_pending_tasks()
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(
                 feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
@@ -839,6 +840,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
                 'property_name': 'title',
                 'new_value': 'New title'
             })], 'Changed title.')
+        self.process_and_flush_pending_tasks()
 
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(
