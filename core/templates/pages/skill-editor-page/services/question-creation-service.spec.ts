@@ -65,9 +65,13 @@ describe('Question Creation Service', function() {
         name: 'name1',
         notes: 'notes1'
       };
-      var rubricDict = {
+      var rubricDict1 = {
         difficulty: 'Easy',
         explanations: ['Easy']
+      };
+      var rubricDict2 = {
+        difficulty: 'Medium',
+        explanations: ['Medium 1', 'Medium 2']
       };
       var conceptCardDict = {
         explanation: {content_id: 'content',
@@ -88,7 +92,7 @@ describe('Question Creation Service', function() {
         misconceptions: [misconceptionDict],
         next_misconception_id: '2',
         prerequisite_skill_ids: [],
-        rubrics: [rubricDict],
+        rubrics: [rubricDict1, rubricDict2],
         skill_contents: conceptCardDict,
         superseding_skill_id: 'skillId2',
         version: 2,
@@ -108,6 +112,9 @@ describe('Question Creation Service', function() {
         current: [],
         others: [skillSummaryDict]
       });
+      var skillObject = SkillObjectFactory.createFromBackendDict(
+        skillBackendDict);
+      spyOn(SkillEditorStateService, 'getSkill').and.returnValue(skillObject);
 
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
 

@@ -1,10 +1,12 @@
 <md-radio-group ng-model="skillWithDifficulty._difficulty">
   <md-radio-button ng-repeat="rubric in getSkillIdToRubricsObject()[skillWithDifficulty.getId()]"
+                   ng-if="rubric.getExplanations().length > 0"
                    ng-value="availableDifficultyValues[$index]"
                    class="protractor-test-skill-difficulty-<[rubric.getDifficulty().toLowerCase()]>">
     <strong> <[rubric.getDifficulty()]> </strong>
     <md-list>
-      <md-list-item ng-repeat="explanation in rubric.getExplanations()">
+      <md-list-item class="pl-0" ng-repeat="explanation in rubric.getExplanations()">
+        <div class="oppia-skill-description-label">Skill description:</div>
         <angular-html-bind html-data="explanation">
         </angular-html-bind>
         <div ng-if="explanation === '' || explanation === '<p></p>'">
@@ -14,3 +16,16 @@
     </md-list>
   </md-radio-button>
 </md-radio-group>
+
+<style>
+  md-radio-button .md-container {
+    top: 1.1rem;
+  }
+
+  .oppia-skill-description-label {
+    display: inline;
+    font-style: italic;
+    margin-right: 1.2rem;
+    width: 9rem;
+  }
+</style>

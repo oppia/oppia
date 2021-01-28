@@ -11,7 +11,9 @@
       <div>
         <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
         <div ng-if="skillRubricExplanations.length > 0">
-          <strong>Difficulty Explanations</strong>
+          <strong title="Use these notes to make sure your question is at the right difficulty.">
+            Notes from Skill Rubric
+          </strong>
           <ul>
             <li ng-repeat="explanation in skillRubricExplanations">
               <span ng-bind-html="explanation"></span>
