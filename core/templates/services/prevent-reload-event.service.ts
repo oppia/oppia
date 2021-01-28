@@ -44,8 +44,9 @@ export class PreventReloadEvent {
     this.listenerActive = false;
   }
 
-  private _confirmAlert(e: { preventDefault: () => void; returnValue: string; })
-  : void {
+  private _confirmAlert(
+    e: { preventDefault: () => void; returnValue: string; }
+  ): void {
     // HTML specification states that authors should use the
     // below function.
     e.preventDefault();
