@@ -873,7 +873,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_2,
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.EXPLORATION_IDS,
             exploration_ids=self.EXPLORATION_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATETIME
