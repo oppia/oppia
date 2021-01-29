@@ -47,6 +47,8 @@ angular.module('oppia').controller(
           .registerContributorDashboardViewSuggestionForReview('Translation');
       }
 
+      // The length of the commit message should not exceed 375 characters,
+      // since this is the maximum allowed commit message size.
       var generateCommitMessage = function() {
         var contentId = $scope.activeSuggestion.change.content_id;
         var stateName = $scope.activeSuggestion.change.state_name;
