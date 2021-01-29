@@ -8,21 +8,11 @@
     <oppia-root>
       <div ng-controller="Base">
         <base-content>
-          <navbar-breadcrumb>
-            <ul class="nav navbar-nav oppia-navbar-breadcrumb protractor-test-teach-page">
-              <li>
-                <span class="oppia-navbar-breadcrumb-separator"></span>
-                Teach with Oppia
-              </li>
-            </ul>
-          </navbar-breadcrumb>
-
           <content>
-            <teach-page></teach-page>
+            <teach-page class="protractor-test-teach-page"></teach-page>
           </content>
         </base-content>
       </div>
-
     </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>

@@ -75,6 +75,36 @@ export class SiteAnalyticsService {
       'BrowseLessonsButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
+  registerClickGuideParentsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'GuideParentsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickTipforParentsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'TipforParentsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickExploreLessonsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'ExploreLessonsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartLearningButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartLearningButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickVisitClassroomButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickBrowseLibraryButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'BrowseLibraryButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
   registerGoToDonationSiteEvent(donationSiteName: string): void {
     this._sendEventToGoogleAnalytics(
       'GoToDonationSite', 'click', donationSiteName);
