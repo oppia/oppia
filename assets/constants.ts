@@ -5435,12 +5435,13 @@ export default {
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
-  "FIREBASE_CONFIG_API_KEY": "",
-  "FIREBASE_CONFIG_APP_ID": "",
+  "FIREBASE_CONFIG_API_KEY": "dev-api-key",
+  "FIREBASE_CONFIG_APP_ID": "dev-app-id",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
   "FIREBASE_CONFIG_DATABASE_URL": "",
+  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
-  "FIREBASE_CONFIG_PROJECT_ID": "",
+  "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",
   "FIREBASE_CONFIG_STORAGE_BUCKET": "",
   "FIREBASE_EMULATOR_ENABLED": true,
 
