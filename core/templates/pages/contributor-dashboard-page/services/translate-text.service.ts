@@ -122,9 +122,14 @@ export class TranslateTextService {
       translationHtml: string, languageCode: string, imagesData:ImagesData[],
       successCallback: ()=>void): void {
     this._translatableTextBackedApiService.suggestTranslatedTextAsync(
-      this.activeExpId, this.activeExpVersion, this.activeContentId,
-      this.activeStateName, languageCode, this.stateWiseContents,
-      translationHtml, imagesData).then(successCallback);
+      this.activeExpId,
+      this.activeExpVersion,
+      this.activeContentId,
+      this.activeStateName,
+      languageCode,
+      this.stateWiseContents[this.activeStateName][this.activeContentId],
+      translationHtml,
+      imagesData).then(successCallback);
   }
 }
 
