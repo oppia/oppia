@@ -126,6 +126,7 @@ class TaskEntryModelValidator(base_model_validators.BaseModelValidator):
                 'Entity id %s: exploration with id "%s" does not exist at '
                 'version %d' % (item.id, item.entity_id, item.entity_version))
             return
+
         if item.target_id not in exp_model.states.keys():
             cls._add_error(
                 'target_id %s' % (
