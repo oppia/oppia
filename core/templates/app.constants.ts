@@ -105,7 +105,9 @@ export const AppConstants = {
   // used to identify components, to generate content ids, and to determine what
   // type of content a given content id is associated with. If you wish to
   // change one of these, a state migration of all existing content ids is
-  // required.
+  // required. The component content type should be sufficiently small such that
+  // the commit messages that use the content type strings do not exceed 375
+  // characters (which is the maximum length of a commit message).
   COMPONENT_NAME_CONTENT: 'content',
   COMPONENT_NAME_FEEDBACK: 'feedback',
   COMPONENT_NAME_HINT: 'hint',

@@ -176,10 +176,10 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.payload.get('commit_message')
             if (commit_message is not None and
-                    len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                    len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
                 raise self.InvalidInputException(
                     'Commit messages must be at most %s characters long.'
-                    % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                    % constants.MAX_COMMIT_MESSAGE_LENGTH)
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))

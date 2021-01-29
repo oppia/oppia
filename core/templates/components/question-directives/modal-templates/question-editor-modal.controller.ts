@@ -37,7 +37,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
-  'rubric', 'skillName', 'untriagedSkillSummaries',
+  'rubric', 'skillName', 'untriagedSkillSummaries', 'MAX_COMMIT_MESSAGE_LENGTH',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
       ImageLocalStorageService, QuestionUndoRedoService,
@@ -45,7 +45,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
-      rubric, skillName, untriagedSkillSummaries) {
+      rubric, skillName, untriagedSkillSummaries, MAX_COMMIT_MESSAGE_LENGTH) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
@@ -60,6 +60,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
     $scope.skillName = skillName;
     $scope.rubric = rubric;
+    $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
 
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;
