@@ -15,26 +15,27 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-
-import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, async, fakeAsync, tick } from
-  '@angular/core/testing';
-
+import { Pipe, EventEmitter } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
+import { LoaderService } from 'services/loader.service.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslateService } from 'services/translate.service';
-
+import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserService } from 'services/user.service';
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
     return value;
   }
 }
-
 class MockTranslateService {
   languageCode = 'es';
   use(newLanguageCode: string): string {
@@ -42,7 +43,6 @@ class MockTranslateService {
     return this.languageCode;
   }
 }
-
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
@@ -54,60 +54,12 @@ class MockI18nLanguageCodeService {
   }
 }
 
-// Mocking window object here because changing location.href causes the
-// full page to reload. Page reloads raise an error in karma.
-class MockWindowRef {
-  _window = {
-    location: {
-      _hash: '',
-      _hashChange: null,
-      _href: '',
-      get hash() {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
-      },
-      get href() {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      },
-      reload: (val) => val
-    },
-    get onhashchange() {
-      return this.location._hashChange;
-    },
-
-    set onhashchange(val) {
-      this.location._hashChange = val;
-    }
-  };
-  get nativeWindow() {
-    return this._window;
-  }
-}
-
-class MockSiteAnalyticsService {
-  registerApplyToTeachWithOppiaEvent(): void {
-    return;
-  }
-}
-
-let component: TeachPageComponent;
-let fixture: ComponentFixture<TeachPageComponent>;
-
-describe('Teach Page', function() {
-  let windowRef: MockWindowRef;
-  let siteAnalyticsService = null;
-
-  beforeEach(async(() => {
-    windowRef = new MockWindowRef();
+describe('Teach Page', () => {
+  const siteAnalyticsServiceStub = new SiteAnalyticsService(
+    new WindowRef());
+  let loaderService: LoaderService = null;
+  let userService: UserService;
+  beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
       providers: [
@@ -115,80 +67,165 @@ describe('Teach Page', function() {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
         },
-        { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true
+          }
+        },
         { provide: TranslateService, useClass: MockTranslateService },
+        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         UrlInterpolationService,
-        { provide: WindowRef, useValue: windowRef }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                href: ''
+              }
+            }
+          }
+        }
+      ]
     }).compileComponents();
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-  }));
+  });
+  beforeEach(angular.mock.module('oppia'));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TeachPageComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    loaderService = TestBed.get(LoaderService);
+    userService = TestBed.get(UserService);
   });
 
-  it('should click on teach tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('teach');
+  let component;
 
-    component.onTabClick('teach');
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(component.activeTabName).toBe('teach');
+  beforeEach(() => {
+    const teachPageComponent = TestBed.createComponent(TeachPageComponent);
+    component = teachPageComponent.componentInstance;
   });
 
-  it('should click on participation tab', (() => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('teach');
+  it('should successfully instantiate the component from beforeEach block',
+    () => {
+      expect(component).toBeDefined();
+    });
 
-    component.onTabClick('participation');
-    expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-    expect(component.activeTabName).toBe('participation');
-  }));
-
-  it('should activate teach tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#teach';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(component.activeTabName).toBe('teach');
-  });
-
-  it('should activate participation tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#participation';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-    expect(component.activeTabName).toBe('participation');
-  });
-
-  it('should get static image url', () => {
+  it('should get static image url', function() {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should apply to teach with oppia', fakeAsync(() => {
-    const applyToTeachWithOppiaEventSpy = spyOn(
-      siteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
-      .and.callThrough();
-
+  it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        href: ''
-      }
-    });
-    component.onApplyToTeachWithOppia();
-    tick(150);
-    fixture.detectChanges();
-    expect(windowRef.nativeWindow.location.href).toBe(
-      'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
-    expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
+    expect(component.displayedTestimonialId).toBe(0);
+    expect(component.testimonialCount).toBe(3);
+    expect(component.classroomUrl).toBe('/learn/math');
+    expect(component.isWindowNarrow).toBe(true);
+  });
+
+  it('should check if loader screen is working', () =>
+    fakeAsync(() => {
+      component.ngOnInit();
+      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+      expect(loaderService.showLoadingScreen)
+        .toHaveBeenCalledWith('Loading');
+    }));
+
+  it('should check if user is logged in or not', fakeAsync(() => {
+    const UserInfoObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject))
+    );
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.userIsLoggedIn).toBe(true);
   }));
+
+  it('should record analytics when Start Learning is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
+      .and.callThrough();
+    component.onClickStartLearningButton();
+    expect(siteAnalyticsServiceStub.registerClickStartLearningButtonEvent)
+      .toHaveBeenCalled();
+  });
+
+  it('should record analytics when Visit Classroom is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
+      .and.callThrough();
+    component.onClickVisitClassroomButton();
+    expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
+      .toHaveBeenCalled();
+  });
+
+
+  it('should record analytics when Browse Library is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
+      .and.callThrough();
+    component.onClickBrowseLibraryButton();
+    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
+      .toHaveBeenCalled();
+  });
+
+  it('should record analytics when Guide For Parents is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickGuideParentsButtonEvent')
+      .and.callThrough();
+    component.onClickGuideParentsButton();
+    expect(siteAnalyticsServiceStub.registerClickGuideParentsButtonEvent)
+      .toHaveBeenCalled();
+  });
+
+  it('should record analytics when Tips For Parents is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
+      .and.callThrough();
+    component.onClickTipforParentsButton();
+    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent)
+      .toHaveBeenCalled();
+  });
+
+  it('should record analytics when Explore Lessons is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickExploreLessonsButtonEvent')
+      .and.callThrough();
+    component.onClickExploreLessonsButton();
+    expect(siteAnalyticsServiceStub.registerClickExploreLessonsButtonEvent)
+      .toHaveBeenCalled();
+  });
+
+  it('should increment and decrement testimonial IDs correctly', function() {
+    component.ngOnInit();
+    expect(component.displayedTestimonialId).toBe(0);
+    component.incrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(1);
+    component.incrementDisplayedTestimonialId();
+    // Add back after testimonials are complete.
+    // component.incrementDisplayedTestimonialId();
+    component.incrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(0);
+
+    component.decrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(2);
+    component.decrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(1);
+  });
+
+  it('should get testimonials correctly', function() {
+    component.ngOnInit();
+    expect(component.getTestimonials().length).toBe(component.testimonialCount);
+  });
 });

@@ -167,8 +167,6 @@
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia antaa sinun <a href=\"/creator-dashboard?mode=create\">luoa</a> ja <a href=\"/community-library\">jakaa</a> tutkimuksia laajalla valikoimalla oppiaineita, joita rajoittavat vain mielikuvituksesi.",
 	"I18N_START_HERE": "Klikkaa tästä alottaaksesi!",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "Tilaa",
-	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1": "<strong>Kaikki ovat tervetulleita pelaamaan ja antamaan palautetta julkaistuista tutkimuksista.</strong> Kaikkien avulla, voimme jatkuvasti parantaa oppitunteja sivustolla ja tehdä niistä \nmahdollisimman tehokkaita.",
-	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Teach with Oppia",
 	"I18N_TOPNAV_BLOG": "Blogi",
 	"I18N_TOPNAV_CONTACT_US": "Ota yhteyttä",
 	"I18N_TOPNAV_CREATOR_DASHBOARD": "Luojan ohjausnäkymä",
