@@ -1695,7 +1695,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             {
                 'version': exploration.version,
                 'commit_message':
-                    'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                    'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
@@ -1711,7 +1711,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.assertEqual(
             response_dict['error'],
-            'Commit messages must be at most 1000 characters long.')
+            'Commit messages must be at most 375 characters long.')
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
