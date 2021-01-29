@@ -26,12 +26,18 @@ var TopicViewerPage = function() {
     element.all(by.css('.protractor-test-story-summary-title'));
   var topicLinkList = element.all(by.css('.protractor-test-topic-link'));
 
-  this.get = async function(classroomUrlFragment, topicIndex) {
+  this.get = async function(classroomUrlFragment, topicName) {
     await browser.get(`/learn/${classroomUrlFragment}`);
     await waitFor.pageToFullyLoad();
-    var topicLink = topicLinkList.get(topicIndex);
-    await action.click('Topic TASV1', topicLink);
-    await waitFor.pageToFullyLoad();
+    var topicLink = element(by.cssContainingText(
+      '.protractor-test-topic-link', topicName));
+    if (await topicLink.isPresent()) {
+      await action.click(topicName, topicLink);
+      await waitFor.pageToFullyLoad();
+    }
+    else {
+      throw new Error ('Topic card is not present.');
+    }
   };
 
   this.expectedTopicInformationToBe = async function(description) {
@@ -42,13 +48,15 @@ var TopicViewerPage = function() {
   };
 
   this.expectedStoryCountToBe = async function(count) {
-    var storySummaryTitleListCount = await storySummaryTitleList.count();
-    if (count > 0) {
+    if (count === 0) {
+      await expect(await storySummaryTitleList.count()).toEqual(0);  
+    }
+    else {
       await waitFor.visibilityOf(
         storySummaryTitleList.first(),
         'Story summary tiles take too long to be visible.');
+      await expect(await storySummaryTitleList.count()).toEqual(count);
     }
-    await expect(storySummaryTitleListCount).toEqual(count);
   };
 };
 

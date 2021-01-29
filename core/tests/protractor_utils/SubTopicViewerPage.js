@@ -23,20 +23,22 @@ var action = require('../protractor_utils/action.js');
 var SubTopicViewerPage = function() {
   var subTopicTileList = element.all(by.css('.protractor-test-subtopic-tile'));
 
-  this.get = async function(classroomUrlFragment, topicUrlFragment) {
+  this.get = async function() {
     var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
     await action.click('Revision Tab', revisionTabLink);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectedRevisionCardCountToBe = async function(count) {
-    var subTopicTileListCount = await subTopicTileList.count();
-    if (count > 0) {
+    if (count === 0) {
+      await expect(await subTopicTileList.count()).toEqual(0);  
+    }
+    else {
       await waitFor.visibilityOf(
         subTopicTileList.first(),
         'Revisions cards take too long to be visible.');
+      await expect(await subTopicTileList.count()).toEqual(count);
     }
-    await expect(subTopicTileListCount).toEqual(count);
   };
 };
 

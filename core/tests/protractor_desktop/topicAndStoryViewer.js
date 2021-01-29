@@ -34,7 +34,7 @@ var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('Topic and Story viewer functionality', function() {
+fdescribe('Topic and Story viewer functionality', function() {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
@@ -159,8 +159,10 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
   });
 
-  it('should work properly for story viewer page.', async function() {
-    await topicViewerPage.get('math', 0);
+  it(
+    'should check for topic description, stories and revision cards',
+    async function() {
+    await topicViewerPage.get('math', 'Topic TASV1');
     await topicViewerPage.expectedTopicInformationToBe('Description');
     await topicViewerPage.expectedStoryCountToBe(1);
     await subTopicViewerPage.get();
