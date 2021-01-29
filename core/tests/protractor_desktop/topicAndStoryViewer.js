@@ -34,7 +34,7 @@ var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-fdescribe('Topic and Story viewer functionality', function() {
+describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
