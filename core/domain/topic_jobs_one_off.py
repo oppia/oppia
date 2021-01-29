@@ -23,6 +23,8 @@ import ast
 import logging
 
 from core import jobs
+from core.domain import exp_fetchers
+from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -62,7 +64,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             topic.validate()
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Topic %s failed validation: %s' % (item.id, e))
             yield (
                 TopicMigrationOneOffJob._ERROR_KEY,
@@ -94,6 +96,37 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class InteractionsInStoriesAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """An audit job to report all interaction ids used in Story models
+    associated to a topic.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            topic = topic_fetchers.get_topic_from_model(item)
+            story_references = topic.get_all_story_references()
+            interaction_ids = set()
+
+            for story_reference in story_references:
+                story = story_fetchers.get_story_by_id(story_reference.story_id)
+                exp_ids = story.story_contents.get_all_linked_exp_ids()
+                explorations = exp_fetchers.get_multiple_explorations_by_id(
+                    exp_ids)
+                for exploration in explorations.values():
+                    for state in exploration.states.values():
+                        interaction_ids.add(state.interaction.id)
+            yield ('%s (%s)' % (topic.name, topic.id), list(interaction_ids))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class RemoveDeletedSkillsFromTopicOneOffJob(

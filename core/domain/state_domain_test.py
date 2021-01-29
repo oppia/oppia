@@ -37,6 +37,8 @@ import feconf
 import schema_utils
 import utils
 
+import contextlib2
+
 
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
     return html_validation_service.regenerate_image_filename_using_dimensions(
@@ -3522,24 +3524,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.validate(None, True)
 
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'info', _mock_logging_function)
-        invalid_state_dict_assert_raises = self.assertRaisesRegexp(
-            Exception, 'Could not convert state dict to YAML')
-
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with logging_swap, invalid_state_dict_assert_raises:
+        with contextlib2.ExitStack() as stack:
+            captured_logs = stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            stack.enter_context(
+                self.assertRaisesRegexp(
+                    Exception, 'string indices must be integers')
+            )
+
             exploration.init_state.convert_state_dict_to_yaml(
                 'invalid_state_dict', 10)
 
-        self.assertEqual(
-            observed_log_messages, ['Bad state dict: invalid_state_dict'])
+        self.assertEqual(len(captured_logs), 1)
+        self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
 
     def test_cannot_update_hints_with_content_id_not_in_written_translations(
             self):
