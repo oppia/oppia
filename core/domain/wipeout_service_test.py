@@ -23,6 +23,7 @@ import logging
 from constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
+from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -561,10 +562,22 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
 
-        self.assertEqual(
-            wipeout_service.run_user_deletion_completion(
-                self.pending_deletion_request),
-            wipeout_domain.USER_VERIFICATION_FAILURE)
+        email_content = (
+            'The Wipeout process failed for the user with ID \'%s\' '
+            'and email \'%s\'.' % (self.user_1_id, self.USER_1_EMAIL)
+        )
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            expected_args=[('WIPEOUT: Account deletion failed', email_content)]
+        )
+
+        with send_email_swap:
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request),
+                wipeout_domain.USER_VERIFICATION_FAILURE)
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
