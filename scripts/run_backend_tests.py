@@ -263,26 +263,46 @@ def _get_all_test_targets_from_shard(shard_name):
     return shards_spec[shard_name]
 
 
-def _check_shards_cover_all_tests(include_load_tests=True):
-    """Check whether the test shards cover all test classes.
+def _check_shards_match_tests(include_load_tests=True):
+    """Check whether the test shards match the tests that exist.
 
     Args:
         include_load_tests: bool. Whether to include load tests.
 
     Returns:
-        str. The dotted name of a test class not included in the shards,
-        or an empty string if all tests are included.
+        str. A description of any problems found, or an empty string if
+        the shards match the tests.
     """
     with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
-    test_modules = tuple(
-        module for shard in shards_spec.values() for module in shard)
+    shard_modules = sorted([
+        module for shard in shards_spec.values() for module in shard])
     test_classes = _get_all_test_targets_from_path(
         include_load_tests=include_load_tests)
+    test_modules_set = set()
     for test_class in test_classes:
-        if not test_class.startswith(test_modules):
-            return test_class
-    return ''
+        last_dot_index = test_class.rfind('.')
+        module_name = test_class[:last_dot_index]
+        test_modules_set.add(module_name)
+    test_modules = sorted(test_modules_set)
+    if test_modules == shard_modules:
+        return ''
+    if len(set(shard_modules)) != len(shard_modules):
+        # A module is duplicated, so we find the duplicate.
+        for module in shard_modules:
+            if shard_modules.count(module) != 1:
+                return '{} duplicated in {}'.format(
+                    module, SHARDS_SPEC_PATH)
+        raise Exception('Failed to find  module duplicated in shards.')
+    # Since there are no duplicates among the shards, we know the
+    # problem must be a module in one list but not the other.
+    shard_modules_set = set(shard_modules)
+    shard_extra = shard_modules_set - test_modules_set
+    if shard_extra:
+        return 'Modules {} in shards not found.'.format(shard_extra)
+    test_extra = test_modules_set - shard_modules_set
+    assert test_extra
+    return 'Modules {} not in shards.'.format(test_extra)
 
 
 def main(args=None):
@@ -349,10 +369,10 @@ def main(args=None):
             python_utils.PRINT('Redirecting to its corresponding test file...')
             all_test_targets = [parsed_args.test_target + '_test']
     elif parsed_args.test_shard:
-        missing_test = _check_shards_cover_all_tests(include_load_tests=False)
-        if missing_test:
-            raise Exception(
-                'The test %s is not in any shard.' % missing_test)
+        validation_error = _check_shards_match_tests(
+            include_load_tests=False)
+        if validation_error:
+            raise Exception(validation_error)
         all_test_targets = _get_all_test_targets_from_shard(
             parsed_args.test_shard)
     else:
