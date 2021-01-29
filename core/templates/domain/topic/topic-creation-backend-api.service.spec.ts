@@ -88,7 +88,7 @@ describe('Topic creation backend api service', () => {
         topic, imagesData, thumbnailBgColor).then(
         successHandler);
       let req = httpTestingController.expectOne(
-        '/topic_editor_handler/create_new');
+        '/topic-editor-handler/create_new');
       expect(req.request.method).toEqual('POST');
 
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
@@ -115,7 +115,7 @@ describe('Topic creation backend api service', () => {
         statusText: 'Not Found'
       });
       let req = httpTestingController.expectOne(
-        '/topic_editor_handler/create_new');
+        '/topic-editor-handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));

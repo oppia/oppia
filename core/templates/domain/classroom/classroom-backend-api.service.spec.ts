@@ -102,7 +102,7 @@ describe('Classroom backend API service', function() {
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/classroom_data_handler/math');
+        '/classroom-data-handler/math');
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
 
@@ -121,7 +121,7 @@ describe('Classroom backend API service', function() {
       classroomBackendApiService.fetchClassroomDataAsync('0').then(
         successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/classroom_data_handler/0');
+      let req = httpTestingController.expectOne('/classroom-data-handler/0');
       expect(req.request.method).toEqual('GET');
       req.flush('Invalid request', {
         status: 400,
@@ -144,7 +144,7 @@ describe('Classroom backend API service', function() {
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/classroom_data_handler/0');
+        '/classroom-data-handler/0');
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
       flushMicrotasks();

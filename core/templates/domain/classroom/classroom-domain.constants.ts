@@ -18,7 +18,7 @@
 
 export const ClassroomDomainConstants = {
   CLASSROOOM_DATA_URL_TEMPLATE:
-    '/classroom_data_handler/<classroom_url_fragment>',
+    '/classroom-data-handler/<classroom_url_fragment>',
   TOPIC_VIEWER_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>'),
   TOPIC_VIEWER_REVISION_URL_TEMPLATE: (

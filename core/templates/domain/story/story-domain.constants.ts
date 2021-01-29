@@ -18,16 +18,16 @@
 
 export const StoryDomainConstants = {
   EDITABLE_STORY_DATA_URL_TEMPLATE:
-    '/story_editor_handler/data/<story_id>',
+    '/story-editor-handler/data/<story_id>',
 
   STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE: (
-    '/story_url_fragment_handler/<story_url_fragment>'),
+    '/story-url-fragment-handler/<story_url_fragment>'),
 
   STORY_PUBLISH_URL_TEMPLATE:
-    '/story_publish_handler/<story_id>',
+    '/story-publish-handler/<story_id>',
 
   VALIDATE_EXPLORATIONS_URL_TEMPLATE:
-    '/validate_story_explorations/<story_id>',
+    '/validate-story-explorations/<story_id>',
 
   // These should match the constants defined in core.domain.story_domain.
   CMD_ADD_STORY_NODE: 'add_story_node',

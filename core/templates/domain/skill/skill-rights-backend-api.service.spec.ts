@@ -57,7 +57,7 @@ describe('Skill rights backend API service', () => {
       skillRightsBackendApiService.fetchSkillRightsAsync('0').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/skill_editor_handler/rights/0');
+        '/skill-editor-handler/rights/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleSkillRights);
       flushMicrotasks();
@@ -73,7 +73,7 @@ describe('Skill rights backend API service', () => {
     skillRightsBackendApiService.fetchSkillRightsAsync('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/skill_editor_handler/rights/0');
+      '/skill-editor-handler/rights/0');
     req.error(new ErrorEvent('Error'));
     expect(req.request.method).toEqual('GET');
     flushMicrotasks();
@@ -88,7 +88,7 @@ describe('Skill rights backend API service', () => {
     skillRightsBackendApiService.loadSkillRightsAsync('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/skill_editor_handler/rights/0');
+      '/skill-editor-handler/rights/0');
     req.flush(sampleSkillRights);
     expect(req.request.method).toEqual('GET');
     flushMicrotasks();

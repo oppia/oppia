@@ -38,7 +38,7 @@ export class CollectionCreationBackendService {
       successCallback: (value: CollectionCreationResponse) => void,
       errorCallback: (reason: string) => void): void {
     this.http.post<CollectionCreationBackendDict>(
-      '/collection_editor_handler/create_new', {}).toPromise()
+      '/collection-editor-handler/create_new', {}).toPromise()
       .then(response => {
         if (successCallback) {
           successCallback({

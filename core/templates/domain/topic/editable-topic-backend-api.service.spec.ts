@@ -110,7 +110,7 @@ describe('Editable topic backend API service', () => {
 
       editableTopicBackendApiService.fetchTopic('0').then(
         successHandler, failHandler);
-      let req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+      let req = httpTestingController.expectOne('/topic-editor-handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -136,7 +136,7 @@ describe('Editable topic backend API service', () => {
 
       editableTopicBackendApiService.fetchTopic('1').then(
         successHandler, failHandler);
-      let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
+      let req = httpTestingController.expectOne('/topic-editor-handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading topic 1.', {
         status: 500,
@@ -157,7 +157,7 @@ describe('Editable topic backend API service', () => {
       editableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/subtopic_page_editor_handler/data/topicId/1');
+        '/subtopic-page-editor-handler/data/topicId/1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -176,7 +176,7 @@ describe('Editable topic backend API service', () => {
     editableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/subtopic_page_editor_handler/data/topicId/1');
+      '/subtopic-page-editor-handler/data/topicId/1');
     expect(req.request.method).toEqual('GET');
     req.flush('Error loading subtopic 1.', {
       status: 500,
@@ -200,7 +200,7 @@ describe('Editable topic backend API service', () => {
         function(data) {
           topic = data.topicDict;
         });
-      let req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+      let req = httpTestingController.expectOne('/topic-editor-handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -220,7 +220,7 @@ describe('Editable topic backend API service', () => {
       editableTopicBackendApiService.updateTopic(
         topic.id, topic.version, 'Name is updated', []
       ).then(successHandler, failHandler);
-      req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+      req = httpTestingController.expectOne('/topic-editor-handler/data/0');
       expect(req.request.method).toEqual('PUT');
       req.flush(topicWrapper);
 
@@ -243,7 +243,7 @@ describe('Editable topic backend API service', () => {
       editableTopicBackendApiService.updateTopic(
         '1', '1', 'Update an invalid topic.', []
       ).then(successHandler, failHandler);
-      let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
+      let req = httpTestingController.expectOne('/topic-editor-handler/data/1');
       expect(req.request.method).toEqual('PUT');
       req.flush('Topic with given id doesn\'t exist.', {
         status: 404,
@@ -264,7 +264,7 @@ describe('Editable topic backend API service', () => {
         expect(topicNameExists).toBeTrue();
       });
       let req = httpTestingController.expectOne(
-        '/topic_name_handler/topic-name');
+        '/topic-name-handler/topic-name');
       expect(req.request.method).toEqual('GET');
       req.flush({
         topic_name_exists: true
@@ -280,7 +280,7 @@ describe('Editable topic backend API service', () => {
         expect(error).toEqual('Error: Failed to check topic name.');
       });
       let req = httpTestingController.expectOne(
-        '/topic_name_handler/topic-name');
+        '/topic-name-handler/topic-name');
       expect(req.request.method).toEqual('GET');
       req.flush('Error: Failed to check topic name.', {
         status: 500,
@@ -297,7 +297,7 @@ describe('Editable topic backend API service', () => {
         expect(topicUrlFragmentExists).toBeTrue();
       });
       let req = httpTestingController.expectOne(
-        '/topic_url_fragment_handler/topic-url-fragment');
+        '/topic-url-fragment-handler/topic-url-fragment');
       expect(req.request.method).toEqual('GET');
       req.flush({
         topic_url_fragment_exists: true
@@ -313,7 +313,7 @@ describe('Editable topic backend API service', () => {
         expect(error).toEqual('Error: Failed to check topic url fragment.');
       });
       let req = httpTestingController.expectOne(
-        '/topic_url_fragment_handler/topic-url-fragment');
+        '/topic-url-fragment-handler/topic-url-fragment');
       expect(req.request.method).toEqual('GET');
       req.flush('Error: Failed to check topic url fragment.', {
         status: 500,
@@ -330,7 +330,7 @@ describe('Editable topic backend API service', () => {
     editableTopicBackendApiService.fetchStories('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/topic_editor_story_handler/' + '0');
+      '/topic-editor-story-handler/' + '0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
@@ -349,7 +349,7 @@ describe('Editable topic backend API service', () => {
     editableTopicBackendApiService.fetchStories('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/topic_editor_story_handler/' + '0');
+      '/topic-editor-story-handler/' + '0');
     expect(req.request.method).toEqual('GET');
     req.flush('Error loading story with id 0.', {
       status: 500,
@@ -370,7 +370,7 @@ describe('Editable topic backend API service', () => {
     editableTopicBackendApiService.deleteTopic('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/topic_editor_handler/data/' + '0');
+      '/topic-editor-handler/data/' + '0');
     expect(req.request.method).toEqual('DELETE');
     req.flush({
       status: 200
@@ -390,7 +390,7 @@ describe('Editable topic backend API service', () => {
       editableTopicBackendApiService.deleteTopic('1').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/topic_editor_handler/data/' + '1');
+        '/topic-editor-handler/data/' + '1');
       expect(req.request.method).toEqual('DELETE');
       req.flush('Error deleting topic 1.', {
         status: 500,

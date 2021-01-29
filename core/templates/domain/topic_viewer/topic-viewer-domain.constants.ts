@@ -18,7 +18,7 @@
 
 export const TopicViewerDomainConstants = {
   TOPIC_DATA_URL_TEMPLATE: (
-    '/topic_data_handler/<classroom_url_fragment>/<topic_url_fragment>'),
+    '/topic-data-handler/<classroom_url_fragment>/<topic_url_fragment>'),
   STORY_VIEWER_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/story/' +
     '<story_url_fragment>'),

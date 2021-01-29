@@ -69,7 +69,7 @@ describe('Collection Creation service', () => {
       collectionCreationService.createNewCollection();
 
       let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
+        '/collection-editor-handler/create_new');
       expect(req.request.method).toEqual('POST');
       req.flush({collection_id: SAMPLE_COLLECTION_ID});
 
@@ -93,7 +93,7 @@ describe('Collection Creation service', () => {
       collectionCreationService.createNewCollection();
 
       let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
+        '/collection-editor-handler/create_new');
       expect(req.request.method).toEqual('POST');
       req.flush({
         error: 'Error creating a new collection.'
@@ -124,7 +124,7 @@ describe('Collection Creation service', () => {
       collectionCreationService.createNewCollection();
 
       let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
+        '/collection-editor-handler/create_new');
       expect(req.request.method).toEqual('POST');
       req.flush({collection_id: SAMPLE_COLLECTION_ID});
 

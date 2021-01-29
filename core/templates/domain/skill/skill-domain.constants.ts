@@ -18,18 +18,18 @@
 
 export const SkillDomainConstants = {
   CONCEPT_CARD_DATA_URL_TEMPLATE:
-    '/concept_card_handler/<comma_separated_skill_ids>',
+    '/concept-card-handler/<comma_separated_skill_ids>',
   EDITABLE_SKILL_DATA_URL_TEMPLATE:
-    '/skill_editor_handler/data/<skill_id>',
+    '/skill-editor-handler/data/<skill_id>',
 
   SKILL_DATA_URL_TEMPLATE:
     '/skill_data_handler/<comma_separated_skill_ids>',
-  FETCH_SKILLS_URL_TEMPLATE: '/fetch_skills',
+  FETCH_SKILLS_URL_TEMPLATE: '/fetch-skills',
   SKILL_EDITOR_QUESTION_URL_TEMPLATE:
-    '/skill_editor_question_handler/<skill_id>?cursor=<cursor>',
+    '/skill-editor-question-handler/<skill_id>?cursor=<cursor>',
 
   SKILL_MASTERY_DATA_URL_TEMPLATE:
-    '/skill_mastery_handler/data',
+    '/skill-mastery-handler/data',
 
   SKILL_PROPERTY_DESCRIPTION: 'description',
   SKILL_PROPERTY_LANGUAGE_CODE: 'language_code',

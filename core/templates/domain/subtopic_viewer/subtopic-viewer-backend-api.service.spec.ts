@@ -70,7 +70,7 @@ describe('Subtopic viewer backend API service', () => {
       subtopicViewerBackendApiService.fetchSubtopicDataAsync(
         'topic', 'staging', '0').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/subtopic_data_handler/staging/topic/0');
+        '/subtopic-data-handler/staging/topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -89,7 +89,7 @@ describe('Subtopic viewer backend API service', () => {
       subtopicViewerBackendApiService.fetchSubtopicDataAsync(
         'topic', 'staging', '0').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/subtopic_data_handler/staging/topic/0');
+        '/subtopic-data-handler/staging/topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading subtopic.', {
         status: 500, statusText: 'Invalid Request'

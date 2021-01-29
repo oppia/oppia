@@ -91,7 +91,7 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.fetchStory('storyId').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/story_editor_handler/data/storyId');
+        '/story-editor-handler/data/storyId');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -116,7 +116,7 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.deleteStory('storyId').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/story_editor_handler/data/storyId');
+        '/story-editor-handler/data/storyId');
       expect(req.request.method).toEqual('DELETE');
       req.flush(200);
 
@@ -133,7 +133,7 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.fetchStory('2').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/story_editor_handler/data/2');
+        '/story-editor-handler/data/2');
       expect(req.request.method).toEqual('GET');
       req.flush({error: 'Error loading story 2.'}, {
         status: 500,
@@ -159,7 +159,7 @@ describe('Editable story backend API service', () => {
           story = data.story;
         });
       let req = httpTestingController.expectOne(
-        '/story_editor_handler/data/storyId');
+        '/story-editor-handler/data/storyId');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -176,7 +176,7 @@ describe('Editable story backend API service', () => {
         story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne(
-        '/story_editor_handler/data/storyId');
+        '/story-editor-handler/data/storyId');
       expect(req.request.method).toEqual('PUT');
       req.flush(storyWrapper);
 
@@ -196,7 +196,7 @@ describe('Editable story backend API service', () => {
         'storyId_1', 1, 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/story_editor_handler/data/storyId_1');
+        '/story-editor-handler/data/storyId_1');
       expect(req.request.method).toEqual('PUT');
       req.flush({error: 'Story with given id doesn\'t exist.'}, {
         status: 404,
@@ -219,7 +219,7 @@ describe('Editable story backend API service', () => {
     editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true).then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/story_publish_handler/storyId');
+      '/story-publish-handler/storyId');
     expect(req.request.method).toEqual('PUT');
     req.flush(200);
     flushMicrotasks();
@@ -237,7 +237,7 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.changeStoryPublicationStatus(
         'storyId', true).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/story_publish_handler/storyId');
+        '/story-publish-handler/storyId');
       expect(req.request.method).toEqual('PUT');
       req.flush({error: 'Story with given id doesn\'t exist.'}, {
         status: 404,

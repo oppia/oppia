@@ -17,6 +17,6 @@
  */
 
 export const TopicsAndSkillsDashboardDomainConstants = {
-  MERGE_SKILLS_URL: '/merge_skills_handler',
-  SKILL_DASHBOARD_DATA_URL: '/skills_dashboard/data'
+  MERGE_SKILLS_URL: '/merge-skills-handler',
+  SKILL_DASHBOARD_DATA_URL: '/skills-dashboard/data'
 } as const;

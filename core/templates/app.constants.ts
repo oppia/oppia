@@ -79,7 +79,7 @@ export const AppConstants = {
   PLACEHOLDER_OUTCOME_DEST: '/',
   INTERACTION_DISPLAY_MODE_INLINE: 'inline',
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
-  OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
+  OBJECT_EDITOR_URL_PREFIX: '/object-editor-template/',
   // Feature still in development.
   // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
   ENABLE_ML_CLASSIFIERS: false,
@@ -142,13 +142,13 @@ export const AppConstants = {
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
   SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE: (
-    '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>'),
-  EDITABLE_TOPIC_DATA_URL_TEMPLATE: '/topic_editor_handler/data/<topic_id>',
+    '/subtopic-page-editor-handler/data/<topic_id>/<subtopic_id>'),
+  EDITABLE_TOPIC_DATA_URL_TEMPLATE: '/topic-editor-handler/data/<topic_id>',
 
   LABEL_FOR_CLEARING_FOCUS: 'labelForClearingFocus',
 
   // TODO(bhenning): This constant should be provided by the backend.
-  COLLECTION_DATA_URL_TEMPLATE: '/collection_handler/data/<collection_id>',
+  COLLECTION_DATA_URL_TEMPLATE: '/collection-handler/data/<collection_id>',
 
   ENTITY_TYPE: {
     COLLECTION: 'collection',

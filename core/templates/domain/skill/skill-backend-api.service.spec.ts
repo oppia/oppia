@@ -134,7 +134,7 @@ describe('Skill backend API service', () => {
         expect(response).toEqual(expectedResponse);
       });
 
-      let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
+      let req = httpTestingController.expectOne('/skill-editor-handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush(backendResponse);
 
@@ -149,7 +149,7 @@ describe('Skill backend API service', () => {
 
       skillBackendApiService.fetchSkill('1').then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
+      let req = httpTestingController.expectOne('/skill-editor-handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Some error in the backend.'
@@ -180,7 +180,7 @@ describe('Skill backend API service', () => {
         expect(response).toEqual(skill);
       });
 
-      let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
+      let req = httpTestingController.expectOne('/skill-editor-handler/data/1');
       expect(req.request.method).toEqual('PUT');
       req.flush(backendResponse);
 
@@ -202,7 +202,7 @@ describe('Skill backend API service', () => {
         '1', 1, 'commit message', [changeList]).then(
         successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
+      let req = httpTestingController.expectOne('/skill-editor-handler/data/1');
       expect(req.request.method).toEqual('PUT');
       req.flush({
         error: 'Some error in the backend.'
@@ -267,7 +267,7 @@ describe('Skill backend API service', () => {
     skillBackendApiService.deleteSkill('1').then(
       successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
+    let req = httpTestingController.expectOne('/skill-editor-handler/data/1');
     expect(req.request.method).toEqual('DELETE');
     req.flush({});
 
@@ -286,7 +286,7 @@ describe('Skill backend API service', () => {
       skillBackendApiService.deleteSkill('1').then(
         successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
+      let req = httpTestingController.expectOne('/skill-editor-handler/data/1');
       expect(req.request.method).toEqual('DELETE');
       req.flush({
         error: 'Some error in the backend.'

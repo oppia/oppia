@@ -141,7 +141,7 @@ def get_redirect_route(regex_route, handler, defaults=None):
     """
     if defaults is None:
         defaults = {}
-    name = regex_route.replace('/', '_')
+    name = regex_route.replace('/', '-')
     return routes.RedirectRoute(
         regex_route, handler, name, strict_slash=True, defaults=defaults)
 
@@ -238,10 +238,10 @@ URLS = MAPREDUCE_HANDLERS + [
         contributor_dashboard.ContributorDashboardPage),
 
     get_redirect_route(
-        '/notifications_dashboard',
+        '/notifications-dashboard',
         creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
-        '/contributor_dashboard',
+        '/contributor-dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
@@ -252,7 +252,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
-        '/creator_dashboard',
+        '/creator-dashboard',
         creator_dashboard.OldCreatorDashboardRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CREATOR_DASHBOARD_URL,
@@ -366,7 +366,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
-        '/learner_dashboard',
+        '/learner-dashboard',
         learner_dashboard.OldLearnerDashboardRedirectPage),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
@@ -464,9 +464,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
-        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
+        r'/preferenceshandler/profile-picture', profile.ProfilePictureHandler),
     get_redirect_route(
-        r'/preferenceshandler/profile_picture_by_username/<username>',
+        r'/preferenceshandler/profile-picture-by-username/<username>',
         profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
@@ -483,7 +483,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
-    get_redirect_route(r'/url_handler', profile.UrlHandler),
+    get_redirect_route(r'/url-handler', profile.UrlHandler),
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
@@ -506,40 +506,40 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_FEATURES_PREFIX,
         features.ExplorationFeaturesHandler),
     get_redirect_route(
-        '/explorehandler/exploration_start_event/<exploration_id>',
+        '/explorehandler/exploration-start-event/<exploration_id>',
         reader.ExplorationStartEventHandler),
     get_redirect_route(
-        '/explorehandler/exploration_actual_start_event/<exploration_id>',
+        '/explorehandler/exploration-actual-start-event/<exploration_id>',
         reader.ExplorationActualStartEventHandler),
     get_redirect_route(
-        '/explorehandler/solution_hit_event/<exploration_id>',
+        '/explorehandler/solution-hit-event/<exploration_id>',
         reader.SolutionHitEventHandler),
     get_redirect_route(
-        r'/explorehandler/state_hit_event/<exploration_id>',
+        r'/explorehandler/state-hit-event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
-        r'/explorehandler/state_complete_event/<exploration_id>',
+        r'/explorehandler/state-complete-event/<exploration_id>',
         reader.StateCompleteEventHandler),
     get_redirect_route(
-        r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
+        r'/explorehandler/leave-for-refresher-exp-event/<exploration_id>',
         reader.LeaveForRefresherExpEventHandler),
     get_redirect_route(
-        r'/explorehandler/answer_submitted_event/<exploration_id>',
+        r'/explorehandler/answer-submitted-event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
     get_redirect_route(
-        r'/explorehandler/give_feedback/<exploration_id>',
+        r'/explorehandler/give-feedback/<exploration_id>',
         reader.ReaderFeedbackHandler),
     get_redirect_route(
-        r'/explorehandler/exploration_complete_event/<exploration_id>',
+        r'/explorehandler/exploration-complete-event/<exploration_id>',
         reader.ExplorationCompleteEventHandler),
     get_redirect_route(
-        r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
+        r'/explorehandler/exploration-maybe-leave-event/<exploration_id>',
         reader.ExplorationMaybeLeaveHandler),
     get_redirect_route(
-        r'/explorehandler/stats_events/<exploration_id>',
+        r'/explorehandler/stats-events/<exploration_id>',
         reader.StatsEventsHandler),
     get_redirect_route(
-        r'/explorehandler/store_playthrough/<exploration_id>',
+        r'/explorehandler/store-playthrough/<exploration_id>',
         reader.StorePlaythroughHandler),
     get_redirect_route(
         r'/explorehandler/rating/<exploration_id>', reader.RatingHandler),
@@ -571,7 +571,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/audioupload/<exploration_id>',
         voice_artist.AudioUploadHandler),
     get_redirect_route(
-        r'/createhandler/state_yaml/<exploration_id>',
+        r'/createhandler/state-yaml/<exploration_id>',
         editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/revert/<exploration_id>',
@@ -598,22 +598,22 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        r'/createhandler/state-interaction-stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
         editor.StateAnswerStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/started_tutorial_event/<exploration_id>',
+        r'/createhandler/started-tutorial-event/<exploration_id>',
         editor.StartedTutorialEventHandler),
     get_redirect_route(
-        r'/createhandler/started_translation_tutorial_event/<exploration_id>',
+        r'/createhandler/started-translation-tutorial_event/<exploration_id>',
         voice_artist.StartedTranslationTutorialEventHandler),
     get_redirect_route(
-        r'/createhandler/autosave_draft/<exploration_id>',
+        r'/createhandler/autosave-draft/<exploration_id>',
         editor.EditorAutosaveHandler),
     get_redirect_route(
-        r'/createhandler/get_top_unresolved_answers/<exploration_id>',
+        r'/createhandler/get-top-unresolved-answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),
     get_redirect_route(
         r'%s/<entity_type>/<entity_id>' %
@@ -789,7 +789,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/numberofdeletionrequestshandler',
         admin.NumberOfDeletionRequestsHandler),
-    get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
+    get_redirect_route(r'/frontend-errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 
     get_redirect_route(
@@ -827,10 +827,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     get_redirect_route(
-        r'/platform_features_evaluation_handler',
+        r'/platform-features-evaluation-handler',
         platform_feature.PlatformFeaturesEvaluationHandler),
     get_redirect_route(
-        r'/platform_feature_dummy_handler',
+        r'/platform-feature-dummy-handler',
         platform_feature.PlatformFeatureDummyHandler),
 
     get_redirect_route(

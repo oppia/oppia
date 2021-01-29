@@ -72,12 +72,12 @@ export class CollectionRightsBackendApiService {
       successCallback: (value: CollectionRights) => void,
       errorCallback: (reason: string) => void): void {
     let collectionPublishUrl = this.urlInterpolationService
-      .interpolateUrl('/collection_editor_handler/publish/<collection_id>', {
+      .interpolateUrl('/collection-editor-handler/publish/<collection_id>', {
         collection_id: collectionId
       });
 
     let collectionUnpublishUrl = this.urlInterpolationService
-      .interpolateUrl('/collection_editor_handler/unpublish/<collection_id>', {
+      .interpolateUrl('/collection-editor-handler/unpublish/<collection_id>', {
         collection_id: collectionId
       });
 

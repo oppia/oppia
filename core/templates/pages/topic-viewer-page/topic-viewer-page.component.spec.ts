@@ -103,7 +103,7 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.activeTab).toBe('story');
 
     var req = httpTestingController.expectOne(
-      `/topic_data_handler/math/${topicUrlFragment}`);
+      `/topic-data-handler/math/${topicUrlFragment}`);
     req.flush(topicDict);
     flushMicrotasks();
 
@@ -133,7 +133,7 @@ describe('Topic viewer page', () => {
       `/learn/math/${topicUrlFragment}/story`);
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
-      `/topic_data_handler/math/${topicUrlFragment}`);
+      `/topic-data-handler/math/${topicUrlFragment}`);
     req.flush(topicDict);
     flushMicrotasks();
     expect(topicViewerPageComponent.activeTab).toBe('story');
@@ -148,7 +148,7 @@ describe('Topic viewer page', () => {
       `/learn/math/${topicUrlFragment}/revision`);
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
-      `/topic_data_handler/math/${topicUrlFragment}`);
+      `/topic-data-handler/math/${topicUrlFragment}`);
     req.flush(topicDict);
     expect(topicViewerPageComponent.activeTab).toBe('subtopics');
   }));
@@ -162,7 +162,7 @@ describe('Topic viewer page', () => {
       `/learn/math/${topicUrlFragment}/practice`);
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
-      `/topic_data_handler/math/${topicUrlFragment}`);
+      `/topic-data-handler/math/${topicUrlFragment}`);
     req.flush(topicDict);
     expect(topicViewerPageComponent.activeTab).toBe('practice');
   }));
@@ -178,7 +178,7 @@ describe('Topic viewer page', () => {
 
       topicViewerPageComponent.ngOnInit();
       let req = httpTestingController.expectOne(
-        `/topic_data_handler/math/${topicUrlFragment}`);
+        `/topic-data-handler/math/${topicUrlFragment}`);
       let errorObject = { status: 404, statusText: 'Not Found' };
       req.flush({ error: errorObject }, errorObject);
       flushMicrotasks();

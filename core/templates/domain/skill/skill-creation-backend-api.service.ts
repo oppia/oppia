@@ -83,7 +83,7 @@ export class SkillCreationBackendApiService {
     }
 
     this.http.post<SkillCreationBackendResponse>(
-      '/skill_editor_handler/create_new', body).toPromise()
+      '/skill-editor-handler/create_new', body).toPromise()
       .then(response => {
         if (successCallback) {
           successCallback({

@@ -272,7 +272,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                 ctrl.explorationCardIsShown = false;
               }
             });
-            $http.get('/collection_handler/data/' + ctrl.collectionId).then(
+            $http.get('/collection-handler/data/' + ctrl.collectionId).then(
               function(response) {
                 response = response.data;
                 angular.element('meta[itemprop="name"]').attr(

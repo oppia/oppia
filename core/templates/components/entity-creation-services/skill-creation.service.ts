@@ -42,7 +42,7 @@ angular.module('oppia').factory('SkillCreationService', [
       TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
       SKILL_DESCRIPTION_STATUS_VALUES) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
-      '/skill_editor/<skill_id>');
+      '/skill-editor/<skill_id>');
     var skillCreationInProgress = false;
     var skillDescriptionStatusMarker = (
       SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);

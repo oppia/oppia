@@ -20,9 +20,9 @@
 
 export const CollectionEditorPageConstants = {
   EDITABLE_COLLECTION_DATA_URL_TEMPLATE:
-    '/collection_editor_handler/data/<collection_id>',
+    '/collection-editor-handler/data/<collection_id>',
   COLLECTION_RIGHTS_URL_TEMPLATE:
-    '/collection_editor_handler/rights/<collection_id>',
+    '/collection-editor-handler/rights/<collection_id>',
 
   COLLECTION_TITLE_INPUT_FOCUS_LABEL:
     'collectionTitleInputFocusLabel'

@@ -121,7 +121,7 @@ describe('Topic viewer backend API service', () => {
       topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/topic_data_handler/staging/0');
+        '/topic-data-handler/staging/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -139,7 +139,7 @@ describe('Topic viewer backend API service', () => {
       topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/topic_data_handler/staging/0');
+        '/topic-data-handler/staging/0');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error fetching topic 0.'

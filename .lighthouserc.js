@@ -49,9 +49,9 @@ module.exports = {
         'http://127.0.0.1:8181/thanks',
         'http://127.0.0.1:8181/volunteers',
         `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
-        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
-        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
+        `http://127.0.0.1:8181/collection-editor/create/${process.env.collection_editor}`,
+        `http://127.0.0.1:8181/topic-editor/${process.env.topic_editor}`,
+        `http://127.0.0.1:8181/skill-editor/${process.env.skill_editor}`,
       ]
     },
     'assert': {
@@ -368,7 +368,7 @@ module.exports = {
           }
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
+          'matchingUrlPattern': 'http://[^/]+/collection-editor/create/.*$',
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
@@ -378,7 +378,7 @@ module.exports = {
           }
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/topic_editor/.*$',
+          'matchingUrlPattern': 'http://[^/]+/topic-editor/.*$',
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
@@ -388,7 +388,7 @@ module.exports = {
           }
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/skill_editor/.*$',
+          'matchingUrlPattern': 'http://[^/]+/skill-editor/.*$',
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}

@@ -18,5 +18,5 @@
 
 export const SkillEditorPageConstants = {
   SKILL_RIGHTS_URL_TEMPLATE:
-    '/skill_editor_handler/rights/<skill_id>'
+    '/skill-editor-handler/rights/<skill_id>'
 } as const;

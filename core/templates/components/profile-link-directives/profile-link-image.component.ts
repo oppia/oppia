@@ -44,7 +44,7 @@ export class ProfileLinkImageComponent implements OnInit {
 
   ngOnInit(): void {
     this.profileImageUrl = (
-      '/preferenceshandler/profile_picture_by_username/' +
+      '/preferenceshandler/profile-picture-by-username/' +
       this.username);
     var DEFAULT_PROFILE_IMAGE_PATH = (
       this.urlInterpolationService.getStaticImageUrl(

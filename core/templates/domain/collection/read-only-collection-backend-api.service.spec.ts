@@ -105,7 +105,7 @@ describe('Read only collection backend API service', () => {
 
       readOnlyCollectionBackendApiService.loadCollectionAsync('0').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne('/collection_handler/data/0');
+      var req = httpTestingController.expectOne('/collection-handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -135,7 +135,7 @@ describe('Read only collection backend API service', () => {
 
       readOnlyCollectionBackendApiService.loadCollectionAsync('0').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne('/collection_handler/data/0');
+      var req = httpTestingController.expectOne('/collection-handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading collection 0'
@@ -160,7 +160,7 @@ describe('Read only collection backend API service', () => {
     // Loading a collection the first time should fetch it from the backend.
     readOnlyCollectionBackendApiService.loadCollectionAsync('0').then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne('/collection_handler/data/0');
+    var req = httpTestingController.expectOne('/collection-handler/data/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
@@ -187,7 +187,7 @@ describe('Read only collection backend API service', () => {
     readOnlyCollectionBackendApiService.clearCollectionCache();
     readOnlyCollectionBackendApiService.loadCollectionAsync('0').then(
       successHandler, failHandler);
-    req = httpTestingController.expectOne('/collection_handler/data/0');
+    req = httpTestingController.expectOne('/collection-handler/data/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 

@@ -17,19 +17,19 @@
  */
 
 export const TopicDomainConstants = {
-  TOPIC_EDITOR_STORY_URL_TEMPLATE: '/topic_editor_story_handler/<topic_id>',
+  TOPIC_EDITOR_STORY_URL_TEMPLATE: '/topic-editor-story-handler/<topic_id>',
 
   TOPIC_NAME_HANDLER_URL_TEMPLATE: (
-    '/topic_name_handler/<topic_name>'),
+    '/topic-name-handler/<topic_name>'),
 
   TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE: (
-    '/topic_url_fragment_handler/<topic_url_fragment>'),
+    '/topic-url-fragment-handler/<topic_url_fragment>'),
 
   TOPIC_EDITOR_QUESTION_URL_TEMPLATE:
-    '/topic_editor_question_handler/<topic_id>?cursor=<cursor>',
+    '/topic-editor-question-handler/<topic_id>?cursor=<cursor>',
 
   TOPIC_MANAGER_RIGHTS_URL_TEMPLATE:
-    '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>',
+    '/rightshandler/assign-topic-manager/<topic_id>/<assignee_id>',
   TOPIC_RIGHTS_URL_TEMPLATE: '/rightshandler/get_topic_rights/<topic_id>',
 
   // These should match the constants defined in core.domain.topic_domain.

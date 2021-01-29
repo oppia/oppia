@@ -162,7 +162,7 @@ describe('Topics List Directive', function() {
       });
 
       var topicId = 'CdjnJUE332dd';
-      var url = `/topic_editor_handler/data/${topicId}`;
+      var url = `/topic-editor-handler/data/${topicId}`;
       ctrl.deleteTopic(topicId);
       $scope.$apply();
 
@@ -182,7 +182,7 @@ describe('Topics List Directive', function() {
     var alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
 
     var topicId = 'CdjnJUE332dd';
-    var url = '/topic_editor_handler/data/CdjnJUE332dd';
+    var url = '/topic-editor-handler/data/CdjnJUE332dd';
 
     ctrl.deleteTopic(topicId);
     $scope.$apply();

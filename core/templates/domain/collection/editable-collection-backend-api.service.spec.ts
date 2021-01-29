@@ -94,7 +94,7 @@ describe('Editable collection backend API service', () => {
       editableCollectionBackendApiService.fetchCollectionAsync('0').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
-        '/collection_editor_handler/data/0');
+        '/collection-editor-handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -116,7 +116,7 @@ describe('Editable collection backend API service', () => {
       editableCollectionBackendApiService.fetchCollectionAsync('1').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
-        '/collection_editor_handler/data/1');
+        '/collection-editor-handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading collection 1'
@@ -143,7 +143,7 @@ describe('Editable collection backend API service', () => {
           collection = data;
         });
       var req = httpTestingController.expectOne(
-        '/collection_editor_handler/data/0');
+        '/collection-editor-handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -160,7 +160,7 @@ describe('Editable collection backend API service', () => {
         collectionDict.collection.title, []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne(
-        '/collection_editor_handler/data/0');
+        '/collection-editor-handler/data/0');
       expect(req.request.method).toEqual('PUT');
       req.flush(collectionDict);
 

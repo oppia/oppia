@@ -73,7 +73,7 @@ describe('Skill creation backend api service', () => {
         [imageData]
       ).then(successHandler);
       let req = httpTestingController.expectOne(
-        '/skill_editor_handler/create_new');
+        '/skill-editor-handler/create_new');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       let sampleFormData = new FormData();
@@ -99,7 +99,7 @@ describe('Skill creation backend api service', () => {
         statusText: 'Not Found'
       });
       let req = httpTestingController.expectOne(
-        '/skill_editor_handler/create_new');
+        '/skill-editor-handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));

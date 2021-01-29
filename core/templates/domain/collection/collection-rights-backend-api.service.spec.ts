@@ -72,7 +72,7 @@ describe('Collection rights backend API service', function() {
         .then(successHandler, failHandler);
 
       let req = httpTestingController
-        .expectOne('/collection_editor_handler/rights/0');
+        .expectOne('/collection-editor-handler/rights/0');
 
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
@@ -94,7 +94,7 @@ describe('Collection rights backend API service', function() {
           .then(successHandler, failHandler);
 
         let req = httpTestingController
-          .expectOne('/collection_editor_handler/rights/1');
+          .expectOne('/collection-editor-handler/rights/1');
 
         expect(req.request.method).toEqual('GET');
         req.flush({
@@ -124,7 +124,7 @@ describe('Collection rights backend API service', function() {
         .then(successHandler, failHandler);
 
       let req = httpTestingController
-        .expectOne('/collection_editor_handler/publish/0');
+        .expectOne('/collection-editor-handler/publish/0');
 
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleDataResults);
@@ -144,7 +144,7 @@ describe('Collection rights backend API service', function() {
           .then(successHandler, failHandler);
 
         let req = httpTestingController
-          .expectOne('/collection_editor_handler/publish/0');
+          .expectOne('/collection-editor-handler/publish/0');
 
         expect(req.request.method).toEqual('PUT');
         req.flush({
@@ -173,7 +173,7 @@ describe('Collection rights backend API service', function() {
         .then(successHandler, failHandler);
 
       let req = httpTestingController
-        .expectOne('/collection_editor_handler/unpublish/0');
+        .expectOne('/collection-editor-handler/unpublish/0');
 
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleDataResults);
@@ -193,7 +193,7 @@ describe('Collection rights backend API service', function() {
           .then(successHandler, failHandler);
 
         let req = httpTestingController
-          .expectOne('/collection_editor_handler/unpublish/0');
+          .expectOne('/collection-editor-handler/unpublish/0');
 
         expect(req.request.method).toEqual('PUT');
         req.flush({
@@ -253,7 +253,7 @@ describe('Collection rights backend API service', function() {
           .then(successHandler, failHandler);
 
         let req = httpTestingController
-          .expectOne('/collection_editor_handler/rights/0');
+          .expectOne('/collection-editor-handler/rights/0');
 
         expect(req.request.method).toEqual('GET');
         req.flush(sampleDataResults);

@@ -70,7 +70,7 @@ describe('Skill mastery backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      let requestUrl = '/skill_mastery_handler/data' +
+      let requestUrl = '/skill-mastery-handler/data' +
         '?comma_separated_skill_ids=skillId1,skillId2';
 
       skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
@@ -92,7 +92,7 @@ describe('Skill mastery backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      let requestUrl = '/skill_mastery_handler/data' +
+      let requestUrl = '/skill-mastery-handler/data' +
         '?comma_separated_skill_ids=skillId1,skillId2';
 
       skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
@@ -121,7 +121,7 @@ describe('Skill mastery backend API service', () => {
         masteryPerSkillMapping).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        '/skill_mastery_handler/data');
+        '/skill-mastery-handler/data');
       expect(req.request.method).toEqual('PUT');
       req.flush(null);
 
@@ -140,7 +140,7 @@ describe('Skill mastery backend API service', () => {
         masteryPerSkillMapping).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        '/skill_mastery_handler/data');
+        '/skill-mastery-handler/data');
       expect(req.request.method).toEqual('PUT');
       req.flush({
         error: 'Error updating skill mastery.'

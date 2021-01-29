@@ -377,7 +377,7 @@ class ProfileLinkTests(test_utils.GenericTestBase):
 
     USERNAME = 'abc123'
     EMAIL = 'abc123@gmail.com'
-    PROFILE_PIC_URL = '/preferenceshandler/profile_picture_by_username/'
+    PROFILE_PIC_URL = '/preferenceshandler/profile-picture-by-username/'
 
     def test_get_profile_picture_invalid_username(self):
         self.get_json(

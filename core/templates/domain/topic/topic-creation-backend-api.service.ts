@@ -53,7 +53,7 @@ export class TopicCreationBackendApiService {
     body.append('image', imagesData[0].imageBlob);
 
     this.http.post<TopicCreationResponse>(
-      '/topic_editor_handler/create_new', body).toPromise()
+      '/topic-editor-handler/create_new', body).toPromise()
       .then(response => {
         if (successCallback) {
           successCallback({

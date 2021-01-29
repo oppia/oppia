@@ -315,7 +315,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         # Raises error as version is None.
         response_dict = self.put_json(
-            '/collection_editor_handler/publish/%s' % collection_id,
+            '/collection-editor-handler/publish/%s' % collection_id,
             {'version': None}, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -325,7 +325,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Raises error as version from payload does not match the collection
         # version.
         response_dict = self.put_json(
-            '/collection_editor_handler/publish/%s' % collection_id,
+            '/collection-editor-handler/publish/%s' % collection_id,
             {'version': 2}, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -349,7 +349,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection = collection_services.get_collection_by_id(collection_id)
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
-            '/collection_editor_handler/publish/%s' % collection_id,
+            '/collection-editor-handler/publish/%s' % collection_id,
             {'version': collection.version},
             csrf_token=csrf_token)
         self.assertFalse(response_dict['is_private'])
@@ -361,7 +361,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         # Raises error as version is None.
         response_dict = self.put_json(
-            '/collection_editor_handler/unpublish/%s' % collection_id,
+            '/collection-editor-handler/unpublish/%s' % collection_id,
             {'version': None}, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -371,7 +371,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Raises error as version from payload does not match the collection
         # version.
         response_dict = self.put_json(
-            '/collection_editor_handler/unpublish/%s' % collection_id,
+            '/collection-editor-handler/unpublish/%s' % collection_id,
             {'version': 2}, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -396,7 +396,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection = collection_services.get_collection_by_id(collection_id)
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
-            '/collection_editor_handler/publish/%s' % collection_id,
+            '/collection-editor-handler/publish/%s' % collection_id,
             {'version': collection.version},
             csrf_token=csrf_token)
         self.assertFalse(response_dict['is_private'])
@@ -406,7 +406,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
-            '/collection_editor_handler/unpublish/%s' % collection_id,
+            '/collection-editor-handler/unpublish/%s' % collection_id,
             {'version': collection.version},
             csrf_token=csrf_token)
         self.assertTrue(response_dict['is_private'])

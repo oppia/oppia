@@ -63,7 +63,7 @@ describe('Story viewer backend API service', () => {
         'abbrev', 'staging', '0').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/story_data_handler/staging/abbrev/0');
+        '/story-data-handler/staging/abbrev/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -85,7 +85,7 @@ describe('Story viewer backend API service', () => {
         'abbrev', 'staging', '0').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/story_data_handler/staging/abbrev/0');
+        '/story-data-handler/staging/abbrev/0');
       expect(req.request.method).toEqual('GET');
       req.flush('Invalid request', {
         status: 400,
@@ -137,7 +137,7 @@ describe('Story viewer backend API service', () => {
         'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/story_progress_handler/staging/abbrev/0/node_1');
+        '/story-progress-handler/staging/abbrev/0/node_1');
       expect(req.request.method).toEqual('POST');
       req.flush(sampleDataResults);
 
@@ -162,7 +162,7 @@ describe('Story viewer backend API service', () => {
         'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/story_progress_handler/staging/abbrev/0/node_1');
+        '/story-progress-handler/staging/abbrev/0/node_1');
       expect(req.request.method).toEqual('POST');
 
       req.flush('Invalid request', {
