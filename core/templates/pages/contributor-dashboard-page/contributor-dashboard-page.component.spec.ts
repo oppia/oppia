@@ -26,12 +26,13 @@ require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 
 describe('Contributor dashboard page', function() {
-  var ctrl = null;
-  var $q = null;
-  var $rootScope = null;
-  var LocalStorageService = null;
-  var UserService = null;
-  var TranslationLanguageService = null;
+  var ctrl;
+  var $q;
+  var $rootScope;
+  var LocalStorageService;
+  var UserService;
+  var TranslationLanguageService;
+  var UrlInterpolationService;
   var userProfilePicture = 'profile-data-url';
   var userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
@@ -51,6 +52,7 @@ describe('Contributor dashboard page', function() {
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     UserService = $injector.get('UserService');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     ctrl = $componentController('contributorDashboardPage');
@@ -68,7 +70,7 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfilePictureUrl')
+      spyOn(UrlInterpolationService, 'getProfilePictureUrl')
         .and.returnValue($q.resolve(userProfilePicture));
       spyOn(UserService, 'getUserContributionRightsDataAsync')
         .and.returnValue($q.resolve(userContributionRights));
@@ -97,7 +99,6 @@ describe('Contributor dashboard page', function() {
         'English', 'Portuguese', 'Hindi']);
       expect(ctrl.userCanReviewQuestions).toBe(true);
       expect(ctrl.userIsReviewer).toBe(true);
-      expect(ctrl.profilePictureUrl).toBe(userProfilePicture);
     });
 
     it('should change active tab name when clicking on translate text tab',

@@ -57,7 +57,7 @@ describe('User Api Service', () => {
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       () =>{
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _) => {
           resolve('sample-csrf-token');
         });
       });
@@ -203,20 +203,27 @@ describe('User Api Service', () => {
     }));
 
   it('should set a profile image data url', fakeAsync(() => {
-    var newProfilePictureBlob = '/avatar/x.png';
-    userService.setProfilePictureBlobAsync(newProfilePictureBlob);
+    let newProfilePictureDataUrl = 'data:image/png;base64,xyz';
+    let newProfilePictureBlob = new Blob(
+      [newProfilePictureDataUrl], {type: 'image/png'});
+    userService.setProfilePictureBlobAsync(newProfilePictureDataUrl);
     const req = httpTestingController.expectOne('/preferenceshandler/data');
     expect(req.request.method).toEqual('PUT');
-    req.flush({profile_picture_data_url: newProfilePictureBlob});
+    expect(req.request.body.get('payload')).toEqual(
+      JSON.stringify({update_type: 'profile_picture_blob'}));
+    expect(req.request.body.get('image')).toEqual(
+      new File([newProfilePictureBlob], '')
+    );
+    req.flush({update_type: 'profile_picture_blob'});
 
     flushMicrotasks();
   }));
 
   it('should handle when set profile image data url is reject',
     fakeAsync(() => {
-      const newProfilePictureBlob = '/avatar/x.png';
+      const newProfilePictureDataUrl = 'data:image/png;base64,xyz';
       const errorMessage = 'It\'s not possible to set a new profile image data';
-      userService.setProfilePictureBlobAsync(newProfilePictureBlob);
+      userService.setProfilePictureBlobAsync(newProfilePictureDataUrl);
       const req = httpTestingController.expectOne('/preferenceshandler/data');
       expect(req.request.method).toEqual('PUT');
       req.flush(errorMessage);

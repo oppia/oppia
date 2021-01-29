@@ -249,7 +249,7 @@ export class UrlInterpolationService {
       'https://storage.googleapis.com/' +
       AppConstants.GCS_RESOURCE_BUCKET_NAME
     );
-    return AppConstants.DEV_MODE ? '/assetsdevhandler' : prodGcsUrl;
+    return this.DEV_MODE ? '/assetsdevhandler' : prodGcsUrl;
   }
 
   getProfilePictureUrl(username: string): string {

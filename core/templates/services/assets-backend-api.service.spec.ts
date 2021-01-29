@@ -24,6 +24,7 @@ import { AudioFile } from 'domain/utilities/audio-file.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import {UrlInterpolationService} from "domain/utilities/url-interpolation.service";
 
 describe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
@@ -386,20 +387,23 @@ describe('Assets Backend API Service', () => {
     }));
   });
 
-  describe('on production mode', () => {
+  fdescribe('on production mode', () => {
     let assetsBackendApiService: AssetsBackendApiService = null;
     let httpTestingController: HttpTestingController = null;
+    let urlInterpolationService: UrlInterpolationService;
     const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
 
     beforeEach(() => {
-      spyOnProperty(AssetsBackendApiService, 'DEV_MODE', 'get')
-        .and.returnValue(false);
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
       });
-      httpTestingController = TestBed.get(HttpTestingController);
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+      urlInterpolationService = TestBed.inject(UrlInterpolationService);
+      spyOnProperty(
+        urlInterpolationService, 'DEV_MODE', 'get'
+      ).and.returnValue(false);
+      httpTestingController = TestBed.inject(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     });
 
     it('should correctly formulate the download URL for audios', () => {

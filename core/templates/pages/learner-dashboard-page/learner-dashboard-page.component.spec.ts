@@ -284,9 +284,7 @@ describe('Learner dashboard page', function() {
 
     it('should initialize correctly controller properties after its' +
     ' initialization and get data from backend', function() {
-      expect(ctrl.profilePictureUrl).toBe(profilePictureUrl);
       expect(ctrl.username).toBe(userInfo.getUsername());
-
       expect(ctrl.noExplorationActivity).toBe(false);
       expect(ctrl.noCollectionActivity).toBe(false);
       expect(ctrl.noActivity).toBe(false);
@@ -853,6 +851,7 @@ describe('Learner dashboard page', function() {
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
       UserService = $injector.get('UserService');
+      UrlInterpolationService = $injector.get('UrlInterpolationService');
 
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
