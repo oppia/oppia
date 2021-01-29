@@ -24,7 +24,7 @@ import { AudioFile } from 'domain/utilities/audio-file.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import {UrlInterpolationService} from "domain/utilities/url-interpolation.service";
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 describe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
@@ -387,7 +387,7 @@ describe('Assets Backend API Service', () => {
     }));
   });
 
-  fdescribe('on production mode', () => {
+  describe('on production mode', () => {
     let assetsBackendApiService: AssetsBackendApiService = null;
     let httpTestingController: HttpTestingController = null;
     let urlInterpolationService: UrlInterpolationService;

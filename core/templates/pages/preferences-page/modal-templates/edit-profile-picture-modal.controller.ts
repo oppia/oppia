@@ -71,7 +71,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
 
     $scope.reset = function() {
       $scope.uploadedImage = null;
-      $scope.croppedImageBlob = '';
+      $scope.croppedImageDataUrl = '';
     };
 
     $scope.onInvalidImageLoaded = function() {
@@ -80,12 +80,12 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
     };
 
     $scope.confirm = function() {
-      $scope.croppedImageBlob = (
+      $scope.croppedImageDataUrl = (
         cropper.getCroppedCanvas({
           height: 150,
           width: 150
         }).toDataURL());
-      $uibModalInstance.close($scope.croppedImageBlob);
+      $uibModalInstance.close($scope.croppedImageDataUrl);
     };
   }
 ]);
