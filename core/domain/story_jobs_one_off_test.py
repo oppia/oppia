@@ -39,9 +39,9 @@ class DescriptionLengthAuditOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
-    #Description with length more than 1000
+    # Description with length more than 1000.
     STORY_ID = 'story_id'
-    DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In in tempus sem. Nam sed aliquam turpis. Nunc vel orci feugiat, dictum ipsum a, aliquam ligula. Integer in pharetra dolor, at semper enim. Fusce et porta mauris, consequat gravida mi. Morbi sed pharetra arcu. Donec elementum faucibus ante id finibus. Sed quam velit, euismod id ante nec, dignissim vestibulum est. Nullam condimentum neque non placerat ultrices. Sed luctus tempor dolor, sed gravida nisi aliquam sed. In eu sagittis odio. Donec gravida elit ut elit fringilla ultrices. Etiam mollis, magna eu porttitor condimentum, dui lorem feugiat lacus, eu semper mauris ante sed erat. Suspendisse potenti. Proin blandit tincidunt vehicula. Quisque magna nisl, consectetur eget lectus a, pulvinar malesuada dui. Integer vel gravida felis, id viverra nibh. Etiam sed velit sapien. In placerat neque imperdiet lectus commodo venenatis. Sed viverra interdum tortor ut congue. Fusce dignissim ornare auctor. Etiam non lorem sodales, ultricies ut.'
+    DESCRIPTION = 'a' * 1001
 
     def setUp(self):
         super(DescriptionLengthAuditOneOffJobTests, self).setUp()
@@ -70,24 +70,24 @@ class DescriptionLengthAuditOneOffJobTests(test_utils.GenericTestBase):
             story_jobs_one_off.DescriptionLengthAuditOneOffJob.create_new())
         story_jobs_one_off.DescriptionLengthAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
-        stringified_output = story_jobs_one_off.DescriptionLengthAuditOneOffJob.get_output(job_id)
-
-        eval_output = [ast.literal_eval(stringified_item) for
-                       stringified_item in stringified_output]
-        return eval_output
+        return story_jobs_one_off.DescriptionLengthAuditOneOffJob.get_output(
+            job_id)
 
     def test_description_length_limit(self):
-        """Checks description length"""
+        """Checks description length."""
 
-        # Creating a new story
+        # Creating a new story.
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', self.DESCRIPTION, self.TOPIC_ID, 'title-one')
+            self.STORY_ID, 'A title', self.DESCRIPTION, self.TOPIC_ID,
+            'title-one')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
 
         output = self._run_one_off_job()
-        self.assertEqual([[u'Topic Id: topic_id', u"Story Id: ['story_id']"]], output)
+        self.assertEqual(
+            [u'[u\'Topic Id: topic_id\', u"Story Id: [\'story_id\']"]'], output
+        )
 
 
 class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
