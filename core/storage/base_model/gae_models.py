@@ -305,7 +305,8 @@ class BaseModel(datastore_services.Model):
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
-    def put_multi(cls, entities):
+    @transaction_services.run_in_transaction_wrapper
+    def put_multi_transactional(cls, entities):
         """Stores the given datastore_services.Model instances.
 
         Args:
@@ -315,7 +316,8 @@ class BaseModel(datastore_services.Model):
         datastore_services.put_multi(entities)
 
     @classmethod
-    def delete_multi(cls, entities):
+    @transaction_services.run_in_transaction_wrapper
+    def delete_multi_transactional(cls, entities):
         """Deletes the given datastore_services.Model instances.
 
         Args:
@@ -821,7 +823,7 @@ class VersionedModel(BaseModel):
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self]
         self.update_timestamps_multi(entities)
-        transaction_services.run_in_transaction(BaseModel.put_multi, entities)
+        BaseModel.put_multi_transactional(entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -922,8 +924,7 @@ class VersionedModel(BaseModel):
                     0,
                     len(all_models_keys),
                     feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-                transaction_services.run_in_transaction(
-                    datastore_services.delete_multi,
+                BaseModel.delete_multi_transactional(
                     all_models_keys[
                         i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
         else:
@@ -952,8 +953,7 @@ class VersionedModel(BaseModel):
                 snapshot_metadata_models + snapshot_content_models +
                 versioned_models)
             cls.update_timestamps_multi(entities)
-            transaction_services.run_in_transaction(
-                BaseModel.put_multi, entities)
+            BaseModel.put_multi_transactional(entities)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
