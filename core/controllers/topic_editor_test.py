@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
+from constants import constants
 from core.domain import config_domain
 from core.domain import skill_services
 from core.domain import story_fetchers
@@ -470,7 +471,7 @@ class TopicEditorTests(
     def test_editable_topic_handler_put_fails_with_long_commit_message(self):
         change_cmd = {
             'version': 2,
-            'commit_message': 'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            'commit_message': 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
             'topic_and_subtopic_page_change_dicts': [{
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
@@ -488,7 +489,7 @@ class TopicEditorTests(
 
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters long.')
+            'Commit messages must be at most 375 characters long.')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {
