@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for attribution guide component.
  */
 
-import { TestBed, async, ComponentFixture } from
-  '@angular/core/testing';
+import {TestBed, ComponentFixture, waitForAsync} from '@angular/core/testing';
 
 import { AttributionGuideComponent } from './attribution-guide.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -75,7 +74,7 @@ describe('Attribution Guide Component', function() {
   let component: AttributionGuideComponent;
   let fixture: ComponentFixture<AttributionGuideComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AttributionGuideComponent],
       providers: [

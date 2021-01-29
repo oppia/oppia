@@ -237,7 +237,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'player-transcript.service.ts',
     'Polyfills.ts',
     'pretest-question-backend-api.service.ts',
-    'profile-link-image.component.ts',
     'profile-link-text.component.ts',
     'progress-nav.directive.ts',
     'promo-bar-backend-api.service.ts',
@@ -367,7 +366,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
     'unicode-string-editor.directive.ts',
-    'unit-test-utils.ts', # Please don't try to cover this file.
+    'unit-test-utils.ts',  # Please don't try to cover this file.
     'url-interpolation.service.ts',
     'utils.service.ts',
     'version-diff-visualization.directive.ts',
