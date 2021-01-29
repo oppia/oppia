@@ -63,7 +63,7 @@
 	"I18N_ACTION_CREATE_LESSON": "Text displayed in a button on the Home page. - When the user clicks the button they are taken to their dashboard, and a dialog is opened where the user can create a new exploration. The text in the button needs to be less than 29 characters long.",
 	"I18N_ACTION_CREATE_LESSON_BUTTON": "Create lesson button in about page taking us to create.",
 	"I18N_ACTION_EXPLORE_LESSONS": "Explore lessons button in about page.",
-	"I18N_ACTION_GUIDE_FOR_TECHERS": "Guide for teachers button displayed in about page.",
+	"I18N_ACTION_GUIDE_FOR_TEACHERS": "Guide for teachers button displayed in about page.",
 	"I18N_ACTION_TIPS_FOR_PARENTS": "Tips for parents and guardians button displayed in about page.",
 	"I18N_ACTION_VISIT_CLASSROOM": "Visit classroom button below content.",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Warning message displayed below state content editor. - When the content written by user in editor mode results in a card longer than 630px in learner mode.",
