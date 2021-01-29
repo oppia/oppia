@@ -40,12 +40,12 @@ import cloneDeep from 'lodash/cloneDeep';
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$http', '$log', '$uibModal', 'CompareVersionsService',
+    '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'LoaderService', 'RouterService', 'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
-        $http, $log, $uibModal, CompareVersionsService,
+        $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
         LoaderService, RouterService, UrlInterpolationService,
         VersionTreeService, WindowRef) {
@@ -140,7 +140,9 @@ angular.module('oppia').component('historyTab', {
               ctrl.totalExplorationVersionMetadata.reverse();
               LoaderService.hideLoadingScreen();
               ctrl.changeItemsPerPage();
+              $rootScope.$applyAsync();
             });
+          $rootScope.$applyAsync();
         });
       };
 

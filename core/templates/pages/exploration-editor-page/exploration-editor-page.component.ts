@@ -160,7 +160,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
+    '$q', '$rootScope', '$scope', '$templateCache', '$timeout', '$uibModal',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -181,7 +181,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
-        $q, $scope, $templateCache, $timeout, $uibModal,
+        $q, $rootScope, $scope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -203,6 +203,7 @@ angular.module('oppia').component('explorationEditorPage', {
         WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.autosaveIsInProgress = false;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
       var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
@@ -405,6 +406,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
+          $scope.$applyAsync();
         });
       };
 
@@ -510,6 +512,14 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
               setPageTitle();
+            }
+          )
+        );
+        ctrl.directiveSubscriptions.add(
+          ChangeListService.autosaveIsInProgress$.subscribe(
+            autosaveIsInProgress => {
+              ctrl.autosaveIsInProgress = autosaveIsInProgress;
+              $rootScope.$applyAsync();
             }
           )
         );
