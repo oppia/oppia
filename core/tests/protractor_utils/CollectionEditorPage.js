@@ -79,6 +79,8 @@ var CollectionEditorPage = function() {
 
     var matchingSearchResult = element(by.cssContainingText(
       '.uib-typeahead-match', new RegExp(query)));
+    await waitFor.presenceOf(
+      matchingSearchResult, 'Unable to find search result: ' + query);
     if (await matchingSearchResult.isDisplayed()) {
       // The user has typed in a title, rather than an exploration ID. We need
       // to select the correct exploration from the dropdown in this case.

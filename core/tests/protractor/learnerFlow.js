@@ -298,9 +298,9 @@ describe('Learner dashboard functionality', function() {
     } else {
       // Create first exploration named 'Dummy Exploration'.
       await createDummyExplorationOnDesktop();
-      // Create a second exploration named 'Collection Exp'.
+      // Create a second exploration named 'Collection Exploration'.
       await workflow.createAndPublishExploration(
-        'Collection Exp',
+        'Collection Exploration',
         'Architect',
         'To be a part of a collection!',
         'English'
@@ -420,7 +420,7 @@ describe('Learner dashboard functionality', function() {
     // 4. The feature of adding an existing exploration to a collection using
     //    the collection editor page is in beta presently.
     if (!browser.isMobile) {
-      // Add exploration 'Collection Exp' to 'Test Collection'
+      // Add exploration 'Collection Exploration' to 'Test Collection'
       // and publish it.
       await users.login('explorationCreator@learnerDashboard.com');
       await creatorDashboardPage.get();
@@ -430,9 +430,9 @@ describe('Learner dashboard functionality', function() {
       await collectionsTab.click();
       await creatorDashboardPage.navigateToCollectionEditor();
       await collectionEditorPage.searchForAndAddExistingExploration(
-        'Collection Exp');
+        'Collection Exploration');
       await collectionEditorPage.saveDraft();
-      await collectionEditorPage.setCommitMessage('Add Collection Exp');
+      await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();
       await users.logout();
 

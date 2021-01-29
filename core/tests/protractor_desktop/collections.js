@@ -135,7 +135,7 @@ describe('Collections', function() {
     // Search and add existing explorations.
     await collectionEditorPage.searchForAndAddExistingExploration('Lazy');
     await collectionEditorPage.searchForAndAddExistingExploration('Linear');
-    await collectionEditorPage.searchForAndAddExistingExploration('Testing');
+    await collectionEditorPage.searchForAndAddExistingExploration('Test');
     // Shifting nodes in the node graph.
     await collectionEditorPage.shiftNodeLeft(1);
     await collectionEditorPage.shiftNodeRight(1);
