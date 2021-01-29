@@ -254,10 +254,10 @@ export class SkillUpdateService {
     );
     newWorkedExamples[workedExampleIndex]
       .getQuestion()
-      .setHtml(newWorkedExampleQuestionHtml);
+      .html = newWorkedExampleQuestionHtml;
     newWorkedExamples[workedExampleIndex]
       .getExplanation()
-      .setHtml(newWorkedExampleAnswerHtml);
+      .html = newWorkedExampleAnswerHtml;
     this.updateWorkedExamples(skill, newWorkedExamples);
   }
 

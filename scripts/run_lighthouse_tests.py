@@ -25,9 +25,11 @@ import re
 import subprocess
 import sys
 
+import feconf
 import python_utils
 from scripts import build
 from scripts import common
+
 
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
@@ -204,16 +206,19 @@ def main(args=None):
 
     # TODO(#11549): Move this to top of the file.
     import contextlib2
+    managed_dev_appserver = common.managed_dev_appserver(
+        APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
+        clear_datastore=True, log_level='critical', skip_sdk_update_check=True)
 
     with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_elasticsearch_dev_server())
         stack.enter_context(common.managed_firebase_auth_emulator())
+        stack.enter_context(managed_dev_appserver)
 
-        stack.enter_context(common.managed_dev_appserver(
-            APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
-            clear_datastore=True, log_level='critical',
-            skip_sdk_update_check=True))
-
+        # Wait for the servers to come up.
+        common.wait_for_port_to_be_open(feconf.ES_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+
         run_lighthouse_puppeteer_script()
         run_lighthouse_checks(lighthouse_mode)
 

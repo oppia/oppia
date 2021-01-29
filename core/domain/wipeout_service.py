@@ -21,6 +21,7 @@ import datetime
 import logging
 import re
 
+from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -48,7 +49,6 @@ import python_utils
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 
-auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -229,7 +229,7 @@ def run_user_deletion_completion(pending_deletion_request):
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
-        _delete_user_models_with_delete_at_end_policy(
+        _delete_models_with_delete_at_end_policy(
             pending_deletion_request.user_id)
         user_models.DeletedUserModel(
             id=pending_deletion_request.user_id
@@ -241,19 +241,21 @@ def run_user_deletion_completion(pending_deletion_request):
             pending_deletion_request.user_id, pending_deletion_request.email)
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
+        email_manager.send_account_deletion_failed_email(
+            pending_deletion_request.user_id, pending_deletion_request.email)
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_VERIFICATION_FAILURE
 
 
-def _delete_user_models_with_delete_at_end_policy(user_id):
-    """Delete user models with deletion policy 'DELETE_AT_END'.
+def _delete_models_with_delete_at_end_policy(user_id):
+    """Delete auth and user models with deletion policy 'DELETE_AT_END'.
 
     Args:
         user_id: str. The unique ID of the user that is being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.user]):
+            [models.NAMES.auth, models.NAMES.user]):
         policy = model_class.get_deletion_policy()
         if policy == base_models.DELETION_POLICY.DELETE_AT_END:
             model_class.apply_deletion_policy(user_id)
@@ -270,8 +272,9 @@ def delete_user(pending_deletion_request):
     user_id = pending_deletion_request.user_id
     user_role = pending_deletion_request.role
 
-    auth_services.delete_auth_associations(user_id)
+    auth_services.delete_external_auth_associations(user_id)
 
+    _delete_models(user_id, user_role, models.NAMES.auth)
     _delete_models(user_id, user_role, models.NAMES.user)
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, user_role, models.NAMES.feedback)
@@ -354,7 +357,7 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    if not auth_services.are_auth_associations_deleted(user_id):
+    if not auth_services.verify_external_auth_associations_are_deleted(user_id):
         return False
 
     policies_not_to_verify = [

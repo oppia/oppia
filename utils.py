@@ -1021,3 +1021,19 @@ class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
 
     pass
+
+
+def is_user_id_valid(user_id):
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
+    """
+    return (
+        user_id in feconf.SYSTEM_USERS.keys() or
+        re.match(feconf.USER_ID_REGEX, user_id) is not None)

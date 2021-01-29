@@ -48,7 +48,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             return 'Email Hash'
 
         self.sender_email = 'noreply@oppia.org'
-        self.sender_id = 'sender'
+        self.sender_id = 'uid_sender%s' % ('a' * 26)
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
             email=self.sender_email)
@@ -56,7 +56,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.sender_model.put()
 
         self.recipient_email = 'recipient@email.com'
-        self.recipient_id = 'recipient'
+        self.recipient_id = 'uid_recipient%s' % ('a' * 23)
         self.recipient_model = user_models.UserSettingsModel(
             id=self.recipient_id,
             email=self.recipient_email)
@@ -79,6 +79,16 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated SentEmailModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated SentEmailModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -197,14 +207,15 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         super(BulkEmailModelValidatorTests, self).setUp()
 
         self.sender_email = 'sender@email.com'
-        self.sender_id = 'sender'
+        self.sender_id = 'uid_sender%s' % ('a' * 26)
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
             email=self.sender_email)
         self.sender_model.update_timestamps()
         self.sender_model.put()
 
-        self.recipient_ids = ['recipient1', 'recipient2']
+        self.recipient_ids = [
+            'uid_recipient%s' % ('a' * 23), 'uid_recipient%s' % ('b' * 23)]
         self.recipient_model_1 = user_models.UserSettingsModel(
             id=self.recipient_ids[0],
             email='recipient1@email.com')

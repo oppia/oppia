@@ -302,6 +302,26 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
@@ -431,10 +451,11 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                     'property_name': 'title',
                     'new_value': 'New title %s' % i
                 })], 'Changes.')
+        self.process_and_flush_pending_tasks()
+
         exp_models.ExplorationModel.get_by_id('0').delete(
             self.user_id, '', [])
 
-        self.process_and_flush_pending_tasks()
         job_id = self.job_class.create_new()
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -838,6 +859,28 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
@@ -1136,6 +1179,28 @@ class ExplorationCommitLogEntryModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_user_id_migration_bot(self):
+        self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_user_id(self):
+        self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
@@ -1389,6 +1454,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'title',
                 'new_value': 'New title'
             })], 'Changes.')
+        self.process_and_flush_pending_tasks()
 
         rights_manager.assign_role_for_exploration(
             self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
@@ -2085,6 +2151,28 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
@@ -2477,6 +2565,28 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 4]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_user_id_migration_bot(self):
+        self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_user_id(self):
+        self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

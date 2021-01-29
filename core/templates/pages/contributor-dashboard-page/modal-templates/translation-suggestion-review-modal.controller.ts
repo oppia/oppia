@@ -16,18 +16,22 @@
  * @fileoverview Controller for translation suggestion review modal.
  */
 
+require('domain/feedback_message/ThreadMessageObjectFactory.ts');
+
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$scope', '$uibModalInstance', 'ContributionAndReviewService',
-    'SiteAnalyticsService', 'initialSuggestionId', 'reviewable',
+    '$http', '$scope', '$uibModalInstance', 'ContributionAndReviewService',
+    'SiteAnalyticsService', 'ThreadMessageObjectFactory',
+    'UrlInterpolationService', 'initialSuggestionId', 'reviewable',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION',
     function(
-        $scope, $uibModalInstance, ContributionAndReviewService,
-        SiteAnalyticsService, initialSuggestionId, reviewable,
+        $http, $scope, $uibModalInstance, ContributionAndReviewService,
+        SiteAnalyticsService, ThreadMessageObjectFactory,
+        UrlInterpolationService, initialSuggestionId, reviewable,
         suggestionIdToSuggestion, ACTION_ACCEPT_SUGGESTION,
         ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
@@ -43,6 +47,8 @@ angular.module('oppia').controller(
           .registerContributorDashboardViewSuggestionForReview('Translation');
       }
 
+      // The length of the commit message should not exceed 375 characters,
+      // since this is the maximum allowed commit message size.
       var generateCommitMessage = function() {
         var contentId = $scope.activeSuggestion.change.content_id;
         var stateName = $scope.activeSuggestion.change.state_name;
@@ -51,13 +57,38 @@ angular.module('oppia').controller(
         return `${contentType} section of "${stateName}" card`;
       };
 
+      var _getThreadHandlerUrl = function(suggestionId) {
+        return UrlInterpolationService.interpolateUrl(
+          '/threadhandler/<suggestionId>', { suggestionId });
+      };
+
+      var _getThreadMessagesAsync = function(threadId) {
+        return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
+          let threadMessageBackendDicts = response.data.messages;
+          return threadMessageBackendDicts.map(
+            m => ThreadMessageObjectFactory.createFromBackendDict(m));
+        });
+      };
+
       var init = function() {
+        $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
         $scope.reviewMessage = '';
+        if (!reviewable) {
+          $scope.suggestionIsRejected = (
+            $scope.activeSuggestion.status === 'rejected');
+          if ($scope.suggestionIsRejected) {
+            _getThreadMessagesAsync($scope.activeSuggestionId).then(
+              function(messageSummaries) {
+                $scope.reviewMessage = messageSummaries[1].text;
+              }
+            );
+          }
+        }
       };
 
       init();
@@ -76,6 +107,7 @@ angular.module('oppia').controller(
       };
 
       $scope.acceptAndReviewNext = function() {
+        $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
           'Translation');
 
@@ -87,6 +119,7 @@ angular.module('oppia').controller(
       };
 
       $scope.rejectAndReviewNext = function() {
+        $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
           'Translation');
 
