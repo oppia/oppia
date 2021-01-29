@@ -24,7 +24,6 @@ var TopicViewerPage = function() {
   var topicDescription = element(by.css('.protractor-test-topic-description'));
   var storySummaryTitleList =
     element.all(by.css('.protractor-test-story-summary-title'));
-  var topicLinkList = element.all(by.css('.protractor-test-topic-link'));
 
   this.get = async function(classroomUrlFragment, topicName) {
     await browser.get(`/learn/${classroomUrlFragment}`);
@@ -34,8 +33,7 @@ var TopicViewerPage = function() {
     if (await topicLink.isPresent()) {
       await action.click(topicName, topicLink);
       await waitFor.pageToFullyLoad();
-    }
-    else {
+    } else {
       throw new Error ('Topic card is not present.');
     }
   };
@@ -49,9 +47,8 @@ var TopicViewerPage = function() {
 
   this.expectedStoryCountToBe = async function(count) {
     if (count === 0) {
-      await expect(await storySummaryTitleList.count()).toEqual(0);  
-    }
-    else {
+      await expect(await storySummaryTitleList.count()).toEqual(0);
+    } else {
       await waitFor.visibilityOf(
         storySummaryTitleList.first(),
         'Story summary tiles take too long to be visible.');

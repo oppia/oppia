@@ -31,9 +31,8 @@ var SubTopicViewerPage = function() {
 
   this.expectedRevisionCardCountToBe = async function(count) {
     if (count === 0) {
-      await expect(await subTopicTileList.count()).toEqual(0);  
-    }
-    else {
+      await expect(await subTopicTileList.count()).toEqual(0);
+    } else {
       await waitFor.visibilityOf(
         subTopicTileList.first(),
         'Revisions cards take too long to be visible.');

@@ -162,12 +162,12 @@ fdescribe('Topic and Story viewer functionality', function() {
   it(
     'should check for topic description, stories and revision cards',
     async function() {
-    await topicViewerPage.get('math', 'Topic TASV1');
-    await topicViewerPage.expectedTopicInformationToBe('Description');
-    await topicViewerPage.expectedStoryCountToBe(1);
-    await subTopicViewerPage.get();
-    await subTopicViewerPage.expectedRevisionCardCountToBe(1);
-  });
+      await topicViewerPage.get('math', 'Topic TASV1');
+      await topicViewerPage.expectedTopicInformationToBe('Description');
+      await topicViewerPage.expectedStoryCountToBe(1);
+      await subTopicViewerPage.get();
+      await subTopicViewerPage.expectedRevisionCardCountToBe(1);
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
