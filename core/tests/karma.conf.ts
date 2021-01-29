@@ -8,7 +8,7 @@ if (argv.prodEnv) {
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'webpack'],
     files: [
       // Constants must be loaded before everything else.
       // Since jquery, angular-mocks and math-expressions
@@ -48,8 +48,6 @@ module.exports = function(config) {
       }
     ],
     exclude: [
-      'local_compiled_js/core/templates/**/*-e2e.js',
-      'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
     ],
     proxies: {
@@ -155,6 +153,13 @@ module.exports = function(config) {
           'assets/constants': 'constants.ts',
           'assets/rich_text_components_definitions':
             'rich_text_components_definitions.ts'
+        },
+        fallback: {
+          assert: require.resolve('assert/'),
+          path: require.resolve('path-browserify'),
+          stream: require.resolve('stream-browserify'),
+          util: require.resolve('util/'),
+          zlib: require.resolve('browserify-zlib')
         }
       },
       devtool: 'inline-cheap-source-map',

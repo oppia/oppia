@@ -54,6 +54,13 @@ module.exports = {
       'assets/constants': 'constants.ts',
       'assets/rich_text_components_definitions':
         'rich_text_components_definitions.ts'
+    },
+    fallback: {
+      assert: require.resolve('assert/'),
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify'),
+      util: require.resolve('util/'),
+      zlib: require.resolve('browserify-zlib')
     }
   },
   entry: {
@@ -686,7 +693,6 @@ module.exports = {
         path.resolve(__dirname, 'typings')
       ],
       use: [
-        'cache-loader',
         {
           loader: 'ts-loader',
           options: {
@@ -701,15 +707,18 @@ module.exports = {
     },
     {
       test: {
-        include: /.html$/,
-        exclude: /(directive|component)\.html$/
+        and: [
+          /.html$/,
+          {
+            not: [/(directive|component)\.html$/]
+          }
+        ]
       },
-      loader: ['cache-loader', 'underscore-template-loader']
+      loader: 'underscore-template-loader'
     },
     {
       test: /(directive|component)\.html$/,
       use: [
-        'cache-loader',
         {
           loader: 'html-loader',
           options: {
@@ -726,7 +735,6 @@ module.exports = {
         path.resolve(__dirname, 'node_modules'),
       ],
       use: [
-        'cache-loader',
         {
           loader: 'style-loader',
           options: {
