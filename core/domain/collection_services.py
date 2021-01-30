@@ -779,7 +779,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             collection_node.to_dict() for collection_node in collection.nodes
         ]
     }
-    collection_model.node_count = len(collection_model.nodes)
+    collection_model.node_count = len(
+        collection_model.collection_contents['nodes'])
     collection_model.commit(committer_id, commit_message, change_list)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])
