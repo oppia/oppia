@@ -58,7 +58,24 @@ export class DateTimeFormatService {
    */
   getLocaleDateTimeHourString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
-    return dayjs(date).format('MMM D hh:mm A');
+    if (date.getFullYear() === new Date().getFullYear()) {
+      // Dayjs will return Oct 10 10:15 AM.
+      return dayjs(date).format('MMM D, h:mm A');
+    } else {
+      // Dayjs will return Oct 10, 2020.
+      return dayjs(date).format('MMM D, YYYY');
+    }
+  }
+
+  /**
+   * This function converts a millisecond date to date in words.
+   * @param {number} millisSinceEpoch - The millisecond date to be converted
+   * @returns {string} a date and time string
+   */
+  getDateTimeInWords(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    // Dayjs will return Monday, January 18, 2021 at 12:30 PM.
+    return dayjs(date).format('dddd, MMMM D, YYYY [at] h:mm A');
   }
   /**
    * This function converts a millisecond date to a date string, using locale

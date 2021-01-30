@@ -71,9 +71,17 @@ describe('datetimeformatter', () => {
         NOW_MILLIS - 365 * 24 * 60 * 60 * 1000)).toBe('11/21/13');
   });
 
-  it('should provide date time hour string', function() {
+  it('should provide date time hour in MMM D, h:mm A format', () => {
     expect(df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
-      dayjs(new Date(NOW_MILLIS)).format('MMM D hh:mm A')
+      dayjs(new Date(NOW_MILLIS)).format('MMM D, h:mm A')
+    );
+  });
+
+  it('should provide date time hour in MMM D, YYYY format', () => {
+    // This is a date that is 1 year before NOW_MILLIS.
+    let dateFromPreviousYear = NOW_MILLIS - 365 * 24 * 60 * 60 * 1000;
+    expect(df.getLocaleDateTimeHourString(dateFromPreviousYear)).toBe(
+      dayjs(new Date(dateFromPreviousYear)).format('MMM D, YYYY')
     );
   });
 
