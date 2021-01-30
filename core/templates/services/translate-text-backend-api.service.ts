@@ -74,7 +74,7 @@ export class TranslateTextBackendApiService {
     for (let idx in imageBlobs) {
       body.append(filenames[idx], imageBlobs[idx]);
     }
-    return this.http.put(
+    return this.http.post(
       '/suggestionhandler/', body,
       // The actual header to be added is 'multipart/form-data', But
       // adding it manually won't work because we will miss the boundary
