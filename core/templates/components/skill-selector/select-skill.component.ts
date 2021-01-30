@@ -16,7 +16,7 @@
  * @fileoverview Controller for the select skill viewer.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -33,18 +33,16 @@ export class SelectSkillComponent implements OnInit {
   @Input() sortedSkillSummaries: [];
   @Input() selectedSkillId: string; // Type? Also an output?
   @Input() countOfSkillsToPrioritize: number;
-  @Input('categorizedSkills') inputCategorizedSkills: {};
+  @Input() categorizedSkills: {};
   @Input() untriagedSkillSummaries: [];
   @Input() allowSkillsFromOtherTopics: boolean;
-  categorizedSkills = null; // Does this need to be an output? Combined with Input above?
+  @Output() setCategorizedSkills: EventEmitter<{}> = new EventEmitter();
   selectedSkill = null;
   topicFilterList = [];
   subTopicFilterDict = {};
   intialSubTopicFilterDict = {};
 
-  constructor() {
-    this.categorizedSkills = this.inputCategorizedSkills;
-  }
+  constructor() {}
 
   ngOnInit(): void {
     for (var topicName in this.categorizedSkills) {
@@ -95,7 +93,7 @@ export class SelectSkillComponent implements OnInit {
           if (!updatedSkillsDict.hasOwnProperty(topicName)) {
             updatedSkillsDict[topicName] = {};
           }
-          var tempCategorizedSkills = this.inputCategorizedSkills;
+          var tempCategorizedSkills = this.categorizedSkills;
           var subTopicName = subTopics[i].subTopicName;
           updatedSkillsDict[topicName][subTopicName] =
             tempCategorizedSkills[topicName][subTopicName];
@@ -109,7 +107,7 @@ export class SelectSkillComponent implements OnInit {
       var isAnyTopicChecked = false;
       for (var i = 0; i < this.topicFilterList.length; i++) {
         if (this.topicFilterList[i].checked) {
-          var tempCategorizedSkills = this.inputCategorizedSkills;
+          var tempCategorizedSkills = this.categorizedSkills;
           var topicName:string = this.topicFilterList[i].topicName;
           updatedSkillsDict[topicName] = tempCategorizedSkills[topicName];
           isAnyTopicChecked = true;
@@ -120,7 +118,7 @@ export class SelectSkillComponent implements OnInit {
       } else {
         // If no filter is applied on both subtopics and topics, we
         // need to display all the skills (the original list).
-        this.categorizedSkills = this.inputCategorizedSkills
+        this.setCategorizedSkills.emit(this.categorizedSkills)
       }
     } else {
       this.categorizedSkills = angular.copy(updatedSkillsDict);

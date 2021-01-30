@@ -33,7 +33,7 @@ import { LoadingDotsComponent } from
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SelectSkillComponent } from
-  './skill-selector/skill-selector.component';
+  './skill-selector/select-skill.component';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
