@@ -33,7 +33,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require('services/prevent-reload-event.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 require('services/user.service.ts');
 require('services/utils.service.ts');
 
@@ -48,14 +48,14 @@ angular.module('oppia').component('preferencesPage', {
   controller: [
     '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
     '$window', 'AlertsService', 'I18nLanguageCodeService',
-    'LanguageUtilService', 'LoaderService', 'PreventReloadEvent',
+    'LanguageUtilService', 'LoaderService', 'PreventPageUnloadEventService',
     'UrlInterpolationService', 'UserService',
     'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
     'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
     'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES', function(
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
         $window, AlertsService, I18nLanguageCodeService,
-        LanguageUtilService, LoaderService, PreventReloadEvent,
+        LanguageUtilService, LoaderService, PreventPageUnloadEventService,
         UrlInterpolationService, UserService,
         DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
         ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
@@ -67,12 +67,12 @@ angular.module('oppia').component('preferencesPage', {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       var _saveDataItem = function(updateType, data) {
-        PreventReloadEvent.addListener();
+        PreventPageUnloadEventService.addListener();
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
         }).then(() => {
-          PreventReloadEvent.removeListener();
+          PreventPageUnloadEventService.removeListener();
           AlertsService.addInfoMessage('Saved!', 1000);
         });
       };
@@ -93,7 +93,7 @@ angular.module('oppia').component('preferencesPage', {
       };
 
       ctrl.registerBioChanged = function() {
-        PreventReloadEvent.addListener();
+        PreventPageUnloadEventService.addListener();
       };
 
       ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {

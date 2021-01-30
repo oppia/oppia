@@ -33,7 +33,7 @@ describe('Preferences Controller', function() {
   var $timeout = null;
   var $uibModal = null;
   var CsrfService = null;
-  var PreventReloadEventService = null;
+  var PreventPageUnloadEventService = null;
   var UserService = null;
   var userInfo = {
     getUsername: () => 'myUsername',
@@ -66,7 +66,8 @@ describe('Preferences Controller', function() {
     $uibModal = $injector.get('$uibModal');
 
     CsrfService = $injector.get('CsrfTokenService');
-    PreventReloadEventService = $injector.get('PreventReloadEvent');
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     UserService = $injector.get('UserService');
 
     spyOn(CsrfService, 'getTokenAsync').and.returnValue(
@@ -99,14 +100,13 @@ describe('Preferences Controller', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match('"update_type":"user_bio"');
     };
-    const preventReloadEventremoveSpy = spyOn(
-      PreventReloadEventService, 'removeListener').and.callThrough();
+    spyOn(PreventPageUnloadEventService, 'removeListener').and.callThrough();
 
     $httpBackend.expect(
       'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
     ctrl.saveUserBio(userBio);
     $httpBackend.flush();
-    expect(preventReloadEventremoveSpy).toHaveBeenCalled();
+    expect(PreventPageUnloadEventService.removeListener).toHaveBeenCalled();
 
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
@@ -272,11 +272,10 @@ describe('Preferences Controller', function() {
     expect(mockWindow.location.reload).not.toHaveBeenCalled();
   });
 
-  it('should call Prevent reload event service for checkbiochanged',
+  it('should add prevent reload event listener when a bio is changed',
     function() {
-      const preventReloadEventaddSpy = spyOn(
-        PreventReloadEventService, 'addListener').and.callThrough();
+      spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
       ctrl.registerBioChanged();
-      expect(preventReloadEventaddSpy).toHaveBeenCalled();
+      expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
     });
 });
