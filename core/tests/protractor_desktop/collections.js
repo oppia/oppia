@@ -87,17 +87,17 @@ describe('Collections', function() {
     fourthExplorationId = await general.getExplorationIdFromEditor();
     // Create searchable explorations.
     await workflow.createAndPublishExploration(
-      'The Lazy Magician',
+      'The Lazy Magician for CollectionSuiteTest',
       'Algorithms',
       'discover the binary search algorithm'
     );
     await workflow.createAndPublishExploration(
-      'Root Linear Coefficient Theorem',
+      'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
       'discover the Root Linear Coefficient Theorem'
     );
     await workflow.createAndPublishExploration(
-      'Test Exploration',
+      'Test Exploration for CollectionSuiteTest',
       'Languages',
       'discover the Protractor Testing'
     );
