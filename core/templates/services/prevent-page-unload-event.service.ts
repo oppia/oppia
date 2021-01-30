@@ -47,8 +47,8 @@ export class PreventPageUnloadEventService {
   private _preventPageUnloadEventHandler(
       e: { preventDefault: () => void; returnValue: string; }
   ): void {
-    // HTML specification states that authors should use the
-    // below function. This is used to trigger a confirmation before leaving.
+    // HTML specification states that authors should use the below
+    // function. This is used to trigger a confirmation before leaving.
     e.preventDefault();
     // The exact value in returnValue is not relevant, but it needs to be set
     // in order to trigger a confirmation before leaving.
