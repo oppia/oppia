@@ -85,8 +85,6 @@ class TaskEntryTests(test_utils.GenericTestBase):
             'issue_description': 'issue description',
             'status': 'resolved',
             'resolver_username': self.OWNER_USERNAME,
-            'resolver_profile_picture_data_url': (
-                user_services.DEFAULT_IDENTICON_DATA_URL),
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 

@@ -406,7 +406,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             error_messages,
             ['[Status 404] Failed to fetch Gravatar from %s' % gravatar_url])
-        self.assertEqual(gravatar, user_services.DEFAULT_IDENTICON_DATA_URL)
+        self.assertIsNone(gravatar)
 
     def test_fetch_gravatar_failure_exception(self):
         user_email = 'user@example.com'
@@ -421,15 +421,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             error_messages, ['Failed to fetch Gravatar from %s' % gravatar_url])
-        self.assertEqual(gravatar, user_services.DEFAULT_IDENTICON_DATA_URL)
-
-    def test_default_identicon_data_url(self):
-        identicon_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'user_blue_72px.png')
-        identicon_data_url = utils.convert_png_to_data_url(identicon_filepath)
-        self.assertEqual(
-            identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
+        self.assertIsNone(gravatar)
 
     def test_set_and_get_user_email_preferences(self):
         auth_id = 'someUser'
