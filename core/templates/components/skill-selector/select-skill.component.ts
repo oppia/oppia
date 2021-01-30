@@ -114,14 +114,15 @@ export class SelectSkillComponent implements OnInit {
         }
       }
       if (isAnyTopicChecked) {
-        this.categorizedSkills = angular.copy(updatedSkillsDict);
+        this.setCategorizedSkills.emit(angular.copy(updatedSkillsDict));
       } else {
         // If no filter is applied on both subtopics and topics, we
         // need to display all the skills (the original list).
+        // This might not be needed below...
         this.setCategorizedSkills.emit(this.categorizedSkills)
       }
     } else {
-      this.categorizedSkills = angular.copy(updatedSkillsDict);
+      this.setCategorizedSkills.emit(angular.copy(updatedSkillsDict));
     }
   }
 
