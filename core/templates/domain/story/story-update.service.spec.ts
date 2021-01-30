@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,37 +16,28 @@
  * @fileoverview Tests for Story update service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// story-update.service.ts is upgraded to Angular 8.
-import { StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from
+  '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/story/story-update.service.ts');
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { StoryUpdateService } from 'domain/story/story-update.service.ts';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
 
 describe('Story update service', function() {
-  var StoryUpdateService = null;
-  var storyObjectFactory = null;
-  var UndoRedoService = null;
+  var storyObjectFactory:StoryObjectFactory = null;
+  var sus:StoryUpdateService = null;
+  var undoRedoService:UndoRedoService = null;
   var _sampleStory = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'StoryContentsObjectFactory', new StoryContentsObjectFactory());
-    $provide.value(
-      'StoryObjectFactory', new StoryObjectFactory(
-        new StoryContentsObjectFactory()));
-  }));
-  importAllAngularServices();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryUpdateService = $injector.get('StoryUpdateService');
-    storyObjectFactory = $injector.get('StoryObjectFactory');
-    UndoRedoService = $injector.get('UndoRedoService');
+    sus = TestBed.inject(StoryUpdateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
 
     var sampleStoryBackendObject = {
       id: 'sample_story_id',
@@ -67,7 +58,9 @@ describe('Story update service', function() {
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
-            outline_is_finalized: false
+            outline_is_finalized: false,
+            thumbnail_filename: 'fileName',
+            thumbnail_bg_color: 'blue',
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -77,28 +70,35 @@ describe('Story update service', function() {
             destination_node_ids: ['node_1'],
             outline: 'Outline 2',
             exploration_id: 'exp_1',
-            outline_is_finalized: true
+            outline_is_finalized: true,
+            thumbnail_filename: 'fileName',
+            thumbnail_bg_color: 'blue',
           }],
         next_node_id: 'node_3'
       },
-      language_code: 'en'
+      language_code: 'en',
+      thumbnail_filename: 'fileName',
+      thumbnail_bg_color: 'blue',
+      url_fragment: 'url',
+      meta_tag_content: 'meta'
     };
+
     _sampleStory = storyObjectFactory.createFromBackendDict(
       sampleStoryBackendObject);
-  }));
+  });
 
   it('should add/remove a prerequisite skill id to/from a node in the story',
-    function() {
+    () => {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
-      StoryUpdateService.addPrerequisiteSkillIdToNode(
+      sus.addPrerequisiteSkillIdToNode(
         _sampleStory, 'node_1', 'skill_3');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1', 'skill_3']);
 
-      UndoRedoService.undoChange(_sampleStory);
+      undoRedoService.undoChange(_sampleStory);
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
@@ -108,9 +108,9 @@ describe('Story update service', function() {
   it('should create a proper backend change dict for adding a prerequisite ' +
     'skill id to a node',
   function() {
-    StoryUpdateService.addPrerequisiteSkillIdToNode(
+    sus.addPrerequisiteSkillIdToNode(
       _sampleStory, 'node_1', 'skill_3');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
       property_name: 'prerequisite_skill_ids',
       new_value: ['skill_1', 'skill_3'],
@@ -124,13 +124,13 @@ describe('Story update service', function() {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
-      StoryUpdateService.addAcquiredSkillIdToNode(
+      sus.addAcquiredSkillIdToNode(
         _sampleStory, 'node_1', 'skill_4');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2', 'skill_4']);
 
-      UndoRedoService.undoChange(_sampleStory);
+      undoRedoService.undoChange(_sampleStory);
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
@@ -140,9 +140,9 @@ describe('Story update service', function() {
   it('should create a proper backend change dict for adding an acquired ' +
     'skill id to a node',
   function() {
-    StoryUpdateService.addAcquiredSkillIdToNode(
+    sus.addAcquiredSkillIdToNode(
       _sampleStory, 'node_1', 'skill_4');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
       property_name: 'acquired_skill_ids',
       new_value: ['skill_2', 'skill_4'],
@@ -156,12 +156,12 @@ describe('Story update service', function() {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual([]);
-      StoryUpdateService.addDestinationNodeIdToNode(
+      sus.addDestinationNodeIdToNode(
         _sampleStory, 'node_1', 'node_2');
 
       // Adding an invalid destination node id should throw an error.
       expect(function() {
-        StoryUpdateService.addDestinationNodeIdToNode(
+        sus.addDestinationNodeIdToNode(
           _sampleStory, 'node_1', 'node_5');
       }).toThrowError('The destination node with given id doesn\'t exist');
 
@@ -169,7 +169,7 @@ describe('Story update service', function() {
         _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual(['node_2']);
 
-      UndoRedoService.undoChange(_sampleStory);
+      undoRedoService.undoChange(_sampleStory);
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual([]);
@@ -179,9 +179,9 @@ describe('Story update service', function() {
   it('should create a proper backend change dict for adding a destination ' +
     'node id to a node',
   function() {
-    StoryUpdateService.addDestinationNodeIdToNode(
+    sus.addDestinationNodeIdToNode(
       _sampleStory, 'node_1', 'node_2');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
       property_name: 'destination_node_ids',
       new_value: ['node_2'],
@@ -195,13 +195,13 @@ describe('Story update service', function() {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
-      StoryUpdateService.removePrerequisiteSkillIdFromNode(
+      sus.removePrerequisiteSkillIdFromNode(
         _sampleStory, 'node_1', 'skill_1');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual([]);
 
-      UndoRedoService.undoChange(_sampleStory);
+      undoRedoService.undoChange(_sampleStory);
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
@@ -211,9 +211,9 @@ describe('Story update service', function() {
   it('should create a proper backend change dict for removing a prerequisite ' +
     'skill id from a node',
   function() {
-    StoryUpdateService.removePrerequisiteSkillIdFromNode(
+    sus.removePrerequisiteSkillIdFromNode(
       _sampleStory, 'node_1', 'skill_1');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
       property_name: 'prerequisite_skill_ids',
       new_value: [],
@@ -227,13 +227,13 @@ describe('Story update service', function() {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
-      StoryUpdateService.removeAcquiredSkillIdFromNode(
+      sus.removeAcquiredSkillIdFromNode(
         _sampleStory, 'node_1', 'skill_2');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual([]);
 
-      UndoRedoService.undoChange(_sampleStory);
+      undoRedoService.undoChange(_sampleStory);
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
@@ -243,9 +243,9 @@ describe('Story update service', function() {
   it('should create a proper backend change dict for removing an acquired ' +
     'skill id from a node',
   function() {
-    StoryUpdateService.removeAcquiredSkillIdFromNode(
+    sus.removeAcquiredSkillIdFromNode(
       _sampleStory, 'node_1', 'skill_2');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
       property_name: 'acquired_skill_ids',
       new_value: [],
@@ -259,14 +259,14 @@ describe('Story update service', function() {
       expect(
         _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
       ).toEqual(['node_1']);
-      StoryUpdateService.removeDestinationNodeIdFromNode(
+      sus.removeDestinationNodeIdFromNode(
         _sampleStory, 'node_2', 'node_1');
 
       expect(
         _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
       ).toEqual([]);
 
-      UndoRedoService.undoChange(_sampleStory);
+      undoRedoService.undoChange(_sampleStory);
       expect(
         _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
       ).toEqual(['node_1']);
@@ -276,9 +276,9 @@ describe('Story update service', function() {
   it('should create a proper backend change dict for removing a destination ' +
     'node id from a node',
   function() {
-    StoryUpdateService.removeDestinationNodeIdFromNode(
+    sus.removeDestinationNodeIdFromNode(
       _sampleStory, 'node_2', 'node_1');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
       property_name: 'destination_node_ids',
       new_value: [],
@@ -289,7 +289,7 @@ describe('Story update service', function() {
 
   it('should add/remove a story node', function() {
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
-    StoryUpdateService.addStoryNode(_sampleStory, 'Title 2');
+    sus.addStoryNode(_sampleStory, 'Title 2');
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(3);
     expect(_sampleStory.getStoryContents().getNextNodeId()).toEqual('node_4');
     expect(
@@ -298,14 +298,14 @@ describe('Story update service', function() {
       _sampleStory.getStoryContents().getNodes()[2].getTitle()).toEqual(
       'Title 2');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
   });
 
   it('should create a proper backend change dict for adding a story node',
     function() {
-      StoryUpdateService.addStoryNode(_sampleStory, 'Title 2');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.addStoryNode(_sampleStory, 'Title 2');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'add_story_node',
         node_id: 'node_3',
         title: 'Title 2'
@@ -315,27 +315,27 @@ describe('Story update service', function() {
 
   it('should remove/add a story node', function() {
     expect(function() {
-      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+      sus.deleteStoryNode(_sampleStory, 'node_2');
     }).toThrowError('Cannot delete initial story node');
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
     ).toEqual(['node_1']);
-    StoryUpdateService.deleteStoryNode(_sampleStory, 'node_1');
+    sus.deleteStoryNode(_sampleStory, 'node_1');
     // Initial node should not be deleted.
-    StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+    sus.deleteStoryNode(_sampleStory, 'node_2');
     expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual(null);
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(0);
 
     expect(function() {
-      UndoRedoService.undoChange(_sampleStory);
+      undoRedoService.undoChange(_sampleStory);
     }).toThrowError('A deleted story node cannot be restored.');
   });
 
   it('should create a proper backend change dict for removing a story node',
     function() {
-      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_1');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.deleteStoryNode(_sampleStory, 'node_1');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_story_node',
         node_id: 'node_1'
       }]);
@@ -346,12 +346,12 @@ describe('Story update service', function() {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(false);
-    StoryUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
+    sus.finalizeStoryNodeOutline(_sampleStory, 'node_1');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(true);
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(false);
@@ -359,8 +359,8 @@ describe('Story update service', function() {
 
   it('should create a proper backend change dict for finalizing a node outline',
     function() {
-      StoryUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.finalizeStoryNodeOutline(_sampleStory, 'node_1');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_outline_status',
         new_value: true,
         old_value: false,
@@ -373,12 +373,12 @@ describe('Story update service', function() {
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(true);
-    StoryUpdateService.unfinalizeStoryNodeOutline(_sampleStory, 'node_2');
+    sus.unfinalizeStoryNodeOutline(_sampleStory, 'node_2');
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(false);
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(true);
@@ -386,8 +386,8 @@ describe('Story update service', function() {
 
   it('should create a proper backend change dict for unfinalizing a node ' +
     'outline', function() {
-    StoryUpdateService.unfinalizeStoryNodeOutline(_sampleStory, 'node_2');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    sus.unfinalizeStoryNodeOutline(_sampleStory, 'node_2');
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_outline_status',
       new_value: false,
       old_value: true,
@@ -399,13 +399,13 @@ describe('Story update service', function() {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('Outline');
-    StoryUpdateService.setStoryNodeOutline(
+    sus.setStoryNodeOutline(
       _sampleStory, 'node_1', 'new outline');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('new outline');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('Outline');
@@ -413,9 +413,9 @@ describe('Story update service', function() {
 
   it('should create a proper backend change dict for setting a node outline',
     function() {
-      StoryUpdateService.setStoryNodeOutline(
+      sus.setStoryNodeOutline(
         _sampleStory, 'node_1', 'new outline');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_property',
         property_name: 'outline',
         new_value: 'new outline',
@@ -429,13 +429,13 @@ describe('Story update service', function() {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('Title 1');
-    StoryUpdateService.setStoryNodeTitle(
+    sus.setStoryNodeTitle(
       _sampleStory, 'node_1', 'new title');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('new title');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('Title 1');
@@ -443,9 +443,9 @@ describe('Story update service', function() {
 
   it('should create a proper backend change dict for setting a node title',
     function() {
-      StoryUpdateService.setStoryNodeTitle(
+      sus.setStoryNodeTitle(
         _sampleStory, 'node_1', 'new title');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_property',
         property_name: 'title',
         new_value: 'new title',
@@ -459,13 +459,13 @@ describe('Story update service', function() {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('Description 1');
-    StoryUpdateService.setStoryNodeDescription(
+    sus.setStoryNodeDescription(
       _sampleStory, 'node_1', 'new description');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('new description');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('Description 1');
@@ -473,9 +473,9 @@ describe('Story update service', function() {
 
   it('should create a backend change dict for setting a node description',
     function() {
-      StoryUpdateService.setStoryNodeDescription(
+      sus.setStoryNodeDescription(
         _sampleStory, 'node_1', 'new description');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_property',
         property_name: 'description',
         new_value: 'new description',
@@ -489,7 +489,7 @@ describe('Story update service', function() {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
     ).toBe(null);
-    StoryUpdateService.setStoryNodeExplorationId(
+    sus.setStoryNodeExplorationId(
       _sampleStory, 'node_1', 'exp_2');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
@@ -498,11 +498,11 @@ describe('Story update service', function() {
     // Adding an already existing exploration in the story should throw an
     // error.
     expect(function() {
-      StoryUpdateService.setStoryNodeExplorationId(
+      sus.setStoryNodeExplorationId(
         _sampleStory, 'node_1', 'exp_1');
     }).toThrowError('The given exploration already exists in the story.');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
     ).toBe(null);
@@ -510,9 +510,9 @@ describe('Story update service', function() {
 
   it('should create a proper backend change dict for setting the exploration ' +
     'id of a node', function() {
-    StoryUpdateService.setStoryNodeExplorationId(
+    sus.setStoryNodeExplorationId(
       _sampleStory, 'node_1', 'exp_2');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
       property_name: 'exploration_id',
       new_value: 'exp_2',
@@ -524,19 +524,19 @@ describe('Story update service', function() {
   it('should set/unset the initial node of the story', function() {
     expect(
       _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_2');
-    StoryUpdateService.setInitialNodeId(_sampleStory, 'node_1');
+    sus.setInitialNodeId(_sampleStory, 'node_1');
     expect(
       _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_1');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_2');
   });
 
   it('should create a proper backend change dict for setting initial node',
     function() {
-      StoryUpdateService.setInitialNodeId(_sampleStory, 'node_1');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.setInitialNodeId(_sampleStory, 'node_1');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_contents_property',
         property_name: 'initial_node_id',
         new_value: 'node_1',
@@ -547,17 +547,17 @@ describe('Story update service', function() {
 
   it('should set/unset changes to a story\'s title', function() {
     expect(_sampleStory.getTitle()).toEqual('Story title');
-    StoryUpdateService.setStoryTitle(_sampleStory, 'new title');
+    sus.setStoryTitle(_sampleStory, 'new title');
     expect(_sampleStory.getTitle()).toEqual('new title');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getTitle()).toEqual('Story title');
   });
 
   it('should create a proper backend change dict for changing title',
     function() {
-      StoryUpdateService.setStoryTitle(_sampleStory, 'new title');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.setStoryTitle(_sampleStory, 'new title');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
         property_name: 'title',
         new_value: 'new title',
@@ -568,17 +568,17 @@ describe('Story update service', function() {
 
   it('should set/unset changes to a story\'s description', function() {
     expect(_sampleStory.getDescription()).toEqual('Story description');
-    StoryUpdateService.setStoryDescription(_sampleStory, 'new description');
+    sus.setStoryDescription(_sampleStory, 'new description');
     expect(_sampleStory.getDescription()).toEqual('new description');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getDescription()).toEqual('Story description');
   });
 
   it('should create a proper backend change dict for changing descriptions',
     function() {
-      StoryUpdateService.setStoryDescription(_sampleStory, 'new description');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.setStoryDescription(_sampleStory, 'new description');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
         property_name: 'description',
         new_value: 'new description',
@@ -589,17 +589,17 @@ describe('Story update service', function() {
 
   it('should set/unset changes to a story\'s notes', function() {
     expect(_sampleStory.getNotes()).toEqual('Story notes');
-    StoryUpdateService.setStoryNotes(_sampleStory, 'new notes');
+    sus.setStoryNotes(_sampleStory, 'new notes');
     expect(_sampleStory.getNotes()).toEqual('new notes');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getNotes()).toEqual('Story notes');
   });
 
   it('should create a proper backend change dict for changing notes',
     function() {
-      StoryUpdateService.setStoryNotes(_sampleStory, 'new notes');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.setStoryNotes(_sampleStory, 'new notes');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
         property_name: 'notes',
         new_value: 'new notes',
@@ -610,17 +610,17 @@ describe('Story update service', function() {
 
   it('should set/unset changes to a story\'s language code', function() {
     expect(_sampleStory.getLanguageCode()).toEqual('en');
-    StoryUpdateService.setStoryLanguageCode(_sampleStory, 'fi');
+    sus.setStoryLanguageCode(_sampleStory, 'fi');
     expect(_sampleStory.getLanguageCode()).toEqual('fi');
 
-    UndoRedoService.undoChange(_sampleStory);
+    undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getLanguageCode()).toEqual('en');
   });
 
   it('should create a proper backend change dict for changing language codes',
     function() {
-      StoryUpdateService.setStoryLanguageCode(_sampleStory, 'fi');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      sus.setStoryLanguageCode(_sampleStory, 'fi');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
         property_name: 'language_code',
         new_value: 'fi',
