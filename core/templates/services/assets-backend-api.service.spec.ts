@@ -364,29 +364,6 @@ describe('Assets Backend API Service', () => {
     }));
   });
 
-  describe('without dev mode settings', () => {
-    beforeAll(() => {
-      spyOnProperty(AssetsBackendApiService, 'GCS_RESOURCE_BUCKET_NAME', 'get')
-        .and.returnValue('');
-      spyOnProperty(AssetsBackendApiService, 'DEV_MODE', 'get')
-        .and.returnValue(false);
-    });
-
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [AssetsBackendApiService]
-      });
-    });
-
-    it('should throw an error when is not on dev mode and Google Cloud' +
-        ' Service bucket name is not set', fakeAsync(() => {
-      expect(() => {
-        TestBed.get(AssetsBackendApiService);
-      }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
-    }));
-  });
-
   describe('on production mode', () => {
     let assetsBackendApiService: AssetsBackendApiService = null;
     let httpTestingController: HttpTestingController = null;

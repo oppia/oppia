@@ -77,9 +77,19 @@ describe('Preferences Controller', function() {
     spyOn(UserService, 'getUserInfoAsync').and.returnValue(
       $q.resolve(userInfo));
     $httpBackend.expectGET('/preferenceshandler/data').respond({
+      user_bio: 'short bio',
+      subject_interests: [],
+      preferred_language_codes: ['en'],
+      default_dashboard: 'creator_dashboard',
       can_receive_email_updates: false,
       can_receive_editor_role_email: true,
-      can_receive_feedback_message_email: true
+      can_receive_subscription_email: false,
+      can_receive_feedback_message_email: true,
+      preferred_site_language_code: 'en',
+      preferred_audio_language_code: 'en',
+      subscription_list: [{
+        creator_username: 'username'
+      }]
     });
 
     ctrl.$onInit();

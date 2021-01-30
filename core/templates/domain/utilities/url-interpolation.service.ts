@@ -245,6 +245,10 @@ export class UrlInterpolationService {
   }
 
   getGcsUrl(): string {
+    if (!AppConstants.DEV_MODE &&
+        !AppConstants.GCS_RESOURCE_BUCKET_NAME) {
+      throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+    }
     const prodGcsUrl = (
       'https://storage.googleapis.com/' +
       AppConstants.GCS_RESOURCE_BUCKET_NAME

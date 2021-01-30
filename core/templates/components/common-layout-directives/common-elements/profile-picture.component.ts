@@ -38,7 +38,7 @@ export class ProfilePictureComponent implements OnChanges {
   @ViewChild('parentDiv') parentDiv: ElementRef;
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnChanges(): void {

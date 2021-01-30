@@ -18,7 +18,9 @@
  * @fileoverview Unit tests for ProfileLinkPictureComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture, fakeAsync, TestBed, tick, waitForAsync,
+} from '@angular/core/testing';
 import { ProfilePictureComponent } from 'components/common-layout-directives/common-elements/profile-picture.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -36,8 +38,14 @@ class MockUrlInterpolationService {
 describe('Profile Picture Component', function() {
   let component: ProfilePictureComponent;
   let fixture: ComponentFixture<ProfilePictureComponent>;
+  let parentDiv;
 
   beforeEach(waitForAsync(() => {
+    let nativeElement = jasmine.createSpyObj(
+      'HTMLElement', null, {offsetHeight: 0});
+    parentDiv = jasmine.createSpyObj(
+      'HTMLElement', null, {nativeElement: nativeElement});
+
     TestBed.configureTestingModule({
       declarations: [ProfilePictureComponent],
       providers: [
@@ -53,6 +61,7 @@ describe('Profile Picture Component', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProfilePictureComponent);
     component = fixture.componentInstance;
+    component.parentDiv = parentDiv;
   });
 
   it('should change profile picture url on username change', () => {
@@ -80,5 +89,34 @@ describe('Profile Picture Component', function() {
 
     component.showPicture();
     expect(component.profilePictureIsLoaded).toBeTrue();
+  });
+
+  it('should correctly set the spinner size', fakeAsync(() => {
+    expect(component.spinnerDiameter).toBe(1);
+    expect(component.parentDiv.nativeElement.offsetHeight).toBe(0);
+
+    component.ngAfterViewInit();
+    tick(150);
+    expect(component.spinnerDiameter).toBe(1);
+    expect(component.parentDiv.nativeElement.offsetHeight).toBe(0);
+
+    let nativeElementMock = jasmine.createSpyObj(
+      'HTMLElement', null, {offsetHeight: 100});
+    let nativeElement = (
+      <jasmine.Spy> Object.getOwnPropertyDescriptor(
+        component.parentDiv, 'nativeElement'
+      ).get
+    );
+    nativeElement.and.returnValue(nativeElementMock);
+    tick(100);
+    expect(component.spinnerDiameter).toBe(90);
+    tick(100);
+  }));
+
+  it('should correctly set the default picture', () => {
+    expect(component.profilePictureUrl).toBeUndefined();
+
+    component.setDefaultPicture();
+    expect(component.profilePictureUrl).toBe('url//avatar/user_blue_150px.png');
   });
 });

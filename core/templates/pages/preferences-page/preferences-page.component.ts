@@ -207,22 +207,15 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.preferredLanguageCodes = data.preferred_language_codes;
           ctrl.defaultDashboard = data.default_dashboard;
           ctrl.canReceiveEmailUpdates = data.can_receive_email_updates;
-          ctrl.canReceiveEditorRoleEmail =
-          data.can_receive_editor_role_email;
-          ctrl.canReceiveSubscriptionEmail =
-            data.can_receive_subscription_email;
+          ctrl.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
+          ctrl.canReceiveSubscriptionEmail = (
+            data.can_receive_subscription_email);
           ctrl.canReceiveFeedbackMessageEmail = (
             data.can_receive_feedback_message_email);
-          ctrl.preferredSiteLanguageCode =
-          data.preferred_site_language_code;
-          ctrl.preferredAudioLanguageCode =
-            data.preferred_audio_language_code;
+          ctrl.preferredSiteLanguageCode = data.preferred_site_language_code;
+          ctrl.preferredAudioLanguageCode = (
+            data.preferred_audio_language_code);
           ctrl.subscriptionList = data.subscription_list;
-          for (let subscription of ctrl.subscriptionList) {
-            subscription.profilePictureUrl = (
-              UrlInterpolationService.getProfilePictureUrl(
-                subscription.creator_username));
-          }
           ctrl.hasPageLoaded = true;
           _forceSelect2Refresh();
         });
