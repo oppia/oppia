@@ -75,18 +75,7 @@ export class TranslateTextBackendApiService {
       body.append(filenames[idx], imageBlobs[idx]);
     }
     return this.http.post(
-      '/suggestionhandler/', body,
-      // The actual header to be added is 'multipart/form-data', But
-      // adding it manually won't work because we will miss the boundary
-      // parameter. When we keep 'Content-Type' as undefined the browser
-      // automatically fills the boundary parameter according to the form
-      // data. Refer https://stackoverflow.com/questions/37039852/. and
-      // https://stackoverflow.com/questions/34983071/.
-      // Note: This should be removed and a convetion similar to
-      // SkillCreationBackendApiService should be followed once this service
-      // is migrated to Angular 8.
-      {headers: {'Content-Type': undefined}}
-    ).toPromise();
+      '/suggestionhandler/', body).toPromise();
   }
 }
 
