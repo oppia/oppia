@@ -110,13 +110,15 @@
 
 
 # Core documentation
-/AUTHORS @seanlip
-/CHANGELOG @seanlip
-/CONTRIBUTORS @seanlip
-/LICENSE @seanlip
-/NOTICE @seanlip
+# TODO(#11811): For the following 5 files, as well as about-page.constants.ts,
+# replace @BenHenning with @seanlip after 2021-02-07.
+/AUTHORS @BenHenning
+/CHANGELOG @BenHenning
+/CONTRIBUTORS @BenHenning
+/LICENSE @BenHenning
+/NOTICE @BenHenning
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.constants.ts @BenHenning @seanlip
+/core/templates/pages/about-page/about-page.constants.ts @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.mainpage.html @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
