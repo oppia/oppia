@@ -1955,6 +1955,11 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.RestrictedImportChecker)
         self.checker_test_object.setup_method()
+        self.checker_test_object.checker.config.forbidden_imports = (
+            'core.storage:core.domain',
+            'core.domain:core.controllers',
+            'core.controllers:core.platform|core.storage'
+        )
 
     def test_forbid_domain_import_in_storage_module(self):
         node_err_import = astroid.extract_node(

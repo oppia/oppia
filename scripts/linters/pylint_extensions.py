@@ -1488,22 +1488,40 @@ class RestrictedImportChecker(checkers.BaseChecker):
         (
             'forbidden-imports',
             {
-                'default': ('int', 'str', 'float', 'bool', 'v'),
-                'type': 'csv', 'metavar': '<comma separated list>',
-                'help': 'List of allowed prefixes in a comment.'
+                'default': ('core.storage:core.domain',),
+                'type': 'csv',
+                'metavar': '<comma separated list>',
+                'help': 'List of disallowed imports.'
             }
-        )
+        ),
     )
 
-    # Mapping between modules and imports that are forbidden in these modules.
-    # The key part needs to be absolute path to the module for which we want to
-    # forbid the imports. Both import formats ('import xyz [as klm]' and
-    # 'from xyz import abc [as klm]') are checked.
-    module_to_forbidden_imports = {
-        'oppia.core.storage': ['core.domain'],
-        'oppia.core.domain': ['core.controllers'],
-        'oppia.core.controllers': ['core.platform', 'core.storage']
-    }
+    def iterate_forbidden_imports(self, node):
+        """Yields pairs of module name and forbidden imports.
+
+        Args:
+            node: astroid.node_classes.Import. Node for a import statement
+                in the AST.
+
+        Yields:
+            tuple(str, str). Yields pair of module name and forbidden import.
+        """
+        splited_module_to_forbidden_imports = [
+            forbidden_import.strip().split(':')
+            for forbidden_import in self.config.forbidden_imports
+        ]
+        module_to_forbidden_imports = list(
+            (
+                'oppia.%s' % forbidden_import[0].strip(),
+                forbidden_import[1].split('|')
+            ) for forbidden_import in splited_module_to_forbidden_imports
+        )
+
+        modnode = node.root()
+        for module_name, forbidden_imports in module_to_forbidden_imports:
+            for forbidden_import in forbidden_imports:
+                if module_name in modnode.name and not '_test' in modnode.name:
+                    yield module_name, forbidden_import
 
     def visit_import(self, node):
         """Visits every import statement in the file.
@@ -1512,24 +1530,18 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.Import. Node for a import statement
                 in the AST.
         """
-
-        modnode = node.root()
         names = [name for name, _ in node.names]
-
-        for module_name, forbidden_imports in (
-                self.module_to_forbidden_imports.items()
-        ):
-            for forbidden_import in forbidden_imports:
-                if module_name in modnode.name and not '_test' in modnode.name:
-                    if any(forbidden_import in name for name in names):
-                        self.add_message(
-                            'invalid-import',
-                            node=node,
-                            args=(
-                                forbidden_import.split('.')[-1],
-                                module_name.split('.')[-1]
-                            ),
-                        )
+        for module_name, forbidden_import in self.iterate_forbidden_imports(
+                node):
+            if any(forbidden_import in name for name in names):
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=(
+                        forbidden_import.split('.')[-1],
+                        module_name.split('.')[-1]
+                    ),
+                )
 
     def visit_importfrom(self, node):
         """Visits all import-from statements in a python file and checks that
@@ -1539,22 +1551,17 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-
-        modnode = node.root()
-        for module_name, forbidden_imports in (
-                self.module_to_forbidden_imports.items()
-        ):
-            for forbidden_import in forbidden_imports:
-                if module_name in modnode.name and not '_test' in modnode.name:
-                    if forbidden_import in node.modname:
-                        self.add_message(
-                            'invalid-import',
-                            node=node,
-                            args=(
-                                forbidden_import.split('.')[-1],
-                                module_name.split('.')[-1]
-                            ),
-                        )
+        for module_name, forbidden_import in self.iterate_forbidden_imports(
+                node):
+            if forbidden_import in node.modname:
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=(
+                        forbidden_import.split('.')[-1],
+                        module_name.split('.')[-1]
+                    ),
+                )
 
 
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
