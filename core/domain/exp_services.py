@@ -464,9 +464,13 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected written_translations to be a dict, '
                             'received %s' % change.new_value)
+                    cleaned_written_translations_dict = (
+                        state_domain.WrittenTranslations
+                        .convert_html_in_written_translations(
+                            change.new_value, html_cleaner.clean))
                     written_translations = (
                         state_domain.WrittenTranslations.from_dict(
-                            change.new_value))
+                            cleaned_written_translations_dict))
                     state.update_written_translations(written_translations)
             elif change.cmd == exp_domain.CMD_ADD_TRANSLATION:
                 exploration.states[change.state_name].add_translation(
@@ -948,9 +952,12 @@ def update_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
-    # Update summary of changed exploration.
-    regenerate_exploration_summary_with_new_contributor(
-        exploration_id, committer_id)
+
+    # Update summary of changed exploration in a deferred task.
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
+        committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
