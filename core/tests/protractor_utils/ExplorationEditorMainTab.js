@@ -609,26 +609,26 @@ var ExplorationEditorMainTab = function() {
     await action.click('Add Interaction button', addInteractionButton);
 
     var INTERACTION_ID_TO_TAB_NAME = {
-      Continue: 'Commonly Used',
-      EndExploration: 'Commonly Used',
-      ImageClickInput: 'Commonly Used',
-      ItemSelectionInput: 'Commonly Used',
-      MultipleChoiceInput: 'Commonly Used',
-      NumericInput: ['Commonly Used', 'Math'],
-      TextInput: 'Commonly Used',
-      FractionInput: 'Math',
-      GraphInput: 'Math',
-      LogicProof: 'Math',
-      SetInput: 'Math',
-      AlgebraicExpressionInput: 'Math',
-      MathEquationInput: 'Math',
-      NumericExpressionInput: 'Math',
-      NumberWithUnits: 'Math',
-      RatioExpressionInput: 'Math',
-      CodeRepl: 'Programming',
-      PencilCodeEditor: 'Programming',
-      MusicNotesInput: 'Music',
-      InteractiveMap: 'Geography'
+      Continue: 'commonly-used',
+      EndExploration: 'commonly-used',
+      ImageClickInput: 'commonly-used',
+      ItemSelectionInput: 'commonly-used',
+      MultipleChoiceInput: 'commonly-used',
+      NumericInput: 'commonly-used',
+      TextInput: 'commonly-used',
+      FractionInput: 'math',
+      GraphInput: 'math',
+      LogicProof: 'math',
+      SetInput: 'math',
+      AlgebraicExpressionInput: 'math',
+      MathEquationInput: 'math',
+      NumericExpressionInput: 'math',
+      NumberWithUnits: 'math',
+      RatioExpressionInput: 'math',
+      CodeRepl: 'programming',
+      PencilCodeEditor: 'programming',
+      MusicNotesInput: 'music',
+      InteractiveMap: 'geography'
     };
 
     expect(
