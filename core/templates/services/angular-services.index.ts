@@ -126,6 +126,7 @@ import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-back
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
 import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { StoryUpdateService } from 'domain/story/story-update.service.ts';
 import { StoryValidationService } from 'domain/story/story-validation.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
@@ -625,6 +626,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryEditorStateService', StoryEditorStateService],
   ['StoryObjectFactory', StoryObjectFactory],
+  ['StoryUpdateService', StoryUpdateService],
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
