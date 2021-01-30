@@ -62,7 +62,7 @@ var CollectionEditorPage = function() {
     await action.click('Add Exploration Button', addExplorationButton);
   };
 
-  // Search and add existing exploration to the node graph.
+  // Search and add an existing exploration (by title) to the node graph.
   this.searchForAndAddExistingExploration = async function(query) {
     await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
@@ -81,11 +81,7 @@ var CollectionEditorPage = function() {
       '.uib-typeahead-match', new RegExp(query)));
     await waitFor.presenceOf(
       matchingSearchResult, 'Unable to find search result: ' + query);
-    if (await matchingSearchResult.isDisplayed()) {
-      // The user has typed in a title, rather than an exploration ID. We need
-      // to select the correct exploration from the dropdown in this case.
-      await action.click('Matching search result', matchingSearchResult);
-    }
+    await action.click('Matching search result', matchingSearchResult);
 
     var isEnabled = await addExplorationButton.isEnabled();
     if (isEnabled) {
