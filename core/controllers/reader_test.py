@@ -1791,49 +1791,33 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
             self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         self.aggregated_stats.pop('num_starts')
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
                     'exp_version': self.exp_version})
 
-        self.assertEqual(len(observed_log_messages), 1)
+        self.assertEqual(len(captured_logs), 1)
         self.assertIn(
-            'num_starts not in aggregated stats dict.',
-            observed_log_messages[0])
+            'num_starts not in aggregated stats dict.', captured_logs[0])
 
     def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
             self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
                     'exp_version': self.exp_version})
 
-        self.assertEqual(len(observed_log_messages), 1)
+        self.assertEqual(len(captured_logs), 1)
         self.assertIn(
             'total_hit_count not in state stats mapping '
-            'of Home in aggregated stats dict.',
-            observed_log_messages[0])
+            'of Home in aggregated stats dict.', captured_logs[0])
 
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):

@@ -2,6 +2,9 @@
   <div class="navbar-tabs">
     <div class="navbar-text">
       <[$ctrl.getNavbarText()]>
+      <span class="protractor-autosave-indicator autosave-indicator" ng-if="$ctrl.autosaveIsInProgress">
+        &emsp;Auto Saving ...
+      </span>
     </div>
     <div class="navbar-icons">
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
@@ -151,6 +154,10 @@
 </svg>
 
 <style>
+  exploration-editor-page .autosave-indicator {
+    font-size: 75%;
+  }
+
   exploration-editor-page .exploration-editor-content {
     margin-top: 95px;
   }
