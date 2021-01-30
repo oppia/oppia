@@ -297,6 +297,11 @@ export class SiteAnalyticsService {
       'PlayerFinishExploration', 'engage', explorationId);
   }
 
+  registerCuratedLessonCompleted(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'CuratedLessonCompleted', 'engage', explorationId);
+  }
+
   registerClassroomLessonActiveUse(): void {
     this._sendEventToGoogleAnalytics(
       'ClassroomActiveUserStartAndSawCards', 'engage', '');
