@@ -49,7 +49,6 @@ describe ('Prevent page unload event service', function() {
   };
 
   it('should adding listener', () => {
-    // Testing adding listener
     expect(preventPageUnloadEventService.getListenerActive()).toBe(false);
 
     preventPageUnloadEventService.addListener();
@@ -77,11 +76,15 @@ describe ('Prevent page unload event service', function() {
   });
 
   it('should prevent multiple listeners', () => {
-    // TODO: Does not test for mul listeners... FIX!
+    spyOn(window, 'addEventListener');
+
+    expect(window.addEventListener).toHaveBeenCalledTimes(0);
     preventPageUnloadEventService.addListener();
+    expect(window.addEventListener).toHaveBeenCalledTimes(1);
     expect(preventPageUnloadEventService.getListenerActive()).toBe(true);
-    expect(preventPageUnloadEventService.addListener()).toBeUndefined();
-    expect(preventPageUnloadEventService.getListenerActive()).toBe(true);
+    preventPageUnloadEventService.addListener();
+
+    expect(window.addEventListener).toHaveBeenCalledTimes(1);
   });
 
   it('should remove listener on ngondestroy', () => {

@@ -34,21 +34,21 @@ export class PreventPageUnloadEventService {
       return;
     }
     this.windowRef.nativeWindow.addEventListener(
-      'beforeunload', this._preventReloadEventHandler);
+      'beforeunload', this._preventPageUnloadEventHandler);
     this.listenerActive = true;
   }
 
   removeListener(): void {
     this.windowRef.nativeWindow.removeEventListener(
-      'beforeunload', this._preventReloadEventHandler);
+      'beforeunload', this._preventPageUnloadEventHandler);
     this.listenerActive = false;
   }
 
-  private _preventReloadEventHandler(
+  private _preventPageUnloadEventHandler(
       e: { preventDefault: () => void; returnValue: string; }
   ): void {
     // HTML specification states that authors should use the
-    // below function.
+    // below function. This is used to trigger a confirmation before leaving.
     e.preventDefault();
     // The exact value in returnValue is not relevant, but it needs to be set
     // in order to trigger a confirmation before leaving.
