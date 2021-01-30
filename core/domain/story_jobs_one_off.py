@@ -32,6 +32,23 @@ import feconf
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
+class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates description length"""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(model_instance):
+        if len(model_instance.description) > 1000:
+            yield (model_instance.corresponding_topic_id, model_instance.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield ('Topic Id: %s' % key, 'Story Id: %s' % values)
+
+
 class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate story schema
     versions. This job will load all existing story from the data store
