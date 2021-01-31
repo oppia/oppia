@@ -284,7 +284,7 @@ class SignupHandler(base.BaseHandler):
         if feconf.CAN_SEND_EMAILS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
-        user_services.generate_initial_profile_picture(self.user_id)
+        user_services.schedule_generate_initial_profile_picture(self.user_id)
 
         if not has_ever_registered:
             # Set the default dashboard for new users.
@@ -353,9 +353,8 @@ class ExportAccountHandler(base.BaseHandler):
             temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
-                decoded_png = utils.convert_png_data_url_to_binary(
-                    image.b64_image_data)
-                zfile.writestr('images/' + image.image_export_path, decoded_png)
+                zfile.writestr(
+                    'images/' + image.image_export_path, image.byte_image_data)
 
         # Render file for download.
         self.render_downloadable_file(

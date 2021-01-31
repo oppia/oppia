@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import improvements_domain
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf

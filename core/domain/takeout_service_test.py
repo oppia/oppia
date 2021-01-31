@@ -19,11 +19,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
+import os
 
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import rights_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
@@ -311,6 +313,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         {'cmd2': 'another_command'}
     ]
 
+    def setUp(self):
+        super(TakeoutServiceFullUserUnitTests, self).setUp()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'correct_profile_picture.png'),
+            'rb',
+            encoding=None
+        ) as f:
+            self.correct_picture_bytes = f.read()
+
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
         1) Simulates the creation of a user, user_1, and their stats model.
@@ -328,8 +340,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         13) Simulates a general suggestion.
         14) Creates new exploration rights.
         15) Populates user settings.
-        16) Creates two reply-to ids for feedback.
-        17) Creates a task closed by the user.
+        16) Populates user settings.
+        17) Creates two reply-to ids for feedback.
+        18) Creates a task closed by the user.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -560,6 +573,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
+        fs_services.save_image(
+            constants.PROFILE_PICTURE_FILEPATH,
+            feconf.ENTITY_TYPE_USER,
+            self.GENERIC_USERNAME,
+            self.correct_picture_bytes,
+        )
+
         # Setup for GeneralFeedbackReplyToId.
         user_two_fake_hash_lambda_one = (
             lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_1)
@@ -721,6 +741,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
+            username=self.GENERIC_USERNAME,
             role=self.USER_1_ROLE
         ).put()
         user_models.UserSettingsModel(
@@ -770,7 +791,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_settings_data = {
             'email': 'user1@example.com',
             'role': feconf.ROLE_ID_ADMIN,
-            'username': None,
+            'username': self.GENERIC_USERNAME,
             'normalized_username': None,
             'last_agreed_to_terms_msec': None,
             'last_started_state_editor_tutorial_msec': None,
@@ -778,7 +799,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'last_logged_in_msec': None,
             'last_edited_an_exploration_msec': None,
             'last_created_an_exploration_msec': None,
-            'profile_picture_filename': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': None,
@@ -1468,13 +1488,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(
-                self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
+                self.correct_picture_bytes, 'profile_picture.png')
         ]
         self.assertEqual(len(expected_images), len(observed_images))
         for i, _ in enumerate(expected_images):
             self.assertEqual(
-                expected_images[i].b64_image_data,
-                observed_images[i].b64_image_data
+                expected_images[i].byte_image_data,
+                observed_images[i].byte_image_data
             )
             self.assertEqual(
                 expected_images[i].image_export_path,
@@ -1490,7 +1510,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         profile_user_settings_data = {
             'email': self.USER_1_EMAIL,
             'role': self.PROFILE_1_ROLE,
-            'username': None,
+            'username': self.GENERIC_USERNAME,
             'normalized_username': None,
             'last_agreed_to_terms_msec': self.GENERIC_DATE,
             'last_started_state_editor_tutorial_msec': None,

@@ -31,6 +31,7 @@ from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
+from core.domain import user_services
 from core.domain import wipeout_service
 import python_utils
 
@@ -181,15 +182,17 @@ class DeferredTasksHandler(base.BaseHandler):
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
         taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS: (
             exp_services.delete_explorations_from_subscribed_users),
+        taskqueue_services.FUNCTION_ID_GENERATE_PROFILE_PICTURE: (
+            user_services.generate_initial_profile_picture),
         taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: (
             exp_services.regenerate_exploration_summary_with_new_contributor),
-        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
-            stats_services.update_stats),
-        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
-            question_services.untag_deleted_misconceptions),
         taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
             wipeout_service
-            .remove_user_from_activities_with_associated_rights_models)
+            .remove_user_from_activities_with_associated_rights_models),
+        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
+            question_services.untag_deleted_misconceptions),
+        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
+            stats_services.update_stats),
     }
 
     def post(self):

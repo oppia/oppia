@@ -164,8 +164,10 @@ class UserSettingsModel(base_models.BaseModel):
             'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
             'display_alias': base_models.EXPORT_POLICY.EXPORTED,
             'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+            # The profile_picture_data_url field is deprecated and will
+            # be removed.
             'profile_picture_data_url':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
             'preferred_language_codes':
                 base_models.EXPORT_POLICY.EXPORTED,

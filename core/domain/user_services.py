@@ -30,6 +30,7 @@ from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import fs_services
 from core.domain import role_services
+from core.domain import taskqueue_services
 from core.domain import user_domain
 from core.platform import models
 import feconf
@@ -527,9 +528,21 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     return result
 
 
+def schedule_generate_initial_profile_picture(user_id):
+    """Schedules the generation of a profile picture for new user.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_GENERATE_PROFILE_PICTURE,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        user_id,
+    )
+
+
 def generate_initial_profile_picture(user_id):
-    """Generates a profile picture for a new user and
-    updates the user's settings in the datastore.
+    """Generates a profile picture for a new user.
 
     Args:
         user_id: str. The unique ID of the user.
@@ -538,6 +551,8 @@ def generate_initial_profile_picture(user_id):
     user_gravatar = fetch_gravatar(user_email)
     if user_gravatar:
         update_profile_picture(user_id, user_gravatar)
+    else:
+        raise IOError('The profile picture could not be fetched.')
 
 
 def get_gravatar_url(email):
@@ -1453,6 +1468,28 @@ def update_profile_picture(user_id, profile_picture_binary):
         profile_picture_binary,
         override=True
     )
+
+
+def get_profile_picture(user_id):
+    """Gets the profile picture of the user with given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        str|None. The bytes of the image or None when the image does not exist.
+    """
+    if fs_services.does_image_exist(
+            constants.PROFILE_PICTURE_FILEPATH,
+            feconf.ENTITY_TYPE_USER,
+            get_username(user_id)
+    ):
+        return fs_services.get_image(
+            constants.PROFILE_PICTURE_FILEPATH,
+            feconf.ENTITY_TYPE_USER,
+            get_username(user_id)
+        )
+    return None
 
 
 def update_user_bio(user_id, user_bio):
