@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ExplorationObjectFactory } from
+import { Exploration, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { VoiceoverObjectFactory } from
@@ -34,7 +34,8 @@ import { SubtitledUnicode } from
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
-  let sof: StateObjectFactory, exploration, vof: VoiceoverObjectFactory;
+  let sof: StateObjectFactory, exploration: Exploration,
+    vof: VoiceoverObjectFactory;
   let ssof: StatesObjectFactory;
   let iof: InteractionObjectFactory;
   let ls: LoggerService;
@@ -379,4 +380,20 @@ describe('Exploration object factory', () => {
     expect(exploration.getAuthorRecommendedExpIds('second state'))
       .toEqual([]);
   });
+
+  it('should correctly get displayable written translation language codes',
+    () => {
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual([]);
+
+      const firstState = exploration.getState('first state');
+
+      firstState.interaction.id = null;
+      firstState.writtenTranslations.addWrittenTranslation(
+        'content', 'fr', 'html', '<p>translation</p>');
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual(['fr']);
+    });
 });

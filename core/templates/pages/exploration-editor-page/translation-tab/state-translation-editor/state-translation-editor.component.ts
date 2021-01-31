@@ -50,7 +50,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
         var availableAudioLanguages = (
-          recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
+          recordedVoiceovers.getLanguageCodes(contentId));
         if (availableAudioLanguages.indexOf(languageCode) !== -1) {
           var voiceover = recordedVoiceovers.getVoiceover(
             contentId, languageCode);

@@ -95,7 +95,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(
         returnDict.exploration, returnDict.version,
-        returnDict.preferred_audio_language_code, returnDict.auto_tts_enabled,
+        returnDict.preferred_audio_language_code,
+        returnDict.auto_tts_enabled,
+        returnDict.preferred_language_codes,
         arePretestsAvailable ? function() {} : callback);
     };
 
@@ -143,7 +145,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         var featuresData = combinedData[1];
         ExplorationFeaturesService.init(explorationData, featuresData);
         ExplorationEngineService.init(
-          explorationData, null, null, null, callback);
+          explorationData, null, null, null, null, callback);
         PlayerCorrectnessFeedbackEnabledService.init(
           explorationData.correctness_feedback_enabled);
         NumberAttemptsService.reset();

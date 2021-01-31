@@ -355,7 +355,9 @@ class BaseModelValidator(python_utils.OBJECT):
                         external_model_fetcher_details.model_class,
                         external_model_fetcher_details.model_ids)
         except utils.ValidationError as err:
-            cls._add_error(ERROR_CATEGORY_INVALID_USER_SETTING_IDS, err)
+            cls._add_error(
+                ERROR_CATEGORY_INVALID_USER_SETTING_IDS,
+                'Entity id %s: %s' % (item.id, python_utils.UNICODE(err)))
         else:
             fetched_model_instances_for_all_ids = (
                 datastore_services.fetch_multiple_entities_by_ids_and_models(

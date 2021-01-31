@@ -505,8 +505,8 @@ angular.module('oppia').directive('stateResponses', [
             if (hasFeedback) {
               summary += (
                 shortenRule ?
-                  $filter('truncate')(outcome.feedback.getHtml(), 30) :
-                  $filter('convertToPlainText')(outcome.feedback.getHtml()));
+                  $filter('truncate')(outcome.feedback.html, 30) :
+                  $filter('convertToPlainText')(outcome.feedback.html));
             }
             return summary;
           };
@@ -539,7 +539,7 @@ angular.module('oppia').directive('stateResponses', [
               summary +=
                 $filter(
                   'convertToPlainText'
-                )(defaultOutcome.feedback.getHtml());
+                )(defaultOutcome.feedback.html);
             }
             return summary;
           };

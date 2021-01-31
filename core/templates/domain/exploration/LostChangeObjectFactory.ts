@@ -104,8 +104,8 @@ export class LostChange {
       (<LostChangeValues> this.oldValue).outcome &&
       (<LostChangeValues> this.oldValue).outcome.feedback) {
       return (
-        (<LostChangeValues> this.newValue).outcome.feedback.getHtml() ===
-        (<LostChangeValues> this.oldValue).outcome.feedback.getHtml());
+        (<LostChangeValues> this.newValue).outcome.feedback.html ===
+        (<LostChangeValues> this.oldValue).outcome.feedback.html);
     }
     return false;
   }
@@ -129,8 +129,8 @@ export class LostChange {
     if ((<LostChangeValues> this.newValue).feedback &&
     (<LostChangeValues> this.oldValue).feedback) {
       return (
-        (<LostChangeValues> this.newValue).feedback.getHtml() ===
-        (<LostChangeValues> this.oldValue).feedback.getHtml());
+        (<LostChangeValues> this.newValue).feedback.html ===
+        (<LostChangeValues> this.oldValue).feedback.html);
     }
     return false;
   }

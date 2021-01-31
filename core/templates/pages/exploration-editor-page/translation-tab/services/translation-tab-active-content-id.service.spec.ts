@@ -35,7 +35,7 @@ describe('Translation tab active content id service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StateRecordedVoiceoversService', {
       displayed: {
-        getAllContentId: function() {
+        getAllContentIds: function() {
           return ['content', 'feedback_1'];
         }
       }

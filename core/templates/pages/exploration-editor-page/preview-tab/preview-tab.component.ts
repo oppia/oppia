@@ -147,7 +147,7 @@ angular.module('oppia').component('previewTab', {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
             explorationId).then(function(returnDict) {
             ExplorationEngineService.init(
-              returnDict, null, null, null,
+              returnDict, null, null, null, null,
               function() {
                 ctrl.loadPreviewState(initStateNameForPreview, []);
               });

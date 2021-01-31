@@ -100,7 +100,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           'RatioExpressionInput',
           $attrs
         );
-        ctrl.placeholder = placeholder.getUnicode();
+        ctrl.placeholder = placeholder.unicode;
         ctrl.expectedNumberOfTerms = numberOfTerms;
         ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA = {
           type: 'unicode',
