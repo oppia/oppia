@@ -62,7 +62,7 @@ var CollectionEditorPage = function() {
     await action.click('Add Exploration Button', addExplorationButton);
   };
 
-  // Search and add existing exploration to the node graph.
+  // Search and add an existing exploration (by title) to the node graph.
   this.searchForAndAddExistingExploration = async function(query) {
     await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
@@ -72,21 +72,17 @@ var CollectionEditorPage = function() {
     await waitFor.elementToBeClickable(
       addExplorationButton, 'Unable to find exploration: ' + query);
 
-    var matched = false;
     var dropdownResultElement = element(
       by.cssContainingText('.dropdown-menu', new RegExp(query)));
-    if (await dropdownResultElement.isPresent()) {
-      await action.click('DropDown Result Element', dropdownResultElement);
-      matched = true;
-    }
-    if (!matched) {
-      // Press Tab to fill in the default result should one appear when
-      // none of the answer matches the given query.
-      await action.sendKeys(
-        'Add Exploration Input', addExplorationInput, protractor.Key.TAB);
-      // If query gets zero result, hitting Tab would not enable the
-      // addExplorationButton.
-    }
+    await waitFor.presenceOf(
+      dropdownResultElement, 'Unable to find exploration: ' + query);
+
+    var matchingSearchResult = element(by.cssContainingText(
+      '.uib-typeahead-match', new RegExp(query)));
+    await waitFor.presenceOf(
+      matchingSearchResult, 'Unable to find search result: ' + query);
+    await action.click('Matching search result', matchingSearchResult);
+
     var isEnabled = await addExplorationButton.isEnabled();
     if (isEnabled) {
       await action.click('Add Exploration Button', addExplorationButton);

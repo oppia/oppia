@@ -195,7 +195,14 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                         }],
                         'must': [],
                     }
-                }
+                },
+                'sort': [{
+                    'rank': {
+                        'order': 'desc',
+                        'missing': '_last',
+                        'unmapped_type': 'float'
+                    }
+                }]
             })
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params, {
@@ -239,7 +246,14 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                             }
                         }]
                     }
-                }
+                },
+                'sort': [{
+                    'rank': {
+                        'order': 'desc',
+                        'missing': '_last',
+                        'unmapped_type': 'float'
+                    }
+                }]
             })
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params, {

@@ -310,10 +310,10 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_search_services(self):
         """Tests import search services function."""
-        from core.platform.search import gae_search_services
+        from core.platform.search import elastic_search_services
         self.assertEqual(
             self.registry_instance.import_search_services(),
-            gae_search_services)
+            elastic_search_services)
 
     def test_import_models_not_implemented_has_not_implemented_error(self):
         """Tests NotImplementedError of Platform."""

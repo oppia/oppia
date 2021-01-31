@@ -935,7 +935,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
                 ]),
@@ -1054,7 +1054,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(
@@ -1402,7 +1402,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
                 ]),
@@ -1576,7 +1576,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(
@@ -1701,7 +1701,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(

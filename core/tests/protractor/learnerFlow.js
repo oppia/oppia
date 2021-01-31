@@ -109,7 +109,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and plays the correct exploration',
+  it('should visit the exploration player and play the correct exploration',
     async function() {
       await users.createUser(
         'expCreator@learnerDashboard.com', 'expCreator');
@@ -134,7 +134,7 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playExploration('Exploration Player Test');
     });
 
-  it('should visit the collection player and plays the correct collection',
+  it('should visit the collection player and play the correct collection',
     async function() {
       await users.createUser(
         'expOfCollectionCreator@learnerDashboard.com',

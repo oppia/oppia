@@ -87,17 +87,17 @@ describe('Collections', function() {
     fourthExplorationId = await general.getExplorationIdFromEditor();
     // Create searchable explorations.
     await workflow.createAndPublishExploration(
-      'The Lazy Magician',
+      'The Lazy Magician for CollectionSuiteTest',
       'Algorithms',
       'discover the binary search algorithm'
     );
     await workflow.createAndPublishExploration(
-      'Root Linear Coefficient Theorem',
+      'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
       'discover the Root Linear Coefficient Theorem'
     );
     await workflow.createAndPublishExploration(
-      'Test Exploration',
+      'Test Exploration for CollectionSuiteTest',
       'Languages',
       'discover the Protractor Testing'
     );
@@ -135,7 +135,7 @@ describe('Collections', function() {
     // Search and add existing explorations.
     await collectionEditorPage.searchForAndAddExistingExploration('Lazy');
     await collectionEditorPage.searchForAndAddExistingExploration('Linear');
-    await collectionEditorPage.searchForAndAddExistingExploration('Testing');
+    await collectionEditorPage.searchForAndAddExistingExploration('Test');
     // Shifting nodes in the node graph.
     await collectionEditorPage.shiftNodeLeft(1);
     await collectionEditorPage.shiftNodeRight(1);
