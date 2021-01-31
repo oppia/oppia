@@ -52,7 +52,7 @@ class MockI18nLanguageCodeService {
   }
 
   get onI18nLanguageCodeChange() {
-    return this.codeChangeEventEmiiter;
+    return this.codeChangeEventEmitter;
   }
 }
 
