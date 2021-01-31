@@ -225,6 +225,7 @@ angular.module('oppia').directive('stateResponses', [
                 return areAllChoicesCovered;
               }
             }
+            return false;
           };
 
           $scope.onChangeSolicitAnswerDetails = function() {

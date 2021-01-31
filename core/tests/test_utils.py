@@ -33,6 +33,7 @@ import unittest
 
 from constants import constants
 from core.controllers import base
+from core.domain import auth_domain
 from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -78,10 +79,10 @@ from google.appengine.ext import testbed
 import webtest
 
 (
-    exp_models, feedback_models, question_models, skill_models, story_models,
-    suggestion_models, topic_models,) = (
+    auth_models, exp_models, feedback_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models,) = (
         models.Registry.import_models([
-            models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.auth, models.NAMES.exploration, models.NAMES.feedback,
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
@@ -89,6 +90,7 @@ current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
+platform_auth_services = models.Registry.import_auth_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 # Prefix to append to all lines printed by tests to the console.
@@ -514,6 +516,229 @@ class ElasticSearchStub(python_utils.OBJECT):
             'max_score': max(
                 [0.0] + [d['_score'] for d in formatted_result_docs]),
         }
+
+
+class AuthServicesStub(python_utils.OBJECT):
+    """Test-only implementation of the public API in core.platform.auth."""
+
+    def __init__(self):
+        """Initializes a new instance that emulates an empty auth server."""
+        self._user_id_by_auth_id = {}
+        self._external_user_id_associations = set()
+
+    @classmethod
+    def install_stub(cls, test):
+        """Installs a new instance of the stub onto the given test instance.
+
+        Args:
+            test: AppEngineTestBase. The test instance to install the stub on.
+
+        Returns:
+            callable. A function that will uninstall the stub when called.
+        """
+        with contextlib2.ExitStack() as stack:
+            stub = cls()
+
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_auth_claims_from_request',
+                stub.get_auth_claims_from_request))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'mark_user_for_deletion',
+                stub.mark_user_for_deletion))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'delete_external_auth_associations',
+                stub.delete_external_auth_associations))
+            stack.enter_context(test.swap(
+                platform_auth_services,
+                'verify_external_auth_associations_are_deleted',
+                stub.verify_external_auth_associations_are_deleted))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_auth_id_from_user_id',
+                stub.get_auth_id_from_user_id))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_user_id_from_auth_id',
+                stub.get_user_id_from_auth_id))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_multi_user_ids_from_auth_ids',
+                stub.get_multi_user_ids_from_auth_ids))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_multi_auth_ids_from_user_ids',
+                stub.get_multi_auth_ids_from_user_ids))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'associate_auth_id_with_user_id',
+                stub.associate_auth_id_with_user_id))
+            stack.enter_context(test.swap(
+                platform_auth_services,
+                'associate_multi_auth_ids_with_user_ids',
+                stub.associate_multi_auth_ids_with_user_ids))
+
+            # Standard usage of ExitStack: enter a bunch of context managers
+            # from the safety of an ExitStack's context. Once they've all been
+            # opened, pop_all() of them off of the original context so they can
+            # *stay* open. Calling the function returned will exit all of them
+            # in reverse order.
+            # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
+            return stack.pop_all().close
+
+    @classmethod
+    def get_auth_claims_from_request(cls, unused_request):
+        """Authenticates the request and returns claims about its authorizer.
+
+        This stub obtains authorization information from os.environ. To make the
+        operation more authentic, this method also creates a new "external"
+        association for the user to simulate a genuine "provided" value.
+
+        Args:
+            unused_request: webapp2.Request. The HTTP request to authenticate.
+                Unused because auth-details are extracted from environment
+                variables.
+
+        Returns:
+            AuthClaims|None. Claims about the currently signed in user. If no
+            user is signed in, then returns None.
+        """
+        auth_id = os.environ.get('USER_ID', '')
+        email = os.environ.get('USER_EMAIL', '')
+        role_is_super_admin = os.environ.get('USER_IS_ADMIN', '0') == '1'
+        if auth_id:
+            return auth_domain.AuthClaims(auth_id, email, role_is_super_admin)
+        return None
+
+    def mark_user_for_deletion(self, user_id):
+        """Marks the user, and all of their auth associations, as deleted.
+
+        Since the stub does not use models, this operation actually deletes the
+        user's association. The "external" associations, however, are not
+        deleted yet.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
+        self._user_id_by_auth_id = {
+            a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
+        }
+
+    def delete_external_auth_associations(self, user_id):
+        """Deletes all associations that refer to the user outside of Oppia.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
+        self._external_user_id_associations.discard(user_id)
+
+    def verify_external_auth_associations_are_deleted(self, user_id):
+        """Returns true if and only if we have successfully verified that all
+        external associations have been deleted.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                checked.
+
+        Returns:
+            bool. True if and only if we have successfully verified that all
+            external associations have been deleted.
+        """
+        return user_id not in self._external_user_id_associations
+
+    def get_auth_id_from_user_id(self, user_id):
+        """Returns the auth ID associated with the given user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            str|None. The auth ID associated with the given user ID, or None if
+            no association exists.
+        """
+        return python_utils.NEXT(
+            (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
+            None)
+
+    def get_user_id_from_auth_id(self, auth_id):
+        """Returns the user ID associated with the given auth ID.
+
+        Args:
+            auth_id: str. The auth ID.
+
+        Returns:
+            str|None. The user ID associated with the given auth ID, or None if
+            no association exists.
+        """
+        return self._user_id_by_auth_id.get(auth_id, None)
+
+    def get_multi_user_ids_from_auth_ids(self, auth_ids):
+        """Returns the user IDs associated with the given auth IDs.
+
+        Args:
+            auth_ids: list(str). The auth IDs.
+
+        Returns:
+            list(str|None). The user IDs associated with each of the given auth
+            IDs, or None for associations which don't exist.
+        """
+        return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
+
+    def get_multi_auth_ids_from_user_ids(self, user_ids):
+        """Returns the auth IDs associated with the given user IDs.
+
+        Args:
+            user_ids: list(str). The user IDs.
+
+        Returns:
+            list(str|None). The auth IDs associated with each of the given user
+            IDs, or None for associations which don't exist.
+        """
+        auth_id_by_user_id = {u: a for a, u in self._user_id_by_auth_id.items()}
+        return [auth_id_by_user_id.get(u, None) for u in user_ids]
+
+    def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
+        """Commits the association between auth ID and user ID.
+
+        This method also adds the user to the "external" set of associations.
+
+        Args:
+            auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association
+                to commit.
+
+        Raises:
+            Exception. The IDs are already associated with a value.
+        """
+        auth_id, user_id = auth_id_user_id_pair
+        if auth_id in self._user_id_by_auth_id:
+            raise Exception(
+                'auth_id=%r is already associated with user_id=%r' % (
+                    auth_id, self._user_id_by_auth_id[auth_id]))
+        auth_models.UserAuthDetailsModel(
+            id=user_id, firebase_auth_id=auth_id).put()
+        self._external_user_id_associations.add(user_id)
+        self._user_id_by_auth_id[auth_id] = user_id
+
+    def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
+        """Commits the associations between auth IDs and user IDs.
+
+        This method also adds the users to the "external" set of associations.
+
+        Args:
+            auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+                associations to commit.
+
+        Raises:
+            Exception. One or more auth associations already exist.
+        """
+        collisions = ', '.join(
+            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
+            for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
+        if collisions:
+            raise Exception('already associated: %s' % collisions)
+        datastore_services.put_multi(
+            [auth_models.UserAuthDetailsModel(
+                id=user_id, firebase_auth_id=auth_id)
+             for auth_id, user_id in auth_id_user_id_pairs])
+        self._external_user_id_associations.add(
+            u for _, u in auth_id_user_id_pairs)
+        self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -951,29 +1176,29 @@ class TestBase(unittest.TestCase):
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
 
-    def assert_matches_regexps(self, items, regexps):
-        """Asserts that each item is a full match of the corresponding regexp.
-
-        Every regexp in the list must be a full match, substring matches are
-        still treated as errors.
+    def assert_matches_regexps(self, items, regexps, full_match=False):
+        """Asserts that each item matches the corresponding regexp.
 
         If there are any missing or extra items that do not correspond to a
-        regexp element, then that is also an error.
+        regexp element, then the assertion fails.
 
         Args:
             items: list(str). The string elements being matched.
             regexps: list(str|RegexObject). The patterns that each item is
                 expected to match.
+            full_match: bool. Whether to require items to match exactly with the
+                corresponding pattern.
 
         Raises:
             AssertionError. At least one item does not match its corresponding
                 pattern, or the number of items does not match the number of
                 regexp patterns.
         """
+        get_match = re.match if full_match else re.search
         differences = [
             '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
             for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
-            if re.match(regexp, item) is None
+            if get_match(regexp, item, re.DOTALL) is None
         ]
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items):]
@@ -1462,6 +1687,9 @@ tags: []
                 elastic_search_services.ES, 'search',
                 self._es_stub.mock_search))
 
+            if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
+                stack.callback(AuthServicesStub.install_stub(self))
+
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
@@ -1534,7 +1762,7 @@ tags: []
         """
         self.testbed.setup_env(
             overwrite=True,
-            user_email=email, user_id=self.get_gae_id_from_email(email),
+            user_email=email, user_id=self.get_auth_id_from_email(email),
             user_is_admin=('1' if is_super_admin else '0'))
 
     def logout(self):
@@ -1569,11 +1797,11 @@ tags: []
         """Log in with the given email under the context of a 'with' statement.
 
         Args:
-            email: str. An email associated to a user account.
+            email: str. An email associated with a user account.
             is_super_admin: bool. Whether the user is a super admin.
 
         Yields:
-            str. The id of the user associated to the given email, who is now
+            str. The id of the user associated with the given email, who is now
             'logged in'.
         """
         self.login(email, is_super_admin=is_super_admin)
@@ -1587,7 +1815,7 @@ tags: []
         """Log in as a global admin under the context of a 'with' statement.
 
         Yields:
-            str. The id of the user associated to the given email, who is now
+            str. The id of the user associated with the given email, who is now
             'logged in'.
         """
         email = self.SUPER_ADMIN_EMAIL
@@ -1601,7 +1829,7 @@ tags: []
             email: str. Email of the given user.
             username: str. Username of the given user.
         """
-        user_services.create_new_user(self.get_gae_id_from_email(email), email)
+        user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
         with self.login_context(email), requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
@@ -1699,31 +1927,33 @@ tags: []
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            str or None. ID of the user possessing the given email, or None if
+            str|None. ID of the user possessing the given email, or None if
             the user does not exist.
         """
-        user_settings = user_services.get_user_settings_by_gae_id(
-            self.get_gae_id_from_email(email))
+        user_settings = user_services.get_user_settings_by_auth_id(
+            self.get_auth_id_from_email(email))
         return user_settings and user_settings.user_id
 
-    def get_gae_id_from_email(self, email):
-        """Returns a mock GAE user ID corresponding to the given email.
+    @classmethod
+    def get_auth_id_from_email(cls, email):
+        """Returns a mock auth ID corresponding to the given email.
 
         This method can use any algorithm to produce results as long as, during
         the runtime of each test case/method, it is:
         1.  Pure (same input always returns the same output).
         2.  One-to-one (no two distinct inputs return the same output).
-        3.  An integer byte-string (to match the behavior of actual GAE IDs).
+        3.  An integer byte-string (integers are always valid in auth IDs).
 
         Args:
             email: str. The email address of the user.
 
         Returns:
-            bytes. The mock GAE ID of a user possessing the given email.
+            bytes. The mock auth ID of a user possessing the given email.
         """
         # Although the hash function doesn't guarantee a one-to-one mapping, in
-        # practice it is sufficient for our tests.
-        return python_utils.convert_to_bytes(hash(email))
+        # practice it is sufficient for our tests. We make it a positive integer
+        # because those are always valid auth IDs.
+        return python_utils.convert_to_bytes(abs(hash(email)))
 
     def _get_response(
             self, url, expected_content_type, params=None,

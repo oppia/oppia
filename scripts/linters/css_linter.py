@@ -67,10 +67,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             # "x"(\u2716) and a message-id in the end. We are capturing these
             # and then replacing them with empty string('').
             if re.search(r'^\d+:\d+', line.lstrip()):
-                # Replacing message-id with an empty string('').
-                line = re.sub(r'(\w+-*)+$', '', line)
-                unicode_x = re.search(r'\u2716', line).group(0)
-                error_message = line.replace(unicode_x, '', 1)
+                error_message = line.replace(u'\u2716 ', '')
             else:
                 error_message = line
             trimmed_error_messages.append(error_message)

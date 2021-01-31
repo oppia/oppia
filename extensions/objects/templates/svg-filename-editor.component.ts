@@ -499,10 +499,9 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.continueDiagramEditing = function() {
         if (
           ctrl.data.savedSvgFileName &&
-          ctrl.imageSaveDestination ===
-          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-          ImageLocalStorageService.deleteImage(
-            ctrl.data.savedSvgFileName);
+          ctrl.imageSaveDestination === IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+        ) {
+          ImageLocalStorageService.deleteImage(ctrl.data.savedSvgFileName);
         }
         ctrl.diagramStatus = STATUS_EDITING;
         ctrl.data = {};
@@ -1311,27 +1310,16 @@ angular.module('oppia').component('svgFilenameEditor', {
           fill: ctrl.onFillChange,
           bg: ctrl.onBgChange
         };
-        var picker = new Picker(parent);
-        parent.style.background = ctrl.fabricjsOptions[value];
-        if (value === 'stroke') {
-          ctrl.strokePicker = picker;
-        }
-        if (value === 'fill') {
-          ctrl.fillPicker = picker;
-        }
-        if (value === 'bg') {
-          ctrl.bgPicker = picker;
-        }
-        picker.onOpen = function() {
+        let onOpen = function() {
           // This DOM manipulation is necessary because the color picker is not
           // configurable in the third-party module.
-          var alphaSliders = document.querySelectorAll(
+          let alphaSliders = document.querySelectorAll(
             '.picker_alpha .picker_selector');
           alphaSliders.forEach(function(element) {
             element.setAttribute('title', 'Transparency Slider');
           });
         };
-        picker.onChange = function(color) {
+        let onChange = function(color) {
           parent.style.background = color.rgbaString;
           var topAlphaSquare = document.getElementById(
             'top-' + value + '-alpha');
@@ -1343,10 +1331,22 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.fabricjsOptions[value] = color.rgbaString;
           onChangeFunc[value]();
         };
-        picker.onOpen();
-        picker.setOptions({
-          color: ctrl.fabricjsOptions[value]
+        var picker = new Picker({
+          parent: parent,
+          color: ctrl.fabricjsOptions[value],
+          onOpen: onOpen,
+          onChange: onChange
         });
+        parent.style.background = ctrl.fabricjsOptions[value];
+        if (value === 'stroke') {
+          ctrl.strokePicker = picker;
+        }
+        if (value === 'fill') {
+          ctrl.fillPicker = picker;
+        }
+        if (value === 'bg') {
+          ctrl.bgPicker = picker;
+        }
       };
 
       ctrl.initializeMouseEvents = function() {

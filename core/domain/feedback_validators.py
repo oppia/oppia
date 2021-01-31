@@ -25,6 +25,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (
     base_models, exp_models, feedback_models, suggestion_models, user_models
@@ -56,7 +57,7 @@ class GeneralFeedbackThreadModelValidator(
         ]
         if (
                 item.original_author_id and
-                user_services.is_user_id_valid(item.original_author_id)
+                utils.is_user_id_valid(item.original_author_id)
         ):
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
@@ -77,7 +78,7 @@ class GeneralFeedbackThreadModelValidator(
                         item.entity_type], [item.entity_id]))
         if (
                 item.last_nonempty_message_author_id and
-                user_services.is_user_id_valid(
+                utils.is_user_id_valid(
                     item.last_nonempty_message_author_id)
         ):
             field_name_to_external_model_references.append(
@@ -191,7 +192,7 @@ class GeneralFeedbackMessageModelValidator(
         ]
         if (
                 item.author_id and
-                user_services.is_user_id_valid(item.author_id)
+                utils.is_user_id_valid(item.author_id)
         ):
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(

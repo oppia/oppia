@@ -149,6 +149,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         PlayerCorrectnessFeedbackEnabledService.init(
           explorationData.correctness_feedback_enabled);
         NumberAttemptsService.reset();
+        $rootScope.$applyAsync();
       });
     };
 
