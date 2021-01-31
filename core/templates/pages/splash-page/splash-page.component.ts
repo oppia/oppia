@@ -48,6 +48,7 @@ export class SplashPageComponent implements OnInit {
   testimonialCount: number;
   testimonials = [];
   userIsLoggedIn: boolean = null;
+
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
@@ -61,19 +62,19 @@ export class SplashPageComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickBrowseLessonsButton():void {
+  onClickBrowseLessonsButton(): void {
     this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
     this.windowRef.nativeWindow.location.href = this.classroomUrl;
     return;
   }
 
-  onClickStartContributingButton():void {
+  onClickStartContributingButton(): void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
     this.windowRef.nativeWindow.location.href = 'https://www.oppiafoundation.org/volunteer';
     return;
   }
 
-  onClickStartTeachingButton():void {
+  onClickStartTeachingButton(): void {
     this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
     this.windowRef.nativeWindow.location.href = ('/teach');
     return;

@@ -46,7 +46,7 @@ class MockTranslateService {
   }
 }
 class MockI18nLanguageCodeService {
-  codeChangeEventEmiiter = new EventEmitter<string>();
+  codeChangeEventEmitter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
     return 'en';
   }
@@ -76,7 +76,7 @@ describe('Splash Page', () => {
           }
         },
         { provide: TranslateService, useClass: MockTranslateService },
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
         UrlInterpolationService,
         {
           provide: WindowRef,
@@ -133,8 +133,8 @@ describe('Splash Page', () => {
 
   it('should record analytics when Start Teaching is clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickStartTeachingButtonEvent')
-      .and.callThrough();
+      siteAnalyticsServiceStub, 'registerClickStartTeachingButtonEvent'
+    ).and.callThrough();
     component.onClickStartTeachingButton();
     expect(siteAnalyticsServiceStub.registerClickStartTeachingButtonEvent)
       .toHaveBeenCalled();
