@@ -23,11 +23,21 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { Change } from 'domain/editor/undo_redo/change.model';
+import { Change, BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+import cloneDeep from 'lodash/cloneDeep';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service.ts';
+import { Story } from 'domain/story/StoryObjectFactory.ts';
+import { StoryContents } from 'domain/story/StoryContentsObjectFactory.ts';
 
+interface ChangeDict {
+  new_value: string,
+  old_value: string,
+  property_name: string,
+  cmd: string,
+  subtopic_id: string,
+}
 
 @Injectable({
   providedIn: 'root'
@@ -37,12 +47,12 @@ export class StoryUpdateService {
     private _undoRedoService: UndoRedoService,
     private _alertsService: AlertsService,
     private _storyEditorStateService: StoryEditorStateService
-  ){}
+  ) {}
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // story.
-  _applyChange(story, command, params, apply, reverse) {
-    var changeDict = angular.copy(params);
+  _applyChange(story: Story, command: string, params: any, apply: any, reverse: any ) {
+    var changeDict = cloneDeep(params);
     changeDict.cmd = command;
     var changeObj = new Change(changeDict, apply, reverse);
     try {
@@ -53,14 +63,14 @@ export class StoryUpdateService {
     }
   }
 
-  _getParameterFromChangeDict(changeDict, paramName) {
+  _getParameterFromChangeDict(changeDict: ChangeDict, paramName: string) {
     return changeDict[paramName];
   }
   
-  _getNodeIdFromChangeDict(changeDict) {
+  _getNodeIdFromChangeDict(changeDict: ChangeDict) {
     return this._getParameterFromChangeDict(changeDict, 'node_id');
   }
-  _getStoryNode(storyContents, nodeId) {
+  _getStoryNode(storyContents: StoryContents, nodeId: string) {
     var storyNodeIndex = storyContents.getNodeIndex(nodeId);
     if (storyNodeIndex === -1) {
       throw new Error('The given node doesn\'t exist');
@@ -71,7 +81,7 @@ export class StoryUpdateService {
   // Applies a story property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
   _applyStoryPropertyChange(
-      story, propertyName, oldValue, newValue, apply, reverse) {
+      story: Story, propertyName: string, oldValue: string, newValue: string, apply, reverse) {
     this._applyChange(story, StoryDomainConstants.CMD_UPDATE_STORY_PROPERTY, {
       property_name: propertyName,
       new_value: angular.copy(newValue),
@@ -80,7 +90,7 @@ export class StoryUpdateService {
   }
 
   _applyStoryContentsPropertyChange(
-      story, propertyName, oldValue, newValue, apply, reverse) {
+      story, propertyName: string, oldValue: string, newValue: string, apply, reverse) {
     this._applyChange(story,
       StoryDomainConstants.CMD_UPDATE_STORY_CONTENTS_PROPERTY, {
       property_name: propertyName,
@@ -90,7 +100,8 @@ export class StoryUpdateService {
   }
 
   _applyStoryNodePropertyChange(
-      story, propertyName, nodeId, oldValue, newValue, apply, reverse) {
+      story: Story, propertyName: string, nodeId, oldValue: string | string[],
+      newValue: string | string[], apply, reverse) {
     this._applyChange(story,
       StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
       node_id: nodeId,
@@ -111,7 +122,7 @@ export class StoryUpdateService {
    * Changes the title of a story and records the change in the
    * undo/redo service.
    */
-  setStoryTitle(story, title) {
+  setStoryTitle(story: Story, title: string) {
     var oldTitle = angular.copy(story.getTitle());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_TITLE, oldTitle, title,
@@ -129,7 +140,7 @@ export class StoryUpdateService {
    * Changes the url fragment of a story and records the change in the
    * undo/redo service.
    */
-  setStoryUrlFragment(story, urlFragment) {
+  setStoryUrlFragment(story: Story, urlFragment: string) {
     var oldUrlFragment = angular.copy(story.getUrlFragment());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_URL_FRAGMENT,
@@ -148,7 +159,7 @@ export class StoryUpdateService {
    * Changes the thumbnail filename of a story and records the change
    * in the undo/redo service.
    */
-  setThumbnailFilename(story, newThumbnailFilename) {
+  setThumbnailFilename(story: Story, newThumbnailFilename: string) {
     var oldThumbnailFilename = angular.copy(story.getThumbnailFilename());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_FILENAME,
@@ -168,7 +179,7 @@ export class StoryUpdateService {
    * Changes the thumbnail background color of a story and records the
    * change in the undo/redo service.
    */
-  setThumbnailBgColor(story, newThumbnailBgColor) {
+  setThumbnailBgColor(story: Story, newThumbnailBgColor: string) {
     var oldThumbnailBgColor = angular.copy(story.getThumbnailBgColor());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -188,7 +199,7 @@ export class StoryUpdateService {
    * Changes the description of a story and records the change in the
    * undo/redo service.
    */
-  setStoryDescription(story, description) {
+  setStoryDescription(story: Story, description: string) {
     var oldDescription = angular.copy(story.getDescription());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_DESCRIPTION,
@@ -207,7 +218,7 @@ export class StoryUpdateService {
    * Changes the notes for a story and records the change in the
    * undo/redo service.
    */
-  setStoryNotes(story, notes) {
+  setStoryNotes(story: Story, notes: string) {
     var oldNotes = angular.copy(story.getNotes());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_NOTES, oldNotes, notes,
@@ -225,7 +236,7 @@ export class StoryUpdateService {
    * Changes the language code of a story and records the change in
    * the undo/redo service.
    */
-  setStoryLanguageCode(story, languageCode) {
+  setStoryLanguageCode(story: Story, languageCode: string) {
     var oldLanguageCode = angular.copy(story.getLanguageCode());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_LANGUAGE_CODE,
@@ -244,7 +255,7 @@ export class StoryUpdateService {
    * Changes the meta tag content of a story and records the change in
    * the undo/redo service.
    */
-  setStoryMetaTagContent(story, metaTagContent) {
+  setStoryMetaTagContent(story: Story, metaTagContent: string) {
     var oldMetaTagContent = angular.copy(story.getMetaTagContent());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_META_TAG_CONTENT,
@@ -263,7 +274,7 @@ export class StoryUpdateService {
    * Sets the initial node of the story and records the change in
    * the undo/redo service.
    */
-  setInitialNodeId(story, newInitialNodeId) {
+  setInitialNodeId(story: Story, newInitialNodeId: string){
     var oldInitialNodeId =
       angular.copy(story.getStoryContents().getInitialNodeId());
     this._applyStoryContentsPropertyChange(
@@ -282,7 +293,7 @@ export class StoryUpdateService {
    * Creates a story node, adds it to the story and records the change in
    * the undo/redo service.
    */
-  addStoryNode(story, nodeTitle) {
+  addStoryNode(story: Story, nodeTitle: string) {
     var nextNodeId = story.getStoryContents().getNextNodeId();
     this._applyChange(story, StoryDomainConstants.CMD_ADD_STORY_NODE, {
       node_id: nextNodeId,
@@ -302,7 +313,7 @@ export class StoryUpdateService {
   /**
    * Removes a story node, and records the change in the undo/redo service.
    */
-  deleteStoryNode(story, nodeId) {
+  deleteStoryNode(story: Story, nodeId: string) {
     this._applyChange(story, StoryDomainConstants.CMD_DELETE_STORY_NODE, {
       node_id: nodeId
     }, (changeDict, story) => {
@@ -319,7 +330,7 @@ export class StoryUpdateService {
    * Marks the node outline of a node as finalized and records the change
    * in the undo/redo service.
    */
-  finalizeStoryNodeOutline(story, nodeId) {
+  finalizeStoryNodeOutline(story: Story, nodeId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     if (storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already finalized.');
@@ -342,7 +353,7 @@ export class StoryUpdateService {
    * Marks the node outline of a node as not finalized and records the
    * change in the undo/redo service.
    */
-  unfinalizeStoryNodeOutline(story, nodeId) {
+  unfinalizeStoryNodeOutline(story: Story, nodeId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     if (!storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already not finalized.');
@@ -365,7 +376,7 @@ export class StoryUpdateService {
    * Sets the outline of a node of the story and records the change
    * in the undo/redo service.
    */
-  setStoryNodeOutline(story, nodeId, newOutline) {
+  setStoryNodeOutline(story: Story, nodeId: string, newOutline: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldOutline = storyNode.getOutline();
 
@@ -386,7 +397,7 @@ export class StoryUpdateService {
    * Sets the title of a node of the story and records the change
    * in the undo/redo service.
    */
-  setStoryNodeTitle(story, nodeId, newTitle) {
+  setStoryNodeTitle(story: Story, nodeId: string, newTitle: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldTitle = storyNode.getTitle();
 
@@ -406,7 +417,7 @@ export class StoryUpdateService {
    * Sets the description of a node of the story and records the change
    * in the undo/redo service.
    */
-  setStoryNodeDescription(story, nodeId, newDescription) {
+  setStoryNodeDescription(story: Story, nodeId: string, newDescription: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldDescription = storyNode.getDescription();
 
@@ -427,7 +438,7 @@ export class StoryUpdateService {
    * change in the undo/redo service.
    */
   setStoryNodeThumbnailFilename(
-      story, nodeId, newThumbnailFilename) {
+      story: Story, nodeId: string, newThumbnailFilename: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldThumbnailFilename = storyNode.getThumbnailFilename();
 
@@ -448,7 +459,7 @@ export class StoryUpdateService {
    * the change in the undo/redo service.
    */
   setStoryNodeThumbnailBgColor(
-      story, nodeId, newThumbnailBgColor) {
+      story: Story, nodeId: string, newThumbnailBgColor: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldThumbnailBgColor = storyNode.getThumbnailBgColor();
 
@@ -468,7 +479,7 @@ export class StoryUpdateService {
    * Sets the id of the exploration that of a node of the story is linked
    * to and records the change in the undo/redo service.
    */
-  setStoryNodeExplorationId(story, nodeId, newExplorationId) {
+  setStoryNodeExplorationId(story: Story, nodeId: string, newExplorationId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldExplorationId = storyNode.getExplorationId();
 
@@ -492,7 +503,7 @@ export class StoryUpdateService {
    * Adds a destination node id to a node of a story and records the change
    * in the undo/redo service.
    */
-  addDestinationNodeIdToNode(story, nodeId, destinationNodeId) {
+  addDestinationNodeIdToNode(story: Story, nodeId: string, destinationNodeId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldDestinationNodeIds = angular.copy(
       storyNode.getDestinationNodeIds());
@@ -518,7 +529,7 @@ export class StoryUpdateService {
    * change in the undo/redo service.
    */
   removeDestinationNodeIdFromNode(
-      story, nodeId, destinationNodeId) {
+      story: Story, nodeId: string, destinationNodeId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldDestinationNodeIds = angular.copy(
       storyNode.getDestinationNodeIds());
@@ -548,7 +559,7 @@ export class StoryUpdateService {
    * Removes a node of a story and records the change in the
    * undo/redo service.
    */
-  rearrangeNodeInStory(story, fromIndex, toIndex) {
+  rearrangeNodeInStory(story: Story, fromIndex: string, toIndex: string,) {
     this._applyStoryContentsPropertyChange(
       story, StoryDomainConstants.NODE, fromIndex, toIndex,
       (changeDict, story) => {
@@ -564,7 +575,7 @@ export class StoryUpdateService {
    * Adds a prerequisite skill id to a node of a story and records the
    * change in the undo/redo service.
    */
-  addPrerequisiteSkillIdToNode(story, nodeId, skillId) {
+  addPrerequisiteSkillIdToNode(story: Story, nodeId: string, skillId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldPrerequisiteSkillIds = angular.copy(
       storyNode.getPrerequisiteSkillIds());
@@ -588,7 +599,7 @@ export class StoryUpdateService {
    * Removes a prerequisite skill id from a node of a story and records the
    * change in the undo/redo service.
    */
-  removePrerequisiteSkillIdFromNode(story, nodeId, skillId) {
+  removePrerequisiteSkillIdFromNode(story: Story, nodeId: string, skillId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldPrerequisiteSkillIds = angular.copy(
       storyNode.getPrerequisiteSkillIds());
@@ -618,7 +629,7 @@ export class StoryUpdateService {
    * Adds an acquired skill id to a node of a story and records the change
    * in the undo/redo service.
    */
-  addAcquiredSkillIdToNode(story, nodeId, skillId) {
+  addAcquiredSkillIdToNode(story: Story, nodeId: string, skillId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldAcquiredSkillIds = angular.copy(
       storyNode.getAcquiredSkillIds());
@@ -643,7 +654,7 @@ export class StoryUpdateService {
    * Removes an acquired skill id from a node of a story and records the
    * change in the undo/redo service.
    */
-  removeAcquiredSkillIdFromNode(story, nodeId, skillId) {
+  removeAcquiredSkillIdFromNode(story: Story, nodeId: string, skillId: string) {
     var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     var oldAcquiredSkillIds = angular.copy(
       storyNode.getAcquiredSkillIds());
