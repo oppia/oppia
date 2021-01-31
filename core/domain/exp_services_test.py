@@ -529,7 +529,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             observed_log_messages,
             [
                 'Search index contains stale exploration ids: '
-                '1_fi_arch_sillat_suomi, 0_en_arch_bridges_in_england',
+                '0_en_arch_bridges_in_england, 1_fi_arch_sillat_suomi',
                 'Could not fulfill search request for query string ; at '
                 'least 1 retries were needed.'
             ]
