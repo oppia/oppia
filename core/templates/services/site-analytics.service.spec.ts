@@ -59,14 +59,14 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register click start learning button event', () => {
-    sas.registerClickStartLearningButtonEvent()
+    sas.registerClickStartLearningButtonEvent();
 
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'StartLearningButton', 'click', '/context.html');
   });
 
   it('should register click start contributing button event', () => {
-    sas.registerClickStartContributingButtonEvent()
+    sas.registerClickStartContributingButtonEvent();
 
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'StartContributingButton', 'click', '/context.html');
