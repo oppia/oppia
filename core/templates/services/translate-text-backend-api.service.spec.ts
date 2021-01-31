@@ -24,7 +24,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { TranslateTextBackendApiService } from
   'services/translate-text-backend-api.service';
 
-fdescribe('TranslateTextBackendApiService', () => {
+describe('TranslateTextBackendApiService', () => {
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let httpTestingController: HttpTestingController;
   beforeEach(() => {
