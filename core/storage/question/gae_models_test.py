@@ -117,7 +117,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         question_model2 = question_models.QuestionModel.get(question_ids[1])
         question_model2.linked_skill_ids = ['skill_id3']
 
-        question_models.QuestionModel.put_multi_questions(
+        question_models.QuestionModel.put_multi_for_bot(
             [question_model1, question_model2])
         self.assertEqual(question_models.QuestionModel.get(
             question_ids[0]).linked_skill_ids, ['skill_id3'])
@@ -178,7 +178,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                 'question_id3', 'skill_id3', 0.8)
             )
 
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
@@ -205,7 +205,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                 'question_id3', 'skill_id3', 0.8)
             )
 
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
@@ -218,7 +218,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                         in question_skill_links]
         self.assertEqual(question_ids, ['question_id1', 'question_id2'])
 
-        question_models.QuestionSkillLinkModel.delete_multi_question_skill_links( # pylint: disable=line-too-long
+        question_models.QuestionSkillLinkModel.delete_multi(
             [questionskilllink_model1, questionskilllink_model2])
         question_skill_links = (
             question_models.QuestionSkillLinkModel.get_models_by_skill_id(
@@ -246,7 +246,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                 'question_id2', 'skill_id3', 0.8)
             )
 
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
@@ -279,7 +279,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id3', skill_id_2, 0.8)
         )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
@@ -332,7 +332,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id2', skill_id_2, 0.8)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
@@ -383,7 +383,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id2', skill_id_4, 0.3)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4])
 
@@ -422,7 +422,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id2', 'skill_id3', 0.6)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6])
@@ -469,7 +469,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id8', 'skill_id1', 0.6)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6,
@@ -536,7 +536,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id3', 'skill_id2', 0.8)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
@@ -565,7 +565,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id3', 'skill_id2', 0.8)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
@@ -599,7 +599,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id2', 'skill_id2', 0.9)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4])
         question_skill_links = (
@@ -650,7 +650,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id8', 'skill_id1', 0.6)
             )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        question_models.QuestionSkillLinkModel.put_multi_for_bot(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6,

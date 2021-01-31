@@ -93,7 +93,7 @@ def _create_models_for_thread_and_first_message(
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
     thread.update_timestamps()
-    thread.put()
+    thread.put_for_human()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
         subject, text)
@@ -259,7 +259,8 @@ def create_messages(
             message_model.updated_subject = updated_subject
     feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
         message_models)
-    feedback_models.GeneralFeedbackMessageModel.put_multi(message_models)
+    feedback_models.GeneralFeedbackMessageModel.put_multi_for_human(
+        message_models)
 
     # Update the message data cache of the threads.
     for thread_model in thread_models:
@@ -286,7 +287,8 @@ def create_messages(
             new_statuses.append(thread_model.status)
     feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
         thread_models)
-    feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
+    feedback_models.GeneralFeedbackThreadModel.put_multi_for_human(
+        thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
     # the thread, so that the last_updated time changes to show that there is
@@ -307,7 +309,7 @@ def create_messages(
             suggestion_models_to_update.append(suggestion_model)
     suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update)
-    suggestion_models.GeneralSuggestionModel.put_multi(
+    suggestion_models.GeneralSuggestionModel.put_multi_for_human(
         suggestion_models_to_update)
 
     if (feconf.CAN_SEND_EMAILS and (

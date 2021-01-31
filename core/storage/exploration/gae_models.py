@@ -699,8 +699,9 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
         query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
         if max_age:
+            threshold_datetime = datetime.datetime.utcnow() - max_age
             query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age)
+                cls.last_updated_by_human >= threshold_datetime)
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
 

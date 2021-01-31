@@ -99,7 +99,7 @@ def link_multiple_skills_for_question(
     _update_linked_skill_ids_of_question(
         user_id, question_id, list(set(new_linked_skill_ids)),
         question.linked_skill_ids)
-    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+    question_models.QuestionSkillLinkModel.put_multi_for_human(
         new_question_skill_link_models)
 
 
@@ -429,9 +429,9 @@ def replace_skill_id_for_all_questions(
                 question_skill_link.question_id, new_skill_id,
                 question_skill_link.skill_difficulty)
             )
-    question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
+    question_models.QuestionSkillLinkModel.delete_multi(
         old_question_skill_link_models)
-    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+    question_models.QuestionSkillLinkModel.put_multi_for_human(
         new_question_skill_link_models)
 
     old_questions = question_models.QuestionModel.get_multi(list(question_ids))
@@ -441,7 +441,7 @@ def replace_skill_id_for_all_questions(
         new_question.linked_skill_ids.remove(curr_skill_id)
         new_question.linked_skill_ids.append(new_skill_id)
         new_questions.append(new_question)
-    question_models.QuestionModel.put_multi_questions(new_questions)
+    question_models.QuestionModel.put_multi_for_human(new_questions)
 
 
 def get_displayable_question_skill_link_details(

@@ -193,19 +193,8 @@ class QuestionModel(base_models.VersionedModel):
 
         return question_model_instance
 
-    @classmethod
-    def put_multi_questions(cls, questions):
-        """Puts multiple question models into the datastore.
 
-        Args:
-            questions: list(Question). The list of question objects
-                to put into the datastore.
-        """
-        cls.update_timestamps_multi(questions)
-        cls.put_multi(questions)
-
-
-class QuestionSkillLinkModel(base_models.BaseModel):
+class QuestionSkillLinkModel(base_models.BaseHumanMaintainedModel):
     """Model for storing Question-Skill Links.
 
     The ID of instances of this class has the form '[question_id]:[skill_id]'.
@@ -327,7 +316,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # Order by cls.key is needed alongside cls.last_updated so as to
                 # resolve conflicts, if any.
                 # Reference SO link: https://stackoverflow.com/q/12449197
-            ).order(-cls.last_updated, cls.key).fetch_page(
+            ).order(-cls.last_updated_by_human, cls.key).fetch_page(
                 question_skill_count,
                 start_cursor=cursor
             )
@@ -600,27 +589,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return QuestionSkillLinkModel.query().filter(
             cls.question_id == question_id,
             cls.deleted == False).fetch() #pylint: disable=singleton-comparison
-
-    @classmethod
-    def put_multi_question_skill_links(cls, question_skill_links):
-        """Puts multiple question skill link models into the datastore.
-
-        Args:
-            question_skill_links: list(QuestionSkillLink). The list of
-                question skill link domain objects to put into the datastore.
-        """
-        cls.update_timestamps_multi(question_skill_links)
-        cls.put_multi(question_skill_links)
-
-    @classmethod
-    def delete_multi_question_skill_links(cls, question_skill_links):
-        """Deletes multiple question skill links from the datastore.
-
-        Args:
-            question_skill_links: list(QuestionSkillLinkModel). The list of
-                question skill link domain objects to delete from the datastore.
-        """
-        cls.delete_multi(question_skill_links)
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
