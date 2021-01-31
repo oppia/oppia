@@ -94,8 +94,7 @@ angular.module('oppia').controller('TranslationModalController', [
       if ($event.target.localName === 'p' && !(children.some(
         child => child.localName === 'oppia-noninteractive-math'))) {
         $scope.paragraphCopyerror = true;
-        }
-      else {
+      } else {
         if ($scope.isCopyModeActive()) {
           $event.stopPropagation();
         }
@@ -151,11 +150,9 @@ angular.module('oppia').controller('TranslationModalController', [
         text => text === '' || text === ' ');
       if (uncopiedImgLefts) {
         $scope.imgCopyError = true;
-      }
-      else if (blankAltText || blankDescription) {
+      } else if (blankAltText || blankDescription) {
         $scope.imgTextError = true;
-      }
-      else {
+      } else {
         if (!$scope.uploadingTranslation && !$scope.loadingData) {
           SiteAnalyticsService
             .registerContributorDashboardSubmitSuggestionEvent('Translation');
