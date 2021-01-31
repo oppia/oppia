@@ -18,7 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
-var action = require('../protractor_utils/action.js');
+var action = require('./action.js');
 
 var SubTopicViewerPage = function() {
   var subTopicTileList = element.all(by.css('.protractor-test-subtopic-tile'));
@@ -31,12 +31,12 @@ var SubTopicViewerPage = function() {
 
   this.expectedRevisionCardCountToBe = async function(count) {
     if (count === 0) {
-      await expect(await subTopicTileList.count()).toEqual(0);
+      expect(await subTopicTileList.count()).toEqual(0);
     } else {
       await waitFor.visibilityOf(
         subTopicTileList.first(),
         'Revisions cards take too long to be visible.');
-      await expect(await subTopicTileList.count()).toEqual(count);
+      expect(await subTopicTileList.count()).toEqual(count);
     }
   };
 };

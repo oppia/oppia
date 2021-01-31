@@ -18,7 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
-var action = require('../protractor_utils/action.js');
+var action = require('./action.js');
 
 var TopicViewerPage = function() {
   var topicDescription = element(by.css('.protractor-test-topic-description'));
@@ -34,7 +34,10 @@ var TopicViewerPage = function() {
       await action.click(topicName, topicLink);
       await waitFor.pageToFullyLoad();
     } else {
-      throw new Error ('Topic card is not present.');
+      throw new Error (
+        'Topic ' +
+        topicName + ' card is not present on /' + classroomUrlFragment
+      );
     }
   };
 
@@ -47,12 +50,12 @@ var TopicViewerPage = function() {
 
   this.expectedStoryCountToBe = async function(count) {
     if (count === 0) {
-      await expect(await storySummaryTitleList.count()).toEqual(0);
+      expect(await storySummaryTitleList.count()).toEqual(0);
     } else {
       await waitFor.visibilityOf(
         storySummaryTitleList.first(),
         'Story summary tiles take too long to be visible.');
-      await expect(await storySummaryTitleList.count()).toEqual(count);
+      expect(await storySummaryTitleList.count()).toEqual(count);
     }
   };
 };
