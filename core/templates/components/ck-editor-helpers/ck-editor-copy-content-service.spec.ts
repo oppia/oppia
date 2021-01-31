@@ -45,8 +45,8 @@ describe('Ck editor copy content service', () => {
   beforeEach(() => {
     ckEditorStub = {
       id: 'editor1',
-      insertHtml: (unused_: string) => {},
-      execCommand: (unused_: string): boolean => true,
+      insertHtml: (_: string) => {},
+      execCommand: (_: string): boolean => true,
     };
     insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
     execCommandSpy = spyOn(ckEditorStub, 'execCommand');

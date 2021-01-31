@@ -31,7 +31,7 @@ describe('Oppia click hexbins visualization', function() {
       getEntityType: () => 'exploration',
     });
     $provide.value('ImagePreloaderService', {
-      getDimensionsOfImage: (unused_: string) => ({width: 300, height: 250}),
+      getDimensionsOfImage: (_: string) => ({width: 300, height: 250}),
     });
   }));
 

@@ -41,7 +41,7 @@ var MockWindow = function() {
   var language = 'en';
   this.localStorage = {
     getItem: () => language,
-    setItem: (unused_, lang) => {
+    setItem: (_, lang) => {
       language = lang;
     }
   };

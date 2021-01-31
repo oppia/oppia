@@ -183,7 +183,7 @@
         "vars": "all",
         "varsIgnorePattern": ".+",
         "args": "all",
-        "argsIgnorePattern": "^unused"
+        "argsIgnorePattern": "^unused|^_"
       }
     ],
     "one-var": [

@@ -34,7 +34,7 @@ class MockGuppy {
     end: () => {}
   };
 
-  render(unused_): void {}
+  render(_): void {}
   'import_text'(): void {}
   asciimath(): string {
     return 'Dummy value';
