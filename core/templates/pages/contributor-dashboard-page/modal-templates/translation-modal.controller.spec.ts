@@ -223,7 +223,7 @@ describe('Translation Modal Controller', function() {
       mockEvent.target);
   });
 
-  it('should broadcast copy to ck editor when clicking on content' + 
+  it('should broadcast copy to ck editor when clicking on content' +
   ' when anything apart from a paragraph is clicked',
   function() {
     spyOn(CkEditorCopyContentService, 'broadcastCopy').and
