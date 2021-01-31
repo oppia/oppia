@@ -26,7 +26,6 @@ import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFact
 import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
 
 export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
@@ -62,8 +61,7 @@ export class ReadOnlyExplorationBackendApiService {
 
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService) {}
+    private urlInterpolationService: UrlInterpolationService) {}
 
   private _fetchExploration(
       explorationId: string, version: number | null
