@@ -67,16 +67,14 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
-    if (!questionPlayerMode) {
-      if (!('skill_editor' === UrlService.getPathname()
+    if (!questionPlayerMode && !('skill_editor' === UrlService.getPathname()
         .split('/')[1].replace(/"/g, "'"))) {
-        ReadOnlyExplorationBackendApiService
-          .loadExploration(explorationId, version)
-          .then(function(exploration) {
-            version = exploration.version;
-            $rootScope.$applyAsync();
-          });
-      }
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+          $rootScope.$applyAsync();
+      });
     }
 
     var storyUrlFragment = UrlService.getStoryUrlFragmentFromLearnerUrl();
