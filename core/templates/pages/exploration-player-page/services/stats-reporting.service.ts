@@ -364,6 +364,11 @@ export class StatsReportingService {
 
     this.siteAnalyticsService.registerFinishExploration(
       StatsReportingService.explorationId);
+    let urlParams = this.urlService.getUrlParams();
+    if (urlParams.hasOwnProperty('classroom_url_fragment')) {
+      this.siteAnalyticsService.registerCuratedLessonCompleted(
+        StatsReportingService.explorationId);
+    }
 
     this.postStatsToBackend();
     this.playthroughService.recordExplorationQuitAction(
