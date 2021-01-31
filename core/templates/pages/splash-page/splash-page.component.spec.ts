@@ -93,14 +93,14 @@ describe('Splash Page', () => {
   });
 
   beforeEach(angular.mock.module('oppia'));
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
-    });
+  });
 
   let component;
   beforeEach(() => {
@@ -119,7 +119,7 @@ describe('Splash Page', () => {
       .and.callThrough();
     component.onClickBrowseLessonsButton();
     expect(siteAnalyticsServiceStub.registerClickBrowseLessonsButtonEvent)
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
   });
 
   it('should record analytics when Start Contributing is clicked', function() {
@@ -128,7 +128,7 @@ describe('Splash Page', () => {
       .and.callThrough();
     component.onClickStartContributingButton();
     expect(siteAnalyticsServiceStub.registerClickStartContributingButtonEvent)
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
   });
 
   it('should record analytics when Start Teaching is clicked', function() {
@@ -137,7 +137,7 @@ describe('Splash Page', () => {
       .and.callThrough();
     component.onClickStartTeachingButton();
     expect(siteAnalyticsServiceStub.registerClickStartTeachingButtonEvent())
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
   });
 
   it('should increment and decrement testimonial IDs correctly', function() {
@@ -200,7 +200,7 @@ describe('Splash Page', () => {
     flushMicrotasks();
     expect(component.userIsLoggedIn).toBe(false);
   }));
-  
+
   it('should check if loader screen is working', () =>
     fakeAsync(() => {
       component.ngOnInit();
@@ -208,7 +208,7 @@ describe('Splash Page', () => {
       expect(loaderService.showLoadingScreen)
         .toHaveBeenCalledWith('Loading');
     }));
-  
+
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
@@ -216,4 +216,4 @@ describe('Splash Page', () => {
     expect(component.classroomUrl).toBe('/learn/math');
     expect(component.isWindowNarrow).toBe(true);
   });
-  });
+});

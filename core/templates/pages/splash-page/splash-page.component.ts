@@ -69,7 +69,7 @@ export class SplashPageComponent implements OnInit {
 
   onClickStartContributingButton():void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
-    this.windowRef.nativeWindow.location.href = "https://www.oppiafoundation.org/volunteer";
+    this.windowRef.nativeWindow.location.href = 'https://www.oppiafoundation.org/volunteer';
   }
 
   onClickStartTeachingButton():void {
@@ -103,7 +103,7 @@ export class SplashPageComponent implements OnInit {
       imageUrl: this.getStaticImageUrl('/splash/mira.png'),
       imageUrlWebp: this.getStaticImageUrl('/splash/mira.webp'),
       borderPresent: false
-      },
+    },
     {
       quote: 'I18N_SPLASH_TESTIMONIAL_2',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_2',
@@ -131,8 +131,6 @@ export class SplashPageComponent implements OnInit {
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
     this.testimonials = this.getTestimonials();
-    console.log(this.getStaticImageUrl(this.testimonials[this.displayedTestimonialId].imageUrlWebp));
-    console.log(this.getStaticImageUrl('/splash/student_desk.png'))
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
