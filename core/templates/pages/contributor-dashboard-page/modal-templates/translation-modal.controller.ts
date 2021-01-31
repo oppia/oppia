@@ -94,7 +94,7 @@ angular.module('oppia').controller('TranslationModalController', [
       if ($event.target.localName === 'p' && !(children.some(
         child => child.localName === 'oppia-noninteractive-math'))) {
         $scope.paragraphCopyerror = true;
-      }
+        }
       else {
         if ($scope.isCopyModeActive()) {
           $event.stopPropagation();
@@ -120,7 +120,8 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.imgTextError = false;
       $scope.originalElements = angular.element(
         $scope.textToTranslate);
-      $scope.translatedElements = angular.element($scope.activeWrittenTranslation.html);
+      $scope.translatedElements = angular.element(
+        $scope.activeWrittenTranslation.html);
       var translatedImageDetails = [];
       var translatedImageAltTxts = [];
       var translatedImageDescriptions = [];
@@ -131,7 +132,8 @@ angular.module('oppia').controller('TranslationModalController', [
           var descriptionText = ctl.attributes['caption-with-value'].value;
           translatedImageDetails.push(ctl.attributes['filepath-with-value']);
           translatedImageAltTxts.push(altText.substring(6, altText.length - 6));
-          translatedImageDescriptions.push(descriptionText.substring(6, descriptionText.length - 6));
+          translatedImageDescriptions.push(
+            descriptionText.substring(6, descriptionText.length - 6));
         }
       });
       [].forEach.call($scope.originalElements, function(ctlTranslated) {
@@ -147,7 +149,7 @@ angular.module('oppia').controller('TranslationModalController', [
         text => text === '' || text === ' ');
       const blankDescription = translatedImageDescriptions.some(
         text => text === '' || text === ' ');
-      if(uncopiedImgLefts){
+      if (uncopiedImgLefts) {
         $scope.imgCopyError = true;
       }
       else if (blankAltText || blankDescription) {
