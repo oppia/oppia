@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the preventPageUnloadEventService Service.
+ * @fileoverview Unit tests for the preventPageUnloadEventService.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -49,19 +49,19 @@ describe ('Prevent page unload event service', function() {
   };
 
   it('should adding listener', () => {
-    expect(preventPageUnloadEventService.getListenerActive()).toBe(false);
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
 
     preventPageUnloadEventService.addListener();
 
-    expect(preventPageUnloadEventService.getListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 
   it('should removing listener', () => {
-    expect(preventPageUnloadEventService.getListenerActive()).toBe(false);
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
     preventPageUnloadEventService.addListener();
     preventPageUnloadEventService.removeListener();
 
-    expect(preventPageUnloadEventService.getListenerActive()).toBe(false);
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
   });
 
   it('should test if Alert is displayed', () => {
@@ -72,7 +72,7 @@ describe ('Prevent page unload event service', function() {
     mockWindow.location.reload();
 
     expect(reloadEvt.preventDefault).toHaveBeenCalled();
-    expect(preventPageUnloadEventService.getListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 
   it('should prevent multiple listeners', () => {
@@ -81,7 +81,8 @@ describe ('Prevent page unload event service', function() {
     expect(window.addEventListener).toHaveBeenCalledTimes(0);
     preventPageUnloadEventService.addListener();
     expect(window.addEventListener).toHaveBeenCalledTimes(1);
-    expect(preventPageUnloadEventService.getListenerActive()).toBe(true);
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+
     preventPageUnloadEventService.addListener();
 
     expect(window.addEventListener).toHaveBeenCalledTimes(1);

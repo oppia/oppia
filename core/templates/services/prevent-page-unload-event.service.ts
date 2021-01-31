@@ -55,7 +55,7 @@ export class PreventPageUnloadEventService {
     e.returnValue = '';
   }
 
-  getListenerActive(): boolean {
+  isListenerActive(): boolean {
     return this.listenerActive;
   }
 
