@@ -24,6 +24,7 @@ import hashlib
 import imghdr
 import logging
 import re
+import time
 
 from constants import constants
 from core.domain import auth_domain
@@ -547,6 +548,7 @@ def generate_initial_profile_picture(user_id):
     Args:
         user_id: str. The unique ID of the user.
     """
+    time.sleep(10)
     user_email = get_email_from_user_id(user_id)
     user_gravatar = fetch_gravatar(user_email)
     if user_gravatar:

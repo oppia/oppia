@@ -2741,6 +2741,15 @@ div#ng-curtain {
   color: #009688;
 }
 
+.oppia-navbar-dropdown-toggle mat-spinner circle {
+  stroke: #ffffff;
+}
+
+.oppia-navbar-dropdown-toggle:focus mat-spinner circle {
+  stroke: #00645c;
+}
+
+
 .oppia-navbar-dropdown {
   border: 0;
   border-top-left-radius: 0;
