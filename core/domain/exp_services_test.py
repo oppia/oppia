@@ -529,7 +529,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             observed_log_messages,
             [
                 'Search index contains stale exploration ids: '
-                '1_fi_arch_sillat_suomi, 0_en_arch_bridges_in_england',
+                '0_en_arch_bridges_in_england, 1_fi_arch_sillat_suomi',
                 'Could not fulfill search request for query string ; at '
                 'least 1 retries were needed.'
             ]
@@ -939,6 +939,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'new_value': 'A new category'
             })], 'Change title and category')
 
+        self.process_and_flush_pending_tasks()
         retrieved_exp_summary = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_0_ID)
 
@@ -2542,8 +2543,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_delete_state_cmd(self):
         """Test deleting a state name."""
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -2586,11 +2585,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             r'The parameter with name \'myParam\' .* does not exist .*'
-            ):
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.owner_id,
+                self.EXP_0_ID,
+                _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                ''
+            )
 
     def test_update_reserved_param_changes(self):
         param_changes = [{
@@ -2603,11 +2605,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             r'The parameter name \'all\' is reserved. Please choose '
-            'a different name for the parameter being set in'):
+            'a different name for the parameter being set in'
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.owner_id,
+                self.EXP_0_ID,
+                _get_change_list(
                     self.init_state_name, 'param_changes', param_changes),
-                '')
+                ''
+            )
 
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
@@ -2618,13 +2624,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid generator id fake'
-            ):
+            utils.ValidationError, 'Invalid generator ID'
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
+                self.owner_id,
+                self.EXP_0_ID,
                 _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                ''
+            )
 
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""
@@ -2972,6 +2980,40 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.written_translations.to_dict(),
             written_translations_dict)
+
+    def test_update_written_translations_cleans_html_translations(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<incomplete-bad-tag><div>OK tag</div>',
+                        'needs_update': True
+                    }
+                },
+                'default_outcome': {},
+                'ca_placeholder_0': {}
+            }
+        }
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.init_state_name, 'written_translations',
+                written_translations_dict), 'Added text translations.')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.written_translations.to_dict(), {
+                'translations_mapping': {
+                    'content': {
+                        'hi': {
+                            'data_format': 'html',
+                            'translation': '<div>OK tag</div>',
+                            'needs_update': True
+                        }
+                    },
+                    'default_outcome': {},
+                    'ca_placeholder_0': {}
+                }
+            })
 
     def test_update_written_translations_with_list_fails(self):
         """Test update content translation with a list fails."""
@@ -3683,6 +3725,8 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                         'property_name': 'category',
                         'new_value': 'cat1'})], 'update category')
+
+            self.process_and_flush_pending_tasks()
             self.assertEqual(actual_docs, [updated_exp_doc])
             self.assertEqual(add_docs_counter.times_called, 3)
 
@@ -3863,6 +3907,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
+        self.process_and_flush_pending_tasks()
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
         # Have Bob update that exploration. Version 3.
@@ -3872,6 +3917,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
+        self.process_and_flush_pending_tasks()
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 2})
 
@@ -3882,6 +3928,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
+        self.process_and_flush_pending_tasks()
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 2, self.bob_id: 2})
 

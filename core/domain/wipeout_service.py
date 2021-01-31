@@ -241,6 +241,8 @@ def run_user_deletion_completion(pending_deletion_request):
             pending_deletion_request.user_id, pending_deletion_request.email)
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
+        email_manager.send_account_deletion_failed_email(
+            pending_deletion_request.user_id, pending_deletion_request.email)
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_VERIFICATION_FAILURE

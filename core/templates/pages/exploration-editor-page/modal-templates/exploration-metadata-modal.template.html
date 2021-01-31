@@ -1,4 +1,4 @@
-<div class="modal-header">
+<div class="modal-header protractor-test-metadata-modal-header">
   <h3>Add Some Details</h3>
 </div>
 
@@ -16,7 +16,8 @@
   </exploration-objective-editor>
   <p ng-if="requireCategoryToBeSpecified">
     <label class="font-weight-normal"> Add a category: How would you categorize your exploration?
-      <select2-dropdown item="explorationCategoryService.displayed"
+      <select2-dropdown class="protractor-test-exploration-category-dropdown"
+                        item="explorationCategoryService.displayed"
                         choices="CATEGORY_LIST_FOR_SELECT2"
                         placeholder="Choose or type a new category"
                         new-choice-regex="^[A-Z a-z]+$"
