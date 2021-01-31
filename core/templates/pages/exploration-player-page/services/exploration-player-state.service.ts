@@ -68,13 +68,13 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
     if (!questionPlayerMode && !('skill_editor' === UrlService.getPathname()
-        .split('/')[1].replace(/"/g, "'"))) {
+      .split('/')[1].replace(/"/g, "'"))) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
           $rootScope.$applyAsync();
-      });
+        });
     }
 
     var storyUrlFragment = UrlService.getStoryUrlFragmentFromLearnerUrl();
