@@ -40,6 +40,17 @@
         </schema-based-editor>
       </div>
     </div>
+    <div class="oppia-translation-error-section">
+      <p ng-if="imgCopyError">
+        All images should be copied!
+      </p>
+      <p ng-if="imgTextError">
+        Image alt text or description should be non-empty!
+      </p>
+      <p ng-if="paragraphCopyerror">
+        Paragraphs are not allowed to copy!
+      </p>
+    </div>
   </div>
 </div>
 <div class="modal-footer">
@@ -136,5 +147,8 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  .oppia-translation-error-section {
+    color: red;
   }
 </style>
