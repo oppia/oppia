@@ -15,3 +15,197 @@
 /**
  * @fileoverview Tests that translatable text backend api works correctly.
  */
+
+import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { TranslateTextBackendApiService } from
+  'services/translate-text-backend-api.service';
+
+fdescribe('TranslateTextBackendApiService', () => {
+  let translateTextBackendApiService: TranslateTextBackendApiService;
+  let httpTestingController: HttpTestingController;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    translateTextBackendApiService = TestBed.inject(
+      TranslateTextBackendApiService);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  describe('getTranslatableTextsAsync', () => {
+    let successHandler, failHandler;
+    it('should correctly request translatable texts for a given exploration ' +
+    'id and language code', fakeAsync(() => {
+      successHandler = jasmine.createSpy('success');
+      failHandler = jasmine.createSpy('error');
+      const sampleDataResults = {
+        state_names_to_content_id_mapping: {
+          stateName1: {contentId1: 'text1', contentId2: 'text2'},
+          stateName2: {contentId3: 'text3'}
+        },
+        version: 1
+      };
+      translateTextBackendApiService.getTranslatableTextsAsync('1', 'en').then(
+        successHandler, failHandler
+      );
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    }));
+
+    it('should call the failHandler on error response', fakeAsync(() => {
+      const errorEvent = new ErrorEvent('error');
+      failHandler = (error: HttpErrorResponse) => {
+        expect(error.error).toBe(errorEvent);
+      };
+      translateTextBackendApiService.getTranslatableTextsAsync('1', 'en').then(
+        successHandler, failHandler
+      );
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en');
+      expect(req.request.method).toEqual('GET');
+      req.error(errorEvent);
+      flushMicrotasks();
+    }));
+  });
+
+  describe('suggestTranslatedTextAsync', () => {
+    let successHandler, failHandler, imagesData;
+    beforeEach(() => {
+      successHandler = jasmine.createSpy('success');
+      failHandler = jasmine.createSpy('error');
+      imagesData = [{
+        filename: 'imageFilename',
+        imageBlob: 'imageBlob'
+      }];
+    });
+
+    it('should correctly submit a translation suggestion', fakeAsync(() => {
+      const expectedPayload = {
+        suggestion_type: 'translate_content',
+        target_type: 'exploration',
+        description: 'Adds translation',
+        target_id: 'activeExpId',
+        target_version_at_submission: 'activeExpVersion',
+        change: {
+          cmd: 'add_translation',
+          content_id: 'activeContentId',
+          state_name: 'activeStateName',
+          language_code: 'languageCode',
+          content_html: 'contentHtml',
+          translation_html: 'translationHtml'
+        }
+      };
+
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        'activeExpId',
+        'activeExpVersion',
+        'activeContentId',
+        'activeStateName',
+        'languageCode',
+        'contentHtml',
+        'translationHtml',
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.getAll('payload')[0]).toEqual(
+        JSON.stringify(expectedPayload));
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+    }));
+
+    it('should append image data to form data', fakeAsync(() => {
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        'activeExpId',
+        'activeExpVersion',
+        'activeContentId',
+        'activeStateName',
+        'languageCode',
+        'contentHtml',
+        'translationHtml',
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.getAll('imageFilename')[0]).toEqual('imageBlob');
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+    }));
+    it('should handle multiple image blobs per filename', fakeAsync(() => {
+      imagesData = [{
+        filename: 'imageFilename1',
+        imageBlob: 'imageBlob1'
+      }, {
+        filename: 'imageFilename1',
+        imageBlob: 'imageBlob2'
+      }, {
+        filename: 'imageFilename2',
+        imageBlob: 'imageBlob1'
+      }, {
+        filename: 'imageFilename2',
+        imageBlob: 'imageBlob2'
+      }];
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        'activeExpId',
+        'activeExpVersion',
+        'activeContentId',
+        'activeStateName',
+        'languageCode',
+        'contentHtml',
+        'translationHtml',
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      const filename1Blobs = req.request.body.getAll('imageFilename1');
+      const filename2Blobs = req.request.body.getAll('imageFilename2');
+      expect(filename1Blobs).toContain('imageBlob1');
+      expect(filename1Blobs).toContain('imageBlob2');
+      expect(filename2Blobs).toContain('imageBlob1');
+      expect(filename2Blobs).toContain('imageBlob2');
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+    }));
+
+    it('should call the failhandler on error response', fakeAsync(() => {
+      const errorEvent = new ErrorEvent('error');
+      failHandler = (error: HttpErrorResponse) => {
+        expect(error.error).toBe(errorEvent);
+      };
+
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        'activeExpId',
+        'activeExpVersion',
+        'activeContentId',
+        'activeStateName',
+        'languageCode',
+        'contentHtml',
+        'translationHtml',
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      req.error(errorEvent);
+      flushMicrotasks();
+    }));
+  });
+});
