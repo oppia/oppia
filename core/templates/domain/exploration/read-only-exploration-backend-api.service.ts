@@ -69,8 +69,6 @@ export class ReadOnlyExplorationBackendApiService {
       explorationId: string, version: number | null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
-      if (!('skill_editor' === this.urlService.getPathname()
-        .split('/')[1].replace(/"/g, "'"))) {
         const explorationDataUrl = this._getExplorationUrl(
           explorationId, version);
 
@@ -80,7 +78,6 @@ export class ReadOnlyExplorationBackendApiService {
         }, errorResponse => {
           reject(errorResponse.error.error);
         });
-      }
     });
   }
 
@@ -159,9 +156,12 @@ export class ReadOnlyExplorationBackendApiService {
   loadExploration(explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
+      if (!('skill_editor' === this.urlService.getPathname()
+      .split('/')[1].replace(/"/g, "'"))) {
       this._fetchExploration(explorationId, version).then(exploration => {
         resolve(exploration);
       }, reject);
+      }
     });
   }
 
