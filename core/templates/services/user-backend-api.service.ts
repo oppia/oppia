@@ -22,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
 
 interface SubscriptionSummary {
-  'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
 }

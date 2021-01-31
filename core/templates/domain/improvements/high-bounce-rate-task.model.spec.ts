@@ -160,7 +160,6 @@ describe('High bounce rate task', function() {
             issue_description: '28% of learners had dropped off at this card.',
             status: 'open',
             resolver_username: null,
-            resolver_profile_picture_data_url: null,
             resolved_on_msecs: null,
           })
         ).toThrowError(
