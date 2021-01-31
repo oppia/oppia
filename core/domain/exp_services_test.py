@@ -1987,7 +1987,7 @@ title: A title
 
         self.assertEqual(zf.namelist(), ['A title.yaml'])
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT) # pylint: disable=disallowed-function-calls
+            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
     def test_export_to_zip_file_with_unpublished_exploration(self):
         """Test the export_to_zip_file() method."""
@@ -2071,7 +2071,7 @@ title: A title
         self.assertEqual(
             zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT) # pylint: disable=disallowed-function-calls
+            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
         self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image) # pylint: disable=disallowed-function-calls
 
     def test_export_by_versions(self):
@@ -2147,7 +2147,7 @@ title: A title
         zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT) # pylint: disable=disallowed-function-calls
+            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
@@ -2155,7 +2155,7 @@ title: A title
         zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT) # pylint: disable=disallowed-function-calls
+            zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
 
 
 class YAMLExportUnitTests(ExplorationServicesUnitTests):

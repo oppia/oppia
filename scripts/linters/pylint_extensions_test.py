@@ -2927,63 +2927,67 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             pylint_extensions.DisallowedFunctionsChecker)
         self.checker_test_object.setup_method()
 
-    def test_disallowed_removals(self):
+    def test_disallowed_removals_str(self):
         (
             self.checker_test_object
-            .checker.config.disallowed_functions_and_replacements) = [
+            .checker.config.disallowed_functions_and_replacements_str) = [
                 b'example_func',
+                b'a.example_attr',
             ]
         self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
 
-        call1 = astroid.extract_node(
+        call1, call2 = astroid.extract_node(
             """
         example_func() #@
+        a.example_attr() #@
         """)
 
-        message_remove_example = testutils.Message(
+        message_remove_example_func = testutils.Message(
             msg_id='remove-disallowed-function-calls',
             node=call1,
             args=b'example_func'
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message_remove_example):
-            self.checker_test_object.checker.visit_call(call1)
+        message_remove_example_attr = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call2,
+            args=b'a.example_attr'
+        )
 
-    def test_disallowed_replacements(self):
+        with self.checker_test_object.assertAddsMessages(
+            message_remove_example_func,
+            message_remove_example_attr):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+
+    def test_disallowed_replacements_str(self):
         (
             self.checker_test_object
-            .checker.config.disallowed_functions_and_replacements) = [
-                b'now=>datetime.datetime.utcnow',
-                b'assertEquals=>self.assertEqual',
-                b'next=>python_utils.NEXT',
+            .checker.config.disallowed_functions_and_replacements_str) = [
+                b'datetime.datetime.now=>datetime.datetime.utcnow',
+                b'self.assertEquals=>self.assertEqual',
+                b'b.next=>python_utils.NEXT',
                 b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
             ]
         self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
 
         (
             call1, call2, call3,
-            call4,
+            call4, call5
             ) = astroid.extract_node(
                 """
         datetime.datetime.now() #@
         self.assertEquals() #@
-
-        class Temp:
-            def str(self):
-                return 1
-            def next(self):
-                return 1
-        b = Temp()
-        b.str() #@
+        str(1) #@
         b.next() #@
+        b.a.next() #@
         """)
 
         message_replace_disallowed_datetime = testutils.Message(
             msg_id='replace-disallowed-function-calls',
             node=call1,
             args=(
-                b'now',
+                b'datetime.datetime.now',
                 b'datetime.datetime.utcnow')
         )
 
@@ -2991,7 +2995,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             msg_id='replace-disallowed-function-calls',
             node=call2,
             args=(
-                b'assertEquals',
+                b'self.assertEquals',
                 b'self.assertEqual')
         )
 
@@ -3007,7 +3011,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             msg_id='replace-disallowed-function-calls',
             node=call4,
             args=(
-                b'next',
+                b'b.next',
                 b'python_utils.NEXT')
         )
 
@@ -3016,6 +3020,91 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             message_replace_disallowed_assert_equals,
             message_replace_disallowed_str,
             message_replace_disallowed_next):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+            self.checker_test_object.checker.visit_call(call3)
+            self.checker_test_object.checker.visit_call(call4)
+            self.checker_test_object.checker.visit_call(call5)
+
+    def test_disallowed_removals_regex(self):
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements_regex) = [
+                r'.*example_func',
+                r'.*\..*example_attr'
+            ]
+        self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
+
+        call1, call2 = astroid.extract_node(
+            """
+        somethingexample_func() #@
+        c.someexample_attr() #@
+        """)
+
+        message_remove_example_func = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call1,
+            args=b'somethingexample_func'
+        )
+
+        message_remove_example_attr = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call2,
+            args=b'c.someexample_attr'
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_remove_example_func,
+            message_remove_example_attr):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+
+    def test_disallowed_replacements_regex(self):
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements_regex) = [
+                r'.*example_func=>other_func',
+                r'.*\.example_attr=>other_attr',
+            ]
+        self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
+
+        call1, call2, call3, call4 = astroid.extract_node(
+            """
+        somethingexample_func() #@
+        d.example_attr() #@
+        d.example_attr() #@
+        d.b.example_attr() #@
+        """)
+
+        message_replace_example_func = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call1,
+            args=(b'somethingexample_func', b'other_func')
+        )
+
+        message_replace_example_attr1 = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call2,
+            args=(b'd.example_attr', b'other_attr')
+        )
+
+        message_replace_example_attr2 = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call3,
+            args=(b'd.example_attr', b'other_attr')
+        )
+
+        message_replace_example_attr3 = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call4,
+            args=(b'd.b.example_attr', b'other_attr')
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_replace_example_func,
+            message_replace_example_attr1,
+            message_replace_example_attr2,
+            message_replace_example_attr3):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
             self.checker_test_object.checker.visit_call(call3)

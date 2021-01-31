@@ -638,9 +638,9 @@ written_translations:
             python_utils.string_io(buffer_value=golden_zipfile))
         # Compare saved with golden file.
         self.assertEqual(
-            zf_saved.open( # pylint: disable=disallowed-function-calls
+            zf_saved.open(
                 'The title for ZIP download handler test!.yaml').read(),
-            zf_gold.open( # pylint: disable=disallowed-function-calls
+            zf_gold.open(
                 'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON.

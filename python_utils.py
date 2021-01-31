@@ -105,7 +105,7 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
     # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
     # This should be removed after we fully migrate to Python 3.
     try:
-        return io.open(filename, mode, encoding=encoding, newline=newline) # pylint: disable=disallowed-function-calls
+        return io.open(filename, mode, encoding=encoding, newline=newline)
     except:
         raise IOError('Unable to open file: %s' % filename)
 

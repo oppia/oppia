@@ -1956,66 +1956,110 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
 
     options = (
         (
-            'disallowed-functions-and-replacements',
+            'disallowed-functions-and-replacements-str',
             {
                 'default': (),
                 'type': 'csv',
                 'metavar': '<comma separated list>',
                 'help': (
                     'List of strings of disallowed function names. '
-                    'Strings should be either in the format \'A=>B\', '
+                    'Strings should be either in the format (1) "A=>B", '
                     'where A is the disallowed function and B is the '
-                    'replacement or in the format \'A\', which signifies '
+                    'replacement, or (2) in the format "A", which signifies '
                     'that A should just be removed.')
-            }
+            },
+        ),
+        (
+            'disallowed-functions-and-replacements-regex',
+            {
+                'default': (),
+                'type': 'csv',
+                'metavar': '<comma separated list>',
+                'help': (
+                    'List of strings of regex to find disallowed function '
+                    'names. Strings should be either in the format "A=>B", '
+                    'where A is a regex for the disallowed function and B '
+                    'is the replacement or in the format "A", which '
+                    ' signifies that A should just be removed. '
+                    'An example regex entry is: ".*func=>other", which '
+                    'suggests "somefunc" be replaced by "other".')
+            },
         ),)
 
     def __init__(self, linter=None):
         super(DisallowedFunctionsChecker, self).__init__(linter)
-        self.funcs_to_replace = {}
-        self.funcs_to_remove = set()
+        self.funcs_to_replace_str = {}
+        self.funcs_to_remove_str = set()
+        self.funcs_to_replace_regex = []
+        self.funcs_to_remove_regex = None
 
     def open(self):
-        self._populate_disallowed_functions_and_replacements()
+        self._populate_disallowed_functions_and_replacements_str()
+        self._populate_disallowed_functions_and_replacements_regex()
 
-    def _populate_disallowed_functions_and_replacements(self):
+    def _populate_disallowed_functions_and_replacements_str(self):
         """Parse pylint config entries for replacements of disallowed
-        functions.
+        functions represented by strings.
         """
-        disallowed_entries = self.config.disallowed_functions_and_replacements
-        for entry in disallowed_entries:
+        for entry in self.config.disallowed_functions_and_replacements_str:
             splits = [s.strip() for s in entry.split('=>')]
             assert len(splits) in (1, 2)
             if len(splits) == 1:
-                self.funcs_to_remove.add(splits[0])
+                self.funcs_to_remove_str.add(splits[0])
             else:
-                self.funcs_to_replace[splits[0]] = splits[1]
+                self.funcs_to_replace_str[splits[0]] = splits[1]
+
+    def _populate_disallowed_functions_and_replacements_regex(self):
+        """Parse pylint config entries for replacements of disallowed
+        functions represented by regex.
+        """
+        remove_regexes = []
+        for entry in self.config.disallowed_functions_and_replacements_regex:
+            splits = [s.strip() for s in entry.split('=>')]
+            assert len(splits) in (1, 2)
+            if len(splits) == 1:
+                remove_regexes.append(splits[0])
+            else:
+                rgx = re.compile(r'{}'.format(splits[0]))
+                self.funcs_to_replace_regex.append((rgx, splits[1]))
+
+        # Store removal regexes as one large regex, concatenated by "|".
+        if len(remove_regexes) > 0:
+            self.funcs_to_remove_regex = (
+                re.compile(r'{}'.format('|'.join(remove_regexes))))
 
     def visit_call(self, node):
         """Visit a function call to ensure that the call is
-        not using any disallowed functions
+        not using any disallowed functions.
 
         Args:
             node: astroid.nodes.Call. Node to access call content.
         """
-        func = node.func
-        func_key = None
-        # The call will either be a direct call or a call as an attribute
-        # of an object (e.g. obj.do_something()). In the case that the
-        # call is an attribute, then it will use the attrname field.
-        if hasattr(func, 'attrname'):
-            func_key = func.attrname
-        elif hasattr(func, 'name'):
-            func_key = func.name
-
-        if func_key in self.funcs_to_replace:
+        func = node.func.as_string()
+        if func in self.funcs_to_replace_str:
             self.add_message(
                 'replace-disallowed-function-calls',
-                node=node, args=(func_key, self.funcs_to_replace[func_key]))
-        elif func_key in self.funcs_to_remove:
+                node=node, args=(func, self.funcs_to_replace_str[func]))
+        elif (
+                func in self.funcs_to_remove_str
+                or (
+                    self.funcs_to_remove_regex is not None
+                    and self.funcs_to_remove_regex.match(func) is not None
+                )
+            ):
             self.add_message(
                 'remove-disallowed-function-calls',
-                node=node, args=func_key)
+                node=node, args=func)
+        else:
+            # Search through list of replacement regexes entries
+            # (tuple(rgx, replacement)). If a match is found, return the
+            # corresponding replacement.
+            for rgx, replacement in self.funcs_to_replace_regex:
+                if rgx.match(func) is not None:
+                    self.add_message(
+                        'replace-disallowed-function-calls',
+                        node=node, args=(func, replacement))
+                    break
 
 
 def register(linter):
