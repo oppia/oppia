@@ -156,12 +156,9 @@ export class ReadOnlyExplorationBackendApiService {
   loadExploration(explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
-      if (!('skill_editor' === this.urlService.getPathname()
-        .split('/')[1].replace(/"/g, "'"))) {
-        this._fetchExploration(explorationId, version).then(exploration => {
-          resolve(exploration);
-        }, reject);
-      }
+      this._fetchExploration(explorationId, version).then(exploration => {
+        resolve(exploration);
+      }, reject);
     });
   }
 
