@@ -2115,8 +2115,8 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 1})
         self.assertEqual(len(response['unresolved_issues']), 2)
-        self.assertEqual(response['unresolved_issues'][0]['issue_type'],
-            'EarlyQuit')
+        self.assertEqual(
+            response['unresolved_issues'][0]['issue_type'], 'EarlyQuit')
         self.assertEqual(
             response['unresolved_issues'][1]['issue_type'],
             'MultipleIncorrectSubmissions')
@@ -2133,7 +2133,8 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 1})
         self.assertEqual(len(response['unresolved_issues']), 1)
-        self.assertEqual(response['unresolved_issues'][0]['issue_type'], 'EarlyQuit')
+        self.assertEqual(
+            response['unresolved_issues'][0]['issue_type'], 'EarlyQuit')
 
     def test_fetch_playthrough_handler(self):
         """Test that the playthrough gets fetched correctly."""
