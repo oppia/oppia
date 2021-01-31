@@ -35,7 +35,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Full exploration editor', function() {
+fdescribe('Full exploration editor', function() {
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -136,7 +136,7 @@ describe('Full exploration editor', function() {
   });
 
   // Adding this comment so I can create a draft PR.
-  it('should prevent going back when help card is shown', async function() {
+  fit('should prevent going back when help card is shown', async function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
     await workflow.createExploration();
@@ -165,9 +165,15 @@ describe('Full exploration editor', function() {
 
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
+    debugger;
     var backButton = element(by.css('.protractor-test-back-button'));
+    var nextCardButton = element(by.css('.protractor-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('LogicProof');
+    debugger;
+    await waitFor.visibilityOf(
+      nextCardButton, 'Next Card Button taking too long to show up');
+    debugger;
     await waitFor.invisibilityOf(
       backButton, 'Back button takes too long to disappear.');
 
