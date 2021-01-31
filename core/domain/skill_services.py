@@ -473,6 +473,9 @@ def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
                         'subtopic_id': subtopic.id,
                         'skill_id': old_skill_id
                     }), topic_domain.TopicChange({
+                        'cmd': 'remove_uncategorized_skill_id',
+                        'uncategorized_skill_id': old_skill_id
+                    }), topic_domain.TopicChange({
                         'cmd': 'add_uncategorized_skill_id',
                         'new_uncategorized_skill_id': new_skill_id
                     }), topic_domain.TopicChange({
