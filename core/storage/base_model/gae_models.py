@@ -316,8 +316,28 @@ class BaseModel(datastore_services.Model):
         datastore_services.put_multi(entities)
 
     @classmethod
+    def put_multi(cls, entities):
+        """Stores the given datastore_services.Model instances.
+
+        Args:
+            entities: list(datastore_services.Model). List of model instances to
+                be stored.
+        """
+        datastore_services.put_multi(entities)
+
+    @classmethod
     @transaction_services.run_in_transaction_wrapper
     def delete_multi_transactional(cls, entities):
+        """Deletes the given datastore_services.Model instances.
+
+        Args:
+            entities: list(datastore_services.Model). The list of model
+                instances to be deleted.
+        """
+        datastore_services.delete_multi([entity.key for entity in entities])
+
+    @classmethod
+    def delete_multi(cls, entities):
         """Deletes the given datastore_services.Model instances.
 
         Args:
