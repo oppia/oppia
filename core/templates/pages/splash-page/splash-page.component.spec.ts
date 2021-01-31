@@ -136,7 +136,7 @@ describe('Splash Page', () => {
       siteAnalyticsServiceStub, 'registerClickStartTeachingButtonEvent')
       .and.callThrough();
     component.onClickStartTeachingButton();
-    expect(siteAnalyticsServiceStub.registerClickStartTeachingButtonEvent())
+    expect(siteAnalyticsServiceStub.registerClickStartTeachingButtonEvent)
       .toHaveBeenCalled();
   });
 

@@ -70,11 +70,13 @@ export class SplashPageComponent implements OnInit {
   onClickStartContributingButton():void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
     this.windowRef.nativeWindow.location.href = 'https://www.oppiafoundation.org/volunteer';
+    return;
   }
 
   onClickStartTeachingButton():void {
     this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
     this.windowRef.nativeWindow.location.href = ('/teach');
+    return;
   }
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
