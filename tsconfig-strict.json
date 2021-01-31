@@ -95,6 +95,7 @@
     "core/templates/services/construct-translation-ids.service.spec.ts",
     "core/templates/services/contextual/logger.service.ts",
     "core/templates/services/contextual/logger.service.spec.ts",
+    "core/templates/services/compute-graph.service.ts",
     "core/templates/services/csrf-token.service.ts",
     "core/templates/services/csrf-token.service.spec.ts",
     "core/templates/services/date-time-format.service.ts",
