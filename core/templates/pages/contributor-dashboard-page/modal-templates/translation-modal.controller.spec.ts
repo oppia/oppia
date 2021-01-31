@@ -112,10 +112,10 @@ describe('Translation Modal Controller', function() {
     spyOn(
       SiteAnalyticsService,
       'registerContributorDashboardSubmitSuggestionEvent');
-    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' + 
-      '"&amp;quot;Image description&amp;quot;" caption-with-value=' + 
-      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' + 
-      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' + 
+    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
+      '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
+      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
     $scope.activeWrittenTranslation.html = '';
     $scope.suggestTranslatedText();
@@ -131,16 +131,16 @@ describe('Translation Modal Controller', function() {
     spyOn(
       SiteAnalyticsService,
       'registerContributorDashboardSubmitSuggestionEvent');
-    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' + 
-      '"&amp;quot;Image description&amp;quot;" caption-with-value=' + 
-      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' + 
-      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' + 
+    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
+      '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
+      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
-    $scope.activeWrittenTranslation.html = 
-      '<oppia-noninteractive-image alt-with-value=' + 
-      '"" caption-with-value=' + 
-      '"" filepath-with-value="&amp;quot;' + 
-      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' + 
+    $scope.activeWrittenTranslation.html =
+      '<oppia-noninteractive-image alt-with-value=' +
+      '"" caption-with-value=' +
+      '"" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
     $scope.suggestTranslatedText();
     expect(
@@ -149,23 +149,23 @@ describe('Translation Modal Controller', function() {
   });
 
   it('should register Contributor Dashboard submit suggestion event when' +
-    ' alt test of images are not present and all imgs are copied when ' + 
+    ' alt test of images are not present and all imgs are copied when ' +
     'suggesting translated text',
   function() {
     $httpBackend.flush();
     spyOn(
       SiteAnalyticsService,
       'registerContributorDashboardSubmitSuggestionEvent');
-    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' + 
-      '"&amp;quot;Image description&amp;quot;" caption-with-value=' + 
-      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' + 
-      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' + 
+    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
+      '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
+      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
-    $scope.activeWrittenTranslation.html = 
-      '<oppia-noninteractive-image alt-with-value=' + 
-      '"&quot;alt-text&quot;" caption-with-value=' + 
-      '"&quot;caption&quot;" filepath-with-value="&amp;quot;' + 
-      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' + 
+    $scope.activeWrittenTranslation.html =
+      '<oppia-noninteractive-image alt-with-value=' +
+      '"&quot;alt-text&quot;" caption-with-value=' +
+      '"&quot;caption&quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
     $scope.suggestTranslatedText();
     expect(
@@ -199,48 +199,48 @@ describe('Translation Modal Controller', function() {
     expect($scope.uploadingTranslation).toBe(false);
   });
 
-  it('should not broadcast copy to ck editor when clicking on content' + 
+  it('should not broadcast copy to ck editor when clicking on content' +
     ' when a paragraph with non math equation is clicked',
-    function() {
-      spyOn(CkEditorCopyContentService, 'broadcastCopy').and
-        .callFake(() => {});
+  function() {
+    spyOn(CkEditorCopyContentService, 'broadcastCopy').and
+      .callFake(() => {});
 
-      var mockEvent = {
-        stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
-        target: {
-          localName: 'p',
-          children: [
-            {
-              localName: 'text'
-            }
-          ]
-        }
-      };
-      $scope.onContentClick(mockEvent);
+    var mockEvent = {
+      stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
+      target: {
+        localName: 'p',
+        children: [
+          {
+            localName: 'text'
+          }
+        ]
+      }
+    };
+    $scope.onContentClick(mockEvent);
 
-      expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
-      expect(CkEditorCopyContentService.broadcastCopy).not.toHaveBeenCalledWith(
-        mockEvent.target);
-    });
+    expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
+    expect(CkEditorCopyContentService.broadcastCopy).not.toHaveBeenCalledWith(
+      mockEvent.target);
+  });
 
-    it('should broadcast copy to ck editor when clicking on content' + 
-    ' when anything apart from a paragraph is clicked',
-    function() {
-      spyOn(CkEditorCopyContentService, 'broadcastCopy').and
-        .callFake(() => {});
+  it('should broadcast copy to ck editor when clicking on content' + 
+  ' when anything apart from a paragraph is clicked',
+  function() {
+    spyOn(CkEditorCopyContentService, 'broadcastCopy').and
+      .callFake(() => {});
 
-      var mockEvent = {
-        stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
-        target: {
-          localName: 'oppia-noninteractive-image'
-        }
-      };
-      $scope.onContentClick(mockEvent);
+    var mockEvent = {
+      stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
+      target: {
+        localName: 'oppia-noninteractive-image'
+      }
+    };
+    $scope.onContentClick(mockEvent);
 
-      expect(mockEvent.stopPropagation).toHaveBeenCalled();
-      expect(CkEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
-        mockEvent.target);
-    });
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+    expect(CkEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
+      mockEvent.target);
+  });
 
   it('should close modal when there is not more text to be translated',
     function() {
