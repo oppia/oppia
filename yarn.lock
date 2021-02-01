@@ -4355,11 +4355,6 @@ di@^0.0.1:
   resolved "https://registry.yarnpkg.com/di/-/di-0.0.1.tgz#806649326ceaa7caa3306d75d985ea2748ba913c"
   integrity sha1-gGZJMmzqp8qjMG112YXqJ0i6kTw=
 
-dialog-polyfill@^0.4.7:
-  version "0.4.10"
-  resolved "https://registry.yarnpkg.com/dialog-polyfill/-/dialog-polyfill-0.4.10.tgz#c4ea68a0deed4abb59a6a2a025c548b278cd532e"
-  integrity sha512-j5yGMkP8T00UFgyO+78OxiN5vC5dzRQF3BEio+LhNvDbyfxWBsi3sfPArDm54VloaJwy2hm3erEiDWqHRC8rzw==
-
 diff@4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/diff/-/diff-4.0.2.tgz#60f3aecb89d5fae520c11aa19efc2bb982aade7d"
@@ -5612,21 +5607,6 @@ firebase@^8.0.0:
     "@firebase/remote-config" "0.1.30"
     "@firebase/storage" "0.4.2"
     "@firebase/util" "0.3.4"
-
-firebaseui-angular@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/firebaseui-angular/-/firebaseui-angular-5.1.1.tgz#1fad945fc7ca36458063e862375171e6a9470c6b"
-  integrity sha512-MbCiENFE3PixE7sFOzrgVl4dH5z6PGQbB33bT/h4QDPvpohFYv5xfrY7R2l63uZ5+hkG6HDhAzq5RlKfoCUYTA==
-  dependencies:
-    tslib "^2.0.0"
-
-firebaseui@4.7.1:
-  version "4.7.1"
-  resolved "https://registry.yarnpkg.com/firebaseui/-/firebaseui-4.7.1.tgz#8e0303d9f733e16b0bfbfa24001ab8bd4bc98038"
-  integrity sha512-wDdo3LLnh9sV1dDKyNgn4M7cKecILosvqvtQE1SUum/R+eXLdN1q1ZRKZ2Lp6ZyP0XDAHrotssS4vJNh4OdwuQ==
-  dependencies:
-    dialog-polyfill "^0.4.7"
-    material-design-lite "^1.2.0"
 
 flagged-respawn@^1.0.0:
   version "1.0.1"
@@ -8531,11 +8511,6 @@ marky@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/marky/-/marky-1.2.1.tgz#a3fcf82ffd357756b8b8affec9fdbf3a30dc1b02"
   integrity sha512-md9k+Gxa3qLH6sUKpeC2CNkJK/Ld+bEz5X96nYwloqphQE0CKCVEKco/6jxEZixinqNdz5RFi/KaCyfbMDMAXQ==
-
-material-design-lite@^1.2.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/material-design-lite/-/material-design-lite-1.3.0.tgz#d004ce3fee99a1eeb74a78b8a325134a5f1171d3"
-  integrity sha1-0ATOP+6Zoe63Sni4oyUTSl8RcdM=
 
 mathjs@^9.0.0:
   version "9.1.0"
@@ -13002,7 +12977,7 @@ webdriver-js-extender@2.1.0:
     "@types/selenium-webdriver" "^3.0.0"
     selenium-webdriver "^3.0.1"
 
-webdriver-manager@^12.1.7:
+webdriver-manager@^12.1.7, webdriver-manager@^12.1.8:
   version "12.1.8"
   resolved "https://registry.yarnpkg.com/webdriver-manager/-/webdriver-manager-12.1.8.tgz#5e70e73eaaf53a0767d5745270addafbc5905fd4"
   integrity sha512-qJR36SXG2VwKugPcdwhaqcLQOD7r8P2Xiv9sfNbfZrKBnX243iAkOueX1yAmeNgIKhJ3YAT/F2gq6IiEZzahsg==

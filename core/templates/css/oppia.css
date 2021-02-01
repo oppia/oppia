@@ -96,6 +96,33 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+/* When AngularFire is in emulator mode, it appends the following element to
+the <body> of every page:
+
+    <div class="firebase-emulator-warning"
+         style="background-color: rgb(255, 255, 255);
+                border: 0.1em solid rgb(0, 0, 0);
+                bottom: 0px;
+                color: rgb(255, 0, 0);
+                left: 0px;
+                margin: 0px;
+                position: fixed;
+                text-align: center;
+                width: 100%;
+                z-index: 10000;">
+      Running in emulator mode. Do not use with production credentials.
+    </div>
+*/
+.firebase-emulator-warning {
+  /* Enhance the contrast of the text to improve accessibility. We need to use
+   `!important` here because inline style rules have a higher priority than CSS
+   style rules, but we only want these CSS rules to be respected. */
+  background-color: #FFFFFF !important;
+  color: #CC0000 !important;
+  /* Do not allow the element to swallow pointer/mouse events. */
+  pointer-events: none;
+}
+
 /* The following classes' styles are overriden by Guppy's OSK stylesheet and
 they end up rotating the tooltips which are placed on the left or right. This is
 why they need to be overriden.  */
