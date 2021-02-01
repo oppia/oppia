@@ -211,7 +211,13 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
                 inside_blanket_codeowners_section = False
                 continue
             if stripped_line and stripped_line[0] != '#':
-                if '@' not in line:
+                if '#' in line:
+                    error_message = (
+                        '%s --> Please remove inline comment from line %s' % (
+                            CODEOWNER_FILEPATH, line_num + 1))
+                    self.error_messages.append(error_message)
+                    self.failed = True
+                elif '@' not in line:
                     error_message = (
                         '%s --> Pattern on line %s doesn\'t have '
                         'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
