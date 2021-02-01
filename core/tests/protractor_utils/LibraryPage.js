@@ -92,7 +92,7 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
-    var watchLaterButton = element(by.css(
+    var addToPlayLaterListButton = element(by.css(
       '.protractor-test-add-to-playlist-btn')
     );
 
@@ -100,8 +100,8 @@ var LibraryPage = function() {
       '.protractor-test-exp-summary-tile-title'))).perform();
 
     await waitFor.elementToBeClickable(
-      watchLaterButton, 'Watch later Icon taking too long to load');
-    await watchLaterButton.click();
+      addToPlayLaterListButton, 'Add to \'Play Later\' list Icon taking too long to load');
+    await addToPlayLaterListButton.click();
   };
 
   this.selectLanguages = async function(languages) {
