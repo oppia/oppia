@@ -636,6 +636,61 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         self.assertEqual(len(topic_assignments_dict), 0)
 
+    def test_successfully_replace_skill_id_in_all_topics(self):
+        topic_id = topic_services.get_new_topic_id()
+        topic_id_1 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five', url_fragment='topic-five',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID],
+            subtopics=[], next_subtopic_id=1)
+
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'url_fragment': 'subtopic-one'
+        })
+        self.save_new_topic(
+            topic_id_1, self.USER_ID, name='Topic2',
+            abbreviated_name='topic-six', url_fragment='topic-six',
+            description='Description2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        topic_assignments_dict = (
+            skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
+        self.assertEqual(len(topic_assignments_dict), 0)
+        skill_services.replace_skill_id_in_all_topics(
+            self.USER_ID, self.SKILL_ID, 'new_skill_id')
+        topic_assignments_dict = (
+            skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
+        self.assertEqual(len(topic_assignments_dict), 2)
+
+    def test_failure_replace_skill_id_in_all_topics(self):
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five', url_fragment='topic-five',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID, 'new_skill_id'],
+            subtopics=[], next_subtopic_id=1)
+        error_message = (
+            'Found topic \'Topic1\' contains the two skills to be merged. '
+            'Please unassign one of these skills from topic '
+            'and retry this operation.')
+        with self.assertRaisesRegexp(Exception, error_message):
+            skill_services.replace_skill_id_in_all_topics(
+                self.USER_ID, self.SKILL_ID, 'new_skill_id')
+
     def test_update_skill(self):
         changelist = [
             skill_domain.SkillChange({

@@ -268,10 +268,8 @@ angular.module('oppia').directive('skillsList', [
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
                 }, 100);
-              }, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
+              }, function(response) {
+                AlertsService.addWarning(response.error.error);
               });
             }, function() {
               // Note to developers:

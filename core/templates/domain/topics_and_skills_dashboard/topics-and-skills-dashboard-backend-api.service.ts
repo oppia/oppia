@@ -206,9 +206,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     };
     return this.http.post<void>(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
-      mergeSkillsData).toPromise().then(() => {}, errorResponse => {
-      throw new Error(errorResponse.error.error);
-    });
+      mergeSkillsData).toPromise();
   }
 
   get onTopicsAndSkillsDashboardReinitialized(): EventEmitter<boolean> {
