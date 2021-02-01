@@ -70,7 +70,7 @@ describe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.addListener();
     spyOn(reloadEvt, 'preventDefault');
 
-    this.windowRef.nativeWindow.reload();
+    windowRef.nativeWindow.location.reload();
 
     expect(reloadEvt.preventDefault).toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
