@@ -24,7 +24,6 @@ import hashlib
 import imghdr
 import logging
 import re
-import time
 
 from constants import constants
 from core.domain import auth_domain
@@ -548,7 +547,6 @@ def generate_initial_profile_picture(user_id):
     Args:
         user_id: str. The unique ID of the user.
     """
-    time.sleep(10)
     user_email = get_email_from_user_id(user_id)
     user_gravatar = fetch_gravatar(user_email)
     if user_gravatar:
@@ -593,8 +591,12 @@ def fetch_gravatar(email):
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if response.ok:
-            if imghdr.what(None, h=response.content) == 'png':
+            image_format = imghdr.what(None, h=response.content)
+            if image_format == 'png':
                 return response.content
+            else:
+                logging.exception(
+                    'The Gravatar is in a wrong format %s' % image_format)
         else:
             logging.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %

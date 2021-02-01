@@ -1829,9 +1829,15 @@ tags: []
             email: str. Email of the given user.
             username: str. Username of the given user.
         """
-        user_services.create_new_user(self.get_auth_id_from_email(email), email)
+        schedule_generate_initial_profile_picture_swap = (
+            self.swap_to_always_return(
+                user_services, 'schedule_generate_initial_profile_picture'))
 
-        with self.login_context(email), requests_mock.Mocker() as m:
+        user_services.create_new_user(self.get_auth_id_from_email(email), email)
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self.login_context(email))
+            stack.enter_context(schedule_generate_initial_profile_picture_swap)
+            m = stack.enter_context(requests_mock.Mocker())
             # We mock out all HTTP requests while trying to signup to avoid
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)
