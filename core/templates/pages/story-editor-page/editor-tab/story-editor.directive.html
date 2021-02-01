@@ -41,11 +41,18 @@
             <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
               <label for="storyDescription" class="form-heading">Description*</label>
               <textarea type="text" class="form-control protractor-test-story-description-field"
+                        maxlength="<[MAX_CHARS_IN_STORY_DESCRIPTION]>"
                         ng-model="editableDescription"
                         ng-change="updateStoryDescriptionStatus(editableDescription)"
                         ng-blur="updateStoryDescription(editableDescription)"
                         placeholder="Enter the description of the story">
               </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Story description should be at most
+                  <[MAX_CHARS_IN_STORY_DESCRIPTION]> characters.
+                </em>
+              </span>
               <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="form-text story-contain-text">
                 What does this story contain?
               </span>
