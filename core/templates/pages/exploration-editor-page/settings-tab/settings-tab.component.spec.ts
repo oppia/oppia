@@ -66,6 +66,7 @@ describe('Settings Tab Component', function() {
   var $uibModal = null;
   var alertsService = null;
   var changeListService = null;
+  var explorationDataService = null;
   var contextService = null;
   var editableExplorationBackendApiService = null;
   var explorationCategoryService = null;
@@ -131,6 +132,9 @@ describe('Settings Tab Component', function() {
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
+      data: {
+        param_changes: []
+      },
       getData: () => $q.resolve(),
       autosaveChangeList: () => {}
     });
@@ -150,6 +154,7 @@ describe('Settings Tab Component', function() {
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
       changeListService = $injector.get('ChangeListService');
+      explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       editableExplorationBackendApiService = $injector.get(
@@ -528,6 +533,21 @@ describe('Settings Tab Component', function() {
 
       ctrl.postSaveParamChangesHook();
       expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
+    });
+
+    it('should check if parameters are used', function() {
+      var paramChangeBackendDict = {
+        customization_args: {
+          parse_with_jinja: false,
+          value: 'test value'
+        },
+        generator_id: '123',
+        name: 'test',
+      };
+
+      expect(ctrl.areParametersUsed()).toBe(false);
+      explorationDataService.data.param_changes.push(paramChangeBackendDict);
+      expect(ctrl.areParametersUsed()).toBe(true);
     });
 
     it('should toggle exploration visibility', function() {

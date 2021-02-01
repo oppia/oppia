@@ -167,7 +167,10 @@ angular.module('oppia').directive('outcomeEditor', [
 
             if (StateEditorService.isInQuestionMode()) {
               ctrl.savedOutcome.dest = null;
-            } else if (ctrl.savedOutcome.dest === ctrl.outcome.dest) {
+            } else if (
+              ctrl.savedOutcome.dest === ctrl.outcome.dest &&
+                !StateEditorService.getStateNames().includes(
+                  ctrl.outcome.dest)) {
               // If the stateName has changed and previously saved
               // destination points to the older name, update it to
               // the active state name.
