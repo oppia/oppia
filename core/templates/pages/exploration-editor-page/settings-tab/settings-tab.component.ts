@@ -328,6 +328,10 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
 
         var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
+        // TODO-gp201 test this in the spec file
+        var onUnpublishingcallback = function() {
+          UserExplorationPermissionsService.fetchPermissionsAsync();
+        };
 
         $http.get(moderatorEmailDraftUrl).then(function(response) {
           // If the draft email body is empty, email functionality will not
@@ -345,7 +349,7 @@ angular.module('oppia').component('settingsTab', {
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
             ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody);
+              emailBody, onUnpublishingcallback);
           }, function() {
             AlertsService.clearWarnings();
           });
@@ -458,31 +462,50 @@ angular.module('oppia').component('settingsTab', {
           width: '16.66666667%',
           'vertical-align': 'top'
         });
+        ctrl.refreshPermissions();
       };
 
       // Called by the ng-if present in Unpublish button in
       // "settings-tab.component.hmtl". Refreshes the permissions for Unpublish
       // and transfer buttons.
 
-      ctrl.canReleaseOwnership = false;
-      ctrl.canUnpublish = false;
+      // ctrl.canReleaseOwnership = false;
+      // ctrl.canUnpublish = false;
 
-      ctrl.showUnpublishButton = function() {
+      // ctrl.showUnpublishButton = function() {
+      //   UserExplorationPermissionsService.getPermissionsAsync()
+      //     .then(function(permissions) {
+      //       ctrl.canUnpublish = permissions.canUnpublish;
+      //       $rootScope.$applyAsync();
+      //     });
+      //   return ctrl.canUnpublish;
+      // };
+
+      // ctrl.showReleaseOwnershipButton = function() {
+      //   UserExplorationPermissionsService.getPermissionsAsync()
+      //     .then(function(permissions) {
+      //       ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+      //       $rootScope.$applyAsync();
+      //     });
+      //   return ctrl.canReleaseOwnership;
+      // };
+
+      ctrl.refreshPermissions = function(button: string) {
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
             ctrl.canUnpublish = permissions.canUnpublish;
-            $rootScope.$applyAsync();
-          });
-        return ctrl.canUnpublish;
-      };
-
-      ctrl.showReleaseOwnershipButton = function() {
-        UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
             ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
             $rootScope.$applyAsync();
           });
-        return ctrl.canReleaseOwnership;
+        if (button === 'Unpublish') {
+          return ctrl.canUnpublish;
+        }
+        if (button === 'ReleaseOwnership') {
+          return ctrl.canReleaseOwnership;
+        }
+        return false;
       };
 
       ctrl.$onDestroy = function() {

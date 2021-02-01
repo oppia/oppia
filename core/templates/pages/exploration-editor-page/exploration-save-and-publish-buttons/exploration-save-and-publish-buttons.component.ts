@@ -99,6 +99,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
 
       var hideLoadingDots = function() {
         $scope.loadingDotsAreShown = false;
+        UserExplorationPermissionsService.fetchPermissionsAsync();
       };
 
       $scope.showPublishExplorationModal = function() {
@@ -134,16 +135,18 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ctrl.saveBeforeUnload();
       };
 
-      $scope.canPublish = false;
+      $scope.explorationCanBePublished = false;
 
       $scope.showPublishButton = function() {
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
-            $scope.canPublish = permissions.canPublish;
+            $scope.explorationCanBePublished = permissions.canPublish;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
             $rootScope.$applyAsync();
           });
 
-        return $scope.canPublish && $scope.isPrivate();
+        return $scope.explorationCanBePublished && $scope.isPrivate();
       };
 
       ctrl.saveBeforeUnload = function() {

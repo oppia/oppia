@@ -64,9 +64,6 @@ require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'user-exploration-permissions.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
@@ -86,7 +83,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationWarningsService', 'ExternalSaveService',
   'FocusManagerService', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
-  'UserExplorationPermissionsService', 'DEFAULT_LANGUAGE_CODE',
+  'DEFAULT_LANGUAGE_CODE',
   function(
       $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
@@ -99,7 +96,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationWarningsService, ExternalSaveService,
       FocusManagerService, RouterService,
       SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
-      UserExplorationPermissionsService, DEFAULT_LANGUAGE_CODE,) {
+      DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet).
     var saveIsInProgress = false;
@@ -161,7 +158,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
             showCongratulatorySharingModal();
             SiteAnalyticsService.registerPublishExplorationEvent(
               ExplorationDataService.explorationId);
-            UserExplorationPermissionsService.getPermissionsAsync(true);
             whenModalClosed.resolve();
           });
       }, function() {

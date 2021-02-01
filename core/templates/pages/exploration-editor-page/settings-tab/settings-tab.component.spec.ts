@@ -425,7 +425,7 @@ describe('Settings Tab Component', function() {
       $scope.$apply();
 
       expect(explorationRightsService.saveModeratorChangeToBackend)
-        .toHaveBeenCalledWith('Email body');
+        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
@@ -643,18 +643,25 @@ describe('Settings Tab Component', function() {
       ctrl.toggleCards('settings');
       expect(ctrl.basicSettingIsShown).toEqual(true);
     });
+
     it('should display Unpublish button', function() {
-      ctrl.showUnpublishButton();
+      ctrl.canUnpublish = false;
+      expect(ctrl.canUnpublish).toBe(false);
+      ctrl.refreshPermissions('Unpublish');
       $scope.$apply();
+
       expect(ctrl.canUnpublish).toBe(true);
-      expect(ctrl.showUnpublishButton()).toEqual(true);
+      expect(ctrl.refreshPermissions('Unpublish')).toEqual(true);
     });
 
     it('should display Transfer ownership button', function() {
-      ctrl.showReleaseOwnershipButton();
+      ctrl.canReleaseOwnership = false;
+      expect(ctrl.canReleaseOwnership).toBe(false);
+      ctrl.refreshPermissions('ReleaseOwnership');
       $scope.$apply();
+
       expect(ctrl.canReleaseOwnership).toBe(true);
-      expect(ctrl.showReleaseOwnershipButton()).toEqual(true);
+      expect(ctrl.refreshPermissions('ReleaseOwnership')).toEqual(true);
     });
   });
 });

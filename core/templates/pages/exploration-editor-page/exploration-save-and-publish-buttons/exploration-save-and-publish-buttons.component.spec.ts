@@ -268,7 +268,7 @@ describe('Exploration save and publish buttons component', function() {
     $scope.showPublishButton();
     $scope.$apply();
     spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
-    expect($scope.canPublish).toBe(true);
+    expect($scope.explorationCanBePublished).toBe(true);
     expect($scope.showPublishButton()).toBe(true);
   });
 
