@@ -62,8 +62,9 @@ describe ('Prevent page unload event service', function() {
 
   it('should removing listener', () => {
     spyOn(preventPageUnloadEventService, 'removeListener').and.callThrough();
-
     preventPageUnloadEventService.addListener();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+
     preventPageUnloadEventService.removeListener();
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
