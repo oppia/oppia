@@ -91,6 +91,8 @@ describe('Exploration editor page component', function() {
 
   var refreshGraphEmitter = new EventEmitter();
 
+  var autosaveIsInProgress = new EventEmitter();
+
   var mockOpenEditorTutorialEmitter = new EventEmitter();
 
   var mockInitExplorationPageEmitter = new EventEmitter();
@@ -438,10 +440,10 @@ describe('Exploration editor page component', function() {
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+      spyOnProperty(cls, 'autosaveIsInProgress$').and.returnValue(
+        autosaveIsInProgress);
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
         mockInitExplorationPageEmitter);
-
-
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
@@ -449,6 +451,12 @@ describe('Exploration editor page component', function() {
 
     afterEach(() => {
       ctrl.$onDestroy();
+    });
+
+    it('should change the value of autosavingIsInProgress', () => {
+      autosaveIsInProgress.emit(true);
+      $scope.$apply();
+      ctrl.autosaveIsInProgress = true;
     });
 
     it('should link exploration to story when initing exploration page', () => {

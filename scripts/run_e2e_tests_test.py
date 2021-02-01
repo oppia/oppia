@@ -200,9 +200,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common.GOOGLE_APP_ENGINE_SDK_HOME)
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
+        elasticsearch_path = '%s/' % common.ES_PATH
         process_pattern = [
             ('.*%s.*' % re.escape(google_app_engine_path),),
-            ('.*%s.*' % re.escape(webdriver_download_path),)
+            ('.*%s.*' % re.escape(webdriver_download_path),),
+            ('.*%s.*' % re.escape(elasticsearch_path),),
         ]
 
         swap_kill_process = self.swap_with_checks(
@@ -237,7 +239,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_wait_for_port_to_be_closed(unused_port):
             return True
 
-        mock_processes = [MockProcessClass(), MockProcessClass()]
+        mock_processes = [
+            MockProcessClass(), MockProcessClass(), MockProcessClass()]
         subprocess_swap = self.swap(
             run_e2e_tests, 'SUBPROCESSES', mock_processes)
         swap_kill_process = self.swap_with_checks(
@@ -277,9 +280,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common.GOOGLE_APP_ENGINE_SDK_HOME)
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
+        elasticsearch_path = '%s/' % common.ES_PATH
         process_pattern = [
             ('.*%s.*' % re.escape(google_app_engine_path),),
-            ('.*%s.*' % re.escape(webdriver_download_path),)
+            ('.*%s.*' % re.escape(webdriver_download_path),),
+            ('.*%s.*' % re.escape(elasticsearch_path),),
         ]
 
         swap_kill_process = self.swap_with_checks(
@@ -323,9 +328,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
+        elasticsearch_path = '%s/' % common.ES_PATH
         process_pattern = [
             ('.*%s.*' % re.escape(google_app_engine_path),),
-            ('.*%s.*' % re.escape(webdriver_download_path),)
+            ('.*%s.*' % re.escape(webdriver_download_path),),
+            ('.*%s.*' % re.escape(elasticsearch_path),),
         ]
         expected_pattern = process_pattern[:]
         expected_pattern[1] = ('.*%s.*' % re.escape(
@@ -928,7 +935,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
                 ]),
@@ -1047,7 +1054,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(
@@ -1395,7 +1402,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
                 ]),
@@ -1569,7 +1576,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(
@@ -1694,7 +1701,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
-                    (feconf.ES_PORT,),
+                    (feconf.ES_LOCALHOST_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(

@@ -46,6 +46,8 @@ describe('Image preloader service', () => {
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    draft_changes: [],
+    is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',
     init_state_name: initStateName,
