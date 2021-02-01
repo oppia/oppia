@@ -127,6 +127,8 @@ angular.module('oppia').component('historyTab', {
                     DateTimeFormatService
                       .getLocaleDateTimeHourString(
                         explorationSnapshots[i].created_on_ms)),
+                  tooltipText: DateTimeFormatService.getDateTimeInWords(
+                    explorationSnapshots[i].created_on_ms),
                   commitMessage: explorationSnapshots[i].commit_message,
                   versionNumber: explorationSnapshots[i].version_number
                 };
