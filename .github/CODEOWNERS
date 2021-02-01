@@ -396,7 +396,6 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/domain/subtopic_*.py @aks68
 /core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
@@ -409,6 +408,7 @@
 /core/controllers/topic_*.py @aks681
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
+/core/domain/subtopic*.py @aks681
 /core/domain/topic*.py @aks681
 /core/templates/components/entity-creation-services/topic-creation.service.ts @kevintab95
 /core/templates/domain/classroom/ @kevintab95
