@@ -100,7 +100,8 @@ var LibraryPage = function() {
       '.protractor-test-exp-summary-tile-title'))).perform();
 
     await waitFor.elementToBeClickable(
-      addToPlayLaterListButton, 'Add to \'Play Later\' list Icon taking too long to load');
+      addToPlayLaterListButton,
+        'Add to \'Play Later\' list Icon taking too long to load');
     await addToPlayLaterListButton.click();
   };
 
