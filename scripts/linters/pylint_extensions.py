@@ -1488,15 +1488,40 @@ class RestrictedImportChecker(checkers.BaseChecker):
         (
             'forbidden-imports',
             {
-                'default': ('core.storage:core.domain',),
+                'default': [],
                 'type': 'csv',
                 'metavar': '<comma separated list>',
-                'help': 'List of disallowed imports.'
+                'help': (
+                    'List of disallowed imports. The items start with '
+                    'the module name where the imports are forbidden, the path '
+                    'needs to be absolute with the root module name included '
+                    '(e.g. \'oppia.core.domain\'), then comes '
+                    'the \':\' separator, and after that a list of the imports '
+                    'that are forbidden separated by \'|\', these imports are '
+                    'relative to the root module (e.g. \'core.domain\').'
+                )
             }
         ),
     )
 
-    def iterate_forbidden_imports(self, node):
+    def __init__(self, linter=None):
+        super(RestrictedImportChecker, self).__init__(linter)
+        self._module_to_forbidden_imports = []
+
+    def open(self):
+        """Parse the forbidden imports."""
+        splitted_module_to_forbidden_imports = [
+            forbidden_import.strip().split(':')
+            for forbidden_import in self.config.forbidden_imports
+        ]
+        self._module_to_forbidden_imports = list(
+            (
+                forbidden_imports[0].strip(),
+                [import_.strip() for import_ in forbidden_imports[1].split('|')]
+            ) for forbidden_imports in splitted_module_to_forbidden_imports
+        )
+
+    def _iterate_forbidden_imports(self, node):
         """Yields pairs of module name and forbidden imports.
 
         Args:
@@ -1506,19 +1531,8 @@ class RestrictedImportChecker(checkers.BaseChecker):
         Yields:
             tuple(str, str). Yields pair of module name and forbidden import.
         """
-        splited_module_to_forbidden_imports = [
-            forbidden_import.strip().split(':')
-            for forbidden_import in self.config.forbidden_imports
-        ]
-        module_to_forbidden_imports = list(
-            (
-                'oppia.%s' % forbidden_import[0].strip(),
-                forbidden_import[1].split('|')
-            ) for forbidden_import in splited_module_to_forbidden_imports
-        )
-
         modnode = node.root()
-        for module_name, forbidden_imports in module_to_forbidden_imports:
+        for module_name, forbidden_imports in self._module_to_forbidden_imports:
             for forbidden_import in forbidden_imports:
                 if module_name in modnode.name and not '_test' in modnode.name:
                     yield module_name, forbidden_import
@@ -1531,7 +1545,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 in the AST.
         """
         names = [name for name, _ in node.names]
-        for module_name, forbidden_import in self.iterate_forbidden_imports(
+        for module_name, forbidden_import in self._iterate_forbidden_imports(
                 node):
             if any(forbidden_import in name for name in names):
                 self.add_message(
@@ -1551,7 +1565,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-        for module_name, forbidden_import in self.iterate_forbidden_imports(
+        for module_name, forbidden_import in self._iterate_forbidden_imports(
                 node):
             if forbidden_import in node.modname:
                 self.add_message(

@@ -1955,11 +1955,14 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.RestrictedImportChecker)
         self.checker_test_object.setup_method()
+        # The spaces are included on purpose so that we properly test
+        # the input sanitization.
         self.checker_test_object.checker.config.forbidden_imports = (
-            'core.storage:core.domain',
-            'core.domain:core.controllers',
-            'core.controllers:core.platform|core.storage'
+            '  oppia.core.storage: core.domain  ',
+            'oppia.core.domain  : core.controllers',
+            'oppia.core.controllers: core.platform  |  core.storage '
         )
+        self.checker_test_object.checker.open()
 
     def test_forbid_domain_import_in_storage_module(self):
         node_err_import = astroid.extract_node(

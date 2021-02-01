@@ -63,9 +63,9 @@ indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
 forbidden-imports=
-    core.storage:core.domain,
-    core.domain:core.controllers,
-    core.controllers:core.platform|core.storage
+    oppia.core.storage:core.domain,
+    oppia.core.domain:core.controllers,
+    oppia.core.controllers:core.platform|core.storage
 
 [SIMILARITIES]
 
