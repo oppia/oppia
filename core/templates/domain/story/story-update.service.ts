@@ -23,20 +23,25 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { Change, BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+import { Change } from 'domain/editor/undo_redo/change.model';
 import cloneDeep from 'lodash/cloneDeep';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
+import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service.ts';
 import { Story } from 'domain/story/StoryObjectFactory.ts';
 import { StoryContents } from 'domain/story/StoryContentsObjectFactory.ts';
+import { StoryNode } from './story-node.model';
 
-interface ChangeDict {
-  new_value: string,
-  old_value: string,
-  property_name: string,
-  cmd: string,
-  subtopic_id: string,
+type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
+type StoryUpdateReverse = (storyChange : StoryChange, story: Story) => void;
+
+interface Dict {
+  'cmd' ?: string,
+  'property_name' ?: string,
+  'new_value' ?: string[],
+  'old_value' ?: string[],
+  'node_id' ?: string
 }
 
 @Injectable({
@@ -51,10 +56,12 @@ export class StoryUpdateService {
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // story.
-  _applyChange(story: Story, command: string, params: any, apply: any, reverse: any ) {
-    var changeDict = cloneDeep(params);
+  _applyChange(
+      story: Story, command: string, params,
+      apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
+    let changeDict = cloneDeep(params);
     changeDict.cmd = command;
-    var changeObj = new Change(changeDict, apply, reverse);
+    let changeObj = new Change(changeDict, apply, reverse);
     try {
       this._undoRedoService.applyChange(changeObj, story);
     } catch (err) {
@@ -63,15 +70,15 @@ export class StoryUpdateService {
     }
   }
 
-  _getParameterFromChangeDict(changeDict: ChangeDict, paramName: string) {
+  _getParameterFromChangeDict(changeDict, paramName: string): string {
     return changeDict[paramName];
   }
   
-  _getNodeIdFromChangeDict(changeDict: ChangeDict) {
+  _getNodeIdFromChangeDict(changeDict): string {
     return this._getParameterFromChangeDict(changeDict, 'node_id');
   }
-  _getStoryNode(storyContents: StoryContents, nodeId: string) {
-    var storyNodeIndex = storyContents.getNodeIndex(nodeId);
+  _getStoryNode(storyContents: StoryContents, nodeId: string): StoryNode {
+    let storyNodeIndex = storyContents.getNodeIndex(nodeId);
     if (storyNodeIndex === -1) {
       throw new Error('The given node doesn\'t exist');
     }
@@ -81,21 +88,23 @@ export class StoryUpdateService {
   // Applies a story property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
   _applyStoryPropertyChange(
-      story: Story, propertyName: string, oldValue: string, newValue: string, apply, reverse) {
+      story: Story, propertyName: string,
+      oldValue: string, newValue: string, apply, reverse): void {
     this._applyChange(story, StoryDomainConstants.CMD_UPDATE_STORY_PROPERTY, {
       property_name: propertyName,
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue)
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue)
     }, apply, reverse);
   }
 
   _applyStoryContentsPropertyChange(
-      story, propertyName: string, oldValue: string, newValue: string, apply, reverse) {
+      story: Story, propertyName: string,
+      oldValue: string, newValue: string, apply, reverse): void {
     this._applyChange(story,
       StoryDomainConstants.CMD_UPDATE_STORY_CONTENTS_PROPERTY, {
       property_name: propertyName,
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue)
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue)
     }, apply, reverse);
   }
 
@@ -106,8 +115,8 @@ export class StoryUpdateService {
       StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
       node_id: nodeId,
       property_name: propertyName,
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue)
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue)
     }, apply, reverse);
   }
 
@@ -123,12 +132,12 @@ export class StoryUpdateService {
    * undo/redo service.
    */
   setStoryTitle(story: Story, title: string) {
-    var oldTitle = angular.copy(story.getTitle());
+    let oldTitle = cloneDeep(story.getTitle());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_TITLE, oldTitle, title,
       (changeDict, story) => {
         // ---- Apply ----
-        var title = this._getNewPropertyValueFromChangeDict(changeDict);
+        let title = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setTitle(title);
       }, (changeDict, story) => {
         // ---- Undo ----
@@ -141,13 +150,13 @@ export class StoryUpdateService {
    * undo/redo service.
    */
   setStoryUrlFragment(story: Story, urlFragment: string) {
-    var oldUrlFragment = angular.copy(story.getUrlFragment());
+    let oldUrlFragment = cloneDeep(story.getUrlFragment());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_URL_FRAGMENT,
       oldUrlFragment, urlFragment,
       (changeDict, story) => {
         // ---- Apply ----
-        var newUrlFragment = this._getNewPropertyValueFromChangeDict(changeDict);
+        let newUrlFragment = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setUrlFragment(newUrlFragment);
       }, (changeDict, story) => {
         // ---- Undo ----
@@ -160,13 +169,13 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   setThumbnailFilename(story: Story, newThumbnailFilename: string) {
-    var oldThumbnailFilename = angular.copy(story.getThumbnailFilename());
+    let oldThumbnailFilename = cloneDeep(story.getThumbnailFilename());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_FILENAME,
       oldThumbnailFilename,newThumbnailFilename,
       (changeDict, story) => {
         // ---- Apply ----
-        var thumbnailFilename = (
+        let thumbnailFilename = (
           this._getNewPropertyValueFromChangeDict(changeDict));
         story.setThumbnailFilename(thumbnailFilename);
       }, (changeDict, story) => {
@@ -180,13 +189,13 @@ export class StoryUpdateService {
    * change in the undo/redo service.
    */
   setThumbnailBgColor(story: Story, newThumbnailBgColor: string) {
-    var oldThumbnailBgColor = angular.copy(story.getThumbnailBgColor());
+    let oldThumbnailBgColor = cloneDeep(story.getThumbnailBgColor());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_BG_COLOR,
       oldThumbnailBgColor, newThumbnailBgColor,
       (changeDict, story) => {
         // ---- Apply ----
-        var thumbnailBgColor = (
+        let thumbnailBgColor = (
           this._getNewPropertyValueFromChangeDict(changeDict));
         story.setThumbnailBgColor(thumbnailBgColor);
       }, (changeDict, story) => {
@@ -200,13 +209,14 @@ export class StoryUpdateService {
    * undo/redo service.
    */
   setStoryDescription(story: Story, description: string) {
-    var oldDescription = angular.copy(story.getDescription());
+    let oldDescription = cloneDeep(story.getDescription());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_DESCRIPTION,
       oldDescription, description,
       (changeDict, story) => {
         // ---- Apply ----
-        var description = this._getNewPropertyValueFromChangeDict(changeDict);
+        console.log(changeDict)
+        let description = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setDescription(description);
       }, (changeDict, story) => {
         // ---- Undo ----
@@ -219,12 +229,12 @@ export class StoryUpdateService {
    * undo/redo service.
    */
   setStoryNotes(story: Story, notes: string) {
-    var oldNotes = angular.copy(story.getNotes());
+    let oldNotes = cloneDeep(story.getNotes());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_NOTES, oldNotes, notes,
       (changeDict, story) => {
         // ---- Apply ----
-        var notes = this._getNewPropertyValueFromChangeDict(changeDict);
+        let notes = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setNotes(notes);
       }, (changeDict, story) => {
         // ---- Undo ----
@@ -237,13 +247,13 @@ export class StoryUpdateService {
    * the undo/redo service.
    */
   setStoryLanguageCode(story: Story, languageCode: string) {
-    var oldLanguageCode = angular.copy(story.getLanguageCode());
+    let oldLanguageCode = cloneDeep(story.getLanguageCode());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_LANGUAGE_CODE,
       oldLanguageCode, languageCode,
       (changeDict, story) => {
         // ---- Apply ----
-        var languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
+        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setLanguageCode(languageCode);
       }, (changeDict, story) => {
         // ---- Undo ----
@@ -256,13 +266,13 @@ export class StoryUpdateService {
    * the undo/redo service.
    */
   setStoryMetaTagContent(story: Story, metaTagContent: string) {
-    var oldMetaTagContent = angular.copy(story.getMetaTagContent());
+    let oldMetaTagContent = cloneDeep(story.getMetaTagContent());
     this._applyStoryPropertyChange(
       story, StoryDomainConstants.STORY_PROPERTY_META_TAG_CONTENT,
       oldMetaTagContent, metaTagContent,
       (changeDict, story) => {
         // ---- Apply ----
-        var metaTagContent = this._getNewPropertyValueFromChangeDict(changeDict);
+        let metaTagContent = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setMetaTagContent(metaTagContent);
       }, (changeDict, story) => {
         // ---- Undo ----
@@ -275,8 +285,8 @@ export class StoryUpdateService {
    * the undo/redo service.
    */
   setInitialNodeId(story: Story, newInitialNodeId: string){
-    var oldInitialNodeId =
-      angular.copy(story.getStoryContents().getInitialNodeId());
+    let oldInitialNodeId =
+      cloneDeep(story.getStoryContents().getInitialNodeId());
     this._applyStoryContentsPropertyChange(
       story, StoryDomainConstants.INITIAL_NODE_ID, oldInitialNodeId,
       newInitialNodeId,
@@ -294,7 +304,7 @@ export class StoryUpdateService {
    * the undo/redo service.
    */
   addStoryNode(story: Story, nodeTitle: string) {
-    var nextNodeId = story.getStoryContents().getNextNodeId();
+    let nextNodeId = story.getStoryContents().getNextNodeId();
     this._applyChange(story, StoryDomainConstants.CMD_ADD_STORY_NODE, {
       node_id: nextNodeId,
       title: nodeTitle
@@ -304,7 +314,7 @@ export class StoryUpdateService {
       this._storyEditorStateService.setExpIdsChanged();
     }, (changeDict, story) => {
       // ---- Undo ----
-      var nodeId = this._getNodeIdFromChangeDict(changeDict);
+      let nodeId = this._getNodeIdFromChangeDict(changeDict);
       story.getStoryContents().deleteNode(nodeId);
       this._storyEditorStateService.setExpIdsChanged();
     });
@@ -331,7 +341,7 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   finalizeStoryNodeOutline(story: Story, nodeId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     if (storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already finalized.');
     }
@@ -354,7 +364,7 @@ export class StoryUpdateService {
    * change in the undo/redo service.
    */
   unfinalizeStoryNodeOutline(story: Story, nodeId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     if (!storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already not finalized.');
     }
@@ -377,8 +387,8 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   setStoryNodeOutline(story: Story, nodeId: string, newOutline: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldOutline = storyNode.getOutline();
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldOutline = storyNode.getOutline();
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_OUTLINE, nodeId,
@@ -398,8 +408,8 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   setStoryNodeTitle(story: Story, nodeId: string, newTitle: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldTitle = storyNode.getTitle();
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldTitle = storyNode.getTitle();
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_TITLE, nodeId,
@@ -418,8 +428,8 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   setStoryNodeDescription(story: Story, nodeId: string, newDescription: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldDescription = storyNode.getDescription();
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldDescription = storyNode.getDescription();
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
@@ -439,8 +449,8 @@ export class StoryUpdateService {
    */
   setStoryNodeThumbnailFilename(
       story: Story, nodeId: string, newThumbnailFilename: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldThumbnailFilename = storyNode.getThumbnailFilename();
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldThumbnailFilename = storyNode.getThumbnailFilename();
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
@@ -460,8 +470,8 @@ export class StoryUpdateService {
    */
   setStoryNodeThumbnailBgColor(
       story: Story, nodeId: string, newThumbnailBgColor: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldThumbnailBgColor = storyNode.getThumbnailBgColor();
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldThumbnailBgColor = storyNode.getThumbnailBgColor();
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -480,8 +490,8 @@ export class StoryUpdateService {
    * to and records the change in the undo/redo service.
    */
   setStoryNodeExplorationId(story: Story, nodeId: string, newExplorationId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldExplorationId = storyNode.getExplorationId();
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldExplorationId = storyNode.getExplorationId();
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_EXPLORATION_ID,
@@ -504,10 +514,10 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   addDestinationNodeIdToNode(story: Story, nodeId: string, destinationNodeId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldDestinationNodeIds = angular.copy(
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldDestinationNodeIds = cloneDeep(
       storyNode.getDestinationNodeIds());
-    var newDestinationNodeIds = angular.copy(oldDestinationNodeIds);
+    let newDestinationNodeIds = cloneDeep(oldDestinationNodeIds);
     newDestinationNodeIds.push(destinationNodeId);
 
     this._applyStoryNodePropertyChange(
@@ -530,11 +540,11 @@ export class StoryUpdateService {
    */
   removeDestinationNodeIdFromNode(
       story: Story, nodeId: string, destinationNodeId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldDestinationNodeIds = angular.copy(
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldDestinationNodeIds = cloneDeep(
       storyNode.getDestinationNodeIds());
-    var newDestinationNodeIds = angular.copy(oldDestinationNodeIds);
-    var index = newDestinationNodeIds.indexOf(destinationNodeId);
+    let newDestinationNodeIds = cloneDeep(oldDestinationNodeIds);
+    let index = newDestinationNodeIds.indexOf(destinationNodeId);
     if (index === -1) {
       throw new Error('The given destination node is not part of the node');
     }
@@ -576,10 +586,10 @@ export class StoryUpdateService {
    * change in the undo/redo service.
    */
   addPrerequisiteSkillIdToNode(story: Story, nodeId: string, skillId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldPrerequisiteSkillIds = angular.copy(
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldPrerequisiteSkillIds = cloneDeep(
       storyNode.getPrerequisiteSkillIds());
-    var newPrerequisiteSkillIds = angular.copy(oldPrerequisiteSkillIds);
+    let newPrerequisiteSkillIds = cloneDeep(oldPrerequisiteSkillIds);
     newPrerequisiteSkillIds.push(skillId);
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
@@ -600,11 +610,11 @@ export class StoryUpdateService {
    * change in the undo/redo service.
    */
   removePrerequisiteSkillIdFromNode(story: Story, nodeId: string, skillId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldPrerequisiteSkillIds = angular.copy(
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldPrerequisiteSkillIds = cloneDeep(
       storyNode.getPrerequisiteSkillIds());
-    var newPrerequisiteSkillIds = angular.copy(oldPrerequisiteSkillIds);
-    var index = newPrerequisiteSkillIds.indexOf(skillId);
+    let newPrerequisiteSkillIds = cloneDeep(oldPrerequisiteSkillIds);
+    let index = newPrerequisiteSkillIds.indexOf(skillId);
     if (index === -1) {
       throw new Error(
         'The given prerequisite skill is not part of the node');
@@ -630,10 +640,10 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   addAcquiredSkillIdToNode(story: Story, nodeId: string, skillId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldAcquiredSkillIds = angular.copy(
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldAcquiredSkillIds = cloneDeep(
       storyNode.getAcquiredSkillIds());
-    var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
+    let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
     newAcquiredSkillIds.push(skillId);
 
     this._applyStoryNodePropertyChange(
@@ -655,11 +665,11 @@ export class StoryUpdateService {
    * change in the undo/redo service.
    */
   removeAcquiredSkillIdFromNode(story: Story, nodeId: string, skillId: string) {
-    var storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
-    var oldAcquiredSkillIds = angular.copy(
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldAcquiredSkillIds = cloneDeep(
       storyNode.getAcquiredSkillIds());
-    var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
-    var index = newAcquiredSkillIds.indexOf(skillId);
+    let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
+    let index = newAcquiredSkillIds.indexOf(skillId);
     if (index === -1) {
       throw new Error(
         'The given acquired skill id is not part of the node');
