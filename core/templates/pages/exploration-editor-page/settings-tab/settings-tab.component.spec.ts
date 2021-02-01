@@ -420,7 +420,11 @@ describe('Settings Tab Component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('Email body')
       });
-      spyOn(explorationRightsService, 'saveModeratorChangeToBackend');
+      spyOn(explorationRightsService, 'saveModeratorChangeToBackend').and
+        .callFake((emailBody, onUnpublishingcallback) => {
+          onUnpublishingcallback();
+          return $q.resolve();
+        });
 
       $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
         draft_email_body: 'Draf message'
