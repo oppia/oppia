@@ -101,7 +101,7 @@ var LibraryPage = function() {
 
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,
-        'Add to \'Play Later\' list Icon taking too long to load');
+      'Add to \'Play Later\' list Icon taking too long to load');
     await addToPlayLaterListButton.click();
   };
 
