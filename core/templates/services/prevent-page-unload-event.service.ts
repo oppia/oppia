@@ -47,9 +47,11 @@ export class PreventPageUnloadEventService {
   private _preventPageUnloadEventHandler(
       e: { preventDefault: () => void; returnValue: string; }
   ): void {
-    // HTML specification states that authors should use the below
-    // function. This is used to trigger a confirmation before leaving.
+    // The preventDefault call is used to trigger a confirmation before leaving.
     e.preventDefault();
+    // According to the specification, to show the confirmation dialog an
+    // event handler should call preventDefault() on the event. However note
+    // that not all browsers support this method. So returnValue is also used.
     // The exact value in returnValue is not relevant, but it needs to be set
     // in order to trigger a confirmation before leaving.
     e.returnValue = '';

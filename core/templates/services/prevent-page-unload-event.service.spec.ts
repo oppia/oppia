@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { PreventPageUnloadEventService }
+  from 'services/prevent-page-unload-event.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe ('Prevent page unload event service', function() {

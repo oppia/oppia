@@ -100,13 +100,11 @@ describe('Preferences Controller', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match('"update_type":"user_bio"');
     };
-    spyOn(PreventPageUnloadEventService, 'removeListener').and.callThrough();
 
     $httpBackend.expect(
       'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
     ctrl.saveUserBio(userBio);
     $httpBackend.flush();
-    expect(PreventPageUnloadEventService.removeListener).toHaveBeenCalled();
 
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
@@ -277,5 +275,24 @@ describe('Preferences Controller', function() {
       spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
       ctrl.registerBioChanged();
       expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
+    });
+
+  it('should remove listener once http call is completed',
+    function() {
+      var userBio = 'User bio example';
+      var isRequestTheExpectOne = function(queryParams) {
+        return decodeURIComponent(queryParams)
+          .match('"update_type":"user_bio"');
+      };
+      spyOn(PreventPageUnloadEventService, 'removeListener').and.callThrough();
+
+      $httpBackend.expect(
+        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
+      ctrl.saveUserBio(userBio);
+      $httpBackend.flush();
+      expect(PreventPageUnloadEventService.removeListener).toHaveBeenCalled();
+
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
     });
 });
