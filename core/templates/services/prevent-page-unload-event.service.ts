@@ -45,8 +45,7 @@ export class PreventPageUnloadEventService {
   }
 
   private _preventPageUnloadEventHandler(
-      e: { preventDefault: () => void; returnValue: string; }
-  ): void {
+      e: BeforeUnloadEvent): void {
     // The preventDefault call is used to trigger a confirmation before leaving.
     e.preventDefault();
     // According to the specification, to show the confirmation dialog an

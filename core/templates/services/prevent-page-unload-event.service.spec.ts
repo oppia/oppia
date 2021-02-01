@@ -38,6 +38,9 @@ describe ('Prevent page unload event service', function() {
     windowRef = TestBed.get(WindowRef);
   });
 
+
+  // Mocking window object here because beforeunload requres the
+  // full page to reload. Page reloads raise an error in karma.
   var mockWindow = {
     addEventListener: function(eventname: string, callback: () => {}) {
       document.addEventListener('mock' + eventname, callback);
@@ -58,10 +61,12 @@ describe ('Prevent page unload event service', function() {
   });
 
   it('should removing listener', () => {
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
+    spyOn(preventPageUnloadEventService, 'removeListener').and.callThrough();
+
     preventPageUnloadEventService.addListener();
     preventPageUnloadEventService.removeListener();
 
+    expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
   });
 
@@ -77,16 +82,16 @@ describe ('Prevent page unload event service', function() {
   });
 
   it('should prevent multiple listeners', () => {
-    spyOn(window, 'addEventListener');
+    spyOn(windowRef.nativeWindow, 'addEventListener');
 
-    expect(window.addEventListener).toHaveBeenCalledTimes(0);
+    expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(0);
     preventPageUnloadEventService.addListener();
-    expect(window.addEventListener).toHaveBeenCalledTimes(1);
+    expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(1);
     expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
 
     preventPageUnloadEventService.addListener();
 
-    expect(window.addEventListener).toHaveBeenCalledTimes(1);
+    expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(1);
   });
 
   it('should remove listener on ngondestroy', () => {
