@@ -11,16 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 /**
  * @fileoverview Module for the shared components.
  */
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -55,6 +57,7 @@ import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
+import { AuthService } from 'services/auth.service';
 
 
 @NgModule({
@@ -62,8 +65,16 @@ import { TakeBreakModalComponent } from
     CommonModule,
     MaterialModule,
     NgbModalModule,
+    BrowserModule,
+    NgbTooltipModule,
     FormsModule,
-    NgbTooltipModule
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
+  ],
+
+  providers: [
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig}
   ],
 
   declarations: [
@@ -84,7 +95,6 @@ import { TakeBreakModalComponent } from
     TranslatePipe,
     TakeBreakModalComponent
   ],
-
   entryComponents: [
     BackgroundBannerComponent,
     SharingLinksComponent,
@@ -98,7 +108,6 @@ import { TakeBreakModalComponent } from
     SkillMasteryViewerComponent,
     SocialButtonsComponent
   ],
-
   exports: [
     // Modules.
     FormsModule,
