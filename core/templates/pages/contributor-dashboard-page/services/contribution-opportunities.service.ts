@@ -33,7 +33,7 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 export class ContributionOpportunitiesService {
     skillOpportunitiesCursor = null;
     translationOpportunitiesCursor = null;
-    private voiceoverOpportunitiesCursor = null;
+    voiceoverOpportunitiesCursor = null;
     moreSkillOpportunitiesAvailable : boolean = true;
     moreTranslationOpportunitiesAvailable: boolean = true;
     moreVoiceoverOpportunitiesAvailable: boolean = true;
@@ -48,7 +48,7 @@ export class ContributionOpportunitiesService {
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   private _removeOpportunitiesEventEmitter = new EventEmitter<void>();
 
-  private _getSkillOpportunities(cursor):
+  private _getSkillOpportunities(cursor: string):
       Promise<{ more: boolean; opportunities: SkillOpportunity[] }> {
     return this.contributionOpportunitiesBackendApiService
       .fetchSkillOpportunitiesAsync(cursor)
@@ -62,7 +62,7 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private _getTranslationOpportunities(languageCode: string, cursor):
+  private _getTranslationOpportunities(languageCode: string, cursor: string):
    Promise<{ more: boolean; opportunities: ExplorationOpportunitySummary[] }> {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(
@@ -77,7 +77,7 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private _getVoiceoverOpportunities(languageCode, cursor):
+  private _getVoiceoverOpportunities(languageCode: string, cursor: string):
    Promise<{ more: boolean; opportunities: ExplorationOpportunitySummary[] }> {
     return this.contributionOpportunitiesBackendApiService
       .fetchVoiceoverOpportunitiesAsync(languageCode, cursor).then(
@@ -113,36 +113,38 @@ export class ContributionOpportunitiesService {
     });
   }
 
-  async getSkillOpportunitiesAsync(): Promise<Object> {
+  async getSkillOpportunitiesAsync():
+   Promise<{ more: boolean, opportunities: SkillOpportunity[]}> {
     return this._getSkillOpportunities('');
   }
 
-  async getTranslationOpportunitiesAsync(languageCode: string)
-  : Promise<Object> {
+  async getTranslationOpportunitiesAsync(languageCode: string):
+   Promise<{ more: boolean, opportunities: ExplorationOpportunitySummary[]}> {
     return this._getTranslationOpportunities(languageCode, '');
   }
 
-  async getVoiceoverOpportunities(languageCode: string)
-  : Promise<Object> {
+  async getVoiceoverOpportunities(languageCode: string):
+   Promise<{more: boolean, opportunities: ExplorationOpportunitySummary[]}> {
     return this._getVoiceoverOpportunities(languageCode, '');
   }
 
-  async getMoreSkillOpportunitiesAsync(): Promise<Object> {
+  async getMoreSkillOpportunitiesAsync():
+   Promise<{more: boolean, opportunities: SkillOpportunity[]}> {
     if (this.moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunities(this.skillOpportunitiesCursor);
     }
   }
 
-  async getMoreTranslationOpportunitiesAsync(languageCode: string)
-  : Promise<Object> {
+  async getMoreTranslationOpportunitiesAsync(languageCode: string):
+   Promise<{more: boolean, opportunities: ExplorationOpportunitySummary[]}> {
     if (this.moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunities(
         languageCode, this.translationOpportunitiesCursor);
     }
   }
 
-  async getMoreVoiceoverOpportunities(languageCode: string)
-  : Promise<Object> {
+  async getMoreVoiceoverOpportunities(languageCode: string):
+   Promise<{more: boolean, opportunities: ExplorationOpportunitySummary[]}> {
     if (this.moreVoiceoverOpportunitiesAvailable) {
       return this._getVoiceoverOpportunities(
         languageCode, this.voiceoverOpportunitiesCursor);

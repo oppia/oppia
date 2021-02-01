@@ -67,6 +67,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
             TranslationLanguageService.getActiveLanguageCode(),
             updateWithNewOpportunities);
         }
+        $rootScope.$applyAsync();
       };
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
@@ -77,6 +78,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
               ContributionOpportunitiesService.getVoiceoverOpportunities(
                 TranslationLanguageService.getActiveLanguageCode(),
                 updateWithNewOpportunities);
+              $rootScope.$applyAsync();
             }
           )
         );
