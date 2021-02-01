@@ -695,6 +695,7 @@ textarea.cdk-textarea-autosize-measuring-firefox {
   font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mat-checkbox-layout .mat-checkbox-label {
+  font-weight: normal;
   line-height: 24px; }
 
 .mat-chip {
