@@ -744,26 +744,25 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'explanation_dict': 'explanation',
             'thumbnail_filename': 'image.svg'
         }
-        json_response = self.post_json(
+        self.post_json(
             self.url, payload, csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
-        self.assertEqual(json_response['status_code'], 400)
-
+            upload_files=(
+                ('image', 'unused_filename', self.original_image_content),
+            )
+        )
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
             'explanation_dict': {
-                'explanation': 'Explanation'
+                'content_id': 1,
+                'html': 'content'
             },
             'thumbnail_filename': 'image.svg'
         }
-        json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400)
-        self.assertEqual(json_response['status_code'], 400)
+        self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
     def test_skill_creation_in_valid_topic(self):

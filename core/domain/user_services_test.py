@@ -389,8 +389,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             requests_mocker.get(gravatar_url, content=expected_gravatar)
             gravatar = user_services.fetch_gravatar(user_email)
 
-        self.assertEqual(
-            gravatar, utils.convert_png_to_data_url(expected_gravatar_filepath))
+        self.assertEqual(gravatar, expected_gravatar)
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'

@@ -291,24 +291,6 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['subscription_list']), 0)
         self.logout()
 
-    def test_can_update_profile_picture_data_url(self):
-        self.login(self.OWNER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertTrue(test_utils.check_image_png_or_webp(
-            user_settings.profile_picture_data_url))
-        self.put_json(
-            feconf.PREFERENCES_DATA_URL,
-            {
-                'update_type': 'profile_picture_data_url',
-                'data': 'new_profile_picture_data_url'},
-            csrf_token=csrf_token)
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url,
-            'new_profile_picture_data_url')
-        self.logout()
-
     def test_can_update_default_dashboard(self):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -543,27 +525,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
-
-
-class ProfilePictureHandlerTests(test_utils.GenericTestBase):
-
-    def test_get_profile_picture_with_updated_value(self):
-        self.get_json(
-            '/preferenceshandler/profile_picture', expected_status_int=401)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.login(self.OWNER_EMAIL)
-        user_settings = user_services.get_user_settings(owner_id)
-        response = self.get_json('/preferenceshandler/profile_picture')
-        self.assertEqual(
-            response['profile_picture_data_url'],
-            user_settings.profile_picture_data_url)
-        user_services.update_profile_picture(
-            owner_id, 'new_profile_picture')
-        response = self.get_json('/preferenceshandler/profile_picture')
-        self.assertEqual(
-            response['profile_picture_data_url'], 'new_profile_picture')
-        self.logout()
 
 
 class SignupTests(test_utils.GenericTestBase):
