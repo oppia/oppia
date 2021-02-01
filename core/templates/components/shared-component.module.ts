@@ -1,3 +1,4 @@
+@@ -1,52 +1,52 @@
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +12,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 /**
  * @fileoverview Module for the shared components.
  */
 import 'core-js/es7/reflect';
 import 'zone.js';
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from
@@ -50,11 +48,7 @@ import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
-  'components/profile-link-directives/profile-link-image.component';
-import { ProfileLinkTextComponent } from
-  'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+@@ -58,7 +58,13 @@ import { TakeBreakModalComponent } from
 
 
 @NgModule({
@@ -84,7 +78,6 @@ import { TakeBreakModalComponent } from
     TranslatePipe,
     TakeBreakModalComponent
   ],
-
   entryComponents: [
     BackgroundBannerComponent,
     SharingLinksComponent,
@@ -98,7 +91,6 @@ import { TakeBreakModalComponent } from
     SkillMasteryViewerComponent,
     SocialButtonsComponent
   ],
-
   exports: [
     // Modules.
     FormsModule,
