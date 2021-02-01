@@ -14,4 +14,4 @@
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @vojtechjelinek
-/.github/CODEOWNERS @DubeySandeep # Invalid inline comment 
+/.github/CODEOWNERS @DubeySandeep # Invalid inline comment

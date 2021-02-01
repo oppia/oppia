@@ -217,7 +217,8 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
                             CODEOWNER_FILEPATH, line_num + 1))
                     self.error_messages.append(error_message)
                     self.failed = True
-                elif '@' not in line:
+
+                if '@' not in line:
                     error_message = (
                         '%s --> Pattern on line %s doesn\'t have '
                         'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))

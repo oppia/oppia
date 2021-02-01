@@ -24,8 +24,8 @@ import os
 
 from core.tests import test_utils
 
-from scripts.linters import codeowner_linter
-from scripts.linters import pre_commit_linter
+from . import codeowner_linter
+from . import pre_commit_linter
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
