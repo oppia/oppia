@@ -398,7 +398,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.getHyphenatedLowercaseCategoryName = function(categoryName) {
-      return categoryName.replaceAll(' ', '-').toLowerCase();
+      return categoryName && categoryName.replaceAll(' ', '-').toLowerCase();
     };
 
     $scope.init = function() {
