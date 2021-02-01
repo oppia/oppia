@@ -5,7 +5,7 @@ Please answer *both* questions below and check off every point from the Essentia
 If there is no corresponding issue number, fill in N/A where it says [fill_in_number_here] below in 1.
 -->
 
-1. This PR fixes or fixes part of #[fill_in_number_here].
+1. This PR (fixes part of) fixes #[fill_in_number_here].
 2. This PR does the following: [Explain here what your PR does and why]
 
 ## Essential Checklist
