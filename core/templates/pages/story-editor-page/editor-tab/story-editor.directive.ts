@@ -136,6 +136,19 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.rearrangeNodeInStory = function(toIndex) {
+            if ($scope.dragStartIndex === toIndex) {
+              return;
+            }
+            if ($scope.dragStartIndex === 0) {
+              StoryUpdateService.setInitialNodeId(
+                $scope.story, $scope.story.getStoryContents().getNodes()[
+                  toIndex].getId());
+            }
+            if (toIndex === 0) {
+              StoryUpdateService.setInitialNodeId(
+                $scope.story, $scope.story.getStoryContents().getNodes()[
+                  $scope.dragStartIndex].getId());
+            }
             StoryUpdateService.rearrangeNodeInStory(
               $scope.story, $scope.dragStartIndex, toIndex);
             _initEditor();
