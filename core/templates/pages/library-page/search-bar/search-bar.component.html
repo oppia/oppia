@@ -205,7 +205,7 @@
     width: 20em;
   }
 
-  search-bar .oppia-dropdown-label{
+  search-bar .oppia-dropdown-label {
     display: none;
   }
 
@@ -248,6 +248,12 @@
     search-bar .oppia-search-bar-input {
       background: #ffffff;
       color: #257D76;
+    }
+    search-bar .oppia-search-button,
+    search-bar .oppia-search-bar-input{
+      border-radius: 0;
+      height: 45px;
+      padding-top: 17px;
     }
     search-bar .oppia-search-bar-input::-webkit-input-placeholder {
       color: #257D76;
@@ -296,13 +302,6 @@
       width: 0;
     }
 
-    search-bar .oppia-search-button,
-    search-bar .oppia-search-bar-input{
-      border-radius: 0;
-      height: 45px;
-      padding-top: 17px;
-    }
-
     search-bar .oppia-dropdown-label{
       color: #257D76;
       display: block;
@@ -318,22 +317,22 @@
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
       height: 45px;
-      padding-top: 8px;      
+      padding-top: 8px;
     }
 
-    search-bar .oppia-search-bar-category-input{
+    search-bar .oppia-search-bar-category-input {
       border-bottom-left-radius: 4px;
     }
 
-    search-bar .oppia-search-bar-language-input{
+    search-bar .oppia-search-bar-language-input {
       border-bottom-right-radius: 4px;
     }
 
-    search-bar .oppia-translate-icon-down{
+    search-bar .oppia-translate-icon-down {
       transform: translate(0,6px);
     }
 
-    search-bar .language-dropdown-toggle::after{
+    search-bar .language-dropdown-toggle::after {
       transform: translate(45px,1px);
     }
   }
@@ -353,7 +352,6 @@
   }
 
   @media (max-width: 629px) {
-    
     search-bar .oppia-search-bar-category-selector {
       /* display: none; */
       position: relative;
