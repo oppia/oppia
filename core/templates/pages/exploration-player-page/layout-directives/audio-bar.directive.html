@@ -43,8 +43,8 @@
         </select>
       </div>
     </div>
-    <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse"><i class="fas fa-sort-up"></i></div>
   </div>
+  <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse"><i class="fas fa-sort-up"></i></div>
   <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()" aria-label="Audio menu expand">
     <div class="container protractor-test-audio-bar">
       <div class="row">
@@ -134,6 +134,7 @@
     display: block;
     font-size: 12px;
     margin: 0 auto;
+    position: sticky;
     text-align: center;
   }
 
@@ -303,8 +304,8 @@
 
   @media screen and (max-width: 550px) {
     .audio-controls {
-      height: 98px;
-      padding: 0;
+      height: auto;
+      padding: 20px 0;
     }
     audio-bar .slider-section {
       transform: translateY(4px);

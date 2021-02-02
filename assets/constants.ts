@@ -5215,13 +5215,14 @@ export default {
   },
 
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput",
-      "DragAndDropSortInput"
+      "DragAndDropSortInput",
+      "NumericInput"
     ]
   }, {
     "name": "Math",
@@ -5235,13 +5236,14 @@ export default {
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
   "ALLOWED_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "Continue",
       "EndExploration",
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
+      "NumericInput",
       "TextInput",
       "DragAndDropSortInput"
     ]
@@ -5367,6 +5369,7 @@ export default {
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
+  "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
