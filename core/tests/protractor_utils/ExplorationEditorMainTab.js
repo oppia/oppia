@@ -619,26 +619,26 @@ var ExplorationEditorMainTab = function() {
     await action.click('Add Interaction button', addInteractionButton);
 
     var INTERACTION_ID_TO_TAB_NAME = {
-      Continue: 'General',
-      EndExploration: 'General',
-      ImageClickInput: 'General',
-      ItemSelectionInput: 'General',
-      MultipleChoiceInput: 'General',
-      TextInput: 'General',
-      FractionInput: 'Math',
-      GraphInput: 'Math',
-      LogicProof: 'Math',
-      NumericInput: 'Math',
-      SetInput: 'Math',
-      AlgebraicExpressionInput: 'Math',
-      MathEquationInput: 'Math',
-      NumericExpressionInput: 'Math',
-      NumberWithUnits: 'Math',
-      RatioExpressionInput: 'Math',
-      CodeRepl: 'Programming',
-      PencilCodeEditor: 'Programming',
-      MusicNotesInput: 'Music',
-      InteractiveMap: 'Geography'
+      Continue: 'commonly-used',
+      EndExploration: 'commonly-used',
+      ImageClickInput: 'commonly-used',
+      ItemSelectionInput: 'commonly-used',
+      MultipleChoiceInput: 'commonly-used',
+      NumericInput: 'commonly-used',
+      TextInput: 'commonly-used',
+      FractionInput: 'math',
+      GraphInput: 'math',
+      LogicProof: 'math',
+      SetInput: 'math',
+      AlgebraicExpressionInput: 'math',
+      MathEquationInput: 'math',
+      NumericExpressionInput: 'math',
+      NumberWithUnits: 'math',
+      RatioExpressionInput: 'math',
+      CodeRepl: 'programming',
+      PencilCodeEditor: 'programming',
+      MusicNotesInput: 'music',
+      InteractiveMap: 'geography'
     };
 
     expect(
