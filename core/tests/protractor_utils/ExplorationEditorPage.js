@@ -215,11 +215,6 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
-    // This is necessary to give the page time to record the changes,
-    // so that it does not attempt to stop the user leaving.
-    await waitFor.invisibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to disappear after saving changes');
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
@@ -230,6 +225,11 @@ var ExplorationEditorPage = function() {
     await waitFor.visibilityOf(
       toastSuccessElement,
       'Toast message is taking too long to appear after saving changes');
+    // This is necessary to give the page time to record the changes,
+    // so that it does not attempt to stop the user leaving.
+    await waitFor.invisibilityOf(
+      toastSuccessElement,
+      'Toast message is taking too long to disappear after saving changes');
   };
 
   this.discardChanges = async function() {
