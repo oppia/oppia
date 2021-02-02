@@ -135,6 +135,7 @@ angular.module('oppia').directive('supplementalCard', [
                 (helpCard) => {
                   $scope.helpCardHtml = helpCard.helpCardHtml;
                   $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
+                  console.error('helpCard.hasContinueButton has value ' + helpCard.hasContinueButton);
                 }
               )
             );

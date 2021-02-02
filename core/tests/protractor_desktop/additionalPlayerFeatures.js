@@ -523,6 +523,9 @@ describe('Full exploration editor', function() {
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
+    var browserLogs = await browser.manage().logs().get('browser');
+    for(i = 0; i < browserLogs.length; i++) {
+      console.log(browserLogs[i].message);
+    }
   });
 });
