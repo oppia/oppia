@@ -92,6 +92,7 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
+        """Handles POST requests."""
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.payload.get('suggestion_type'),
@@ -354,6 +355,7 @@ class SuggestionListHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
+        """Handles GET requests."""
         # The query_fields_and_values variable is a list of tuples. The first
         # element in each tuple is the field being queried and the second
         # element is the value of the field being queried.
