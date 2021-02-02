@@ -102,7 +102,8 @@ var LibraryPage = function() {
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,
       'Add to \'Play Later\' list Icon taking too long to load');
-    await addToPlayLaterListButton.click();
+    await action.click(
+      'Add to play later list button', addToPlayLaterListButton);
   };
 
   this.selectLanguages = async function(languages) {
