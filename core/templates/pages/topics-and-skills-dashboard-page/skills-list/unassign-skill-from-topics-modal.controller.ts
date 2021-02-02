@@ -47,6 +47,7 @@ angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
             };
           });
           $scope.topicsAssignmentsAreFetched = true;
+          $scope.$applyAsync();
         });
     };
     $scope.init = function() {

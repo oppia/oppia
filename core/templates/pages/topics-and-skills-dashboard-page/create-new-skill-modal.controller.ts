@@ -19,21 +19,22 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
   '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
-  'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
-  'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
-  'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-  'SKILL_DIFFICULTIES',
+  'RubricObjectFactory', 'SkillCreationService', 'SkillEditorStateService',
+  'SkillObjectFactory', 'SubtitledHtmlObjectFactory',
+  'COMPONENT_NAME_EXPLANATION', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
+  'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
   function(
       $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
-      RubricObjectFactory, SkillCreationService, SkillObjectFactory,
-      SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION,
-      MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-      SKILL_DIFFICULTIES) {
+      RubricObjectFactory, SkillCreationService, SkillEditorStateService,
+      SkillObjectFactory, SubtitledHtmlObjectFactory,
+      COMPONENT_NAME_EXPLANATION, MAX_CHARS_IN_SKILL_DESCRIPTION,
+      SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
@@ -42,6 +43,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     $scope.newSkillDescription = '';
     $scope.rubrics = rubrics;
     $scope.errorMsg = '';
+    $scope.skillDescriptionExists = true;
     $scope.conceptCardExplanationEditorIsShown = false;
     $scope.bindableDict = {
       displayedConceptCardExplanation: ''
@@ -57,8 +59,30 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
       $scope.conceptCardExplanationEditorIsShown = true;
     };
 
-    $scope.updateSkillDescription = function() {
+    $scope.setErrorMessageIfNeeded = function() {
+      if (
+        !SkillObjectFactory.hasValidDescription(
+          $scope.newSkillDescription)) {
+        $scope.errorMsg = (
+          'Please use a non-empty description consisting of ' +
+          'alphanumeric characters, spaces and/or hyphens.');
+      }
+      if ($scope.skillDescriptionExists) {
+        $scope.errorMsg = (
+          'This description already exists. Please choose a ' +
+            'new name or modify the existing skill.');
+      }
+    };
+
+    $scope._skillDescriptionExistsCallback = function(skillDescriptionExists) {
+      $scope.skillDescriptionExists = skillDescriptionExists;
+      $scope.setErrorMessageIfNeeded();
+    };
+    $scope.updateSkillDescriptionAndCheckIfExists = function() {
       $scope.resetErrorMsg();
+      SkillEditorStateService.updateExistenceOfSkillDescription(
+        $scope.newSkillDescription, $scope._skillDescriptionExistsCallback
+      );
       if (
         SkillCreationService.getSkillDescriptionStatus() !==
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
@@ -80,25 +104,9 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
         explanationObject.html);
     };
 
-    $scope.isSkillDescriptionValid = function() {
-      if (
-        !SkillObjectFactory.hasValidDescription(
-          $scope.newSkillDescription)) {
-        $scope.errorMsg = (
-          'Please use a non-empty description consisting of ' +
-            'alphanumeric characters, spaces and/or hyphens.');
-        return false;
-      }
-      return true;
-    };
-
     $scope.createNewSkill = function() {
-      if (
-        !SkillObjectFactory.hasValidDescription(
-          $scope.newSkillDescription)) {
-        $scope.errorMsg = (
-          'Please use a non-empty description consisting of ' +
-          'alphanumeric characters, spaces and/or hyphens.');
+      $scope.setErrorMessageIfNeeded();
+      if ($scope.errorMsg !== '') {
         return;
       }
       $scope.saveConceptCardExplanation();
