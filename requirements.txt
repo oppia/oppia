@@ -8,65 +8,189 @@
 #
 #    pip-compile
 #
-backports.functools-lru-cache==1.6.1  # via -r requirements.in, soupsieve
-beautifulsoup4==4.9.1     # via -r requirements.in
-bleach==3.1.5             # via -r requirements.in
-cachecontrol==0.12.6      # via firebase-admin
-cachetools==3.1.1         # via google-auth
-callbacks==0.3.0          # via -r requirements.in
-certifi==2020.6.20        # via elasticsearch, requests
-chardet==3.0.4            # via requests
-contextlib2==0.6.0.post1  # via -r requirements.in
-crcmod==1.7               # via google-resumable-media
-elasticsearch==7.10.0     # via -r requirements.in
-enum34==1.1.10            # via google-cloud-tasks, grpcio
-firebase-admin==3.2.1     # via -r requirements.in
-funcsigs==1.0.2           # via mock
-future==0.18.2            # via -r requirements.in
-futures==3.3.0            # via google-api-core, grpcio
-google-api-core[grpc]==1.22.4  # via firebase-admin, google-api-python-client, google-cloud-core, google-cloud-firestore, google-cloud-tasks
-google-api-python-client==1.12.8  # via firebase-admin
-google-auth-httplib2==0.0.4  # via google-api-python-client
-google-auth==1.22.1       # via google-api-core, google-api-python-client, google-auth-httplib2, google-cloud-storage
-google-cloud-core==1.5.0  # via google-cloud-firestore, google-cloud-storage
-google-cloud-firestore==1.9.0  # via firebase-admin
-google-cloud-storage==1.35.0  # via firebase-admin
-google-cloud-tasks==1.5.0  # via -r requirements.in
-google-resumable-media==1.2.0  # via google-cloud-storage
-googleapis-common-protos[grpc]==1.52.0  # via -r requirements.in, google-api-core, grpc-google-iam-v1
-googleappenginecloudstorageclient==1.9.22.1  # via -r requirements.in, googleappenginemapreduce, googleappenginepipeline
-googleappenginemapreduce==1.9.22.0  # via -r requirements.in
-googleappenginepipeline==1.9.22.1  # via -r requirements.in, googleappenginemapreduce
-graphy==1.0.0             # via -r requirements.in, googleappenginemapreduce
-grpc-google-iam-v1==0.12.3  # via google-cloud-tasks
-grpcio==1.32.0            # via google-api-core, googleapis-common-protos, grpc-google-iam-v1
-html5lib==1.0.1           # via -r requirements.in
-httplib2==0.18.1          # via google-api-python-client, google-auth-httplib2
-idna==2.10                # via requests
-mock==3.0.5               # via googleappenginemapreduce
-mox==0.5.3                # via googleappenginemapreduce
-msgpack==1.0.2            # via cachecontrol
-mutagen==1.43.0           # via -r requirements.in
-packaging==20.4           # via -r requirements.in, bleach
-protobuf==3.13.0          # via google-api-core, googleapis-common-protos
-pyasn1-modules==0.2.8     # via google-auth
-pyasn1==0.4.8             # via pyasn1-modules, rsa
-pylatexenc==2.6           # via -r requirements.in
-pyparsing==2.4.7          # via packaging
-pytz==2020.1              # via google-api-core, google-cloud-firestore
-redis==3.5.3              # via -r requirements.in
-requests-mock==1.5.2      # via -r requirements.in
-requests-toolbelt==0.9.1  # via -r requirements.in
-requests==2.24.0          # via -r requirements.in, cachecontrol, google-api-core, google-cloud-storage, requests-mock, requests-toolbelt
-rsa==4.5                  # via google-auth
-simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
-six==1.15.0               # via -r requirements.in, bleach, firebase-admin, google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud-core, google-resumable-media, grpcio, html5lib, mock, packaging, protobuf, requests-mock, webapp2
-soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
-uritemplate==3.0.1        # via google-api-python-client
-urllib3==1.25.11          # via elasticsearch, requests
-webapp2==3.0.0b1          # via -r requirements.in
-webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
-webob==1.8.6              # via webapp2
+backports.functools-lru-cache==1.6.1
+    # via -r requirements.in
+beautifulsoup4==4.9.1
+    # via -r requirements.in
+bleach==3.3.0
+    # via -r requirements.in
+cachecontrol==0.12.6
+    # via firebase-admin
+cachetools==3.1.1
+    # via google-auth
+callbacks==0.3.0
+    # via -r requirements.in
+certifi==2020.6.20
+    # via
+    #   elasticsearch
+    #   requests
+cffi==1.14.4
+    # via google-crc32c
+chardet==3.0.4
+    # via requests
+contextlib2==0.6.0.post1
+    # via -r requirements.in
+elasticsearch==7.10.0
+    # via -r requirements.in
+firebase-admin==3.2.1
+    # via -r requirements.in
+future==0.18.2
+    # via -r requirements.in
+google-api-core[grpc]==1.22.4
+    # via
+    #   firebase-admin
+    #   google-api-python-client
+    #   google-cloud-core
+    #   google-cloud-firestore
+    #   google-cloud-tasks
+google-api-python-client==1.12.8
+    # via firebase-admin
+google-auth-httplib2==0.0.4
+    # via google-api-python-client
+google-auth==1.22.1
+    # via
+    #   google-api-core
+    #   google-api-python-client
+    #   google-auth-httplib2
+    #   google-cloud-storage
+google-cloud-core==1.5.0
+    # via
+    #   google-cloud-firestore
+    #   google-cloud-storage
+google-cloud-firestore==1.9.0
+    # via firebase-admin
+google-cloud-storage==1.35.0
+    # via firebase-admin
+google-cloud-tasks==1.5.0
+    # via -r requirements.in
+google-crc32c==1.1.2
+    # via google-resumable-media
+google-resumable-media==1.2.0
+    # via google-cloud-storage
+googleapis-common-protos[grpc]==1.52.0
+    # via
+    #   -r requirements.in
+    #   google-api-core
+    #   grpc-google-iam-v1
+googleappenginecloudstorageclient==1.9.22.1
+    # via
+    #   -r requirements.in
+    #   googleappenginemapreduce
+    #   googleappenginepipeline
+googleappenginemapreduce==1.9.22.0
+    # via -r requirements.in
+googleappenginepipeline==1.9.22.1
+    # via
+    #   -r requirements.in
+    #   googleappenginemapreduce
+graphy==1.0.0
+    # via
+    #   -r requirements.in
+    #   googleappenginemapreduce
+grpc-google-iam-v1==0.12.3
+    # via google-cloud-tasks
+grpcio==1.32.0
+    # via
+    #   google-api-core
+    #   googleapis-common-protos
+    #   grpc-google-iam-v1
+html5lib==1.0.1
+    # via -r requirements.in
+httplib2==0.18.1
+    # via
+    #   google-api-python-client
+    #   google-auth-httplib2
+idna==2.10
+    # via requests
+mock==3.0.5
+    # via googleappenginemapreduce
+mox==0.5.3
+    # via googleappenginemapreduce
+msgpack==1.0.2
+    # via cachecontrol
+mutagen==1.43.0
+    # via -r requirements.in
+packaging==20.4
+    # via
+    #   -r requirements.in
+    #   bleach
+protobuf==3.13.0
+    # via
+    #   google-api-core
+    #   googleapis-common-protos
+pyasn1-modules==0.2.8
+    # via google-auth
+pyasn1==0.4.8
+    # via
+    #   pyasn1-modules
+    #   rsa
+pycparser==2.20
+    # via cffi
+pylatexenc==2.6
+    # via -r requirements.in
+pyparsing==2.4.7
+    # via packaging
+pytz==2020.1
+    # via
+    #   google-api-core
+    #   google-cloud-firestore
+redis==3.5.3
+    # via -r requirements.in
+requests-mock==1.5.2
+    # via -r requirements.in
+requests-toolbelt==0.9.1
+    # via -r requirements.in
+requests==2.24.0
+    # via
+    #   -r requirements.in
+    #   cachecontrol
+    #   google-api-core
+    #   google-cloud-storage
+    #   requests-mock
+    #   requests-toolbelt
+rsa==4.5
+    # via google-auth
+simplejson==3.17.0
+    # via
+    #   -r requirements.in
+    #   googleappenginemapreduce
+six==1.15.0
+    # via
+    #   -r requirements.in
+    #   bleach
+    #   firebase-admin
+    #   google-api-core
+    #   google-api-python-client
+    #   google-auth
+    #   google-auth-httplib2
+    #   google-cloud-core
+    #   google-resumable-media
+    #   grpcio
+    #   html5lib
+    #   mock
+    #   packaging
+    #   protobuf
+    #   requests-mock
+    #   webapp2
+soupsieve==1.9.5
+    # via
+    #   -r requirements.in
+    #   beautifulsoup4
+uritemplate==3.0.1
+    # via google-api-python-client
+urllib3==1.25.11
+    # via
+    #   elasticsearch
+    #   requests
+webapp2==3.0.0b1
+    # via -r requirements.in
+webencodings==0.5.1
+    # via
+    #   -r requirements.in
+    #   bleach
+    #   html5lib
+webob==1.8.6
+    # via webapp2
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
