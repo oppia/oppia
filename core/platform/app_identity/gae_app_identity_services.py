@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+import utils
 
 from google.appengine.api import app_identity
 
@@ -53,7 +54,7 @@ def get_gcs_resource_bucket_name():
     Returns:
         str. The bucket name for the application's GCS resources.
     """
-    if constants.DEV_MODE:
+    if constants.DEV_MODE or utils.is_local_server_environment():
         return get_default_gcs_bucket_name()
     else:
         return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX

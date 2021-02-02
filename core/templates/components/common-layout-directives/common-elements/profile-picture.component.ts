@@ -34,7 +34,7 @@ export class ProfilePictureComponent implements OnChanges {
   profilePictureIsLoaded: boolean = false;
   profilePictureIsLoading: boolean = false;
 
-  spinnerDiameter: number = 1;
+  spinnerDiameter: number = 10;
   @ViewChild('parentDiv') parentDiv: ElementRef;
 
   constructor(
@@ -57,7 +57,7 @@ export class ProfilePictureComponent implements OnChanges {
     let offsetHeight = 0;
     const refreshInterval = setInterval(() => {
       if (offsetHeight === 0) {
-        offsetHeight = this.parentDiv.nativeElement.offsetHeight;
+        offsetHeight = Math.max(this.parentDiv.nativeElement.offsetHeight, 0);
         this.spinnerDiameter = offsetHeight - (offsetHeight / 10);
       } else {
         clearInterval(refreshInterval);
