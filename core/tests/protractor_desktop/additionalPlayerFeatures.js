@@ -524,8 +524,8 @@ describe('Full exploration editor', function() {
 
   afterEach(async function() {
     var browserLogs = await browser.manage().logs().get('browser');
-    for(i = 0; i < browserLogs.length; i++) {
-      console.log(browserLogs[i].message);
+    for (var i = 0; i < browserLogs.length; i++) {
+      console.error(browserLogs[i].message);
     }
   });
 });
