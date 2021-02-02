@@ -205,7 +205,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             RouterService.onRefreshVersionHistory.emit({
               forceRefresh: true
             });
-            AlertsService.addSuccessMessage('Changes saved.');
+            AlertsService.addSuccessMessage('Changes saved.', 5000);
             saveIsInProgress = false;
             EditabilityService.markEditable();
             whenSavingDone.resolve();
