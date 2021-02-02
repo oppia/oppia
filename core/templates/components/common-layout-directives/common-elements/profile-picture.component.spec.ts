@@ -90,12 +90,12 @@ describe('Profile Picture Component', function() {
   });
 
   it('should correctly set the spinner size', fakeAsync(() => {
-    expect(component.spinnerDiameter).toBe(1);
+    expect(component.spinnerDiameter).toBe(10);
     expect(component.parentDiv.nativeElement.offsetHeight).toBe(0);
 
     component.ngAfterViewInit();
     tick(150);
-    expect(component.spinnerDiameter).toBe(1);
+    expect(component.spinnerDiameter).toBe(10);
     expect(component.parentDiv.nativeElement.offsetHeight).toBe(0);
 
     let nativeElementMock = jasmine.createSpyObj(
