@@ -414,10 +414,12 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch Host
-# and Port when switching to prod server.
-ES_HOST = 'localhost'
-ES_PORT = 9200
+ES_LOCALHOST_PORT = 9200
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
+# auth information during deployment.
+ES_CLOUD_ID = None
+ES_USERNAME = None
+ES_PASSWORD = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
@@ -506,9 +508,6 @@ ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
-
-# Maximum allowed commit message length for SnapshotMetadata models.
-MAX_COMMIT_MESSAGE_LENGTH = 1000
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -829,6 +828,7 @@ SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'

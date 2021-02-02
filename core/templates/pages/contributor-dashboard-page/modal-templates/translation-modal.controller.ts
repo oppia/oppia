@@ -57,8 +57,8 @@ angular.module('oppia').controller('TranslationModalController', [
       type: 'html',
       ui_config: {
         hide_complex_extensions: 'true',
-        activeLanguage: (TranslationLanguageService.getActiveLanguageCode()),
-        activeLanguageDirection: (
+        language: TranslationLanguageService.getActiveLanguageCode(),
+        languageDirection: (
           TranslationLanguageService.getActiveLanguageDirection())
       }
     };

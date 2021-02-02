@@ -358,7 +358,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts',
     'translatable-html-content-id.component.ts',
     'translate-text.service.ts',
-    'translation-file-hash-loader.service.ts',
+    'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
