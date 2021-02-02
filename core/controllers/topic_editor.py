@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -291,10 +292,10 @@ class EditableTopicDataHandler(base.BaseHandler):
         commit_message = self.payload.get('commit_message')
 
         if (commit_message is not None and
-                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         topic_and_subtopic_page_change_dicts = self.payload.get(
             'topic_and_subtopic_page_change_dicts')
@@ -436,7 +437,7 @@ class TopicUrlFragmentHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_create_topic
     def get(self, topic_url_fragment):
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
@@ -454,7 +455,7 @@ class TopicNameHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_create_topic
     def get(self, topic_name):
         """Handler that receives a topic name and checks whether
         a topic with the same name exists.

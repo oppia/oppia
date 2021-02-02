@@ -451,10 +451,11 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                     'property_name': 'title',
                     'new_value': 'New title %s' % i
                 })], 'Changes.')
+        self.process_and_flush_pending_tasks()
+
         exp_models.ExplorationModel.get_by_id('0').delete(
             self.user_id, '', [])
 
-        self.process_and_flush_pending_tasks()
         job_id = self.job_class.create_new()
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -1453,6 +1454,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'title',
                 'new_value': 'New title'
             })], 'Changes.')
+        self.process_and_flush_pending_tasks()
 
         rights_manager.assign_role_for_exploration(
             self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)

@@ -26,16 +26,19 @@ angular.module('oppia').controller(
     'newContent', 'suggestionIsHandled', 'suggestionIsValid',
     'suggestionStatus', 'threadUibModalInstance', 'unsavedChangesExist',
     'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+    'MAX_COMMIT_MESSAGE_LENGTH',
     function(
         $scope, $uibModalInstance, EditabilityService,
         SuggestionModalService, currentContent,
         newContent, suggestionIsHandled, suggestionIsValid,
         suggestionStatus, threadUibModalInstance, unsavedChangesExist,
-        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
+        MAX_COMMIT_MESSAGE_LENGTH,) {
       $scope.isNotHandled = !suggestionIsHandled;
       $scope.canEdit = EditabilityService.isEditable();
       $scope.commitMessage = '';
       $scope.reviewMessage = '';
+      $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       $scope.canReject = $scope.canEdit && $scope.isNotHandled;
       $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
         suggestionIsValid && !unsavedChangesExist;
