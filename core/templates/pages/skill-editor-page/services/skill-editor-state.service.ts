@@ -212,6 +212,24 @@ export class SkillEditorStateService {
       });
     return true;
   }
+  /**
+   * Checks if the skill description exists and updates class
+   * variable. `create-new-skill-modal.controller` will search
+   * for that variable.
+   */
+  updateExistenceOfSkillDescription(
+      description: string, successCallback: (value?: Object) => void): void {
+    this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
+      description).then(
+      (skillDescriptionExists) => {
+        successCallback(skillDescriptionExists);
+      }, (error) => {
+        this.alertsService.addWarning(
+          error ||
+          'There was an error when checking if the skill description ' +
+          'exists for another skill.');
+      });
+  }
 
   get onSkillChange(): EventEmitter<unknown> {
     return this._skillChangedEventEmitter;

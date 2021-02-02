@@ -337,6 +337,10 @@ class NewSkillHandler(base.BaseHandler):
 
         skill_domain.Skill.require_valid_description(description)
 
+        if skill_services.does_skill_with_description_exist(description):
+            raise self.InvalidInputException(
+                'Skill description should not be a duplicate.')
+
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 

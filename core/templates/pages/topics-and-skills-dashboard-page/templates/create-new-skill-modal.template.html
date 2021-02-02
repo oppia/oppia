@@ -10,7 +10,7 @@
         <strong>Skill Description</strong>
       </div>
       <input type="text" class="form-control protractor-test-new-skill-description-field"
-             placeholder="eg: Adding Fractions" ng-change="updateSkillDescription()" ng-model="newSkillDescription"
+             placeholder="eg: Adding Fractions" ng-change="updateSkillDescriptionAndCheckIfExists()" ng-model="newSkillDescription"
              ng-blur="validateDescription()"
              autofocus maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>"
              aria-label="Skill Description">
@@ -48,7 +48,7 @@
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-skill-creation-button"
             type="submit"
-            ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || !isSkillDescriptionValid()">
+            ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || errorMsg !== ''">
             Save
     </button>
   </div>

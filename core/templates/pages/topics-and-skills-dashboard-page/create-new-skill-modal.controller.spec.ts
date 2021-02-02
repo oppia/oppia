@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the Create new skill modal controller.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Create new skill modal', function() {
@@ -25,6 +26,8 @@ describe('Create new skill modal', function() {
   var RubricObjectFactory = null;
   var COMPONENT_NAME_EXPLANATION = null;
   var SubtitledHtmlObjectFactory = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -74,12 +77,14 @@ describe('Create new skill modal', function() {
 
   it('should update the rubrics explanation and clear error message when' +
     ' changing skill description', function() {
+    $scope.skillDescriptionExists = false;
     $scope.errorMsg = 'Please enter a valid description';
+
     $scope.newSkillDescription = 'Addition';
     expect($scope.rubrics[1].getExplanations()).toEqual(['']);
     expect($scope.errorMsg).toEqual('Please enter a valid description');
 
-    $scope.updateSkillDescription();
+    $scope.updateSkillDescriptionAndCheckIfExists();
     expect($scope.rubrics[1].getExplanations()).toEqual(['Addition']);
     expect($scope.errorMsg).toEqual('');
   });
@@ -91,35 +96,50 @@ describe('Create new skill modal', function() {
 
   it('should add error message text when skill description is invalid',
     function() {
+      $scope.skillDescriptionExists = false;
       var errorString = (
         'Please use a non-empty description consisting of ' +
         'alphanumeric characters, spaces and/or hyphens.');
 
       $scope.newSkillDescription = '';
+      $scope.updateSkillDescriptionAndCheckIfExists();
       $scope.createNewSkill();
       expect($scope.errorMsg).toEqual(errorString);
       $scope.resetErrorMsg();
 
       $scope.newSkillDescription = 'valid';
+      $scope.updateSkillDescriptionAndCheckIfExists();
       $scope.createNewSkill();
       expect($scope.errorMsg).toEqual('');
       $scope.resetErrorMsg();
 
       $scope.newSkillDescription = 'invalidvalid>>';
+      $scope.updateSkillDescriptionAndCheckIfExists();
       $scope.createNewSkill();
       expect($scope.errorMsg).toEqual(errorString);
     });
 
-  it('should return if the skill description is valid', function() {
-    $scope.newSkillDescription = 'valid';
-    expect($scope.isSkillDescriptionValid()).toBe(true);
-    $scope.newSkillDescription = 'invalid{{}}';
-    expect($scope.isSkillDescriptionValid()).toBe(false);
-    $scope.newSkillDescription = 'valid';
-    expect($scope.isSkillDescriptionValid()).toBe(true);
-  });
+  it('should correctly call callback function for skill description exists',
+    function() {
+      $scope.skillDescriptionExists = false;
+      $scope._skillDescriptionExistsCallback(true);
+      expect($scope.skillDescriptionExists).toBe(true);
+    });
+  it('should add error message text when skill description is duplicate',
+    function() {
+      $scope.skillDescriptionExists = true;
+      var errorString = (
+        'This description already exists. Please choose a ' +
+          'new name or modify the existing skill.');
+
+      $scope.newSkillDescription = 'Adding';
+      $scope.updateSkillDescriptionAndCheckIfExists();
+      $scope.createNewSkill();
+      expect($scope.errorMsg).toEqual(errorString);
+    });
 
   it('should close the modal with skill input values', function() {
+    $scope.skillDescriptionExists = false;
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),
       RubricObjectFactory.create(skillDifficulties[1], ['Large addition']),
@@ -131,7 +151,7 @@ describe('Create new skill modal', function() {
 
     $scope.newSkillDescription = 'Large addition';
     expect($scope.rubrics[1].getExplanations()).toEqual(['']);
-    $scope.updateSkillDescription();
+    $scope.updateSkillDescriptionAndCheckIfExists();
     $scope.createNewSkill();
     expect($scope.rubrics[1].getExplanations()).toEqual(['Large addition']);
     expect($uibModalInstance.close).toHaveBeenCalledWith({

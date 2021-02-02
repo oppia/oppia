@@ -594,6 +594,20 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         skill.description)
 
 
+def does_skill_with_description_exist(description):
+    """Checks if skill with provided description exists.
+
+    Args:
+        description: str. The description for the skill.
+
+    Returns:
+        bool. Whether the the description for the skill exists.
+    """
+    existing_skill = (
+        skill_fetchers.get_skill_by_description(description))
+    return existing_skill is not None
+
+
 def save_new_skill(committer_id, skill):
     """Saves a new skill.
 

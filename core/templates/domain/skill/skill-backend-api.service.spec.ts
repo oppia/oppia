@@ -188,6 +188,55 @@ describe('Skill backend API service', () => {
     }));
 
   it(
+    'should make a request to check if skill description exists in backend.',
+    fakeAsync(() => {
+      const backendResponse = {
+        skill_description_exists: false,
+      };
+      const description = 'Adding Fractions';
+
+      skillBackendApiService.doesSkillWithDescriptionExistAsync(
+        description).then(response => {
+        expect(response).toEqual(false);
+      });
+
+      let req = httpTestingController.expectOne(
+        '/skill_description_handler/Adding%20Fractions'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(backendResponse);
+
+      flushMicrotasks();
+    }));
+
+  it(
+    'should use the rejection handler if skill description exists backend ' +
+    'request failed.', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const description = 'Adding Fractions';
+
+      skillBackendApiService.doesSkillWithDescriptionExistAsync(
+        description).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/skill_description_handler/Adding%20Fractions'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    }));
+
+  it(
     'should use the rejection handler if the skill update in the backend' +
     'failed.', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');

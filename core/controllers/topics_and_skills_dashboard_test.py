@@ -655,6 +655,13 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         large_image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 4000)
+        post_data = {
+            'description': 'Skill Description 2',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg'
+        }
         response_dict = self.post_json(
             self.url, post_data,
             csrf_token=csrf_token,
@@ -799,6 +806,44 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(
             topic.uncategorized_skill_ids,
             [self.linked_skill_id, skill_id])
+        self.logout()
+
+    def test_skill_creation_in_duplicate_description(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
+        post_data = {
+            'description': 'Duplicate Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict(),
+            'thumbnail_filename': 'image.svg'
+        }
+
+        # No errors when we publish the skill description for the first time.
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token)
+        self.assertTrue('error' not in response_dict)
+
+        # Error when we publish the same skill description again.
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'Skill description should not be a duplicate',
+            response_dict['error'])
+
         self.logout()
 
 
