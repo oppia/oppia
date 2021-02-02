@@ -94,7 +94,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
     var manualParamChanges = null;
     var initStateName = null;
     var version = UrlService.getExplorationVersionFromUrl();
-    if (!_questionPlayerMode) {
+    if (!_questionPlayerMode && !('skill_editor' === UrlService.getPathname()
+      .split('/')[1].replace(/"/g, "'"))) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(_explorationId, version)
         .then(function(exploration) {
