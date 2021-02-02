@@ -121,10 +121,10 @@ export class SkillEditorStateService {
    */
   loadSkill(skillId: string): void {
     this._skillIsBeingLoaded = true;
-    let fetchSkillPromise = this.skillBackendApiService.fetchSkill(skillId);
-    let fetchSkillRightsPromise = (
+    let skillDataPromise = this.skillBackendApiService.fetchSkill(skillId);
+    let skillRightsPromise = (
       this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
-    Promise.all([fetchSkillPromise, fetchSkillRightsPromise]).then(
+    Promise.all([skillDataPromise, skillRightsPromise]).then(
       ([newBackendSkillObject, newSkillRightsObject]) => {
         this._updateSkillRights(newSkillRightsObject);
         this.assignedSkillTopicData = (
@@ -211,6 +211,24 @@ export class SkillEditorStateService {
         this._skillIsBeingSaved = false;
       });
     return true;
+  }
+  /**
+   * Checks if the skill description exists and updates class
+   * variable. `create-new-skill-modal.controller` will search
+   * for that variable.
+   */
+  updateExistenceOfSkillDescription(
+      description: string, successCallback: (value?: Object) => void): void {
+    this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
+      description).then(
+      (skillDescriptionExists) => {
+        successCallback(skillDescriptionExists);
+      }, (error) => {
+        this.alertsService.addWarning(
+          error ||
+          'There was an error when checking if the skill description ' +
+          'exists for another skill.');
+      });
   }
 
   get onSkillChange(): EventEmitter<unknown> {
