@@ -441,6 +441,56 @@ def get_all_topic_assignments_for_skill(skill_id):
     return topic_assignments
 
 
+def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
+    """Replaces the old skill id with the new one in all the associated topics.
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        old_skill_id: str. The old skill id.
+        new_skill_id: str. The new skill id.
+    """
+    all_topics = topic_fetchers.get_all_topics()
+    for topic in all_topics:
+        change_list = []
+        if old_skill_id in topic.get_all_skill_ids():
+            if new_skill_id in topic.get_all_skill_ids():
+                raise Exception(
+                    'Found topic \'%s\' contains the two skills to be merged. '
+                    'Please unassign one of these skills from topic '
+                    'and retry this operation.' % topic.name)
+            if old_skill_id in topic.uncategorized_skill_ids:
+                change_list.extend([topic_domain.TopicChange({
+                    'cmd': 'remove_uncategorized_skill_id',
+                    'uncategorized_skill_id': old_skill_id
+                }), topic_domain.TopicChange({
+                    'cmd': 'add_uncategorized_skill_id',
+                    'new_uncategorized_skill_id': new_skill_id
+                })])
+            for subtopic in topic.subtopics:
+                if old_skill_id in subtopic.skill_ids:
+                    change_list.extend([topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                        'subtopic_id': subtopic.id,
+                        'skill_id': old_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': 'remove_uncategorized_skill_id',
+                        'uncategorized_skill_id': old_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': 'add_uncategorized_skill_id',
+                        'new_uncategorized_skill_id': new_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                        'old_subtopic_id': None,
+                        'new_subtopic_id': subtopic.id,
+                        'skill_id': new_skill_id
+                    })])
+                    break
+            topic_services.update_topic_and_subtopic_pages(
+                user_id, topic.id, change_list,
+                'Replace skill id %s with skill id %s in the topic' % (
+                    old_skill_id, new_skill_id))
+
+
 def remove_skill_from_all_topics(user_id, skill_id):
     """Deletes the skill with the given id from all the associated topics.
 
@@ -542,6 +592,20 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
     opportunity_services.create_skill_opportunity(
         skill.id,
         skill.description)
+
+
+def does_skill_with_description_exist(description):
+    """Checks if skill with provided description exists.
+
+    Args:
+        description: str. The description for the skill.
+
+    Returns:
+        bool. Whether the the description for the skill exists.
+    """
+    existing_skill = (
+        skill_fetchers.get_skill_by_description(description))
+    return existing_skill is not None
 
 
 def save_new_skill(committer_id, skill):
