@@ -132,6 +132,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
     };
     var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
       for (var skillId in skillIdToRubricsObject) {
+        // Skips deleted skills.
+        if (!skillIdToRubricsObject[skillId]) {
+          continue;
+        }
         var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
           return RubricObjectFactory.createFromBackendDict(rubric);
         });
