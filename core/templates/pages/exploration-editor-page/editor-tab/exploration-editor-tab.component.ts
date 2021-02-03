@@ -68,7 +68,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorTab', {
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
+    '$scope', '$templateCache', '$uibModal', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'GraphDataService', 'LoaderService',
@@ -76,7 +76,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'StateEditorService', 'StateTutorialFirstTimeService',
     'UrlInterpolationService', 'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $timeout, $uibModal, EditabilityService,
+        $scope, $templateCache, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, GraphDataService, LoaderService,
@@ -461,9 +461,7 @@ angular.module('oppia').component('explorationEditorTab', {
       };
 
       ctrl.startTutorial = function() {
-        $timeout(function() {
-          ctrl.tutorialInProgress = true;
-        });
+        ctrl.tutorialInProgress = true;
       };
 
       // Remove save from tutorial if user does not has edit rights for

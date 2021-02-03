@@ -58,7 +58,8 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('translationTab', {
   template: require('./translation-tab.component.html'),
-  controller: ['$scope', '$templateCache', '$timeout', '$uibModal',
+  controller: [
+    '$scope', '$templateCache', '$uibModal',
     'ContextService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'RouterService', 'SiteAnalyticsService',
     'StateEditorService', 'StateRecordedVoiceoversService',
@@ -66,7 +67,7 @@ angular.module('oppia').component('translationTab', {
     'TranslationTabActiveModeService', 'UrlInterpolationService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $timeout, $uibModal,
+        $scope, $templateCache, $uibModal,
         ContextService, EditabilityService, ExplorationStatesService,
         LoaderService, RouterService, SiteAnalyticsService,
         StateEditorService, StateRecordedVoiceoversService,
@@ -127,9 +128,7 @@ angular.module('oppia').component('translationTab', {
           return;
         }
         if (permissions.canVoiceover) {
-          $timeout(function() {
-            $scope.tutorialInProgress = true;
-          });
+          $scope.tutorialInProgress = true;
         }
       };
 
