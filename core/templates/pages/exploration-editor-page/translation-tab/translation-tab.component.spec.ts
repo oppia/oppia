@@ -290,24 +290,24 @@ describe('Translation tab component', function() {
 
   it('should not start tutorial if in tutorial mode on page load but' +
     ' no permissions', () => {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve(null));
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve(null));
 
-      editabilityService.onStartTutorial();
-      ctrl.$onInit();
-      $scope.$apply();
-      $scope.initTranslationTab();
-      $scope.$apply();
-  
-      expect(editabilityService.inTutorialMode()).toBe(true);
-      expect($scope.tutorialInProgress).toBe(false);
-    });
+    editabilityService.onStartTutorial();
+    ctrl.$onInit();
+    $scope.$apply();
+    $scope.initTranslationTab();
+    $scope.$apply();
+
+    expect(editabilityService.inTutorialMode()).toBe(true);
+    expect($scope.tutorialInProgress).toBe(false);
+  });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-    .returnValue($q.resolve({
-      canVoiceover: true
-    }));
+      .returnValue($q.resolve({
+        canVoiceover: true
+      }));
 
     editabilityService.onEndTutorial();
     ctrl.$onInit();
@@ -353,7 +353,7 @@ describe('Translation tab component', function() {
       $scope.$apply();
       editabilityService.onStartTutorial();
       $scope.$apply();
-    
+
       spyOn(editabilityService, 'onEndTutorial');
       spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
 
