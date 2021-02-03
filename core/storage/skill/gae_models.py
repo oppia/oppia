@@ -161,6 +161,22 @@ class SkillModel(base_models.VersionedModel):
             'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    @classmethod
+    def get_by_description(cls, description):
+        """Gets SkillModel by description. Returns None if the skill with
+        description doesn't exist.
+
+        Args:
+            description: str. The description of the skill.
+
+        Returns:
+            SkillModel|None. The skill model of the skill or None if not
+            found.
+        """
+        return SkillModel.query().filter(
+            cls.description == description).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
+
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.
