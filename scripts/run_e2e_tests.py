@@ -507,7 +507,7 @@ def cleanup_portserver(portserver_process):
     _kill_process(portserver_process)
 
 
-def run_tests(args):
+def run_tests(args, attempt):
     """Run the scripts to start end-to-end tests."""
     oppia_instance_is_already_running = is_oppia_server_already_running()
 
@@ -539,7 +539,8 @@ def run_tests(args):
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
     with contextlib2.ExitStack() as stack:
-        stack.enter_context(common.managed_elasticsearch_dev_server())
+        stack.enter_context(common.managed_elasticsearch_dev_server(
+            log_path='log_elasticsearch_{}.txt'.format(attempt)))
         stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
@@ -592,7 +593,7 @@ def main(args=None):
 
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
-        output, return_code = run_tests(parsed_args)
+        output, return_code = run_tests(parsed_args, attempt_num + 1)
         # Don't rerun passing tests.
         if return_code == 0:
             flake_checker.report_pass(parsed_args.suite)
