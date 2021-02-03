@@ -20,7 +20,6 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoggerService } from 'services/contextual/logger.service';
 import constants from 'assets/constants';
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -38,8 +37,7 @@ export class LoginRequiredMessageComponent {
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
-    private windowRef: WindowRef,
-    private loggerService: LoggerService) {}
+    private windowRef: WindowRef) {}
 
 
   ngOnInit(): void {
@@ -51,11 +49,11 @@ export class LoginRequiredMessageComponent {
 
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(
-      function(loginUrl) {
+      (loginUrl) => {
         if (loginUrl) {
           this.siteAnalyticsService.registerStartLoginEvent('loginButton');
-          setTimeout(function() {
-            this.windowRef.nativeWindow.location = loginUrl;
+          setTimeout(() => {
+            this.windowRef.nativeWindow.location.href = loginUrl;
           }, 150);
         } else {
           this.windowRef.nativeWindow.location.reload();
