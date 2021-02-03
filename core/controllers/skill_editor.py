@@ -271,3 +271,21 @@ class FetchSkillsHandler(base.BaseHandler):
         })
 
         self.render_json(self.values)
+
+
+class SkillDescriptionHandler(base.BaseHandler):
+    """A data handler for checking if a skill with given description exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_create_skill
+    def get(self, skill_description):
+        """Handler that receives a skill description and checks whether
+        a skill with the same description exists.
+        """
+        self.values.update({
+            'skill_description_exists': (
+                skill_services.does_skill_with_description_exist(
+                    skill_description))
+        })
+        self.render_json(self.values)

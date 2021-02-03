@@ -297,8 +297,8 @@ class _Gae(Platform):
         Returns:
             module. The gae_search_services module.
         """
-        from core.platform.search import gae_search_services
-        return gae_search_services
+        from core.platform.search import elastic_search_services
+        return elastic_search_services
 
     NAME = 'gae'
 
