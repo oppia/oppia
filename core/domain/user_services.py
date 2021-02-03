@@ -685,7 +685,8 @@ def _create_user_contribution_rights_from_model(user_contribution_rights_model):
                 user_contribution_rights_model
                 .can_review_voiceover_for_language_codes
             ),
-            user_contribution_rights_model.can_review_questions)
+            user_contribution_rights_model.can_review_questions,
+            user_contribution_rights_model.can_submit_questions)
     else:
         return user_domain.UserContributionRights('', [], [], False)
 
@@ -793,7 +794,9 @@ def _save_user_contribution_rights(user_contribution_rights):
         can_review_voiceover_for_language_codes=(
             user_contribution_rights.can_review_voiceover_for_language_codes),
         can_review_questions=(
-            user_contribution_rights.can_review_questions)).put()
+            user_contribution_rights.can_review_questions),
+        can_submit_questions=(
+            user_contribution_rights.can_submit_questions)).put()
 
 
 def _update_user_contribution_rights(user_contribution_rights):
@@ -2413,6 +2416,19 @@ def can_review_question_suggestions(user_id):
     return user_contribution_rights.can_review_questions
 
 
+def can_submit_question_suggestions(user_id):
+    """Checks whether the user can submit question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. Whether the user can submit question suggestions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    return user_contribution_rights.can_submit_questions
+
+
 def allow_user_to_review_translation_in_language(user_id, language_code):
     """Allows the user with the given user id to review translation in the given
     language_code.
@@ -2504,6 +2520,30 @@ def remove_question_review_rights(user_id):
     """
     user_contribution_rights = get_user_contribution_rights(user_id)
     user_contribution_rights.can_review_questions = False
+    _update_user_contribution_rights(user_contribution_rights)
+
+
+def allow_user_to_submit_question(user_id):
+    """Allows the user with the given user id to submit question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user does not have rights to submit questions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_submit_questions = True
+    _save_user_contribution_rights(user_contribution_rights)
+
+
+def remove_question_submit_rights(user_id):
+    """Removes the user's submit rights to question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user already has rights to submit questions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_submit_questions = False
     _update_user_contribution_rights(user_contribution_rights)
 
 

@@ -2366,6 +2366,8 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_review_voiceover_for_language_codes = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     can_review_questions = datastore_services.BooleanProperty(indexed=True)
+    can_submit_questions = datastore_services.BooleanProperty(default=False,
+        indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -2480,6 +2482,18 @@ class UserContributionRightsModel(base_models.BaseModel):
         reviewer_keys = cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
             keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+    @classmethod
+    def get_question_contributor_user_ids(cls):
+        """Returns the IDs of the users who have rights to submit questions.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to submit
+            questions.
+        """
+        contributor_keys = cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
+            keys_only=True)
+        return [contributor_key.id() for contributor_key in contributor_keys]
 
 
 class PendingDeletionRequestModel(base_models.BaseModel):

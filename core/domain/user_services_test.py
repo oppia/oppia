@@ -2529,6 +2529,15 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_question_suggestions(self.voice_artist_id))
 
+    def test_assign_user_submit_question_suggestion(self):
+        self.assertFalse(
+            user_services.can_submit_question_suggestions(self.voice_artist_id))
+
+        user_services.allow_user_to_submit_question(self.voice_artist_id)
+
+        self.assertTrue(
+            user_services.can_submit_question_suggestions(self.voice_artist_id))
+
     def test_get_users_contribution_rights_with_multiple_reviewer_user_ids(
             self):
         user_services.allow_user_to_review_question(self.question_reviewer_id)

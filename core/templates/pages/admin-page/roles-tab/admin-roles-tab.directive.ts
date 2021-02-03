@@ -126,7 +126,7 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
-          $http.post('/addcontributionreviewerhandler', {
+          $http.post('/addcontributionrightshandler', {
             review_category: formResponse.category,
             username: formResponse.username,
             language_code: formResponse.languageCode
@@ -161,7 +161,7 @@ angular.module('oppia').directive('adminRolesTab', [
             var translationLanguages = [];
             var voiceoverLanguages = [];
             $http.get(
-              '/contributionreviewerrightsdatahandler', {
+              '/contributionrightsdatahandler', {
                 params: {
                   username: formResponse.username
                 }
@@ -189,7 +189,7 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
           $http.put(
-            '/removecontributionreviewerhandler', {
+            '/removecontributionrightshandler', {
               username: formResponse.username,
               removal_type: formResponse.method,
               review_category: formResponse.category,

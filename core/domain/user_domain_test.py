@@ -576,6 +576,13 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
             'Expected can_review_questions to be a boolean value'):
             self.user_contribution_rights.validate()
 
+    def test_incorrect_type_for_can_submit_questions_raise_error(self):
+        self.user_contribution_rights.can_submit_questions = 5
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_submit_questions to be a boolean value'):
+            self.user_contribution_rights.validate()
+
 
 class ModifiableUserDataTests(test_utils.GenericTestBase):
     """Testing domain object for modifiable user data."""

@@ -784,8 +784,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddContributionReviewerHandler(base.BaseHandler):
-    """Handles adding reviewer for contributor dashboard page."""
+class AddContributionRightsHandler(base.BaseHandler):
+    """Handles adding contribution rights for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -842,8 +842,8 @@ class AddContributionReviewerHandler(base.BaseHandler):
         self.render_json({})
 
 
-class RemoveContributionReviewerHandler(base.BaseHandler):
-    """Handles removing reviewer for contributor dashboard."""
+class RemoveContributionRightsHandler(base.BaseHandler):
+    """Handles removing contribution rights for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -927,8 +927,8 @@ class ContributionReviewersListHandler(base.BaseHandler):
         self.render_json({'usernames': usernames})
 
 
-class ContributionReviewerRightsDataHandler(base.BaseHandler):
-    """Handler to show the review rights of a user."""
+class ContributionRightsDataHandler(base.BaseHandler):
+    """Handler to show the contribution rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -948,7 +948,8 @@ class ContributionReviewerRightsDataHandler(base.BaseHandler):
                 user_rights.can_review_translation_for_language_codes),
             'can_review_voiceover_for_language_codes': (
                 user_rights.can_review_voiceover_for_language_codes),
-            'can_review_questions': user_rights.can_review_questions
+            'can_review_questions': user_rights.can_review_questions,
+            'can_submit_questions': user_rights.can_submit_questions
         })
 
 

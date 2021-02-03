@@ -2345,6 +2345,32 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertFalse(self.USER_ID_1 in question_reviewer_ids)
         self.assertTrue(self.USER_ID_2 in question_reviewer_ids)
 
+    def test_get_question_contributor_user_ids(self):
+        question_contributor_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_contributor_user_ids())
+        self.assertEqual(len(question_contributor_ids), 0)
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False,
+            can_submit_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True,
+            can_submit_questions=True).put()
+
+        question_contributor_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_contributor_user_ids())
+        self.assertEqual(len(question_contributor_ids), 1)
+        self.assertFalse(self.USER_ID_1 in question_contributor_ids)
+        self.assertTrue(self.USER_ID_2 in question_contributor_ids)
+
 
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     """Tests for PendingDeletionRequestModel."""
