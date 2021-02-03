@@ -23,6 +23,7 @@ import contextlib
 import logging
 import os
 import re
+import shutil
 import signal
 import subprocess
 import sys
@@ -80,6 +81,7 @@ BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
 FAILURE_OUTPUT_STRING = '*                    Failures                    *'
 LOG_FORMAT = (
     '[%(asctime)-15s %(levelname)s %(filename)s:%(lineno)s] %(message)s')
+ELASTICSEARCH_LOG_DIR = 'elasticsearch_logs'
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -540,7 +542,11 @@ def run_tests(args, attempt):
 
     with contextlib2.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server(
-            log_path='log_elasticsearch_{}.txt'.format(attempt)))
+            log_path=os.path.join(
+                ELASTICSEARCH_LOG_DIR,
+                'log_elasticsearch_{}.txt'.format(attempt),
+            )
+        ))
         stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
@@ -590,6 +596,10 @@ def main(args=None):
 
     portserver_process = start_portserver()
     atexit.register(cleanup_portserver, portserver_process)
+
+    if os.path.exists(ELASTICSEARCH_LOG_DIR):
+        shutil.rmtree(ELASTICSEARCH_LOG_DIR)
+    os.mkdir(ELASTICSEARCH_LOG_DIR)
 
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
