@@ -252,7 +252,7 @@ describe('Translation tab component', function() {
 
       expect($scope.isTranslationTabBusy).toBe(false);
       expect($scope.showTranslationTabSubDirectives).toBe(false);
-      expect($scope.translationTutorial).toBe(false);
+      expect($scope.tutorialInProgress).toBe(false);
     });
 
   it('should load translation tab data when translation tab page is' +
@@ -270,6 +270,26 @@ describe('Translation tab component', function() {
 
     expect($scope.showTranslationTabSubDirectives).toBe(true);
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  });
+
+  it('should start tutorial if in tutorial mode on page load', () => {
+    spyOn($scope, 'startTutorial');
+    editabilityService.onStartTutorial();
+    $scope.$apply;
+    $scope.initTranslationTab();
+    $scope.$apply;
+    expect(editabilityService.inTutorialMode()).toBe(true);
+    expect($scope.startTutorial).toHaveBeenCalled();
+  });
+
+  it('should not start tutorial if not in tutorial mode on page load', () => {
+    spyOn($scope, 'startTutorial');
+    editabilityService.onEndTutorial();
+    $scope.$apply;
+    $scope.initTranslationTab();
+    $scope.$apply;
+    expect(editabilityService.inTutorialMode()).toBe(false);
+    expect($scope.startTutorial).not.toHaveBeenCalled();
   });
 
   it('should finish tutorial on clicking the end tutorial button when' +
@@ -291,7 +311,7 @@ describe('Translation tab component', function() {
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
       .toHaveBeenCalled();
-    expect($scope.translationTutorial).toBe(false);
+    expect($scope.tutorialInProgress).toBe(false);
   });
 
   it('should skip tutorial when the skip tutorial button is clicked',
@@ -313,7 +333,7 @@ describe('Translation tab component', function() {
       expect(editabilityService.onEndTutorial).toHaveBeenCalled();
       expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
         .toHaveBeenCalled();
-      expect($scope.translationTutorial).toBe(false);
+      expect($scope.tutorialInProgress).toBe(false);
     });
 
   it('should start tutorial when translation tutorial modal is closed',
@@ -326,11 +346,9 @@ describe('Translation tab component', function() {
       ctrl.$onInit();
       $scope.$apply();
 
-      spyOn(editabilityService, 'onStartTutorial');
       openTranslationTutorialEmitter.emit();
 
-      expect($scope.translationTutorial).toBe(true);
-      expect(editabilityService.onStartTutorial).toHaveBeenCalled();
+      expect($scope.tutorialInProgress).toBe(true);
     });
 
   it('should not start tutorial when user has no permissions',
@@ -341,11 +359,9 @@ describe('Translation tab component', function() {
       ctrl.$onInit();
       $scope.$apply();
 
-      spyOn(editabilityService, 'onStartTutorial');
       openTranslationTutorialEmitter.emit();
 
-      expect($scope.translationTutorial).toBe(false);
-      expect(editabilityService.onStartTutorial).not.toHaveBeenCalled();
+      expect($scope.tutorialInProgress).toBe(false);
     });
 
   it('should start tutorial when welcome translation modal is closed',
@@ -358,7 +374,6 @@ describe('Translation tab component', function() {
       ctrl.$onInit();
       $scope.$apply();
 
-      spyOn(editabilityService, 'onStartTutorial');
       spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('exp1')
@@ -366,7 +381,6 @@ describe('Translation tab component', function() {
       enterTranslationForTheFirstTimeEmitter.emit();
       $scope.$apply();
 
-      expect(editabilityService.onStartTutorial).toHaveBeenCalled();
       expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
         .toHaveBeenCalled();
     });
