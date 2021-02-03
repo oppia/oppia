@@ -25,7 +25,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
 
-fdescribe('Login required message component', () => {
+describe('Login required message component', () => {
   let component: LoginRequiredMessageComponent;
   let fixture: ComponentFixture<LoginRequiredMessageComponent>;
   let userService: UserService;

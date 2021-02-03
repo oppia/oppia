@@ -31,12 +31,12 @@ require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
-  '$controller', '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
+  '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
   'opportunity', 'ENTITY_TYPE',
   function(
-      $controller, $rootScope, $scope, $uibModalInstance, AlertsService,
+      $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
       opportunity, ENTITY_TYPE) {
@@ -78,7 +78,6 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.textToTranslate = textAndAvailability.text;
         $scope.moreAvailable = textAndAvailability.more;
         $scope.loadingData = false;
-        $rootScope.$applyAsync();
       });
 
     $scope.onContentClick = function($event) {
