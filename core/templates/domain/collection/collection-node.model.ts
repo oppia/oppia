@@ -106,13 +106,11 @@ export class CollectionNode {
 
   getCapitalizedObjective(): string | null {
     if (this._explorationSummaryObject === null) {
-      return null;  
-    }
-    else{
+      return null;
+    } else {
       return (
         this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
         this._explorationSummaryObject.objective.slice(1));
     }
-
   }
 }

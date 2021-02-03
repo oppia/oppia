@@ -61,7 +61,8 @@ export class Collection {
       id: string | null, title: string | null, objective: string | null,
       languageCode: string | null, tags: string[] | null,
       playthrough: CollectionPlaythrough, category: string | null,
-      version: number | null, schemaVersion: number | null, nodes: CollectionNode[]) {
+      version: number | null, schemaVersion: number | null,
+      nodes: CollectionNode[]) {
     this.id = id;
     this.title = title;
     this.objective = objective;

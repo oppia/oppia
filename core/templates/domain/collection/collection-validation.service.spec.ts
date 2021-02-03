@@ -62,8 +62,8 @@ describe('Collection validation service', function() {
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
   });
 
-  var _addCollectionNode = (explorationId: string, exists: boolean,
-    isPublic: boolean) => {
+  var _addCollectionNode = (
+    explorationId: string, exists: boolean, isPublic: boolean) => {
     var collectionNode = CollectionNode.createFromExplorationId(
       explorationId);
     if (exists) {
