@@ -300,7 +300,7 @@ class StatsEventsHandler(base.BaseHandler):
         try:
             self._require_aggregated_stats_are_valid(aggregated_stats)
         except self.InvalidInputException as e:
-            logging.error(e)
+            logging.exception(e)
         event_services.StatsEventsHandler.record(
             exploration_id, exp_version, aggregated_stats)
         self.render_json({})

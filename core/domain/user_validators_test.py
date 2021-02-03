@@ -1080,6 +1080,8 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'objective',
                 'new_value': 'The objective'
             })], 'Test edit 2')
+        self.process_and_flush_pending_tasks()
+
         rights_manager.publish_exploration(self.owner, 'exp0')
         rights_manager.publish_exploration(self.owner, 'exp1')
 
