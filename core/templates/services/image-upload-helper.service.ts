@@ -28,8 +28,8 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 })
 export class ImageUploadHelperService {
   constructor(
-    private _assetsBackendApiService: AssetsBackendApiService,
-    private _sanitizer: DomSanitizer) {}
+    private assetsBackendApiService: AssetsBackendApiService,
+    private sanitizer: DomSanitizer) {}
 
   private _generateDateTimeStringForFilename() {
     const date = new Date();
@@ -97,8 +97,8 @@ export class ImageUploadHelperService {
       imageFileName: string, entityType: string, entityId: string):
         SafeResourceUrl {
     const encodedFilepath = window.encodeURIComponent(imageFileName);
-    return this._sanitizer.bypassSecurityTrustResourceUrl(
-      this._assetsBackendApiService.getThumbnailUrlForPreview(
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      this.assetsBackendApiService.getThumbnailUrlForPreview(
         entityType, entityId, encodedFilepath));
   }
 
