@@ -663,18 +663,18 @@ describe('Exploration editor tab component', function() {
   it('should start tutorial if in tutorial mode on page load', () => {
     spyOn(ctrl, 'startTutorial');
     editabilityService.onStartTutorial();
-    $scope.$apply;
+    $scope.$apply();
     ctrl.initStateEditor();
-    $scope.$apply;
+    $scope.$apply();
     expect(ctrl.startTutorial).toHaveBeenCalled();
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
     spyOn(ctrl, 'startTutorial');
     editabilityService.onEndTutorial();
-    $scope.$apply;
+    $scope.$apply();
     ctrl.initStateEditor();
-    $scope.$apply;
+    $scope.$apply();
     expect(ctrl.startTutorial).not.toHaveBeenCalled();
   });
 
@@ -683,9 +683,9 @@ describe('Exploration editor tab component', function() {
       spyOn(siteAnalyticsService, 'registerFinishTutorialEvent'));
     spyOn(editabilityService, 'onEndTutorial');
     editabilityService.onStartTutorial();
-    $scope.$apply;
+    $scope.$apply();
     ctrl.initStateEditor();
-    $scope.$apply;
+    $scope.$apply();
     ctrl.onFinishTutorial();
     expect(registerFinishTutorialEventSpy).toHaveBeenCalled();
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
@@ -697,9 +697,9 @@ describe('Exploration editor tab component', function() {
       spyOn(siteAnalyticsService, 'registerSkipTutorialEvent'));
     spyOn(editabilityService, 'onEndTutorial');
     editabilityService.onStartTutorial();
-    $scope.$apply;
+    $scope.$apply();
     ctrl.initStateEditor();
-    $scope.$apply;
+    $scope.$apply();
     ctrl.onSkipTutorial();
     expect(registerSkipTutorialEventSpy).toHaveBeenCalled();
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();

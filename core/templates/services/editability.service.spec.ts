@@ -59,7 +59,5 @@ describe('EditabilityService', () => {
     expect(editabilityService.inTutorialMode()).toBe(false);
     editabilityService.onStartTutorial();
     expect(editabilityService.inTutorialMode()).toBe(true);
-    editabilityService.onEndTutorial();
-    expect(editabilityService.inTutorialMode()).toBe(false);
   });
 });

@@ -74,7 +74,6 @@ describe('Translation tab component', function() {
   var stateTutorialFirstTimeService = null;
   var userExplorationPermissionsService = null;
 
-  var openTranslationTutorialEmitter = new EventEmitter();
   var refreshTranslationTabEmitter = new EventEmitter();
   var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
 
@@ -138,8 +137,6 @@ describe('Translation tab component', function() {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
-    spyOnProperty(stateTutorialFirstTimeService, 'onOpenTranslationTutorial')
-      .and.returnValue(openTranslationTutorialEmitter);
     spyOnProperty(
       stateTutorialFirstTimeService, 'onEnterTranslationForTheFirstTime')
       .and.returnValue(enterTranslationForTheFirstTimeEmitter);
@@ -272,24 +269,54 @@ describe('Translation tab component', function() {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   });
 
-  it('should start tutorial if in tutorial mode on page load', () => {
-    spyOn($scope, 'startTutorial');
+  it('should start tutorial if in tutorial mode on page load with' +
+    ' permissions', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve({
+        canVoiceover: true
+      }));
+    spyOn($scope, 'startTutorial').and.callThrough();
+
     editabilityService.onStartTutorial();
-    $scope.$apply;
+    ctrl.$onInit();
+    $scope.$apply();
     $scope.initTranslationTab();
-    $scope.$apply;
+    $scope.$apply();
+
     expect(editabilityService.inTutorialMode()).toBe(true);
     expect($scope.startTutorial).toHaveBeenCalled();
+    expect($scope.tutorialInProgress).toBe(true);
   });
 
+  it('should not start tutorial if in tutorial mode on page load but' +
+    ' no permissions', () => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue($q.resolve(null));
+
+      editabilityService.onStartTutorial();
+      ctrl.$onInit();
+      $scope.$apply();
+      $scope.initTranslationTab();
+      $scope.$apply();
+  
+      expect(editabilityService.inTutorialMode()).toBe(true);
+      expect($scope.tutorialInProgress).toBe(false);
+    });
+
   it('should not start tutorial if not in tutorial mode on page load', () => {
-    spyOn($scope, 'startTutorial');
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+    .returnValue($q.resolve({
+      canVoiceover: true
+    }));
+
     editabilityService.onEndTutorial();
-    $scope.$apply;
+    ctrl.$onInit();
+    $scope.$apply();
     $scope.initTranslationTab();
-    $scope.$apply;
+    $scope.$apply();
+
     expect(editabilityService.inTutorialMode()).toBe(false);
-    expect($scope.startTutorial).not.toHaveBeenCalled();
+    expect($scope.tutorialInProgress).toBe(false);
   });
 
   it('should finish tutorial on clicking the end tutorial button when' +
@@ -301,10 +328,11 @@ describe('Translation tab component', function() {
 
     ctrl.$onInit();
     $scope.$apply();
+    editabilityService.onStartTutorial();
+    $scope.$apply();
 
     spyOn(editabilityService, 'onEndTutorial');
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-    openTranslationTutorialEmitter.emit();
 
     $scope.onFinishTutorial();
 
@@ -323,44 +351,17 @@ describe('Translation tab component', function() {
 
       ctrl.$onInit();
       $scope.$apply();
-
+      editabilityService.onStartTutorial();
+      $scope.$apply();
+    
       spyOn(editabilityService, 'onEndTutorial');
       spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-      openTranslationTutorialEmitter.emit();
 
       $scope.onSkipTutorial();
 
       expect(editabilityService.onEndTutorial).toHaveBeenCalled();
       expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
         .toHaveBeenCalled();
-      expect($scope.tutorialInProgress).toBe(false);
-    });
-
-  it('should start tutorial when translation tutorial modal is closed',
-    function() {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
-          canVoiceover: true
-        }));
-
-      ctrl.$onInit();
-      $scope.$apply();
-
-      openTranslationTutorialEmitter.emit();
-
-      expect($scope.tutorialInProgress).toBe(true);
-    });
-
-  it('should not start tutorial when user has no permissions',
-    function() {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve(null));
-
-      ctrl.$onInit();
-      $scope.$apply();
-
-      openTranslationTutorialEmitter.emit();
-
       expect($scope.tutorialInProgress).toBe(false);
     });
 

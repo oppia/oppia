@@ -127,9 +127,8 @@ angular.module('oppia').component('translationTab', {
           return;
         }
         if (permissions.canVoiceover) {
-          $timeout(function() {
-            $scope.tutorialInProgress = true;
-          });
+          console.log("CAN VOICEOVER");
+          $scope.tutorialInProgress = true;
         }
       };
 
