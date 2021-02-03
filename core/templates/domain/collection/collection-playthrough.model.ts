@@ -24,12 +24,12 @@ export interface CollectionPlaythroughBackendDict {
 }
 
 export class CollectionPlaythrough {
-  _nextExplorationId: string;
+  _nextExplorationId: string | null;
   _completedExplorationIds: string[];
 
   // Stores information about a current playthrough of a collection for a
   // user.
-  constructor(nextExplorationId: string, completedExplorationIds: string[]) {
+  constructor(nextExplorationId: string | null, completedExplorationIds: string[]) {
     this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
   }
@@ -43,7 +43,7 @@ export class CollectionPlaythrough {
   }
 
   static create(
-      nextExplorationId: string,
+      nextExplorationId: string | null,
       completedExplorationIds: string[]): CollectionPlaythrough {
     return new CollectionPlaythrough(
       nextExplorationId, cloneDeep(completedExplorationIds));
@@ -51,7 +51,7 @@ export class CollectionPlaythrough {
 
   // Returns the upcoming exploration ID. Changes to this are not
   // reflected in the collection.
-  getNextExplorationId(): string {
+  getNextExplorationId(): string | null {
     return this._nextExplorationId;
   }
 

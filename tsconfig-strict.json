@@ -34,6 +34,8 @@
   "files": [
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.spec.ts",
+    "core/templates/domain/collection/collection-validation.service.ts",
+    "core/templates/domain/collection/collection-validation.service.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",

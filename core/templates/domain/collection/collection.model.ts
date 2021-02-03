@@ -35,9 +35,9 @@ export interface CollectionBackendDict {
   'id': string;
   'title': string;
   'objective': string;
-  'language_code': string;
-  'tags': string[];
-  'schema_version': number;
+  'language_code': string | null;
+  'tags': string[] | null;
+  'schema_version': number | null;
   'playthrough_dict': CollectionPlaythroughBackendDict;
   'category': string;
   'version': number;
@@ -45,22 +45,23 @@ export interface CollectionBackendDict {
 }
 
 export class Collection {
-  id: string;
-  title: string;
-  objective: string;
-  languageCode: string;
-  tags: string[];
+  id: string | null;
+  title: string | null;
+  objective: string | null;
+  languageCode: string | null;
+  tags: string[] | null;
   playthrough: CollectionPlaythrough;
-  category: string;
-  version: number;
-  schemaVersion: number;
+  category: string | null;
+  version: number | null;
+  schemaVersion: number | null;
   nodes: CollectionNode[];
   explorationIdToNodeIndexMap: ExplorationIdToNodeIndexMap = {};
 
   constructor(
-      id: string, title: string, objective: string, languageCode: string,
-      tags: string[], playthrough: CollectionPlaythrough, category: string,
-      version: number, schemaVersion: number, nodes: CollectionNode[]) {
+      id: string | null, title: string | null, objective: string | null,
+      languageCode: string | null, tags: string[] | null,
+      playthrough: CollectionPlaythrough, category: string | null,
+      version: number | null, schemaVersion: number | null, nodes: CollectionNode[]) {
     this.id = id;
     this.title = title;
     this.objective = objective;
@@ -111,23 +112,23 @@ export class Collection {
       null, null, null, []);
   }
 
-  getId(): string {
+  getId(): string | null {
     return this.id;
   }
 
-  getTitle(): string {
+  getTitle(): string | null {
     return this.title;
   }
 
-  setTitle(title: string): void {
+  setTitle(title: string | null): void {
     this.title = title;
   }
 
-  getCategory(): string {
+  getCategory(): string | null {
     return this.category;
   }
 
-  getSchemaVersion(): number {
+  getSchemaVersion(): number | null {
     return this.schemaVersion;
   }
 
@@ -135,35 +136,35 @@ export class Collection {
     return this.playthrough;
   }
 
-  setCategory(category: string): void {
+  setCategory(category: string | null): void {
     this.category = category;
   }
 
-  getObjective(): string {
+  getObjective(): string | null {
     return this.objective;
   }
 
-  setObjective(objective: string): void {
+  setObjective(objective: string | null): void {
     this.objective = objective;
   }
 
-  getLanguageCode(): string {
+  getLanguageCode(): string | null {
     return this.languageCode;
   }
 
-  setLanguageCode(languageCode: string): void {
+  setLanguageCode(languageCode: string | null): void {
     this.languageCode = languageCode;
   }
 
-  getTags(): string[] {
+  getTags(): string[] | null {
     return this.tags;
   }
 
-  setTags(tags: string[]): void {
+  setTags(tags: string[] | null): void {
     this.tags = tags;
   }
 
-  getVersion(): number {
+  getVersion(): number | null {
     return this.version;
   }
 
@@ -273,7 +274,7 @@ export class Collection {
 
   // Returns the collection node which is initially available to play
   // by the player.
-  getStartingCollectionNode(): CollectionNode {
+  getStartingCollectionNode(): CollectionNode | null {
     if (this.nodes.length === 0) {
       return null;
     } else {

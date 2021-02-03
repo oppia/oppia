@@ -26,9 +26,9 @@ import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 
 describe('Collection validation service', function() {
-  let collectionValidationService: CollectionValidationService = null;
-  let sampleCollectionBackendObject: CollectionBackendDict = null;
-  let _sampleCollection: Collection = null;
+  let collectionValidationService: CollectionValidationService;
+  let sampleCollectionBackendObject: CollectionBackendDict;
+  let _sampleCollection: Collection;
 
   let EXISTS: boolean = true;
   let DOES_NOT_EXIST: boolean = false;
@@ -62,7 +62,8 @@ describe('Collection validation service', function() {
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
   });
 
-  var _addCollectionNode = (explorationId, exists, isPublic) => {
+  var _addCollectionNode = (explorationId: string, exists: boolean,
+    isPublic: boolean) => {
     var collectionNode = CollectionNode.createFromExplorationId(
       explorationId);
     if (exists) {
@@ -94,7 +95,7 @@ describe('Collection validation service', function() {
     return _sampleCollection.addCollectionNode(collectionNode);
   };
 
-  var _getCollectionNode = (explorationId) => {
+  var _getCollectionNode = (explorationId: string) => {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 
