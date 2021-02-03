@@ -19,10 +19,11 @@
 import { TestBed } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 
 describe('ImageLocalStorageService', () => {
   let alertsService: AlertsService = null;
-  let imageLocalStorageService: ImageLocalStorageService = null;
+  let imageLocalStorageService: ImageLocalStorageService;
   const sampleImageData = 'data:image/png;base64,xyz';
   const imageFilename = 'filename';
   const mockImageUploadHelperService = {
@@ -30,22 +31,22 @@ describe('ImageLocalStorageService', () => {
   };
 
   beforeEach(() => {
+    spyOn(mockImageUploadHelperService, 'convertImageDataToImageFile');
     TestBed.configureTestingModule({
-      providers: [mockImageUploadHelperService]
+      providers: [
+        {
+          provide: ImageUploadHelperService,
+          useValue: mockImageUploadHelperService
+        }
+      ]
     });
-    alertsService = TestBed.inject(AlertsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    alertsService = TestBed.inject(AlertsService);
   });
-
-  beforeEach(angular.mock.inject(($injector) => {
-    imageLocalStorageService = $injector.get('ImageLocalStorageService');
-    alertsService = $injector.get('AlertsService');
-  }));
 
   it(
     'should call helper service function correctly when getting' +
     ' object url', () => {
-      spyOn(mockImageUploadHelperService, 'convertImageDataToImageFile');
       spyOn(URL, 'createObjectURL').and.returnValue('objectUrl');
       imageLocalStorageService.saveImage(imageFilename, sampleImageData);
       expect(

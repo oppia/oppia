@@ -45,7 +45,7 @@ export class ImageLocalStorageService {
     private windowRef: WindowRef) {}
 
   getObjectUrlForImage(filename: string): string {
-    const urlCreator = window.URL || window.webkitURL;
+    const urlCreator = URL || webkitURL;
     const imageBlob = this.imageUploadHelperService.convertImageDataToImageFile(
       this.windowRef.nativeWindow.sessionStorage.getItem(filename));
     return urlCreator.createObjectURL(imageBlob);
