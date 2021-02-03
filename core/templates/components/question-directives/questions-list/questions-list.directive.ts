@@ -52,6 +52,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
+require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
@@ -91,6 +92,7 @@ angular.module('oppia').directive('questionsList', [
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
         'ShortSkillSummaryObjectFactory', 'SkillBackendApiService',
+        'SkillEditorRoutingService',
         'UtilsService', 'WindowDimensionsService',
         'INTERACTION_SPECS', 'NUM_QUESTIONS_PER_PAGE',
         function(
@@ -100,6 +102,7 @@ angular.module('oppia').directive('questionsList', [
             QuestionObjectFactory, QuestionUndoRedoService,
             QuestionValidationService, QuestionsListService,
             ShortSkillSummaryObjectFactory, SkillBackendApiService,
+            SkillEditorRoutingService,
             UtilsService, WindowDimensionsService,
             INTERACTION_SPECS, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
@@ -130,8 +133,10 @@ angular.module('oppia').directive('questionsList', [
                 $rootScope.$apply();
               });
             }
+            if (SkillEditorRoutingService.navigateToQuestionEditor()) {
+              ctrl.createQuestion();
+            }
           };
-
           ctrl.getQuestionIndex = function(index) {
             return (
               QuestionsListService.getCurrentPageNumber() *
@@ -565,9 +570,11 @@ angular.module('oppia').directive('questionsList', [
             } else {
               if (ctrl.skillLinkageModificationsArray.length > 0) {
                 ctrl.updateSkillLinkage(null);
+                SkillEditorRoutingService.creatingNewQuestion(false);
               } else {
                 ContextService.resetImageSaveDestination();
                 ctrl.saveAndPublishQuestion(null);
+                SkillEditorRoutingService.creatingNewQuestion(false);
               }
             }
           };
