@@ -31,27 +31,33 @@ export class SelectSkillComponent implements OnInit {
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
   @Input() sortedSkillSummaries: [];
-  @Input() selectedSkillId: string; // Type? Also an output?
+  @Input() selectedSkillId: string;
   @Input() countOfSkillsToPrioritize: number;
   @Input() categorizedSkills: {};
   @Input() untriagedSkillSummaries: [];
   @Input() allowSkillsFromOtherTopics: boolean;
-  @Output() setCategorizedSkills: EventEmitter<{}> = new EventEmitter();
+  @Output() newSelectedSkillIdEmitter: EventEmitter<string> = new EventEmitter();
+  scopeCategorizedSkills = {}
+  scopeUntriagedSkillSummaries = []
   selectedSkill = null;
+  
   topicFilterList = [];
   subTopicFilterDict = {};
   intialSubTopicFilterDict = {};
 
-  constructor() {}
+  constructor() {
+    this.scopeCategorizedSkills = this.categorizedSkills
+    this.scopeUntriagedSkillSummaries = this.untriagedSkillSummaries
+  }
 
   ngOnInit(): void {
-    for (var topicName in this.categorizedSkills) {
+    for (var topicName in this.scopeCategorizedSkills) {
       var topicNameDict = {
         topicName: topicName,
         checked: false
       };
       this.topicFilterList.push(topicNameDict);
-      var subTopics = this.categorizedSkills[topicName];
+      var subTopics = this.scopeCategorizedSkills[topicName];
       this.subTopicFilterDict[topicName] = [];
       for (var subTopic in subTopics) {
         var subTopicNameDict = {
@@ -69,8 +75,8 @@ export class SelectSkillComponent implements OnInit {
   }
 
   checkIfTopicIsEmpty(topicName: string): boolean {
-    for (let key in this.categorizedSkills[topicName]) {
-      if (Object.keys(this.categorizedSkills[topicName][key]).length) {
+    for (let key in this.scopeCategorizedSkills[topicName]) {
+      if (Object.keys(this.scopeCategorizedSkills[topicName][key]).length) {
         return true;
       }
     }
@@ -78,7 +84,7 @@ export class SelectSkillComponent implements OnInit {
   }
 
   setSelectedSkillId(): void {
-    this.selectedSkillId = this.selectedSkill;
+    this.newSelectedSkillIdEmitter.emit(this.selectedSkill);
   }
   
   // The folowing function is called when the subtopic filter changes.
@@ -114,15 +120,15 @@ export class SelectSkillComponent implements OnInit {
         }
       }
       if (isAnyTopicChecked) {
-        this.setCategorizedSkills.emit(angular.copy(updatedSkillsDict));
+        this.scopeCategorizedSkills = angular.copy(updatedSkillsDict);
       } else {
         // If no filter is applied on both subtopics and topics, we
         // need to display all the skills (the original list).
         // This might not be needed below...
-        this.setCategorizedSkills.emit(this.categorizedSkills)
+        this.scopeCategorizedSkills = this.categorizedSkills
       }
     } else {
-      this.setCategorizedSkills.emit(angular.copy(updatedSkillsDict));
+      this.scopeCategorizedSkills = angular.copy(updatedSkillsDict);
     }
   }
 
