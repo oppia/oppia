@@ -1528,6 +1528,7 @@ md-card.oppia-dashboard-tile {
   height: 100%;
   margin: 0 auto;
   min-height: 100%;
+  overflow: hidden;
 }
 
 .oppia-wide-panel {
