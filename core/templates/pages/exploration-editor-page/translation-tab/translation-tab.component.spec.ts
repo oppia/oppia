@@ -269,7 +269,7 @@ describe('Translation tab component', function() {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   });
 
-  fit('should start tutorial if in tutorial mode on page load with' +
+  it('should start tutorial if in tutorial mode on page load with' +
     ' permissions', () => {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
@@ -288,7 +288,7 @@ describe('Translation tab component', function() {
     expect($scope.tutorialInProgress).toBe(true);
   });
 
-  fit('should not start tutorial if in tutorial mode on page load but' +
+  it('should not start tutorial if in tutorial mode on page load but' +
     ' no permissions', () => {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve(null));
@@ -303,7 +303,7 @@ describe('Translation tab component', function() {
     expect($scope.tutorialInProgress).toBe(false);
   });
 
-  fit('should not start tutorial if not in tutorial mode on page load', () => {
+  it('should not start tutorial if not in tutorial mode on page load', () => {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canVoiceover: true
