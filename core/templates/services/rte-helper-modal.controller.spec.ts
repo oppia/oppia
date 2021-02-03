@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for RteHelperModalController.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
 
@@ -25,6 +28,7 @@ describe('Rte Helper Modal Controller', function() {
   var $timeout = null;
 
   var mockExternalRteSaveEventEmitter = null;
+  importAllAngularServices();
 
   describe('when customization args has a valid youtube video', function() {
     var customizationArgSpecs = [{

@@ -37,7 +37,7 @@ describe('Login required message component', () => {
       imports: [HttpClientTestingModule],
       declarations: [LoginRequiredMessageComponent]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(
       LoginRequiredMessageComponent);
     component = fixture.componentInstance;
