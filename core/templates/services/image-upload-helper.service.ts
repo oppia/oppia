@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
-import { AssetsBackendApiService } from './assets-backend-api.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
