@@ -42,6 +42,8 @@ INVALID_MISSING_IMPORTANT_PATTERN_CODEOWNER_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_missing_important_pattern_codeowner')
 INVALID_MISSING_CODEOWNER_NAME_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_missing_codeowner_name')
+INVALID_INLINE_COMMENT_CODEOWNER_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_inline_comment_codeowner_filepath')
 INVALID_FULL_FILEPATH_CODEOWNER_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_path_codeowner')
 INVALID_WILDCARD_IN_FILEPATH = os.path.join(
@@ -203,6 +205,20 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             'file.')
         self.assert_same_list_elements(
             error_message,
+            lint_task_report.trimmed_messages)
+        self.assertEqual('CODEOWNERS', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_check_invalid_inline_comment_codeowner_filepath(self):
+        codeowner_swap = self.swap(
+            codeowner_linter, 'CODEOWNER_FILEPATH',
+            INVALID_INLINE_COMMENT_CODEOWNER_FILEPATH)
+
+        with self.listdir_swap, codeowner_swap:
+            linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
+            lint_task_report = linter.check_codeowner_file()
+        self.assert_same_list_elements(
+            ['Please remove inline comment from line 17'],
             lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
