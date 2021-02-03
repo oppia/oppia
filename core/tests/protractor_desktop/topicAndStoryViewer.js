@@ -27,30 +27,23 @@ var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicAndStoryViewerPage = require(
   '../protractor_utils/TopicAndStoryViewerPage.js');
+var TopicViewerPage = require('../protractor_utils/TopicViewerPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
+var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('Story viewer functionality', function() {
+describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
+  var topicViewerPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
+  var subTopicViewerPage = null;
   var explorationPlayerPage = null;
   var dummyExplorationIds = [];
-
-  beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    topicAndStoryViewerPage = (
-      new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
-    topicsAndSkillsDashboardPage = (
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-    topicEditorPage = new TopicEditorPage.TopicEditorPage();
-    storyEditorPage = new StoryEditorPage.StoryEditorPage();
-  });
 
   var createDummyExplorations = async function() {
     var EXPLORATION = {
@@ -70,7 +63,17 @@ describe('Story viewer functionality', function() {
     }
   };
 
-  it('should save story progress on login.', async function() {
+  beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    topicAndStoryViewerPage = (
+      new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
+    topicViewerPage = new TopicViewerPage.TopicViewerPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
     await users.createAndLoginAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
     await adminPage.editConfigProperty(
@@ -115,10 +118,8 @@ describe('Story viewer functionality', function() {
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
-
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
-
     await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
@@ -139,6 +140,9 @@ describe('Story viewer functionality', function() {
     }
     await storyEditorPage.saveStory('First save');
     await storyEditorPage.publishStory();
+  });
+
+  it('should play through story and save progress on login.', async function() {
     await users.logout();
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
@@ -154,6 +158,16 @@ describe('Story viewer functionality', function() {
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
   });
+
+  it(
+    'should check for topic description, stories and revision cards',
+    async function() {
+      await topicViewerPage.get('math', 'Topic TASV1');
+      await topicViewerPage.expectedTopicInformationToBe('Description');
+      await topicViewerPage.expectedStoryCountToBe(1);
+      await subTopicViewerPage.get();
+      await subTopicViewerPage.expectedRevisionCardCountToBe(1);
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
