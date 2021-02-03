@@ -30,9 +30,9 @@ import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-ed
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 import { LoginRequiredMessageComponent } from
-'./login-required-message/login-required-message.component';
+  './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from
-'./modal-templates/login-required-modal.component';
+  './modal-templates/login-required-modal.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
