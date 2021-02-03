@@ -772,8 +772,8 @@ def swap_env(key, value):
 
 @contextlib.contextmanager
 def managed_process(
-        command_args, shell=False, timeout_secs=60, proc_name_to_kill=None,
-        **kwargs):
+        command_args, shell=False, timeout_secs=60,
+        proc_name_to_kill=None, log_path=None, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -794,6 +794,8 @@ def managed_process(
             matches all additional processes that should be killed when the
             given process is terminated. (This is needed for, e.g.,
             elasticsearch.)
+        log_path: str|None. Path to log file to write process stdout and
+            stderr to. If None, no log file will be created.
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -809,7 +811,13 @@ def managed_process(
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
     logging.info('Starting new process: %s' % command)
-    popen_proc = psutil.Popen(command, shell=shell, **kwargs)
+    if log_path:
+        log_file = python_utils.open_file(log_path, 'w')
+    else:
+        log_file = None
+    popen_proc = psutil.Popen(
+        command, shell=shell, stdout=log_file, stderr=subprocess.STDOUT,
+        **kwargs)
 
     try:
         yield popen_proc
@@ -847,12 +855,19 @@ def managed_process(
             logging.info(
                 'Killing remaining %s processes' % proc_name_to_kill)
             for proc in psutil.process_iter():
-                proc_should_be_killed = any(
-                    proc_name_to_kill in cmd_part
-                    for cmd_part in proc.cmdline())
+                try:
+                    proc_should_be_killed = any(
+                        proc_name_to_kill in cmd_part
+                        for cmd_part in proc.cmdline())
+                except psutil.AccessDenied:
+                    # If we don't have access to a process, we won't be
+                    # able to kill it either.
+                    proc_should_be_killed = False
                 if proc_should_be_killed:
                     proc.kill()
                     logging.warn('Forced to kill %s!' % get_debug_info(proc))
+        if log_path:
+            log_file.close()
 
 
 @contextlib.contextmanager
@@ -940,10 +955,15 @@ def managed_firebase_auth_emulator():
 
 
 @contextlib.contextmanager
-def managed_elasticsearch_dev_server():
+def managed_elasticsearch_dev_server(log_path=None):
     """Returns a context manager for ElasticSearch server for running tests
     in development mode and running a local dev server. This is only required
     in a development environment.
+
+    Args:
+        log_path: str|None. Path to a log file where the standard input
+            and output from the elasticsearch process will be written.
+            If None (the default), no log file will be used.
 
     Yields:
         psutil.Process. The ElasticSearch server process.
@@ -954,10 +974,8 @@ def managed_elasticsearch_dev_server():
 
     # Override the default path to ElasticSearch config files.
     os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
-    es_args = [
-        '%s/bin/elasticsearch' % ES_PATH,
-        '-d'
-    ]
+    es_args = ['%s/bin/elasticsearch' % ES_PATH]
     with managed_process(
-        es_args, shell=True, proc_name_to_kill='elasticsearch') as proc:
+            es_args, shell=True, proc_name_to_kill='elasticsearch',
+            log_path=log_path) as proc:
         yield proc
