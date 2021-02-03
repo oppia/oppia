@@ -976,6 +976,7 @@ def managed_elasticsearch_dev_server(log_path=None):
     os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
     es_args = ['%s/bin/elasticsearch' % ES_PATH]
     with managed_process(
-            es_args, shell=True, proc_name_to_kill='elasticsearch',
-            log_path=log_path) as proc:
+        es_args, shell=True, proc_name_to_kill='elasticsearch',
+        log_path=log_path,
+    ) as proc:
         yield proc
