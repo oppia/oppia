@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 
 
-fdescribe('ImageUploadHelperService', () => {
+describe('ImageUploadHelperService', () => {
   let imageUploadHelperService: ImageUploadHelperService;
   let httpTestingController: HttpTestingController;
 
