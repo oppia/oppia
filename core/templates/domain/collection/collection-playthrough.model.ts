@@ -29,8 +29,8 @@ export class CollectionPlaythrough {
 
   // Stores information about a current playthrough of a collection for a
   // user.
-  constructor(nextExplorationId: string | null,
-    completedExplorationIds: string[]) {
+  constructor(
+      nextExplorationId: string | null, completedExplorationIds: string[]) {
     this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
   }

@@ -63,7 +63,7 @@ describe('Collection validation service', function() {
   });
 
   var _addCollectionNode = (
-    explorationId: string, exists: boolean, isPublic: boolean) => {
+      explorationId: string, exists: boolean, isPublic: boolean) => {
     var collectionNode = CollectionNode.createFromExplorationId(
       explorationId);
     if (exists) {
