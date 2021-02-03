@@ -122,6 +122,7 @@ import { AuthService } from 'services/auth.service';
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     SharingLinksComponent,
+    SelectSkillComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TakeBreakModalComponent,

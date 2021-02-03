@@ -36,7 +36,7 @@ export class SelectSkillComponent implements OnInit {
   @Input() categorizedSkills: {};
   @Input() untriagedSkillSummaries: [];
   @Input() allowSkillsFromOtherTopics: boolean;
-  @Output() newSelectedSkillIdEmitter: EventEmitter<string> = new EventEmitter();
+  @Output() selectedSkillIdEmitter: EventEmitter<string> = new EventEmitter();
   scopeCategorizedSkills = {}
   scopeUntriagedSkillSummaries = []
   selectedSkill = null;
@@ -84,7 +84,7 @@ export class SelectSkillComponent implements OnInit {
   }
 
   setSelectedSkillId(): void {
-    this.newSelectedSkillIdEmitter.emit(this.selectedSkill);
+    this.selectedSkillIdEmitter.emit(this.selectedSkill);
   }
   
   // The folowing function is called when the subtopic filter changes.
