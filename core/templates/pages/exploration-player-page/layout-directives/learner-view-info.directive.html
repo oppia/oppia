@@ -1,7 +1,17 @@
 <ul class="nav navbar-nav oppia-navbar-breadcrumb">
   <li>
-    <span class="oppia-navbar-breadcrumb-separator"></span>
-    <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description"><[$ctrl.explorationTitle]></span></h1>
+    <div class="oppia-learner-navbar-container">
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <div class="oppia-navbar-title-container">
+        <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description"><[$ctrl.explorationTitle]></span></h1>
+        <a class="oppia-topic-title" ng-href="<[$ctrl.getTopicUrl()]>"><[$ctrl.topicName]>Topic</a>
+      </div>
+    </div>
+    <!--<a class="topic-name oppia-topic-name-text" [href]="getTopicUrl()">{{ topicName }} <[$ctrl.explorationTitle]></a>
+    <!--<div class="oppia-subtopic-viewer-nav-labels-container">
+      <p class="oppia-subtopic-title-text">{<!--{ subtopicTitle }}<[$ctrl.explorationTitle]></p>
+      <a class="topic-name oppia-topic-name-text" [href]="getTopicUrl()">{{ topicName }}</a>
+    </div>-->
   </li>
   <li ng-click="$ctrl.showInformationCard()" uib-tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
     <i class="material-icons oppia-navbar-breadcrumb-icon oppia-navbar-info-icon">&#xE88E;</i>
@@ -10,11 +20,24 @@
 </ul>
 
 <style>
+  .oppia-learner-navbar-container {
+    display: flex;
+  }
+  .oppia-navbar-title-container {
+    display: flex;
+    flex-direction: column;
+  }
   .oppia-exploration-h1 {
     color: #fff;
     display: inline;
-    font-size: 1em;
+    font-size: 18px;
     font-weight: normal;
+    margin-bottom: 1px;
+  }
+  .oppia-topic-title {
+    color: white;
+    font-size: 12px;
+    font-weight: 400;
   }
   .oppia-exploration-info-icon {
     cursor: pointer;
