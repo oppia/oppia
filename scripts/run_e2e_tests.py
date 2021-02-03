@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import atexit
 import contextlib
+import logging
 import os
 import re
 import signal
@@ -77,6 +78,8 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
 FAILURE_OUTPUT_STRING = '*                    Failures                    *'
+LOG_FORMAT = (
+    '[%(asctime)-15s %(levelname)s %(filename)s:%(lineno)s] %(message)s')
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -580,6 +583,8 @@ def run_tests(args):
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
+    logging.basicConfig(format=LOG_FORMAT)
+    logging.getLogger().setLevel(logging.INFO)
     parsed_args = _PARSER.parse_args(args=args)
 
     portserver_process = start_portserver()

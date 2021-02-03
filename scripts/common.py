@@ -435,10 +435,10 @@ def install_npm_library(library_name, version, path):
         version: str. The library version.
         path: str. The installation path for the library.
     """
-    python_utils.PRINT(
+    logging.info(
         'Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
-        python_utils.PRINT('Installing %s' % library_name)
+        logging.info('Installing %s' % library_name)
         subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
 
@@ -549,7 +549,7 @@ def kill_processes_based_on_regex(pattern):
         try:
             cmdline = ' '.join(process.cmdline())
             if regex.match(cmdline) and process.is_running():
-                python_utils.PRINT('Killing %s ...' % cmdline)
+                logging.info('Killing %s ...' % cmdline)
                 process.kill()
         # Possible exception raised by psutil includes: AccessDenied,
         # NoSuchProcess, ZombieProcess, TimeoutExpired. We can safely ignore
@@ -634,7 +634,7 @@ def wait_for_port_to_be_open(port_number):
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_open(port_number)):
-        python_utils.PRINT(
+        logging.warning(
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
@@ -675,7 +675,7 @@ def start_redis_server():
         os.remove(REDIS_DUMP_PATH)
 
     # Redis-cli is only required in a development environment.
-    python_utils.PRINT('Starting Redis development server.')
+    logging.info('Starting Redis development server.')
     # Start the redis local development server. Redis doesn't run on
     # Windows machines.
     subprocess.call([
@@ -693,7 +693,7 @@ def stop_redis_server():
             'machine is on the Windows operating system. There is no redis '
             'server to shutdown.')
 
-    python_utils.PRINT('Cleaning up the redis_servers.')
+    logging.info('Cleaning up the redis_servers.')
     # Shutdown the redis server before exiting.
     subprocess.call([REDIS_CLI_PATH, 'shutdown'])
 
@@ -808,7 +808,7 @@ def managed_process(
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
-    python_utils.PRINT('Starting new process: %s' % command)
+    logging.info('Starting new process: %s' % command)
     popen_proc = psutil.Popen(command, shell=shell, **kwargs)
 
     try:
@@ -844,7 +844,7 @@ def managed_process(
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
         if proc_name_to_kill is not None:
-            python_utils.PRINT(
+            logging.info(
                 'Killing remaining %s processes' % proc_name_to_kill)
             for proc in psutil.process_iter():
                 proc_should_be_killed = any(
