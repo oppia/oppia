@@ -21,6 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+
 describe('Login required message component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
