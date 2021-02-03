@@ -45,14 +45,14 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent
+    TranslationLanguageSelectorComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent
+    TranslationLanguageSelectorComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent
   ],
