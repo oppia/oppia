@@ -1958,9 +1958,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # The spaces are included on purpose so that we properly test
         # the input sanitization.
         self.checker_test_object.checker.config.forbidden_imports = (
-            '  oppia.core.storage: core.domain  ',
-            'oppia.core.domain  : core.controllers',
-            'oppia.core.controllers: core.platform  |  core.storage '
+            '  core.storage: core.domain  ',
+            'core.domain  : core.controllers',
+            'core.controllers: core.platform  |  core.storage '
         )
         self.checker_test_object.checker.open()
 

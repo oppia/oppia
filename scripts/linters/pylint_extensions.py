@@ -1537,6 +1537,24 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 if module_name in modnode.name and not '_test' in modnode.name:
                     yield module_name, forbidden_import
 
+    def _add_invalid_import_message(self, node, module_name, forbidden_import):
+        """Adds pylint message about the invalid import.
+
+        Args:
+            node: astroid.node_classes.Import. Node for a import statement
+                in the AST.
+            module_name: str. The module that was checked.
+            forbidden_import: str. The import that was invalid.
+        """
+        self.add_message(
+            'invalid-import',
+            node=node,
+            args=(
+                forbidden_import.split('.')[-1],
+                module_name.split('.')[-1]
+            ),
+        )
+
     def visit_import(self, node):
         """Visits every import statement in the file.
 
@@ -1548,14 +1566,8 @@ class RestrictedImportChecker(checkers.BaseChecker):
         for module_name, forbidden_import in self._iterate_forbidden_imports(
                 node):
             if any(forbidden_import in name for name in names):
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=(
-                        forbidden_import.split('.')[-1],
-                        module_name.split('.')[-1]
-                    ),
-                )
+                self._add_invalid_import_message(
+                    node, module_name, forbidden_import)
 
     def visit_importfrom(self, node):
         """Visits all import-from statements in a python file and checks that
@@ -1568,14 +1580,8 @@ class RestrictedImportChecker(checkers.BaseChecker):
         for module_name, forbidden_import in self._iterate_forbidden_imports(
                 node):
             if forbidden_import in node.modname:
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=(
-                        forbidden_import.split('.')[-1],
-                        module_name.split('.')[-1]
-                    ),
-                )
+                self._add_invalid_import_message(
+                    node, module_name, forbidden_import)
 
 
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
