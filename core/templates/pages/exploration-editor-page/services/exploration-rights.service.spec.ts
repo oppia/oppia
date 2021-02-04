@@ -279,6 +279,19 @@ describe('Exploration rights service', function() {
       sampleDataResults.rights.viewable_if_private);
   });
 
+  it('should callback to be called in saveModeratorChangeToBackend',
+    function() {
+      $httpBackend.expectPUT('/createhandler/moderatorrights/12345').respond(
+        200, sampleDataResults);
+      const onUnpublishingcallbackFunc =
+        jasmine.createSpy('onUnpublishingcallback');
+      ers.saveModeratorChangeToBackend('Email body',
+        onUnpublishingcallbackFunc);
+      $httpBackend.flush();
+
+      expect(onUnpublishingcallbackFunc).toHaveBeenCalled();
+    });
+
   it('should reject handler when saving moderator change to backend fails',
     function() {
       $httpBackend.expectPUT('/createhandler/moderatorrights/12345')
