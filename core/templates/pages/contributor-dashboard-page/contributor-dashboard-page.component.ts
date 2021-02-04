@@ -78,8 +78,10 @@ angular.module('oppia').component('contributorDashboardPage', {
       };
 
       var $win = angular.element($window);
-      var defaultHeader = angular.element(document.querySelector('#default-header'));
-      var collapsibleHeader = angular.element(document.querySelector('#collapsible-header'));
+      var defaultHeader = angular.element(document.querySelector(
+        '#default-header'));
+      var collapsibleHeader = angular.element(document.querySelector(
+        '#collapsible-header'));
 
       $win.on('scroll', function(e) {
         if ($win.scrollTop() >= 5) {
