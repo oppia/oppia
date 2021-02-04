@@ -45,20 +45,20 @@ export class ContributionOpportunitiesService {
       ContributionOpportunitiesBackendApiService,
       private modalService: NgbModal) {}
 
-  reloadOpportunitiesEventEmitter = new EventEmitter<void>();
-  removeOpportunitiesEventEmitter = new EventEmitter<void>();
-  skillOpportunitiesCursor = null;
-  translationOpportunitiesCursor = null;
-  voiceoverOpportunitiesCursor = null;
-  moreSkillOpportunitiesAvailable = true;
-  moreTranslationOpportunitiesAvailable = true;
-  moreVoiceoverOpportunitiesAvailable = true;
+  public reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+  public removeOpportunitiesEventEmitter = new EventEmitter<void>();
+  private skillOpportunitiesCursor: string = null;
+  private translationOpportunitiesCursor: string = null;
+  private voiceoverOpportunitiesCursor: string = null;
+  private moreSkillOpportunitiesAvailable = true;
+  private moreTranslationOpportunitiesAvailable = true;
+  private moreVoiceoverOpportunitiesAvailable = true;
 
   private _getSkillOpportunities(cursor: string):
   Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
-      .fetchSkillOpportunitiesAsync(
-        cursor).then(({ opportunities, nextCursor, more }) => {
+      .fetchSkillOpportunitiesAsync(cursor)
+      .then(({ opportunities, nextCursor, more }) => {
         this.skillOpportunitiesCursor = nextCursor;
         this.moreSkillOpportunitiesAvailable = more;
         return {
@@ -69,8 +69,8 @@ export class ContributionOpportunitiesService {
   }
   private _getTranslationOpportunities(languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
-      .fetchTranslationOpportunitiesAsync(
-        languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
+      .fetchTranslationOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) => {
         this.translationOpportunitiesCursor = nextCursor;
         this.moreTranslationOpportunitiesAvailable = more;
         return {
@@ -81,15 +81,15 @@ export class ContributionOpportunitiesService {
   }
   private _getVoiceoverOpportunities(languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
-      .fetchVoiceoverOpportunitiesAsync(languageCode, cursor).then(
-        function({ opportunities, nextCursor, more }) {
-          this.voiceoverOpportunitiesCursor = nextCursor;
-          this.moreVoiceoverOpportunitiesAvailable = more;
-          return {
-            opportunities: opportunities,
-            more: more
-          };
-        });
+      .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) => {
+        this.voiceoverOpportunitiesCursor = nextCursor;
+        this.moreVoiceoverOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
+      });
   }
   showRequiresLoginModal(): void {
     this.modalService.open(LoginRequiredModalContent);
