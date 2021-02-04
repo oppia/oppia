@@ -17,9 +17,8 @@
  */
 
 export interface ClientContextBackendDict {
-  'client_type': string;
+  'platform_type': string;
   'browser_type': string;
-  'user_locale': string;
 }
 
 /**
@@ -27,21 +26,16 @@ export interface ClientContextBackendDict {
  * of feature flags. This is used only in the frontend feature value retrieval.
  */
 export class ClientContext {
-  readonly clientType: string;
+  readonly platformType: string;
   readonly browserType: string;
-  readonly userLocale: string;
 
-  constructor(
-      clientType: string, browserType: string, userLocale: string) {
-    this.clientType = clientType;
+  constructor(platformType: string, browserType: string) {
+    this.platformType = platformType;
     this.browserType = browserType;
-    this.userLocale = userLocale;
   }
 
-  static create(
-      clientType: string, browserType: string, userLocale: string
-  ): ClientContext {
-    return new ClientContext(clientType, browserType, userLocale);
+  static create(platformType: string, browserType: string): ClientContext {
+    return new ClientContext(platformType, browserType);
   }
 
   /**
@@ -52,9 +46,8 @@ export class ClientContext {
    */
   toBackendDict(): ClientContextBackendDict {
     return {
-      client_type: this.clientType,
+      platform_type: this.platformType,
       browser_type: this.browserType,
-      user_locale: this.userLocale,
     };
   }
 }

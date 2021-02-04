@@ -1,0 +1,47 @@
+name: End-to-End tests
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  e2e_learner_flow_skill_editor_and_embedding:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '2.x'
+          architecture: 'x64'
+      - name: Setup python by installing wheel
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: pip install wheel==0.35.0
+      - name: Install third party
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_third_party_libs
+      - name: Install chrome version 77.0.3865.75-1
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: |
+          sudo apt-get update
+          sudo apt-get install libappindicator3-1
+          curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
+          sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+          sudo dpkg -i google-chrome.deb
+          google-chrome --version
+      - name: Run Learner Flow E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="learner" --prod_env
+      - name: Run Skill Editor E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="skillEditor" --prod_env
+      - name: Run Embedding E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="embedding" --prod_env

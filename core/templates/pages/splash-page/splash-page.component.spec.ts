@@ -16,38 +16,45 @@
  * @fileoverview Unit tests for the splash page.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { UserService } from 'services/user.service';
+
 require('pages/splash-page/splash-page.component.ts');
 
 describe('Splash Page', function() {
-  var $scope = null, ctrl = null;
+  var $scope = null, ctrl = null, $rootScope = null;
   var $timeout = null;
   var $q = null;
-  var UserService = null;
+  var userService: UserService = null;
   var LoaderService = null;
   var loadingMessage = null;
   var SiteAnalyticsService = null;
   var subscriptions = [];
-  var windowRefMock = {
-    nativeWindow: {
-      location: ''
-    }
-  };
+  var WindowDimensionsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRefMock);
+    $provide.value('UserService', TestBed.get(UserService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    UserService = $injector.get('UserService');
+    userService = $injector.get('UserService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     ));
     loadingMessage = '';
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
     ctrl = $componentController('splashPage', {
@@ -66,46 +73,46 @@ describe('Splash Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should get static subject image url', function() {
-    expect(ctrl.getStaticSubjectImageUrl('subject-file-name')).toBe(
-      '/assets/images/subjects/subject-file-name.svg');
-  });
-
-  it('should redirect to login page', function() {
-    var startLoginEventSpy = spyOn(
-      SiteAnalyticsService, 'registerStartLoginEvent').and.callThrough();
-    ctrl.onRedirectToLogin('/login');
-    $timeout.flush(150);
-
-    expect(windowRefMock.nativeWindow.location).toBe('/login');
-    expect(startLoginEventSpy).toHaveBeenCalled();
-  });
-
-  it('should redirect to library page', function() {
+  it('should record analytics when Browse Lessons is clicked', function() {
     var clickBrowseLibraryButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+      SiteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
-    ctrl.onClickBrowseLibraryButton();
+    ctrl.onClickBrowseLessonsButton();
     $timeout.flush(150);
 
-    expect(windowRefMock.nativeWindow.location).toBe('/community-library');
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should redirect to create exploration page', function() {
-    var clickCreateExplorationButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickCreateExplorationButtonEvent')
-      .and.callThrough();
-    ctrl.onClickCreateExplorationButton();
-    $timeout.flush(150);
+  it('should check if window is narrow', function() {
+    spyOn(
+      WindowDimensionsService, 'isWindowNarrow').and.returnValues(false, true);
+    expect(ctrl.isWindowNarrow()).toBe(false);
+    expect(ctrl.isWindowNarrow()).toBe(true);
+  });
 
-    expect(windowRefMock.nativeWindow.location).toBe(
-      '/creator-dashboard?mode=create');
-    expect(clickCreateExplorationButtonEventSpy).toHaveBeenCalled();
+  it('should increment and decrement testimonial IDs correctly', function() {
+    ctrl.$onInit();
+    expect(ctrl.displayedTestimonialId).toBe(0);
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(1);
+    ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(0);
+
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(3);
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(2);
+  });
+
+  it('should get testimonials correctly', function() {
+    ctrl.$onInit();
+    expect(ctrl.getTestimonials().length).toBe(ctrl.testimonialCount);
   });
 
   it('should evaluate if user is logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {
@@ -117,6 +124,7 @@ describe('Splash Page', function() {
 
     ctrl.$onInit();
     expect(ctrl.userIsLoggedIn).toBe(null);
+    expect(ctrl.classroomUrl).toBe('/learn/math');
     expect(loadingMessage).toBe('Loading');
 
     $scope.$digest();
@@ -125,7 +133,7 @@ describe('Splash Page', function() {
   });
 
   it('should evaluate if user is not logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {
@@ -142,5 +150,17 @@ describe('Splash Page', function() {
     $scope.$digest();
     expect(ctrl.userIsLoggedIn).toBe(false);
     expect(loadingMessage).toBe('');
+  });
+
+  it('should refresh translate labels once it\'s loaded', function() {
+    var functionCallCount = 0;
+    spyOn(ctrl, 'getTestimonials').and.callFake(function() {
+      functionCallCount++;
+    });
+    ctrl.$onInit();
+    $rootScope.$broadcast('$translateChangeSuccess');
+    $scope.$digest();
+    // Once, when $onInit() is called, and once when the broadcast is done.
+    expect(functionCallCount).toBe(2);
   });
 });

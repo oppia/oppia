@@ -41,7 +41,6 @@ describe('Router Service', () => {
   var refreshStateEditorSpy = null;
 
   importAllAngularServices();
-
   beforeEach(angular.mock.inject($injector => {
     RouterService = $injector.get('RouterService');
     ExplorationStatesService = $injector.get('ExplorationStatesService');

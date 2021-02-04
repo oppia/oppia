@@ -20,7 +20,7 @@
 // equivalents of the Angular constants are no longer needed.
 import { AppConstants } from 'app.constants';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 for (var constantName in constants) {
   angular.module('oppia').constant(constantName, constants[constantName]);
@@ -107,6 +107,8 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
+angular.module('oppia').constant(
+  'COMPONENT_NAME_RULE_INPUT', AppConstants.COMPONENT_NAME_RULE_INPUT);
 angular.module('oppia').constant(
   'COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
 angular.module('oppia').constant(

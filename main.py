@@ -324,6 +324,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
     get_redirect_route(
+        r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
+        skill_editor.SkillDescriptionHandler),
+    get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
@@ -448,7 +451,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(r'/learn', library.LibraryRedirectPage),
+    get_redirect_route(r'/learn', classroom.DefaultClassroomRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,

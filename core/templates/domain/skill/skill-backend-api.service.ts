@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
-import { SkillChange } from 'domain/editor/undo_redo/change.model';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { Skill, SkillBackendDict, SkillObjectFactory } from
   'domain/skill/SkillObjectFactory';
@@ -55,6 +55,10 @@ interface FetchMultiSkillsBackendResponse {
 
 interface UpdateSkillBackendResponse {
   skill: SkillBackendDict;
+}
+
+interface DoesSkillWithDescriptionExistBackendResponse {
+  'skill_description_exists': boolean;
 }
 
 @Injectable({
@@ -126,7 +130,8 @@ export class SkillBackendApiService {
 
   updateSkill(
       skillId: string, skillVersion: number,
-      commitMessage: string, changeList: SkillChange): Promise<Skill> {
+      commitMessage: string,
+      changeList: BackendChangeObject[]): Promise<Skill> {
     return new Promise((resolve, reject) => {
       const editableSkillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -145,6 +150,31 @@ export class SkillBackendApiService {
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
+    });
+  }
+
+  private _doesSkillWithDescriptionExist(
+      description: string,
+      successCallback: (value?: boolean) => void,
+      errorCallback: (reason?: string) => void): void {
+    let skillDescriptionUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE, {
+        skill_description: description
+      });
+    this.http.get<DoesSkillWithDescriptionExistBackendResponse>(
+      skillDescriptionUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback(response.skill_description_exists);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
+  }
+
+  async doesSkillWithDescriptionExistAsync(description: string):
+      Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._doesSkillWithDescriptionExist(description, resolve, reject);
     });
   }
 }

@@ -5,7 +5,7 @@
       <span class="oppia-icon-accessibility-label">Facebook</span>
     </a>
   </div>
-  <div class="fx-main-center fx-cross-center padding-0-2">
+  <div class="fx-main-center fx-cross-center padding-0-2 twitter-icon">
     <a title="Twitter" class="fx-main-center fx-cross-start" [href]="getUrl('twitter')"  (click)="registerShareEvent('twitter')" target="_window">
       <i class="oppia-share-icons fab fa-twitter-square" [ngClass] = "smallFont ? 'font-small' : 'font-big'" ></i>
       <span class="oppia-icon-accessibility-label">Twitter</span>
@@ -18,7 +18,7 @@
   </div>
   <div *ngIf="shareType === 'exploration'" title="Embed this Exploration" class="fx-main-center fx-cross-center padding-0-2">
     <a class="fx-main-center fx-cross-center" (click)="showEmbedExplorationModal()" tabindex="0">
-      <i class="material-icons md-48 embed-link share-icons" [ngClass] = "smallFont ? 'font-small' : 'font-big'" >&#xE86F;</i>
+      <i class="material-icons embed-link share-icons embed-icon" [ngClass] = "smallFont ? 'font-small' : 'font-big'">&#xE86F;</i>
       <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
   </div>
@@ -30,16 +30,16 @@
   }
 
   .oppia-sharing-links .padding-0-2 {
-    padding: 0 2px;
+    padding: 0 0.125rem;
   }
 
   .oppia-sharing-links.font-big {
-    height: 32px;
+    height: 2rem;
     width: 100%;
   }
 
   .oppia-sharing-links.font-small {
-    height: 32px;
+    height: 2rem;
     width: 60%;
   }
 
@@ -49,52 +49,42 @@
 
   .oppia-sharing-links .embed-link {
     background-color: #009688;
-    border-radius: 3px;
+    border-radius: 0.1875rem;
     color: white;
     margin: 0;
     text-align: center;
   }
 
   .oppia-sharing-links .embed-link.font-big {
-    font-size: 32px;
-    height: 32px;
-    width: 32px;
+    font-size: 2rem;
+    height: 2rem;
+    width: 2rem;
   }
 
   .oppia-sharing-links .embed-link.font-small {
-    font-size: 15px;
-    height: 18px;
-    width: 18px;
+    font-size: 0.9375rem;
+    height: 1.125rem;
+    width: 1.125rem;
   }
 
   .oppia-sharing-links .share-option-img {
-    border-radius: 5px;
+    border-radius: 0.2rem;
     margin: 0;
-    max-width: 32px;
-  }
-
-  .oppia-sharing-links .share-option-img.font-big {
-    height: 32px;
-    width: 32px;
-  }
-
-  .oppia-sharing-links .share-option-img.font-small {
-    height: 18px;
-    width: 18px;
+    max-width: 2rem;
   }
 
   .oppia-sharing-links a:focus .share-option-img,
   .oppia-sharing-links a:focus .embed-link {
-    outline: 1px dotted #212121;
-    outline: auto 5px -webkit-focus-ring-color;
+    outline: 0.0625rem dotted #212121;
+    outline: auto 0.3125rem -webkit-focus-ring-color;
   }
 
   div.oppia-sharing-links i.oppia-share-icons .font-big {
-    font-size: 32px;
+    font-size: 2rem;
   }
 
   div.oppia-sharing-links i.oppia-share-icons .font-small {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   i.oppia-share-icons.fab.fa-facebook-square {
@@ -110,11 +100,25 @@
   }
 
   i.oppia-share-icons.font-big {
-    font-size: 32px;
+    font-size: 2.01rem;
+    margin-top: 0.004375rem;
   }
 
   i.oppia-share-icons.font-small {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
-
+  i.material-icons.embed-link.share-icons.embed-icon {
+    font-size: 1.8rem;
+    height: 1.75rem;
+    margin-top: 0.1rem;
+    width: 1.8rem;
+  }
+  .oppia-sharing-links .share-option-img.font-big {
+    height: 1.79rem;
+    margin-top: 0.1rem;
+    width: 1.8rem;
+  }
+  .fx-main-center.fx-cross-center.padding-0-2.twitter-icon {
+    height: 1.78125rem;
+  }
 </style>

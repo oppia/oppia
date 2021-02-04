@@ -17,7 +17,7 @@
  * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
-export = {
+export default {
   "Collapsible": {
     "backend_id": "Collapsible",
     "category": "Basic Input",
@@ -83,7 +83,8 @@ export = {
           "id": "is_nonempty"
         }],
         "ui_config": {
-          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)"
+          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)",
+          "rows": 3
         }
       },
       "default_value": ""

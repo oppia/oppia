@@ -28,8 +28,6 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-current_user_services = models.Registry.import_current_user_services()
-
 
 class EmailDashboardPage(base.BaseHandler):
     """Page to submit query and show past queries."""
@@ -136,10 +134,10 @@ class QueryStatusCheckHandler(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         query_id = self.request.get('query_id')
-        try:
-            query_model = user_models.UserQueryModel.get(query_id)
-        except:
-            raise self.InvalidInputException('400 Invalid query id.')
+
+        query_model = user_models.UserQueryModel.get(query_id, strict=False)
+        if query_model is None:
+            raise self.InvalidInputException('Invalid query id.')
 
         query_data = {
             'id': query_model.id,

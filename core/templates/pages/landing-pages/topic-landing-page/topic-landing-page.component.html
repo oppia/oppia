@@ -64,12 +64,12 @@
 
   <div class="oppia-landing-section text-center oppia-grey-container">
     <div class="oppia-landing-section-inner oppia-flex-box oppia-flex-column oppia-container-low-width">
-      <h3>Get started today! Looking to learn something else? We offer more than 10 subjects and you can check them all out in our Lesson Library. </h3>
+      <h3>Get started today! Looking for something else? Check out all of our other lessons in the Basic Mathematics curriculum in the Oppia Classroom! </h3>
       <div class="oppia-flex-item">
         <button class="btn oppia-landing-page-button" (click)="onClickGetStartedButton()">Get started with {{ topicTitle }}</button>
       </div>
       <div class="oppia-flex-item">
-        <button class="btn oppia-landing-page-button oppia-make-button-transparent" (click)="onClickLearnMoreButton()">Go to Lesson Library</button>
+        <button class="btn oppia-landing-page-button oppia-make-button-transparent" (click)="goToClassroom()">Go to Oppia Classroom</button>
       </div>
     </div>
   </div>
@@ -77,7 +77,8 @@
 
 <style>
   .oppia-landing-page h2, button {
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    border-radius: 4px;
+    font-family: "Roboto", Arial, sans-serif;
   }
   .oppia-landing-page h2, h3, p {
     line-height: 1.5;

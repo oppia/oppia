@@ -24,6 +24,7 @@ import { CollectionNode, CollectionNodeBackendDict } from
 import { Collection } from
   'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require(
@@ -35,6 +36,8 @@ describe('Collection linearizer service', function() {
   var firstCollectionNode = null;
   var secondCollectionNode = null;
   var thirdCollectionNode = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

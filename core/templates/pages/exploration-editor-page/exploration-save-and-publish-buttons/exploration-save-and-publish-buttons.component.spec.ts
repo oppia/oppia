@@ -28,9 +28,6 @@ import { StateInteractionIdService } from
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { EditabilityService } from 'services/editability.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -50,6 +47,8 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration save and publish buttons component', function() {
@@ -85,8 +84,6 @@ describe('Exploration save and publish buttons component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
     $provide.value(
       'ExplorationImprovementsTaskRegistryService',
@@ -112,6 +109,9 @@ describe('Exploration save and publish buttons component', function() {
     $provide.value(
       'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

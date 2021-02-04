@@ -21,6 +21,7 @@ var forms = require('./forms.js');
 var path = require('path');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
@@ -31,6 +32,8 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var stateNameText = element(
+  by.css('.oppia-state-name-text'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -88,11 +91,11 @@ var createExplorationAndStartTutorial = async function() {
       'ActivityCreationModal takes too long to be visible.');
     var createExplorationButton = element(
       by.css('.protractor-test-create-exploration'));
-    await waitFor.elementToBeClickable(
-      createExplorationButton,
-      'createExplorationButton takes too long to be clickable.');
-    await createExplorationButton.click();
+    await action.click('Create Exploration Button', createExplorationButton);
   }
+
+  await waitFor.visibilityOf(
+    stateNameText, 'State name text takes too long to appear.');
 };
 
 /**
@@ -126,8 +129,12 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-publish-exploration')));
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
   await element(by.css('.protractor-test-publish-exploration')).click();
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   await prePublicationButtonElem.isPresent();
@@ -218,11 +225,16 @@ var createAndPublishTwoCardExploration = async function(
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {
-  await element(by.css('.protractor-test-edit-roles')).click();
-  await element(by.css('.protractor-test-role-username')).sendKeys(username);
-  await element(by.css('.protractor-test-role-select')).
-    element(by.cssContainingText('option', roleName)).click();
-  await element(by.css('.protractor-test-save-role')).click();
+  await action.click(
+    'Edit roles', element(by.css('.protractor-test-edit-roles')));
+  await action.sendKeys(
+    'Username input',
+    element(by.css('.protractor-test-role-username')),
+    username);
+  await action.select(
+    'Role select', element(by.css('.protractor-test-role-select')), roleName);
+  await action.click(
+    'Save role', element(by.css('.protractor-test-save-role')));
 };
 
 var addExplorationManager = async function(username) {

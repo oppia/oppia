@@ -26,6 +26,7 @@ import constants
 from extensions.objects.models import objects
 import feconf
 import python_utils
+import utils
 
 
 class BaseRteComponent(python_utils.OBJECT):
@@ -79,9 +80,12 @@ class BaseRteComponent(python_utils.OBJECT):
             missing_attr_names = list(
                 set(required_attr_names) - set(attr_names))
             extra_attr_names = list(set(attr_names) - set(required_attr_names))
-            raise Exception('Missing attributes: %s, Extra attributes: %s' % (
-                ', '.join(missing_attr_names),
-                ', '.join(extra_attr_names)))
+            raise utils.ValidationError(
+                'Missing attributes: %s, Extra attributes: %s' % (
+                    ', '.join(missing_attr_names),
+                    ', '.join(extra_attr_names)
+                )
+            )
 
         for arg_name in required_attr_names:
             arg_obj_class = arg_names_to_obj_classes[arg_name]
@@ -104,7 +108,7 @@ class Collapsible(BaseRteComponent):
         tabs = inner_soup.findAll(
             name='oppia-noninteractive-tabs')
         if len(collapsible) or len(tabs):
-            raise Exception('Nested tabs and collapsible')
+            raise utils.ValidationError('Nested tabs and collapsible')
 
 
 class Image(BaseRteComponent):
@@ -117,7 +121,7 @@ class Image(BaseRteComponent):
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
         filepath = value_dict['filepath-with-value']
         if not re.match(filename_re, filepath):
-            raise Exception('Invalid filepath')
+            raise utils.ValidationError('Invalid filepath')
 
 
 class Svgdiagram(BaseRteComponent):
@@ -130,7 +134,7 @@ class Svgdiagram(BaseRteComponent):
         filename_re = r'^[A-Za-z0-9+/_-]*\.(svg)$'
         filename = value_dict['svg_filename-with-value']
         if not re.match(filename_re, filename):
-            raise Exception('Invalid filename')
+            raise utils.ValidationError('Invalid filename')
 
 
 class Link(BaseRteComponent):
@@ -149,7 +153,7 @@ class Math(BaseRteComponent):
         filename_pattern_regex = constants.constants.MATH_SVG_FILENAME_REGEX
         filename = value_dict['math_content-with-value']['svg_filename']
         if not re.match(filename_pattern_regex, filename):
-            raise Exception(
+            raise utils.ValidationError(
                 'Invalid svg_filename attribute in math component: %s' % (
                     filename))
 
@@ -177,7 +181,7 @@ class Tabs(BaseRteComponent):
             tabs = inner_soup.findAll(
                 name='oppia-noninteractive-tabs')
             if len(collapsible) or len(tabs):
-                raise Exception('Nested tabs and collapsible')
+                raise utils.ValidationError('Nested tabs and collapsible')
 
 
 class Video(BaseRteComponent):
@@ -189,4 +193,4 @@ class Video(BaseRteComponent):
         super(Video, cls).validate(value_dict)
         video_id = value_dict['video_id-with-value']
         if len(video_id) != 11:
-            raise Exception('Video id length is not 11')
+            raise utils.ValidationError('Video id length is not 11')

@@ -16,6 +16,14 @@
  * @fileoverview File to import necessary scripts for get_started page.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'ngSanitize', 'pascalprecht.translate', 'toastr',
+  'ui.bootstrap'
+]);
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require(

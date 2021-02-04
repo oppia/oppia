@@ -20,7 +20,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const subtopicValidationConstants = require('constants.ts');
+import subtopicValidationConstants from 'assets/constants';
 
 angular.module('oppia').factory('SubtopicValidationService', [
   'TopicEditorStateService', function(

@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Editor Navbar Breadcrumb directive', function() {
   var ctrl = null;
@@ -31,12 +31,7 @@ describe('Editor Navbar Breadcrumb directive', function() {
 
   var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');

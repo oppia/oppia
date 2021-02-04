@@ -222,12 +222,25 @@ export type RatioInputRuleInputs = (
   RatioInputEqualRuleInputs |
   RatioInputHasNumberOfTermsEqualToRuleInputs);
 
+export interface BaseTranslatableObject {
+  contentId: string | null;
+}
+
+export interface TranslatableSetOfUnicodeString extends BaseTranslatableObject {
+  unicodeStrSet: string[];
+}
+
 export interface SetInputRuleInputs {
-  x: string[];
+  x: TranslatableSetOfUnicodeString;
+}
+
+export interface TranslatableSetOfNormalizedString
+  extends BaseTranslatableObject {
+  normalizedStrSet: string[];
 }
 
 export interface TextInputRuleInputs {
-  x: string[];
+  x: TranslatableSetOfNormalizedString;
 }
 
 export type InteractionRuleInputs = (

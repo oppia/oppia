@@ -29,6 +29,8 @@ import { StateRecordedVoiceoversService } from
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -55,6 +57,7 @@ describe('Translator Overview component', function() {
   var translationLanguageService = null;
   var translationStatusService = null;
   var translationTabActiveModeService = null;
+  var explorationLanguageCode = 'hi';
 
   var mockWindow = null;
   beforeEach(angular.mock.module('oppia'));
@@ -71,6 +74,9 @@ describe('Translator Overview component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', languageUtilService);
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
@@ -98,7 +104,7 @@ describe('Translator Overview component', function() {
     spyOn(translationTabActiveModeService, 'isVoiceoverModeActive').and
       .returnValue(true);
 
-    explorationLanguageCodeService.init('hi');
+    explorationLanguageCodeService.init(explorationLanguageCode);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('translatorOverview', {
@@ -116,7 +122,15 @@ describe('Translator Overview component', function() {
       expect($scope.languageCode).toBe('en');
       expect($scope.inTranslationMode).toBe(true);
       expect($scope.inVoiceoverMode).toBe(true);
-      expect($scope.languageCodesAndDescriptions.length).toBe(45);
+      expect($scope.languageCodesAndDescriptions.length).toBe(
+        languageUtilService.getAllVoiceoverLanguageCodes().length - 1);
+      expect(languageUtilService.getAllVoiceoverLanguageCodes()).toContain(
+        explorationLanguageCode);
+      expect($scope.languageCodesAndDescriptions).not.toContain({
+        id: explorationLanguageCode,
+        description: languageUtilService.getAudioLanguageDescription(
+          explorationLanguageCode)
+      });
     });
 
   it('should show tab mode switcher when language code is different' +

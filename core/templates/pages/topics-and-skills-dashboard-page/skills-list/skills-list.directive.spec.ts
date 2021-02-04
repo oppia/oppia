@@ -47,7 +47,7 @@ describe('Skills List Directive', function() {
   var testSubscription = null;
 
   var MockTopicsAndSkillsDashboardBackendApiService = {
-    mergeSkills: () => {
+    mergeSkillsAsync: () => {
       var deferred = $q.defer();
       deferred.resolve();
       return deferred.promise;
@@ -143,6 +143,42 @@ describe('Skills List Directive', function() {
 
       spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
         $q.resolve());
+
+      var skillId = 'CdjnJUE332dd';
+      ctrl.deleteSkill(skillId);
+
+      $timeout.flush();
+      tick(100);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
+    }));
+
+  it('should reinitialize the page after failing to deleting a skill',
+    fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.reject('Subtopic does not have any skills linked'));
+
+      var skillId = 'CdjnJUE332dd';
+      ctrl.deleteSkill(skillId);
+
+      $timeout.flush();
+      tick(100);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
+    }));
+
+  it(
+    'should reinitialize the page after failing to deleting a skill with ' +
+    'questions',
+    fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.reject('Please delete all questions from skills first.'));
 
       var skillId = 'CdjnJUE332dd';
       ctrl.deleteSkill(skillId);

@@ -18,9 +18,12 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -53,10 +56,26 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { TakeBreakModalComponent } from
+  'pages/exploration-player-page/templates/take-break-modal.component';
+import { AuthService } from 'services/auth.service';
 
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    NgbModalModule,
+    BrowserModule,
+    FormsModule,
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
+  ],
+
+  providers: [
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+  ],
 
   declarations: [
     AttributionGuideComponent,
@@ -73,7 +92,8 @@ import { ProfileLinkTextComponent } from
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
+    TakeBreakModalComponent
   ],
 
   entryComponents: [
@@ -83,6 +103,7 @@ import { ProfileLinkTextComponent } from
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
@@ -99,6 +120,7 @@ import { ProfileLinkTextComponent } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    TakeBreakModalComponent,
     TranslatePipe
   ],
 })

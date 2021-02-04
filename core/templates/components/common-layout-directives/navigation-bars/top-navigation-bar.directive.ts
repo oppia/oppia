@@ -19,7 +19,7 @@
  */
 
 require('domain/classroom/classroom-backend-api.service');
-require('domain/sidebar/sidebar-status.service.ts');
+require('services/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
 require('services/navigation.service.ts');
@@ -48,13 +48,13 @@ angular.module('oppia').directive('topNavigationBar', [
         '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$scope', '$timeout', '$translate', '$window',
+        '$http', '$rootScope', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
         'I18nLanguageCodeService', 'NavigationService', 'SearchService',
         'SidebarStatusService', 'SiteAnalyticsService', 'UserService',
         'WindowDimensionsService', 'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
-            $http, $scope, $timeout, $translate, $window,
+            $http, $rootScope, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
             I18nLanguageCodeService, NavigationService, SearchService,
             SidebarStatusService, SiteAnalyticsService, UserService,
@@ -138,15 +138,17 @@ angular.module('oppia').directive('topNavigationBar', [
           };
 
           ctrl.isSidebarShown = function() {
-            if (SidebarStatusService.isSidebarShown()) {
-              angular.element(document.body).addClass('oppia-stop-scroll');
-            } else {
-              angular.element(document.body).removeClass('oppia-stop-scroll');
-            }
             return SidebarStatusService.isSidebarShown();
           };
           ctrl.toggleSidebar = function() {
             SidebarStatusService.toggleSidebar();
+          };
+
+          ctrl.navigateToClassroomPage = function(classroomUrl) {
+            SiteAnalyticsService.registerClassoomHeaderClickEvent();
+            $timeout(function() {
+              $window.location = classroomUrl;
+            }, 150);
           };
 
           /**
@@ -293,10 +295,17 @@ angular.module('oppia').directive('topNavigationBar', [
                   }
                 });
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
-            UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-              ctrl.profilePictureDataUrl = dataUrl;
-            });
+            UserService.getProfileImageDataUrlAsync().then(
+              function(dataUrl) {
+                ctrl.profilePictureDataUrl = dataUrl;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$applyAsync();
+              });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
               ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;

@@ -207,9 +207,7 @@ def main(args=None):
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.
-    if os.environ.get('TRAVIS'):
-        chrome_bin = '/usr/bin/chromium-browser'
-    elif os.path.isfile('/usr/bin/google-chrome'):
+    if os.path.isfile('/usr/bin/google-chrome'):
         # Unix.
         chrome_bin = '/usr/bin/google-chrome'
     elif os.path.isfile('/usr/bin/chromium-browser'):

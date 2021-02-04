@@ -18,9 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -44,6 +41,8 @@ import { UserExplorationPermissionsService } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -67,6 +66,7 @@ describe('Settings Tab Component', function() {
   var $uibModal = null;
   var alertsService = null;
   var changeListService = null;
+  var explorationDataService = null;
   var contextService = null;
   var editableExplorationBackendApiService = null;
   var explorationCategoryService = null;
@@ -118,8 +118,6 @@ describe('Settings Tab Component', function() {
     $provide.value('WindowDimensionsService', TestBed.get(
       WindowDimensionsService));
     $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
     $provide.value(
@@ -134,9 +132,15 @@ describe('Settings Tab Component', function() {
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
+      data: {
+        param_changes: []
+      },
       getData: () => $q.resolve(),
       autosaveChangeList: () => {}
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   afterEach(() => {
@@ -150,6 +154,7 @@ describe('Settings Tab Component', function() {
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
       changeListService = $injector.get('ChangeListService');
+      explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       editableExplorationBackendApiService = $injector.get(
@@ -528,6 +533,21 @@ describe('Settings Tab Component', function() {
 
       ctrl.postSaveParamChangesHook();
       expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
+    });
+
+    it('should check if parameters are used', function() {
+      var paramChangeBackendDict = {
+        customization_args: {
+          parse_with_jinja: false,
+          value: 'test value'
+        },
+        generator_id: '123',
+        name: 'test',
+      };
+
+      expect(ctrl.areParametersUsed()).toBe(false);
+      explorationDataService.data.param_changes.push(paramChangeBackendDict);
+      expect(ctrl.areParametersUsed()).toBe(true);
     });
 
     it('should toggle exploration visibility', function() {

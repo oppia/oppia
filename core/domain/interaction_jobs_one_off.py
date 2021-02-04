@@ -206,3 +206,189 @@ class InteractionCustomizationArgsValidationOneOffJob(
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class RuleInputToCustomizationArgsMappingOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of (exploration, state) pairs that use the item
+    selection or drag and drop sort interaction and that have rules that do not
+    match the answer choices.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        exp_status = rights_manager.get_exploration_rights(item.id).status
+        if exp_status == rights_domain.ACTIVITY_STATUS_PRIVATE:
+            return
+
+        def get_invalid_values(value_type, value, choices):
+            """Checks that the html in SetOfHtmlString, ListOfSetsOfHtmlStrings,
+            and DragAndDropHtmlString rule inputs have associated content ids
+            in choices.
+
+            Args:
+                value_type: str. The type of the value.
+                value: *. The value to migrate.
+                choices: list(dict). The list of subtitled html dicts to find
+                    content ids from.
+
+            Returns:
+                *. The migrated rule input.
+            """
+            invalid_values = []
+
+            if value_type == 'DragAndDropHtmlString':
+                if value not in choices:
+                    invalid_values.append(value)
+
+            if value_type == 'SetOfHtmlString':
+                for html in value:
+                    invalid_values.extend(
+                        get_invalid_values(
+                            'DragAndDropHtmlString', html, choices))
+
+            if value_type == 'ListOfSetsOfHtmlStrings':
+                for html_set in value:
+                    invalid_values.extend(
+                        get_invalid_values(
+                            'SetOfHtmlString', html_set, choices))
+
+            return invalid_values
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            if state.interaction.id not in [
+                    'DragAndDropSortInput', 'ItemSelectionInput']:
+                continue
+
+            choices = [
+                choice.html
+                for choice in state.interaction.customization_args[
+                    'choices'].value
+            ]
+            solution = state.interaction.solution
+
+            if solution is not None:
+                if state.interaction.id == 'ItemSelectionInput':
+                    invalid_values = get_invalid_values(
+                        'SetOfHtmlString',
+                        solution.correct_answer,
+                        choices)
+                    if invalid_values:
+                        yield (
+                            exploration.id,
+                            (
+                                '<ItemSelectionInput Answer> '
+                                'State: %s, Invalid Values: %s' % (
+                                    state_name, invalid_values)
+                            ).encode('utf-8')
+                        )
+
+                if state.interaction.id == 'DragAndDropSortInput':
+                    invalid_values = get_invalid_values(
+                        'ListOfSetsOfHtmlStrings',
+                        solution.correct_answer,
+                        choices)
+                    if invalid_values:
+                        yield (
+                            exploration.id,
+                            (
+                                '<DragAndDropSortInput Answer> '
+                                'State: %s, Invalid Values: %s' % (
+                                    state_name, invalid_values)
+                            ).encode('utf-8')
+                        )
+
+            for group_i, group in enumerate(state.interaction.answer_groups):
+                for rule_spec in group.rule_specs:
+                    rule_inputs = rule_spec.inputs
+                    rule_type = rule_spec.rule_type
+                    if state.interaction.id == 'ItemSelectionInput':
+                        # For all rule inputs for ItemSelectionInput, the x
+                        # input is of type SetOfHtmlString.
+                        invalid_values = get_invalid_values(
+                            'SetOfHtmlString', rule_inputs['x'], choices)
+                        if invalid_values:
+                            yield (
+                                exploration.id,
+                                (
+                                    '<ItemSelectionInput Rule> State: %s, '
+                                    'Answer Group Index: %i, '
+                                    'Invalid Values: %s' % (
+                                        state_name, group_i, invalid_values)
+                                ).encode('utf-8')
+                            )
+                    if state.interaction.id == 'DragAndDropSortInput':
+                        if rule_type in [
+                                'IsEqualToOrdering',
+                                'IsEqualToOrderingWithOneItemAtIncorrectPosition' # pylint: disable=line-too-long
+                        ]:
+                            # For rule type IsEqualToOrdering and
+                            # IsEqualToOrderingWithOneItemAtIncorrectPosition,
+                            # the x is of type ListOfSetsOfHtmlStrings.
+                            invalid_values = get_invalid_values(
+                                'ListOfSetsOfHtmlStrings',
+                                rule_inputs['x'],
+                                choices)
+                            if invalid_values:
+                                yield (
+                                    exploration.id,
+                                    (
+                                        '<DragAndDropSortInput Rule> '
+                                        'State: %s, '
+                                        'Answer Group Index: %i, '
+                                        'Invalid Values: %s' % (
+                                            state_name, group_i, invalid_values)
+                                    ).encode('utf-8')
+                                )
+                        elif rule_type == 'HasElementXAtPositionY':
+                            # For rule type HasElementXAtPositionY,
+                            # the x input is of type DragAndDropHtmlString. The
+                            # y input is of type DragAndDropPositiveInt (no
+                            # validation required).
+                            invalid_values = get_invalid_values(
+                                'DragAndDropHtmlString',
+                                rule_inputs['x'],
+                                choices)
+                            if invalid_values:
+                                yield (
+                                    exploration.id,
+                                    (
+                                        '<DragAndDropSortInput Rule> '
+                                        'State: %s, '
+                                        'Answer Group Index: %i, '
+                                        'Invalid Values: %s' % (
+                                            state_name, group_i, invalid_values)
+                                    ).encode('utf-8')
+                                )
+                        elif rule_type == 'HasElementXBeforeElementY':
+                            # For rule type HasElementXBeforeElementY,
+                            # the x and y inputs are of type
+                            # DragAndDropHtmlString.
+                            for rule_input_name in ['x', 'y']:
+                                invalid_values = get_invalid_values(
+                                    'DragAndDropHtmlString',
+                                    rule_inputs[rule_input_name],
+                                    choices)
+                                if invalid_values:
+                                    yield (
+                                        exploration.id,
+                                        (
+                                            '<DragAndDropSortInput Rule> '
+                                            'State: %s, '
+                                            'Answer Group Index: %i, '
+                                            'Invalid Values: %s' % (
+                                                state_name, group_i,
+                                                invalid_values)
+                                        ).encode('utf-8')
+                                    )
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

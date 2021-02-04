@@ -226,10 +226,10 @@ describe('Learner dashboard page', function() {
           ));
       }
 
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(profilePictureDataUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
-        userInfo));
+      spyOn(UserService, 'getProfileImageDataUrlAsync').and
+        .returnValue($q.resolve(profilePictureDataUrl));
+      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
           completedExplorationsList: (
@@ -859,10 +859,10 @@ describe('Learner dashboard page', function() {
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(profilePictureDataUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
-        userInfo));
+      spyOn(UserService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(profilePictureDataUrl));
+      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404

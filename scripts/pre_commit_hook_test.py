@@ -59,7 +59,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertTrue(
-            'pre-commit hook file is now executable!'in self.print_arr)
+            'pre-commit hook file is now executable!' in self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(self):
         def mock_islink(unused_file):
@@ -179,7 +179,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue('Removing broken symlink' in self.print_arr)
         self.assertTrue(
-            'pre-commit hook file is now executable!'in self.print_arr)
+            'pre-commit hook file is now executable!' in self.print_arr)
 
     def test_start_subprocess_for_result(self):
         process = subprocess.Popen(

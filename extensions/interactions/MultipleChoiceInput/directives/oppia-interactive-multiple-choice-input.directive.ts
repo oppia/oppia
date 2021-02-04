@@ -89,7 +89,7 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
 
             var choicesWithIndex = choices.map(
               function(value, originalIndex) {
-                return {originalIndex: originalIndex, value: value.getHtml()};
+                return {originalIndex: originalIndex, value: value.html};
               }
             );
 

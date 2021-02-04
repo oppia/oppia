@@ -42,9 +42,7 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -115,9 +113,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -127,7 +123,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -227,7 +223,7 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models.append(exploration_commit_log)
             ExplorationCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
 
 
 class ExplorationContextModel(base_models.BaseModel):
@@ -241,9 +237,7 @@ class ExplorationContextModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationContextModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -253,7 +247,7 @@ class ExplorationContextModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -272,8 +266,8 @@ class ExplorationRightsSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there are owner_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
 
         The pseudonymization of this model is handled in the wipeout_service
@@ -350,8 +344,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationRightsModel contains data to pseudonymize/delete
-        corresponding to a user: viewer_ids, voice_artist_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
         """
         return (
@@ -370,7 +364,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -526,9 +520,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when explorations
-            # are changed).
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -541,7 +532,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
@@ -617,8 +608,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationCommitLogEntryModel contains data corresponding to a user
-        that requires pseudonymization/deletion: user_id field.
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
         """
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
@@ -633,7 +624,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user. This
+        model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -800,7 +792,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExpSummaryModel contains data to pseudonymize/delete corresponding
+        """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, voice_artist_ids, editor_ids, owner_ids,
         contributor_ids, and contributors_summary fields.
         """
@@ -931,9 +923,9 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model data has already been exported as a part of the
-        ExplorationModel and thus does not need a separate export_data
-        function.
+        """Model contains data corresponding to a user, but this isn't exported
+        because because noteworthy details that belong to this model have
+        already been exported as a part of the ExplorationModel.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,

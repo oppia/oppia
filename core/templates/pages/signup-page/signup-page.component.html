@@ -75,7 +75,7 @@ link before completing the signup process, they will be logged out.
       <br>
 
       <button type="submit" class="btn btn-success protractor-test-register-user"
-              ng-disabled="$ctrl.warningI18nCode || !$ctrl.hasAgreedToLatestTerms || $ctrl.submissionInProcess"
+              ng-disabled="$ctrl.warningI18nCode || !$ctrl.hasAgreedToLatestTerms || $ctrl.submissionInProcess || $ctrl.usernameCheckIsInProgress"
               ng-click="$ctrl.submitPrerequisitesForm($ctrl.hasAgreedToLatestTerms, $ctrl.username, $ctrl.canReceiveEmailUpdates)"
               translate="I18N_SIGNUP_BUTTON_SUBMIT"
               id="signup-submit">

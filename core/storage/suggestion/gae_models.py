@@ -27,19 +27,6 @@ import feconf
 
 datastore_services = models.Registry.import_datastore_services()
 
-# Constants defining types of entities to which suggestions can be created.
-TARGET_TYPE_EXPLORATION = 'exploration'
-TARGET_TYPE_QUESTION = 'question'
-TARGET_TYPE_SKILL = 'skill'
-TARGET_TYPE_TOPIC = 'topic'
-
-TARGET_TYPE_CHOICES = [
-    TARGET_TYPE_EXPLORATION,
-    TARGET_TYPE_QUESTION,
-    TARGET_TYPE_SKILL,
-    TARGET_TYPE_TOPIC
-]
-
 # Constants defining the different possible statuses of a suggestion.
 STATUS_ACCEPTED = 'accepted'
 STATUS_IN_REVIEW = 'review'
@@ -51,21 +38,10 @@ STATUS_CHOICES = [
     STATUS_REJECTED
 ]
 
-# Constants defining various suggestion types.
-SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
-SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
-SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
-
-SUGGESTION_TYPE_CHOICES = [
-    SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-    SUGGESTION_TYPE_TRANSLATE_CONTENT,
-    SUGGESTION_TYPE_ADD_QUESTION
-]
-
 # The types of suggestions that are offered on the Contributor Dashboard.
 CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
-    SUGGESTION_TYPE_TRANSLATE_CONTENT,
-    SUGGESTION_TYPE_ADD_QUESTION
+    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    feconf.SUGGESTION_TYPE_ADD_QUESTION
 ]
 
 # Daily emails are sent to reviewers to notify them of suggestions on the
@@ -78,7 +54,7 @@ MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
-    SUGGESTION_TYPE_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
+    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
 }
 
 # Constants defining various contribution types.
@@ -94,10 +70,6 @@ SCORE_TYPE_CHOICES = [
 
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
-
-ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
-                        'status', 'author_id', 'final_reviewer_id',
-                        'score_category', 'language_code']
 
 # Threshold number of days after which suggestion will be accepted.
 THRESHOLD_DAYS_BEFORE_ACCEPT = 7
@@ -138,10 +110,6 @@ INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG = (
 # accepted suggestion.
 INCREMENT_SCORE_OF_AUTHOR_BY = 1
 
-# Action types for incoming requests to the suggestion action handlers.
-ACTION_TYPE_ACCEPT = 'accept'
-ACTION_TYPE_REJECT = 'reject'
-
 # The unique ID for the CommunityContributionStatsModel.
 COMMUNITY_CONTRIBUTION_STATS_MODEL_ID = 'community_contribution_stats'
 
@@ -158,10 +126,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     # The type of suggestion.
     suggestion_type = datastore_services.StringProperty(
-        required=True, indexed=True, choices=SUGGESTION_TYPE_CHOICES)
+        required=True, indexed=True, choices=feconf.SUGGESTION_TYPE_CHOICES)
     # The type of the target entity which the suggestion is linked to.
     target_type = datastore_services.StringProperty(
-        required=True, indexed=True, choices=TARGET_TYPE_CHOICES)
+        required=True,
+        indexed=True,
+        choices=feconf.SUGGESTION_TARGET_TYPE_CHOICES
+    )
     # The ID of the target entity being suggested to.
     target_id = datastore_services.StringProperty(required=True, indexed=True)
     # The version number of the target entity at the time of creation of the
@@ -189,7 +160,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General suggestion needs to be pseudonymized for the user."""
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
+        """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
@@ -201,7 +174,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -291,11 +264,34 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         query = cls.query()
         for (field, value) in query_fields_and_values:
-            if field not in ALLOWED_QUERY_FIELDS:
+            if field not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
                 raise Exception('Not allowed to query on field %s' % field)
             query = query.filter(getattr(cls, field) == value)
 
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+        """Returns translation suggestions which are in review with target_id
+        == exp_id.
+
+        Args:
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions in review
+            with target_id of exp_id. The number of returned results is capped
+            by feconf.DEFAULT_QUERY_LIMIT.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.target_id == exp_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
@@ -314,7 +310,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         query = (
             cls.get_all()
             .order(cls.key)
-            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id.IN(exp_ids))
         )
         suggestion_models = []
@@ -431,7 +428,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return (
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
+            .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
             .order(cls.last_updated)
             .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
         )
@@ -455,7 +452,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return (
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.language_code == language_code)
             .order(cls.last_updated)
             .fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
@@ -559,8 +557,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General voiceover application needs to be pseudonymized for the
-        user.
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -645,7 +643,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -750,9 +748,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -765,8 +761,8 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
+        """Model doesn't contain any data directly corresponding to a user
+        because the data is aggregated.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'translation_reviewer_counts_by_lang_code':

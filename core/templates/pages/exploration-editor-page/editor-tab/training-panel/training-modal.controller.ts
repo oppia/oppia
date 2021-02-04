@@ -38,6 +38,9 @@ require(
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');

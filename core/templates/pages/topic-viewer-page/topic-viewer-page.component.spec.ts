@@ -66,7 +66,8 @@ describe('Topic viewer page', () => {
     degrees_of_mastery: {},
     skill_descriptions: {},
     practice_tab_is_displayed: true,
-    meta_tag_content: 'Topic Meta Tag'
+    meta_tag_content: 'Topic Meta Tag',
+    page_title_fragment_for_web: 'Topic page title'
   };
 
   beforeEach(() => {
@@ -109,7 +110,7 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.topicId).toBe('1');
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
     expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
-      `Learn ${topicName} | Topic Description | Oppia`);
+      `Learn ${topicName} | Topic page title | Oppia`);
     expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
       'Topic Meta Tag');
     expect(topicViewerPageComponent.topicDescription).toBe(

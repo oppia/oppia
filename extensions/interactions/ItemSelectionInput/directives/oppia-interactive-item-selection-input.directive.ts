@@ -79,11 +79,20 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
           };
 
           ctrl.submitAnswer = function() {
-            var answers = Object.keys(ctrl.userSelections).filter(
-              function(obj) {
-                return ctrl.userSelections[obj];
-              }
-            );
+            const getContentIdOfHtml = (html) => {
+              const {
+                choices
+              } = InteractionAttributesExtractorService.getValuesFromAttributes(
+                'ItemSelectionInput',
+                $attrs
+              );
+
+              return choices[ctrl.choices.indexOf(html)].contentId;
+            };
+
+            const htmlAnswers = Object.keys(ctrl.userSelections).filter(
+              (obj) => ctrl.userSelections[obj]);
+            const answers = htmlAnswers.map(getContentIdOfHtml);
 
             CurrentInteractionService.onSubmit(
               answers, ItemSelectionInputRulesService);
@@ -101,7 +110,7 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
               'ItemSelectionInput',
               $attrs
             );
-            ctrl.choices = choices.map(choice => choice.getHtml());
+            ctrl.choices = choices.map(choice => choice.html);
             ctrl.maxAllowableSelectionCount = maxAllowableSelectionCount;
             ctrl.minAllowableSelectionCount = minAllowableSelectionCount;
 

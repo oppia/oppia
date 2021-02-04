@@ -95,7 +95,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/querystatuscheck', params={'query_id': 'invalid_query_id'},
             expected_status_int=400)
-        self.assertEqual(response['error'], '400 Invalid query id.')
+        self.assertEqual(response['error'], 'Invalid query id.')
 
         self.logout()
 

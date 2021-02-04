@@ -58,78 +58,44 @@ require(
   'contribution-opportunities.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').component('questionOpportunities', {
   template: require('./question-opportunities.component.html'),
   controller: [
     '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionOpportunitiesService', 'QuestionObjectFactory',
-    'QuestionUndoRedoService', 'UrlInterpolationService', 'UserService',
-    'MAX_QUESTIONS_PER_SKILL',
+    'QuestionUndoRedoService', 'SiteAnalyticsService',
+    'UrlInterpolationService', 'UserService', 'MAX_QUESTIONS_PER_SKILL',
     function(
         $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, QuestionObjectFactory,
-        QuestionUndoRedoService, UrlInterpolationService, UserService,
-        MAX_QUESTIONS_PER_SKILL) {
+        QuestionUndoRedoService, SiteAnalyticsService,
+        UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
+      let allOpportunities = [];
 
-      const updateWithNewOpportunities = function(opportunities, more) {
-        for (const index in opportunities) {
+      var getPresentableOpportunitiesData = function({opportunities, more}) {
+        let opportunitiesDicts = [];
+        for (let index in opportunities) {
           const opportunity = opportunities[index];
           const heading = opportunity.getOpportunityHeading();
           const subheading = opportunity.getOpportunitySubheading();
           const progressPercentage = (
             (opportunity.getQuestionCount() / MAX_QUESTIONS_PER_SKILL) *
             100).toFixed(2);
-          ctrl.opportunities.push({
+          var opportunityDict = {
             id: opportunity.id,
             heading: heading,
             subheading: subheading,
             progressPercentage: progressPercentage,
-            actionButtonTitle: 'Suggest Question'
-          });
+            actionButtonTitle: 'Suggest Question',
+          };
+          allOpportunities[opportunityDict.id] = opportunityDict;
+          opportunitiesDicts.push(opportunityDict);
         }
-        ctrl.moreOpportunitiesAvailable = more;
-        ctrl.opportunitiesAreLoading = false;
-        // TODO(#8521): Remove the use of $rootScope.$apply().
-        $rootScope.$apply();
-      };
-
-      ctrl.onLoadMoreOpportunities = function() {
-        if (!ctrl.opportunitiesAreLoading &&
-            ctrl.moreOpportunitiesAvailable) {
-          ctrl.opportunitiesAreLoading = true;
-          ContributionOpportunitiesService.getMoreSkillOpportunities(
-            updateWithNewOpportunities);
-        }
-      };
-
-      ctrl.onClickSuggestQuestionButton = function(skillId) {
-        if (!userIsLoggedIn) {
-          ContributionOpportunitiesService.showRequiresLoginModal();
-          return;
-        }
-
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-            'select-skill-and-difficulty-modal.template.html'),
-          backdrop: true,
-          resolve: {
-            skillId: () => skillId
-          },
-          controller: (
-            'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
-        }).result.then(function(result) {
-          if (AlertsService.warnings.length === 0) {
-            ctrl.createQuestion(result.skill, result.skillDifficulty);
-          }
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
+        return {opportunitiesDicts, more};
       };
 
       ctrl.createQuestion = function(skill, skillDifficulty) {
@@ -163,16 +129,52 @@ angular.module('oppia').component('questionOpportunities', {
       };
 
       ctrl.$onInit = function() {
-        ctrl.opportunities = [];
-        ctrl.opportunitiesAreLoading = true;
-        ctrl.moreOpportunitiesAvailable = true;
-        ctrl.progressBarRequired = true;
-        ctrl.opportunityHeadingTruncationLength = 45;
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
-        ContributionOpportunitiesService.getSkillOpportunities(
-          updateWithNewOpportunities);
+      };
+
+      ctrl.loadMoreOpportunities = function() {
+        return ContributionOpportunitiesService.getMoreSkillOpportunitiesAsync()
+          .then(getPresentableOpportunitiesData);
+      };
+
+      ctrl.loadOpportunities = function() {
+        return ContributionOpportunitiesService.getSkillOpportunitiesAsync()
+          .then(getPresentableOpportunitiesData);
+      };
+
+      ctrl.onClickSuggestQuestionButton = function(skillId) {
+        if (!userIsLoggedIn) {
+          ContributionOpportunitiesService.showRequiresLoginModal();
+          return;
+        }
+
+        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
+          'Question');
+
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/topic-editor-page/modal-templates/' +
+            'select-skill-and-difficulty-modal.template.html'),
+          backdrop: true,
+          resolve: {
+            skillId: () => skillId
+          },
+          controller: (
+            'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
+        }).result.then(function(result) {
+          if (AlertsService.warnings.length === 0) {
+            ctrl.createQuestion(result.skill, result.skillDifficulty);
+          }
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
       };
     }
   ]

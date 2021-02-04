@@ -25,6 +25,8 @@ import { AlertsService } from 'services/alerts.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 class MockRouterService {
   private refreshStatisticsTabEventEmitter: EventEmitter<void>;
@@ -134,6 +136,9 @@ describe('Statistics Tab Component', function() {
     $provide.value('ExplorationDataService', {
       explorationId: explorationId
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -152,7 +157,7 @@ describe('Statistics Tab Component', function() {
           }
         }
       }));
-    spyOn(explorationStatsService, 'getExplorationStats').and.returnValue(
+    spyOn(explorationStatsService, 'getExplorationStatsAsync').and.returnValue(
       $q.resolve({
         numStarts: 20,
         numActualStarts: 10,

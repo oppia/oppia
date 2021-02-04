@@ -28,6 +28,8 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+import constants from 'assets/constants';
+
 class MockWindowRef {
   _window = {
     location: {
@@ -117,11 +119,12 @@ describe('Topic Landing Page', () => {
 
   it('should click learn more button', fakeAsync(() => {
     windowRef.nativeWindow.location.href = '';
-    component.onClickLearnMoreButton();
+    component.goToClassroom();
     tick(150);
     fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location.href).toBe('/community-library');
+    expect(windowRef.nativeWindow.location.href).toBe(
+      `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
   }));
 
   it('should have a tagline in the page title', fakeAsync(() => {

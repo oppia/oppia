@@ -65,6 +65,11 @@ describe('Contributor dashboard page', function() {
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
     await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
+    await adminPage.editConfigProperty(
+      'Whether the contributor can suggest questions for skill opportunities.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true);
+      });
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
@@ -110,6 +115,9 @@ describe('Contributor dashboard page', function() {
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', ['correct']);
     await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
@@ -168,6 +176,9 @@ describe('Contributor dashboard page', function() {
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', ['correct']);
     await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
@@ -232,7 +243,13 @@ describe('Admin page contributor reviewer form', function() {
       translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
-    await users.createAdmin(ADMIN_EMAIL, 'assignReviewer');
+    await users.createAndLoginAdminUser(ADMIN_EMAIL, 'assignReviewer');
+    await adminPage.editConfigProperty(
+      'Whether the contributor can suggest questions for skill opportunities.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true);
+      });
+    await users.logout();
   });
 
   beforeEach(async function() {

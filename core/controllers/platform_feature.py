@@ -36,10 +36,9 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
         the given client information.
         """
         context_dict = {
-            'client_type': self.request.get('client_type', None),
+            'platform_type': self.request.get('platform_type', None),
             'browser_type': self.request.get('browser_type', None),
             'app_version': self.request.get('app_version', None),
-            'user_locale': self.request.get('user_locale', None),
         }
         context = (
             platform_feature_services.create_evaluation_context_for_client(
@@ -66,7 +65,7 @@ class PlatformFeatureDummyHandler(base.BaseHandler):
         # This handler is gated by the dummy_feature flag, i.e. it's only
         # visible when the dummy_feature is enabled.
         if not platform_feature_services.is_feature_enabled(
-                platform_feature_list.PARAM_NAMES.dummy_feature, self.user_id):
+                platform_feature_list.PARAM_NAMES.dummy_feature):
             raise self.PageNotFoundException()
         self.render_json({
             'msg': 'ok'

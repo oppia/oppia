@@ -85,7 +85,7 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
               'SetInput',
               $attrs
             );
-            ctrl.buttonText = buttonText.getUnicode();
+            ctrl.buttonText = buttonText.unicode;
             ctrl.schema = {
               type: 'list',
               items: {

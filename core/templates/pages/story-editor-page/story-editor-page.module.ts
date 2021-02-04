@@ -16,20 +16,6 @@
  * @fileoverview Module for the story editor page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/dnd-lists.import';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable',
-  uiValidate
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';

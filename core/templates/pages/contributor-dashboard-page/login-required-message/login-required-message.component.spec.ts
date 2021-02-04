@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for loginRequiredMessage.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// file is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 describe('Login required message component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
@@ -33,6 +38,13 @@ describe('Login required message component', function() {
     };
 
     $provide.value('$window', mockWindow);
+  }));
+
+  beforeEach(angular.mock.module('oppia', $provide => {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -65,7 +77,8 @@ describe('Login required message component', function() {
 
   it('should refresh page if login url is not provided when login button is' +
     ' clicked', function() {
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue($q.resolve(null));
+    spyOn(userService, 'getLoginUrlAsync')
+      .and.returnValue($q.resolve(null));
 
     ctrl.onLoginButtonClicked();
     $scope.$apply();

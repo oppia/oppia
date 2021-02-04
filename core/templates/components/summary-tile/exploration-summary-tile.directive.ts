@@ -16,7 +16,6 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
-require('components/profile-link-directives/circular-image.directive.ts');
 require('domain/learner_dashboard/learner-dashboard-icons.directive.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
@@ -67,39 +66,12 @@ angular.module('oppia').directive('explorationSummaryTile', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/exploration-summary-tile.directive.html'),
-      link: function(scope, element) {
-        element.find('.exploration-summary-avatars').on(
-          'mouseenter',
-          function() {
-            element.find('.mask').attr(
-              'class', 'exploration-summary-tile-mask mask');
-            // As animation duration time may be 400ms, .stop(true) is used to
-            // prevent the effects queue falling behind the mouse movement.
-            // .hide(1) and .show(1) used to place the animation in the effects
-            // queue.
-            element.find('.avatars-num-minus-one').stop(true).hide(
-              1, function() {
-                element.find('.all-avatars').stop(true).slideDown();
-              }
-            );
-          }
-        );
-
-        element.find('.exploration-summary-avatars').on(
-          'mouseleave', function() {
-            element.find('.mask').attr('class', 'top-section-mask mask');
-            element.find('.all-avatars').stop(true).slideUp(400, function() {
-              element.find('.avatars-num-minus-one').stop(true).show(1);
-            });
-          }
-        );
-      },
       controller: [
-        '$scope', '$window', 'DateTimeFormatService',
+        '$rootScope', '$scope', '$window', 'DateTimeFormatService',
         'RatingComputationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
-            $scope, $window, DateTimeFormatService,
+            $rootScope, $scope, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           var ctrl = this;
@@ -182,6 +154,9 @@ angular.module('oppia').directive('explorationSummaryTile', [
             $scope.userIsLoggedIn = null;
             UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
             $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
             var contributorsSummary = $scope.getContributorsSummary() || {};
@@ -202,9 +177,6 @@ angular.module('oppia').directive('explorationSummaryTile', [
                 $scope.getParentExplorationIds().length > 0);
             }
 
-            $scope.avatarsList = [];
-
-            $scope.MAX_AVATARS_TO_DISPLAY = 5;
             if (!$scope.mobileCutoffPx) {
               $scope.mobileCutoffPx = 0;
             }
