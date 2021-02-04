@@ -285,8 +285,8 @@ describe('Exploration rights service', function() {
         200, sampleDataResults);
       const onUnpublishingcallbackFunc =
         jasmine.createSpy('onUnpublishingcallback');
-      ers.saveModeratorChangeToBackend('Email body',
-        onUnpublishingcallbackFunc);
+      ers.saveModeratorChangeToBackend(
+        'Email body', onUnpublishingcallbackFunc);
       $httpBackend.flush();
 
       expect(onUnpublishingcallbackFunc).toHaveBeenCalled();
