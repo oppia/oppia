@@ -174,7 +174,7 @@ export const AboutPageConstants = {
     'Jared Silver',
     'Jasmine Rider',
     'Jasper Deng',
-    'Jassi',
+    'Jaswinder Singh',
     'Jaysinh Shukla',
     'Jenna Mandel',
     'Jennifer Chen',
