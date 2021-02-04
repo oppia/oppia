@@ -86,16 +86,16 @@ def update_timestamps_multi(entities, update_last_updated_time=True):
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(Models):
+def put_multi(entities):
     """Stores a sequence of Model instances.
 
     Args:
-        Models: list(datastore_services.Model). A list of Model instances.
+        entities: list(datastore_services.Model). A list of Model instances.
 
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(Models)
+    return ndb.put_multi(entities)
 
 
 @transaction_services.run_in_transaction_wrapper
