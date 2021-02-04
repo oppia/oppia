@@ -408,7 +408,6 @@ export const AboutPageConstants = {
     'Tony Afula',
     'Tony Jiang',
     'Tracy Homer',
-    'Translatewiki.org',
     'Travis Shafer',
     'Truong Kim',
     'Tuguldur Baigalmaa',
