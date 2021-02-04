@@ -169,7 +169,7 @@ angular.module('oppia').component('contributorDashboardPage', {
       };
     }
   ]
-}).directive('changeNavbarContent', [function($window) {
+}).directive('changeNavbarContent', function($window) {
   var $win = angular.element($window);
 
   return {
@@ -181,14 +181,14 @@ angular.module('oppia').component('contributorDashboardPage', {
       $win.on('scroll', function(e) {
         if ($win.scrollTop() >= 5) {
           defaultHeader.addClass('oppia-contributor-dashboard-header');
-          collapsibleHeader.removeClass('oppia-contributor-dashboard-'+
-            'collapsible-header');
+          collapsibleHeader.removeClass(
+            'oppia-contributor-dashboard-collapsible-header');
         } else {
-          collapsibleHeader.addClass('oppia-contributor-dashboard-'+
-            'collapsible-header');
+          collapsibleHeader.addClass(
+            'oppia-contributor-dashboard-collapsible-header');
           defaultHeader.removeClass('oppia-contributor-dashboard-header');
         }
       });
     }
   };
-}]);
+});
