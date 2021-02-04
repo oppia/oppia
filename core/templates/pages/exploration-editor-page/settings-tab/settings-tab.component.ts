@@ -432,6 +432,8 @@ angular.module('oppia').component('settingsTab', {
         ctrl.TAG_REGEX = TAG_REGEX;
         ctrl.canDelete = false;
         ctrl.canModifyRoles = false;
+        ctrl.canReleaseOwnership = false;
+        ctrl.canUnpublish = false;
         ctrl.explorationId = ExplorationDataService.explorationId;
 
         UserExplorationPermissionsService.getPermissionsAsync()
@@ -477,7 +479,6 @@ angular.module('oppia').component('settingsTab', {
           width: '16.66666667%',
           'vertical-align': 'top'
         });
-        ctrl.refreshPermissions();
       };
 
       ctrl.refreshPermissions = function() {
