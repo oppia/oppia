@@ -47,20 +47,20 @@ export class ContributionOpportunitiesService {
 
   public reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   public removeOpportunitiesEventEmitter = new EventEmitter<void>();
-  private skillOpportunitiesCursor: string = null;
-  private translationOpportunitiesCursor: string = null;
-  private voiceoverOpportunitiesCursor: string = null;
-  private moreSkillOpportunitiesAvailable = true;
-  private moreTranslationOpportunitiesAvailable = true;
-  private moreVoiceoverOpportunitiesAvailable = true;
+  private _skillOpportunitiesCursor: string = null;
+  private _translationOpportunitiesCursor: string = null;
+  private _voiceoverOpportunitiesCursor: string = null;
+  private _moreSkillOpportunitiesAvailable = true;
+  private _moreTranslationOpportunitiesAvailable = true;
+  private _moreVoiceoverOpportunitiesAvailable = true;
 
   private _getSkillOpportunities(cursor: string):
   Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchSkillOpportunitiesAsync(cursor)
       .then(({ opportunities, nextCursor, more }) => {
-        this.skillOpportunitiesCursor = nextCursor;
-        this.moreSkillOpportunitiesAvailable = more;
+        this._skillOpportunitiesCursor = nextCursor;
+        this._moreSkillOpportunitiesAvailable = more;
         return {
           opportunities: opportunities,
           more: more
@@ -71,8 +71,8 @@ export class ContributionOpportunitiesService {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(languageCode, cursor)
       .then(({ opportunities, nextCursor, more }) => {
-        this.translationOpportunitiesCursor = nextCursor;
-        this.moreTranslationOpportunitiesAvailable = more;
+        this._translationOpportunitiesCursor = nextCursor;
+        this._moreTranslationOpportunitiesAvailable = more;
         return {
           opportunities: opportunities,
           more: more
@@ -83,8 +83,8 @@ export class ContributionOpportunitiesService {
     return this.contributionOpportunitiesBackendApiService
       .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
       .then(({ opportunities, nextCursor, more }) => {
-        this.voiceoverOpportunitiesCursor = nextCursor;
-        this.moreVoiceoverOpportunitiesAvailable = more;
+        this._voiceoverOpportunitiesCursor = nextCursor;
+        this._moreVoiceoverOpportunitiesAvailable = more;
         return {
           opportunities: opportunities,
           more: more
@@ -107,22 +107,22 @@ export class ContributionOpportunitiesService {
     return this._getVoiceoverOpportunities(languageCode, '');
   }
   async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
-    if (this.moreSkillOpportunitiesAvailable) {
-      return this._getSkillOpportunities(this.skillOpportunitiesCursor);
+    if (this._moreSkillOpportunitiesAvailable) {
+      return this._getSkillOpportunities(this._skillOpportunitiesCursor);
     }
   }
   async getMoreTranslationOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
-    if (this.moreTranslationOpportunitiesAvailable) {
+    if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunities(
-        languageCode, this.translationOpportunitiesCursor);
+        languageCode, this._translationOpportunitiesCursor);
     }
   }
   async getMoreVoiceoverOpportunities(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
-    if (this.moreVoiceoverOpportunitiesAvailable) {
+    if (this._moreVoiceoverOpportunitiesAvailable) {
       return this._getVoiceoverOpportunities(
-        languageCode, this.voiceoverOpportunitiesCursor);
+        languageCode, this._voiceoverOpportunitiesCursor);
     }
   }
 }
