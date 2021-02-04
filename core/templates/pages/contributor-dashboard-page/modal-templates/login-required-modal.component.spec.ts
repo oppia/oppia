@@ -39,6 +39,7 @@ describe('Login Required Modal Content', () => {
     component = fixture.componentInstance;
   });
 
-  describe('activeModal', () => {
+  it('should have a publicly accessible activeModal', () => {
+    expect(component.activeModal).toBeInstanceOf(NgbActiveModal);
   });
 });
