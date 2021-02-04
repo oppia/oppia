@@ -35,6 +35,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -1920,7 +1921,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
             description='Description', canonical_story_ids=[],
@@ -1988,7 +1989,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.story_id = story_services.get_new_story_id()
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(self.story_id, self.admin_id, self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
@@ -2007,7 +2008,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
     def test_can_not_edit_story_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(story_id, self.admin_id, topic_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -2081,7 +2082,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
                 '/mock_add_story_to_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
             description='Description', canonical_story_ids=[],
@@ -2187,7 +2188,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.story_url_fragment = 'story-frag'
         self.save_new_story(
@@ -2338,7 +2339,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = ['skill_id_1']
@@ -2473,7 +2474,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = ['skill_id_1']
@@ -2801,7 +2802,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name1',
             description='Description', canonical_story_ids=[],
@@ -3261,7 +3262,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_can_edit_topic(self):
         self.login(self.ADMIN_EMAIL)
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
@@ -3298,7 +3299,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_can_edit_story(self):
         self.login(self.ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(story_id, self.admin_id, topic_id)
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
