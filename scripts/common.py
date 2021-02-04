@@ -830,9 +830,18 @@ def managed_process(
         # becoming zombies.
         procs_to_kill.append(popen_proc)
 
-        get_debug_info = lambda proc: (
-            'Process(name=%r, pid=%d)' % (proc.name(), proc.pid)
-            if proc.is_running() else 'Process(pid=%d)' % (proc.pid,))
+        def get_debug_info(proc):
+            """Get a string representing a process."""
+            try:
+                is_running = proc.is_running()
+                name = proc.name() if is_running else None
+            except psutil.NoSuchProcess:
+                return 'Process(pid=%d)' % proc.pid
+
+            if is_running:
+                return 'Process(name=%r, pid=%d)' % (name, proc.pid)
+            else:
+                return 'Process(pid=%d)' % proc.pid
 
         procs_still_alive = []
         for proc in procs_to_kill:
