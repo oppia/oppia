@@ -1,5 +1,5 @@
 <div>
-  <div class="oppia-contributor-home" change-navbar-content="oppia-contributor-header">
+  <div class="oppia-contributor-home">
     <div class="oppia-opportunities-tabs">
       <ul class="oppia-opportunities-tabs-list">
         <li ng-class="{'oppia-active-opportunities-tab': tabName === $ctrl.activeTabName}"
@@ -13,7 +13,7 @@
         </li>
       </ul>
     </div>
-    <div>
+    <div id="default-header">
       <div class="oppia-opportunities-tab-custmization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -71,7 +71,7 @@
         </div>
       </div>
     </div>
-    <div class="oppia-contributor-dashboard-collapsible-header">
+    <div class="oppia-contributor-dashboard-collapsible-header" id="collapsible-header">
       <div class="collapsed-oppia-opportunities-tab-custmization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -312,8 +312,8 @@
   .collapsed-oppia-opportunities-tabs-explanation {
     color: #009688;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    position: relative;
     font-size: 15px;
+    position: relative;
     width: 390px
   }
   .collapsed-oppia-dashboard-language-container-label {
