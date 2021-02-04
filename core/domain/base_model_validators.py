@@ -153,7 +153,11 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                     model_id_errors.append(
                         'The field \'%s\' should not contain '
                         'pseudonymous IDs' % field_name)
-            elif not utils.is_user_id_valid(model_id):
+            elif not utils.is_user_id_valid(
+                    model_id,
+                    allow_system_user_id=False,
+                    allow_pseudonymous_id=False
+            ):
                 model_id_errors.append(
                     'The user id %s in the field \'%s\' is '
                     'invalid' % (model_id, field_name))
