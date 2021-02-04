@@ -2189,7 +2189,7 @@ class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
             '/getcontributionreviewershandler', params={
-                'category': 'translation',
+                'review_category': 'translation',
                 'language_code': 'hi'
             })
 

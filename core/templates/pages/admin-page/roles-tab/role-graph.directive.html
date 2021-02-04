@@ -118,7 +118,7 @@
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select id="label-target-form-review-category-select"
                       class="form-control protractor-test-form-review-category-select"
-                      ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES"
+                      ng-options="roleString as roleName for (roleName, roleString) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
                       ng-model="$ctrl.formData.viewContributionReviewers.category">
               </select>
             </div>
@@ -193,7 +193,7 @@
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-assign-reviewer-form">
         <form class="form-horizontal" ng-submit="$ctrl.submitAddContributionReviewerForm($ctrl.formData.addContributionReviewer)">
-          <legend class="text-center">Add Contribution Reviewer</legend>
+          <legend class="text-center">Add Contribution Rights</legend>
           <div class="d-xl-inline-flex form-group">
             <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
@@ -206,7 +206,7 @@
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select id="label-target-form-review-category-select"
                       class="form-control protractor-test-form-review-category-select"
-                      ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES"
+                      ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
                       ng-model="$ctrl.formData.addContributionReviewer.category">
               </select>
             </div>
@@ -232,7 +232,7 @@
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-remove-reviewer-form">
         <form class="form-horizontal" ng-submit="$ctrl.submitRemoveContributionReviewerForm($ctrl.formData.removeContributionReviewer)">
-          <legend class="text-center">Remove Contribution Reviewer</legend>
+          <legend class="text-center">Remove Contribution Rights</legend>
           <div class="d-xl-inline-flex form-group">
             <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
@@ -258,7 +258,7 @@
                ng-if="$ctrl.formData.removeContributionReviewer.method===$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Remove from</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.removeContributionReviewer.category" class="form-control">
+              <select ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES" ng-model="$ctrl.formData.removeContributionReviewer.category" class="form-control">
               </select>
             </div>
           </div>

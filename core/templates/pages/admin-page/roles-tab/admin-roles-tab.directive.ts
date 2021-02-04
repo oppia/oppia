@@ -28,16 +28,20 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 angular.module('oppia').directive('adminRolesTab', [
   '$http', '$rootScope', 'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService',
-  'ACTION_REMOVE_ALL_REVIEW_RIGHTS', 'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
+  'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
+  'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
   'ADMIN_ROLE_HANDLER_URL', 'REVIEW_CATEGORY_QUESTION',
   'REVIEW_CATEGORY_TRANSLATION', 'REVIEW_CATEGORY_VOICEOVER',
+  'SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
       $http, $rootScope, AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService,
-      ACTION_REMOVE_ALL_REVIEW_RIGHTS, ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS,
+      ACTION_REMOVE_ALL_REVIEW_RIGHTS,
+      ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
       ADMIN_ROLE_HANDLER_URL, REVIEW_CATEGORY_QUESTION,
       REVIEW_CATEGORY_TRANSLATION, REVIEW_CATEGORY_VOICEOVER,
+      SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY,
       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
@@ -127,7 +131,7 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
           $http.post('/addcontributionrightshandler', {
-            review_category: formResponse.category,
+            category: formResponse.category,
             username: formResponse.username,
             language_code: formResponse.languageCode
           }).then(function(response) {
@@ -192,7 +196,7 @@ angular.module('oppia').directive('adminRolesTab', [
             '/removecontributionrightshandler', {
               username: formResponse.username,
               removal_type: formResponse.method,
-              review_category: formResponse.category,
+              category: formResponse.category,
               language_code: formResponse.languageCode
             }).then(function(response) {
             ctrl.setStatusMessage('Success.');
@@ -296,16 +300,17 @@ angular.module('oppia').directive('adminRolesTab', [
         ctrl.$onInit = function() {
           ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
             ACTION_REMOVE_ALL_REVIEW_RIGHTS);
-          ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS = (
-            ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS);
+          ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
+            ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
           ctrl.USER_FILTER_CRITERION_ROLE = USER_FILTER_CRITERION_ROLE;
           ctrl.UPDATABLE_ROLES = {};
           ctrl.VIEWABLE_ROLES = {};
-          ctrl.REVIEW_CATEGORIES = {
-            TRANSLATION: REVIEW_CATEGORY_TRANSLATION,
-            VOICEOVER: REVIEW_CATEGORY_VOICEOVER,
-            QUESTION: REVIEW_CATEGORY_QUESTION
+          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+            REVIEW_TRANSLATION: REVIEW_CATEGORY_TRANSLATION,
+            REVIEW_VOICEOVER: REVIEW_CATEGORY_VOICEOVER,
+            REVIEW_QUESTION: REVIEW_CATEGORY_QUESTION,
+            SUBMIT_QUESTION: SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY
           };
           refreshFormData();
           ctrl.resultRolesVisible = false;
