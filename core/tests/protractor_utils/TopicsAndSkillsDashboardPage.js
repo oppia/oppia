@@ -237,7 +237,7 @@ var TopicsAndSkillsDashboardPage = function() {
       by.css('.protractor-test-select-skill-status-dropdown'));
 
     await action.sendKeys(
-      'Skill Dashboard status filter', filterSkillStatusInput, status + '\n');
+      'Skill Dashboard status filter', filterSkillStatus, status + '\n');
   };
 
   this.filterTopicsByKeyword = async function(keyword) {
@@ -390,8 +390,8 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.expectNumberOfTopicsToBe = async function(number) {
     if (number > 0) {
-      await waitFor.visibilityOf(topicsListItems,
-        'Topics table taking too long to appear');
+      await waitFor.visibilityOf(
+        topicsListItems, 'Topics table taking too long to appear');
     }
     expect(await topicsListItems.count()).toBe(number);
   };
