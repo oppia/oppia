@@ -630,10 +630,11 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                     results_list.append(json.loads(item))
             job_class.register_completion(job_id, results_list)
         except Exception as e:
-            logging.error(traceback.format_exc())
-            logging.error(
-                'Job %s failed at %s' %
-                (job_id, utils.get_current_time_in_millisecs()))
+            logging.exception(
+                'Job %s failed at %s' % (
+                    job_id, utils.get_current_time_in_millisecs()
+                )
+            )
             job_class.register_failure(
                 job_id,
                 '%s\n%s' % (python_utils.UNICODE(e), traceback.format_exc()))
