@@ -233,9 +233,11 @@ var TopicsAndSkillsDashboardPage = function() {
   this.filterSkillsByStatus = async function(status) {
     await action.click(
       'Skill Dashboard status filter', skillStatusFilterDropdown);
-    await (
-      await browser.driver.switchTo().activeElement()
-    ).sendKeys(status + '\n');
+    var filterSkillStatus = skillStatusFilterDropdown.element(
+      by.css('.protractor-test-select-skill-status-dropdown'));
+
+    await action.sendKeys(
+      'Skill Dashboard status filter', filterSkillStatusInput, status + '\n');
   };
 
   this.filterTopicsByKeyword = async function(keyword) {
@@ -256,9 +258,11 @@ var TopicsAndSkillsDashboardPage = function() {
 
     await action.click(
       'Topic Dashboard classroom filter', topicFilterClassroomField);
-    await (
-      await browser.driver.switchTo().activeElement()
-    ).sendKeys(keyword + '\n');
+    var filterClassroom = topicFilterClassroomField.element(
+      by.css('.topic-skill-filter-value'));
+
+    await action.sendKeys(
+      'Topic Dashboard classroom filter', filterClassroom, keyword + '\n');
   };
 
   this.resetTopicFilters = async function() {
@@ -385,10 +389,11 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.expectNumberOfTopicsToBe = async function(number) {
-    let topicsTableIsPresent = await topicsTable.isPresent();
-    if (topicsTableIsPresent) {
-      expect(await topicsListItems.count()).toBe(number);
+    if (number > 0) {
+      await waitFor.visibilityOf(topicsListItems,
+        'Topics table taking too long to appear');
     }
+    expect(await topicsListItems.count()).toBe(number);
   };
 
   this.expectTopicNameToBe = async function(topicName, index) {
