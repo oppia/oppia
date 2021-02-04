@@ -17,8 +17,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import caching_services
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -283,13 +285,13 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         put_payload_copy = self.put_payload.copy()
         put_payload_copy['commit_message'] = (
-            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
+            'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
         json_response = self.put_json(
             self.url, put_payload_copy, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters long.'
+            'Commit messages must be at most 375 characters long.'
         )
         self.logout()
 
@@ -420,9 +422,59 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
         self.assertEqual(len(json_response['skills']), 1)
         self.logout()
 
-    def test_skill_data_handler_get_fails(self):
+
+class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for SkillDescriptionHandler."""
+
+    def setUp(self):
+        super(SkillDescriptionHandlerTest, self).setUp()
+        self.skill_description = 'Adding Fractions'
+        self.url = '%s/%s' % (
+            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
+
+    def test_skill_description_handler_when_unique(self):
         self.login(self.ADMIN_EMAIL)
-        # Check GET returns 404 when cannot get skill by id.
-        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
-        self.get_json(self.url, expected_status_int=404)
-        self.logout()
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+        # Publish a skill.
+        new_skill_id = skill_services.get_new_skill_id()
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            new_skill_id, self.skill_description, rubrics)
+        skill_services.save_new_skill(self.admin_id, skill)
+
+        # Unique skill description does not exist.
+        skill_description_2 = 'Subtracting Fractions'
+        url_2 = '%s/%s' % (
+            feconf.SKILL_DESCRIPTION_HANDLER, skill_description_2)
+        json_response = self.get_json(url_2)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+    def test_skill_description_handler_when_duplicate(self):
+        self.login(self.ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+        # Publish a skill.
+        new_skill_id = skill_services.get_new_skill_id()
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            new_skill_id, self.skill_description, rubrics)
+        skill_services.save_new_skill(self.admin_id, skill)
+
+        # Skill description exists since we've already published it.
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], True)
