@@ -2160,15 +2160,15 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
 
 
-class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
-    """Tests ContributionReviewersListHandler."""
+class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
+    """Tests ContributorUsersListHandler."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(ContributionReviewersListHandlerTest, self).setUp()
+        super(ContributorUsersListHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -2188,8 +2188,8 @@ class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcontributionreviewershandler', params={
-                'review_category': 'translation',
+            '/getcontributorusershandler', params={
+                'category': 'translation',
                 'language_code': 'hi'
             })
 
@@ -2204,8 +2204,8 @@ class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_voiceover_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcontributionreviewershandler', params={
-                'review_category': 'voiceover',
+            '/getcontributorusershandler', params={
+                'category': 'voiceover',
                 'language_code': 'hi'
             })
 
@@ -2218,8 +2218,21 @@ class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/getcontributionreviewershandler', params={
-                'review_category': 'question'
+            '/getcontributorusershandler', params={
+                'category': 'question'
+            })
+
+        self.assertEqual(len(response['usernames']), 2)
+        self.assertTrue('question' in response['usernames'])
+        self.assertTrue('voiceartist' in response['usernames'])
+
+    def test_check_contributor_user_by_question_contributor_role(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        user_services.allow_user_to_submit_question(self.question_reviewer_id)
+        user_services.allow_user_to_submit_question(self.voiceover_reviewer_id)
+        response = self.get_json(
+            '/getcontributorusershandler', params={
+                'category': 'submit_question'
             })
 
         self.assertEqual(len(response['usernames']), 2)
@@ -2230,24 +2243,24 @@ class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcontributionreviewershandler', params={
-                'review_category': 'voiceover',
+            '/getcontributorusershandler', params={
+                'category': 'voiceover',
                 'language_code': 'invalid'
             }, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid language_code: invalid')
         self.logout()
 
-    def test_check_contribution_reviewer_with_invalid_review_category_raise_error( # pylint: disable=line-too-long
+    def test_check_contribution_reviewer_with_invalid_category_raise_error(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcontributionreviewershandler', params={
-                'review_category': 'invalid',
+            '/getcontributorusershandler', params={
+                'category': 'invalid',
                 'language_code': 'hi'
             }, expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Invalid review_category: invalid')
+        self.assertEqual(response['error'], 'Invalid category: invalid')
         self.logout()
 
 

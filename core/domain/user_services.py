@@ -2568,12 +2568,12 @@ def remove_contribution_reviewer(user_id):
         user_contribution_rights_model.delete()
 
 
-def get_contribution_reviewer_usernames(review_category, language_code=None):
-    """Returns a list of usernames of users who has rights to review item of
-    given review category.
+def get_contributor_usernames(category, language_code=None):
+    """Returns a list of usernames of users who has contribution rights of given
+    category.
 
     Args:
-        review_category: str. The review category to find the list of reviewers
+        category: str. The review category to find the list of reviewers
             for.
         language_code: None|str. The language code for translation or voiceover
             review category.
@@ -2581,26 +2581,30 @@ def get_contribution_reviewer_usernames(review_category, language_code=None):
     Returns:
         list(str). A list of usernames.
     """
-    reviewer_ids = []
-    if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
-        reviewer_ids = (
+    user_ids = []
+    if category == constants.REVIEW_CATEGORY_TRANSLATION:
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
-    elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
-        reviewer_ids = (
+    elif category == constants.REVIEW_CATEGORY_VOICEOVER:
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
-    elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+    elif category == constants.REVIEW_CATEGORY_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (
                 language_code))
-        reviewer_ids = (
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
+    elif category == constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY:
+        user_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_contributor_user_ids())
     else:
-        raise Exception('Invalid review category: %s' % review_category)
+        raise Exception('Invalid category: %s' % category)
 
-    return get_usernames(reviewer_ids)
+    return get_usernames(user_ids)
 
 
 def log_username_change(committer_id, old_username, new_username):

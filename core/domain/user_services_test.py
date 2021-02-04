@@ -2753,12 +2753,12 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self):
         with self.assertRaisesRegexp(
             Exception, 'Expected language_code to be None'):
-            user_services.get_contribution_reviewer_usernames(
+            user_services.get_contributor_usernames(
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
-    def test_get_contribution_reviewer_usernames_with_invalid_category_raises(
+    def test_get_contributor_usernames_with_invalid_category_raises(
             self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid review category: invalid_category'):
-            user_services.get_contribution_reviewer_usernames(
+            user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')

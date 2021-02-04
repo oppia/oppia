@@ -124,7 +124,7 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitAddContributionReviewerForm = function(formResponse) {
+        ctrl.submitAddContributionRightsForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -143,7 +143,7 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitViewContributionReviewersForm = function(formResponse) {
+        ctrl.submitViewContributorUsersForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -151,9 +151,9 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.startTask();
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             $http.get(
-              '/getcontributionreviewershandler', {
+              '/getcontributorusershandler', {
                 params: {
-                  review_category: formResponse.category,
+                  category: formResponse.category,
                   language_code: formResponse.languageCode
                 }
               }).then(function(response) {
@@ -177,7 +177,8 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
-                questions: response.data.can_review_questions
+                questions: response.data.can_review_questions,
+                can_submit_questions: response.data.can_submit_questions
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
@@ -186,7 +187,7 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitRemoveContributionReviewerForm = function(formResponse) {
+        ctrl.submitRemoveContributionRightsForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }

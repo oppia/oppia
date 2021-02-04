@@ -223,7 +223,7 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-describe('Admin page contributor reviewer form', function() {
+fdescribe('Admin page contributor reviewer form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var contributorDashboardPage = null;
@@ -287,6 +287,18 @@ describe('Admin page contributor reviewer form', function() {
   });
 
   it('should allow admin to add question reviewer', async function() {
+    await adminPage.get();
+    await adminPage.assignQuestionReviewer(questionReviewerUsername);
+    await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
+    await users.logout();
+
+    await users.login(questionReviewerEmail);
+    await contributorDashboardPage.get();
+    await contributorDashboardPage.expectUserToBeQuestionReviewer();
+    await users.logout();
+  });
+
+  it('should allow admin to add question contributor', async function() {
     await adminPage.get();
     await adminPage.assignQuestionReviewer(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);

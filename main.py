@@ -228,8 +228,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/removecontributionrightshandler',
         admin.RemoveContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributionreviewershandler',
-        admin.ContributionReviewersListHandler),
+        r'/getcontributorusershandler',
+        admin.ContributorUsersListHandler),
     get_redirect_route(
         r'/contributionrightsdatahandler',
         admin.ContributionRightsDataHandler),

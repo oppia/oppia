@@ -920,27 +920,27 @@ class RemoveContributionRightsHandler(base.BaseHandler):
         self.render_json({})
 
 
-class ContributionReviewersListHandler(base.BaseHandler):
-    """Handler to show the existing reviewers."""
+class ContributorUsersListHandler(base.BaseHandler):
+    """Handler to show users with contribution rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        review_category = self.request.get('review_category')
+        category = self.request.get('category')
         language_code = self.request.get('language_code', None)
         if language_code is not None and not (
                 utils.is_supported_audio_language_code(language_code)):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
-        if review_category not in [
+        if category not in [
                 constants.REVIEW_CATEGORY_TRANSLATION,
                 constants.REVIEW_CATEGORY_VOICEOVER,
-                constants.REVIEW_CATEGORY_QUESTION]:
-            raise self.InvalidInputException(
-                'Invalid review_category: %s' % review_category)
-        usernames = user_services.get_contribution_reviewer_usernames(
-            review_category, language_code=language_code)
+                constants.REVIEW_CATEGORY_QUESTION,
+                constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY]:
+            raise self.InvalidInputException('Invalid category: %s' % category)
+        usernames = user_services.get_contributor_usernames(
+            category, language_code=language_code)
         self.render_json({'usernames': usernames})
 
 
