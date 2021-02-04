@@ -56,6 +56,7 @@ describe('EditabilityService', () => {
   });
 
   it('should return correctly when checking if in tutorial mode', () => {
+    editabilityService.onEndTutorial();
     expect(editabilityService.inTutorialMode()).toBe(false);
     editabilityService.onStartTutorial();
     expect(editabilityService.inTutorialMode()).toBe(true);
