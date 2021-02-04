@@ -33,6 +33,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 require('services/user.service.ts');
 require('services/utils.service.ts');
 
@@ -47,18 +48,18 @@ angular.module('oppia').component('preferencesPage', {
   controller: [
     '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
     '$window', 'AlertsService', 'I18nLanguageCodeService',
-    'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
-    'UserService', 'DASHBOARD_TYPE_CREATOR',
-    'DASHBOARD_TYPE_LEARNER', 'ENABLE_ACCOUNT_DELETION',
-    'ENABLE_ACCOUNT_EXPORT', 'SUPPORTED_AUDIO_LANGUAGES',
-    'SUPPORTED_SITE_LANGUAGES', function(
+    'LanguageUtilService', 'LoaderService', 'PreventPageUnloadEventService',
+    'UrlInterpolationService', 'UserService',
+    'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
+    'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
+    'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES', function(
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
         $window, AlertsService, I18nLanguageCodeService,
-        LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserService, DASHBOARD_TYPE_CREATOR,
-        DASHBOARD_TYPE_LEARNER, ENABLE_ACCOUNT_DELETION,
-        ENABLE_ACCOUNT_EXPORT, SUPPORTED_AUDIO_LANGUAGES,
-        SUPPORTED_SITE_LANGUAGES) {
+        LanguageUtilService, LoaderService, PreventPageUnloadEventService,
+        UrlInterpolationService, UserService,
+        DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
+        ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
+        SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
       var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -66,10 +67,14 @@ angular.module('oppia').component('preferencesPage', {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       var _saveDataItem = function(updateType, data) {
+        PreventPageUnloadEventService.addListener();
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
-        }).then(() => AlertsService.addInfoMessage('Saved!', 1000));
+        }).then(() => {
+          PreventPageUnloadEventService.removeListener();
+          AlertsService.addInfoMessage('Saved!', 1000);
+        });
       };
 
       // Select2 dropdown cannot automatically refresh its display
@@ -85,6 +90,10 @@ angular.module('oppia').component('preferencesPage', {
 
       ctrl.saveUserBio = function(userBio) {
         _saveDataItem('user_bio', userBio);
+      };
+
+      ctrl.registerBioChanged = function() {
+        PreventPageUnloadEventService.addListener();
       };
 
       ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
