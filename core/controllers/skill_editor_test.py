@@ -422,13 +422,6 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
         self.assertEqual(len(json_response['skills']), 1)
         self.logout()
 
-    def test_skill_data_handler_get_fails(self):
-        self.login(self.ADMIN_EMAIL)
-        # Check GET returns 404 when cannot get skill by id.
-        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
-        self.get_json(self.url, expected_status_int=404)
-        self.logout()
-
 
 class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillDescriptionHandler."""
