@@ -108,6 +108,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
     var diffData = null;
 
     var _initExplorationPageEventEmitter = new EventEmitter();
+    var explorationPublishedEventEmitter = new EventEmitter();
 
     var isAdditionalMetadataNeeded = function() {
       return (
@@ -154,6 +155,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
             if (onSaveDoneCallback) {
               onSaveDoneCallback();
             }
+
+            explorationPublishedEventEmitter.emit();
 
             showCongratulatorySharingModal();
             SiteAnalyticsService.registerPublishExplorationEvent(
@@ -459,7 +462,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
       get onInitExplorationPage() {
         return _initExplorationPageEventEmitter;
-      }
+      },
+
+      get onExplorationPublished() {
+        return explorationPublishedEventEmitter;
+      },
     };
   }
 ]);

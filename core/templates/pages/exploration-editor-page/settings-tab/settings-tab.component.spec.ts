@@ -57,6 +57,16 @@ class MockRouterService {
   }
 }
 
+class MockExplorationSaveService {
+  private explorationPublishedEventEmitter: EventEmitter<void>;
+  get onExplorationPublished() {
+    return this.explorationPublishedEventEmitter;
+  }
+  set explorationPublishedEmitter(val) {
+    this.explorationPublishedEventEmitter = val;
+  }
+}
+
 describe('Settings Tab Component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -82,6 +92,7 @@ describe('Settings Tab Component', function() {
   var userExplorationPermissionsService = null;
   var windowRef = null;
   var routerService = null;
+  var explorationSaveService = null;
 
   var testSubscriptipns = null;
   var refreshGraphSpy = null;
@@ -108,6 +119,7 @@ describe('Settings Tab Component', function() {
       TestBed.get(UserExplorationPermissionsService));
     windowRef = TestBed.get(WindowRef);
     routerService = new MockRouterService();
+    explorationSaveService = new MockExplorationSaveService;
     mockWindowDimensionsService = {
       isWindowNarrow: () => true
     };
@@ -183,10 +195,12 @@ describe('Settings Tab Component', function() {
       explorationCategoryService.init('Astrology');
 
       routerService.refreshSettingsTabEmitter = new EventEmitter();
+      explorationSaveService.explorationPublishedEmitter = new EventEmitter();
       $scope = $rootScope.$new();
       ctrl = $componentController('settingsTab', {
         $scope: $scope,
         AlertsService: alertsService,
+        ExplorationSaveService: explorationSaveService,
         UserExplorationPermissionsService: userExplorationPermissionsService,
         RouterService: routerService,
         WindowRef: windowRef,
@@ -232,6 +246,17 @@ describe('Settings Tab Component', function() {
 
       expect(ctrl.stateNames).toEqual(['Introduction']);
       expect(ctrl.hasPageLoaded).toBe(true);
+    });
+
+    it('should refresh permissions when onExplorationPublished flag is ' +
+        'broadcasted', function() {
+      spyOn(ctrl, 'refreshPermissions').and.callThrough();
+      ctrl.canUnpublish = false;
+      explorationSaveService.onExplorationPublished.emit();
+      $scope.$apply();
+
+      expect(ctrl.refreshPermissions).toHaveBeenCalled();
+      expect(ctrl.canUnpublish).toBe(true);
     });
 
     it('should get explore page url based on the exploration id', function() {
@@ -636,12 +661,13 @@ describe('Settings Tab Component', function() {
         'Introduction']);
 
       explorationCategoryService.init('Astrology');
-
+      explorationSaveService.explorationPublishedEmitter = new EventEmitter();
       routerService.refreshSettingsTabEmitter = new EventEmitter();
       $scope = $rootScope.$new();
       ctrl = $componentController('settingsTab', {
         $scope: $scope,
         AlertsService: alertsService,
+        ExplorationSaveService: explorationSaveService,
         UserExplorationPermissionsService: userExplorationPermissionsService,
         RouterService: routerService,
         WindowRef: windowRef,
@@ -671,21 +697,25 @@ describe('Settings Tab Component', function() {
     it('should display Unpublish button', function() {
       ctrl.canUnpublish = false;
       expect(ctrl.canUnpublish).toBe(false);
-      ctrl.refreshPermissions('Unpublish');
+      spyOn(ctrl, 'refreshPermissions').and.callThrough();
+
+      explorationSaveService.onExplorationPublished.emit();
       $scope.$apply();
 
+      expect(ctrl.refreshPermissions).toHaveBeenCalled();
       expect(ctrl.canUnpublish).toBe(true);
-      expect(ctrl.refreshPermissions('Unpublish')).toEqual(true);
     });
 
     it('should display Transfer ownership button', function() {
       ctrl.canReleaseOwnership = false;
       expect(ctrl.canReleaseOwnership).toBe(false);
-      ctrl.refreshPermissions('ReleaseOwnership');
+      spyOn(ctrl, 'refreshPermissions').and.callThrough();
+
+      explorationSaveService.onExplorationPublished.emit();
       $scope.$apply();
 
+      expect(ctrl.refreshPermissions).toHaveBeenCalled();
       expect(ctrl.canReleaseOwnership).toBe(true);
-      expect(ctrl.refreshPermissions('ReleaseOwnership')).toEqual(true);
     });
   });
 });
