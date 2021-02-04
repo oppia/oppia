@@ -169,25 +169,26 @@ angular.module('oppia').component('contributorDashboardPage', {
       };
     }
   ]
-}).directive('changeNavbarContent', function ($window) {
+}).directive('changeNavbarContent', [function($window) {
   var $win = angular.element($window);
 
   return {
-    restrict: 'A',
-    link: function (scope, element, attrs) {
-      
+    restrict: 'E',
+    link: function(scope, element, attrs) {
       var defaultHeader = angular.element(element[0].children[1]);
       var collapsibleHeader = angular.element(element[0].children[2]);
 
-      $win.on('scroll', function (e) {
+      $win.on('scroll', function(e) {
         if ($win.scrollTop() >= 5) {
-          defaultHeader.addClass("oppia-contributor-dashboard-header");
-          collapsibleHeader.removeClass("oppia-contributor-dashboard-collapsible-header");
+          defaultHeader.addClass('oppia-contributor-dashboard-header');
+          collapsibleHeader.removeClass('oppia-contributor-dashboard-'+
+            'collapsible-header');
         } else {
-          collapsibleHeader.addClass("oppia-contributor-dashboard-collapsible-header");
-          defaultHeader.removeClass("oppia-contributor-dashboard-header");
+          collapsibleHeader.addClass('oppia-contributor-dashboard-'+
+            'collapsible-header');
+          defaultHeader.removeClass('oppia-contributor-dashboard-header');
         }
       });
     }
   };
-});;
+}]);
