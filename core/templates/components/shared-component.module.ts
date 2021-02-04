@@ -35,8 +35,8 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
-import { SelectSkillComponent } from
-  './skill-selector/select-skill.component';
+import { SkillSelectorComponent } from
+  './skill-selector/skill-selector.component';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -90,7 +90,7 @@ import { AuthService } from 'services/auth.service';
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
-    SelectSkillComponent,
+    SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
     SocialButtonsComponent,
@@ -106,7 +106,7 @@ import { AuthService } from 'services/auth.service';
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
-    SelectSkillComponent,
+    SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -122,7 +122,7 @@ import { AuthService } from 'services/auth.service';
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     SharingLinksComponent,
-    SelectSkillComponent,
+    SkillSelectorComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TakeBreakModalComponent,

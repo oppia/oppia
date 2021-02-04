@@ -22,11 +22,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
 require('domain/utilities/url-interpolation.service.ts');
 
 @Component({
-  selector: 'select-skill',
+  selector: 'skill-selector',
   templateUrl: './skill-selector.component.html',
   styleUrls: []
 })
-export class SelectSkillComponent implements OnInit {
+export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
@@ -180,4 +180,4 @@ export class SelectSkillComponent implements OnInit {
 
 angular.module('oppia').directive(
   'conceptCard', downgradeComponent(
-    { component: SelectSkillComponent }));
+    { component: SkillSelectorComponent }));
