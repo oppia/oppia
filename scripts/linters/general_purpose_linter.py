@@ -889,7 +889,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             if filepath.startswith(('core/templates', 'extensions')) and (
                     filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
                         not filepath.endswith('protractor.js')) and (
-                            filepath.endswith(('.js', '.ts'))):
+                            filepath.endswith(('.js'))):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)
