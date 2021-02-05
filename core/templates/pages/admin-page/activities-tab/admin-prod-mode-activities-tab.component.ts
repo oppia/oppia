@@ -17,7 +17,6 @@
  * is in production mode.
  */
 import { Component } from '@angular/core';
-//import { SharedComponentsModule } from 'components/shared-component.module';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
