@@ -62,6 +62,7 @@ describe('Exploration save and publish buttons component', function() {
   var explorationWarningsService = null;
   var editabilityService = null;
   var userExplorationPermissionsService = null;
+  var PreventPageUnloadEventService = null;
 
   var mockExternalSaveEventEmitter = null;
 
@@ -121,7 +122,8 @@ describe('Exploration save and publish buttons component', function() {
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
-
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canPublish: true
@@ -272,12 +274,11 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.showPublishButton()).toBe(true);
   });
 
-  it('should call confirm before leaving', function() {
-    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-    spyOn(window, 'addEventListener');
-    ctrl.saveBeforeUnload();
-    expect(ctrl.confirmBeforeLeaving({ returnValue: '' })).toBe(false);
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
-  });
+  it('should add prevent reload event listener when a bio is changed',
+    function() {
+      spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
+      spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+      $scope.$apply();
+      expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
+    });
 });

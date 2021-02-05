@@ -250,12 +250,12 @@ describe('Settings Tab Component', function() {
 
     it('should refresh permissions when onExplorationPublished flag is ' +
         'broadcasted', function() {
-      spyOn(ctrl, 'refreshPermissions').and.callThrough();
       ctrl.canUnpublish = false;
       explorationSaveService.onExplorationPublished.emit();
       $scope.$apply();
 
-      expect(ctrl.refreshPermissions).toHaveBeenCalled();
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
       expect(ctrl.canUnpublish).toBe(true);
     });
 
@@ -697,24 +697,24 @@ describe('Settings Tab Component', function() {
     it('should display Unpublish button', function() {
       ctrl.canUnpublish = false;
       expect(ctrl.canUnpublish).toBe(false);
-      spyOn(ctrl, 'refreshPermissions').and.callThrough();
 
       explorationSaveService.onExplorationPublished.emit();
       $scope.$apply();
 
-      expect(ctrl.refreshPermissions).toHaveBeenCalled();
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
       expect(ctrl.canUnpublish).toBe(true);
     });
 
     it('should display Transfer ownership button', function() {
       ctrl.canReleaseOwnership = false;
       expect(ctrl.canReleaseOwnership).toBe(false);
-      spyOn(ctrl, 'refreshPermissions').and.callThrough();
 
       explorationSaveService.onExplorationPublished.emit();
       $scope.$apply();
 
-      expect(ctrl.refreshPermissions).toHaveBeenCalled();
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
       expect(ctrl.canReleaseOwnership).toBe(true);
     });
   });

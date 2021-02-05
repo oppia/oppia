@@ -30,19 +30,20 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/editability.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
     '$rootScope', '$scope', 'ChangeListService', 'EditabilityService',
     'ExplorationRightsService', 'ExplorationSaveService',
-    'ExplorationWarningsService', 'UserExplorationPermissionsService',
-    'WindowRef',
+    'ExplorationWarningsService', 'PreventPageUnloadEventService',
+    'UserExplorationPermissionsService',
     function(
         $rootScope, $scope, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
-        ExplorationWarningsService, UserExplorationPermissionsService,
-        WindowRef) {
+        ExplorationWarningsService, PreventPageUnloadEventService,
+        UserExplorationPermissionsService,) {
       var ctrl = this;
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
@@ -132,7 +133,6 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = false;
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
-        ctrl.saveBeforeUnload();
       };
 
       $scope.explorationCanBePublished = false;
@@ -149,19 +149,14 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         return $scope.explorationCanBePublished && $scope.isPrivate();
       };
 
-      ctrl.saveBeforeUnload = function() {
-        WindowRef.nativeWindow.addEventListener(
-          'beforeunload', ctrl.confirmBeforeLeaving);
-      };
-
-      ctrl.confirmBeforeLeaving = function(e) {
+      $scope.$watch(function() {
         if ($scope.getChangeListLength() > 50) {
-          // This message is irrelevant, but is needed to trigger the
-          // confirmation before leaving.
-          e.returnValue = 'Sure?';
-          return false;
+          PreventPageUnloadEventService.addListener();
+        } else {
+          PreventPageUnloadEventService.removeListener();
         }
-      };
+        $rootScope.$applyAsync();
+      });
     }
   ]
 });

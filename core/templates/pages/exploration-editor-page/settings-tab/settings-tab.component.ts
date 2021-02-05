@@ -413,7 +413,16 @@ angular.module('oppia').component('settingsTab', {
         ctrl.directiveSubscriptions.add(
           // eslint-disable-next-line max-len
           ExplorationSaveService.onExplorationPublished.subscribe(
-            () => refreshPermissions()
+            () => {
+              UserExplorationPermissionsService.getPermissionsAsync()
+                .then(function(permissions) {
+                  ctrl.canUnpublish = permissions.canUnpublish;
+                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
+                });
+            }
           )
         );
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
@@ -485,17 +494,6 @@ angular.module('oppia').component('settingsTab', {
           width: '16.66666667%',
           'vertical-align': 'top'
         });
-      };
-
-      var refreshPermissions = function() {
-        UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
-            ctrl.canUnpublish = permissions.canUnpublish;
-            ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
       };
 
       ctrl.$onDestroy = function() {
