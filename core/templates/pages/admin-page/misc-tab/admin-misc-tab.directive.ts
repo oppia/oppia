@@ -99,6 +99,33 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
+        ctrl.regenerateMissingExplorationStats = function() {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (!$window.confirm(irreversibleActionMessage)) {
+            return;
+          }
+          ctrl.regenerationMessage = 'Regenerating opportunities...';
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'regenerate_missing_exploration_stats',
+            exp_id: ctrl.explorationIdForRegeneratingMissingStats
+          }).then(function(response) {
+            ctrl.missingExplorationStatsRegenerationMessage = (
+              'No. of valid Exploration Stats: ' +
+              `${response.data.num_valid_exp_stats}\n` +
+              'No. of valid State Stats: ' +
+              `${response.data.num_valid_state_stats}\n` +
+              'Missing Exploration Stats: ' +
+              `${response.data.missing_exp_stats.join(', ') || 'NA'}\n` +
+              'Missing State Stats: ' +
+              `${response.data.missing_state_stats.join(', ') || 'NA'}\n`);
+          }, function(errorResponse) {
+            ctrl.missingExplorationStatsRegenerationMessage = (
+              'Server error: ' + errorResponse.data.error);
+          });
+        };
+
         ctrl.uploadTopicSimilaritiesFile = function() {
           var file = (
             <HTMLInputElement>document.getElementById(
@@ -230,6 +257,8 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.regenerationMessage = null;
           ctrl.oldUsername = null;
           ctrl.newUsername = null;
+          ctrl.explorationIdForRegeneratingMissingStats = null;
+          ctrl.missingExplorationStatsRegenerationMessage = null;
         };
       }]
     };
