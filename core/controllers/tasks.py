@@ -46,7 +46,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             # Model may not exist if user has already attended to the feedback.
             return
 
-        feedback_services.update_feedback_email_retries(user_id)
+        feedback_services.update_feedback_email_retries_transactional(user_id)
 
         messages = {}
         for reference in references:
@@ -69,7 +69,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
                 }
 
         email_manager.send_feedback_message_email(user_id, messages)
-        feedback_services.pop_feedback_message_references(
+        feedback_services.pop_feedback_message_references_transactional(
             user_id, len(references))
         self.render_json({})
 
@@ -181,6 +181,8 @@ class DeferredTasksHandler(base.BaseHandler):
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
         taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS: (
             exp_services.delete_explorations_from_subscribed_users),
+        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: (
+            exp_services.regenerate_exploration_summary_with_new_contributor),
         taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
             stats_services.update_stats),
         taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (

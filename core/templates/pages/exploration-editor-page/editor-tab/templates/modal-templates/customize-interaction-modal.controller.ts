@@ -397,6 +397,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       $uibModalInstance.close();
     };
 
+    $scope.getHyphenatedLowercaseCategoryName = function(categoryName) {
+      return categoryName && categoryName.replace(/\s/g, '-').toLowerCase();
+    };
+
     $scope.init = function() {
       $scope.originalContentIdToContent = {};
       if (StateInteractionIdService.savedMemento) {
