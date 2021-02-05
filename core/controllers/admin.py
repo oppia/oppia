@@ -873,7 +873,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
         elif (removal_type ==
-                constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
+              constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
             category = self.payload.get('category')
             if category == constants.REVIEW_CATEGORY_TRANSLATION:
                 if not user_services.can_review_translation_suggestions(
@@ -898,7 +898,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                             username))
                 user_services.remove_question_review_rights(user_id)
             elif (category ==
-                    constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY):
+                  constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY):
                 if not user_services.can_submit_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to submit question.' % (
