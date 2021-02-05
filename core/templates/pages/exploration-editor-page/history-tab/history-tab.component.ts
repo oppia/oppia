@@ -121,8 +121,7 @@ angular.module('oppia').component('historyTab', {
               for (
                 var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
                 var versionNumber = explorationSnapshots[i].version_number;
-                ctrl.explorationVersionMetadata[
-                  currentVersion - versionNumber] = {
+                ctrl.explorationVersionMetadata[versionNumber - 1] = {
                   committerId: explorationSnapshots[i].committer_id,
                   createdOnMsecsStr: (
                     DateTimeFormatService

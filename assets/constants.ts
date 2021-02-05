@@ -5612,5 +5612,5 @@ export default {
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
 
-  "DEV_MODE": true
+  "DEV_MODE": false
 } as const;
