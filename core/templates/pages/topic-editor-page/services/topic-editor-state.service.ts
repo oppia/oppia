@@ -238,7 +238,9 @@ export class TopicEditorStateService {
   }
 
   getGroupedSkillSummaries(): unknown {
-    return angular.copy(this._groupedSkillSummaries);
+    let _groupedSkillSummaries = Object.assign(
+      {}, this._groupedSkillSummaries);
+    return _groupedSkillSummaries;
   }
 
   getSkillQuestionCountDict(): { [skillId: string]: number; } | undefined[] {
@@ -266,7 +268,8 @@ export class TopicEditorStateService {
   loadSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
-      this._subtopicPage = angular.copy(
+      this._subtopicPage = Object.assign(
+        {},
         this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPageId)]);
       this._subtopicPageLoadedEventEmitter.emit();
       return;
@@ -371,8 +374,8 @@ export class TopicEditorStateService {
   setSubtopicPage(subtopicPage: SubtopicPage): void {
     if (this._getSubtopicPageIndex(subtopicPage.getId()) !== null) {
       this._cachedSubtopicPages[
-        this._getSubtopicPageIndex(subtopicPage.getId())] =
-            angular.copy(subtopicPage);
+        this._getSubtopicPageIndex(subtopicPage.getId())] = Object.assign(
+        {}, subtopicPage);
       this._subtopicPage.copyFromSubtopicPage(subtopicPage);
     } else {
       this._setSubtopicPage(subtopicPage);

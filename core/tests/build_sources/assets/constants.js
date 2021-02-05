@@ -454,13 +454,14 @@ var constants = {
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
   "ALLOWED_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
         "Continue",
         "EndExploration",
         "ImageClickInput",
         "ItemSelectionInput",
         "MultipleChoiceInput",
+        "NumericInput",
         "TextInput",
         "DragAndDropSortInput"
     ]
