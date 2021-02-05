@@ -1912,13 +1912,7 @@ class UserQueryModel(base_models.BaseModel):
         datastore_services.StringProperty(default=None, indexed=True))
     # Current status of the query.
     query_status = datastore_services.StringProperty(
-        indexed=True,
-        choices=[
-            feconf.USER_QUERY_STATUS_PROCESSING,
-            feconf.USER_QUERY_STATUS_COMPLETED,
-            feconf.USER_QUERY_STATUS_ARCHIVED,
-            feconf.USER_QUERY_STATUS_FAILED
-        ])
+        indexed=True, choices=feconf.ALLOWED_USER_QUERY_STATUSES)
 
     @staticmethod
     def get_deletion_policy():

@@ -260,10 +260,7 @@ class FetchSkillsHandler(base.BaseHandler):
 
         skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
 
-        try:
-            skills = skill_fetchers.get_multi_skills(skill_ids)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
 
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
