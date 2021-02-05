@@ -208,12 +208,10 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for final author '
-                'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
-                'Original author ID %s is in a wrong format. '
-                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
-            ) % (
-                self.model_instance.id, self.model_instance.original_author_id)
+                u'[u\'failed validation check for invalid ids in field of '
+                u'GeneralFeedbackThreadModel\', [u"Entity id %s: '
+                'The user id wrong_id in the field \'author_ids\' is invalid"]]'
+            ) % (self.model_instance.id)
         ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -224,14 +222,11 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for final author '
-                'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
-                'Last non-empty message author ID %s is in a wrong format. '
-                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
-            ) % (
-                self.model_instance.id,
-                self.model_instance.last_nonempty_message_author_id
-            )
+                u'[u\'failed validation check for invalid ids in field of '
+                'GeneralFeedbackThreadModel\', [u"Entity id %s: '
+                'The user id wrong_id in the field '
+                '\'last_nonempty_message_author_ids\' is invalid"]]'
+            ) % (self.model_instance.id)
         ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -371,12 +366,10 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for final author '
-                'check of GeneralFeedbackMessageModel\', [u\'Entity id %s: '
-                'Author ID %s is in a wrong format. '
-                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
-            ) % (
-                self.model_instance.id, self.model_instance.author_id)
+                u'[u\'failed validation check for invalid ids in field of '
+                'GeneralFeedbackMessageModel\', [u"Entity id %s: '
+                'The user id wrong_id in the field \'author_ids\' is invalid"]]'
+            ) % (self.model_instance.id)
         ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)

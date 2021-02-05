@@ -68,6 +68,8 @@ import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { BottomNavbarStatusService } from
   'services/bottom-navbar-status.service';
+import { PreventPageUnloadEventService } from
+  'services/prevent-page-unload-event.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
@@ -885,6 +887,8 @@ export class UpgradedServices {
     upgradedServices['BottomNavbarStatusService'] = (
       new BottomNavbarStatusService(
         upgradedServices['WindowDimensionsService']));
+    upgradedServices['PreventPageUnloadEventService'] =
+        new PreventPageUnloadEventService(upgradedServices['WindowRef']);
     upgradedServices['CodeReplPredictionService'] =
       new CodeReplPredictionService(
         upgradedServices['CountVectorizerService'],

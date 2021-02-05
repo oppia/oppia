@@ -96,24 +96,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    def test_is_user_or_pseudonymous_id(self):
-        self.assertTrue(
-            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id(
-                'uid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
-        self.assertTrue(
-            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id(
-                'pid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
-
     def test_set_and_get_username(self):
         auth_id = 'someUser'
         username = 'username'
