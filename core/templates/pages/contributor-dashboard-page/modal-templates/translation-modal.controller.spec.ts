@@ -144,7 +144,7 @@ describe('Translation Modal Controller', function() {
     expect($scope.uploadingTranslation).toBe(false);
   });
 
-  it('should attempt to go back to the previous translation and fail',
+  it('should return null for completely completed submissions',
     function() {
       $scope.returnToPreviousTranslation();
       expect($scope.textToTranslate).toBe(null);
