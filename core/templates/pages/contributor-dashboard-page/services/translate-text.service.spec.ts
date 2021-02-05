@@ -65,8 +65,25 @@ describe('TranslateTextService', function() {
         more: true
       };
 
+      const expectedTextAndPreviousAvailability1 = {
+        text: 'text1',
+        more: false
+      };
+
       textAndAvailability = TranslateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
+
+      textAndAvailability = TranslateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+
+      textAndAvailability = TranslateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
+
+      textAndAvailability = TranslateTextService.getPreviousTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+
+      textAndAvailability = TranslateTextService.getPreviousTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndPreviousAvailability1);
 
       textAndAvailability = TranslateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
@@ -117,6 +134,11 @@ describe('TranslateTextService', function() {
       const textAndAvailability = TranslateTextService.getTextToTranslate();
 
       expect(textAndAvailability).toEqual(expectedTextAndAvailability);
+
+      const textAndPreviousAvailability =
+       TranslateTextService.getPreviousTextToTranslate();
+
+      expect(textAndAvailability).toEqual(textAndPreviousAvailability);
     });
   });
 });

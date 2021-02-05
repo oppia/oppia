@@ -36,7 +36,7 @@ angular.module('oppia').factory('TranslateTextService', [
     var stateNamesList = [];
     var activeExpId = null;
     var activeExpVersion = null;
-    var activeIndex = 0;
+    var activeIndex = -1;
     var activeStateName = null;
     var activeContentId = null;
     var activeContentText = null;
@@ -45,18 +45,33 @@ angular.module('oppia').factory('TranslateTextService', [
       if (translateTextContainers.length === 0) {
         return null;
       }
+      activeIndex += 1;
       activeStateName = translateTextContainers[activeIndex].stateName;
       activeContentId = translateTextContainers[activeIndex].contentID;
       activeContentText = translateTextContainers[activeIndex].contentText;
-      activeIndex += 1;
       return activeContentText;
+    };
+
+    const getPreviousText = function() {
+      if (translateTextContainers.length === 0 || activeIndex <= 0) {
+        return null;
+      }
+      activeIndex -= 1;
+      activeStateName = translateTextContainers[activeIndex].stateName;
+      activeContentId = translateTextContainers[activeIndex].contentID;
+      activeContentText = translateTextContainers[activeIndex].contentText;
+      return activeContentText;
+    };
+
+    const isPreviousTextAvailableForTranslation = function() {
+      return activeIndex > 0;
     };
 
     const isMoreTextAvailableForTranslation = function() {
       if (translateTextContainers.length === 0) {
         return false;
       }
-      return (activeIndex < translateTextContainers.length);
+      return (activeIndex + 1 < translateTextContainers.length);
     };
 
     return {
@@ -64,6 +79,9 @@ angular.module('oppia').factory('TranslateTextService', [
         stateWiseContents = null;
         stateWiseContentIds = {};
         stateNamesList = [];
+        translateTextContainers = [];
+        activeIndex = -1;
+
         activeExpId = expId;
         activeExpVersion = null;
 
@@ -102,6 +120,12 @@ angular.module('oppia').factory('TranslateTextService', [
         return {
           text: getNextText(),
           more: isMoreTextAvailableForTranslation()
+        };
+      },
+      getPreviousTextToTranslate: function() {
+        return {
+          text: getPreviousText(),
+          more: isPreviousTextAvailableForTranslation()
         };
       },
       suggestTranslatedText: function(

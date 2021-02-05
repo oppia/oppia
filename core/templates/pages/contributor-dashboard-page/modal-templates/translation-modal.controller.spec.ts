@@ -144,6 +144,12 @@ describe('Translation Modal Controller', function() {
     expect($scope.uploadingTranslation).toBe(false);
   });
 
+  it('should attempt to go back to the previous translation and fail',
+    function() {
+      $scope.returnToPreviousTranslation();
+      expect($scope.textToTranslate).toBe(null);
+    });
+
   it('should broadcast copy to ck editor when clicking on content',
     function() {
       spyOn(CkEditorCopyContentService, 'broadcastCopy').and
