@@ -25,7 +25,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './login-required-modal.component.html'
 })
 export class LoginRequiredModalContent {
-  constructor(public activeModal: NgbActiveModal) {}
+  constructor(public readonly activeModal: NgbActiveModal) {}
 }
 
 angular.module('oppia').directive(

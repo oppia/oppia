@@ -34,10 +34,10 @@ export class LoginRequiredMessageComponent {
   OPPIA_AVATAR_LINK_URL: string;
 
   constructor(
-    private siteAnalyticsService: SiteAnalyticsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private userService: UserService,
-    private windowRef: WindowRef) {}
+    private readonly siteAnalyticsService: SiteAnalyticsService,
+    private readonly urlInterpolationService: UrlInterpolationService,
+    private readonly userService: UserService,
+    private readonly windowRef: WindowRef) {}
 
 
   ngOnInit(): void {
