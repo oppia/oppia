@@ -91,8 +91,8 @@
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Page title fragment will appear in the browser tab for relevant learner facing pages.
-                  Topic page title fragment should be at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
+                  Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn <[editableName]> | Add, Subtract, Multiply and Divide | Oppia".
+                  It should be at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
                 </em>
               </span>
             </div>
@@ -176,7 +176,7 @@
         <button class="btn add-subtopic-btn protractor-test-add-subtopic-button puppeteer-test-add-subtopic-button" ng-click="createSubtopic()">
           + ADD SUBTOPIC
         </button>
-        <button class="btn add-skill-btn protractor-test-add-skill-button puppeteer-test-add-skill-button" ng-click="createSkill()">
+        <button ng-if="skillCreationIsAllowed" class="btn add-skill-btn protractor-test-add-skill-button puppeteer-test-add-skill-button" ng-click="createSkill()">
           + ADD SKILL
         </button>
         <div ng-if="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">

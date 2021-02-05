@@ -48,20 +48,14 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             return 'Email Hash'
 
         self.sender_email = 'noreply@oppia.org'
-        self.sender_id = 'sender'
-        self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id,
-            email=self.sender_email)
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
-
+        self.signup(self.sender_email, 'noreply')
+        self.sender_id = self.get_user_id_from_email(self.sender_email)
+        self.sender_model = user_models.UserSettingsModel.get(self.sender_id)
         self.recipient_email = 'recipient@email.com'
-        self.recipient_id = 'recipient'
-        self.recipient_model = user_models.UserSettingsModel(
-            id=self.recipient_id,
-            email=self.recipient_email)
-        self.recipient_model.update_timestamps()
-        self.recipient_model.put()
+        self.signup(self.recipient_email, 'recipient')
+        self.recipient_id = self.get_user_id_from_email(self.recipient_email)
+        self.recipient_model = (
+            user_models.UserSettingsModel.get(self.recipient_id))
 
         with self.swap(
             email_models.SentEmailModel, '_generate_hash',
@@ -207,24 +201,22 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         super(BulkEmailModelValidatorTests, self).setUp()
 
         self.sender_email = 'sender@email.com'
-        self.sender_id = 'sender'
-        self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id,
-            email=self.sender_email)
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
+        self.signup(self.sender_email, 'sender')
+        self.sender_id = self.get_user_id_from_email(self.sender_email)
+        self.sender_model = user_models.UserSettingsModel.get(self.sender_id)
 
-        self.recipient_ids = ['recipient1', 'recipient2']
-        self.recipient_model_1 = user_models.UserSettingsModel(
-            id=self.recipient_ids[0],
-            email='recipient1@email.com')
-        self.recipient_model_1.update_timestamps()
-        self.recipient_model_1.put()
-        self.recipient_model_2 = user_models.UserSettingsModel(
-            id=self.recipient_ids[1],
-            email='recipient2@email.com')
-        self.recipient_model_2.update_timestamps()
-        self.recipient_model_2.put()
+        self.recipient_1_email = 'recipient1@email.com'
+        self.recipient_2_email = 'recipient2@email.com'
+        self.signup(self.recipient_1_email, 'recipient1')
+        self.signup(self.recipient_2_email, 'recipient2')
+        self.recipient_ids = [
+            self.get_user_id_from_email(self.recipient_1_email),
+            self.get_user_id_from_email(self.recipient_2_email)
+        ]
+        self.recipient_model_1 = (
+            user_models.UserSettingsModel.get(self.recipient_ids[0]))
+        self.recipient_model_2 = (
+            user_models.UserSettingsModel.get(self.recipient_ids[1]))
 
         self.model_id = 'bulkemailid1'
         email_models.BulkEmailModel.create(
