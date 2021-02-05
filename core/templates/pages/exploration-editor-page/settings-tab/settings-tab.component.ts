@@ -337,7 +337,7 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
 
         var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
-        var onUnpublishingcallback = function() {
+        var onUnpublishcallback = function() {
           UserExplorationPermissionsService.fetchPermissionsAsync()
             .then(function(permissions) {
               ctrl.canUnpublish = permissions.canUnpublish;
@@ -364,7 +364,7 @@ angular.module('oppia').component('settingsTab', {
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
             ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody, onUnpublishingcallback);
+              emailBody, onUnpublishcallback);
           }, function() {
             AlertsService.clearWarnings();
           });

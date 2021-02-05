@@ -446,8 +446,8 @@ describe('Settings Tab Component', function() {
         result: $q.resolve('Email body')
       });
       spyOn(explorationRightsService, 'saveModeratorChangeToBackend').and
-        .callFake((emailBody, onUnpublishingcallback) => {
-          onUnpublishingcallback();
+        .callFake((emailBody, onUnpublishcallback) => {
+          onUnpublishcallback();
           return $q.resolve();
         });
 
@@ -460,6 +460,34 @@ describe('Settings Tab Component', function() {
 
       expect(explorationRightsService.saveModeratorChangeToBackend)
         .toHaveBeenCalledWith('Email body', jasmine.any(Function));
+    });
+
+    it('should call onUnpublishcallback which will invoke' +
+    'fetchPermissionsAsync', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('Email body')
+      });
+      ctrl.canUnpublish = false;
+      spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+        .returnValue($q.resolve(userPermissions));
+      spyOn(explorationRightsService, 'saveModeratorChangeToBackend').and
+        .callFake((emailBody, onUnpublishcallback) => {
+          onUnpublishcallback();
+          return $q.resolve();
+        });
+
+      $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
+        draft_email_body: 'Draf message'
+      });
+      ctrl.unpublishExplorationAsModerator();
+      $httpBackend.flush();
+      $scope.$apply();
+
+      expect(explorationRightsService.saveModeratorChangeToBackend)
+        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
+      expect(userExplorationPermissionsService.fetchPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canUnpublish).toBe(true);
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
