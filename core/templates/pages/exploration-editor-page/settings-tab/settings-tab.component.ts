@@ -338,8 +338,14 @@ angular.module('oppia').component('settingsTab', {
 
         var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
         var onUnpublishingcallback = function() {
-          UserExplorationPermissionsService.fetchPermissionsAsync();
-          ctrl.refreshPermissions();
+          UserExplorationPermissionsService.fetchPermissionsAsync()
+            .then(function(permissions) {
+              ctrl.canUnpublish = permissions.canUnpublish;
+              ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
+            });
         };
 
         $http.get(moderatorEmailDraftUrl).then(function(response) {
@@ -407,7 +413,7 @@ angular.module('oppia').component('settingsTab', {
         ctrl.directiveSubscriptions.add(
           // eslint-disable-next-line max-len
           ExplorationSaveService.onExplorationPublished.subscribe(
-            () => ctrl.refreshPermissions()
+            () => refreshPermissions()
           )
         );
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
@@ -481,7 +487,7 @@ angular.module('oppia').component('settingsTab', {
         });
       };
 
-      ctrl.refreshPermissions = function() {
+      var refreshPermissions = function() {
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
             ctrl.canUnpublish = permissions.canUnpublish;
