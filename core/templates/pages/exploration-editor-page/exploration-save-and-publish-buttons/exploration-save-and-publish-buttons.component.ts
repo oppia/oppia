@@ -43,7 +43,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $rootScope, $scope, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
         ExplorationWarningsService, PreventPageUnloadEventService,
-        UserExplorationPermissionsService,) {
+        UserExplorationPermissionsService) {
       var ctrl = this;
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
@@ -155,6 +155,8 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         } else {
           PreventPageUnloadEventService.removeListener();
         }
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
         $rootScope.$applyAsync();
       });
     }
