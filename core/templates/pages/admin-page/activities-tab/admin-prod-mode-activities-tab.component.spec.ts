@@ -18,22 +18,22 @@
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { oppiaAdminProdModeActivitiesTabComponent } from
+import { OppiaAdminProdModeActivitiesTabComponent } from
  './admin-prod-mode-activities-tab.component';
 
-describe('oppiaAdminProdModeActivitiesTabComponent', () => {
-  let component: oppiaAdminProdModeActivitiesTabComponent;
-  let fixture: ComponentFixture<oppiaAdminProdModeActivitiesTabComponent>;
+describe('OppiaAdminProdModeActivitiesTabComponent', () => {
+  let component: OppiaAdminProdModeActivitiesTabComponent;
+  let fixture: ComponentFixture<OppiaAdminProdModeActivitiesTabComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ oppiaAdminProdModeActivitiesTabComponent ]
+      declarations: [ OppiaAdminProdModeActivitiesTabComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(oppiaAdminProdModeActivitiesTabComponent);
+    fixture = TestBed.createComponent(OppiaAdminProdModeActivitiesTabComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

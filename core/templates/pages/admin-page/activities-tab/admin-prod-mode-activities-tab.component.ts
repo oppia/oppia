@@ -17,6 +17,7 @@
  * is in production mode.
  */
 import { Component } from '@angular/core';
+//import { SharedComponentsModule } from 'components/shared-component.module';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -24,8 +25,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './admin-prod-mode-activities-tab.component.html',
   styleUrls: []
 })
-export class oppiaAdminProdModeActivitiesTabComponent {}
+export class OppiaAdminProdModeActivitiesTabComponent {}
 
 angular.module('oppia').directive(
   'adminProdModeActivitiesTab', downgradeComponent(
-    {component: oppiaAdminProdModeActivitiesTabComponent}));
+    {component: OppiaAdminProdModeActivitiesTabComponent}));
