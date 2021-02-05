@@ -31,6 +31,7 @@ import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-
 import { RubricObjectFactory, RubricBackendDict, Rubric } from 'domain/skill/RubricObjectFactory.ts';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service.ts';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service.ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { SkillIdToDescriptionMap } from 'domain/topic/SubtopicObjectFactory';
@@ -154,7 +155,7 @@ export class TopicEditorStateService {
   }
   private _setSubtopicPage(subtopicPage: SubtopicPage): void {
     this._subtopicPage.copyFromSubtopicPage(subtopicPage);
-    this._cachedSubtopicPages.push(angular.copy(subtopicPage));
+    this._cachedSubtopicPages.push(cloneDeep(subtopicPage));
     this._subtopicPageLoadedEventEmitter.emit();
   }
   private _updateSubtopicPage(
@@ -238,7 +239,7 @@ export class TopicEditorStateService {
   }
 
   getGroupedSkillSummaries(): unknown {
-    return angular.copy(this._groupedSkillSummaries);
+    return cloneDeep(this._groupedSkillSummaries);
   }
 
   getSkillQuestionCountDict(): { [skillId: string]: number; } | undefined[] {
@@ -266,7 +267,7 @@ export class TopicEditorStateService {
   loadSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
-      this._subtopicPage = angular.copy(
+      this._subtopicPage = cloneDeep(
         this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPageId)]);
       this._subtopicPageLoadedEventEmitter.emit();
       return;
@@ -371,8 +372,8 @@ export class TopicEditorStateService {
   setSubtopicPage(subtopicPage: SubtopicPage): void {
     if (this._getSubtopicPageIndex(subtopicPage.getId()) !== null) {
       this._cachedSubtopicPages[
-        this._getSubtopicPageIndex(subtopicPage.getId())] =
-            angular.copy(subtopicPage);
+        this._getSubtopicPageIndex(subtopicPage.getId())] = cloneDeep(
+        subtopicPage);
       this._subtopicPage.copyFromSubtopicPage(subtopicPage);
     } else {
       this._setSubtopicPage(subtopicPage);
