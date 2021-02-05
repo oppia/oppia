@@ -23,7 +23,6 @@ import logging
 
 from constants import constants
 from core import jobs
-from core.controllers import cron
 from core.domain import config_services
 from core.domain import cron_services
 from core.domain import email_manager
@@ -230,7 +229,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'warning', _mock_logging_function)
         recency_msec_swap = self.swap(
-            cron, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
+            jobs, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
