@@ -287,7 +287,7 @@ class UserContributionRightsDataHandler(base.BaseHandler):
             'can_suggest_questions': (
                 config_domain.CONTRIBUTOR_CAN_SUGGEST_QUESTIONS.value and
                 (contribution_rights.can_submit_questions
-                if contribution_rights else False))
+                 if contribution_rights else False))
         })
 
 

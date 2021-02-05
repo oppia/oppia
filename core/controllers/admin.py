@@ -839,9 +839,9 @@ class AddContributionRightsHandler(base.BaseHandler):
                 'Invalid category: %s' % category)
 
         if category in [
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER,
-            constants.REVIEW_CATEGORY_QUESTION
+                constants.REVIEW_CATEGORY_TRANSLATION,
+                constants.REVIEW_CATEGORY_VOICEOVER,
+                constants.REVIEW_CATEGORY_QUESTION
         ]:
             email_manager.send_email_to_new_contribution_reviewer(
                 user_id, category, language_code=language_code)
@@ -872,7 +872,8 @@ class RemoveContributionRightsHandler(base.BaseHandler):
         removal_type = self.payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
-        elif removal_type == constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS:
+        elif (removal_type ==
+                constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
             category = self.payload.get('category')
             if category == constants.REVIEW_CATEGORY_TRANSLATION:
                 if not user_services.can_review_translation_suggestions(
@@ -896,7 +897,8 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                         '%s does not have rights to review question.' % (
                             username))
                 user_services.remove_question_review_rights(user_id)
-            elif category == constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY:
+            elif (category ==
+                    constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY):
                 if not user_services.can_submit_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to submit question.' % (
@@ -907,9 +909,9 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                     'Invalid category: %s' % category)
 
             if category in [
-                constants.REVIEW_CATEGORY_TRANSLATION,
-                constants.REVIEW_CATEGORY_VOICEOVER,
-                constants.REVIEW_CATEGORY_QUESTION
+                    constants.REVIEW_CATEGORY_TRANSLATION,
+                    constants.REVIEW_CATEGORY_VOICEOVER,
+                    constants.REVIEW_CATEGORY_QUESTION
             ]:
                 email_manager.send_email_to_removed_contribution_reviewer(
                     user_id, category, language_code=language_code)

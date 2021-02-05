@@ -2366,8 +2366,8 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_review_voiceover_for_language_codes = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     can_review_questions = datastore_services.BooleanProperty(indexed=True)
-    can_submit_questions = datastore_services.BooleanProperty(default=False,
-        indexed=True)
+    can_submit_questions = datastore_services.BooleanProperty(
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
