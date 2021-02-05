@@ -427,7 +427,7 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
             NotImplementedError,
             'Classes derived from BaseMapReduceJobManager must implement '
             'map as a @staticmethod.'):
-            jobs.BaseMapReduceJobManager.map('item') # pylint: disable=disallowed-function-calls
+            jobs.BaseMapReduceJobManager.map('item')
 
     def test_base_map_reduce_job_manager_reduce_raise_error(self):
         with self.assertRaisesRegexp(
