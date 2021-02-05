@@ -39,7 +39,6 @@ export class LoginRequiredMessageComponent {
     private readonly userService: UserService,
     private readonly windowRef: WindowRef) {}
 
-
   ngOnInit(): void {
     this.OPPIA_AVATAR_LINK_URL = constants.OPPIA_AVATAR_LINK_URL;
     this.OPPIA_AVATAR_IMAGE_URL = (
