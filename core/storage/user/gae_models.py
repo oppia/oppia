@@ -2416,7 +2416,8 @@ class UserContributionRightsModel(base_models.BaseModel):
                 rights_model.can_review_translation_for_language_codes),
             'can_review_voiceover_for_language_codes': (
                 rights_model.can_review_voiceover_for_language_codes),
-            'can_review_questions': rights_model.can_review_questions
+            'can_review_questions': rights_model.can_review_questions,
+            'can_submit_questions': rights_model.can_submit_questions
         }
 
     @staticmethod
@@ -2432,7 +2433,8 @@ class UserContributionRightsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'can_review_voiceover_for_language_codes':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'can_review_questions': base_models.EXPORT_POLICY.EXPORTED
+            'can_review_questions': base_models.EXPORT_POLICY.EXPORTED,
+            'can_submit_questions': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod

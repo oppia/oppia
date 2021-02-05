@@ -2759,6 +2759,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_get_contributor_usernames_with_invalid_category_raises(
             self):
         with self.assertRaisesRegexp(
-            Exception, 'Invalid review category: invalid_category'):
+            Exception, 'Invalid category: invalid_category'):
             user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')

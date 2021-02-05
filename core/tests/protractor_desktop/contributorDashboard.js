@@ -31,7 +31,7 @@ var SkillEditorPage = require(
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
-describe('Contributor dashboard page', function() {
+fdescribe('Contributor dashboard page', function() {
   const TOPIC_NAMES = [
     'Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
@@ -70,6 +70,8 @@ describe('Contributor dashboard page', function() {
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
+    await adminPage.assignQuestionContributor('user0');
+    await adminPage.assignQuestionContributor('user1');
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
