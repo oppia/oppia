@@ -64,9 +64,9 @@ import { AuthService } from 'services/auth.service';
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
-    NgbModalModule,
     BrowserModule,
+    NgbModalModule,
+    MaterialModule,
     FormsModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,

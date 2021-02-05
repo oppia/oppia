@@ -17,7 +17,6 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { OppiaAdminProdModeActivitiesTabComponent } from
  './admin-prod-mode-activities-tab.component';
 
