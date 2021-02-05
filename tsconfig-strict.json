@@ -134,12 +134,9 @@
     "extensions/interactions/ItemSelectionInput/directives/item-selection-input-rules.service.spec.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
-<<<<<<< HEAD
-    "extensions/interactions/MusicNotesInput/directives/music-phrase-player.service.ts"
-=======
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
-    "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts"
->>>>>>> upstream/develop
+    "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts",
+    "extensions/interactions/MusicNotesInput/directives/music-phrase-player.service.ts"
   ],
   "include": ["typings/*.ts"]
 }
