@@ -919,7 +919,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_kill_signal: bool. Whether the manager
                 should have sent a kill signal to the process.
         """
-        proc_pattern = r'Process\((name=\'python\', )?pid=%d\)' % (pid,)
+        proc_pattern = r'Process\((name=\'[a-z]+\', )?pid=%d\)' % (pid,)
 
         expected_patterns = []
         if manager_should_have_sent_terminate_signal:
@@ -1126,6 +1126,30 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assert_proc_was_managed_as_expected(
             logs, proc.pid,
+            manager_should_have_sent_terminate_signal=True,
+            manager_should_have_sent_kill_signal=False)
+
+    def test_manually_kills_named_processes(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+
+            # Spawn a new process unrelated to any existing one. This is set up
+            # to be killed by regular_proc, below.
+            orphan_proc = psutil.Popen(['sleep', '10000'], shell=False)
+            orphan_proc_pid = orphan_proc.pid
+
+            stack.enter_context(self._swap_popen())
+            regular_proc = stack.enter_context(
+                common.managed_process(
+                    ['a'], timeout_secs=10, proc_name_to_kill='10000'))
+            regular_proc_pid = regular_proc.pid
+
+        self.assert_proc_was_managed_as_expected(
+            logs, orphan_proc_pid,
+            manager_should_have_sent_terminate_signal=False,
+            manager_should_have_sent_kill_signal=True)
+        self.assert_proc_was_managed_as_expected(
+            logs, regular_proc_pid,
             manager_should_have_sent_terminate_signal=True,
             manager_should_have_sent_kill_signal=False)
 

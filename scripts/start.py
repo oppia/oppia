@@ -167,7 +167,7 @@ def main(args=None):
 
         # Wait for the servers to come up.
         common.wait_for_port_to_be_open(PORT_NUMBER_FOR_GAE_SERVER)
-        common.wait_for_port_to_be_open(feconf.ES_PORT)
+        common.wait_for_port_to_be_open(feconf.ES_LOCALHOST_PORT)
 
         # Launch a browser window.
         if common.is_linux_os() and not parsed_args.no_browser:
