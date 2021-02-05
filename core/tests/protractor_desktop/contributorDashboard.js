@@ -223,7 +223,7 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-fdescribe('Admin page contributor reviewer form', function() {
+describe('Admin page contribution rights form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var contributorDashboardPage = null;
@@ -300,13 +300,8 @@ fdescribe('Admin page contributor reviewer form', function() {
 
   it('should allow admin to add question contributor', async function() {
     await adminPage.get();
-    await adminPage.assignQuestionReviewer(questionReviewerUsername);
-    await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
-    await users.logout();
-
-    await users.login(questionReviewerEmail);
-    await contributorDashboardPage.get();
-    await contributorDashboardPage.expectUserToBeQuestionReviewer();
+    await adminPage.assignQuestionContributor(questionReviewerUsername);
+    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
     await users.logout();
   });
 

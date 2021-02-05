@@ -398,26 +398,30 @@ var AdminPage = function() {
     await waitFor.visibilityOf(
       addContributionRightsForm, 'Assign reviewer form is not visible');
 
-    var usernameInputField = addContributionRightsForm.element(contributorUsernameCss);
+    var usernameInputField = addContributionRightsForm.element(
+      contributorUsernameCss);
     await action.sendKeys(
       'Username input field', usernameInputField, username);
 
-    var categorySelectField = addContributionRightsForm.element(categorySelectCss);
+    var categorySelectField = addContributionRightsForm.element(
+      categorySelectCss);
     await action.select(
       'Review category selector', categorySelectField, category);
 
     if (languageDescription !== null) {
-      var languageSelectField = addContributionRightsForm.element(languageSelectCss);
+      var languageSelectField = addContributionRightsForm.element(
+        languageSelectCss);
       await action.select(
         'Language selector', languageSelectField, languageDescription);
     }
 
-    var submitButton = addContributionRightsForm.element(contributionRightsFormSubmitButtonCss);
+    var submitButton = addContributionRightsForm.element(
+      contributionRightsFormSubmitButtonCss);
     await action.click('Submit assign reviewer button', submitButton);
 
     await waitFor.textToBePresentInElement(
       statusMessage, 'Successfully added', (
-        'Status message for assigning ' + reviewCategory + ' reviewer takes ' +
+        'Status message for assigning ' + category + ' reviewer takes ' +
         'too long to appear'));
   };
 
