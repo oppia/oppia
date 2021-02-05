@@ -819,8 +819,7 @@ def enqueue_feedback_message_batch_email_task(user_id):
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
 
-def enqueue_feedback_message_instant_email_task(
-        user_id, reference):
+def enqueue_feedback_message_instant_email_task(user_id, reference):
     """Adds a 'send feedback email' (instant) task into the task queue.
 
     Args:
