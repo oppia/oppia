@@ -37,7 +37,7 @@ export class PromoBarComponent implements OnInit {
     private windowRef: WindowRef
   ) {}
 
-  isSessionStorageAvailable():boolean {
+  isSessionStorageAvailable(): boolean {
     // This is to ensure sessionStorage is accessible.
     const testKey = 'Oppia';
     try {
@@ -49,7 +49,7 @@ export class PromoBarComponent implements OnInit {
     }
   }
 
-  isPromoDismissed():boolean {
+  isPromoDismissed(): boolean {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
@@ -57,7 +57,7 @@ export class PromoBarComponent implements OnInit {
       this.windowRef.nativeWindow.sessionStorage.promoIsDismissed);
   }
 
-  setPromoDismissed(promoIsDismissed:boolean):void|boolean {
+  setPromoDismissed(promoIsDismissed: boolean): void|boolean {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
@@ -65,7 +65,7 @@ export class PromoBarComponent implements OnInit {
       JSON.stringify(promoIsDismissed));
   }
 
-  dismissPromo():void {
+  dismissPromo(): void {
     this.promoIsVisible = false;
     this.setPromoDismissed(true);
   }
