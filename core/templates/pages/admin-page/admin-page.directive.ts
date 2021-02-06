@@ -49,7 +49,7 @@ angular.module('oppia').directive('adminPage', [
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$rootScope', '$scope', 'AdminDataService',
+        '$location', '$rootScope', '$scope',
         'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
         'DEV_MODE',
         function(
