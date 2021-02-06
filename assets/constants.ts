@@ -5434,6 +5434,8 @@ export default {
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
+  "FIREBASE_AUTH_ENABLED": false,
+
   // Data required for Firebase authentication.
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,

@@ -16,11 +16,11 @@
  * @fileoverview Service for managing the authorizations of logged-in users.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
 
@@ -28,22 +28,28 @@ import { AppConstants } from 'app.constants';
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(private angularFireAuth: AngularFireAuth) {}
+  constructor(@Optional() private angularFireAuth?: AngularFireAuth) {}
 
   get idToken$(): Observable<string | null> {
-    return this.angularFireAuth.idToken;
+    return this.angularFireAuth?.idToken ?? of(null);
   }
 
   async signOutAsync(): Promise<void> {
-    return this.angularFireAuth.signOut();
+    await this.angularFireAuth?.signOut();
+  }
+
+  static get firebaseAuthIsEnabled(): boolean {
+    return AppConstants.FIREBASE_AUTH_ENABLED;
   }
 
   static get firebaseEmulatorIsEnabled(): boolean {
-    return AppConstants.FIREBASE_EMULATOR_ENABLED;
+    return (
+      AuthService.firebaseAuthIsEnabled &&
+      AppConstants.FIREBASE_EMULATOR_ENABLED);
   }
 
   static get firebaseConfig(): FirebaseOptions {
-    return {
+    return !AuthService.firebaseAuthIsEnabled ? undefined : {
       apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
       authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
       projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
