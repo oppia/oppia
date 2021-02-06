@@ -136,21 +136,21 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.showLanguageSelector()).toBe(true);
     });
 
-    it('should not be viewed the collapsed header content if' + 
+    it('should not be viewed the collapsed header content if' +
       ' scrolled less than 5', function() {
-        mockWindow.scrollTop = 3;
-        ctrl.scrollFunction();
-        expect(ctrl.defaultHeaderVisible).toBe(true);
-        expect(ctrl.collapsibleHeaderVisible).toBe(false);
-      });
+      mockWindow.scrollTop = 3;
+      ctrl.scrollFunction();
+      expect(ctrl.defaultHeaderVisible).toBe(true);
+      expect(ctrl.collapsibleHeaderVisible).toBe(false);
+    });
 
-    it('should not be viewed the collapsed header content if' + 
+    it('should not be viewed the collapsed header content if' +
       ' scrolled less than 5', function() {
-        mockWindow.scrollTop = 10;
-        ctrl.scrollFunction();
-        expect(ctrl.defaultHeaderVisible).toBe(false);
-        expect(ctrl.collapsibleHeaderVisible).toBe(true);
-      });
+      mockWindow.scrollTop = 10;
+      ctrl.scrollFunction();
+      expect(ctrl.defaultHeaderVisible).toBe(false);
+      expect(ctrl.collapsibleHeaderVisible).toBe(true);
+    });
   });
 
   describe('when user is not logged in', function() {
