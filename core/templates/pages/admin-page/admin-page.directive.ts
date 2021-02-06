@@ -91,12 +91,6 @@ angular.module('oppia').directive('adminPage', [
               AdminRouterService.showTab($location.path().replace('/', '#'));
             });
             ctrl.userEmail = '';
-            AdminDataService.getDataAsync().then(function(response) {
-              ctrl.userEmail = response.user_email;
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            });
             ctrl.inDevMode = DEV_MODE;
             ctrl.statusMessage = '';
             CsrfTokenService.initializeToken();
