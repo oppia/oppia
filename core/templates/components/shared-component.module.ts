@@ -78,9 +78,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
-    NgbModalModule,
     BrowserModule,
+    NgbModalModule,
+    MaterialModule,
     FormsModule,
     ...firebaseAuthModules,
   ],
