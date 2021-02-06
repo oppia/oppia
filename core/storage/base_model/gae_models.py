@@ -307,7 +307,12 @@ class BaseModel(datastore_services.Model):
     @classmethod
     @transaction_services.run_in_transaction_wrapper
     def put_multi_transactional(cls, entities):
-        """Stores the given datastore_services.Model instances.
+        """Stores the given datastore_services.Model instances and runs it
+        through a transaction. Either all of the operations in the transaction
+        are applied, or none of them are applied.
+
+        If an exception is raised, the transaction is likely not safe to
+        commit.
 
         Args:
             entities: list(datastore_services.Model). List of model instances to

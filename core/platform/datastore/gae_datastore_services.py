@@ -100,7 +100,12 @@ def put_multi(entities):
 
 @transaction_services.run_in_transaction_wrapper
 def delete_multi_transactional(keys):
-    """Deletes models corresponding to a sequence of keys.
+    """Deletes models corresponding to a sequence of keys and runs it through
+    a transaction. Either all of the operations in the transaction are
+    applied, or none of them are applied.
+
+    If an exception is raised, the transaction is likely not safe to
+    commit.
 
     Args:
         keys: list(str). A list of keys.
