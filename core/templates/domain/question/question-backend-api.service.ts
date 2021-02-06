@@ -56,7 +56,7 @@ export class QuestionBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _fetchQuestions(
+  private async _fetchQuestionsAsync(
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean,
       successCallback: (value: QuestionBackendDict[]) => void,
@@ -85,7 +85,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchTotalQuestionCountForSkillIds(
+  private async _fetchTotalQuestionCountForSkillIdsAsync(
       skillIds: string[],
       successCallback: (value: number) => void,
       errorCallback: (reason: string) => void): void {
@@ -105,7 +105,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchQuestionSummaries(
+  private async _fetchQuestionSummariesAsync(
       skillId: string, cursor: string,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
@@ -181,27 +181,27 @@ export class QuestionBackendApiService {
    * Returns a list of questions based on the list of skill ids and number
    * of questions requested.
    */
-  fetchQuestions(
+  async fetchQuestionsAsync(
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestions(
+      this._fetchQuestionsAsync(
         skillIds, questionCount, questionsSortedByDifficulty,
         resolve, reject);
     });
   }
 
-  fetchTotalQuestionCountForSkillIds(skillIds: string[]): Promise<number> {
+  async fetchTotalQuestionCountForSkillIdsAsync(skillIds: string[]): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._fetchTotalQuestionCountForSkillIds(skillIds, resolve, reject);
+      this._fetchTotalQuestionCountForSkillIdsAsync(skillIds, resolve, reject);
     });
   }
 
-  fetchQuestionSummaries(
+  async fetchQuestionSummariesAsync(
       skillId: string,
       cursor: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestionSummaries(skillId, cursor, resolve, reject);
+      this._fetchQuestionSummariesAsync(skillId, cursor, resolve, reject);
     });
   }
 }
