@@ -18,9 +18,12 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -55,10 +58,36 @@ import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
+import { AuthService } from 'services/auth.service';
+
+
+// TODO(#11462): Delete these conditional values once firebase auth is launched.
+const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireModule.initializeApp(AuthService.firebaseConfig),
+  AngularFireAuthModule,
+] : [];
+
+const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireAuth,
+  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+] : [
+  {provide: AngularFireAuth, useValue: null},
+];
 
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    NgbModalModule,
+    BrowserModule,
+    FormsModule,
+    ...firebaseAuthModules,
+  ],
+
+  providers: [
+    ...firebaseAuthProviders,
+  ],
 
   declarations: [
     AttributionGuideComponent,
