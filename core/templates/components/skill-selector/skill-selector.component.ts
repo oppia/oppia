@@ -51,7 +51,7 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    for (var topicName in this.scopeCategorizedSkills) {
+    for (let topicName in this.scopeCategorizedSkills) {
       var topicNameDict = {
         topicName: topicName,
         checked: false
@@ -59,7 +59,7 @@ export class SkillSelectorComponent implements OnInit {
       this.topicFilterList.push(topicNameDict);
       var subTopics = this.scopeCategorizedSkills[topicName];
       this.subTopicFilterDict[topicName] = [];
-      for (var subTopic in subTopics) {
+      for (let subTopic in subTopics) {
         var subTopicNameDict = {
           subTopicName: subTopic,
           checked: false
@@ -92,7 +92,7 @@ export class SkillSelectorComponent implements OnInit {
   updateSkillsListOnSubtopicFilterChange(): void {
     var updatedSkillsDict = {};
     var isAnySubTopicChecked = false;
-    for (var topicName in this.subTopicFilterDict) {
+    for (let topicName in this.subTopicFilterDict) {
       var subTopics = this.subTopicFilterDict[topicName];
       for (var i = 0; i < subTopics.length; i++) {
         if (subTopics[i].checked) {
@@ -168,7 +168,7 @@ export class SkillSelectorComponent implements OnInit {
     for (var i = 0; i < this.topicFilterList.length; i++) {
       this.topicFilterList[i].checked = false;
     }
-    for (var topicName in this.subTopicFilterDict) {
+    for (let topicName in this.subTopicFilterDict) {
       var length = this.subTopicFilterDict[topicName].length;
       for (var j = 0; j < length; j++) {
         this.subTopicFilterDict[topicName][j].checked = false;
