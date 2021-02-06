@@ -84,6 +84,7 @@ describe('Exploration editor tab component', function() {
   var solutionObjectFactory = null;
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
+  var userExplorationPermissionsService = null;
 
   var mockRefreshStateEditorEventEmitter = null;
 
@@ -158,7 +159,9 @@ describe('Exploration editor tab component', function() {
     routerService = $injector.get('RouterService');
     siteAnalyticsService = $injector.get('SiteAnalyticsService');
     stateEditorRefreshService = $injector.get('StateEditorRefreshService');
-
+    userExplorationPermissionsService = $injector.get(
+      'UserExplorationPermissionsService'
+    );
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOnProperty(
       stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
@@ -894,6 +897,28 @@ describe('Exploration editor tab component', function() {
       expect(animateSpy).toHaveBeenCalledWith({
         scrollTop: (20 - 200)
       }, 1000);
+    });
+
+    it('should not remove save button element at index 9 when the user' +
+      ' does have edit permissions', () => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue($q.resolve({
+          canEdit: true
+        }));
+      ctrl.removeTutorialSaveButtonIfNoPermissions();
+      $scope.$apply();
+      expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).toBe('Save');
+    });
+
+    it('should remove save button element at index 9 when the user does' +
+      ' not have edit permissions', () => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue($q.resolve({
+          canEdit: false
+        }));
+      ctrl.removeTutorialSaveButtonIfNoPermissions();
+      $scope.$apply();
+      expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).not.toBe('Save');
     });
   });
 });

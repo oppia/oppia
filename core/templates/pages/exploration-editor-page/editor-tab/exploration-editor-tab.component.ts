@@ -467,14 +467,17 @@ angular.module('oppia').component('explorationEditorTab', {
       // Remove save from tutorial if user does not has edit rights for
       // exploration since in that case Save Draft button will not be
       // visible on the create page.
-      UserExplorationPermissionsService.getPermissionsAsync()
-        .then(function(permissions) {
-          if (!permissions.canEdit) {
-            var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
-              saveButtonTutorialElement);
-            ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
-          }
-        });
+      ctrl.removeTutorialSaveButtonIfNoPermissions = function() {
+        UserExplorationPermissionsService.getPermissionsAsync()
+          .then(function(permissions) {
+            if (!permissions.canEdit) {
+              var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
+                saveButtonTutorialElement);
+              ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
+            }
+          });
+      };
+      ctrl.removeTutorialSaveButtonIfNoPermissions();
     }
   ]
 });
