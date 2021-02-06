@@ -53,7 +53,7 @@ angular.module('oppia').directive('adminPage', [
         'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
         'DEV_MODE',
         function(
-            $location, $rootScope, $scope, AdminDataService,
+            $location, $rootScope, $scope,
             AdminRouterService, CsrfTokenService, PlatformFeatureService,
             DEV_MODE) {
           var ctrl = this;
