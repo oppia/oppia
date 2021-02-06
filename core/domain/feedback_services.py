@@ -1071,7 +1071,7 @@ def _send_instant_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            enqueue_feedback_message_instant_email_task(
+            enqueue_feedback_message_instant_email_task_transactional(
                 recipient_id, feedback_message_reference)
 
 
