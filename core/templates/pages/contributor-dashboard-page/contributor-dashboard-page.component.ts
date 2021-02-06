@@ -110,11 +110,11 @@ angular.module('oppia').component('contributorDashboardPage', {
         var collapsibleHeader = angular.element(document.querySelector(
           '#collapsible-header'));
 
-        $win.on('scroll', function(e){
+        $win.on('scroll', function(e) {
           ctrl.scrollFunction();
         });
 
-        ctrl.scrollFunction = function(){
+        ctrl.scrollFunction = function() {
           if ($win.scrollTop() >= 5) {
             defaultHeader.addClass('oppia-contributor-dashboard-header');
             collapsibleHeader.removeClass(
@@ -128,7 +128,7 @@ angular.module('oppia').component('contributorDashboardPage', {
             ctrl.defaultHeaderVisible = true;
             ctrl.collapsibleHeaderVisible = false;
           }
-        }
+        };
 
         UserService.getProfileImageDataUrlAsync().then(
           function(dataUrl) {
