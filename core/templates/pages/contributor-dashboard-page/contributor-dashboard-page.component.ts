@@ -77,24 +77,6 @@ angular.module('oppia').component('contributorDashboardPage', {
         return languageDescriptions;
       };
 
-      var $win = angular.element($window);
-      var defaultHeader = angular.element(document.querySelector(
-        '#default-header'));
-      var collapsibleHeader = angular.element(document.querySelector(
-        '#collapsible-header'));
-
-      $win.on('scroll', function(e) {
-        if ($win.scrollTop() >= 5) {
-          defaultHeader.addClass('oppia-contributor-dashboard-header');
-          collapsibleHeader.removeClass(
-            'oppia-contributor-dashboard-collapsible-header');
-        } else {
-          collapsibleHeader.addClass(
-            'oppia-contributor-dashboard-collapsible-header');
-          defaultHeader.removeClass('oppia-contributor-dashboard-header');
-        }
-      });
-
       ctrl.onChangeLanguage = function(languageCode: string) {
         ctrl.languageCode = languageCode;
         TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
@@ -119,6 +101,34 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
+        ctrl.defaultHeaderVisible = true;
+        ctrl.collapsibleHeaderVisible = false;
+
+        var $win = angular.element($window);
+        var defaultHeader = angular.element(document.querySelector(
+          '#default-header'));
+        var collapsibleHeader = angular.element(document.querySelector(
+          '#collapsible-header'));
+
+        $win.on('scroll', function(e){
+          ctrl.scrollFunction();
+        });
+
+        ctrl.scrollFunction = function(){
+          if ($win.scrollTop() >= 5) {
+            defaultHeader.addClass('oppia-contributor-dashboard-header');
+            collapsibleHeader.removeClass(
+              'oppia-contributor-dashboard-collapsible-header');
+            ctrl.defaultHeaderVisible = false;
+            ctrl.collapsibleHeaderVisible = true;
+          } else {
+            collapsibleHeader.addClass(
+              'oppia-contributor-dashboard-collapsible-header');
+            defaultHeader.removeClass('oppia-contributor-dashboard-header');
+            ctrl.defaultHeaderVisible = true;
+            ctrl.collapsibleHeaderVisible = false;
+          }
+        }
 
         UserService.getProfileImageDataUrlAsync().then(
           function(dataUrl) {

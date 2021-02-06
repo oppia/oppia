@@ -38,6 +38,10 @@ describe('Contributor dashboard page', function() {
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
     can_review_questions: true
   };
+  var mockWindow = {
+    scrollTop: 6
+  };
+  var element = null;
 
   importAllAngularServices();
 
@@ -46,6 +50,7 @@ describe('Contributor dashboard page', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+    $provide.value('$window', mockWindow);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
@@ -130,6 +135,20 @@ describe('Contributor dashboard page', function() {
       ctrl.onTabClick(changedTab);
       expect(ctrl.activeTabName).toBe(changedTab);
       expect(ctrl.showLanguageSelector()).toBe(true);
+    });
+
+    it('if scrolled less than 5, header content should not be collapsed', function() {
+      mockWindow.scrollTop = 3;
+      ctrl.scrollFunction();
+      expect(ctrl.defaultHeaderVisible).toBe(true);
+      expect(ctrl.collapsibleHeaderVisible).toBe(false);
+    });
+
+    it('if scrolled more than 5, header content should be collapsed', function() {
+      mockWindow.scrollTop = 10;
+      ctrl.scrollFunction();
+      expect(ctrl.defaultHeaderVisible).toBe(false);
+      expect(ctrl.collapsibleHeaderVisible).toBe(true);
     });
   });
 

@@ -117,9 +117,12 @@
                    ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
             </a>
           </div>
-          <div class="collapsed-oppia-opportunities-tabs-explanation">
-            Translate Text
+          <div class="collapsed-oppia-opportunities-tabs-explanation" ng-if="$ctrl.activeTabName === 'submitQuestionTab'">
+            Submit Question
           </div>
+          <div class="collapsed-oppia-opportunities-tabs-explanation" ng-if="$ctrl.activeTabName === 'translateTextTab'">
+            Translate Text
+          </div> 
           <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
             <span class="collapsed-oppia-dashboard-language-container-label">Translate to</span>
             <translation-language-selector [active-language-code]="$ctrl.languageCode"
