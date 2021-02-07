@@ -43,16 +43,16 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent,
     LoginRequiredMessageComponent,
-    LoginRequiredModalContent
+    LoginRequiredModalContent,
+    TranslationLanguageSelectorComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent,
     LoginRequiredMessageComponent,
-    LoginRequiredModalContent
+    LoginRequiredModalContent,
+    TranslationLanguageSelectorComponent,
   ],
   providers: [
     {
