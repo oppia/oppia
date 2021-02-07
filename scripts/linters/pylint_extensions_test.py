@@ -3020,7 +3020,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
                 b'example_func',
                 b'a.example_attr',
             ]
-        self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
+        self.checker_test_object.checker.open()
 
         call1, call2 = astroid.extract_node(
             """
@@ -3055,7 +3055,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
                 b'b.next=>python_utils.NEXT',
                 b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
             ]
-        self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
+        self.checker_test_object.checker.open()
 
         (
             call1, call2, call3,
@@ -3119,7 +3119,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
                 r'.*example_func',
                 r'.*\..*example_attr'
             ]
-        self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
+        self.checker_test_object.checker.open()
 
         call1, call2 = astroid.extract_node(
             """
@@ -3152,7 +3152,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
                 r'.*example_func=>other_func',
                 r'.*\.example_attr=>other_attr',
             ]
-        self.checker_test_object.checker.open() # pylint: disable=disallowed-function-calls
+        self.checker_test_object.checker.open()
 
         call1, call2, call3, call4 = astroid.extract_node(
             """
