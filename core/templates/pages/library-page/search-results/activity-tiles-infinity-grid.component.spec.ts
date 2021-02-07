@@ -110,7 +110,7 @@ describe('Activity tiles infinity grid component', function() {
 
     var loadMoreDataSpy = spyOn(searchService, 'loadMoreData');
     loadMoreDataSpy.and.callFake(
-      (successCallback, failCallback) => successCallback({
+      (successCallback, unusedFailCallback) => successCallback({
         activity_list: [{}, {}, {}]
       }, true));
     ctrl.showMoreActivities();
@@ -139,7 +139,7 @@ describe('Activity tiles infinity grid component', function() {
     loadingMessageChangeEventEmitter.emit('');
 
     loadMoreDataSpy.and.callFake(
-      (successCallback, failCallback) => successCallback({
+      (successCallback, unusedFailCallback) => successCallback({
         activity_list: [{}]
       }, true));
     ctrl.showMoreActivities();
@@ -155,7 +155,7 @@ describe('Activity tiles infinity grid component', function() {
       initialSearchResultsLoadedEmitter.emit([]);
 
       spyOn(searchService, 'loadMoreData').and.callFake(
-        (successCallback, failCallback) => failCallback(false));
+        (unusedSuccessCallback, failCallback) => failCallback(false));
       ctrl.showMoreActivities();
       $scope.$apply();
 

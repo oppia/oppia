@@ -76,7 +76,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
           });
     };
 
-    var showRequiresLoginModal = function(argument) {
+    var showRequiresLoginModal = function(unusedArgument) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/community-dashboard-page/modal-templates/' +

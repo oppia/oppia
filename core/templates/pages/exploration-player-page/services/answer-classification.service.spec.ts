@@ -321,7 +321,7 @@ describe('Answer Classification Service', () => {
         }
       });
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
+        'TestClassifier', 1, { predict: (unusedClassifierData, unusedAnswer) => 1 });
 
       stateDict = {
         content: {

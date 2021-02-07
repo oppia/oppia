@@ -409,7 +409,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             $scope.$watch('opacityMap', redrawGraph);
 
             ctrl.directiveSubscriptions.add(
-              WindowDimensionsService.getResizeEvent().subscribe(evt => {
+              WindowDimensionsService.getResizeEvent().subscribe(unusedEvt => {
                 redrawGraph();
                 $scope.$applyAsync();
               })

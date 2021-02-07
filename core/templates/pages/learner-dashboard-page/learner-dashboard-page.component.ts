@@ -235,7 +235,7 @@ angular.module('oppia').component('learnerDashboardPage', {
       var getPlaylistSortableOptions = function(activityType) {
         return {
           'ui-floating': 'auto',
-          start: function(e, ui) {
+          start: function(unusedE, ui) {
             ui.placeholder.height(ui.item.height());
             $scope.$apply();
           },
@@ -248,7 +248,7 @@ angular.module('oppia').component('learnerDashboardPage', {
               /* eslint-disable-next-line quote-props */
               {'top': '0 px'});
           },
-          update: function(e, ui) {
+          update: function(unusedE, ui) {
             var insertExpInLearnerPlaylistUrl = (
               UrlInterpolationService.interpolateUrl((
                 '/learnerplaylistactivityhandler/<activityType>/' +
@@ -263,7 +263,7 @@ angular.module('oppia').component('learnerDashboardPage', {
             });
             $scope.$apply();
           },
-          stop: function(e, ui) {
+          stop: function(unusedE, unusedUi) {
             $scope.$apply();
           },
           axis: 'y'

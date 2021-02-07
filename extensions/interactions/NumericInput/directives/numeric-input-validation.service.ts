@@ -39,7 +39,7 @@ export class NumericInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: NumericInputCustomizationArgs): Warning[] {
+      unusedCustomizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];
   }
 

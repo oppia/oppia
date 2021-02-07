@@ -31,7 +31,7 @@ export class PromoBarBackendApiService {
 
   async getPromoBarDataAsync(): Promise<PromoBar> {
     if (!ServicesConstants.ENABLE_PROMO_BAR) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, unusedReject) => {
         resolve(PromoBar.createEmpty());
       });
     }

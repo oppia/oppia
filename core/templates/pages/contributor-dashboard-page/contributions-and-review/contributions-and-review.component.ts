@@ -310,7 +310,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
       ctrl.loadContributions = function() {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, unusedReject) => {
             resolve({opportunitiesDicts: [], more: false});
           });
         }

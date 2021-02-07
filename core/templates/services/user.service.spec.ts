@@ -61,7 +61,7 @@ describe('User Api Service', () => {
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       () =>{
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, unusedReject) => {
           resolve('sample-csrf-token');
         });
       });

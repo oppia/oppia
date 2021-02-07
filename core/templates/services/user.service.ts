@@ -42,12 +42,12 @@ export class UserService {
 
     async getUserInfoAsync(): Promise<UserInfo> {
       if (this.urlService.getPathname() === '/signup') {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, unusedReject) => {
           resolve(UserInfo.createDefault());
         });
       }
       if (this.userInfo) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, unusedReject) => {
           resolve(this.userInfo);
         });
       }
@@ -68,7 +68,7 @@ export class UserService {
             return this.userBackendApiService.getProfileImageDataUrlAsync(
               defaultUrl);
           } else {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve, unusedReject) => {
               resolve(defaultUrl);
             });
           }
@@ -94,7 +94,7 @@ export class UserService {
     async getUserContributionRightsDataAsync():
       Promise<UserContributionRightsDataBackendDict> {
       if (this.userContributionRightsInfo) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, unusedReject) => {
           resolve(this.userContributionRightsInfo);
         });
       }

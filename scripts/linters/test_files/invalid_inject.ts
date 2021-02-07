@@ -23,7 +23,7 @@ describe('Mark All Audio And Translations AsNeeding Update Controller',
 
     beforeEach(angular.mock.module('oppia'));
     // Use of inject is not allowed.
-    beforeEach(inject(function($controller, $rootScope) {
+    beforeEach(inject(function(unused$controller, $rootScope) {
         $scope = $rootScope.$new();
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);

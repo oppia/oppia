@@ -25,7 +25,7 @@ describe('TranslateTextService', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
+  beforeEach(angular.mock.inject(function($injector, unused$q) {
     TranslateTextService = $injector.get('TranslateTextService');
     $httpBackend = $injector.get('$httpBackend');
   }));

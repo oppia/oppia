@@ -79,7 +79,7 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             // NOTE: we must use beforeChange rather than change here to avoid
             // an infinite loop (which code-mirror will not catch).
-            editor.on('beforeChange', function(instance, change) {
+            editor.on('beforeChange', function(unusedInstance, change) {
               var convertedText =
               logicProofConversion.convertToLogicCharacters(
                 change.text.join('\n'));
@@ -101,7 +101,7 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             // NOTE: we use change rather than beforeChange here so that
             // checking for mistakes is done with respect to the updated text.
-            editor.on('change', function(instance, change) {
+            editor.on('change', function(unusedInstance, change) {
               ctrl.proofString = editor.getValue();
               // We update the message only if the user has added or removed a
               // line break, so that it remains while they work on a single

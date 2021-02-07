@@ -24,7 +24,7 @@ describe('Post Publish Modal Controller', function() {
   var explorationId = 'exp1';
   var mockWindow = {
     document: {
-      execCommand: (command) => {}
+      execCommand: (unusedCommand) => {}
     },
     location: {
       protocol: 'https:',

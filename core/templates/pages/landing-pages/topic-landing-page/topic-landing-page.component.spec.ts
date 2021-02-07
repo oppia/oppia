@@ -55,7 +55,7 @@ class MockWindowRef {
 }
 
 class MockSiteAnalyticsService {
-  registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
+  registerOpenCollectionFromLandingPageEvent(unusedCollectionId: string): void {
     return;
   }
 }

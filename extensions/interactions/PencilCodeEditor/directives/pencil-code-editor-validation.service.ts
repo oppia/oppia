@@ -37,7 +37,7 @@ export class PencilCodeEditorValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: PencilCodeEditorCustomizationArgs): Warning[] {
+      unusedCustomizationArgs: PencilCodeEditorCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }

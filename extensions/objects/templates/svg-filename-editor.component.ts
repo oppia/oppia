@@ -508,7 +508,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         angular.element(document).ready(function() {
           initializeFabricJs();
           fabric.loadSVGFromString(
-            ctrl.savedSvgDiagram, function(objects, options, elements) {
+            ctrl.savedSvgDiagram, function(objects, unusedOptions, elements) {
               var groupedObjects = [];
               objects.forEach(function(obj, index) {
                 var objId = elements[index].id;
@@ -1058,7 +1058,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         reader.readAsDataURL(file);
       };
 
-      ctrl.onFileChanged = function(file, filename) {
+      ctrl.onFileChanged = function(file, unusedFilename) {
         ctrl.setUploadedFile(file);
       };
 

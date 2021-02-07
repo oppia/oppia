@@ -98,7 +98,7 @@ var expectComponentDetailsToMatch = async function(elem, rawLatex) {
     mathSvgImage,
     'Math SVG takes too long to load.');
   var src = await mathSvgImage.getAttribute('src');
-  await request(src, function(error, response, body) {
+  await request(src, function(unusedError, unusedResponse, body) {
     expect(body).toBe(SVGTAGS[rawLatex]);
   });
 };

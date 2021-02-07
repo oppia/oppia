@@ -240,7 +240,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
+        .callFake(function(unusedAnswer, callback) {
           callback();
         });
 
@@ -376,7 +376,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
+        .callFake(function(unusedAnswer, callback) {
           callback();
         });
 

@@ -178,7 +178,13 @@
       "off"
     ],
     "no-unused-vars": [
-      "off"
+      "error",
+      {
+        "vars": "all",
+        "varsIgnorePattern": ".+",
+        "args": "all",
+        "argsIgnorePattern": "^unused|^_"
+      }
     ],
     "one-var": [
       "off"

@@ -23,7 +23,7 @@ require('controller.ts');
 
 angular.module('oppia').factory('StatesObjectFactory', [
   'StateObjectFactory', 'INTERACTION_SPECS',
-  function(StateObjectFactory, INTERACTION_SPECS) {
+  function(unusedStateObjectFactory, unusedINTERACTION_SPECS) {
     var States = function(states) {
       this._states = states;
     };

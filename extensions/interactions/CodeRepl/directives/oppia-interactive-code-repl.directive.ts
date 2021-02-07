@@ -175,7 +175,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             }
           };
 
-          ctrl.sendResponse = function(evaluation, err) {
+          ctrl.sendResponse = function(unusedEvaluation, err) {
             CurrentInteractionService.onSubmit({
               // Replace tabs with 2 spaces.
               // TODO(sll): Change the default Python indentation to 4 spaces.

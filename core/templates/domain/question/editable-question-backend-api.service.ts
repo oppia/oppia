@@ -68,7 +68,7 @@ export class EditableQuestionBackendApiService {
       successCallback: (value: EditableQuestionBackendResponse) => void,
       errorCallback: (reason?: string) => void)
     : Promise<EditableQuestionBackendResponse> {
-    return new Promise((resolve, reject) => {
+    return new Promise((unusedResolve, unusedReject) => {
       let postData = {
         question_dict: questionObject,
         skill_ids: skillIds,
@@ -132,7 +132,7 @@ export class EditableQuestionBackendApiService {
       successCallback: (value: QuestionBackendDict) => void,
       errorCallback: (reason?: string) => void)
       : Promise<QuestionBackendDict> {
-    return new Promise((resolve, reject) => {
+    return new Promise((unusedResolve, unusedReject) => {
       let editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
         QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
           question_id: questionId
@@ -164,7 +164,7 @@ export class EditableQuestionBackendApiService {
       successCallback: (value: void) => void,
       errorCallback: (reason?: string) => void)
     : Promise<Question> {
-    return new Promise((resolve, reject) => {
+    return new Promise((unusedResolve, unusedReject) => {
       var editQuestionSkillLinkUrl = this.urlInterpolationService
         .interpolateUrl(
           QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE, {
@@ -176,7 +176,7 @@ export class EditableQuestionBackendApiService {
         skill_ids_task_list: skillIdsTaskArray
       }).toPromise()
         .then(
-          response => {
+          unusedResponse => {
             successCallback();
           },
           errorResponse => {

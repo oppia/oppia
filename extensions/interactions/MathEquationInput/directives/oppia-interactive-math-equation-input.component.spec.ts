@@ -37,8 +37,8 @@ require(
 describe('MathEquationInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, validateEquationFn) {
+    onSubmit: function(unusedAnswer, unusedRulesService) {},
+    registerCurrentInteraction: function(submitAnswerFn, unusedValidateEquationFn) {
       submitAnswerFn();
     }
   };
@@ -56,18 +56,18 @@ describe('MathEquationInputInteractive', function() {
   let deviceInfoService = null;
 
   class MockGuppy {
-    constructor(id: string, config: Object) {}
+    constructor(unusedId: string, unusedConfig: Object) {}
 
     asciimath() {
       return 'Dummy value';
     }
-    configure(name: string, val: Object): void {}
-    static event(name: string, handler: Function): void {
+    configure(unusedName: string, unusedVal: Object): void {}
+    static event(unusedName: string, handler: Function): void {
       handler({focused: true});
     }
-    static configure(name: string, val: Object): void {}
-    static 'remove_global_symbol'(symbol: string): void {}
-    static 'add_global_symbol'(name: string, symbol: Object): void {}
+    static configure(unusedName: string, unusedVal: Object): void {}
+    static 'remove_global_symbol'(unusedSymbol: string): void {}
+    static 'add_global_symbol'(unusedName: string, unusedSymbol: Object): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));

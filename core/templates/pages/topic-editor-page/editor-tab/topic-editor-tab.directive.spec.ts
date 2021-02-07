@@ -252,7 +252,7 @@ describe('Topic editor tab directive', function() {
   it('should call the TopicUpdateService if name is updated', function() {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
     spyOn(TopicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
-      (newName, successCallback) => successCallback());
+      (unusedNewName, successCallback) => successCallback());
     $scope.updateTopicName('Different Name');
     expect(topicNameSpy).toHaveBeenCalled();
   });
@@ -289,7 +289,7 @@ describe('Topic editor tab directive', function() {
       spyOn(
         TopicEditorStateService,
         'updateExistenceOfTopicUrlFragment').and.callFake(
-        (newUrlFragment, successCallback) => successCallback());
+        (unusedNewUrlFragment, successCallback) => successCallback());
       $scope.updateTopicUrlFragment('topic');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
     });

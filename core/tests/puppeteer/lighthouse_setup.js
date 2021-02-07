@@ -78,7 +78,7 @@ var updateFormSubmit = '.protractor-update-form-submit';
 var roleSelect = '.protractor-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
 
-const login = async function(browser, page) {
+const login = async function(unusedBrowser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -105,7 +105,7 @@ const login = async function(browser, page) {
   }
 };
 
-const setRole = async function(browser, page, role) {
+const setRole = async function(unusedBrowser, page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -131,7 +131,7 @@ const setRole = async function(browser, page, role) {
   }
 };
 
-const getExplorationEditorUrl = async function(browser, page) {
+const getExplorationEditorUrl = async function(unusedBrowser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -213,7 +213,7 @@ const getTopicEditorUrl = async function(browser, page) {
   }
 };
 
-const getStoryEditorUrl = async function(browser, page) {
+const getStoryEditorUrl = async function(unusedBrowser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, { waitUntil: networkIdle });

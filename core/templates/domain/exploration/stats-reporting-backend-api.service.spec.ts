@@ -212,8 +212,8 @@ describe('Stats reporting backend API Service', () => {
     };
 
     let mockInterpolateUrl = (
-        urlTemplate: string,
-        interpolationValues: InterpolationValuesType) => {
+        unusedUrlTemplate: string,
+        unusedInterpolationValues: InterpolationValuesType) => {
       throw new Error('Error');
     };
 

@@ -95,11 +95,13 @@ export class TopicRightsBackendApiService {
       topic_name: topicName
     };
 
-    this.httpClient.put(sendMailUrl, putParams).toPromise().then((response) => {
-      successCallback();
-    }, (errorResponse) => {
-      errorCallback(errorResponse.error.error);
-    });
+    this.httpClient.put(sendMailUrl, putParams)
+      .toPromise()
+      .then((unusedResponse) => {
+        successCallback();
+      }, (errorResponse) => {
+        errorCallback(errorResponse.error.error);
+      });
   }
 
   private _isCached(topicId: string): boolean {

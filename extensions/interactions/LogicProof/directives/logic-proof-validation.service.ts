@@ -37,14 +37,14 @@ export class LogicProofValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: LogicProofCustomizationArgs): Warning[] {
+      unusedCustomizationArgs: LogicProofCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
   getAllWarnings(
       stateName: string, customizationArgs: LogicProofCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+      answerGroups: AnswerGroup[], unusedDefaultOutcome: Outcome): Warning[] {
     // We do not require a default rule for this interaction, since the
     // feedback is mostly provided from within the interaction itself.
     return this.getCustomizationArgsWarnings(customizationArgs).concat(

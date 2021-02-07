@@ -131,7 +131,7 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.sendDummyMailToAdmin = function() {
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
-            .then(function(response) {
+            .then(function(unusedResponse) {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
@@ -141,7 +141,7 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.flushMemoryCache = function() {
           $http.post(MEMORY_CACHE_HANDLER_URL)
-            .then(function(response) {
+            .then(function(unusedResponse) {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
@@ -172,7 +172,7 @@ angular.module('oppia').directive('adminMiscTab', [
               old_username: ctrl.oldUsername,
               new_username: ctrl.newUsername
             }).then(
-            function(response) {
+            function(unusedResponse) {
               ctrl.setStatusMessage(
                 'Successfully renamed ' + ctrl.oldUsername + ' to ' +
                   ctrl.newUsername + '!');

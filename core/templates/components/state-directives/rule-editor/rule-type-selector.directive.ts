@@ -91,7 +91,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
           // Initialize the dropdown.
           $(select2Node).val(ctrl.localValue).trigger('change');
 
-          $(select2Node).on('change', function(e) {
+          $(select2Node).on('change', function(unusedE) {
             ctrl.onSelectionChange()($(select2Node).val());
             // This is needed to propagate the change and display input fields
             // for parameterizing the rule. Otherwise, the input fields do not

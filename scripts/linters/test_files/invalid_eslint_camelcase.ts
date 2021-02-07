@@ -22,7 +22,7 @@ describe('Mark All Audio And Translations AsNeeding Update Controller',
     var $scope, $uibModalInstance;
 
     beforeEach(angular.mock.module('oppia')); // eslint-enable camelcase
-    beforeEach(inject(function($controller, $rootScope) {
+    beforeEach(inject(function(unused$controller, $rootScope) {
         $scope = $rootScope.$new();
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);

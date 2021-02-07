@@ -141,7 +141,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
           // Apply.
           var explorationId = _getExplorationIdFromChangeDict(changeDict);
           collection.deleteCollectionNode(explorationId);
-        }, function(changeDict, collection) {
+        }, function(unusedChangeDict, collection) {
           // Undo.
           collection.addCollectionNode(oldCollectionNode);
         });
@@ -159,7 +159,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
             // ---- Apply ----
             var title = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setTitle(title);
-          }, function(changeDict, collection) {
+          }, function(unusedChangeDict, collection) {
             // ---- Undo ----
             collection.setTitle(oldTitle);
           });
@@ -177,7 +177,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
             // Apply.
             var category = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setCategory(category);
-          }, function(changeDict, collection) {
+          }, function(unusedChangeDict, collection) {
             // Undo.
             collection.setCategory(oldCategory);
           });
@@ -195,7 +195,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
             // Apply.
             var objective = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setObjective(objective);
-          }, function(changeDict, collection) {
+          }, function(unusedChangeDict, collection) {
             // Undo.
             collection.setObjective(oldObjective);
           });
@@ -214,7 +214,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
             // Apply.
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setLanguageCode(languageCode);
-          }, function(changeDict, collection) {
+          }, function(unusedChangeDict, collection) {
             // Undo.
             collection.setLanguageCode(oldLanguageCode);
           });
@@ -232,7 +232,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
             // Apply.
             var tags = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setTags(tags);
-          }, function(changeDict, collection) {
+          }, function(unusedChangeDict, collection) {
             // Undo.
             collection.setTags(oldTags);
           });

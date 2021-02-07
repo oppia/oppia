@@ -62,7 +62,7 @@ describe('Pie Chart component', function() {
           PieChart: () => mockedChart
         },
         charts: {
-          setOnLoadCallback: callback => {}
+          setOnLoadCallback: unusedCallback => {}
         }
       });
 
@@ -112,7 +112,7 @@ describe('Pie Chart component', function() {
           PieChart: () => jasmine.createSpy('chart')
         },
         charts: {
-          setOnLoadCallback: callback => {}
+          setOnLoadCallback: unusedCallback => {}
         }
       });
 

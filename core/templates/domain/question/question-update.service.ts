@@ -123,7 +123,7 @@ angular.module('oppia').factory('QuestionUpdateService', [
           function(changeDict, question) {
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             question.setLanguageCode(languageCode);
-          }, function(changeDict, question) {
+          }, function(unusedChangeDict, question) {
             question.setLanguageCode(oldLanguageCode);
           });
       },
@@ -138,7 +138,7 @@ angular.module('oppia').factory('QuestionUpdateService', [
           function(changeDict, question) {
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             question.setInapplicableSkillMisconceptionIds(languageCode);
-          }, function(changeDict, question) {
+          }, function(unusedChangeDict, question) {
             question.setInapplicableSkillMisconceptionIds(
               oldInapplicableSkillMisconceptionIds);
           });
@@ -165,9 +165,9 @@ angular.module('oppia').factory('QuestionUpdateService', [
           question, QUESTION_PROPERTY_QUESTION_STATE_DATA,
           newStateData.toBackendDict(),
           oldStateData.toBackendDict(),
-          function(changeDict, question) {
+          function(unusedChangeDict, unusedQuestion) {
             // Unused (see comment above).
-          }, function(changeDict, question) {
+          }, function(unusedChangeDict, question) {
             question.setStateData(oldStateData);
           });
       }

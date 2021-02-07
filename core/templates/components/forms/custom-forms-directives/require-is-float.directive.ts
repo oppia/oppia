@@ -27,7 +27,7 @@ angular.module('oppia').directive('requireIsFloat', [
     return {
       require: 'ngModel',
       restrict: 'A',
-      link: function(scope, elm, attrs, ctrl) {
+      link: function(unusedScope, unusedElm, unusedAttrs, ctrl) {
         var floatValidator = function(viewValue) {
           var filteredValue = $filter('isFloat')(viewValue);
           ctrl.$setValidity('isFloat', filteredValue !== undefined);

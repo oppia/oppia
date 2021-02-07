@@ -71,7 +71,7 @@ angular.module('oppia').component('pieChart', {
       $scope.$watch('data()', redrawChart);
 
       ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
-        .subscribe(evt => {
+        .subscribe(unusedEvt => {
           redrawChart();
           $scope.$applyAsync();
         });

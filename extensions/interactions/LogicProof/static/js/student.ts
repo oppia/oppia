@@ -333,7 +333,7 @@ var logicProofStudent = (function() {
       // from 1.
       indentation: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(args, unusedTypes, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
@@ -343,7 +343,7 @@ var logicProofStudent = (function() {
       },
       template: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(args, unusedTypes, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
@@ -354,7 +354,7 @@ var logicProofStudent = (function() {
       antecedents: {
         // NOTE: assumes antecedents are given as formulas, not integers.
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(args, unusedTypes, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
@@ -368,7 +368,7 @@ var logicProofStudent = (function() {
       },
       results: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(args, unusedTypes, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
@@ -378,7 +378,7 @@ var logicProofStudent = (function() {
       },
       variables: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(args, unusedTypes, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
@@ -388,7 +388,7 @@ var logicProofStudent = (function() {
       },
       text: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(args, unusedTypes, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
@@ -398,7 +398,7 @@ var logicProofStudent = (function() {
       },
       element: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(args, unusedTypes, evaluationParameters) {
           // The name of the element is provided as a string such as \'R\', so
           // we must strip the quotes.
           var element = args[0].substr(1, args[0].length - 2);
@@ -415,25 +415,25 @@ var logicProofStudent = (function() {
       },
       num_lines: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
           return evaluationParameters.proof.lines.length;
         }
       },
       assumptions: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
           return evaluationParameters.assumptions;
         }
       },
       target: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
           return evaluationParameters.target;
         }
       },
       question_variables: {
         format: 'bottom_up',
-        evaluateExpression: function(args, types, evaluationParameters) {
+        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
           var names = logicProofShared.getOperatorsFromExpressionArray(
             evaluationParameters.assumptions.concat(
               [evaluationParameters.target]), ['variable']);

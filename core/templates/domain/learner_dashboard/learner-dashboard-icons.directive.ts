@@ -51,7 +51,7 @@ angular.module('oppia').directive('learnerDashboardIcons', [
             $scope.playlistTooltipIsEnabled = false;
           };
 
-          $scope.$watch('activityActive', function(value) {
+          $scope.$watch('activityActive', function(unusedValue) {
             $scope.activityIsCurrentlyHoveredOver = $scope.activityActive;
           });
 

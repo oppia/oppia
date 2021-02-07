@@ -186,7 +186,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
             });
           };
 
-          $scope.deleteSolution = function(index, evt) {
+          $scope.deleteSolution = function(unusedIndex, evt) {
             evt.stopPropagation();
 
             AlertsService.clearWarnings();

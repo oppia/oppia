@@ -32,7 +32,7 @@ import { UserInfo } from 'domain/user/user-info.model.ts';
 import { UserService } from 'services/user.service';
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, unusedParams: Object | undefined):string {
     return value;
   }
 }

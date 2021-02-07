@@ -343,7 +343,7 @@ angular.module('oppia').directive('questionsList', [
                     skill.getMisconceptions();
                 });
                 $rootScope.$apply();
-              }, function(error) {
+              }, function(unusedError) {
                 AlertsService.addWarning();
               });
           };
@@ -529,7 +529,7 @@ angular.module('oppia').directive('questionsList', [
             EditableQuestionBackendApiService.editQuestionSkillLinks(
               ctrl.questionId, ctrl.skillLinkageModificationsArray,
               ctrl.difficulty).then(
-              data => {
+              unusedData => {
                 $timeout(function() {
                   QuestionsListService.resetPageNumber();
                   _reInitializeSelectedSkillIds();

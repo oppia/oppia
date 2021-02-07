@@ -111,7 +111,7 @@ angular.module('oppia').directive('adminRolesTab', [
             role: formResponse.newRole,
             username: formResponse.username,
             topic_id: formResponse.topicId
-          }).then(function(response) {
+          }).then(function(unusedResponse) {
             ctrl.setStatusMessage(
               'Role of ' + formResponse.username + ' successfully updated to ' +
               formResponse.newRole);
@@ -130,7 +130,7 @@ angular.module('oppia').directive('adminRolesTab', [
             review_category: formResponse.category,
             username: formResponse.username,
             language_code: formResponse.languageCode
-          }).then(function(response) {
+          }).then(function(unusedResponse) {
             ctrl.setStatusMessage(
               'Successfully added "' + formResponse.username + '" as ' +
               formResponse.category + ' reviewer.');
@@ -194,7 +194,7 @@ angular.module('oppia').directive('adminRolesTab', [
               removal_type: formResponse.method,
               review_category: formResponse.category,
               language_code: formResponse.languageCode
-            }).then(function(response) {
+            }).then(function(unusedResponse) {
             ctrl.setStatusMessage('Success.');
             refreshFormData();
           }, handleErrorResponse);

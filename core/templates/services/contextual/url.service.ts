@@ -63,7 +63,7 @@ export class UrlService {
   getUrlParams(): UrlParamsType {
     let params = {};
     this.getCurrentQueryString().replace(
-      /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+      /[?&]+([^=&]+)=([^&]*)/gi, function(unusedM, key, value) {
         return params[decodeURIComponent(key)] = decodeURIComponent(value);
       }
     );

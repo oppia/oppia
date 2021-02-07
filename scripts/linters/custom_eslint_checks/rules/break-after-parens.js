@@ -49,7 +49,7 @@ module.exports = {
         var parens = [];
         var excluded = false;
         // Iterates over all tokens and store all parenthesis tokens in a list.
-        tokens.forEach((token, i) => {
+        tokens.forEach((token, unusedI) => {
           if (token.value === '(' || token.value === ')') {
             parens.push(token);
           }
