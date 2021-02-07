@@ -30,6 +30,10 @@ import os
 import sys
 import unittest
 
+sys.path.insert(1, os.getcwd())
+
+from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
@@ -38,16 +42,6 @@ THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk', 'platform',
     'google_appengine')
-
-DIRS_TO_ADD_TO_SYS_PATH = [
-    GOOGLE_APP_ENGINE_SDK_HOME,
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.35'),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.2.2'),
-    os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.3'),
-    os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-1.45'),
-    CURR_DIR,
-    os.path.join(THIRD_PARTY_DIR, 'python_libs')
-]
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -73,7 +67,7 @@ def main(args=None):
     """Runs the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    for directory in DIRS_TO_ADD_TO_SYS_PATH:
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
