@@ -61,6 +61,20 @@ import { TakeBreakModalComponent } from
 import { AuthService } from 'services/auth.service';
 
 
+// TODO(#11462): Delete these conditional values once firebase auth is launched.
+const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireModule.initializeApp(AuthService.firebaseConfig),
+  AngularFireAuthModule,
+] : [];
+
+const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireAuth,
+  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+] : [
+  {provide: AngularFireAuth, useValue: null},
+];
+
+
 @NgModule({
   imports: [
     CommonModule,
@@ -68,13 +82,11 @@ import { AuthService } from 'services/auth.service';
     NgbModalModule,
     BrowserModule,
     FormsModule,
-    AngularFireModule.initializeApp(AuthService.firebaseConfig),
-    AngularFireAuthModule,
+    ...firebaseAuthModules,
   ],
 
   providers: [
-    AngularFireAuth,
-    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+    ...firebaseAuthProviders,
   ],
 
   declarations: [
