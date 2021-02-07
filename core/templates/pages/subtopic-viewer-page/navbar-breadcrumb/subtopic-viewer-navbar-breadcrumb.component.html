@@ -38,4 +38,29 @@
     color: white;
     font-size: 12px;
   }
+  @media(max-width:450px) {
+    .collapse:not(.show) {
+      display: flex;
+    }
+    .oppia-subtopic-title-text {
+      font-size: 17px;
+      margin-top: 4px;
+    }
+    .oppia-topic-name-text {
+      font-size: 10px;
+    }
+    .oppia-subtopic-viewer-nav-separator {
+      display: none;
+    }
+   @media(max-width: 359px) {
+    .oppia-subtopic-title-text {
+      font-size: 16px;
+      margin-top: 2px;
+    }
+    .oppia-topic-name-text {
+      font-size: 8px;
+      margin-top: -2px;
+    }
+   }
+  }
 </style>

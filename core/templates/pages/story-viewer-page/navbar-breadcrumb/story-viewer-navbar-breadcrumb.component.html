@@ -5,7 +5,6 @@
     <a class="oppia-story-navbar-topic" ng-href="<[$ctrl.getTopicUrl()]>"><[$ctrl.topicName]></a>
   </div>
 </div>
-
 <style>
   .oppia-story-viewer-nav-breadcrumb {
     align-items: center;
@@ -17,6 +16,31 @@
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 18px;
     margin: 0;
+  }
+  @media(max-width:450px) {
+    .collapse:not(.show) {
+      display: flex;
+    }
+    .oppia-story-navbar-title {
+      font-size: 17px;
+      margin-top: 4px;
+    }
+    .oppia-story-navbar-topic {
+      font-size: 10px;
+    }
+    .oppia-story-viewer-nav-separator {
+      display: none;
+    }
+   @media(max-width: 359px) {
+    .oppia-story-navbar-title {
+      font-size: 16px;
+      margin-top: 2px;
+    }
+    .oppia-story-navbar-topic {
+      font-size: 8px;
+      margin-top: -2px;
+    }
+   }
   }
 
   .oppia-story-navbar-topic {
