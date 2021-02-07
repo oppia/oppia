@@ -49,12 +49,12 @@ angular.module('oppia').directive('adminPage', [
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$rootScope', '$scope',
-        'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
+        '$location', '$rootScope', '$scope', 'AdminRouterService',
+        'CsrfTokenService', 'PlatformFeatureService', 'UserBackendApiService',
         'DEV_MODE',
         function(
-            $location, $rootScope, $scope,
-            AdminRouterService, CsrfTokenService, PlatformFeatureService,
+            $location, $rootScope, $scope, AdminRouterService,
+            CsrfTokenService, PlatformFeatureService, UserBackendApiService,
             DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {
@@ -91,6 +91,12 @@ angular.module('oppia').directive('adminPage', [
               AdminRouterService.showTab($location.path().replace('/', '#'));
             });
             ctrl.userEmail = '';
+            UserBackendApiService.getUserInfoAsync().then(function(response) {
+              ctrl.userEmail = response.getEmail();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            });
             ctrl.inDevMode = DEV_MODE;
             ctrl.statusMessage = '';
             CsrfTokenService.initializeToken();
