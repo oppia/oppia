@@ -1410,7 +1410,9 @@ class ExplorationCommitLogEntryModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_message_length(self):
-        self.model_instance_0.commit_message = 'a'*(constants.MAX_COMMIT_MESSAGE_LENGTH+1)
+
+        self.model_instance_0.commit_message = 'a' * (
+            constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
         self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
