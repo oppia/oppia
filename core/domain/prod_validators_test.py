@@ -1410,8 +1410,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_message_length(self):
-        self.model_instance_0.commit_message =
-            'a'*(constants.MAX_COMMIT_MESSAGE_LENGTH+1)
+        self.model_instance_0.commit_message = 'a'*(constants.MAX_COMMIT_MESSAGE_LENGTH+1)
         self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
@@ -1423,6 +1422,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+
 
 class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
