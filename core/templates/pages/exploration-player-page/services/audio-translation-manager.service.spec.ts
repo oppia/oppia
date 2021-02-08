@@ -145,12 +145,12 @@ describe('Audio translation manager service', () => {
       atms.setContentAudioTranslations(
         testAudioTranslations, '', _contentComponentName);
       expect(atms.getCurrentComponentName()).toEqual(
-        'contentComponentName'
+        _contentComponentName
       );
       atms.setSecondaryAudioTranslations(
         testAudioTranslations2, '', _secondaryComponentName);
       expect(atms.getCurrentComponentName()).toEqual(
-        'secondaryComponentName'
+        _secondaryComponentName
       );
     });
 });
