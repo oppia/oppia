@@ -7,13 +7,13 @@
 <div class="modal-body oppia-long-text">
   <p ng-if="isTopicPublished">
     Please enter a brief description of what you have changed:
-    <textarea rows="3" cols="50" maxlength="<[MAX_COMMIT_MESSAGE_LENGTH]>" ng-model="$parent.commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
+    <textarea rows="3" cols="50" maxlength="<[MAX_COMMIT_MESSAGE_LENGTH]>" ng-model="commit.message" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
   </p>
   <p ng-if="!isTopicPublished">Do you want to save the changes?</p>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-  <button class="btn btn-success protractor-test-close-save-modal-button" ng-disabled="!commitMessage && isTopicPublished" ng-click="confirm(commitMessage||'commit-before-publishing')">
+  <button class="btn btn-success protractor-test-close-save-modal-button" ng-disabled="!commit.message && isTopicPublished" ng-click="confirm(commit.message||'commit-before-publishing')">
     <span ng-if="!isTopicPublished">Save Draft</span>
     <span ng-if="isTopicPublished">Publish Changes</span>
   </button>
