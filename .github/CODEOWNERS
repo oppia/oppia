@@ -593,7 +593,7 @@
 
 
 # Service constants
-/core/templates/services/services.constants.ajs.ts @vojtechjelinek
+/core/templates/services/services.constants.ajs.ts @HarshKhilawala
 /core/templates/services/services.constants.ts @vojtechjelinek
 
 
