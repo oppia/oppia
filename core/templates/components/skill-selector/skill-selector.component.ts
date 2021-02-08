@@ -17,10 +17,11 @@
  */
 
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { CategorizedSkills } from 'core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { FilterForMatchingTextPipe } from 'filters/string-utility-filters/filter-for-matching-text.pipe';
 import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { GroupedSkillSummaries } from 'core/templates/pages/skill-editor-page/services/skill-editor-state.service';
+import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -43,9 +44,11 @@ export class SkillSelectorComponent implements OnInit {
   scopeCategorizedSkills: CategorizedSkills = {}
   scopeUntriagedSkillSummaries: SkillSummary[] = []
   selectedSkill = null;
+  skillFilterText = '';
   
   topicFilterList = [];
-  subTopicFilterDict = {};
+  subTopicFilterDict: { [subtopic: string]:
+     {subTopicName: string; checked: boolean}[] } = {};
   intialSubTopicFilterDict = {};
 
   constructor() {

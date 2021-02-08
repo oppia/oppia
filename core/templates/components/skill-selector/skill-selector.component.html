@@ -6,26 +6,30 @@
     </mat-card>
     <div class="skill-list-box">
       <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
-        <mat-card *ngFor="(topicName, subtopics) in categorizedSkills" class="list-view-item" *ngIf="checkIfTopicIsEmpty(topicName)">
-          <mat-card layout="row" class="list-view-item">
-            <h2><label class="oppia-topic-name-text">{{ topicName }}</label></h2>
-          </mat-card>
-          <div *ngIf="!checkIfEmpty(skills)" *ngFor="(subtopicName, skills) in subtopics" class="list-view-item ">
-            <mat-card class="list-view-item">
-              <label class="oppia-subtopic-name-text">{{ subtopicName }}</label>
-              <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in skills | filter:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
-                {{ skill.description }}
-              </mat-radio-button>
+        <div *ngFor="(topicName, subtopics) in categorizedSkills">
+          <mat-card class="list-view-item" *ngIf="checkIfTopicIsEmpty(topicName)">
+            <mat-card layout="row" class="list-view-item">
+              <h2><label class="oppia-topic-name-text">{{ topicName }}</label></h2>
             </mat-card>
+            <div *ngIf="!checkIfEmpty(skills)">
+              <div *ngFor="(subtopicName, skills) in subtopics" class="list-view-item ">
+              <mat-card class="list-view-item">
+                <label class="oppia-subtopic-name-text">{{ subtopicName }}</label>
+                <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in skills | filterForMatchingText:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
+                  {{ skill.description }}
+                </mat-radio-button>
+              </mat-card>
+            </div>
           </div>
-        </mat-card>
+          </mat-card>
+        </div>
         <mat-card *ngIf="untriagedSkillSummaries.length" class="list-view-item">
           <mat-card layout="row" class="list-view-item">
             <h2><label class="oppia-heading-text">Untriaged Skills</label></h2>
           </mat-card>
           <div *ngIf="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
             <mat-card class="list-view-item">
-              <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in untriagedSkillSummaries | filter:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
+              <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="skill in untriagedSkillSummaries | filterForMatchingText:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
                 {{ skill.description }}
               </mat-radio-button>
             </mat-card>
