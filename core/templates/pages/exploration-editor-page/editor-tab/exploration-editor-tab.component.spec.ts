@@ -38,6 +38,7 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SolutionValidityService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -61,6 +62,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { EditabilityService } from 'services/editability.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -69,6 +71,7 @@ describe('Exploration editor tab component', function() {
   var $rootScope = null;
   var $uibModal = null;
   var answerGroupObjectFactory = null;
+  var editabilityService = null;
   var explorationFeaturesService = null;
   var explorationInitStateNameService = null;
   var explorationStatesService = null;
@@ -76,10 +79,12 @@ describe('Exploration editor tab component', function() {
   var hintObjectFactory = null;
   var outcomeObjectFactory = null;
   var routerService = null;
+  var siteAnalyticsService = null;
   var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
+  var userExplorationPermissionsService = null;
 
   var mockRefreshStateEditorEventEmitter = null;
 
@@ -101,6 +106,8 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
     $provide.value(
+      'EditabilityService', TestBed.get(EditabilityService));
+    $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('HintObjectFactory', hintObjectFactory);
@@ -115,6 +122,7 @@ describe('Exploration editor tab component', function() {
       'RecordedVoiceoversObjectFactory',
       TestBed.get(RecordedVoiceoversObjectFactory));
     $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
+    $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
     $provide.value(
       'SolutionValidityService', TestBed.get(SolutionValidityService));
     $provide.value(
@@ -143,13 +151,17 @@ describe('Exploration editor tab component', function() {
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     stateEditorService = $injector.get('StateEditorService');
+    editabilityService = $injector.get('EditabilityService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
+    siteAnalyticsService = $injector.get('SiteAnalyticsService');
     stateEditorRefreshService = $injector.get('StateEditorRefreshService');
-
+    userExplorationPermissionsService = $injector.get(
+      'UserExplorationPermissionsService'
+    );
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOnProperty(
       stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
@@ -649,5 +661,264 @@ describe('Exploration editor tab component', function() {
     );
 
     testsubscription.unsubscribe();
+  });
+
+  it('should start tutorial if in tutorial mode on page load', () => {
+    spyOn(ctrl, 'startTutorial');
+    editabilityService.onStartTutorial();
+    $scope.$apply();
+    ctrl.initStateEditor();
+    $scope.$apply();
+    expect(ctrl.startTutorial).toHaveBeenCalled();
+  });
+
+  it('should not start tutorial if not in tutorial mode on page load', () => {
+    spyOn(ctrl, 'startTutorial');
+    editabilityService.onEndTutorial();
+    $scope.$apply();
+    ctrl.initStateEditor();
+    $scope.$apply();
+    expect(ctrl.startTutorial).not.toHaveBeenCalled();
+  });
+
+  it('should finish tutorial if finish tutorial button is clicked', () => {
+    var registerFinishTutorialEventSpy = (
+      spyOn(siteAnalyticsService, 'registerFinishTutorialEvent'));
+    spyOn(editabilityService, 'onEndTutorial');
+    editabilityService.onStartTutorial();
+    $scope.$apply();
+    ctrl.initStateEditor();
+    $scope.$apply();
+    ctrl.onFinishTutorial();
+    expect(registerFinishTutorialEventSpy).toHaveBeenCalled();
+    expect(editabilityService.onEndTutorial).toHaveBeenCalled();
+    expect(ctrl.tutorialInProgress).toBe(false);
+  });
+
+  it('should skip tutorial if skip tutorial button is clicked', () => {
+    var registerSkipTutorialEventSpy = (
+      spyOn(siteAnalyticsService, 'registerSkipTutorialEvent'));
+    spyOn(editabilityService, 'onEndTutorial');
+    editabilityService.onStartTutorial();
+    $scope.$apply();
+    ctrl.initStateEditor();
+    $scope.$apply();
+    ctrl.onSkipTutorial();
+    expect(registerSkipTutorialEventSpy).toHaveBeenCalled();
+    expect(editabilityService.onEndTutorial).toHaveBeenCalled();
+    expect(ctrl.tutorialInProgress).toBe(false);
+  });
+
+  // The describe block below tests all the possible functions
+  // included on ctrl.EDITOR_TUTORIAL_OPTIONS array, which manipulates
+  // with JQuery the 'save from tutorial' button.
+  describe('when testing functions for JQuery manipulation from' +
+    ' ctrl.EDITOR_TUTORIAL_OPTIONS array', () => {
+    it('should change element scroll top when calling fn property' +
+      ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
+    () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: 20
+      }, 1000);
+    });
+
+    it('should not change element scroll top when calling fn property' +
+      ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: 0
+      }, 1000);
+    });
+
+    it('should change state interaction element scroll top when calling' +
+      ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
+    () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+      spyOn(angular, 'element')
+        .withArgs('#tutorialStateContent').and.returnValue({
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'." This is because the actual 'offset'
+          // functions returns more properties than the function we've
+          // defined. We have only returned the properties we need
+          // in 'offset' function.
+          // @ts-expect-error
+          offset: () => ({
+            top: 5
+          })
+        });
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: (5 - 200)
+      }, 1000);
+    });
+
+    it('should change state content element scroll top when calling fn' +
+      ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
+    () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+      spyOn(angular, 'element')
+        .withArgs('#tutorialStateInteraction').and.returnValue({
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'." This is because the actual 'offset'
+          // functions returns more properties than the function we've
+          // defined. We have only returned the properties we need
+          // in 'offset' function.
+          // @ts-expect-error
+          offset: () => ({
+            top: 20
+          })
+        });
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: (20 - 200)
+      }, 1000);
+    });
+
+    it('should change preview tab element scroll top when calling fn' +
+      ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
+    () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+      spyOn(angular, 'element')
+        .withArgs('#tutorialPreviewTab').and.returnValue({
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'." This is because the actual 'offset'
+          // functions returns more properties than the function we've
+          // defined. We have only returned the properties we need
+          // in 'offset' function.
+          // @ts-expect-error
+          offset: () => ({
+            top: 5
+          })
+        });
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: (5 - 200)
+      }, 1000);
+    });
+
+    it('should change state interaction element scroll top when calling' +
+      ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
+    () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+      spyOn(angular, 'element')
+        .withArgs('#tutorialStateInteraction').and.returnValue({
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'." This is because the actual 'offset'
+          // functions returns more properties than the function we've
+          // defined. We have only returned the properties we need
+          // in 'offset' function.
+          // @ts-expect-error
+          offset: () => ({
+            top: 20
+          })
+        });
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: (20 - 200)
+      }, 1000);
+    });
+
+    it('should change preview tabn element scroll top when calling fn' +
+      ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
+    () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+      spyOn(angular, 'element')
+        .withArgs('#tutorialPreviewTab').and.returnValue({
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'." This is because the actual 'offset'
+          // functions returns more properties than the function we've
+          // defined. We have only returned the properties we need
+          // in 'offset' function.
+          // @ts-expect-error
+          offset: () => ({
+            top: 5
+          })
+        });
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: (5 - 200)
+      }, 1000);
+    });
+
+    it('should change state interaction element scroll top when calling' +
+      ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
+    () => {
+      var element = angular.element('div');
+      spyOn(window, '$').and.returnValue(element);
+      var animateSpy = spyOn(element, 'animate').and.callThrough();
+      spyOn(angular, 'element')
+        .withArgs('#tutorialStateInteraction').and.returnValue({
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'." This is because the actual 'offset'
+          // functions returns more properties than the function we've
+          // defined. We have only returned the properties we need
+          // in 'offset' function.
+          // @ts-expect-error
+          offset: () => ({
+            top: 20
+          })
+        });
+
+      ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
+
+      expect(animateSpy).toHaveBeenCalledWith({
+        scrollTop: (20 - 200)
+      }, 1000);
+    });
+
+    it('should not remove save button element at index 9 when the user' +
+      ' does have edit permissions', () => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue($q.resolve({
+          canEdit: true
+        }));
+      ctrl.removeTutorialSaveButtonIfNoPermissions();
+      $scope.$apply();
+      expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).toBe('Save');
+    });
+
+    it('should remove save button element at index 9 when the user does' +
+      ' not have edit permissions', () => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue($q.resolve({
+          canEdit: false
+        }));
+      ctrl.removeTutorialSaveButtonIfNoPermissions();
+      $scope.$apply();
+      expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).not.toBe('Save');
+    });
   });
 });

@@ -1,4 +1,8 @@
-<div class="exp-editor-content-container">
+<div class="exp-editor-content-container"
+     ng-joy-ride="$ctrl.tutorialInProgress"
+     config="$ctrl.EDITOR_TUTORIAL_OPTIONS"
+     on-finish="$ctrl.onFinishTutorial()"
+     on-skip="$ctrl.onSkipTutorial()">
   <div class="exp-editor-main-editor">
     <div class="oppia-editor-cards-container">
       <div class="oppia-editor-header">

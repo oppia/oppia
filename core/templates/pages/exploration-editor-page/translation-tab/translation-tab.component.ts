@@ -58,7 +58,8 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('translationTab', {
   template: require('./translation-tab.component.html'),
-  controller: ['$scope', '$templateCache', '$uibModal',
+  controller: [
+    '$scope', '$templateCache', '$uibModal',
     'ContextService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'RouterService', 'SiteAnalyticsService',
     'StateEditorService', 'StateRecordedVoiceoversService',
@@ -87,7 +88,7 @@ angular.module('oppia').component('translationTab', {
       ngJoyrideTemplate = ngJoyrideTemplate.replace(
         /\{\{/g, '<[').replace(/\}\}/g, ']>');
 
-      var initTranslationTab = function() {
+      $scope.initTranslationTab = function() {
         StateTutorialFirstTimeService.initTranslation(
           ContextService.getExplorationId());
         var stateName = StateEditorService.getActiveStateName();
@@ -100,13 +101,17 @@ angular.module('oppia').component('translationTab', {
         $scope.showTranslationTabSubDirectives = true;
         TranslationTabActiveModeService.activateVoiceoverMode();
         LoaderService.hideLoadingScreen();
+
+        if (EditabilityService.inTutorialMode()) {
+          $scope.startTutorial();
+        }
       };
 
       $scope.leaveTutorial = function() {
         EditabilityService.onEndTutorial();
         $scope.$apply();
         StateTutorialFirstTimeService.markTranslationTutorialFinished();
-        $scope.translationTutorial = false;
+        $scope.tutorialInProgress = false;
       };
 
       $scope.onFinishTutorial = function() {
@@ -118,13 +123,12 @@ angular.module('oppia').component('translationTab', {
       };
 
       var permissions = null;
-      $scope.onStartTutorial = function() {
+      $scope.startTutorial = function() {
         if (permissions === null) {
           return;
         }
         if (permissions.canVoiceover) {
-          EditabilityService.onStartTutorial();
-          $scope.translationTutorial = true;
+          $scope.tutorialInProgress = true;
         }
       };
 
@@ -139,7 +143,7 @@ angular.module('oppia').component('translationTab', {
         }).result.then(function(explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
             explorationId);
-          $scope.onStartTutorial();
+          $scope.startTutorial();
         }, function(explorationId) {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(
             explorationId);
@@ -151,15 +155,15 @@ angular.module('oppia').component('translationTab', {
         LoaderService.showLoadingScreen('Loading');
         $scope.isTranslationTabBusy = false;
         $scope.showTranslationTabSubDirectives = false;
+        $scope.tutorialInProgress = false;
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshTranslationTab.subscribe(
             () => {
-              initTranslationTab();
+              $scope.initTranslationTab();
             }
           )
         );
         // Toggles the translation tab tutorial on/off.
-        $scope.translationTutorial = false;
         $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
           type: 'title',
           heading: 'Translations In Oppia',
@@ -327,13 +331,6 @@ angular.module('oppia').component('translationTab', {
           // eslint-disable-next-line max-len
           StateTutorialFirstTimeService.onEnterTranslationForTheFirstTime.subscribe(
             () => $scope.showWelcomeTranslationModal()
-          )
-        );
-        ctrl.directiveSubscriptions.add(
-          StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
-            () => {
-              $scope.onStartTutorial();
-            }
           )
         );
       };
