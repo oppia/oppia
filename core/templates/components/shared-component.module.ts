@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview Module for the shared components.
  */
@@ -48,7 +49,7 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbTooltipModule  } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
@@ -60,6 +61,20 @@ import { TakeBreakModalComponent } from
 import { AuthService } from 'services/auth.service';
 
 
+// TODO(#11462): Delete these conditional values once firebase auth is launched.
+const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireModule.initializeApp(AuthService.firebaseConfig),
+  AngularFireAuthModule,
+] : [];
+
+const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireAuth,
+  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+] : [
+  {provide: AngularFireAuth, useValue: null},
+];
+
+
 @NgModule({
   imports: [
     CommonModule,
@@ -68,13 +83,11 @@ import { AuthService } from 'services/auth.service';
     BrowserModule,
     NgbTooltipModule,
     FormsModule,
-    AngularFireModule.initializeApp(AuthService.firebaseConfig),
-    AngularFireAuthModule,
+    ...firebaseAuthModules,
   ],
 
   providers: [
-    AngularFireAuth,
-    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig}
+    ...firebaseAuthProviders,
   ],
 
   declarations: [
@@ -95,6 +108,7 @@ import { AuthService } from 'services/auth.service';
     TranslatePipe,
     TakeBreakModalComponent
   ],
+
   entryComponents: [
     BackgroundBannerComponent,
     SharingLinksComponent,
@@ -108,10 +122,12 @@ import { AuthService } from 'services/auth.service';
     SkillMasteryViewerComponent,
     SocialButtonsComponent
   ],
+
   exports: [
     // Modules.
     FormsModule,
     MaterialModule,
+    NgbTooltipModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
@@ -119,8 +135,7 @@ import { AuthService } from 'services/auth.service';
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TakeBreakModalComponent,
-    TranslatePipe,
-    NgbTooltipModule
+    TranslatePipe
   ],
 })
 
