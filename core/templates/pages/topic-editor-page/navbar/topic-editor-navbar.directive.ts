@@ -204,6 +204,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 () => {
                   AlertsService.addSuccessMessage(
                     'Changes saved.', 1000);
+                  $rootScope.$applyAsync();
                 });
             }, function() {
               // Note to developers:
