@@ -17,7 +17,10 @@
  */
 
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { CategorizedSkills } from 'core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { GroupedSkillSummaries } from 'core/templates/pages/skill-editor-page/services/skill-editor-state.service';
 
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -30,15 +33,15 @@ export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
-  @Input() sortedSkillSummaries: [];
+  @Input() sortedSkillSummaries: GroupedSkillSummaries;
   @Input() selectedSkillId: string;
   @Input() countOfSkillsToPrioritize: number;
-  @Input() categorizedSkills: {};
-  @Input() untriagedSkillSummaries: [];
+  @Input() categorizedSkills: CategorizedSkills;
+  @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() allowSkillsFromOtherTopics: boolean;
-  @Output() selectedSkillIdEmitter: EventEmitter<string> = new EventEmitter();
-  scopeCategorizedSkills = {}
-  scopeUntriagedSkillSummaries = []
+  @Output() selectedSkillIdChanged: EventEmitter<string> = new EventEmitter();
+  scopeCategorizedSkills: CategorizedSkills = {}
+  scopeUntriagedSkillSummaries: SkillSummary[] = []
   selectedSkill = null;
   
   topicFilterList = [];
@@ -84,7 +87,7 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   setSelectedSkillId(): void {
-    this.selectedSkillIdEmitter.emit(this.selectedSkill);
+    this.selectedSkillIdChanged.emit(this.selectedSkill);
   }
   
   // The folowing function is called when the subtopic filter changes.

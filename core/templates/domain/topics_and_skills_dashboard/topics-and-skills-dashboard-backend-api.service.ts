@@ -55,7 +55,7 @@ interface CategorizedSkillsBackendDict {
   };
 }
 
-interface CategorizedSkills {
+export interface CategorizedSkills {
   [topicName: string]: {
     uncategorized: ShortSkillSummary[];
     [subtopicName: string]: ShortSkillSummary[];
