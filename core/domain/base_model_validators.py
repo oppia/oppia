@@ -777,7 +777,8 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             item: datastore_services.Model. Entity to validate.
         """
 
-        if len(item.commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH:
+        if item.commit_message and (
+                len(item.commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             cls._add_error(
                 ERROR_CATEGORY_COMMIT_MESSAGE_CHECK,
                 'Entity id %s: Commit message %s larger than accepted length'
