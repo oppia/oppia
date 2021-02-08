@@ -27,7 +27,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-
+import { SplashPageComponent } from './splash-page.component';
 @NgModule({
   imports: [
     BrowserModule,
@@ -35,9 +35,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    SplashPageComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    SplashPageComponent,
     OppiaAngularRootComponent
   ],
   providers: [

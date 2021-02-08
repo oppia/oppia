@@ -15,111 +15,133 @@
 /**
  * @fileoverview Component for the Oppia splash page.
  */
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('base-components/base-content.directive.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/site-analytics.service.ts');
-require('services/user.service.ts');
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
 import splashConstants from 'assets/constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
+import { LoaderService } from 'services/loader.service.ts';
+import { UserService } from 'services/user.service';
 
-angular.module('oppia').component('splashPage', {
-  template: require('./splash-page.component.html'),
-  controller: [
-    '$rootScope', '$translate', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
-    function(
-        $rootScope, $translate, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, WindowDimensionsService) {
-      var ctrl = this;
-      ctrl.getStaticImageUrl = function(imagePath) {
-        if (imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        }
-      };
+export interface Testimonial {
+  quote: string,
+  studentDetails: string,
+  imageUrl: string,
+  imageUrlWebp: string,
+  borderPresent: boolean
+}
 
-      ctrl.onClickBrowseLessonsButton = function() {
-        SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
-        return false;
-      };
+@Component({
+  selector: 'splashPage',
+  templateUrl: './splash-page.component.html',
+  styleUrls: []
+})
+export class SplashPageComponent implements OnInit {
+  isWindowNarrow: boolean = false;
+  classroomUrlFragment: string;
+  classroomUrl :string;
+  displayedTestimonialId: number;
+  testimonialCount: number;
+  testimonials = [];
+  userIsLoggedIn: boolean = null;
 
-      ctrl.isWindowNarrow = function() {
-        return WindowDimensionsService.isWindowNarrow();
-      };
+  constructor(
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionService: WindowDimensionsService,
+    private windowRef: WindowRef,
+    private userService: UserService,
+    private loaderService: LoaderService,
+  ) {}
 
-      // The 2 functions below are to cycle between values:
-      // 0 to (testimonialCount - 1) for displayedTestimonialId.
-      ctrl.incrementDisplayedTestimonialId = function() {
-        // This makes sure that incrementing from (testimonialCount - 1)
-        // returns 0 instead of testimonialCount,since we want the testimonials
-        // to cycle through.
-        ctrl.displayedTestimonialId = (
-          ctrl.displayedTestimonialId + 1) % ctrl.testimonialCount;
-      };
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-      ctrl.decrementDisplayedTestimonialId = function() {
-        // This makes sure that decrementing from 0, returns
-        // (testimonialCount - 1) instead of -1, since we want the testimonials
-        // to cycle through.
-        ctrl.displayedTestimonialId = (
-          ctrl.displayedTestimonialId + ctrl.testimonialCount - 1) %
-          ctrl.testimonialCount;
-      };
+  onClickBrowseLessonsButton(): void {
+    this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+  }
 
-      ctrl.getTestimonials = function() {
-        return [{
-          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_1'),
-          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_1'),
-          imageUrl: '/splash/mira.png',
-          imageUrlWebp: '/splash/mira.webp',
-          borderPresent: false
-        }, {
-          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_2'),
-          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_2'),
-          imageUrl: '/splash/Dheeraj_3.png',
-          imageUrlWebp: '/splash/Dheeraj_3.webp',
-          borderPresent: true
-        }, {
-          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_3'),
-          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_3'),
-          imageUrl: '/splash/sama.png',
-          imageUrlWebp: '/splash/sama.webp',
-          borderPresent: false
-        }, {
-          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_4'),
-          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_4'),
-          imageUrl: '/splash/Gaurav_2.png',
-          imageUrlWebp: '/splash/Gaurav_2.webp',
-          borderPresent: true
-        }];
-      };
+  onClickStartContributingButton(): void {
+    this.siteAnalyticsService.registerClickStartContributingButtonEvent();
+    this.windowRef.nativeWindow.location.href = 'https://www.oppiafoundation.org/volunteer';
+  }
 
-      ctrl.$onInit = function() {
-        ctrl.userIsLoggedIn = null;
-        ctrl.displayedTestimonialId = 0;
-        ctrl.testimonialCount = 4;
-        ctrl.testimonials = ctrl.getTestimonials();
-        ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
-          '/learn/<classroomUrlFragment>', {
-            classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
-          });
-        LoaderService.showLoadingScreen('Loading');
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          LoaderService.hideLoadingScreen();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
+  onClickStartTeachingButton(): void {
+    this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
+    this.windowRef.nativeWindow.location.href = ('/teach');
+  }
+  // TODO(#11657): Extract the testimonials code into a separate component.
+  // The 2 functions below are to cycle between values:
+  // 0 to (testimonialCount - 1) for displayedTestimonialId.
+  incrementDisplayedTestimonialId(): void {
+    // This makes sure that incrementing from (testimonialCount - 1)
+    // returns 0 instead of testimonialCount,since we want the testimonials
+    // to cycle through.
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + 1) % this.testimonialCount;
+  }
 
-        $rootScope.$on('$translateChangeSuccess', function() {
-          ctrl.testimonials = ctrl.getTestimonials();
-        });
-      };
-    }
-  ]
-});
+  decrementDisplayedTestimonialId(): void {
+    // This makes sure that decrementing from 0, returns
+    // (testimonialCount - 1) instead of -1, since we want the testimonials
+    // to cycle through.
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + this.testimonialCount - 1) %
+      this.testimonialCount;
+  }
+
+  getTestimonials(): [Testimonial, Testimonial, Testimonial, Testimonial] {
+    return [{
+      quote: 'I18N_SPLASH_TESTIMONIAL_1',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_1',
+      imageUrl: this.getStaticImageUrl('/splash/mira.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/mira.webp'),
+      borderPresent: false
+    },
+    {
+      quote: 'I18N_SPLASH_TESTIMONIAL_2',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_2',
+      imageUrl: this.getStaticImageUrl('/splash/Dheeraj_3.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/Dheeraj_3.webp'),
+      borderPresent: true
+    }, {
+      quote: 'I18N_SPLASH_TESTIMONIAL_3',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_3',
+      imageUrl: this.getStaticImageUrl('/splash/sama.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/sama.webp'),
+      borderPresent: false
+    }, {
+      quote: 'I18N_SPLASH_TESTIMONIAL_4',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_4',
+      imageUrl: this.getStaticImageUrl('/splash/Gaurav_2.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/Gaurav_2.webp'),
+      borderPresent: true
+    }];
+  }
+
+  ngOnInit(): void {
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+    this.userIsLoggedIn = null;
+    this.displayedTestimonialId = 0;
+    this.testimonialCount = 4;
+    this.testimonials = this.getTestimonials();
+    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
+      '/learn/<classroomUrlFragment>', {
+        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+      });
+    this.loaderService.showLoadingScreen('Loading');
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+      this.loaderService.hideLoadingScreen();
+    });
+  }
+}
+
+angular.module('oppia').directive('splashPage',
+  downgradeComponent({component: SplashPageComponent}));

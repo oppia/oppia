@@ -31,3 +31,4 @@ require('pages/splash-page/splash-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 require('pages/splash-page/splash-page.component.ts');
+require('base-components/base-content.directive.ts');
