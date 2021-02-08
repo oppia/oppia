@@ -34,7 +34,7 @@
                    ng-if="!isSolutionValid()"
                    ng-click="toggleInlineSolutionEditorIsActive()"
                    uib-tooltip="<[getInvalidSolutionTooltip()]>"
-                   tooltip-placement="bottom">
+                   tooltip-placement="auto bottom-left">
                 <div class="oppia-rule-header-warning-style">
                   ⚠
                 </div>
@@ -86,18 +86,7 @@
   }
 
   state-solution-editor .nav .tooltip-inner {
-    height: auto;
-    line-height: normal;
-    max-width: 20vw;
     white-space: pre-line
-  }
-
-  state-solution-editor .tooltip-arrow {
-    left: 0.75em !important;
-  }
-
-  state-solution-editor .tooltip.bottom {
-    left: -1em !important;
   }
 
   @media screen and (max-width: 768px) {
