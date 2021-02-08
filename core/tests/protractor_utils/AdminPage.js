@@ -463,12 +463,16 @@ var AdminPage = function() {
   this.assignTranslationReviewer = async function(
       username, languageDescription) {
     await _assignContributionRights(
-      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION, languageDescription);
+      username,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+      languageDescription);
   };
 
   this.assignVoiceoverReviewer = async function(username, languageDescription) {
     await _assignContributionRights(
-      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER, languageDescription);
+      username,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+      languageDescription);
   };
 
   this.assignQuestionReviewer = async function(username) {

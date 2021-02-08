@@ -875,7 +875,8 @@ class RemoveContributionRightsHandler(base.BaseHandler):
         elif (removal_type ==
               constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
             category = self.payload.get('category')
-            if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+            if (category ==
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
                 if not user_services.can_review_translation_suggestions(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -883,7 +884,8 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_translation_review_rights_in_language(
                     user_id, language_code)
-            elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
+            elif (category ==
+                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER):
                 if not user_services.can_review_voiceover_applications(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -891,7 +893,8 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_voiceover_review_rights_in_language(
                     user_id, language_code)
-            elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
+            elif (category ==
+                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
                 if not user_services.can_review_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to review question.' % (
