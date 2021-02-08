@@ -136,6 +136,14 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.showLanguageSelector()).toBe(true);
     });
 
+    it('should call scrollFunction on scroll', function() {
+      var e = document.createEvent('Event');
+      var scrollSpy = spyOn(ctrl, 'scrollFunction');
+      e.initEvent("scroll", true, true);  
+      window.dispatchEvent(e);
+      expect(scrollSpy).toHaveBeenCalled();
+    });
+
     it('should not be viewed the collapsed header content if' +
       ' scrolled less than 5', function() {
       mockWindow.scrollTop = 3;
