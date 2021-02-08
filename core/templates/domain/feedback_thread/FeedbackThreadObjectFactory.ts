@@ -22,8 +22,8 @@ import { Injectable } from '@angular/core';
 
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+import { ThreadMessageSummary } from
+  'domain/feedback_message/ThreadMessageSummary.model';
 
 export interface FeedbackThreadBackendDict {
   'status': string;
@@ -89,10 +89,6 @@ export class FeedbackThread {
 
 @Injectable({providedIn: 'root'})
 export class FeedbackThreadObjectFactory {
-  constructor(
-    private threadMessageSummaryObjectFactory:
-      ThreadMessageSummaryObjectFactory) {}
-
   createFromBackendDict(
       feedbackThreadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
     return new FeedbackThread(
@@ -103,7 +99,7 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
       feedbackThreadBackendDict.thread_id,
-      this.threadMessageSummaryObjectFactory.createNew(
+      ThreadMessageSummary.createNew(
         feedbackThreadBackendDict.last_nonempty_message_author,
         feedbackThreadBackendDict.last_nonempty_message_text));
   }

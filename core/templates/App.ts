@@ -153,7 +153,7 @@ angular.module('oppia').config([
       'SubtopicPageContentsObjectFactory', 'SubtopicPageObjectFactory',
       'SubtopicViewerBackendApiService', 'SuggestionThreadObjectFactory',
       'SuggestionsService', 'TextInputRulesService',
-      'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
+      'ThreadMessageObjectFactory', 'ThreadMessageSummary',
       'ThreadStatusDisplayService', 'TopicObjectFactory',
       'TopicRightsObjectFactory', 'TopicViewerBackendApiService',
       'TranslationLanguageService', 'UrlInterpolationService', 'UrlService',
