@@ -1,8 +1,8 @@
 <div class="oppia-translate-text-header-container">
   <div class="oppia-translate-text-header">
     <div class="oppia-opportunities-details">
-      <div class="oppia-opportunities-subheading"><[subheading]></div>
-      <div class="oppia-opportunities-heading"><[heading]></div>
+      <div class="oppia-opportunities-subheading">{{ subheading }}</div>
+      <div class="oppia-opportunities-heading">{{ heading }}</div>
     </div>
     <button type="button" class="close oppia-close-button-position" ng-click="confirm()" aria-label="Close">
       <span aria-hidden="true">&times;</span>
@@ -10,7 +10,7 @@
   </div>
 </div>
 <div class="modal-body">
-  <div class="oppia-loading-text" ng-if="loadingData || uploadingTranslation">
+  <div class="oppia-loading-text" *ngIf="loadingData || uploadingTranslation">
     <div class="oppia-loading-text1 oppia-animate-fadein">
       <lazy-loading></lazy-loading>
     </div>
@@ -18,17 +18,17 @@
       <lazy-loading></lazy-loading>
     </div>
   </div>
-  <div ng-if="!textToTranslate && !loadingData">
+  <div *ngIf="!textToTranslate && !loadingData">
     <strong>Sorry! All available translations are in review currently.</strong>
   </div>
-  <div ng-if="textToTranslate">
+  <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given content in <[languageDescription]>:</strong>
-      <a class="oppia-skip-button" href="" ng-if="moreAvailable" ng-click="skipActiveTranslation()">skip</a>
+      <a class="oppia-skip-button" href="" *ngIf="moreAvailable" ng-click="skipActiveTranslation()">skip</a>
     </div>
-    <div ng-if="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
-      <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                         ng-click="onContentClick($event)"
+    <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
+      <angular-html-bind ngClass="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                         (click)="onContentClick($event)"
                          html-data="textToTranslate"
                          class="oppia-rte-editor">
       </angular-html-bind>
@@ -47,9 +47,9 @@
   <button class="btn btn-success oppia-upload-translated-text-button"
           ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
           ng-click="suggestTranslatedText()">
-    <i ng-show="uploadingTranslation" class="fa fa-spinner"></i>
-    <span ng-show="!uploadingTranslation && !moreAvailable">Save and close</span>
-    <span ng-show="!uploadingTranslation && moreAvailable">Save and translate another</span>
+    <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
+    <span [hidden]="uploadingTranslation || moreAvailable">Save and close</span>
+    <span [hidden]="uploadingTranslation || !moreAvailable">Save and translate another</span>
   </button>
 </div>
 <style>
