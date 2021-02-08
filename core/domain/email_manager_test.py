@@ -6089,7 +6089,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
-                self.question_reviewer_id, constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                self.question_reviewer_id,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.

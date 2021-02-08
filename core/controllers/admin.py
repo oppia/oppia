@@ -876,7 +876,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
               constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
             category = self.payload.get('category')
             if (category ==
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
                 if not user_services.can_review_translation_suggestions(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
