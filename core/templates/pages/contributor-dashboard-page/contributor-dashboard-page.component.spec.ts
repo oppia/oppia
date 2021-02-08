@@ -139,7 +139,7 @@ describe('Contributor dashboard page', function() {
     it('should call scrollFunction on scroll', function() {
       var e = document.createEvent('Event');
       var scrollSpy = spyOn(ctrl, 'scrollFunction');
-      e.initEvent("scroll", true, true);  
+      e.initEvent('scroll', true, true);
       window.dispatchEvent(e);
       expect(scrollSpy).toHaveBeenCalled();
     });
