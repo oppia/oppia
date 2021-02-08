@@ -24,9 +24,9 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var REVIEW_CATEGORY_TRANSLATION = 'TRANSLATION';
-  var REVIEW_CATEGORY_VOICEOVER = 'VOICEOVER';
-  var REVIEW_CATEGORY_QUESTION = 'QUESTION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'TRANSLATION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER = 'VOICEOVER';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'QUESTION';
   var CATEGORY_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
@@ -449,11 +449,11 @@ var AdminPage = function() {
       statusMessage, 'Success',
       'Could not view contribution rights successfully');
 
-    if (category === REVIEW_CATEGORY_TRANSLATION) {
+    if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION) {
       return element.all(userTranslationReviewerLanguageCss);
-    } else if (category === REVIEW_CATEGORY_VOICEOVER) {
+    } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER) {
       return element.all(userVoiceoverReviewerLanguageCss);
-    } else if (category === REVIEW_CATEGORY_QUESTION) {
+    } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION) {
       return element(userQuestionReviewerCss);
     } else if (category === CATEGORY_SUBMIT_QUESTION) {
       return element(userQuestionContributorCss);
@@ -463,16 +463,16 @@ var AdminPage = function() {
   this.assignTranslationReviewer = async function(
       username, languageDescription) {
     await _assignContributionRights(
-      username, REVIEW_CATEGORY_TRANSLATION, languageDescription);
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION, languageDescription);
   };
 
   this.assignVoiceoverReviewer = async function(username, languageDescription) {
     await _assignContributionRights(
-      username, REVIEW_CATEGORY_VOICEOVER, languageDescription);
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER, languageDescription);
   };
 
   this.assignQuestionReviewer = async function(username) {
-    await _assignContributionRights(username, REVIEW_CATEGORY_QUESTION);
+    await _assignContributionRights(username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
   };
 
   this.assignQuestionContributor = async function(username) {
@@ -482,7 +482,7 @@ var AdminPage = function() {
   this.expectUserToBeTranslationReviewer = async function(
       username, languageDescription) {
     var contributionRights = await _getUserContributionRightsElement(
-      username, REVIEW_CATEGORY_TRANSLATION);
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION);
     var languageList = await Promise.all(
       contributionRights.map(function(languageElem) {
         return languageElem.getText();
@@ -493,7 +493,7 @@ var AdminPage = function() {
   this.expectUserToBeVoiceoverReviewer = async function(
       username, languageDescription) {
     var contributionRights = await _getUserContributionRightsElement(
-      username, REVIEW_CATEGORY_VOICEOVER);
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
     var languageList = await Promise.all(contributionRights.map(
       function(languageElem) {
         return languageElem.getText();
@@ -503,7 +503,7 @@ var AdminPage = function() {
 
   this.expectUserToBeQuestionReviewer = async function(username) {
     var contributionRights = await _getUserContributionRightsElement(
-      username, REVIEW_CATEGORY_QUESTION);
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
     await waitFor.visibilityOf(
       contributionRights, 'Review Right Element taking too long to appear');
     expect(await contributionRights.getText()).toBe('Allowed');

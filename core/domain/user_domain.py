@@ -317,7 +317,7 @@ class UserContributionRights(python_utils.OBJECT):
     def __init__(
             self, user_id, can_review_translation_for_language_codes,
             can_review_voiceover_for_language_codes, can_review_questions,
-            can_submit_questions=False):
+            can_submit_questions):
         self.id = user_id
         self.can_review_translation_for_language_codes = (
             can_review_translation_for_language_codes)

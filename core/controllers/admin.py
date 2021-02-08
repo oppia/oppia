@@ -800,7 +800,7 @@ class AddContributionRightsHandler(base.BaseHandler):
         category = self.payload.get('category')
         language_code = self.payload.get('language_code', None)
 
-        if category == constants.REVIEW_CATEGORY_TRANSLATION:
+        if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
             if not utils.is_supported_audio_language_code(language_code):
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
@@ -811,7 +811,7 @@ class AddContributionRightsHandler(base.BaseHandler):
                     'language code %s' % (username, language_code))
             user_services.allow_user_to_review_translation_in_language(
                 user_id, language_code)
-        elif category == constants.REVIEW_CATEGORY_VOICEOVER:
+        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
             if not utils.is_supported_audio_language_code(language_code):
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
@@ -822,13 +822,13 @@ class AddContributionRightsHandler(base.BaseHandler):
                     'language code %s' % (username, language_code))
             user_services.allow_user_to_review_voiceover_in_language(
                 user_id, language_code)
-        elif category == constants.REVIEW_CATEGORY_QUESTION:
+        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
             if user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to review question.' % (
                         username))
             user_services.allow_user_to_review_question(user_id)
-        elif category == constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY:
+        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
             if user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to submit question.' % (
@@ -839,9 +839,9 @@ class AddContributionRightsHandler(base.BaseHandler):
                 'Invalid category: %s' % category)
 
         if category in [
-                constants.REVIEW_CATEGORY_TRANSLATION,
-                constants.REVIEW_CATEGORY_VOICEOVER,
-                constants.REVIEW_CATEGORY_QUESTION
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
         ]:
             email_manager.send_email_to_new_contribution_reviewer(
                 user_id, category, language_code=language_code)
@@ -875,7 +875,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
         elif (removal_type ==
               constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
             category = self.payload.get('category')
-            if category == constants.REVIEW_CATEGORY_TRANSLATION:
+            if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
                 if not user_services.can_review_translation_suggestions(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -883,7 +883,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_translation_review_rights_in_language(
                     user_id, language_code)
-            elif category == constants.REVIEW_CATEGORY_VOICEOVER:
+            elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
                 if not user_services.can_review_voiceover_applications(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -891,14 +891,14 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_voiceover_review_rights_in_language(
                     user_id, language_code)
-            elif category == constants.REVIEW_CATEGORY_QUESTION:
+            elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
                 if not user_services.can_review_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to review question.' % (
                             username))
                 user_services.remove_question_review_rights(user_id)
             elif (category ==
-                  constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY):
+                  constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
                 if not user_services.can_submit_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to submit question.' % (
@@ -909,9 +909,9 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                     'Invalid category: %s' % category)
 
             if category in [
-                    constants.REVIEW_CATEGORY_TRANSLATION,
-                    constants.REVIEW_CATEGORY_VOICEOVER,
-                    constants.REVIEW_CATEGORY_QUESTION
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
             ]:
                 email_manager.send_email_to_removed_contribution_reviewer(
                     user_id, category, language_code=language_code)
@@ -936,10 +936,10 @@ class ContributorUsersListHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
         if category not in [
-                constants.REVIEW_CATEGORY_TRANSLATION,
-                constants.REVIEW_CATEGORY_VOICEOVER,
-                constants.REVIEW_CATEGORY_QUESTION,
-                constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY]:
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
             raise self.InvalidInputException('Invalid category: %s' % category)
         usernames = user_services.get_contributor_usernames(
             category, language_code=language_code)

@@ -2486,7 +2486,7 @@ class UserContributionRightsModel(base_models.BaseModel):
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
-    def get_question_contributor_user_ids(cls):
+    def get_question_submitter_user_ids(cls):
         """Returns the IDs of the users who have rights to submit questions.
 
         Returns:

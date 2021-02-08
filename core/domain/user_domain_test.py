@@ -497,7 +497,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(UserContributionRightsTests, self).setUp()
         self.user_contribution_rights = user_domain.UserContributionRights(
-            'user_id', ['hi'], [], True)
+            'user_id', ['hi'], [], True, False)
 
     def test_initialization(self):
         """Testing init method."""

@@ -1816,7 +1816,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'],
             'User question already has rights to review question.')
 
-    def test_add_question_contributor(self):
+    def test_add_question_submitter(self):
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
@@ -1832,7 +1832,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
-    def test_assigning_same_user_as_question_contributor_raise_error(self):
+    def test_assigning_same_user_as_question_submitter_raise_error(self):
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
@@ -2065,7 +2065,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'],
             'question does not have rights to review question.')
 
-    def test_remove_question_contributor(self):
+    def test_remove_question_submitter(self):
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         self.assertTrue(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
@@ -2082,7 +2082,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
-    def test_removing_unassigned_question_contributor_raise_error(self):
+    def test_removing_unassigned_question_submitter_raise_error(self):
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
@@ -2226,7 +2226,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('question' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_contributor_user_by_question_contributor_role(self):
+    def test_check_contributor_user_by_question_submitter_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         user_services.allow_user_to_submit_question(self.voiceover_reviewer_id)

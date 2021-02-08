@@ -688,7 +688,7 @@ def _create_user_contribution_rights_from_model(user_contribution_rights_model):
             user_contribution_rights_model.can_review_questions,
             user_contribution_rights_model.can_submit_questions)
     else:
-        return user_domain.UserContributionRights('', [], [], False)
+        return user_domain.UserContributionRights('', [], [], False, False)
 
 
 def get_user_contribution_rights(user_id):
@@ -2582,25 +2582,25 @@ def get_contributor_usernames(category, language_code=None):
         list(str). A list of usernames.
     """
     user_ids = []
-    if category == constants.REVIEW_CATEGORY_TRANSLATION:
+    if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
         user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
-    elif category == constants.REVIEW_CATEGORY_VOICEOVER:
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
         user_ids = (
             user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
-    elif category == constants.REVIEW_CATEGORY_QUESTION:
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (
                 language_code))
         user_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
-    elif category == constants.SUBMIT_QUESTION_CONTRIBUTION_RIGHT_CATEGORY:
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
         user_ids = (
             user_models.UserContributionRightsModel
-            .get_question_contributor_user_ids())
+            .get_question_submitter_user_ids())
     else:
         raise Exception('Invalid category: %s' % category)
 
