@@ -5779,7 +5779,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -5826,7 +5827,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5872,7 +5874,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.voiceover_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5917,7 +5920,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.question_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(

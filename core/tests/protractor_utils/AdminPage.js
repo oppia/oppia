@@ -472,7 +472,8 @@ var AdminPage = function() {
   };
 
   this.assignQuestionReviewer = async function(username) {
-    await _assignContributionRights(username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
+    await _assignContributionRights(
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
   };
 
   this.assignQuestionContributor = async function(username) {
