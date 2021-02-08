@@ -32,8 +32,5 @@ angular.module('oppia').controller('TopicEditorSaveModalController', [
     });
     $scope.isTopicPublished = topicIsPublished;
     $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
-    $scope.commit = {
-      message: ''
-    };
   }
 ]);
