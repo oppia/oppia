@@ -23,9 +23,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FilterForMatchingTextPipe implements PipeTransform {
 
-  transform(value: string, input: string): any {
+  transform(value: any, input: string): any {
     if (input) {
-       return value.filter(val => val.indexOf(input)) >= 0);
+       return value.filter(val => val.indexOf(input) >= 0);
      } else {
        return value;
      }
