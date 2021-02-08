@@ -41,12 +41,12 @@ class ExplorationOpportunitiesDict {
 })
 export class ContributionOpportunitiesService {
   constructor(
-    private contributionOpportunitiesBackendApiService:
+    private readonly contributionOpportunitiesBackendApiService:
       ContributionOpportunitiesBackendApiService,
-      private modalService: NgbModal) {}
+      private readonly modalService: NgbModal) {}
 
-  public reloadOpportunitiesEventEmitter = new EventEmitter<void>();
-  public removeOpportunitiesEventEmitter = new EventEmitter<void>();
+  public readonly reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+  public readonly removeOpportunitiesEventEmitter = new EventEmitter<void>();
   private _skillOpportunitiesCursor: string = null;
   private _translationOpportunitiesCursor: string = null;
   private _voiceoverOpportunitiesCursor: string = null;

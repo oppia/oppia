@@ -30,10 +30,8 @@ import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-ed
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 import { TranslationModalContent } from './modal-templates/translation-modal.component';
-import { LoginRequiredMessageComponent } from
-  './login-required-message/login-required-message.component';
-import { LoginRequiredModalContent } from
-  './modal-templates/login-required-modal.component';
+import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
+import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -46,18 +44,18 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
-    TranslationModalContent
+    TranslationLanguageSelectorComponent,
+    TranslationModalContent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
-    TranslationModalContent
+    TranslationLanguageSelectorComponent,
+    TranslationModalContent,
   ],
   providers: [
     {
