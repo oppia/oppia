@@ -781,8 +781,8 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
                 len(item.commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             cls._add_error(
                 ERROR_CATEGORY_COMMIT_MESSAGE_CHECK,
-                'Entity id %s: Commit message %s larger than accepted length'
-                % (item.id, item.commit_message))
+                'Entity id %s: Commit message larger than accepted length'
+                % (item.id))
 
     @classmethod
     def validate(cls, item):
@@ -855,22 +855,6 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
                 'post_commit_is_private is True' % item.id)
 
     @classmethod
-    def _validate_commit_message_length(cls, item):
-        """Validates that commit_message length is less than
-        MAX_COMMIT_MESSAGE_LENGTH.
-
-        Args:
-            item: datastore_services.Model. Entity to validate.
-        """
-
-        if item.commit_message and (
-                len(item.commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-            cls._add_error(
-                ERROR_CATEGORY_COMMIT_MESSAGE_CHECK,
-                'Entity id %s: Commit message larger than accepted length'
-                % (item.id))
-
-    @classmethod
     def validate(cls, item):
         """Run _fetch_field_name_to_external_model_references and
         all _validate functions.
@@ -880,7 +864,6 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         """
         super(BaseCommitLogEntryModelValidator, cls).validate(item)
 
-        cls._validate_commit_message_length(item)
         cls._validate_post_commit_status(item)
 
         if item.id.startswith('question') or item.id.startswith('skill'):
