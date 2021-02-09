@@ -3,15 +3,16 @@
 <div ng-show="!$ctrl.isCurrentAnswerValid()" class="alert alert-danger mt-2">
   <[$ctrl.warningText]>
 </div>
-<!-- Using CSS selectors to crawl down to the span with class base -->>
+<!-- Using CSS selectors to fix issue -->
 <style>
-  .base {
-    white-space: pre-wrap !important;
-    width: 100% !important;
+  .guppy-div-learner > span > span:nth-child(2) > span {
+    white-space: pre-wrap;
+    width: 100%;
   }
 
-  .mord {
-    white-space: pre-wrap !important;
-    width: 100% !important;
+  .guppy-div-learner > span > span:nth-child(2) > span > span:nth-child(2) {
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
   }
 </style>
