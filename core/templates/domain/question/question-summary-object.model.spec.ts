@@ -16,15 +16,13 @@
  * @fileoverview Unit tests for QuestionSummaryObjectFactory.
  */
 
-import { QuestionSummaryBackendDict, QuestionSummaryObjectFactory } from
-  'domain/question/QuestionSummaryObjectFactory';
+import { QuestionSummaryBackendDict, QuestionSummary } from
+  'domain/question/question-summary-object.model';
 
-describe('Question summary object factory', () => {
-  let questionSummaryObjectFactory: QuestionSummaryObjectFactory;
+describe('Question summary', () => {
   let summaryDict: QuestionSummaryBackendDict;
 
   beforeEach(() => {
-    questionSummaryObjectFactory = new QuestionSummaryObjectFactory();
     summaryDict = {
       id: 'question_id',
       question_content: 'Question 1',
@@ -35,7 +33,7 @@ describe('Question summary object factory', () => {
 
   it('should create a new question summary', () => {
     const questionSummary = (
-      questionSummaryObjectFactory.createFromBackendDict(summaryDict));
+      QuestionSummary.createFromBackendDict(summaryDict));
     expect(questionSummary.getQuestionId()).toEqual('question_id');
     expect(questionSummary.getQuestionContent()).toEqual('Question 1');
     expect(questionSummary.getInteractionId()).toEqual('TextInput');
@@ -45,7 +43,7 @@ describe('Question summary object factory', () => {
   it('should change question content in a question summary', () => {
     const newQuestionContent = 'New question content';
     const questionSummary = (
-      questionSummaryObjectFactory.createFromBackendDict(summaryDict));
+      QuestionSummary.createFromBackendDict(summaryDict));
     expect(questionSummary.getQuestionContent()).toEqual('Question 1');
 
     questionSummary.setQuestionContent(newQuestionContent);
