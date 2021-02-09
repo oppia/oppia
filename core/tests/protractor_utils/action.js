@@ -42,7 +42,7 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
   // Failed: element click intercepted: Element A is not clickable at point
   // (x, y). Other element would receive the click: B.
   // It is expected that the masked element receives the click. Therefore, a
-  // Javascript click action is used here to bypass the error.
+  // Javascript click action is used here to avoid the error.
   if (elementIsMasked) {
     await browser.executeScript(
       'arguments[0].click()', await clickableElement.getWebElement());
