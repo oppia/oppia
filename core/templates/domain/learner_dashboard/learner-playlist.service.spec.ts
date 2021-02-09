@@ -56,9 +56,12 @@ describe('Learner playlist service factory', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        LearnerPlaylistService
+      ],
     });
     httpTestingController = TestBed.get(HttpTestingController);
-    instance = TestBed.get(LearnerPlaylistService);
+    instance = TestBed.inject(LearnerPlaylistService);
     ref = TestBed.get(ChangeDetectorRef);
     appRef = TestBed.get(ApplicationRef);
     activityType = TestBed.get(constants.ACTIVITY_TYPE_EXPLORATION);
@@ -68,6 +71,33 @@ describe('Learner playlist service factory', () => {
     ngbModal = TestBed.get(NgbModal);
     mockModalRef = TestBed.get(NgbModalRef);
   });
+
+  beforeEach(angular.mock.inject(function($injector, _$q_) {
+    instance = $injector.get('LearnerPlaylistService');
+    httpTestingController = $injector.get('HttpTestingController)';
+    instance = $injector.inject('LearnerPlaylistService');
+    ref = $injector.get('ChangeDetectorRef');
+    appRef = $injector.get('ApplicationRef');
+    activityType = $injector.get(constants.ACTIVITY_TYPE_EXPLORATION);
+    urlInterpolationService = $injector.get(UrlInterpolationService);
+    alertsService = $injector.get(AlertsService);
+    csrfService = $injector.get(CsrfTokenService);
+    ngbModal = $injector.get(NgbModal);
+    mockModalRef = $injector.get(NgbModalRef);
+    activityType = $injector.get('ACTIVITY_TYPE_EXPLORATION');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
+    AlertsService = $injector.get('AlertsService');
+    spyOn(AlertsService, 'addInfoMessage').and.callThrough();
+    spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
+    CsrfService = $injector.get('CsrfTokenService');
+    $uibModal = $injector.get('$uibModal');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
+  }));
 
   afterEach(() => {
     httpTestingController.verify();
