@@ -24,7 +24,6 @@ import re
 
 import python_utils
 
-
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
 
@@ -886,10 +885,10 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         failed = False
 
         for filepath in files_to_lint:
-            if filepath.startswith(('core/templates', 'extensions')) and (
-                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
-                        not filepath.endswith('protractor.js')) and (
-                            filepath.endswith(('.js'))):
+            if (filepath.endswith(('.js')) and
+                    filepath.startswith(('core/templates', 'extensions')) and
+                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD and
+                    not filepath.endswith('protractor.js')):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)
