@@ -217,6 +217,7 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service.ts';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
+import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { EmailDashboardDataService } from 'pages/email-dashboard-pages/email-dashboard-data.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -305,6 +306,7 @@ import { MessengerService } from 'services/messenger.service';
 import { PageTitleService } from 'services/page-title.service';
 import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
 import { PlaythroughService } from 'services/playthrough.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
@@ -384,6 +386,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
+  ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
@@ -541,6 +544,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlaythroughObjectFactory', PlaythroughObjectFactory],
   ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],
   ['PlaythroughService', PlaythroughService],
+  ['PreventPageUnloadEventService', PreventPageUnloadEventService],
   ['PredictionAlgorithmRegistryService', PredictionAlgorithmRegistryService],
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],
   ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
