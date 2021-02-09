@@ -61,7 +61,7 @@ describe('Collection node object factory', () => {
       collectionNode.getExplorationSummaryObject());
   });
 
-  // fit is not allowed to use.
+// fit is not allowed to use.
   fit('should be able to create a new collection node by exploration ID',
     () => {
       var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
