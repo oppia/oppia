@@ -3,16 +3,25 @@
 <div ng-show="!$ctrl.isCurrentAnswerValid()" class="alert alert-danger mt-2">
   <[$ctrl.warningText]>
 </div>
-<!-- Using CSS selectors to fix issue -->
+<!-- 
+  Forced to use !important here as it makes the code easy to understand, but does not align with design principles.
+  Normal CSS styles aren't working as Guppy styles overrides them by default. Only way to fix this is to override the 
+  specificity using !important.
+-->
 <style>
-  .guppy-div-learner > span > span:nth-child(2) > span {
-    white-space: pre-wrap;
+  .guppy-div-learner {
     width: 100%;
+    height: auto !important;
   }
 
-  .guppy-div-learner > span > span:nth-child(2) > span > span:nth-child(2) {
-    white-space: pre-wrap;
-    word-break: break-all;
+  .base {
+    white-space: pre-wrap !important;
+    width: 100% !important;
+  }
+
+  .mord {
+    white-space: pre-wrap !important;
+    hyphens: auto;
     word-wrap: break-word;
   }
 </style>
