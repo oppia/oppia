@@ -148,23 +148,28 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionSummaryTile.first(),
       'Library Page does not have any collections');
+    var collectionCard = allCollectionsTitled(collectionName).first();
     await waitFor.visibilityOf(
-      allCollectionsTitled(collectionName).first(),
+      collectionCard,
       'Unable to find collection ' + collectionName);
-    await allCollectionsTitled(collectionName).first().click();
+    // The Collection summary card is masked by a dummy element. Therefore, a
+    // Javascript click is used.
+    await action.click('Collection Card', collectionCard, true);
     await waitFor.pageToFullyLoad();
   };
 
   this.playExploration = async function(explorationName) {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      await allExplorationSummaryTile.first(),
+      allExplorationSummaryTile.first(),
       'Library Page does not have any explorations');
 
-    var explorationCard = await allExplorationsTitled(explorationName).first();
+    var explorationCard = allExplorationsTitled(explorationName).first();
     await waitFor.visibilityOf(
       explorationCard, 'Unable to find exploration ' + explorationName);
-    await explorationCard.click();
+    // The Exploration summary card is masked by a dummy element. Therefore, a
+    // Javascript click is used.
+    await action.click('Exploration Card', explorationCard, true);
     await waitFor.pageToFullyLoad();
   };
 

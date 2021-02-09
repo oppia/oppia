@@ -32,13 +32,23 @@ var clear = async function(inputName, inputElement) {
   await inputElement.clear();
 };
 
-var click = async function(elementName, clickableElement) {
+var click = async function(elementName, clickableElement, elementIsMasked) {
   await waitFor.visibilityOf(
     clickableElement, `${elementName} is not visible.`);
   await waitFor.elementToBeClickable(
     clickableElement, `${elementName} is not clickable.`);
-
-  await clickableElement.click();
+  // In some cases, we expect the element to be masked by a dummy element. In
+  // these cases, the regular click will throw an error of the form
+  // Failed: element click intercepted: Element A is not clickable at point
+  // (x, y). Other element would receive the click: B.
+  // It is expected that the masked element receives the click. Therefore, a
+  // Javascript click action is used here to avoid the error.
+  if (elementIsMasked) {
+    await browser.executeScript(
+      'arguments[0].click()', await clickableElement.getWebElement());
+  } else {
+    await clickableElement.click();
+  }
 };
 
 var select = async function(selectorName, selectorElement, optionToSelect) {

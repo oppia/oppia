@@ -330,15 +330,11 @@ var AdminPage = function() {
   };
 
   this.updateRole = async function(name, newRole) {
-    await waitFor.elementToBeClickable(
-      adminRolesTab, 'Admin Roles tab is not clickable');
     await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
     await action.sendKeys('Update Form Name', updateFormName, name);
-    var roleOption = roleSelect.element(
-      by.cssContainingText('option', newRole));
-    await action.click('Role Option', roleOption);
+    await action.select('Role Drop Down', roleSelect, newRole);
     await action.click('Update Form Submit', updateFormSubmit);
     await waitFor.visibilityOf(
       statusMessage, 'Confirmation message not visible');
@@ -348,18 +344,14 @@ var AdminPage = function() {
   };
 
   this.getUsersAsssignedToRole = async function(role) {
-    await action.sendKeys('Role Drop Down', roleDropdown, 'By Role');
-
-    await action.sendKeys('Role Value Option', roleValueOption, role);
-
+    await action.select('Role Drop Down', roleDropdown, 'By Role');
+    await action.select('Role Value Option', roleValueOption, role);
     await action.click('View Role Button', viewRoleButton);
   };
 
   this.viewRolesbyUsername = async function(username) {
-    await action.sendKeys('Role Drop Down', roleDropdown, 'By Username');
-
+    await action.select('Role Drop Down', roleDropdown, 'By Username');
     await action.sendKeys('Role Username Option', roleUsernameOption, username);
-
     await action.click('View Role Button', viewRoleButton);
   };
 
