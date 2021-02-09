@@ -35,6 +35,7 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { FilterForMatchingTextPipe } from 'filters/string-utility-filters/filter-for-matching-text.pipe';
 import { SkillSelectorComponent } from
   './skill-selector/skill-selector.component';
 import { SkillMasteryViewerComponent } from
@@ -96,6 +97,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    FilterForMatchingTextPipe,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -133,6 +135,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    FilterForMatchingTextPipe,
     SharingLinksComponent,
     SkillSelectorComponent,
     StorySummaryTileDirective,
