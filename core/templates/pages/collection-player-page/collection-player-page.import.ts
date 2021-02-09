@@ -40,7 +40,7 @@ require(
   'collection-footer.component.ts');
 require(
   'pages/collection-player-page/collection-local-nav/' +
-  'collection-local-nav.directive.ts');
+  'collection-local-nav.component.ts');
 require(
   'pages/collection-player-page/collection-navbar/' +
   'collection-navbar.component.ts');
