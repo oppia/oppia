@@ -149,7 +149,7 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
-INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
+CONSTANT_FILEPATH = 'constants.ts'
 
 
 class HTMLLintTests(test_utils.LinterTestBase):
@@ -864,10 +864,31 @@ class GeneralLintTests(test_utils.LinterTestBase):
 
         with readlines_swap:
             linter = general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_DEV_MODE_IN_CONSTANT_FILEPATH], FILE_CACHE)
+                [CONSTANT_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
             'Please set the DEV_MODE variable in constants.ts'
+            'to true before committing.'], lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_emulator_mode_in_constant_ts(self):
+        def mock_readlines(unused_self, unused_filepath):
+            return (
+                'Copyright 2020 The Oppia Authors. All Rights Reserved.',
+                ' * @fileoverview Initializes constants for '
+                'the Oppia codebase.',
+                '"EMULATOR_MODE": false\n',)
+
+        readlines_swap = self.swap(
+            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+
+        with readlines_swap:
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [CONSTANT_FILEPATH], FILE_CACHE)
+            lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements([
+            'Please set the EMULATOR_MODE variable in constants.ts'
             'to true before committing.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

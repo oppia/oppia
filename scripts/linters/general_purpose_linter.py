@@ -65,6 +65,11 @@ REQUIRED_STRINGS_CONSTANTS = {
         'message': 'Please set the DEV_MODE variable in constants.ts'
                    'to true before committing.',
         'excluded_files': ()
+    },
+    'EMULATOR_MODE: true': {
+        'message': 'Please set the EMULATOR_MODE variable in constants.ts'
+                   'to true before committing.',
+        'excluded_files': ()
     }
 }
 
