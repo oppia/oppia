@@ -190,8 +190,10 @@ angular.module('oppia').directive('skillsList', [
             });
           };
 
-          ctrl.assignSkillToTopic = function(skillId) {
-            var topicSummaries = $scope.getEditableTopicSummaries();
+          ctrl.assignSkillToTopic = function(skill) {
+            var skillId = skill.id;
+            var topicSummaries = $scope.getEditableTopicSummaries().filter(
+              topicSummary => !skill.topicNames.includes(topicSummary.name));
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
