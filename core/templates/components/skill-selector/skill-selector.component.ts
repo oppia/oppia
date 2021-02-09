@@ -46,7 +46,7 @@ export class SkillSelectorComponent implements OnInit {
   skillFilterText = '';
   
   topicFilterList = [];
-  subTopicFilterDict: { [subtopic: string]:
+  subTopicFilterDict: { [topicName: string]:
      {subTopicName: string; checked: boolean}[] } = {};
   intialSubTopicFilterDict = {};
 
