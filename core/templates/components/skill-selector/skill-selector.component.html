@@ -6,15 +6,11 @@
     </mat-card>
     <div class="skill-list-box">
       <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
-        <!-- <div *ngFor="(topicName, subtopics) in categorizedSkills"> -->
-        <!-- topic.key = topicName, topic.value = subtopics -->
         <div *ngFor="let topic of categorizedSkills | keyvalue">
           <mat-card class="list-view-item" *ngIf="checkIfTopicIsEmpty(topicName)">
             <mat-card layout="row" class="list-view-item">
               <h2><label class="oppia-topic-name-text">{{ topic.key }}</label></h2>
             </mat-card>
-            <!-- <div *ngFor="(subtopicName, skills) in topic.value" class="list-view-item "> -->
-            <!-- subtopic.key = subtopicName, subtopic.value = skills -->
             <div *ngFor="let subtopic of topic.value | keyvalue" class="list-view-item ">
               <div *ngIf="!checkIfEmpty(subtopic.value)">
                 <mat-card class="list-view-item">
@@ -57,8 +53,6 @@
     </mat-card>
     <div class="oppia-list-view-item-container">
       <mat-card class="list-view-item">
-        <!-- <div *ngFor="(topicName, subtopics) in subTopicFilterDict"> -->
-        <!-- topic.key = topicName, topic.value = subtopics -->
         <div *ngFor="let topic of subTopicFilterDict | keyvalue">
           <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>
           <mat-card class="list-view-item">
