@@ -13,45 +13,55 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the item view of an opportunity.
+ * @fileoverview Component for login required message.
  */
 
-require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import constants from 'assets/constants';
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('loginRequiredMessage', {
-  template: require('./login-required-message.component.html'),
-  controller: [
-    '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService',
-    'OPPIA_AVATAR_LINK_URL', function(
-        $rootScope, $timeout, $window, SiteAnalyticsService,
-        UrlInterpolationService, UserService,
-        OPPIA_AVATAR_LINK_URL) {
-      var ctrl = this;
-      ctrl.onLoginButtonClicked = function() {
-        UserService.getLoginUrlAsync().then(
-          function(loginUrl) {
-            if (loginUrl) {
-              SiteAnalyticsService.registerStartLoginEvent('loginButton');
-              $timeout(function() {
-                $window.location = loginUrl;
-              }, 150);
-            } else {
-              $window.location.reload();
-            }
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          }
-        );
-      };
-      ctrl.$onInit = function() {
-        ctrl.OPPIA_AVATAR_LINK_URL = OPPIA_AVATAR_LINK_URL;
-        ctrl.OPPIA_AVATAR_IMAGE_URL = (
-          UrlInterpolationService.getStaticImageUrl(
-            '/avatar/oppia_avatar_100px.svg'));
-      };
-    }
-  ]
-});
+@Component({
+  selector: 'login-required-message',
+  templateUrl: './login-required-message.component.html',
+  styleUrls: []
+})
+export class LoginRequiredMessageComponent {
+  OPPIA_AVATAR_IMAGE_URL: string;
+  OPPIA_AVATAR_LINK_URL: string;
+
+  constructor(
+    private readonly siteAnalyticsService: SiteAnalyticsService,
+    private readonly urlInterpolationService: UrlInterpolationService,
+    private readonly userService: UserService,
+    private readonly windowRef: WindowRef) {}
+
+  ngOnInit(): void {
+    this.OPPIA_AVATAR_LINK_URL = constants.OPPIA_AVATAR_LINK_URL;
+    this.OPPIA_AVATAR_IMAGE_URL = (
+      this.urlInterpolationService.getStaticImageUrl(
+        '/avatar/oppia_avatar_100px.svg'));
+  }
+
+  onLoginButtonClicked(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) => {
+        if (loginUrl) {
+          this.siteAnalyticsService.registerStartLoginEvent('loginButton');
+          setTimeout(() => {
+            this.windowRef.nativeWindow.location.href = loginUrl;
+          }, 150);
+        } else {
+          this.windowRef.nativeWindow.location.reload();
+        }
+      }
+    );
+  }
+}
+
+angular.module('oppia').directive(
+  'loginRequiredMessage', downgradeComponent(
+    {component: LoginRequiredMessageComponent}));

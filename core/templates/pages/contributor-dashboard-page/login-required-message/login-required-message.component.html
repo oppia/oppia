@@ -1,22 +1,22 @@
 <div class="oppia-login-required-message-container">
   <div class="oppia-mascot-avatar-container">
-    <a ng-class="{'oppia-disabled-image-link': ($ctrl.OPPIA_AVATAR_LINK_URL === null)}"
-       ng-href="<[$ctrl.OPPIA_AVATAR_LINK_URL]>"
+    <a [ngClass]="{'oppia-disabled-image-link': OPPIA_AVATAR_LINK_URL === null}"
+       [href]="OPPIA_AVATAR_LINK_URL"
        rel="noopener"
        target="_blank">
       <img class="oppia-mascot-avatar"
-           ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+           [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
     </a>
   </div>
   <div class="oppia-login-required-message">
     Oops! You haven't logged in yet.
     <br>
-    Log in <a class="oppia-link-text" ng-click="$ctrl.onLoginButtonClicked()">here</a> to start contributing!
+    Log in <a class="oppia-link-text" (click)="onLoginButtonClicked()">here</a> to start contributing!
   </div>
 </div>
 
 <style>
-  login-required-message .oppia-login-required-message-container {
+  .oppia-login-required-message-container {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -25,11 +25,11 @@
     margin: auto;
     width: 100%;
   }
-  login-required-message .oppia-login-required-message {
+  .oppia-login-required-message {
     color: #4a4a4a;
     font-size: 28px;
   }
-  login-required-message .oppia-login-required-message > .oppia-link-text {
+  .oppia-login-required-message > .oppia-link-text {
     color: #009688;
   }
 </style>
