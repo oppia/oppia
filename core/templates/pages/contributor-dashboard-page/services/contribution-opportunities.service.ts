@@ -31,7 +31,7 @@ class SkillOpportunitiesDict {
   more: boolean;
 }
 
-class ExplorationOpportunitiesDict {
+export class ExplorationOpportunitiesDict {
   opportunities: ExplorationOpportunitySummary[];
   more: boolean;
 }

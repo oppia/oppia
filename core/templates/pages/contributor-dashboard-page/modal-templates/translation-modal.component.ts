@@ -27,37 +27,50 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { AppConstants } from 'app.constants';
+import { TranslationOpportunityDict } from '../translation-opportunities/translation-opportunities.component';
+
+class UiConfig {
+  'hide_complex_extensions': boolean;
+  'startupFocusEnabled'?: boolean;
+  'language'?: string;
+  'languageDirection'?: string;
+}
 
 @Component({
   selector: 'translation-modal',
   templateUrl: './translation-modal.directive.html',
-  styleUrls: []
+  styleUrls: [],
+  providers: [TranslationOpportunityDict]
 })
 export class TranslationModalContent {
   activeWrittenTranslation: {html: string} = {html: ''};
   uploadingTranslation = false;
-  subheading;
-  heading;
+  subheading: string;
+  heading: string;
   loadingData = true;
   moreAvailable = false;
   textToTranslate = '';
-  languageDescription;
-  HTML_SCHEMA;
+  languageDescription: string;
+  HTML_SCHEMA: {
+    'type': string;
+    'ui_config': UiConfig;
+  };
 
   constructor(
-    public activeModal: NgbActiveModal,
-    private alertsService: AlertsService,
-    private ckEditorCopyContentService: CkEditorCopyContentService,
-    private contextService: ContextService,
-    private imageLocalStorageService: ImageLocalStorageService,
-    private siteAnalyticsService: SiteAnalyticsService,
-    private translateTextService: TranslateTextService,
-    private translationLanguageService: TranslationLanguageService,
-    opportunity, ENTITY_TYPE) {
+    private readonly activeModal: NgbActiveModal,
+    private readonly alertsService: AlertsService,
+    private readonly ckEditorCopyContentService: CkEditorCopyContentService,
+    private readonly contextService: ContextService,
+    private readonly imageLocalStorageService: ImageLocalStorageService,
+    private readonly siteAnalyticsService: SiteAnalyticsService,
+    private readonly translateTextService: TranslateTextService,
+    private readonly translationLanguageService: TranslationLanguageService,
+    opportunity: TranslationOpportunityDict) {
     // We need to set the context here so that the rte fetches
     // images for the given ENTITY_TYPE and targetId.
     this.contextService.setCustomEntityContext(
-      ENTITY_TYPE.EXPLORATION, opportunity.id);
+      AppConstants.ENTITY_TYPE.EXPLORATION, opportunity.id);
     this.subheading = opportunity.subheading;
     this.heading = opportunity.heading;
     this.contextService.setImageSaveDestinationToLocalStorage();
@@ -76,7 +89,7 @@ export class TranslationModalContent {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        hide_complex_extensions: 'true',
+        hide_complex_extensions: true,
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection: (
           this.translationLanguageService.getActiveLanguageDirection())
