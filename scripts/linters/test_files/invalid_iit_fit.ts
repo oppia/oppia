@@ -60,7 +60,6 @@ describe('Collection node object factory', () => {
     expect(summaryObject).not.toEqual(
       collectionNode.getExplorationSummaryObject());
   });
-
 // fit is not allowed to use.
   fit('should be able to create a new collection node by exploration ID',
     () => {
