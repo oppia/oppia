@@ -348,18 +348,14 @@ var AdminPage = function() {
   };
 
   this.getUsersAsssignedToRole = async function(role) {
-    await action.sendKeys('Role Drop Down', roleDropdown, 'By Role');
-
+    await action.select('Role Drop Down', roleDropdown, 'By Role');
     await action.sendKeys('Role Value Option', roleValueOption, role);
-
     await action.click('View Role Button', viewRoleButton);
   };
 
   this.viewRolesbyUsername = async function(username) {
-    await action.sendKeys('Role Drop Down', roleDropdown, 'By Username');
-
+    await action.select('Role Drop Down', roleDropdown, 'By Username');
     await action.sendKeys('Role Username Option', roleUsernameOption, username);
-
     await action.click('View Role Button', viewRoleButton);
   };
 
