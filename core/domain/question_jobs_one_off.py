@@ -59,7 +59,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             question.validate()
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Question %s failed validation: %s' % (item.id, e))
             yield (
                 QuestionMigrationOneOffJob._ERROR_KEY,

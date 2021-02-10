@@ -28,6 +28,8 @@ import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateClassifierMappingService } from
@@ -59,7 +61,6 @@ describe('Exploration editor page component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $timeout = null;
   var $uibModal = null;
   var aims = null;
   var cls = null;
@@ -77,6 +78,7 @@ describe('Exploration editor page component', function() {
   var pts = null;
   var rs = null;
   var sas = null;
+  var sers = null;
   var ses = null;
   var sts = null;
   var stass = null;
@@ -85,13 +87,14 @@ describe('Exploration editor page component', function() {
   var ueps = null;
   var mockEnterEditorForTheFirstTime = null;
   var registerAcceptTutorialModalEventSpy;
-  var registerSkipTutorialEventSpy;
-  var registerFinishTutorialEventSpy;
   var registerDeclineTutorialModalEventSpy;
 
   var refreshGraphEmitter = new EventEmitter();
 
+  var autosaveIsInProgress = new EventEmitter();
+
   var mockOpenEditorTutorialEmitter = new EventEmitter();
+  var mockOpenTranslationTutorialEmitter = new EventEmitter();
 
   var mockInitExplorationPageEmitter = new EventEmitter();
 
@@ -199,6 +202,7 @@ describe('Exploration editor page component', function() {
         ParamSpecsObjectFactory,
         SiteAnalyticsService,
         StateClassifierMappingService,
+        StateEditorRefreshService,
         StateEditorService,
         StateTopAnswersStatsBackendApiService,
         UserExplorationPermissionsService,
@@ -214,7 +218,6 @@ describe('Exploration editor page component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $uibModal = $injector.get('$uibModal');
     aims = $injector.get('AutosaveInfoModalsService');
     cls = $injector.get('ChangeListService');
@@ -232,6 +235,7 @@ describe('Exploration editor page component', function() {
     pts = $injector.get('PageTitleService');
     rs = $injector.get('RouterService');
     sas = $injector.get('SiteAnalyticsService');
+    sers = $injector.get('StateEditorRefreshService');
     ses = $injector.get('StateEditorService');
     sts = $injector.get('StateTutorialFirstTimeService');
     stass = $injector.get('StateTopAnswersStatsService');
@@ -251,9 +255,6 @@ describe('Exploration editor page component', function() {
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
@@ -270,6 +271,8 @@ describe('Exploration editor page component', function() {
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
         mockOpenEditorTutorialEmitter);
+      spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
+        mockOpenTranslationTutorialEmitter);
 
       explorationData.is_version_of_draft_valid = false;
 
@@ -280,10 +283,45 @@ describe('Exploration editor page component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should start tutorial on event of opening tutorial', () => {
-      spyOn(ctrl, 'startTutorial');
+    it('should start editor tutorial when on main page', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
+      spyOn(sers.onRefreshStateEditor, 'emit');
+      rs.navigateToMainTab();
+      $scope.$apply();
       mockOpenEditorTutorialEmitter.emit();
-      expect(ctrl.startTutorial).toHaveBeenCalled();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
+      expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
+    });
+
+    it('should start editor tutorial when not on main page', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
+      spyOn(rs, 'navigateToMainTab');
+      rs.navigateToSettingsTab();
+      $scope.$apply();
+      expect(rs.getActiveTabName()).toBe('settings');
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+    });
+
+    it('should start translation tutorial when on translation page', () => {
+      spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
+      spyOn(rs.onRefreshTranslationTab, 'emit');
+      rs.navigateToTranslationTab();
+      $scope.$apply();
+      mockOpenTranslationTutorialEmitter.emit();
+      expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
+      expect(rs.onRefreshTranslationTab.emit).toHaveBeenCalled();
+    });
+
+    it('should start translation tutorial when not on translation page', () => {
+      spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
+      spyOn(rs, 'navigateToTranslationTab');
+      rs.navigateToSettingsTab();
+      $scope.$apply();
+      mockOpenTranslationTutorialEmitter.emit();
+      expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
+      expect(rs.navigateToTranslationTab).toHaveBeenCalled();
     });
 
     it('should mark exploration as editable and translatable', () => {
@@ -418,9 +456,6 @@ describe('Exploration editor page component', function() {
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
@@ -438,10 +473,10 @@ describe('Exploration editor page component', function() {
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+      spyOnProperty(cls, 'autosaveIsInProgress$').and.returnValue(
+        autosaveIsInProgress);
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
         mockInitExplorationPageEmitter);
-
-
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
@@ -449,6 +484,12 @@ describe('Exploration editor page component', function() {
 
     afterEach(() => {
       ctrl.$onDestroy();
+    });
+
+    it('should change the value of autosavingIsInProgress', () => {
+      autosaveIsInProgress.emit(true);
+      $scope.$apply();
+      ctrl.autosaveIsInProgress = true;
     });
 
     it('should link exploration to story when initing exploration page', () => {
@@ -472,8 +513,6 @@ describe('Exploration editor page component', function() {
       expect(ctrl.currentUserIsModerator).toBeTrue();
       expect(ctrl.currentUser).toEqual(explorationData.user);
       expect(ctrl.currentVersion).toBe(explorationData.version);
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
     });
 
     it('should navigate to feedback tab', () => {
@@ -523,69 +562,34 @@ describe('Exploration editor page component', function() {
       expect(successCallback).toHaveBeenCalled();
     }));
 
-    it('should accept tutorial when closing welcome exploration modal and' +
-      ' then skip it', () => {
-      spyOn(rs, 'navigateToMainTab').and.callThrough();
+    it('should start editor tutorial when closing welcome exploration' +
+      ' modal', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve(explorationId)
       });
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
 
       expect(registerAcceptTutorialModalEventSpy)
         .toHaveBeenCalledWith(explorationId);
-      expect(rs.navigateToMainTab).toHaveBeenCalled();
-      $timeout.flush();
-
-      expect(ctrl.tutorialInProgress).toBeTrue();
-
-      ctrl.onSkipTutorial();
-      expect(registerSkipTutorialEventSpy)
-        .toHaveBeenCalledWith(explorationId);
-      expect(ctrl.tutorialInProgress).toBeFalse();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
     });
 
-    it('should accept tutorial when closing welcome exploration modal and' +
-      ' then finish it', () => {
-      spyOn(rs, 'navigateToMainTab').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve(explorationId)
-      });
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
-
-      ctrl.showWelcomeExplorationModal();
-      $scope.$apply();
-
-      expect(registerAcceptTutorialModalEventSpy)
-        .toHaveBeenCalledWith(explorationId);
-      expect(rs.navigateToMainTab).toHaveBeenCalled();
-      $timeout.flush();
-
-      expect(ctrl.tutorialInProgress).toBeTrue();
-
-      ctrl.onFinishTutorial();
-      expect(registerFinishTutorialEventSpy)
-        .toHaveBeenCalledWith(explorationId);
-      expect(ctrl.tutorialInProgress).toBeFalse();
-    });
-
-    it('should dismiss tutorial if welcome exploration modal dismissed', () => {
+    it('should dismiss tutorial when dismissing welcome exploration' +
+      ' modal', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject(explorationId)
       });
-
-      expect(ctrl.tutorialInProgress).toBeFalse();
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
 
       expect(registerDeclineTutorialModalEventSpy)
         .toHaveBeenCalled();
-      expect(ctrl.tutorialInProgress).toBeFalse();
+      expect(ctrl.startEditorTutorial).not.toHaveBeenCalled();
     });
 
     it('should toggle exploration warning visibility', () => {
@@ -612,206 +616,12 @@ describe('Exploration editor page component', function() {
       activeTabNameSpy.and.returnValue('history');
       expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('history');
     });
-
-    // The describe block below tests all the possible functions
-    // included on ctrl.EDITOR_TUTORIAL_OPTIONS array, which manipulates
-    // with JQuery the 'save from tutorial' button.
-    describe('when testing functions for JQuery manipulation from' +
-      ' ctrl.EDITOR_TUTORIAL_OPTIONS array', () => {
-      it('should change element scroll top when calling fn property' +
-        ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: 20
-        }, 1000);
-      });
-
-      it('should not change element scroll top when calling fn property' +
-        ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: 0
-        }, 1000);
-      });
-
-      it('should change state interaction element scroll top when calling' +
-        ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateContent').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 5
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
-
-      it('should change state content element scroll top when calling fn' +
-        ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateInteraction').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 20
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
-
-      it('should change preview tab element scroll top when calling fn' +
-        ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialPreviewTab').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 5
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
-
-      it('should change state interaction element scroll top when calling' +
-        ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateInteraction').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 20
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
-
-      it('should change preview tabn element scroll top when calling fn' +
-        ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialPreviewTab').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 5
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
-
-      it('should change state interaction element scroll top when calling' +
-        ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-      () => {
-        var element = angular.element('div');
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element')
-          .withArgs('#tutorialStateInteraction').and.returnValue({
-            // This throws "Type '{ top: number; }' is not assignable to type
-            // 'JQLite | Coordinates'." This is because the actual 'offset'
-            // functions returns more properties than the function we've
-            // defined. We have only returned the properties we need
-            // in 'offset' function.
-            // @ts-expect-error
-            offset: () => ({
-              top: 20
-            })
-          });
-
-        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
-
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
-    });
   });
 
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       mockEnterEditorForTheFirstTime = new EventEmitter();
@@ -874,9 +684,6 @@ describe('Exploration editor page component', function() {
     beforeEach(() => {
       registerAcceptTutorialModalEventSpy = (
         spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
-      registerFinishTutorialEventSpy = (
-        spyOn(sas, 'registerFinishTutorialEvent'));
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);

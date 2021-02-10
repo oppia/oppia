@@ -44,8 +44,7 @@
 
 
 # Android team
-# TODO(#11477): Replace @rt4914 with @BenHenning after 2021-01-04.
-/core/domain/android_validation_constants*.py @rt4914
+/core/domain/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -66,9 +65,9 @@
 /core/templates/services/translate.service.ts @srijanreddy98
 /core/templates/services/translations-backend-api.service.ts @srijanreddy98
 /core/templates/services/UpgradedServices.ts @srijanreddy98
-/typings/ @nishantwrp
-/tsconfig.json @nishantwrp
-/tsconfig-strict.json @nishantwrp @vojtechjelinek
+/typings/ @vojtechjelinek
+/tsconfig.json @vojtechjelinek
+/tsconfig-strict.json @vojtechjelinek
 
 
 # Answer classification team.
@@ -111,17 +110,19 @@
 
 
 # Core documentation
-/AUTHORS @seanlip
-/CHANGELOG @seanlip
-/CONTRIBUTORS @seanlip
-/LICENSE @seanlip
-/NOTICE @seanlip
+# TODO(#11811): For the following 5 files, as well as about-page.constants.ts,
+# replace @BenHenning with @seanlip after 2021-02-07.
+/AUTHORS @BenHenning
+/CHANGELOG @BenHenning
+/CONTRIBUTORS @BenHenning
+/LICENSE @BenHenning
+/NOTICE @BenHenning
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.constants.ts @seanlip
+/core/templates/pages/about-page/about-page.constants.ts @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
-/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
-/core/templates/pages/terms-page/terms-page.component.html @seanlip
+/core/templates/pages/terms-page/terms-page.component.html @BenHenning
 
 
 # Dashboard pages.
@@ -144,8 +145,7 @@
 
 
 # Dev workflow team.
-# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04.
-/.circleci/ @U8NWXD @kevintab95 @vinitamurthi
+/.circleci/ @U8NWXD @kevintab95
 /.eslintignore @DubeySandeep
 /.eslintrc @DubeySandeep
 /.htmllintrc @DubeySandeep
@@ -164,9 +164,9 @@
 /scripts/check_frontend_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
-/scripts/typescript_checks*.py @nishantwrp @DubeySandeep
+/scripts/typescript_checks*.py @DubeySandeep @vojtechjelinek
 /scripts/linters/ @DubeySandeep
-/scripts/linters/ts_ignore_exceptions.json @nishantwrp
+/scripts/linters/ts_ignore_exceptions.json @vojtechjelinek
 /ubuntu_dockerfile @DubeySandeep
 
 
@@ -213,6 +213,7 @@
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @srijanreddy98
 /core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
 /core/templates/services/schema-default-value.service*.ts @kevintab95
+/core/templates/services/schema-form-submitted.service*.ts @kevintab95
 /core/templates/services/schema-undefined-last-element.service*.ts @kevintab95
 
 
@@ -228,7 +229,7 @@
 /core/templates/components/button-directives/* @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
@@ -244,7 +245,9 @@
 /core/templates/components/summary-tile/ @srijanreddy98
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
+/core/templates/services/attribution.service*.ts @srijanreddy98
 
 
 # Global frontend services
@@ -258,6 +261,7 @@
 /core/templates/services/local-storage.service*.ts @srijanreddy98
 /core/templates/services/nested-directives*.ts @srijanreddy98
 /core/templates/services/page-title.service*.ts @srijanreddy98
+/core/templates/services/prevent-page-unload-event.service*.ts @srijanreddy98
 /core/templates/services/promo-bar-backend-api.service*.ts @srijanreddy98
 /core/templates/services/site-analytics.service*.ts @srijanreddy98
 /core/templates/services/utils.service*.ts @srijanreddy98
@@ -277,8 +281,11 @@
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
 /core/domain/expression_parser*.py @iamprayush
+/core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
 /core/domain/obj_services*.py @iamprayush
+/core/domain/rules_registry*.py @aks681
+/core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
 /core/templates/services/code-normalizer.service*.ts @iamprayush
@@ -300,12 +307,15 @@
 /core/domain/event_services*.py @brianrodri
 /core/domain/improvements_domain*.py @brianrodri
 /core/domain/improvements_services*.py @brianrodri
+/core/domain/improvements_validators*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
+/core/domain/statistics_validators*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
+/core/templates/components/statistics-directives/ @brianrodri
 /core/templates/domain/statistics/ @brianrodri
 /core/templates/domain/improvements/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
@@ -332,16 +342,17 @@
 /core/domain/search_services*.py @aks681
 /core/templates/pages/library-page/ @kevintab95
 /core/templates/services/construct-translation-ids.service*.ts @kevintab95
+/core/templates/services/search-backend-api.service*.ts @kevintab95
 /core/templates/services/search.service*.ts @kevintab95
 
 
 # Navigation bar project.
-/core/templates/domain/sidebar/ @nithusha21
 /core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
 /core/templates/components/button-directives/create-activity-button.directive.html @nithusha21
 /core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/services/bottom-navbar-status.service*.ts @nithusha21
 /core/templates/services/navigation.service*.ts @nithusha21
+/core/templates/services/sidebar-status.service*.ts @nithusha21
 
 
 # New structures team.
@@ -349,7 +360,10 @@
 /core/controllers/practice_sessions*.py @aks681
 /core/controllers/question*.py @aks681
 /core/controllers/review_tests*.py @aks681
+/core/domain/classroom_domain.py @aks681
+/core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
+/core/domain/rights_domain*.py @aks681
 /core/templates/components/concept-card/ @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
@@ -419,17 +433,21 @@
 /main_cron.py @nithusha21
 /main_mail.py @aks681
 /main.py @DubeySandeep @nithusha21
-/feconf.py @seanlip @nithusha21
+/feconf.py @DubeySandeep @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
+/core/domain/audit_validators*.py @vojtechjelinek
+/core/domain/base_model_validators*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
+/core/domain/job_validators*.py @vojtechjelinek
+/core/domain/prod_validators*.py @vojtechjelinek
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
-/core/jobs*.py @seanlip
-/core/platform/ @seanlip
+/core/jobs*.py @brianrodri
+/core/platform/ @brianrodri
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
@@ -443,8 +461,9 @@
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
-/core/templates/services/translation-file-hash-loader.service.ts @nithusha21
-/redis.conf @seanlip
+/core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
+# TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
+/redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
 
 
@@ -454,20 +473,20 @@
 /core/controllers/__init__.py @nithusha21
 /core/domain/__init__.py @nithusha21
 /core/domain/config*.py @DubeySandeep
-/core/domain/change_domain.py @seanlip
+/core/domain/change_domain.py @DubeySandeep
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
-/schema_utils*.py @seanlip
+/schema_utils*.py @DubeySandeep
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
 
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
-/core/controllers/moderator*.py @seanlip
-/core/controllers/recent_commits*.py @seanlip
-/core/domain/moderator_services*.py @seanlip
+/core/controllers/moderator*.py @DubeySandeep
+/core/controllers/recent_commits*.py @DubeySandeep
+/core/domain/moderator_services*.py @DubeySandeep
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
@@ -482,10 +501,12 @@
 /core/templates/directives/mathjax-bind.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @shavavo @aks681
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @shavavo @aks681
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @shavavo @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @DubeySandeep @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @DubeySandeep @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681
+/core/templates/services/external-save.service*.ts @srijanreddy98
+/core/templates/services/external-rte-save.service*.ts @srijanreddy98
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
@@ -544,25 +565,23 @@
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
-/core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
+/core/templates/third-party-imports/ @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
 /.lighthouserc-accessibility.js @jimbyo
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
 /scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
-/webpack.*.ts @nishantwrp @vojtechjelinek
+/webpack.*.ts @vojtechjelinek
 
 
 # Typings.
-/typings @nishantwrp
-/typings/tests/ @shavavo
+/typings @vojtechjelinek
+/typings/tests/ @vojtechjelinek
 
 
 # User Data Takeout.
-# TODO(#11477): Replace @seanlip with @BenHenning after 2021-01-04.
-/core/domain/takeout_*.py @seanlip @vojtechjelinek
-# TODO(#11477): Replace @seanlip with @BenHenning after 2021-01-04.
-/core/domain/wipeout_*.py @seanlip @vojtechjelinek
+/core/domain/takeout_*.py @BenHenning @vojtechjelinek
+/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
 
 
 # User’s profile page.
@@ -579,14 +598,13 @@
 
 
 # Dynamic Feature Gating project
-# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04 (for all dynamic feature gating paths below).
-/core/controllers/platform_feature*.py @vinitamurthi
-/core/domain/platform_feature_services*.py @vinitamurthi
-/core/domain/platform_parameter*.py @vinitamurthi
-/core/platform_feature*.py @vinitamurthi
-/core/templates/domain/platform_feature/ @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @vinitamurthi
-/core/templates/services/platform-feature*.ts @vinitamurthi
+/core/controllers/platform_feature*.py @BenHenning
+/core/domain/platform_feature_services*.py @BenHenning
+/core/domain/platform_parameter*.py @BenHenning
+/core/platform_feature*.py @BenHenning
+/core/templates/domain/platform_feature/ @BenHenning
+/core/templates/pages/admin-page/features-tab/ @BenHenning
+/core/templates/services/platform-feature*.ts @BenHenning
 
 
 # Frontend unit tests
@@ -603,7 +621,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
-/core/templates/karma.module.ts @nishantwrp @vojtechjelinek
+/core/templates/karma.module.ts @vojtechjelinek
 /core/tests/protractor_utils/ @U8NWXD @kevintab95
 /core/tests/protractor_desktop/ @U8NWXD @kevintab95
 /core/tests/protractor/ @U8NWXD @kevintab95
@@ -613,6 +631,15 @@
 /extensions/rich_text_components/*/protractor.js @U8NWXD @kevintab95
 /extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
 /extensions/objects/protractor.js @U8NWXD @kevintab95
+
+
+# Python 3 Migration project.
+/core/domain/auth*.py @brianrodri
+/core/domain/caching*.py @brianrodri
+/core/domain/taskqueue*.py @brianrodri
+/core/templates/services/auth-interceptor.service*.ts @brianrodri
+/core/templates/services/auth.service*.ts @brianrodri
+
 
 # Critical files.
 #
@@ -624,14 +651,16 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
-/scripts/linters/warranted_angular_security_bypasses.py @seanlip
-/core/controllers/acl_decorators*.py @seanlip
-/core/controllers/base*.py @seanlip
-/core/domain/html*.py @seanlip
-/core/domain/rights_manager*.py @seanlip
-/core/domain/role_services*.py @seanlip
-/core/storage/ @seanlip
-/core/domain/user*.py @seanlip
+# TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
+# 8 lines.
+/scripts/linters/warranted_angular_security_bypasses.py @BenHenning
+/core/controllers/acl_decorators*.py @BenHenning
+/core/controllers/base*.py @BenHenning
+/core/domain/html*.py @BenHenning
+/core/domain/rights_manager*.py @BenHenning
+/core/domain/role_services*.py @BenHenning
+/core/storage/ @BenHenning
+/core/domain/user*.py @BenHenning
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
@@ -641,5 +670,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04.
-/.github/workflows/ @vinitamurthi
+/.github/workflows/ @DubeySandeep @U8NWXD

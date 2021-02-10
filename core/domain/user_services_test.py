@@ -24,6 +24,7 @@ import logging
 import os
 
 from constants import constants
+from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
@@ -40,7 +41,8 @@ import python_utils
 import requests_mock
 import utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+auth_models, user_models = (
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
 class MockUserStatsAggregator(
@@ -94,45 +96,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    def test_is_user_id_valid(self):
-        self.assertTrue(
-            user_services.is_user_id_valid(feconf.SYSTEM_COMMITTER_ID))
-        self.assertTrue(
-            user_services.is_user_id_valid(feconf.MIGRATION_BOT_USER_ID))
-        self.assertTrue(
-            user_services.is_user_id_valid(feconf.SUGGESTION_BOT_USER_ID))
-        self.assertTrue(user_services.is_user_id_valid('uid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_id_valid('a' * 36))
-
-    def test_is_user_or_pseudonymous_id(self):
-        self.assertTrue(
-            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id(
-                'uid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
-        self.assertTrue(
-            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id(
-                'pid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
-
     def test_set_and_get_username(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'username'
         with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.set_username(gae_id, username)
+            user_services.set_username(auth_id, username)
 
         user_settings = user_services.create_new_user(
-            gae_id, 'user@example.com')
+            auth_id, 'user@example.com')
 
         user_services.set_username(user_settings.user_id, username)
         self.assertEqual(
@@ -179,10 +150,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username('fakeUser')
 
     def test_get_username_for_user_being_deleted(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'newUsername'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com'
+            auth_id, 'user@example.com'
         ).user_id
         user_services.set_username(user_id, username)
 
@@ -201,27 +172,27 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(user_services.is_username_taken('fakeUsername'))
 
     def test_is_username_taken_true(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'newUsername'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
+            auth_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'camelCase'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
+            auth_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_is_username_taken_when_user_marked_as_deleted_has_same_username(
             self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'camelCase'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
+            auth_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         user_services.mark_user_for_deletion(user_id)
         self.assertTrue(user_services.is_username_taken(username))
@@ -234,9 +205,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_set_invalid_usernames(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
+            auth_id, 'user@example.com').user_id
         bad_usernames_with_expected_error_message = [
             (' bob ', 'Usernames can only have alphanumeric characters.'),
             ('@', 'Usernames can only have alphanumeric characters.'),
@@ -257,9 +228,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 user_services.set_username(user_id, username)
 
     def test_update_user_settings_for_invalid_display_alias_raises_error(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
+            auth_id, 'user@example.com').user_id
         bad_display_aliases_with_expected_error = [
             ('', 'Expected display_alias to be a string, received .'),
             (0, 'Expected display_alias to be a string, received 0.'),
@@ -274,9 +245,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     [self.modifiable_new_user_data])
 
     def test_update_user_settings_valid_display_alias_set_successfully(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
+            auth_id, 'user@example.com').user_id
         display_alias = 'Name'
         user_settings = user_services.get_user_settings(user_id)
         self.assertIsNone(user_settings.display_alias)
@@ -300,18 +271,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 r'\[u\'a\', u\'@\', u\'b.com\'\]')]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-                user_services.create_new_user('gae_id', email)
+                user_services.create_new_user('auth_id', email)
 
     def test_create_new_user_with_invalid_email_creates_no_user_models(self):
         bad_email = '@'
         error_msg = 'Invalid email address: @'
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-            user_services.create_new_user('gae_id', bad_email)
+            user_services.create_new_user('auth_id', bad_email)
         tmp_admin_user_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
         user_ids_in_user_settings = [
             model.id for model in user_models.UserSettingsModel.get_all()]
         user_ids_in_user_auth_details = [
-            model.id for model in user_models.UserAuthDetailsModel.get_all()]
+            model.id for model in auth_models.UserAuthDetailsModel.get_all()]
         user_ids_in_user_contributions = [
             model.id for model in user_models.UserContributionsModel.get_all()]
         self.assertEqual(user_ids_in_user_settings, [tmp_admin_user_id])
@@ -332,11 +303,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_user_id_from_username(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'username'
         user_email = 'user@example.com'
 
-        user_settings = user_services.create_new_user(gae_id, user_email)
+        user_settings = user_services.create_new_user(auth_id, user_email)
         user_services.set_username(user_settings.user_id, username)
         self.assertEqual(
             user_services.get_username(user_settings.user_id), username)
@@ -355,55 +326,35 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
-    def test_get_user_settings_by_gae_id_returns_user_settings(self):
-        gae_id = 'gae_id'
+    def test_get_user_settings_by_auth_id_returns_user_settings(self):
+        auth_id = 'auth_id'
         email = 'user@example.com'
         user_id = 'user_id'
-        username = 'username'
-        user_models.UserSettingsModel(
-            id=user_id,
-            email=email,
-            username=username,
-        ).put()
-        user_models.UserIdentifiersModel(
-            id=gae_id,
-            user_id=user_id
-        ).put()
+        user_id = user_services.create_new_user(auth_id, email).user_id
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        user_settings = user_services.get_user_settings_by_auth_id(auth_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
-        self.assertEqual(user_settings_model.username, user_settings.username)
 
-    def test_get_user_settings_by_gae_id_for_nonexistent_gae_id_is_none(self):
-        self.assertIsNone(user_services.get_user_settings_by_gae_id('gae_id_x'))
+    def test_get_user_settings_by_auth_id_for_nonexistent_auth_id_is_none(self):
+        self.assertIsNone(
+            user_services.get_user_settings_by_auth_id('auth_id_x'))
 
-    def test_get_user_settings_by_gae_id_strict_returns_user_settings(self):
-        gae_id = 'gae_id'
+    def test_get_user_settings_by_auth_id_strict_returns_user_settings(self):
+        auth_id = 'auth_id'
         email = 'user@example.com'
-        user_id = 'user_id'
-        username = 'username'
-        user_models.UserSettingsModel(
-            id=user_id,
-            email=email,
-            username=username,
-        ).put()
-        user_models.UserIdentifiersModel(
-            id=gae_id,
-            user_id=user_id
-        ).put()
+        user_id = user_services.create_new_user(auth_id, email).user_id
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_id)
         user_settings = (
-            user_services.get_user_settings_by_gae_id(gae_id, strict=True))
+            user_services.get_user_settings_by_auth_id(auth_id, strict=True))
         self.assertEqual(user_settings_model.id, user_settings.user_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
-        self.assertEqual(user_settings_model.username, user_settings.username)
 
-    def test_get_user_settings_by_gae_id_strict_for_nonexistent_gae_id_is_none(
+    def test_get_user_settings_by_auth_id_strict_for_missing_auth_id_is_none(
             self):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.get_user_settings_by_gae_id('gae_id_x', strict=True)
+            user_services.get_user_settings_by_auth_id('auth_id_x', strict=True)
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
@@ -463,11 +414,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_set_and_get_user_email_preferences(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'username'
         user_email = 'user@example.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         # When UserEmailPreferencesModel is yet to be created,
@@ -510,12 +461,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
     def test_set_and_get_user_email_preferences_for_exploration(self):
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         exploration_id = 'someExploration'
         username = 'username'
         user_email = 'user@example.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         # When ExplorationUserDataModel is yet to be created, the value
@@ -575,16 +526,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.mute_suggestion_notifications)
 
     def test_get_usernames_by_role(self):
-        gae_ids = ['test1', 'test2', 'test3', 'test4']
+        auth_ids = ['test1', 'test2', 'test3', 'test4']
         usernames = ['name1', 'name2', 'name3', 'name4']
         user_emails = [
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
         user_ids = []
-        for gae_id, email, name in python_utils.ZIP(
-                gae_ids, user_emails, usernames):
-            user_id = user_services.create_new_user(gae_id, email).user_id
+        for auth_id, email, name in python_utils.ZIP(
+                auth_ids, user_emails, usernames):
+            user_id = user_services.create_new_user(auth_id, email).user_id
             user_ids.append(user_id)
             user_services.set_username(user_id, name)
 
@@ -603,7 +554,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             set(['name3', 'name4']))
 
     def test_get_user_ids_by_role(self):
-        gae_ids = ['test1', 'test2', 'test3', 'test4']
+        auth_ids = ['test1', 'test2', 'test3', 'test4']
         usernames = ['name1', 'name2', 'name3', 'name4']
         user_emails = [
             'test1@email.com', 'test2@email.com',
@@ -611,7 +562,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_ids = []
         for uid, email, name in python_utils.ZIP(
-                gae_ids, user_emails, usernames):
+                auth_ids, user_emails, usernames):
             user_id = user_services.create_new_user(uid, email).user_id
             user_ids.append(user_id)
             user_services.set_username(user_id, name)
@@ -631,11 +582,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             set([user_ids[2], user_ids[3]]))
 
     def test_update_user_creator_dashboard_display(self):
-        gae_id = 'test_id'
+        auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         user_setting = user_services.get_user_settings(user_id)
@@ -651,11 +602,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
 
     def test_update_user_role(self):
-        gae_id = 'test_id'
+        auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         self.assertEqual(
@@ -676,13 +627,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 non_existent_user_id)
 
     def test_update_user_role_from_learner_to_other_role_raises_exception(self):
-        gae_id = 'test_id'
+        auth_id = 'test_id'
         user_email = 'test@email.com'
         user_pin = '12345'
         profile_pin = '123'
         display_alias = 'display_alias'
         display_alias_2 = 'display_alias_2'
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
 
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
@@ -692,7 +643,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.pin = profile_pin
 
         user_services.create_new_profiles(
-            gae_id, user_email, [self.modifiable_new_user_data])
+            auth_id, user_email, [self.modifiable_new_user_data])
         profile_user_id = (
             user_services.get_all_profiles_auth_details_by_parent_user_id(
                 user_id)[0].user_id
@@ -706,10 +657,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 profile_user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
     def test_update_user_role_from_other_role_to_learner_raises_exception(self):
-        gae_id = 'test_id'
+        auth_id = 'test_id'
         user_email = 'test@email.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         self.assertEqual(
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_EXPLORATION_EDITOR)
@@ -719,51 +670,30 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 user_id, feconf.ROLE_ID_LEARNER)
 
     def test_create_new_user_creates_a_new_user_auth_details_entry(self):
-        new_gae_id = 'new_gae_id'
+        new_auth_id = 'new_auth_id'
         new_email = 'new@example.com'
 
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, new_gae_id)
-        )
+        self.assertIsNone(auth_services.get_user_id_from_auth_id(new_auth_id))
 
-        user_services.create_new_user(new_gae_id, new_email)
-        user_settings = user_services.get_user_settings_by_gae_id(new_gae_id)
-        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
-            user_settings.user_id)
-        self.assertEqual(user_auth_details.gae_id, new_gae_id)
+        user_id = user_services.create_new_user(new_auth_id, new_email).user_id
 
-    def test_create_new_user_creates_a_new_user_identifiers_entry(self):
-        new_gae_id = 'new_gae_id'
-        new_email = 'new@example.com'
-
-        self.assertIsNone(
-            user_models.UserIdentifiersModel.get_by_id(new_gae_id))
-
-        user_services.create_new_user(new_gae_id, new_email)
-        user_settings = user_services.get_user_settings_by_gae_id(new_gae_id)
-        user_identifiers = (
-            user_models.UserIdentifiersModel.get_by_id(new_gae_id))
-        self.assertEqual(user_settings.user_id, user_identifiers.user_id)
+        self.assertIsNotNone(auth_models.UserAuthDetailsModel.get(user_id))
+        self.assertEqual(
+            auth_services.get_auth_id_from_user_id(user_id), new_auth_id)
 
     def test_get_auth_details_by_user_id_for_existing_user_works_fine(self):
-        gae_id = 'new_gae_id'
+        auth_id = 'new_auth_id'
         email = 'new@example.com'
-        user_services.create_new_user(gae_id, email)
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id)
-        )
-        user_auth_details = user_services.get_auth_details_by_user_id(
-            user_auth_details_model.id)
+        user_id = user_services.create_new_user(auth_id, email).user_id
+        user_auth_details_model = auth_models.UserAuthDetailsModel.get(user_id)
+        user_auth_details = user_services.get_auth_details_by_user_id(user_id)
         self.assertEqual(
             user_auth_details.user_id, user_auth_details_model.id)
         self.assertEqual(
             user_auth_details.gae_id, user_auth_details_model.gae_id)
         self.assertEqual(
             user_auth_details.parent_user_id,
-            user_auth_details_model.parent_user_id
-        )
+            user_auth_details_model.parent_user_id)
 
     def test_get_auth_details_by_user_id_non_existing_user_returns_none(self):
         non_existent_user_id = 'id_x'
@@ -777,24 +707,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_auth_details_by_user_id(
                 non_existent_user_id, strict=True)
 
-    def test_get_auth_details_by_gae_id_non_existing_user_returns_none(self):
+    def test_get_auth_details_by_auth_id_non_existing_user_returns_none(self):
         non_existent_user_id = 'id_x'
         self.assertIsNone(
             user_services.get_auth_details_by_user_id(non_existent_user_id))
 
     def test_create_new_profile_with_parent_user_pin_set_is_success(self):
-        gae_id = 'gae_id'
+        auth_id = 'auth_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
         display_alias_2 = 'display_alias2'
         user_pin = '12345'
         profile_pin = '123'
-        user_services.create_new_user(gae_id, email)
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id)
-        )
-        user_id = user_auth_details_model.id
+        user_id = user_services.create_new_user(auth_id, email).user_id
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -802,7 +727,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
         user_services.create_new_profiles(
-            gae_id, email, [self.modifiable_new_user_data]
+            auth_id, email, [self.modifiable_new_user_data]
         )
 
         user_auth_details_models = (
@@ -814,32 +739,27 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(user_auth_details_models[0].gae_id)
 
     def test_create_new_profile_with_parent_user_pin_not_set_raises_error(self):
-        gae_id = 'gae_id'
+        auth_id = 'auth_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
         profile_pin = '123'
-        user_services.create_new_user(gae_id, email)
+        user_services.create_new_user(auth_id, email)
         error_msg = 'Pin must be set for a full user before creating a profile.'
         with self.assertRaisesRegexp(Exception, error_msg):
             self.modifiable_new_user_data.display_alias = display_alias
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
-                gae_id, email, [self.modifiable_new_user_data])
+                auth_id, email, [self.modifiable_new_user_data])
 
     def test_create_multiple_new_profiles_for_same_user_works_correctly(self):
-        gae_id = 'gae_id'
+        auth_id = 'auth_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
         display_alias_2 = 'display_alias2'
         display_alias_3 = 'display_alias3'
         user_pin = '12345'
         profile_pin = '123'
-        user_services.create_new_user(gae_id, email)
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id)
-        )
-        user_id = user_auth_details_model.id
+        user_id = user_services.create_new_user(auth_id, email).user_id
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -859,7 +779,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_domain.ModifiableUserData.from_raw_dict(
                 new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
-            gae_id, email, [
+            auth_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
             ]
         )
@@ -869,22 +789,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_auth_details_models = [
             {
                 'id': model.id,
-                'gae_id': model.gae_id,
+                'auth_id': model.gae_id,
                 'parent_user_id': model.parent_user_id
             } for model in
-            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
-                user_id)
+            auth_services.get_all_profiles_by_parent_user_id(user_id)
         ]
 
         expected_user_auth_output = [
             {
                 'id': profile_1_id,
-                'gae_id': None,
+                'auth_id': None,
                 'parent_user_id': user_id
             },
             {
                 'id': profile_2_id,
-                'gae_id': None,
+                'auth_id': None,
                 'parent_user_id': user_id
             }
         ]
@@ -920,7 +839,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings_models, expected_user_settings_output)
 
     def test_create_new_profile_with_nonexistent_user_raises_error(self):
-        non_existent_gae_id = 'gae_id_x'
+        non_existent_auth_id = 'auth_id_x'
         non_existent_email = 'x@example.com'
         profile_pin = '123'
         display_alias = 'display_alias'
@@ -929,23 +848,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.modifiable_new_user_data.display_alias = display_alias
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
-                non_existent_gae_id, non_existent_email,
+                non_existent_auth_id, non_existent_email,
                 [self.modifiable_new_user_data]
             )
 
     def test_create_new_profile_modifiable_user_with_user_id_raises_error(self):
-        gae_id = 'gae_id'
+        auth_id = 'auth_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
         display_alias_2 = 'display_alias2'
         user_pin = '12345'
         profile_pin = '123'
-        user_services.create_new_user(gae_id, email)
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id)
-        )
-        user_id = user_auth_details_model.id
+        user_id = user_services.create_new_user(auth_id, email).user_id
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -956,15 +870,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.modifiable_new_user_data.pin = profile_pin
             self.modifiable_new_user_data.user_id = 'user_id'
             user_services.create_new_profiles(
-                gae_id, email, [self.modifiable_new_user_data]
+                auth_id, email, [self.modifiable_new_user_data]
             )
 
     def test_update_users_modifiable_object_user_id_not_set_raises_error(self):
-        gae_id = 'gae_id'
+        auth_id = 'auth_id'
         email = 'new@example.com'
         display_alias = 'display_alias2'
         user_pin = '12345'
-        user_services.create_new_user(gae_id, email)
+        user_services.create_new_user(auth_id, email)
         self.modifiable_user_data.user_id = None
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -975,12 +889,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 [self.modifiable_user_data])
 
     def test_update_users_for_user_with_non_existent_id_raises_error(self):
-        gae_id = 'gae_id'
+        auth_id = 'auth_id'
         non_existent_user_id = 'id_x'
         email = 'new@example.com'
         display_alias = 'display_alias2'
         user_pin = '12345'
-        user_services.create_new_user(gae_id, email)
+        user_services.create_new_user(auth_id, email)
         self.modifiable_user_data.user_id = non_existent_user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -992,19 +906,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_users_data_for_multiple_users_works_correctly(self):
         # Preparing for the test.
-        gae_id = 'gae_id'
+        auth_id = 'auth_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
         display_alias_2 = 'display_alias2'
         display_alias_3 = 'display_alias3'
         user_pin = '12345'
         profile_pin = '123'
-        user_services.create_new_user(gae_id, email)
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id)
-        )
-        user_id = user_auth_details_model.id
+        user_id = user_services.create_new_user(auth_id, email).user_id
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -1024,7 +933,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_domain.ModifiableUserData.from_raw_dict(
                 new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
-            gae_id, email, [
+            auth_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
             ]
         )
@@ -1043,21 +952,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_auth_details_models = [
             {
                 'id': model.id,
-                'gae_id': model.gae_id,
+                'auth_id': model.gae_id,
                 'parent_user_id': model.parent_user_id
             } for model in
-            user_models.UserAuthDetailsModel.get_multi(profile_user_ids)
+            auth_models.UserAuthDetailsModel.get_multi(profile_user_ids)
         ]
 
         expected_auth_details_output = [
             {
                 'id': profile_user_ids[0],
-                'gae_id': None,
+                'auth_id': None,
                 'parent_user_id': user_id
             },
             {
                 'id': profile_user_ids[1],
-                'gae_id': None,
+                'auth_id': None,
                 'parent_user_id': user_id
             }
         ]
@@ -1089,52 +998,50 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             expected_user_settings_output, user_settings_models)
 
     def test_mark_user_for_deletion_deletes_user_settings(self):
-        gae_id = 'test_id'
+        auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        user_settings = user_services.get_user_settings_by_auth_id(auth_id)
         self.assertFalse(user_settings.deleted)
 
         user_services.mark_user_for_deletion(user_id)
 
-        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
-        self.assertTrue(user_settings.deleted)
+        user_settings = user_services.get_user_settings_by_auth_id(auth_id)
+        self.assertIsNone(user_settings)
 
     def test_mark_user_for_deletion_deletes_user_auth_details_entry(self):
-        gae_id = 'test_id'
+        auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(user_id)
+        user_auth_details = auth_models.UserAuthDetailsModel.get_by_id(user_id)
         self.assertFalse(user_auth_details.deleted)
 
         user_services.mark_user_for_deletion(user_id)
 
-        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(user_id)
+        user_auth_details = auth_models.UserAuthDetailsModel.get_by_id(user_id)
         self.assertTrue(user_auth_details.deleted)
 
     def test_mark_user_for_deletion_deletes_user_identifiers_entry(self):
-        gae_id = 'test_id'
+        auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
 
-        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_identifiers = user_models.UserIdentifiersModel.get_by_id(gae_id)
-        self.assertFalse(user_identifiers.deleted)
+        self.assertIsNotNone(auth_services.get_auth_id_from_user_id(user_id))
 
         user_services.mark_user_for_deletion(user_id)
 
-        user_identifiers = user_models.UserIdentifiersModel.get_by_id(gae_id)
-        self.assertTrue(user_identifiers.deleted)
+        self.assertIsNone(auth_services.get_auth_id_from_user_id(user_id))
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -1157,41 +1064,26 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(datetime_strings[1], '2012-02-28')
 
     def test_parse_date_from_string(self):
-        test_datetime_strings = [
-            '2016-06-30',
-            '2016-07-05',
-            '2016-13-01',
-            '2016-03-32'
-        ]
-
         self.assertEqual(
-            user_services.parse_date_from_string(test_datetime_strings[0]),
-            {
-                'year': 2016,
-                'month': 6,
-                'day': 30
-            })
+            user_services.parse_date_from_string('2016-06-30'),
+            {'year': 2016, 'month': 6, 'day': 30})
         self.assertEqual(
-            user_services.parse_date_from_string(test_datetime_strings[1]),
-            {
-                'year': 2016,
-                'month': 7,
-                'day': 5
-            })
+            user_services.parse_date_from_string('2016-07-05'),
+            {'year': 2016, 'month': 7, 'day': 5})
 
         with self.assertRaisesRegexp(
             ValueError,
             'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''):
-            user_services.parse_date_from_string(test_datetime_strings[2])
+            user_services.parse_date_from_string('2016-13-01')
         with self.assertRaisesRegexp(ValueError, 'unconverted data remains: 2'):
-            user_services.parse_date_from_string(test_datetime_strings[3])
+            user_services.parse_date_from_string('2016-03-32')
 
     def test_record_user_started_state_translation_tutorial(self):
         # Testing of the user translation tutorial firsttime state storage.
-        gae_id = 'someUser'
+        auth_id = 'someUser'
         username = 'username'
         user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
+            auth_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         user_services.record_user_started_state_translation_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
@@ -1596,12 +1488,12 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubjectInterestsUnitTests, self).setUp()
-        self.gae_id = 'someUser'
+        self.auth_id = 'someUser'
         self.username = 'username'
         self.user_email = 'user@example.com'
 
         self.user_id = user_services.create_new_user(
-            self.gae_id, self.user_email).user_id
+            self.auth_id, self.user_email).user_id
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):
@@ -1980,29 +1872,27 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = 'temp_name'
         user_services.update_multiple_users_data([self.modifiable_user_data])
 
-        gae_id = self.get_gae_id_from_email(self.OWNER_EMAIL)
+        auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
         profile_pin = '123'
         error_msg = 'Expected display_alias to be a string, received'
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
             self.modifiable_new_user_data.display_alias = ''
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
-                gae_id, self.OWNER_EMAIL, [self.modifiable_new_user_data]
+                auth_id, self.OWNER_EMAIL, [self.modifiable_new_user_data]
             )
 
     def test_has_not_fully_registered_for_guest_user_is_false(self):
         self.assertFalse(user_services.has_fully_registered_account(None))
 
-    def test_create_new_user_with_existing_gae_id_raises_error(self):
+    def test_create_new_user_with_existing_auth_id_raises_error(self):
         user_id = self.user_settings.user_id
-        user_gae_id = (
-            user_services.get_auth_details_by_user_id(user_id).gae_id)
+        user_auth_id = auth_services.get_auth_id_from_user_id(user_id)
         with self.assertRaisesRegexp(
-            Exception, 'User %s already exists for gae_id %s.'
-            % (user_id, user_gae_id)
+            Exception, 'User %s already exists for auth_id %s.'
+            % (user_id, user_auth_id)
         ):
-            user_services.create_new_user(
-                user_gae_id, self.OWNER_EMAIL)
+            user_services.create_new_user(user_auth_id, self.OWNER_EMAIL)
 
     def test_cannot_set_existing_username(self):
         with self.assertRaisesRegexp(
@@ -2057,8 +1947,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
             self):
-        user_id = (
-            user_services.create_new_user('gae_id', 'user@example.com').user_id)
+        user_id = user_services.create_new_user(
+            'auth_id', 'user@example.com').user_id
         user_services.set_username(user_id, 'username')
         user_services.mark_user_for_deletion(user_id)
         human_readable_user_ids = user_services.get_human_readable_user_ids(
@@ -2072,7 +1962,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         # created_on should not be updated upon updating other attributes of
         # the user settings model.
         user_settings = user_services.create_new_user(
-            'gae_id', 'user@example.com')
+            'auth_id', 'user@example.com')
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
@@ -2083,160 +1973,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         self.assertEqual(user_settings_model.created_on, time_of_creation)
-
-
-class UserAuthDetailsTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(UserAuthDetailsTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_id(self.owner_id))
-        self.user_auth_details = user_services.UserAuthDetails(
-            self.user_auth_details_model.id,
-            self.user_auth_details_model.gae_id
-        )
-        self.user_auth_details.validate()
-
-    def test_validate_non_str_user_id(self):
-        self.user_auth_details.user_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected user_id to be a string'
-        ):
-            self.user_auth_details.validate()
-
-    def test_validate_user_id(self):
-        self.user_auth_details.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
-
-        self.user_auth_details.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
-
-        self.user_auth_details.user_id = 'a' * 36
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
-
-    def test_validate_empty_user_id(self):
-        self.user_auth_details.user_id = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'No user id specified.'
-        ):
-            self.user_auth_details.validate()
-
-    def test_validate_parent_user_id(self):
-        self.user_auth_details.parent_user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
-
-        self.user_auth_details.parent_user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
-
-        self.user_auth_details.parent_user_id = 'a' * 36
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
-
-    def test_validate_non_str_gae_id(self):
-        self.user_auth_details.gae_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_id to be a string'
-        ):
-            self.user_auth_details.validate()
-
-    def test_parent_user_id_gae_id_together_raises_error(self):
-        self.user_auth_details.parent_user_id = (
-            user_models.UserSettingsModel.get_new_id(''))
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID and gae_id cannot be '
-            'present together for a user.'
-        ):
-            self.user_auth_details.validate()
-
-    def test_both_parent_user_id_and_gae_id_none_raises_error(self):
-        self.user_auth_details.parent_user_id = None
-        self.user_auth_details.gae_id = None
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID and gae_id cannot be '
-            'None together for a user.'
-        ):
-            self.user_auth_details.validate()
-
-
-class UserIdentifiersTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(UserIdentifiersTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_identifiers_model = (
-            user_models.UserIdentifiersModel.get_by_user_id(self.owner_id))
-        self.user_identifiers = user_services.UserIdentifiers(
-            self.user_identifiers_model.id,
-            self.user_identifiers_model.user_id
-        )
-        self.user_identifiers.validate()
-
-    def test_validate_non_str_user_id(self):
-        self.user_identifiers.user_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected user_id to be a string'
-        ):
-            self.user_identifiers.validate()
-
-    def test_validate_user_id(self):
-        self.user_identifiers.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_identifiers.validate()
-
-        self.user_identifiers.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_identifiers.validate()
-
-        self.user_identifiers.user_id = 'a' * 36
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_identifiers.validate()
-
-    def test_validate_empty_gae_id(self):
-        self.user_identifiers.user_id = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'No user id specified.'
-        ):
-            self.user_identifiers.validate()
-
-    def test_validate_empty_user_id(self):
-        self.user_identifiers.gae_id = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'No GAE id specified.'
-        ):
-            self.user_identifiers.validate()
-
-    def test_validate_non_str_gae_id(self):
-        self.user_identifiers.gae_id = 123
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_id to be a string'
-        ):
-            self.user_identifiers.validate()
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
@@ -2993,7 +2729,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_contribution_reviewer_usernames(
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
-    def test_get_contribution_reviewer_usernames_in_invalid_category_raise_error( # pylint: disable=line-too-long
+    def test_get_contribution_reviewer_usernames_with_invalid_category_raises(
             self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid review category: invalid_category'):

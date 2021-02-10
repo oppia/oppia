@@ -27,7 +27,7 @@ import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactor
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-interface ReadOnlyExplorationBackendDict {
+export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
   'param_changes': ParamChangeBackendDict[];
   'param_specs': ParamSpecsBackendDict;
@@ -46,6 +46,7 @@ export interface FetchExplorationBackendResponse {
   'session_id': string;
   'version': number;
   'preferred_audio_language_code': string;
+  'preferred_language_codes': string[];
   'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;

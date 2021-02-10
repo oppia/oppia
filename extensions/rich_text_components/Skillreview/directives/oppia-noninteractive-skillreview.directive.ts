@@ -75,7 +75,9 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
                 'OppiaNoninteractiveSkillreviewConceptCardModalController')
             }).result.then(function() {}, function(res) {
               ContextService.removeCustomEntityContext();
-              if (!(res === 'cancel' || res === 'escape key press')) {
+              let allowedDismissActions = (
+                ['cancel', 'escape key press', 'backdrop click']);
+              if (!allowedDismissActions.includes(res)) {
                 throw new Error(res);
               }
             });

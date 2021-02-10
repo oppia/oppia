@@ -35,8 +35,9 @@ angular.module('oppia').controller('SaveVersionMismatchModalController', [
     // When the user clicks on discard changes button, signal backend
     // to discard the draft and reload the page thereafter.
     $scope.discardChanges = function() {
-      ExplorationDataService.discardDraft(function() {
+      ExplorationDataService.discardDraft().then(() => {
         _refreshPage(MSECS_TO_REFRESH);
+        $scope.$applyAsync();
       });
     };
 
