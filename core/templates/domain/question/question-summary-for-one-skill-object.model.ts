@@ -64,16 +64,16 @@ export class QuestionSummaryForOneSkill {
   }
 
   static createFromBackendDict(
-    backendDict:
+      backendDict:
     QuestionSummaryForOneSkillBackendDict): QuestionSummaryForOneSkill {
-  var questionSummary =
+    var questionSummary =
     QuestionSummary.createFromBackendDict(
       backendDict.summary);
-  return new QuestionSummaryForOneSkill(
-    backendDict.skill_id,
-    backendDict.skill_description,
-    backendDict.skill_difficulty,
-    questionSummary
-  );
-}
+    return new QuestionSummaryForOneSkill(
+      backendDict.skill_id,
+      backendDict.skill_description,
+      backendDict.skill_difficulty,
+      questionSummary
+    );
+  }
 }

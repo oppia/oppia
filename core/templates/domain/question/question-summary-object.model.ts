@@ -60,11 +60,11 @@ export class QuestionSummary {
   }
 
   static createFromBackendDict(
-    backendDict: QuestionSummaryBackendDict): QuestionSummary {
-  return new QuestionSummary(
-    backendDict.id,
-    backendDict.question_content,
-    backendDict.interaction_id,
-    backendDict.misconception_ids);
-}
+      backendDict: QuestionSummaryBackendDict): QuestionSummary {
+    return new QuestionSummary(
+      backendDict.id,
+      backendDict.question_content,
+      backendDict.interaction_id,
+      backendDict.misconception_ids);
+  }
 }
