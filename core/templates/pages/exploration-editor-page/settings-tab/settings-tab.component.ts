@@ -411,7 +411,6 @@ angular.module('oppia').component('settingsTab', {
           )
         );
         ctrl.directiveSubscriptions.add(
-          // eslint-disable-next-line max-len
           ExplorationSaveService.onExplorationPublished.subscribe(
             () => {
               UserExplorationPermissionsService.getPermissionsAsync()
