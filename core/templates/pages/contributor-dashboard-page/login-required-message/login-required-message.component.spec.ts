@@ -16,73 +16,70 @@
  * @fileoverview Unit tests for loginRequiredMessage.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// file is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { ComponentFixture, flushMicrotasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-describe('Login required message component', function() {
-  var ctrl = null;
-  var $flushPendingTasks = null;
-  var $q = null;
-  var $scope = null;
-  var userService = null;
+import { LoginRequiredMessageComponent } from 'pages/contributor-dashboard-page/login-required-message/login-required-message.component';
+import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
 
-  var mockWindow = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    mockWindow = {
+describe('Login required message component', () => {
+  let component: LoginRequiredMessageComponent;
+  let fixture: ComponentFixture<LoginRequiredMessageComponent>;
+  let userService: UserService;
+  let windowRef: WindowRef;
+  let httpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [LoginRequiredMessageComponent]
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(
+      LoginRequiredMessageComponent);
+    component = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
+    windowRef = TestBed.inject(WindowRef);
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: jasmine.createSpy('reload', () => {})
+        reload: ()=>{},
+        href: 'starting-url'
       }
-    };
+    });
+    component.ngOnInit();
+  });
 
-    $provide.value('$window', mockWindow);
-  }));
-
-  beforeEach(angular.mock.module('oppia', $provide => {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $flushPendingTasks = $injector.get('$flushPendingTasks');
-    var $rootScope = $injector.get('$rootScope');
-    $q = $injector.get('$q');
-    userService = $injector.get('UserService');
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('loginRequiredMessage');
-    ctrl.$onInit();
-  }));
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
   it('should initialize controller properties after its initialization',
-    function() {
-      expect(ctrl.OPPIA_AVATAR_IMAGE_URL).toBe(
+    () => {
+      expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
         '/assets/images/avatar/oppia_avatar_100px.svg');
     });
 
-  it('should go to login url when login button is clicked', function() {
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-      $q.resolve('login-url'));
+  it('should go to login url when login button is clicked', fakeAsync(() => {
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('login-url');
 
-    ctrl.onLoginButtonClicked();
-    $scope.$apply();
-    $flushPendingTasks();
+    component.onLoginButtonClicked();
+    flushMicrotasks();
+    tick(151);
 
-    expect(mockWindow.location).toBe('login-url');
-  });
+    expect(windowRef.nativeWindow.location.href).toBe('login-url');
+  }));
 
   it('should refresh page if login url is not provided when login button is' +
-    ' clicked', function() {
+    ' clicked', fakeAsync(() => {
+    const reloadSpy = spyOn(windowRef.nativeWindow.location, 'reload');
     spyOn(userService, 'getLoginUrlAsync')
-      .and.returnValue($q.resolve(null));
+      .and.resolveTo(null);
+    component.onLoginButtonClicked();
+    flushMicrotasks();
 
-    ctrl.onLoginButtonClicked();
-    $scope.$apply();
-
-    expect(mockWindow.location.reload).toHaveBeenCalled();
-  });
+    expect(reloadSpy).toHaveBeenCalled();
+  }));
 });
