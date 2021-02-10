@@ -16,100 +16,111 @@
  * @fileoverview Service for all tutorials to be run only for the first time.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-require(
-  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service.ts';
+import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 
-angular.module('oppia').factory('StateTutorialFirstTimeService', [
-  '$http', 'EditorFirstTimeEventsService',
-  function($http, EditorFirstTimeEventsService) {
-    // Whether this is the first time the tutorial has been seen by this user.
-    var _currentlyInEditorFirstVisit = true;
-    var STARTED_EDITOR_TUTORIAL_EVENT_URL = '/createhandler/' +
-    'started_tutorial_event';
-    var _currentlyInTranslationFirstVisit = true;
-    var _translationTutorialNotSeenBefore = false;
-    var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
-    'started_translation_tutorial_event';
-    /** @private */
-    var enterEditorForTheFirstTimeEventEmitter = new EventEmitter();
-    /** @private */
-    var enterTranslationForTheFirstTimeEventEmitter = new EventEmitter();
+@Injectable({
+  providedIn: 'root'
+})
+export class StateTutorialFirstTimeService {
+  // Whether this is the first time the tutorial has been seen by this user.
+  private _currentlyInEditorFirstVisit: boolean = true;
+  private _currentlyInTranslationFirstVisit: boolean = true;
+  private _translationTutorialNotSeenBefore: boolean = false;
 
-    var _openEditorTutorialEventEmitter = new EventEmitter();
-    var _openPostTutorialHelpPopoverEventEmitter = new EventEmitter();
-    var _openTranslationTutorialEventEmitter = new EventEmitter();
+  private enterEditorForTheFirstTimeEventEmitter = new EventEmitter();
+  private enterTranslationForTheFirstTimeEventEmitter = new EventEmitter();
 
-    return {
-      initEditor: function(firstTime, expId) {
-        // After the first call to it in a client session, this does nothing.
-        if (!firstTime || !_currentlyInEditorFirstVisit) {
-          _currentlyInEditorFirstVisit = false;
-        }
+  private _openEditorTutorialEventEmitter = new EventEmitter();
+  private _openPostTutorialHelpPopoverEventEmitter = new EventEmitter();
+  private _openTranslationTutorialEventEmitter = new EventEmitter();
 
-        if (_currentlyInEditorFirstVisit) {
-          enterEditorForTheFirstTimeEventEmitter.emit();
-          EditorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).then(
-            null, function() {
-              console.error(
-                'Warning: could not record editor tutorial start event.');
-            });
-        }
-      },
-      markEditorTutorialFinished: function() {
-        if (_currentlyInEditorFirstVisit) {
-          _openPostTutorialHelpPopoverEventEmitter.emit();
-          EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
-        }
+  constructor(
+    private editorFirstTimeEventsService : EditorFirstTimeEventsService,
+    private tutorialEventsBackendApiService: TutorialEventsBackendApiService) {}
 
-        _currentlyInEditorFirstVisit = false;
-      },
-      markTranslationTutorialNotSeenBefore: function() {
-        _translationTutorialNotSeenBefore = true;
-      },
-      initTranslation: function(expId) {
-        // After the first call to it in a client session, this does nothing.
-        if (!_translationTutorialNotSeenBefore ||
-            !_currentlyInTranslationFirstVisit) {
-          _currentlyInTranslationFirstVisit = false;
-        }
+  initEditor(firstTime: boolean, expId: string): void {
+    // After the first call to it in a client session, this does nothing.
+    if (!firstTime || !this._currentlyInEditorFirstVisit) {
+      this._currentlyInEditorFirstVisit = false;
+    }
 
-        if (_currentlyInTranslationFirstVisit) {
-          enterTranslationForTheFirstTimeEventEmitter.emit();
-          EditorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
-            .then(null, function() {
-              console.error(
-                'Warning: could not record translation tutorial start event.'
-              );
-            });
-        }
-      },
-      markTranslationTutorialFinished: function() {
-        if (_currentlyInTranslationFirstVisit) {
-          _openPostTutorialHelpPopoverEventEmitter.emit();
-          EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
-        }
-
-        _currentlyInTranslationFirstVisit = false;
-      },
-      get onEnterEditorForTheFirstTime() {
-        return enterEditorForTheFirstTimeEventEmitter;
-      },
-      get onEnterTranslationForTheFirstTime() {
-        return enterTranslationForTheFirstTimeEventEmitter;
-      },
-      get onOpenEditorTutorial() {
-        return _openEditorTutorialEventEmitter;
-      },
-      get onOpenPostTutorialHelpPopover() {
-        return _openPostTutorialHelpPopoverEventEmitter;
-      },
-      get onOpenTranslationTutorial() {
-        return _openTranslationTutorialEventEmitter;
-      }
-    };
+    if (this._currentlyInEditorFirstVisit) {
+      this.enterEditorForTheFirstTimeEventEmitter.emit();
+      this.editorFirstTimeEventsService.initRegisterEvents(expId);
+      this.tutorialEventsBackendApiService
+        .recordStartedEditorTutorialEventAsync(expId).then(null, () => {
+          console.error(
+            'Warning: could not record editor tutorial start event.'
+          );
+        });
+    }
   }
-]);
+
+  markEditorTutorialFinished(): void {
+    if (this._currentlyInEditorFirstVisit) {
+      this._openPostTutorialHelpPopoverEventEmitter.emit();
+      this.editorFirstTimeEventsService.registerEditorFirstEntryEvent();
+    }
+
+    this._currentlyInEditorFirstVisit = false;
+  }
+
+  markTranslationTutorialNotSeenBefore(): void {
+    this._translationTutorialNotSeenBefore = true;
+  }
+
+  initTranslation(expId: string): void {
+    // After the first call to it in a client session, this does nothing.
+    if (!this._translationTutorialNotSeenBefore ||
+        !this._currentlyInTranslationFirstVisit) {
+      this._currentlyInTranslationFirstVisit = false;
+    }
+
+    if (this._currentlyInTranslationFirstVisit) {
+      this.enterTranslationForTheFirstTimeEventEmitter.emit();
+      this.editorFirstTimeEventsService.initRegisterEvents(expId);
+      this.tutorialEventsBackendApiService
+        .recordStartedTranslationTutorialEventAsync(expId).then(null, () => {
+          console.error(
+            'Warning: could not record translation tutorial start event.');
+        });
+    }
+  }
+
+  markTranslationTutorialFinished(): void {
+    if (this._currentlyInTranslationFirstVisit) {
+      this._openPostTutorialHelpPopoverEventEmitter.emit();
+      this.editorFirstTimeEventsService.registerEditorFirstEntryEvent();
+    }
+
+    this._currentlyInTranslationFirstVisit = false;
+  }
+
+  get onEnterEditorForTheFirstTime(): EventEmitter<unknown> {
+    return this.enterEditorForTheFirstTimeEventEmitter;
+  }
+
+  get onEnterTranslationForTheFirstTime(): EventEmitter<unknown> {
+    return this.enterTranslationForTheFirstTimeEventEmitter;
+  }
+
+  get onOpenEditorTutorial(): EventEmitter<unknown> {
+    return this._openEditorTutorialEventEmitter;
+  }
+
+  get onOpenPostTutorialHelpPopover(): EventEmitter<unknown> {
+    return this._openPostTutorialHelpPopoverEventEmitter;
+  }
+
+  get onOpenTranslationTutorial(): EventEmitter<unknown> {
+    return this._openTranslationTutorialEventEmitter;
+  }
+}
+
+angular.module('oppia').factory(
+  'StateTutorialFirstTimeService',
+  downgradeInjectable(StateTutorialFirstTimeService));
