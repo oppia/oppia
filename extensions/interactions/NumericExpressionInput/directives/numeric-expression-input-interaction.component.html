@@ -5,8 +5,9 @@
 </div>
 <!--
   Forced to use !important here as it makes the code easy to understand, but does not align with design principles.
-  Normal CSS styles aren't working as Guppy styles overrides them by default. Only way to fix this is to override the
-  specificity using !important.
+  A solution could be added using CSS, but for some reason the styles defined in this file seem to be overriden by Guppy.
+  Only way to fix this is to override the specificity using !important and force the component to take the styles from here
+  and not the styles defined by Guppy.
 -->
 <style>
   .guppy-div-learner {
@@ -23,6 +24,6 @@
     hyphens: auto;
     white-space: pre-wrap !important;
     width: 100% !important;
-    word-wrap: break-word;
+    word-wrap: break-all;
   }
 </style>
