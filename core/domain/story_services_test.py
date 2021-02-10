@@ -1958,14 +1958,14 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 completed_node.to_dict(), self.nodes[ind].to_dict())
 
-    def test_get_pending_nodes_in_story(self):
+    def test_get_pending_and_all_nodes_in_story(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
 
         # The starting index is 1 because the first story node is completed,
         # and the pending nodes will start from the second node.
         for index, pending_node in enumerate(
-                story_fetchers.get_pending_nodes_in_story(
-                    self.owner_id, self.STORY_1_ID), start=1):
+                story_fetchers.get_pending_and_all_nodes_in_story(
+                    self.owner_id, self.STORY_1_ID)['pending_nodes'], start=1):
             self.assertEqual(
                 pending_node.to_dict(), self.nodes[index].to_dict())
 
