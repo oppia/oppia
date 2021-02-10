@@ -109,7 +109,7 @@ angular.module('oppia').component('stateTranslation', {
       $scope.getRequiredHtml = function(subtitledHtml) {
         var html = null;
         if (isTranslatedTextRequired()) {
-          var contentId = subtitledHtml.getContentId();
+          var contentId = subtitledHtml.contentId;
           var activeLanguageCode = (
             TranslationLanguageService.getActiveLanguageCode());
           var writtenTranslations = (
@@ -123,7 +123,7 @@ angular.module('oppia').component('stateTranslation', {
             html = writtenTranslation.getHtml();
           }
         } else {
-          html = subtitledHtml.getHtml();
+          html = subtitledHtml.html;
         }
         return html;
       };
@@ -166,28 +166,28 @@ angular.module('oppia').component('stateTranslation', {
         let activeDataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
 
         if (tabId === $scope.TAB_ID_CONTENT) {
-          activeContentId = $scope.stateContent.getContentId();
+          activeContentId = $scope.stateContent.contentId;
         } else if (tabId === $scope.TAB_ID_FEEDBACK) {
           $scope.activeAnswerGroupIndex = 0;
           if ($scope.stateAnswerGroups.length > 0) {
             activeContentId = (
-              $scope.stateAnswerGroups[0].outcome.feedback.getContentId());
+              $scope.stateAnswerGroups[0].outcome.feedback.contentId);
           } else {
             activeContentId = (
-              $scope.stateDefaultOutcome.feedback.getContentId());
+              $scope.stateDefaultOutcome.feedback.contentId);
           }
         } else if (tabId === $scope.TAB_ID_HINTS) {
           $scope.activeHintIndex = 0;
           activeContentId = (
-            $scope.stateHints[0].hintContent.getContentId());
+            $scope.stateHints[0].hintContent.contentId);
         } else if (tabId === $scope.TAB_ID_SOLUTION) {
-          activeContentId = $scope.stateSolution.explanation.getContentId();
+          activeContentId = $scope.stateSolution.explanation.contentId;
         } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
           $scope.activeCustomizationArgContentIndex = 0;
           const activeContent = (
             $scope.interactionCustomizationArgTranslatableContent[0].content
           );
-          activeContentId = activeContent.getContentId();
+          activeContentId = activeContent.contentId;
           if (activeContent instanceof SubtitledUnicode) {
             activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
           }
@@ -226,7 +226,7 @@ angular.module('oppia').component('stateTranslation', {
           summary +=
             $filter(
               'convertToPlainText'
-            )(defaultOutcome.feedback.getHtml());
+            )(defaultOutcome.feedback.html);
         }
         return summary;
       };
@@ -253,8 +253,8 @@ angular.module('oppia').component('stateTranslation', {
         if (hasFeedback) {
           summary += (
             shortenRule ?
-              $filter('truncate')(outcome.feedback.getHtml(), 30) :
-              $filter('convertToPlainText')(outcome.feedback.getHtml()));
+              $filter('truncate')(outcome.feedback.html, 30) :
+              $filter('convertToPlainText')(outcome.feedback.html));
         }
         return summary;
       };
@@ -310,7 +310,7 @@ angular.module('oppia').component('stateTranslation', {
         }
         $scope.activeHintIndex = newIndex;
         var activeContentId = (
-          $scope.stateHints[newIndex].hintContent.getContentId());
+          $scope.stateHints[newIndex].hintContent.contentId);
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
       };
@@ -327,7 +327,7 @@ angular.module('oppia').component('stateTranslation', {
           $scope.interactionCustomizationArgTranslatableContent[
             newIndex].content
         );
-        const activeContentId = activeContent.getContentId();
+        const activeContentId = activeContent.contentId;
         let activeDataFormat = null;
         if (activeContent instanceof SubtitledUnicode) {
           activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
@@ -349,11 +349,11 @@ angular.module('oppia').component('stateTranslation', {
           $scope.activeAnswerGroupIndex = newIndex;
           if (newIndex === $scope.stateAnswerGroups.length) {
             activeContentId = (
-              $scope.stateDefaultOutcome.feedback.getContentId());
+              $scope.stateDefaultOutcome.feedback.contentId);
           } else {
             activeContentId = (
               $scope.stateAnswerGroups[newIndex]
-                .outcome.feedback.getContentId());
+                .outcome.feedback.contentId);
           }
           TranslationTabActiveContentIdService.setActiveContent(
             activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
@@ -386,9 +386,9 @@ angular.module('oppia').component('stateTranslation', {
 
       $scope.getSubtitledContentSummary = function(subtitledContent) {
         if (subtitledContent instanceof SubtitledHtml) {
-          return $filter('formatRtePreview')(subtitledContent.getHtml());
+          return $filter('formatRtePreview')(subtitledContent.html);
         } else if (subtitledContent instanceof SubtitledUnicode) {
-          return subtitledContent.getUnicode();
+          return subtitledContent.unicode;
         }
       };
 

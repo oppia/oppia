@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0031.
+presubmit checks. Next message id would be C0032.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1484,6 +1484,77 @@ class RestrictedImportChecker(checkers.BaseChecker):
             'domain layer and controller layer respectively.'),
     }
 
+    options = (
+        (
+            'forbidden-imports',
+            {
+                'default': [],
+                'type': 'csv',
+                'metavar': '<comma separated list>',
+                'help': (
+                    'List of disallowed imports. The items start with '
+                    'the module name where the imports are forbidden, the path '
+                    'needs to be absolute with the root module name included '
+                    '(e.g. \'oppia.core.domain\'), then comes '
+                    'the \':\' separator, and after that a list of the imports '
+                    'that are forbidden separated by \'|\', these imports are '
+                    'relative to the root module (e.g. \'core.domain\').'
+                )
+            }
+        ),
+    )
+
+    def __init__(self, linter=None):
+        super(RestrictedImportChecker, self).__init__(linter)
+        self._module_to_forbidden_imports = []
+
+    def open(self):
+        """Parse the forbidden imports."""
+        splitted_module_to_forbidden_imports = [
+            forbidden_import.strip().split(':')
+            for forbidden_import in self.config.forbidden_imports
+        ]
+        self._module_to_forbidden_imports = list(
+            (
+                forbidden_imports[0].strip(),
+                [import_.strip() for import_ in forbidden_imports[1].split('|')]
+            ) for forbidden_imports in splitted_module_to_forbidden_imports
+        )
+
+    def _iterate_forbidden_imports(self, node):
+        """Yields pairs of module name and forbidden imports.
+
+        Args:
+            node: astroid.node_classes.Import. Node for a import statement
+                in the AST.
+
+        Yields:
+            tuple(str, str). Yields pair of module name and forbidden import.
+        """
+        modnode = node.root()
+        for module_name, forbidden_imports in self._module_to_forbidden_imports:
+            for forbidden_import in forbidden_imports:
+                if module_name in modnode.name and not '_test' in modnode.name:
+                    yield module_name, forbidden_import
+
+    def _add_invalid_import_message(self, node, module_name, forbidden_import):
+        """Adds pylint message about the invalid import.
+
+        Args:
+            node: astroid.node_classes.Import. Node for a import statement
+                in the AST.
+            module_name: str. The module that was checked.
+            forbidden_import: str. The import that was invalid.
+        """
+        self.add_message(
+            'invalid-import',
+            node=node,
+            args=(
+                forbidden_import.split('.')[-1],
+                module_name.split('.')[-1]
+            ),
+        )
+
     def visit_import(self, node):
         """Visits every import statement in the file.
 
@@ -1491,25 +1562,12 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.Import. Node for a import statement
                 in the AST.
         """
-
-        modnode = node.root()
         names = [name for name, _ in node.names]
-        # Checks import of domain layer in storage layer.
-        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
-            if any('core.domain' in name for name in names):
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('domain', 'storage'),
-                )
-        # Checks import of controller layer in domain layer.
-        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
-            if any('core.controllers' in name for name in names):
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('controller', 'domain'),
-                )
+        for module_name, forbidden_import in self._iterate_forbidden_imports(
+                node):
+            if any(forbidden_import in name for name in names):
+                self._add_invalid_import_message(
+                    node, module_name, forbidden_import)
 
     def visit_importfrom(self, node):
         """Visits all import-from statements in a python file and checks that
@@ -1519,22 +1577,11 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-
-        modnode = node.root()
-        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
-            if 'core.domain' in node.modname:
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('domain', 'storage'),
-                )
-        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
-            if 'core.controllers' in node.modname:
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('controller', 'domain'),
-                )
+        for module_name, forbidden_import in self._iterate_forbidden_imports(
+                node):
+            if forbidden_import in node.modname:
+                self._add_invalid_import_message(
+                    node, module_name, forbidden_import)
 
 
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
@@ -1893,6 +1940,42 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
                 self.add_message('inequality-with-none', node=node)
 
 
+class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
+    """Custom pylint checker prohibiting use of "test_only" prefix in function
+    names of non-test files.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'non-test-files-function-name-checker'
+    priority = -1
+    msgs = {
+        'C0031': (
+            'Please change the name of the function so that it does not use '
+            '"test_only" as its prefix in non-test files.',
+            'non-test-files-function-name-checker',
+            'Prohibit use of "test_only" prefix in function names of non-test '
+            'files.'
+        )
+    }
+
+    def visit_functiondef(self, node):
+        """Visit every function definition and ensure their name doesn't have
+        test_only as its prefix.
+
+        Args:
+            node: astroid.nodes.FunctionDef. A node for a function or method
+                definition in the AST.
+        """
+        modnode = node.root()
+        if modnode.name.endswith('_test'):
+            return
+        function_name = node.name
+        if function_name.startswith('test_only'):
+            self.add_message(
+                'non-test-files-function-name-checker', node=node)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1913,3 +1996,4 @@ def register(linter):
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
     linter.register_checker(InequalityWithNoneChecker(linter))
+    linter.register_checker(NonTestFilesFunctionNameChecker(linter))

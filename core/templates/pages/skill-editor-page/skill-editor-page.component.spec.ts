@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for skill editor page component.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // Skill editor page is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -31,6 +33,8 @@ describe('Skill editor page', function() {
   var UndoRedoService = null;
   var $uibModal = null;
   var UrlService = null;
+  var $rootScope = null;
+  var mockOnSkillChangeEmitter = new EventEmitter();
 
   importAllAngularServices();
 
@@ -41,6 +45,7 @@ describe('Skill editor page', function() {
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
+    $rootScope = $injector.get('$rootScope');
     ctrl = $componentController('skillEditorPage');
   }));
 
@@ -52,6 +57,18 @@ describe('Skill editor page', function() {
       ctrl.$onInit();
       expect(SkillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
     });
+
+  it('should trigger a digest loop when onSkillChange is emitted', () => {
+    spyOnProperty(SkillEditorStateService, 'onSkillChange').and.returnValue(
+      mockOnSkillChangeEmitter);
+    spyOn(SkillEditorStateService, 'loadSkill').and.stub();
+    spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
+    spyOn($rootScope, '$applyAsync').and.callThrough();
+
+    ctrl.$onInit();
+    mockOnSkillChangeEmitter.emit();
+    expect($rootScope.$applyAsync).toHaveBeenCalled();
+  });
 
   it('should call confirm before leaving', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);

@@ -62,9 +62,9 @@ angular.module('oppia').factory('QuestionUpdateService', [
 
     var _getAllContentIds = function(state) {
       var allContentIdsSet = new Set();
-      allContentIdsSet.add(state.content.getContentId());
+      allContentIdsSet.add(state.content.contentId);
       state.interaction.answerGroups.forEach(function(answerGroup) {
-        allContentIdsSet.add(answerGroup.outcome.feedback.getContentId());
+        allContentIdsSet.add(answerGroup.outcome.feedback.contentId);
         answerGroup.rules.forEach(rule => {
           Object.keys(rule.inputs).forEach(inputName => {
             if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
@@ -75,14 +75,14 @@ angular.module('oppia').factory('QuestionUpdateService', [
       });
       if (state.interaction.defaultOutcome) {
         allContentIdsSet.add(
-          state.interaction.defaultOutcome.feedback.getContentId());
+          state.interaction.defaultOutcome.feedback.contentId);
       }
       state.interaction.hints.forEach(function(hint) {
-        allContentIdsSet.add(hint.hintContent.getContentId());
+        allContentIdsSet.add(hint.hintContent.contentId);
       });
       if (state.interaction.solution) {
         allContentIdsSet.add(
-          state.interaction.solution.explanation.getContentId());
+          state.interaction.solution.explanation.contentId);
       }
       const custArgs = state.interaction.customizationArgs;
       Interaction.getCustomizationArgContentIds(custArgs)

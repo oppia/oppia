@@ -160,21 +160,24 @@ angular.module('oppia').directive('outcomeEditor', [
           ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
             ctrl.feedbackEditorIsOpen = false;
             var contentHasChanged = (
-              ctrl.savedOutcome.feedback.getHtml() !==
-              ctrl.outcome.feedback.getHtml());
+              ctrl.savedOutcome.feedback.html !==
+              ctrl.outcome.feedback.html);
             ctrl.savedOutcome.feedback = angular.copy(
               ctrl.outcome.feedback);
 
             if (StateEditorService.isInQuestionMode()) {
               ctrl.savedOutcome.dest = null;
-            } else if (ctrl.savedOutcome.dest === ctrl.outcome.dest) {
+            } else if (
+              ctrl.savedOutcome.dest === ctrl.outcome.dest &&
+                !StateEditorService.getStateNames().includes(
+                  ctrl.outcome.dest)) {
               // If the stateName has changed and previously saved
               // destination points to the older name, update it to
               // the active state name.
               ctrl.savedOutcome.dest = StateEditorService.getActiveStateName();
             }
             if (fromClickSaveFeedbackButton && contentHasChanged) {
-              var contentId = ctrl.savedOutcome.feedback.getContentId();
+              var contentId = ctrl.savedOutcome.feedback.contentId;
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
             }
             ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
