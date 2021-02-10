@@ -15,7 +15,8 @@
 # limitations under the License.
 
 """Python file with invalid syntax, used by scripts/linters/
-python_linter_test. This file is using map() which is not allowed.
+python_linter_test. This file has a disallowed function usage but
+uses a pragma to ignore this invalid call.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -23,6 +24,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import python_utils
 
+__author__ = "Something" # disable-bad-pattern-check
 
 class FakeClass(python_utils.OBJECT):
     """This is a fake docstring for invalid syntax purposes."""
@@ -30,14 +32,12 @@ class FakeClass(python_utils.OBJECT):
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg
 
-    def fake_method(self, num):
+    def fake_method(self, name):
         """This doesn't do anything.
-
         Args:
-            num: list(int). Means nothing.
-
+            name: str. Means nothing.
         Yields:
-            tuple(list, list). The argument passed in but twice in a tuple.
+            tuple(str, str). The argument passed in but twice
+            in a tuple.
         """
-        num = list(map(lambda x: x + x, num)) # The map is not allowed to use.
-        yield (num, num)
+        yield (name, name) # disable-bad-pattern-check
