@@ -40,7 +40,7 @@ export class UserService {
     private userInfo = null;
     private returnUrl = '';
 
-    getUserInfoAsync(): Promise<UserInfo> {
+    async getUserInfoAsync(): Promise<UserInfo> {
       if (this.urlService.getPathname() === '/signup') {
         return new Promise((resolve, reject) => {
           resolve(UserInfo.createDefault());
@@ -58,7 +58,7 @@ export class UserService {
         });
     }
 
-    getProfileImageDataUrlAsync(): Promise<string> {
+    async getProfileImageDataUrlAsync(): Promise<string> {
       let defaultUrl = (
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
@@ -75,13 +75,13 @@ export class UserService {
         });
     }
 
-    setProfileImageDataUrlAsync(
+    async setProfileImageDataUrlAsync(
         newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
       return this.userBackendApiService.setProfileImageDataUrlAsync(
         newProfileImageDataUrl);
     }
 
-    getLoginUrlAsync(): Promise<string> {
+    async getLoginUrlAsync(): Promise<string> {
       return this.userBackendApiService.getLoginUrlAsync(
         this.returnUrl ||
         this.windowRef.nativeWindow.location.pathname);
@@ -91,14 +91,14 @@ export class UserService {
       this.returnUrl = newReturnUrl;
     }
 
-    getUserContributionRightsData():
+    async getUserContributionRightsDataAsync():
       Promise<UserContributionRightsDataBackendDict> {
       if (this.userContributionRightsInfo) {
         return new Promise((resolve, reject) => {
           resolve(this.userContributionRightsInfo);
         });
       }
-      return this.userBackendApiService.getUserContributionRightsData()
+      return this.userBackendApiService.getUserContributionRightsDataAsync()
         .then((userContributionRightsInfo) => {
           this.userContributionRightsInfo = userContributionRightsInfo;
           return this.userContributionRightsInfo;

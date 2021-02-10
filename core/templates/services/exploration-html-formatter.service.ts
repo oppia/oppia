@@ -80,8 +80,7 @@ export class ExplorationHtmlFormatterService {
     var interactionChoices = null;
 
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value.map(
-        choice => choice.getHtml());
+      interactionChoices = interactionCustomizationArgs.choices.value;
     }
 
     var el = $(
@@ -103,7 +102,7 @@ export class ExplorationHtmlFormatterService {
     // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value.map(
-        choice => choice.getHtml());
+        choice => choice.html);
     }
 
     var el = $(

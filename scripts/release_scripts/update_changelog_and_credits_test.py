@@ -503,6 +503,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'run_cmd_gets_called': True,
             'open_new_tab_in_browser_if_possible_gets_called': True
         }
+        filepaths_get_contents_is_called_with = []
         def mock_get_branch(unused_self, unused_branch_name):
             check_function_calls['get_branch_gets_called'] = True
             return github.Branch.Branch(
@@ -510,8 +511,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 attributes={'commit': {'sha': 'test'}}, completed='')
         def mock_create_git_ref(unused_self, ref, sha):  # pylint: disable=unused-argument
             check_function_calls['create_git_ref_gets_called'] = True
-        def mock_get_contents(unused_self, unused_filepath, ref):  # pylint: disable=unused-argument
+        def mock_get_contents(unused_self, filepath, ref):  # pylint: disable=unused-argument
             check_function_calls['get_contents_gets_called'] = True
+            filepaths_get_contents_is_called_with.append(filepath)
             return github.ContentFile.ContentFile(
                 requester='', headers='',
                 attributes={'path': 'path', 'sha': 'sha'}, completed='')
@@ -544,10 +546,14 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                     self.mock_repo, self.mock_repo, 'target_branch', 'username',
                     '1.2.3')
         self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertItemsEqual(
+            filepaths_get_contents_is_called_with,
+            update_changelog_and_credits.LIST_OF_FILEPATHS_TO_MODIFY
+        )
 
     def test_update_package_json(self):
         package_json_swap = self.swap(
-            update_changelog_and_credits, 'PACKAGE_JSON_PATH',
+            update_changelog_and_credits, 'PACKAGE_JSON_FILEPATH',
             MOCK_PACKAGE_JSON_PATH)
         package_json_content = python_utils.open_file(
             MOCK_PACKAGE_JSON_PATH, 'r').read()

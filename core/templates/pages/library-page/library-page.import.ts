@@ -16,6 +16,19 @@
  * @fileoverview Directives required in library.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+import ngInfiniteScroll from 'ng-infinite-scroll';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'headroom', 'ngAnimate', ngInfiniteScroll,
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+]);
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/library-page/library-page.module.ts');

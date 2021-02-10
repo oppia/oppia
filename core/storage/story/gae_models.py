@@ -37,9 +37,7 @@ class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StorySnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -61,7 +59,7 @@ class StoryModel(base_models.VersionedModel):
     # The thumbnail background color of the story.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     # A high-level description of the story.
-    description = datastore_services.StringProperty(indexed=True)
+    description = datastore_services.TextProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
     notes = datastore_services.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this story is written in.
@@ -86,9 +84,7 @@ class StoryModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StoryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
@@ -127,7 +123,7 @@ class StoryModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -195,7 +191,8 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -222,7 +219,7 @@ class StorySummaryModel(base_models.BaseModel):
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
     # A high-level description of the story.
-    description = datastore_services.StringProperty(required=True, indexed=True)
+    description = datastore_services.TextProperty(required=True, indexed=False)
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the
     # story *summary* model was last updated).
@@ -247,9 +244,7 @@ class StorySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StorySummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -259,7 +254,7 @@ class StorySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,

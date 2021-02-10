@@ -26,17 +26,17 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
-const newStoryConstants = require('constants.ts');
+import newStoryConstants from 'assets/constants';
 
 angular.module('oppia').controller('CreateNewStoryModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
   'ImageLocalStorageService', 'StoryEditorStateService',
-  'TopicEditorStateService', 'WindowRef',
+  'TopicEditorStateService', 'WindowRef', 'MAX_CHARS_IN_STORY_DESCRIPTION',
   'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
   function(
       $controller, $rootScope, $scope, $uibModalInstance,
       ImageLocalStorageService, StoryEditorStateService,
-      TopicEditorStateService, WindowRef,
+      TopicEditorStateService, WindowRef, MAX_CHARS_IN_STORY_DESCRIPTION,
       MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -47,6 +47,7 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
     $scope.story = NewlyCreatedStory.createDefault();
     $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
     $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = MAX_CHARS_IN_STORY_URL_FRAGMENT;
+    $scope.MAX_CHARS_IN_STORY_DESCRIPTION = MAX_CHARS_IN_STORY_DESCRIPTION;
     $scope.allowedBgColors = (
       newStoryConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
     $scope.storyUrlFragmentExists = false;

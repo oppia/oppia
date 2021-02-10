@@ -66,7 +66,10 @@ describe('StateTopAnswersStatsService', () => {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Contains',
-          inputs: {x: ['hola']}
+          inputs: {x: {
+            contentId: 'rule_input',
+            normalizedStrSet: ['hola']
+          }}
         }],
         outcome: {
           dest: 'Me Llamo',
@@ -292,7 +295,18 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createNew('Contains', {x: ['adios']}));
+      ruleObjectFactory.createFromBackendDict(
+        {
+          rule_type: 'Contains',
+          inputs: {
+            x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['adios']
+            }
+          }
+        },
+        'TextInput'
+      ));
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
@@ -313,7 +327,18 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
-      ruleObjectFactory.createNew('Contains', {x: ['bonjour']})
+      ruleObjectFactory.createFromBackendDict(
+        {
+          rule_type: 'Contains',
+          inputs: {
+            x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['bonjour']
+            }
+          }
+        },
+        'TextInput'
+      )
     ];
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 

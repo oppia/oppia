@@ -76,9 +76,11 @@ describe('Library index page', function() {
       'earendil@publicationAndLibrary.com', 'earendilPublicationAndLibrary');
 
     await users.login('feanor@publicationAndLibrary.com');
+
     await workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_ARCHITECTURE,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
+
     await users.logout();
 
     await users.login('earendil@publicationAndLibrary.com');
@@ -105,13 +107,13 @@ describe('Library index page', function() {
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setObjective(
       'preserve the works of the elves');
+
     await explorationEditorPage.saveChanges();
 
     // There are now two non-private explorations whose titles, categories
     // and languages are, respectively:
     // - silmarils, gems, Deutsch
     // - Vingilot, ships, français.
-
     var ALL_PUBLIC_EXPLORATION_TITLES = [
       EXPLORATION_SILMARILS, EXPLORATION_VINGILOT];
 

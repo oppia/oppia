@@ -20,7 +20,7 @@ import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 
 describe('Numeric Input service', () => {
-  let imrs: InteractiveMapRulesService = null;
+  let imrs: InteractiveMapRulesService;
   beforeEach(() => {
     imrs = new InteractiveMapRulesService();
   });

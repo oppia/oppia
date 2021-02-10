@@ -20,8 +20,6 @@ import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-const constants = require('constants.ts');
-
 describe('Site Analytics Service', () => {
   let sas = null;
   let ws = null;
@@ -30,15 +28,11 @@ describe('Site Analytics Service', () => {
   beforeEach(() => {
     sas = TestBed.get(SiteAnalyticsService);
     ws = TestBed.get(WindowRef);
-
-    constants.CAN_SEND_ANALYTICS_EVENTS = true;
+    spyOnProperty(sas, 'CAN_SEND_ANALYTICS_EVENTS', 'get')
+      .and.returnValue(true);
 
     ws.nativeWindow.ga = function() {};
     gaSpy = spyOn(ws.nativeWindow, 'ga').and.stub();
-  });
-
-  afterAll(() => {
-    constants.CAN_SEND_ANALYTICS_EVENTS = false;
   });
 
   it('should register start login event', () => {
@@ -54,7 +48,7 @@ describe('Site Analytics Service', () => {
     sas.registerNewSignupEvent();
 
     expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'SignupButton', 'click', '');
+      'send', 'event', 'OnboardingEngagement', 'signup', 'AccountSignUp');
   });
 
   it('should register click browse lessons event', () => {
@@ -62,6 +56,20 @@ describe('Site Analytics Service', () => {
 
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'BrowseLessonsButton', 'click', '/context.html');
+  });
+
+  it('should register click start learning button event', () => {
+    sas.registerClickStartLearningButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'StartLearningButton', 'click', '/context.html');
+  });
+
+  it('should register click start contributing button event', () => {
+    sas.registerClickStartContributingButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'StartContributingButton', 'click', '/context.html');
   });
 
   it('should register go to donation site event', () => {
@@ -336,10 +344,17 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register finish exploration event', () => {
-    sas.registerFinishExploration();
+    sas.registerFinishExploration('123');
 
     expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'PlayerFinishExploration', 'click', '');
+      'send', 'event', 'PlayerFinishExploration', 'engage', '123');
+  });
+
+  it('should register finish curated lesson event', () => {
+    sas.registerCuratedLessonCompleted('123');
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'CuratedLessonCompleted', 'engage', '123');
   });
 
   it('should register open collection from landing page event', () => {
@@ -382,5 +397,80 @@ describe('Site Analytics Service', () => {
 
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'UploadRecordedAudio', 'click', explorationId);
+  });
+
+  it('should register Contributor Dashboard suggest event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardSuggestEvent(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardSuggest', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard submit suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardSubmitSuggestionEvent(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardSubmitSuggestion', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard view suggestion for review event',
+    () => {
+      const contributionType = 'Translation';
+      sas.registerContributorDashboardViewSuggestionForReview(contributionType);
+
+      expect(gaSpy).toHaveBeenCalledWith(
+        'send', 'event', 'ContributorDashboardViewSuggestionForReview', 'click',
+        contributionType);
+    });
+
+  it('should register Contributor Dashboard accept suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardAcceptSuggestion(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardAcceptSuggestion', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard reject suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardRejectSuggestion(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardRejectSuggestion', 'click',
+      contributionType);
+  });
+
+  it('should register active lesson usage', () => {
+    sas.registerLessonActiveUse();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ActiveUserStartAndSawCards', 'engage', '');
+  });
+
+  it('should register exploration start', () => {
+    const explorationId = 'abc1';
+    sas.registerStartExploration(explorationId);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'PlayerStartExploration', 'engage', explorationId);
+  });
+
+  it('should register active classroom lesson usage', () => {
+    sas.registerClassroomLessonActiveUse();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ClassroomActiveUserStartAndSawCards', 'engage', '');
+  });
+
+  it('should register classroom header click event', () => {
+    sas.registerClassoomHeaderClickEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ClassroomEngagement', 'click', 'ClickOnClassroom');
   });
 });

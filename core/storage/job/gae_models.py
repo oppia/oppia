@@ -95,7 +95,7 @@ class JobModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """JobModel is not related to users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -105,7 +105,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'time_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -181,6 +181,9 @@ class JobModel(base_models.BaseModel):
     def do_unfinished_jobs_exist(cls, job_type):
         """Checks if unfinished jobs exist.
 
+        Args:
+            job_type: str. Type of job for which to check.
+
         Returns:
             bool. True if unfinished jobs exist, otherwise false.
         """
@@ -227,7 +230,7 @@ class ContinuousComputationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ContinuousComputationModel is not related to users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -237,7 +240,7 @@ class ContinuousComputationModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'active_realtime_layer_index':

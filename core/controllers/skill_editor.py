@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import role_services
@@ -120,8 +121,8 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on the individual skill page."""
         try:
             skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
-            raise self.PageNotFoundException(Exception('Invalid skill id.'))
+        except utils.ValidationError:
+            raise self.PageNotFoundException('Invalid skill id.')
 
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
@@ -178,10 +179,10 @@ class EditableSkillDataHandler(base.BaseHandler):
         commit_message = self.payload.get('commit_message')
 
         if (commit_message is not None and
-                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_dicts = self.payload.get('change_dicts')
         change_list = [
@@ -233,7 +234,7 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception as e:
+        except utils.ValidationError:
             raise self.PageNotFoundException('Invalid skill id.')
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
@@ -259,14 +260,29 @@ class FetchSkillsHandler(base.BaseHandler):
 
         skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
 
-        try:
-            skills = skill_fetchers.get_multi_skills(skill_ids)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
 
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
             'skills': skill_dicts
         })
 
+        self.render_json(self.values)
+
+
+class SkillDescriptionHandler(base.BaseHandler):
+    """A data handler for checking if a skill with given description exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_create_skill
+    def get(self, skill_description):
+        """Handler that receives a skill description and checks whether
+        a skill with the same description exists.
+        """
+        self.values.update({
+            'skill_description_exists': (
+                skill_services.does_skill_with_description_exist(
+                    skill_description))
+        })
         self.render_json(self.values)

@@ -45,9 +45,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
@@ -71,6 +68,8 @@ import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { BottomNavbarStatusService } from
   'services/bottom-navbar-status.service';
+import { PreventPageUnloadEventService } from
+  'services/prevent-page-unload-event.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
@@ -331,6 +330,8 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PopulateRuleContentIdsService } from
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -380,7 +381,7 @@ import { SetInputRulesService } from
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -535,6 +536,9 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SolutionVerificationService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -560,8 +564,6 @@ export class UpgradedServices {
     upgradedServices['AlgebraicExpressionInputRulesService'] =
       new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
-    upgradedServices['AnswerGroupsCacheService'] =
-      new AnswerGroupsCacheService();
     upgradedServices['AnswerStatsObjectFactory'] =
       new AnswerStatsObjectFactory();
     upgradedServices['AppService'] = new AppService();
@@ -883,6 +885,8 @@ export class UpgradedServices {
     upgradedServices['BottomNavbarStatusService'] = (
       new BottomNavbarStatusService(
         upgradedServices['WindowDimensionsService']));
+    upgradedServices['PreventPageUnloadEventService'] =
+        new PreventPageUnloadEventService(upgradedServices['WindowRef']);
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
@@ -1152,6 +1156,11 @@ export class UpgradedServices {
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['SolutionVerificationService'] =
+      new SolutionVerificationService(
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
         upgradedServices['HttpClient']);
@@ -1264,6 +1273,9 @@ export class UpgradedServices {
       upgradedServices['LoggerService'],
       upgradedServices['UrlService'],
       upgradedServices['BrowserCheckerService']);
+    upgradedServices['PopulateRuleContentIdsService'] =
+      new PopulateRuleContentIdsService(
+        upgradedServices['GenerateContentIdService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['TextInputPredictionService']);

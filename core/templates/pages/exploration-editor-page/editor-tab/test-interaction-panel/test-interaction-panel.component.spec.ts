@@ -22,6 +22,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Test Interaction Panel directive', function() {
   var $scope = null;
@@ -35,6 +36,8 @@ describe('Test Interaction Panel directive', function() {
       id: 'NumberWithUnits'
     }
   };
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 

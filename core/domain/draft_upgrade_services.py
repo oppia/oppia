@@ -23,6 +23,7 @@ import logging
 
 from core.domain import exp_domain
 from core.domain import html_validation_service
+from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
 import python_utils
@@ -101,6 +102,55 @@ def try_upgrading_draft_to_exp_version(
 
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
+
+    @classmethod
+    def _convert_states_v41_dict_to_v42_dict(cls, draft_change_list):
+        """Converts draft change list from state version 41 to 42.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Converting the answer groups depends on getting an
+                # exploration state of v41, because we need an interaction's
+                # customization arguments to properly convert ExplorationChanges
+                # that set DragAndDropSortInput and ItemSelectionInput rules.
+                # Since we do not yet support passing an exploration state of a
+                # given version into draft conversion functions, we throw an
+                # Exception to indicate that the conversion cannot be completed.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v40_dict_to_v41_dict(cls, draft_change_list):
+        """Converts draft change list from state version 40 to 41.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Converting the answer groups depends on getting an
+                # exploration state of v40, because we need an interaction's id
+                # to properly convert ExplorationChanges that set answer groups.
+                # Since we do not yet support passing an exploration state of a
+                # given version into draft conversion functions, we throw an
+                # Exception to indicate that the conversion cannot be completed.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+        return draft_change_list
 
     @classmethod
     def _convert_states_v39_dict_to_v40_dict(cls, draft_change_list):
@@ -328,9 +378,14 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                                                 conversion_fn(answer_html))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                html_field_types_to_rule_specs = (
+                    rules_registry.Registry.get_html_field_types_to_rule_specs(
+                        state_schema_version=41))
                 new_value = [
                     state_domain.AnswerGroup.convert_html_in_answer_group(
-                        answer_group, conversion_fn)
+                        answer_group, conversion_fn,
+                        html_field_types_to_rule_specs
+                    )
                     for answer_group in new_value]
             if new_value is not None:
                 draft_change_list[i] = exp_domain.ExplorationChange({

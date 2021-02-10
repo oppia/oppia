@@ -23,6 +23,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_jobs_one_off
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
@@ -32,7 +33,6 @@ from core.tests import test_utils
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
-search_services = models.Registry.import_search_services()
 
 
 # This mock should be used only in InteractionCustomizationArgsValidationJob.
@@ -877,3 +877,481 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
             self,
             interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob)
+
+
+class RuleInputToCustomizationArgsMappingOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(RuleInputToCustomizationArgsMappingOneOffJobTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_exp_state_pairs_are_produced_for_item_selection_interactions(self):
+        """Checks (exp, state) pairs are produced correctly for ItemSelection
+        interactions.
+        """
+        owner = user_services.UserActionsInfo(self.albert_id)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+
+        customization_args_dict1 = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
+        }
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value2 for ItemSelection</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        solution1 = state_domain.Solution.from_dict('ItemSelectionInput', {
+            'answer_is_exclusive': True,
+            'correct_answer': ['<p>This is value2 for DragAndDropSort</p>'],
+            'explanation': {
+                'content_id': 'solution',
+                'html': ''
+            }
+        })
+
+        hint_list1 = [state_domain.Hint.from_dict({
+            'hint_content': {
+                'content_id': 'hint_0',
+                'html': ''
+            }
+        })]
+
+        state1.update_interaction_id('ItemSelectionInput')
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        state1.update_interaction_solution(solution1)
+        state1.update_interaction_hints(hint_list1)
+
+        # Start RuleInputToCustomizationArgsMappingOneOffJob job on sample
+        # exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
+        (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+        customization_args_dict2 = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
+        }
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelection</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        solution2 = state_domain.Solution.from_dict('ItemSelectionInput', {
+            'answer_is_exclusive': True,
+            'correct_answer': ['<p>This is value3 for DragAndDropSort</p>'],
+            'explanation': {
+                'content_id': 'solution',
+                'html': ''
+            }
+        })
+
+        hint_list2 = [state_domain.Hint.from_dict({
+            'hint_content': {
+                'content_id': 'hint_0',
+                'html': ''
+            }
+        })]
+
+        state2.update_interaction_id('ItemSelectionInput')
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(2)
+        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_solution(solution2)
+        state2.update_interaction_hints(hint_list2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
+        (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.get_output(job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', [u"<ItemSelectionInput Answer> State: State2, '
+            'Invalid Values: [\'<p>This is value3 for DragAndDropSort</p>\']"'
+            ', u"<ItemSelectionInput Rule> State: State2, '
+            'Answer Group Index: 0, Invalid Values: [u\'<p>This is value3 '
+            'for ItemSelection</p>\']", u"<ItemSelectionInput Answer> State: '
+            'State1, Invalid Values: [\'<p>This is value2 for '
+            'DragAndDropSort</p>\']"]]'
+        )]
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_exp_state_pairs_are_produced_for_drag_and_drop_sort_interactions(
+            self):
+        """Checks (exp, state) pairs are produced correctly for DragAndDropSort
+        interactions.
+        """
+        owner = user_services.UserActionsInfo(self.albert_id)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'اختبارات'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['اختبارات']
+
+        customization_args_dict1 = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSort</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSort</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
+        }
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [
+                    ['<p>This is value1 for DragAndDropSort</p>']
+                ]}
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [
+                    ['<p>This is value2 for DragAndDropSort</p>']
+                ]}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        solution1 = state_domain.Solution.from_dict('DragAndDropSortInput', {
+            'answer_is_exclusive': True,
+            'correct_answer': [['<p>This is value2 for DragAndDropSort</p>']],
+            'explanation': {
+                'content_id': 'solution',
+                'html': ''
+            }
+        })
+
+        hint_list1 = [state_domain.Hint.from_dict({
+            'hint_content': {
+                'content_id': 'hint_0',
+                'html': ''
+            }
+        })]
+
+        state1.update_interaction_id('DragAndDropSortInput')
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        state1.update_interaction_solution(solution1)
+        state1.update_interaction_hints(hint_list1)
+
+        # Start RuleInputToCustomizationArgsMappingOneOffJob job on sample
+        # exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
+        (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+        customization_args_dict2 = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSort</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSort</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
+        }
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [
+                    [
+                        '<p>This is value1 for DragAndDropSort</p>',
+                        '<p>This is value3 for DragAndDropSort</p>'
+                    ]
+                ]}
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': '<p>This is value3 for DragAndDropSort</p>',
+                    'y': '<p>This is value1 for DragAndDropSort</p>'
+                }
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': '<p>This is value3 for DragAndDropSort</p>',
+                    'y': 2
+                }
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        solution2 = state_domain.Solution.from_dict('DragAndDropSortInput', {
+            'answer_is_exclusive': True,
+            'correct_answer': [['<p>This is value3 for DragAndDropSort</p>']],
+            'explanation': {
+                'content_id': 'solution',
+                'html': ''
+            }
+        })
+
+        hint_list2 = [state_domain.Hint.from_dict({
+            'hint_content': {
+                'content_id': 'hint_0',
+                'html': ''
+            }
+        })]
+
+        state2.update_interaction_id('DragAndDropSortInput')
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(2)
+        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_solution(solution2)
+        state2.update_interaction_hints(hint_list2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
+        (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.get_output(job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', [u"<DragAndDropSortInput Answer> State: '
+            '\\u0627\\u062e\\u062a\\u0628\\u0627\\u0631\\u0627\\u062a, '
+            'Invalid Values: [\'<p>This is value3 for DragAndDropSort</p>\']"'
+            ', u"<DragAndDropSortInput Rule> State: \\u0627\\u062e\\u062a'
+            '\\u0628\\u0627\\u0631\\u0627\\u062a, Answer Group Index: 0, '
+            'Invalid Values: [u\'<p>This is value3 for DragAndDropSort</p>\']"'
+            ', u"<DragAndDropSortInput Rule> State: \\u0627\\u062e\\u062a'
+            '\\u0628\\u0627\\u0631\\u0627\\u062a, Answer Group Index: 0, '
+            'Invalid Values: [u\'<p>This is value3 for DragAndDropSort</p>\']'
+            '", u"<DragAndDropSortInput Rule> State: \\u0627\\u062e\\u062a'
+            '\\u0628\\u0627\\u0631\\u0627\\u062a, Answer Group Index: 0, '
+            'Invalid Values: [u\'<p>This is value3 for DragAndDropSort<'
+            '/p>\']"]]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+        rights_manager.unpublish_exploration(self.admin, self.VALID_EXP_ID)
+        # Start job on private exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
+        (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+        actual_output = (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
+        }
+
+        answer_group_list = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelection</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_next_content_id_index(2)
+        state1.update_interaction_answer_groups(answer_group_list)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            (
+                interaction_jobs_one_off
+                .RuleInputToCustomizationArgsMappingOneOffJob)
+        )

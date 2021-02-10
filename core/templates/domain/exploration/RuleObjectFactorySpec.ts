@@ -32,18 +32,31 @@ describe('RuleObjectFactory', () => {
       x: [['<p>list_of_sets_of_html_strings</p>']]
     };
     ruleBackendDict = {
-      rule_type: 'rule_type_1',
+      rule_type: 'Equals',
       inputs: inputBackend
     };
   });
 
   it('should convert to a backend dictionary', () => {
-    let rulesDict = ruleObjectFactory.createFromBackendDict(ruleBackendDict);
-    expect(rulesDict.toBackendDict()).toEqual(ruleBackendDict);
+    const rule = ruleObjectFactory.createFromBackendDict(
+      ruleBackendDict, 'ItemSelectionInput');
+    expect(rule.toBackendDict()).toEqual(ruleBackendDict);
   });
 
-  it('should creat a new rule from creatNew()', () => {
-    let rulesDict = ruleObjectFactory.createNew('rule_type_1', inputBackend);
-    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend));
+  it('should create a new rule from createNew()', () => {
+    let rulesDict = ruleObjectFactory.createNew(
+      'rule_type_1', inputBackend, {
+        x: ''
+      });
+    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend, {
+      x: ''
+    }));
+  });
+
+  it('should throw an error on createNew() if the keys in inputs and ' +
+    'inputTypes do not match', () => {
+    expect(() => {
+      ruleObjectFactory.createNew('rule_type_1', inputBackend, {});
+    }).toThrowError('The keys of inputs and inputTypes do not match.');
   });
 });

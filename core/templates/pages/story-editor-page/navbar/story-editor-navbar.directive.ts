@@ -31,6 +31,8 @@ require('pages/story-editor-page/services/story-editor-navigation.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+require('services/alerts.service.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('storyEditorNavbar', [
@@ -39,12 +41,15 @@ angular.module('oppia').directive('storyEditorNavbar', [
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'EditableStoryBackendApiService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'EditableStoryBackendApiService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryValidationService', 'UndoRedoService',
         function(
-            $rootScope, $scope, $uibModal, EditableStoryBackendApiService,
+            $rootScope, $scope, $uibModal, AlertsService,
+            EditableStoryBackendApiService,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryValidationService, UndoRedoService) {
           var ctrl = this;
@@ -52,6 +57,14 @@ angular.module('oppia').directive('storyEditorNavbar', [
           var PREVIEW = 'Preview';
           ctrl.directiveSubscriptions = new Subscription();
           $scope.explorationValidationIssues = [];
+
+          ctrl.isStoryPublished = function() {
+            return StoryEditorStateService.isStoryPublished();
+          };
+
+          ctrl.isSaveInProgress = function() {
+            return StoryEditorStateService.isSavingStory();
+          };
 
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
@@ -154,10 +167,14 @@ angular.module('oppia').directive('storyEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'story-editor-save-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
-              StoryEditorStateService.saveStory(commitMessage);
+              StoryEditorStateService.saveStory(
+                commitMessage, null, function(errorMessage) {
+                  AlertsService.addInfoMessage(errorMessage, 5000);
+                }
+              );
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -222,8 +239,6 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.showNavigationOptions = false;
             $scope.showStoryEditOptions = false;
             $scope.story = StoryEditorStateService.getStory();
-            $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
-            $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             ctrl.directiveSubscriptions.add(

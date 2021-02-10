@@ -27,7 +27,7 @@ class DragAndDropSortInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_trainable = False
     _dependency_ids = []
-    answer_type = 'ListOfSetsOfHtmlStrings'
+    answer_type = 'ListOfSetsOfTranslatableHtmlContentIds'
     instructions = 'Drag and drop items'
     narrow_instructions = 'Drag and drop items'
     needs_summary = True

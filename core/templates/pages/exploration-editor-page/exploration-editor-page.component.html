@@ -2,6 +2,9 @@
   <div class="navbar-tabs">
     <div class="navbar-text">
       <[$ctrl.getNavbarText()]>
+      <span class="protractor-autosave-indicator autosave-indicator" ng-if="$ctrl.autosaveIsInProgress">
+        &emsp;Auto Saving ...
+      </span>
     </div>
     <div class="navbar-icons">
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
@@ -90,7 +93,7 @@
   </div>
 </div>
 <div class="exploration-editor-content" ng-cloak>
-  <div class="container-fluid oppia-editor-page-container" ng-joy-ride="$ctrl.tutorialInProgress" config="$ctrl.EDITOR_TUTORIAL_OPTIONS" on-finish="$ctrl.onFinishTutorial()" on-skip="$ctrl.onSkipTutorial()">
+  <div class="container-fluid oppia-editor-page-container">
     <div class="row" ng-if="$ctrl.ExplorationRightsService.isCloned()">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="oppia-align-center uib-alert alert-warning oppia-alert-warning">
@@ -151,6 +154,10 @@
 </svg>
 
 <style>
+  exploration-editor-page .autosave-indicator {
+    font-size: 75%;
+  }
+
   exploration-editor-page .exploration-editor-content {
     margin-top: 95px;
   }

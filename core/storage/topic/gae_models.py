@@ -41,9 +41,7 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -107,12 +105,17 @@ class TopicModel(base_models.VersionedModel):
     # The content of the meta tag in the Topic viewer page.
     meta_tag_content = datastore_services.StringProperty(
         indexed=True, default='')
+    # The page title fragment used in the Topic viewer web page.
+    # For example, if the full Topic viewer web page title is
+    # 'Learn Fractions | Add, Subtract, Multiply and Divide | Oppia'
+    # the page title fragment field represents the middle value 'Add, Subtract,
+    # Multiply and Divide'.
+    page_title_fragment_for_web = datastore_services.StringProperty(
+        indexed=True, default='')
 
     @staticmethod
     def get_deletion_policy():
-        """TopicModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
@@ -190,7 +193,7 @@ class TopicModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -210,6 +213,8 @@ class TopicModel(base_models.VersionedModel):
             'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_title_fragment_for_web': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -249,7 +254,8 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -319,9 +325,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -331,7 +335,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -364,8 +368,8 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there is manager_ids field.
+        """Model contains data corresponding to a user: inside the content field
+        there is a manager_ids field.
 
         The pseudonymization of this model is handled in the wipeout_service
         in the _pseudonymize_activity_models_with_associated_rights_models(),
@@ -410,7 +414,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicRightsModel contains data to pseudonymize corresponding
+        """Model contains data to pseudonymize or delete corresponding
         to a user: manager_ids field.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
@@ -518,7 +522,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE

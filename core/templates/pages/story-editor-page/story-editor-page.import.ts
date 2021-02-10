@@ -16,6 +16,20 @@
  * @fileoverview Directive scripts for the story editor page.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/dnd-lists.import';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable',
+  uiValidate
+]);
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/story-editor-page/story-editor-page.module.ts');

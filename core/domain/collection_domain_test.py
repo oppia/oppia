@@ -643,10 +643,11 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         # Should not be able to create a collection from no YAML content.
         with self.assertRaisesRegexp(
-            Exception, 'Please ensure that you are uploading a YAML text file, '
+            utils.InvalidInputException,
+            'Please ensure that you are uploading a YAML text file, '
             'not a zip file. The YAML parser returned the following error: '
-            '\'NoneType\' object has no attribute \'read\''):
-            collection_domain.Collection.from_yaml('collection3', None)
+        ):
+            collection_domain.Collection.from_yaml('collection3', '')
 
     def test_from_yaml_with_no_schema_version_specified_raises_error(self):
         collection = collection_domain.Collection(
@@ -1144,3 +1145,27 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             self.collection_summary.is_solely_owned_by_user('viewer_id'))
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('contributor_id'))
+
+    def test_add_new_contribution_for_user_adds_user_to_contributors(self):
+        self.collection_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.collection_summary.contributors_summary)
+        self.assertEqual(
+            self.collection_summary.contributors_summary['user_id'], 1)
+        self.assertIn('user_id', self.collection_summary.contributor_ids)
+
+    def test_add_new_contribution_for_user_increases_score_in_contributors(
+            self):
+        self.collection_summary.add_contribution_by_user('user_id')
+        self.collection_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.collection_summary.contributors_summary)
+        self.assertEqual(
+            self.collection_summary.contributors_summary['user_id'], 2)
+
+    def test_add_new_contribution_for_user_does_not_add_system_user(self):
+        self.collection_summary.add_contribution_by_user(
+            feconf.SYSTEM_COMMITTER_ID)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID,
+            self.collection_summary.contributors_summary)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.collection_summary.contributor_ids)

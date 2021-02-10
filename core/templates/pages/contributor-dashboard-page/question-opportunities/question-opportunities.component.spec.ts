@@ -25,6 +25,7 @@ import { ContributionOpportunitiesBackendApiService } from
 import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { UserService } from 'services/user.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
@@ -39,6 +40,7 @@ describe('Question opportunities component', function() {
   var alertsService = null;
   var contributionOpportunitiesService = null;
   var questionUndoRedoService = null;
+  var siteAnalyticsService = null;
   var skillObjectFactory = null;
   var userService = null;
 
@@ -51,6 +53,7 @@ describe('Question opportunities component', function() {
     });
 
     alertsService = TestBed.get(AlertsService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
     userService = TestBed.get(UserService);
   });
@@ -91,50 +94,59 @@ describe('Question opportunities component', function() {
     });
   }));
 
-  it('should load question opportunities when component is initialized',
-    function() {
-      spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-        .callFake((callback) => {
-          callback(opportunitiesArray, false);
-        });
-      ctrl.$onInit();
+  it('should load question opportunities', () => {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
 
-      expect(ctrl.opportunities.length).toBe(2);
-      expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
+  });
+
+  it('should load more question opportunities', function() {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: true
+      }));
+
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(true);
     });
 
-  it('should load more question opportunities when reaching the end' +
-    ' of page and there are more opportunities available', function() {
-    spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-      .callFake((callback) => {
-        callback(opportunitiesArray, true);
-      });
+    spyOn(
+      contributionOpportunitiesService, 'getMoreSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+
+    ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
+  });
+
+  it('should register Contributor Dashboard suggest event when clicking on' +
+    ' suggest question button', function() {
+    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
     ctrl.$onInit();
     $rootScope.$apply();
 
-    expect(ctrl.opportunities.length).toBe(2);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(true);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    var getMoreSkillOpportunitiesSpy = spyOn(
-      contributionOpportunitiesService, 'getMoreSkillOpportunities');
-
-    getMoreSkillOpportunitiesSpy
-      .and.callFake((callback) => {
-        callback(opportunitiesArray, false);
-      });
-    ctrl.onLoadMoreOpportunities();
+    ctrl.onClickSuggestQuestionButton('1');
     $rootScope.$apply();
 
-    getMoreSkillOpportunitiesSpy.calls.reset();
-
-    expect(ctrl.opportunities.length).toBe(4);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    ctrl.onLoadMoreOpportunities();
-    expect(getMoreSkillOpportunitiesSpy).not.toHaveBeenCalled();
+    expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
+      .toHaveBeenCalledWith('Question');
   });
 
   it('should open requires login modal when trying to select a question and' +

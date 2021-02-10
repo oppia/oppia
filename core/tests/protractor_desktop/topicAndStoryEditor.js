@@ -96,6 +96,11 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
       'Skill 1', 'Topic 1');
 
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+
     await topicEditorPage.get(topicId);
     await topicEditorPage.moveToQuestionsTab();
     await topicEditorPage.createQuestionForSkillWithName('Skill 1');
@@ -108,6 +113,9 @@ describe('Topic editor functionality', function() {
       'FuzzyEquals', ['correct']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
@@ -230,7 +238,7 @@ describe('Chapter editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
-  var storyId = null;
+  var storyName = 'Story 0';
   var explorationEditorPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
@@ -282,17 +290,17 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       topicName, topicUrlFragment, 'Description', false);
     await topicEditorPage.createStory(
-      'Story 0', 'topic-and-story-editor-two', 'Story description',
+      storyName, 'topic-and-story-editor-two', 'Story description',
       Constants.TEST_SVG_PATH);
-    var url = await browser.getCurrentUrl();
-    storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
     dummySkills = await createDummySkills(2);
   });
 
   beforeEach(async function() {
     await users.login(userEmail);
-    await storyEditorPage.get(storyId);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
+    await topicEditorPage.navigateToStoryWithTitle(storyName);
   });
 
   it('should create a basic chapter.', async function() {

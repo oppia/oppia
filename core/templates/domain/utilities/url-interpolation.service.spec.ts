@@ -22,8 +22,6 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 
-const Constants = require('constants.ts');
-
 describe('URL Interpolation Service', () => {
   let hashes = require('hashes.json');
   let uis: UrlInterpolationService = null;
@@ -41,13 +39,9 @@ describe('URL Interpolation Service', () => {
     uis = TestBed.get(UrlInterpolationService);
     urlService = TestBed.get(UrlService);
     alertsService = TestBed.get(AlertsService);
-    Constants.DEV_MODE = false;
+    spyOnProperty(uis, 'DEV_MODE', 'get').and.returnValue(false);
     spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
     alertsObject.alertsService = alertsService;
-  });
-
-  afterAll(() => {
-    Constants.DEV_MODE = true;
   });
 
   it('should add hash to url if hash is set', () => {

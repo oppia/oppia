@@ -17,7 +17,7 @@
  * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
-export = {
+export default {
   "Collapsible": {
     "backend_id": "Collapsible",
     "category": "Basic Input",

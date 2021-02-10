@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for user management.
  */
 
+var action = require('../protractor_utils/action.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
@@ -32,8 +33,10 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
-  await element(by.css('.protractor-test-i18n-language-selector'))
-    .element(by.cssContainingText('option', language)).click();
+  await action.select(
+    'Language Selector',
+    element(by.css('.protractor-test-i18n-language-selector')),
+    language);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();
 };

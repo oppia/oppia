@@ -98,7 +98,7 @@ angular.module('oppia').component('feedbackTab', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/feedback-tab/templates/' +
             'create-feedback-thread-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'CreateFeedbackThreadModalController'
         }).result.then(
           result => ThreadDataBackendApiService.createNewThreadAsync(

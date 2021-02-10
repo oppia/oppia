@@ -120,8 +120,8 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TaskEntryModel contains data to delete corresponding to
-        a user: resolver_id field.
+        """Model contains data to delete corresponding to a user:
+        resolver_id field.
 
         It is okay to delete task entries since, after they are resolved, they
         only act as a historical record. The removal just removes the historical
@@ -150,7 +150,9 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """TaskEntryModel contains the user ID that acted on a task."""
+        """Model contains data to export corresponding to a user:
+        TaskEntryModel contains the ID of the user that acted on a task.
+        """
         return dict(super(cls, cls).get_export_policy(), **{
             'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,

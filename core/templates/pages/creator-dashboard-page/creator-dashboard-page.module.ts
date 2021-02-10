@@ -16,19 +16,6 @@
  * @fileoverview Module for the collection player page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/ui-tree.import';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';

@@ -29,21 +29,22 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
   'ContextService', 'ImageLocalStorageService',
   'QuestionSuggestionService', 'QuestionUndoRedoService',
-  'QuestionValidationService', 'UrlInterpolationService',
-  'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
-  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'QuestionValidationService', 'SiteAnalyticsService',
+  'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
+  'skill', 'skillDifficulty', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService,
       ContextService, ImageLocalStorageService,
       QuestionSuggestionService, QuestionUndoRedoService,
-      QuestionValidationService, UrlInterpolationService,
-      question, questionId, questionStateData, skill, skillDifficulty,
-      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      QuestionValidationService, SiteAnalyticsService,
+      UrlInterpolationService, question, questionId, questionStateData,
+      skill, skillDifficulty, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;
@@ -62,6 +63,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       if (!$scope.isQuestionValid()) {
         return;
       }
+      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+        'Question');
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
       ContextService.resetImageSaveDestination();

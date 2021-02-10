@@ -16,6 +16,20 @@
  * @fileoverview Scripts for the practice session.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/ng-audio.import';
+import 'third-party-imports/ui-tree.import';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngAudio', 'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
+]);
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/practice-session-page/practice-session-page.module.ts');

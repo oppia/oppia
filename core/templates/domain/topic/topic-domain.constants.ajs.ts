@@ -111,6 +111,9 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_META_TAG_CONTENT',
   TopicDomainConstants.TOPIC_PROPERTY_META_TAG_CONTENT);
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB',
+  TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB);
 
 angular.module('oppia').constant(
   'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME',
