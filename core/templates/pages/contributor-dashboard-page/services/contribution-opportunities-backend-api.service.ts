@@ -54,25 +54,25 @@ interface VoiceoverContributionOpportunitiesBackendDict {
   'more': boolean;
 }
 
-export interface SkillContributionOpportunities {
+interface SkillContributionOpportunities {
   opportunities: SkillOpportunity[];
   nextCursor: string;
   more: boolean;
 }
 
-export interface TranslationContributionOpportunities {
+interface TranslationContributionOpportunities {
   opportunities: ExplorationOpportunitySummary[];
   nextCursor: string;
   more: boolean;
 }
 
-export interface VoiceoverContributionOpportunities {
+interface VoiceoverContributionOpportunities {
   opportunities: ExplorationOpportunitySummary[];
   nextCursor: string;
   more: boolean;
 }
 
-export interface FeaturedTranslationLanguagesBackendDict {
+interface FeaturedTranslationLanguagesBackendDict {
   'featured_translation_languages': FeaturedTranslationLanguageBackendDict[];
 }
 
