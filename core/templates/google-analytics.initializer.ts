@@ -19,7 +19,9 @@
 const constants = require('constants.ts');
 
 (function() {
+  console.log('init gtag');
   if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
+    console.log('init gtag successful');
     window.dataLayer = window.dataLayer || [];
     function gtag() {
       dataLayer.push(arguments);
