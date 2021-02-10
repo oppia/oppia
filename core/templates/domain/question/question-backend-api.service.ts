@@ -60,7 +60,7 @@ export class QuestionBackendApiService {
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean,
       successCallback: (value: QuestionBackendDict[]) => void,
-      errorCallback: (reason: string) => void): void {
+      errorCallback: (reason: string) => void): Promise<void> {
     if (!this.validateRequestParameters(
       skillIds, questionCount, errorCallback)) {
       return;
@@ -88,7 +88,7 @@ export class QuestionBackendApiService {
   private async _fetchTotalQuestionCountForSkillIdsAsync(
       skillIds: string[],
       successCallback: (value: number) => void,
-      errorCallback: (reason: string) => void): void {
+      errorCallback: (reason: string) => void): Promise<void> {
     var questionsCountUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTION_COUNT_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
@@ -108,7 +108,7 @@ export class QuestionBackendApiService {
   private async _fetchQuestionSummariesAsync(
       skillId: string, cursor: string,
       successCallback: (value: QuestionSummariesResponse) => void,
-      errorCallback: (reason: string) => void): void|boolean {
+      errorCallback: (reason: string) => void): Promise<boolean | void> {
     const skillIds = [skillId];
 
     var questionsDataUrl = this.urlInterpolationService.interpolateUrl(

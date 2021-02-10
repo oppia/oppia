@@ -42,12 +42,12 @@ export class PretestQuestionBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
-  ) {}
+  ) { }
 
   async _fetchPretestQuestionsAsync(
-      explorationId: string, storyUrlFragment: string,
-      successCallback: (value: QuestionBackendDict[]) => void,
-      errorCallback: (reason: string) => void): void {
+    explorationId: string, storyUrlFragment: string,
+    successCallback: (value: QuestionBackendDict[]) => void,
+    errorCallback: (reason: string) => void): Promise<void> {
     if (
       !storyUrlFragment ||
       !storyUrlFragment.match(constants.VALID_URL_FRAGMENT_REGEX)) {
@@ -57,9 +57,9 @@ export class PretestQuestionBackendApiService {
 
     var pretestDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE, {
-        exploration_id: explorationId,
-        story_url_fragment: storyUrlFragment,
-      });
+      exploration_id: explorationId,
+      story_url_fragment: storyUrlFragment,
+    });
 
     this.http.get<PretestQuestionsBackendResponse>(
       pretestDataUrl
@@ -77,8 +77,8 @@ export class PretestQuestionBackendApiService {
   }
 
   async fetchPretestQuestionsAsync(
-      explorationId: string,
-      storyUrlFragment: string): Promise<QuestionBackendDict[]> {
+    explorationId: string,
+    storyUrlFragment: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchPretestQuestionsAsync(
         explorationId, storyUrlFragment, resolve, reject);
