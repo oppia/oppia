@@ -19,9 +19,8 @@
 import { CollectionNode } from
   'domain/collection/collection-node.model';
 
-interface SummaryObject {
-  category?: string
-}
+import { LearnerExplorationSummaryBackendDict } from
+  'domain/summary/learner-exploration-summary.model';
 
 describe('Collection node model', () => {
   it('should provide an immutable exploration summary', () => {
@@ -57,7 +56,7 @@ describe('Collection node model', () => {
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(collectionNode.getExplorationTitle()).toEqual('exp title');
 
-    var summaryObject: SummaryObject =
+    var summaryObject: LearnerExplorationSummaryBackendDict =
       collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
 
