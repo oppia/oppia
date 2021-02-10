@@ -16,49 +16,54 @@
  * @fileoverview Service for managing the authorizations of logged-in users.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
+import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Observable, of } from 'rxjs';
 
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService implements OnDestroy {
-  private tokenCache: BehaviorSubject<string | null>;
-  private tokenSubscription: Subscription;
-
-  constructor(private angularFireAuth: AngularFireAuth) {
-    // An Observable (i.e. stream of values) Subject (i.e. producer of values).
-    // BehaviorSubjects are "cold" observables (i.e. lazy streams that only emit
-    // values when prompted by a subscriber), and emits the value it last
-    // produced to new subscribers (or null, the initial value we've given it).
-    this.tokenCache = new BehaviorSubject(null);
-    // Object used to control the lifetime of a subscription. After the
-    // subscription becomes obsolete, we should call ".unsubscribe()" on it to
-    // prevent a memory leak.
-    this.tokenSubscription = (
-      // Given an untrusted source of ID Tokens, prepare to apply a sequence of
-      // transformations on the values it emits using a "pipe".
-      this.angularFireAuth.idToken.pipe(
-        // Catch errors thrown by the untrusted source and change them into a
-        // "cold" Observable that eternally emits "null".
-        catchError(_ => new BehaviorSubject(null)))
-        // Subscribe to the results, forwarding every token (or null) it emits
-        // into our BehaviorSubject.
-        .subscribe(this.tokenCache));
-  }
-
-  ngOnDestroy(): void {
-    this.tokenSubscription.unsubscribe();
-  }
+export class AuthService {
+  constructor(@Optional() private angularFireAuth?: AngularFireAuth) {}
 
   get idToken$(): Observable<string | null> {
-    return this.tokenCache.asObservable();
+    return this.angularFireAuth?.idToken ?? of(null);
   }
 
   async signOutAsync(): Promise<void> {
-    return this.angularFireAuth.signOut();
+    await this.angularFireAuth?.signOut();
+  }
+
+  static get firebaseAuthIsEnabled(): boolean {
+    return AppConstants.FIREBASE_AUTH_ENABLED;
+  }
+
+  static get firebaseEmulatorIsEnabled(): boolean {
+    return (
+      AuthService.firebaseAuthIsEnabled &&
+      AppConstants.FIREBASE_EMULATOR_ENABLED);
+  }
+
+  static get firebaseConfig(): FirebaseOptions {
+    return !AuthService.firebaseAuthIsEnabled ? undefined : {
+      apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
+      authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
+      projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
+      storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
+      messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+      appId: AppConstants.FIREBASE_CONFIG_APP_ID,
+    } as const;
+  }
+
+  static get firebaseEmulatorConfig(): readonly [string, number] {
+    return AuthService.firebaseEmulatorIsEnabled ?
+      ['localhost', 9099] : undefined;
   }
 }
+
+angular.module('oppia').factory(
+  'AuthService', downgradeInjectable(AuthService));
