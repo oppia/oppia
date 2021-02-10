@@ -35,7 +35,6 @@ require('value_generators/valueGeneratorsRequires.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
-require('services/user-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 require('services/utils.service.ts');
 
@@ -49,12 +48,12 @@ angular.module('oppia').directive('adminPage', [
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$rootScope', '$scope', 'AdminRouterService',
-        'CsrfTokenService', 'PlatformFeatureService', 'UserBackendApiService',
+        '$location', '$rootScope', '$scope',
+        'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
         'DEV_MODE',
         function(
-            $location, $rootScope, $scope, AdminRouterService,
-            CsrfTokenService, PlatformFeatureService, UserBackendApiService,
+            $location, $rootScope, $scope,
+            AdminRouterService, CsrfTokenService, PlatformFeatureService,
             DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {
@@ -89,13 +88,6 @@ angular.module('oppia').directive('adminPage', [
           ctrl.$onInit = function() {
             $scope.$on('$locationChangeSuccess', function() {
               AdminRouterService.showTab($location.path().replace('/', '#'));
-            });
-            ctrl.userEmail = '';
-            UserBackendApiService.getUserInfoAsync().then(function(response) {
-              ctrl.userEmail = response.getEmail();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
             });
             ctrl.inDevMode = DEV_MODE;
             ctrl.statusMessage = '';
