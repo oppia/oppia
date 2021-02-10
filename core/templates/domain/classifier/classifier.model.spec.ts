@@ -56,14 +56,23 @@ describe('Classifier model', () => {
       a: 0
     }
   });
+  let classifierBuffer : Uint8Array =
+    classifierFrozenModel.serialize() as Uint8Array;
 
   it('should create a new classifier', () => {
     var classifierObject = (
-      new Classifier('TestClassifier', classifierFrozenModel.serialize(), 1));
+      new Classifier(
+        'TestClassifier',
+        classifierBuffer.buffer.slice(
+          classifierBuffer.byteOffset,
+          classifierBuffer.byteOffset + classifierBuffer.byteLength),
+        1));
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
     expect(classifierObject.classifierData).toEqual(
-      classifierFrozenModel.serialize());
+      classifierBuffer.buffer.slice(
+        classifierBuffer.byteOffset,
+        classifierBuffer.byteOffset + classifierBuffer.byteLength));
     expect(classifierObject.algorithmVersion).toEqual(1);
   });
 });

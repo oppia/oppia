@@ -38,6 +38,7 @@
   "include": ["core", "extensions", "typings"],
   "exclude": [
     "core/tests",
-    "core/templates/google-analytics.initializer.ts"
+    "core/templates/google-analytics.initializer.ts",
+    "extensions/classifiers/proto"
   ]
 }

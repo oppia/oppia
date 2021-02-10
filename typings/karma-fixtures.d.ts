@@ -209,10 +209,6 @@ interface RuleTemplates {
 
 interface KarmaFixtures {
   'extensions/interactions/rule_templates': RuleTemplates;
-  'core/tests/data/code_classifier_data': ClassifierData;
-  'core/tests/data/code_classifier_accuracy_test': ClassifierAccuracyTest;
-  'core/tests/data/code_classifier_test_knn': ClassifierAccuracyTest;
-  'core/tests/data/code_classifier_test_svm': ClassifierAccuracyTest;
   'core/tests/data/hashes': Hashes;
   'core/tests/data/inplace_replace_test': InplaceReplaceTest;
   'core/tests/data/test_cases_for_rte': TestCasesRTE;

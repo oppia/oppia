@@ -30,11 +30,14 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
+import { AlertsService } from 'services/alerts.service';
+import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -52,6 +55,9 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UtilsService } from 'services/utils.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
@@ -79,7 +85,7 @@ describe('Exploration Warnings Service', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide, $http, $window) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
@@ -108,7 +114,13 @@ describe('Exploration Warnings Service', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService());
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierDataBackendApiService(
+          $http, new UrlInterpolationService(
+            new AlertsService(new LoggerService()), new UrlService($window),
+            new UtilsService())),
+        new LoggerService()
+      ));
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));

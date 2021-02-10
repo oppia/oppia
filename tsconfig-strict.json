@@ -135,5 +135,6 @@
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts"
   ],
-  "include": ["typings/*.ts"]
+  "include": ["typings/*.ts"],
+  "exclude": ["extensions/classifiers/proto"]
 }

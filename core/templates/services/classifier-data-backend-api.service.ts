@@ -56,7 +56,7 @@ export class ClassifierDataBackendApiService {
     }
 
     const urlPrefix = Constants.DEV_MODE ?
-      '/_ah/gcs/' + Constants.DEFAULT_GCS_RESOURCE_BUCKET_NAME:
+      '/_ah/gcs/' + Constants.DEFAULT_GCS_RESOURCE_BUCKET_NAME :
       'https://storage.googleapis.com/' + Constants.GCS_RESOURCE_BUCKET_NAME;
     this.classifierDataDownloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<filename>');
@@ -77,14 +77,14 @@ export class ClassifierDataBackendApiService {
       stateName:string): Promise<ClassifierMetaData> {
     return new Promise((resolve, reject) => {
       this.http.get<ClassifierMetaDataBackendDict>(
-      '/ml/trainedclassifierhandler', {
-        params: {
-          exploration_id: explorationId,
-          exploration_version: explorationVersion.toString(),
-          state_name: stateName
-        },
-        responseType: 'json'
-      }).toPromise().then(response => {
+        '/ml/trainedclassifierhandler', {
+          params: {
+            exploration_id: explorationId,
+            exploration_version: explorationVersion.toString(),
+            state_name: stateName
+          },
+          responseType: 'json'
+        }).toPromise().then(response => {
         resolve({
           algorithmId: response.algorithm_id,
           algorithmVersion: response.algorithm_version,
@@ -102,25 +102,25 @@ export class ClassifierDataBackendApiService {
     return new Promise((resolve, reject) => {
       this.getClassifierMetaData(
         explorationId, explorationVersion, stateName).then(
-          response => {
-            let classifierMetaData = response;
-            this.http.get(
-              this.getDownloadUrl(
-                AppConstants.ENTITY_TYPE.EXPLORATION, explorationId,
-                response.filename), {
+        response => {
+          let classifierMetaData = response;
+          this.http.get(
+            this.getDownloadUrl(
+              AppConstants.ENTITY_TYPE.EXPLORATION, explorationId,
+              response.filename), {
               responseType: 'arraybuffer'
-              }).toPromise().then(response => {
-                  resolve(new Classifier(
-                    classifierMetaData.algorithmId,
-                    unzipSync(Buffer.from(response)),
-                    classifierMetaData.algorithmVersion
-                  ));
-              }, errorResponse => {
-                reject(errorResponse);
-              });
+            }).toPromise().then(response => {
+            resolve(new Classifier(
+              classifierMetaData.algorithmId,
+              unzipSync(Buffer.from(response)),
+              classifierMetaData.algorithmVersion
+            ));
           }, errorResponse => {
             reject(errorResponse);
           });
+        }, errorResponse => {
+          reject(errorResponse);
+        });
     });
   }
 }

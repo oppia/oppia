@@ -65,9 +65,9 @@ describe('Classifier Data Backend API Service', () => {
         'exploration_version')).toEqual('1');
       expect(metaDataReq.request.params.get('state_name')).toEqual('state');
       metaDataReq.flush({
-        'algorithm_id': 'TextClassifier',
-        'algorithm_version': 0,
-        'gcs_filename': 'classifier.pb.xz'
+        algorithm_id: 'TextClassifier',
+        algorithm_version: 0,
+        gcs_filename: 'classifier.pb.xz'
       });
       flushMicrotasks();
 
@@ -84,7 +84,7 @@ describe('Classifier Data Backend API Service', () => {
     }));
 
     it('should handle rejection when fetching meta data fails',
-       fakeAsync(() => {
+      fakeAsync(() => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
@@ -100,7 +100,7 @@ describe('Classifier Data Backend API Service', () => {
       }));
 
     it('should handle rejection when fetching classifier data fails',
-       fakeAsync(() => {
+      fakeAsync(() => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
@@ -110,9 +110,9 @@ describe('Classifier Data Backend API Service', () => {
         const metaDataReq = httpTestingController.expectOne(
           req => req.url === classifierMetaDataRequestUrl);
         metaDataReq.flush({
-          'algorithm_id': 'TextClassifier',
-          'algorithm_version': 0,
-          'gcs_filename': 'classifier.pb.xz'
+          algorithm_id: 'TextClassifier',
+          algorithm_version: 0,
+          gcs_filename: 'classifier.pb.xz'
         });
         flushMicrotasks();
 

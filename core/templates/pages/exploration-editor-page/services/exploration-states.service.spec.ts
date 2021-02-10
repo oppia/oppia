@@ -47,6 +47,12 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { AlertsService } from 'services/alerts.service';
+import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { UtilsService } from 'services/utils.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -64,7 +70,7 @@ describe('ExplorationStatesService', function() {
   var ExplorationStatesService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide) {
+  beforeEach(angular.mock.module(function($provide, $http, $window) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
@@ -88,7 +94,13 @@ describe('ExplorationStatesService', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService());
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierDataBackendApiService(
+          $http, new UrlInterpolationService(
+            new AlertsService(new LoggerService()), new UrlService($window),
+            new UtilsService())),
+        new LoggerService()
+      ));
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));

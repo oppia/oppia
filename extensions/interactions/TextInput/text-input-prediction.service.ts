@@ -44,7 +44,7 @@ export class TextInputPredictionService {
 
   predict(classifierBuffer: ArrayBuffer, textInput: string): number {
     const classifierData = JSON.parse(TextClassifierFrozenModel.deserialize(
-      classifierBuffer).model_json) as TextInputClassifierData;
+      new Uint8Array(classifierBuffer)).model_json) as TextInputClassifierData;
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 

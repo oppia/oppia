@@ -47,7 +47,14 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { AlertsService } from 'services/alerts.service';
+import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { UtilsService } from 'services/utils.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+
 // ^^^ This block is to be removed.
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -73,7 +80,7 @@ describe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide, $http, $window) {
     $provide.value('LanguageUtilService', {
       getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
@@ -101,7 +108,13 @@ describe('Translation status service', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService());
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierDataBackendApiService(
+          $http, new UrlInterpolationService(
+            new AlertsService(new LoggerService()), new UrlService($window),
+            new UtilsService())),
+        new LoggerService()
+      ));
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
