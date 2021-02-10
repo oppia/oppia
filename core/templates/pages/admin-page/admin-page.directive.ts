@@ -35,7 +35,7 @@ require('value_generators/valueGeneratorsRequires.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
-require('core/templates/services/user-backend-api.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 require('services/utils.service.ts');
 
