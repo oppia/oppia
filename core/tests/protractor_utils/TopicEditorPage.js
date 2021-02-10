@@ -55,7 +55,7 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-close-save-modal-button'));
   var addSubtopicButton = element(
     by.css('.protractor-test-add-subtopic-button'));
-  var newSubtopicTitlefield = element(
+  var newSubtopicTitleField = element(
     by.css('.protractor-test-new-subtopic-title-field'));
   var newSubtopicUrlFragmentField = element(
     by.css('.protractor-test-new-subtopic-url-fragment-field'));
