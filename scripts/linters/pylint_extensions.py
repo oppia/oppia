@@ -866,7 +866,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         arguments_node = node.args
         expected_argument_names = set(
             None if (arg.name in self.not_needed_param_in_docstring)
-            else (arg.name + ':') for arg in arguments_node.args)
+            else ('%s:' % arg.name) for arg in arguments_node.args)
         currently_in_args_section = False
         # When we are in the args section and a line ends in a colon,
         # we can ignore the indentation styling in the next section of
@@ -1898,7 +1898,9 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                 line = line.strip()
                 # Regex evaluates to True if the line is of the form "if #" or
                 # "... if #" where # is not a space.
-                if not re.search(br'(\s|^)' + token + br'(\s[^\s]|$)', line):
+                if not re.search('%s%s%s' % (br'(\s|^)', token,
+                                             br'(\s[^\s]|$)'),
+                                 line):
                     self.add_message(
                         'single-space-after-keyword',
                         args=(token),
@@ -2109,6 +2111,47 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
+class ConcatenationChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that string
+    concatenation is present or not
+    """
+
+    __implements__ = interfaces.ITokenChecker
+
+    name = 'string-concatenation'
+    priority = -1
+    msgs = {
+        'C0032': (
+            'At string %s, please prefer string interpolation over '
+            'concatenation',
+            'string-concatenation',
+            'Prefer: "My string %s" % varname to "My string " + varname.',
+        ),
+    }
+
+    def process_tokens(self, tokens):
+        """Custom pylint checker which makes sure that string concatenation
+        is not used.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.STRING:
+                if token.startswith('"""') or token.startswith('u"""'):
+                    continue
+                line = line.strip()
+                # Regex evaluates to True if the line is of the form
+                # 'text' + ... or ... + 'text'
+                if re.search(
+                        r'(\'[^\']*\'(\s*)\+(\s*))|((\s*)\+(\s*)\'[^\']*\')',
+                        line):
+                    self.add_message(
+                        'string-concatenation',
+                        args=(token),
+                        line=line_num)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -2131,3 +2174,4 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
+    linter.register_checker(ConcatenationChecker(linter))
