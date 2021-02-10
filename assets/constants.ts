@@ -5439,6 +5439,10 @@ export = {
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
+  // The bucket name used by gcs to store files when development server
+  // is running.
+  "DEFAULT_GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
+
   // The bucket name is set to None-resources to enable it to be used
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",

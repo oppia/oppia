@@ -158,7 +158,6 @@ import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normaliz
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { AlgebraicExpressionInputValidationService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
-import { CodeReplPredictionService } from 'interactions/CodeRepl/code-repl-prediction.service';
 import { CodeReplRulesService } from 'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CodeReplValidationService } from 'interactions/CodeRepl/directives/code-repl-validation.service';
 import { ContinueRulesService } from 'interactions/Continue/directives/continue-rules.service';
@@ -345,7 +344,6 @@ export const angularServices: [string, unknown][] = [
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
   ['CodeNormalizerService', CodeNormalizerService],
-  ['CodeReplPredictionService', CodeReplPredictionService],
   ['CodeReplRulesService', CodeReplRulesService],
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],

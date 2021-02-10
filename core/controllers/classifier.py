@@ -171,6 +171,8 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
                 'No valid classifier exists for the given exploration state')
 
         return self.render_json({
+            'algorithm_id': algorithm_id,
+            'algorithm_version': algorithm_version,
             'gcs_filename': training_job.classifier_data_filename
         })
 

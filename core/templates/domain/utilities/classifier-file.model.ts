@@ -13,20 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating new frontend instances of Classifier
- *     domain objects.
+ * @fileoverview Model class for classifier data files.
  */
 
-export class Classifier {
-  algorithmId: string;
-  classifierData: ArrayBuffer;
-  algorithmVersion: number;
+export class ClassifierFile {
+  filename: string;
+  data: Blob;
 
-  constructor(
-      algorithmId: string, classifierData: ArrayBuffer,
-      algorithmVersion: number) {
-    this.algorithmId = algorithmId;
-    this.classifierData = classifierData;
-    this.algorithmVersion = algorithmVersion;
+  constructor(filename: string, data: Blob) {
+    this.filename = filename;
+    this.data = data;
   }
 }

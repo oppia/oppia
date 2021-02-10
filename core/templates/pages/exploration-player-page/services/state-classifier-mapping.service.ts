@@ -19,11 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Classifier, ClassifierBackendDict } from 'domain/classifier/classifier.model';
-
-interface StateClassifierMappingBackendDict {
-  [state: string]: ClassifierBackendDict;
-}
+import { Classifier } from 'domain/classifier/classifier.model';
+import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 interface StateClassifierMapping {
   [state: string]: Classifier;
@@ -33,28 +31,51 @@ interface StateClassifierMapping {
   providedIn: 'root'
 })
 export class StateClassifierMappingService {
-  constructor() {}
+  _explorationId: string;
+  _explorationVersion: number;
   stateClassifierMapping: StateClassifierMapping = null;
 
-  init(
-      backendStateClassifierMapping: StateClassifierMappingBackendDict): void {
+  constructor(
+    private classifierDataService: ClassifierDataBackendApiService,
+    private loggerService: LoggerService) {}
+
+  init(explorationId: string, explorationVersion: number): void {
+    this.loggerService.info('Initializing state classifier mapping service');
+    this._explorationId = explorationId;
+    this._explorationVersion = explorationVersion;
     this.stateClassifierMapping = {};
-    for (var stateName in backendStateClassifierMapping) {
-      if (backendStateClassifierMapping.hasOwnProperty(stateName)) {
-        this.stateClassifierMapping[stateName] = (
-          Classifier.createFromBackendDict(
-            backendStateClassifierMapping[stateName]));
-      }
+  }
+
+  async initializeClassifierDataForState(stateName: string): Promise<void> {
+    this.stateClassifierMapping[stateName] = null;
+    this.loggerService.info('Fetching classifier data for ' + stateName);
+    try {
+      const classifier = (
+        await this.classifierDataService.getClassifierData(
+          this._explorationId, this._explorationVersion, stateName));
+      this.stateClassifierMapping[stateName] = classifier;
+    } catch (error) {
+      this.loggerService.error(
+        'Fetching classifier data for ' + stateName +
+        ' failed with error: ' + error);
     }
   }
 
+  hasClassifierData(stateName: string): boolean {
+    return this.stateClassifierMapping &&
+           stateName in this.stateClassifierMapping &&
+           this.stateClassifierMapping[stateName] !== null;
+  }
+
   getClassifier(stateName: string): Classifier {
-    if (this.stateClassifierMapping &&
-          this.stateClassifierMapping.hasOwnProperty(stateName)) {
+    if (this.hasClassifierData(stateName)) {
       return this.stateClassifierMapping[stateName];
-    } else {
-      return null;
     }
+  }
+
+  testOnlySetClassifierData(
+      stateName: string, classifierData: Classifier): void {
+    this.stateClassifierMapping[stateName] = classifierData;
   }
 }
 

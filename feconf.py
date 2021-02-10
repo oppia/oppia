@@ -180,7 +180,7 @@ MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The minimum number of training samples required for training a classifier.
-MIN_TOTAL_TRAINING_EXAMPLES = 50
+MIN_TOTAL_TRAINING_EXAMPLES = 10
 
 # The minimum number of assigned labels required for training a classifier.
 MIN_ASSIGNED_LABELS = 2
@@ -888,7 +888,7 @@ TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with app.constants.ts.
-ENABLE_ML_CLASSIFIERS = False
+ENABLE_ML_CLASSIFIERS = True
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.

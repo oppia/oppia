@@ -32,14 +32,6 @@ interface SVM {
   'dual_coef': number[][];
 }
 
-interface ClassifierData {
-  'KNN': KNN;
-  'SVM': SVM;
-  'cv_vocabulary': {
-    [key: string]: number;
-  };
-}
-
 type ClassifierAccuracyTest = {
   'answer_group_index': number;
   'answers': {

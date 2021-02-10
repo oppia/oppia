@@ -175,6 +175,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService', 'UrlInterpolationService',
@@ -196,6 +197,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataBackendApiService, UrlInterpolationService,
@@ -260,7 +262,10 @@ angular.module('oppia').component('explorationEditorPage', {
 
           ExplorationFeaturesService.init(explorationData, featuresData);
 
+          StateClassifierMappingService.init(
+            ContextService.getExplorationId(), explorationData.version);
           ExplorationStatesService.init(explorationData.states);
+
 
           ExplorationTitleService.init(explorationData.title);
           ExplorationCategoryService.init(explorationData.category);

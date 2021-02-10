@@ -15,16 +15,19 @@
 /**
  * @fileoverview Unit tests for the State classifier mapping service.
  */
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { Classifier } from 'domain/classifier/classifier.model';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 
 describe('State classifier mapping service', () => {
   describe('Test correct retrieval of classifier details', () => {
     let mappingService: StateClassifierMappingService;
-    let classifierData: ClassifierData = {
+    let classifierFrozenModel = new TextClassifierFrozenModel();
+    classifierFrozenModel.model_json = JSON.stringify({
       KNN: {
         occurrence: 0,
         K: 0,
@@ -58,10 +61,14 @@ describe('State classifier mapping service', () => {
       cv_vocabulary: {
         a: 0
       }
-    };
+    });
+
+    let classifierData = new Classifier(
+      'TestClassifier', classifierFrozenModel.serialize(), 1);
 
     beforeEach(() => {
       TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
         providers: [StateClassifierMappingService]
       });
 
@@ -69,24 +76,20 @@ describe('State classifier mapping service', () => {
     });
 
     it('should return correct classifier details.', () => {
-      mappingService.init({
-        stateName1: {
-          algorithm_id: 'TestClassifier',
-          classifier_data: classifierData,
-          data_schema_version: 1
-        }
-      });
-
+      mappingService.init('0', 0);
       var stateName = 'stateName1';
       var stateNameNonexistent = 'stateName2';
+
+      mappingService.testOnlySetClassifierData(stateName, classifierData);
       var retrievedClassifier = mappingService.getClassifier(stateName);
       var nonExistentClassifier = mappingService.getClassifier(
         stateNameNonexistent);
 
       expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
-      expect(retrievedClassifier.classifierData).toEqual(classifierData);
-      expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
-      expect(nonExistentClassifier).toBe(null);
+      expect(retrievedClassifier.classifierData).toEqual(
+        classifierFrozenModel.serialize());
+      expect(retrievedClassifier.algorithmVersion).toEqual(1);
+      expect(nonExistentClassifier).toBe(undefined);
     });
 
     it('should not return correct classifier details when init is not ' +
@@ -94,7 +97,7 @@ describe('State classifier mapping service', () => {
       var stateName = 'stateName1';
       var retrievedClassifier = mappingService.getClassifier(stateName);
 
-      expect(retrievedClassifier).toBe(null);
+      expect(retrievedClassifier).toBe(undefined);
     });
   });
 });

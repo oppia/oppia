@@ -82,7 +82,7 @@ export const AppConstants = {
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
   // Feature still in development.
   // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-  ENABLE_ML_CLASSIFIERS: false,
+  ENABLE_ML_CLASSIFIERS: true,
   // Feature still in development.
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION: (
     'The current solution does not lead to another card.'),
@@ -161,6 +161,7 @@ export const AppConstants = {
   ASSET_TYPE_AUDIO: 'audio',
   ASSET_TYPE_IMAGE: 'image',
   ASSET_TYPE_THUMBNAIL: 'thumbnail',
+  ASSET_TYPE_CLASSIFIER_DATA: 'classifier_data',
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
   IMAGE_UPLOAD_URL_TEMPLATE: (

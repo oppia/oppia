@@ -63,7 +63,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
   'FocusManagerService', 'ImagePreloaderService', 'LearnerParamsService',
   'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
-  'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
+  'StateCardObjectFactory', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlService',
   function(
       $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
@@ -71,7 +72,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
       ExplorationObjectFactory, ExpressionInterpolationService,
       FocusManagerService, ImagePreloaderService, LearnerParamsService,
       PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
-      StateCardObjectFactory, StatsReportingService, UrlService) {
+      StateCardObjectFactory, StateClassifierMappingService,
+      StatsReportingService, UrlService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
@@ -200,6 +202,9 @@ angular.module('oppia').factory('ExplorationEngineService', [
           exploration.initStateName, newParams);
       }
 
+      StateClassifierMappingService.initializeClassifierDataForState(
+        exploration.initStateName);
+
       var initialCard =
         StateCardObjectFactory.createNewCard(
           currentStateName, questionHtml, interactionHtml,
@@ -274,6 +279,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           explorationDict, explorationVersion, preferredAudioLanguage,
           autoTtsEnabled, successCallback) {
         answerIsBeingProcessed = false;
+        StateClassifierMappingService.init(_explorationId, explorationVersion);
         if (_editorPreviewMode) {
           exploration = ExplorationObjectFactory.createFromBackendDict(
             explorationDict);

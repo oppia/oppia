@@ -17,9 +17,11 @@
  */
 
 import { Classifier } from 'domain/classifier/classifier.model';
+import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 
 describe('Classifier model', () => {
-  let sampleClassifierData = {
+  let classifierFrozenModel = new TextClassifierFrozenModel();
+  classifierFrozenModel.model_json = JSON.stringify({
     KNN: {
       occurrence: 0,
       K: 0,
@@ -53,14 +55,15 @@ describe('Classifier model', () => {
     cv_vocabulary: {
       a: 0
     }
-  };
+  });
 
   it('should create a new classifier', () => {
     var classifierObject = (
-      new Classifier('TestClassifier', sampleClassifierData, 1));
+      new Classifier('TestClassifier', classifierFrozenModel.serialize(), 1));
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
-    expect(classifierObject.classifierData).toEqual(sampleClassifierData);
-    expect(classifierObject.dataSchemaVersion).toEqual(1);
+    expect(classifierObject.classifierData).toEqual(
+      classifierFrozenModel.serialize());
+    expect(classifierObject.algorithmVersion).toEqual(1);
   });
 });
