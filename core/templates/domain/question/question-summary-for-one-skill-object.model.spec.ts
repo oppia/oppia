@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for QuestionSummaryObjectFactory.
+ * @fileoverview Unit tests for QuestionSummaryModelClass.
  */
 
 import { TestBed } from '@angular/core/testing';
