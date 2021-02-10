@@ -2977,3 +2977,48 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
+
+
+class ConcatenationCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(ConcatenationCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ConcatenationChecker)
+        self.checker_test_object.setup_method()
+
+    def test_string_concatenation(self):
+        node_string_concatenation = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                """
+                a = 'hello' + 'mello'
+
+                b = a + 'mello'
+
+                c = 'hello' + b
+                """)
+        node_string_concatenation.file = filename
+        node_string_concatenation.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_string_concatenation))
+
+        double_message1 = testutils.Message(
+            msg_id='string-concatenation', args=('\'hello\''), line=2)
+        double_message2 = testutils.Message(
+            msg_id='string-concatenation', args=('\'mello\''), line=2)
+        right_message = testutils.Message(
+            msg_id='string-concatenation', args=('\'mello\''), line=4)
+        left_message = testutils.Message(
+            msg_id='string-concatenation', args=('\'hello\''), line=6)
+
+        with self.checker_test_object.assertAddsMessages(
+            double_message1, double_message2, right_message, left_message):
+            temp_file.close()
