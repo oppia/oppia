@@ -558,7 +558,7 @@ class FetchIssuesHandler(EditorHandler):
                 unresolved_issues.append(issue)
         exp_issues.unresolved_issues = unresolved_issues
         exp_issues_dict = exp_issues.to_dict()
-        self.render_json(exp_issues_dict['unresolved_issues'])
+        self.render_json(exp_issues_dict)
 
 
 class FetchPlaythroughHandler(EditorHandler):

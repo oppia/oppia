@@ -66,7 +66,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let req = httpTestingController.expectOne(
           '/issuesdatahandler/7?exp_version=1');
         expect(req.request.method).toEqual('GET');
-        req.flush(backendIssues);
+        req.flush({unresolved_issues: backendIssues});
         flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(
@@ -110,7 +110,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let req = httpTestingController.expectOne(
           '/issuesdatahandler/7?exp_version=1');
         expect(req.request.method).toEqual('GET');
-        req.flush(backendIssues);
+        req.flush({unresolved_issues: backendIssues});
         flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(
@@ -199,7 +199,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
       let req = httpTestingController.expectOne(
         '/issuesdatahandler/7?exp_version=1');
       expect(req.request.method).toEqual('GET');
-      req.flush(backendIssues);
+      req.flush({unresolved_issues: backendIssues});
       flushMicrotasks();
 
       req = httpTestingController.expectOne(
@@ -228,7 +228,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let req = httpTestingController.expectOne(
           '/issuesdatahandler/7?exp_version=1');
         expect(req.request.method).toEqual('GET');
-        req.flush(backendIssues);
+        req.flush({unresolved_issues: backendIssues});
         flushMicrotasks();
 
         req = httpTestingController.expectOne(
