@@ -485,7 +485,6 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         for error in actual_error_list:
             assert (error in full_error_list), ('Extra error: %s' % error)
 
-
     def test_model_with_invalid_commit_message_length(self):
         self.model_instance_0.commit_message = 'a' * (
             constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
@@ -1439,6 +1438,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+
 
 class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
