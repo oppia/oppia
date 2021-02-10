@@ -53,8 +53,9 @@
               role="menu">
             <li class="nav-item">
               <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE})"
+                 ng-click="$ctrl.navigateToClassroomPage('/learn/math')"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link"
-                 href="/learn/math" translate="I18N_TOPNAV_CLASSROOM_BASIC_MATHS">
+                 href="#" translate="I18N_TOPNAV_CLASSROOM_BASIC_MATHS">
               </a>
             </li>
           </ul>
@@ -356,7 +357,7 @@
   }
   top-navigation-bar .oppia-navbar-menu:focus {
     outline: 1px dotted #212121;
-    outline: auto 5px -webkit-focus-ring-color;
+    outline: 5px -webkit-focus-ring-color;
   }
   top-navigation-bar .oppia-navbar-profile {
     float: right;

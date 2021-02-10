@@ -68,6 +68,8 @@ import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { BottomNavbarStatusService } from
   'services/bottom-navbar-status.service';
+import { PreventPageUnloadEventService } from
+  'services/prevent-page-unload-event.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
@@ -379,7 +381,7 @@ import { SetInputRulesService } from
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -885,6 +887,8 @@ export class UpgradedServices {
     upgradedServices['BottomNavbarStatusService'] = (
       new BottomNavbarStatusService(
         upgradedServices['WindowDimensionsService']));
+    upgradedServices['PreventPageUnloadEventService'] =
+        new PreventPageUnloadEventService(upgradedServices['WindowRef']);
     upgradedServices['CodeReplPredictionService'] =
       new CodeReplPredictionService(
         upgradedServices['CountVectorizerService'],

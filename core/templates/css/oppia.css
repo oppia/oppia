@@ -96,6 +96,33 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+/* When AngularFire is in emulator mode, it appends the following element to
+the <body> of every page:
+
+    <div class="firebase-emulator-warning"
+         style="background-color: rgb(255, 255, 255);
+                border: 0.1em solid rgb(0, 0, 0);
+                bottom: 0px;
+                color: rgb(255, 0, 0);
+                left: 0px;
+                margin: 0px;
+                position: fixed;
+                text-align: center;
+                width: 100%;
+                z-index: 10000;">
+      Running in emulator mode. Do not use with production credentials.
+    </div>
+*/
+.firebase-emulator-warning {
+  /* Enhance the contrast of the text to improve accessibility. We need to use
+   `!important` here because inline style rules have a higher priority than CSS
+   style rules, but we only want these CSS rules to be respected. */
+  background-color: #FFFFFF !important;
+  color: #CC0000 !important;
+  /* Do not allow the element to swallow pointer/mouse events. */
+  pointer-events: none;
+}
+
 /* The following classes' styles are overriden by Guppy's OSK stylesheet and
 they end up rotating the tooltips which are placed on the left or right. This is
 why they need to be overriden.  */
@@ -1312,11 +1339,13 @@ span.sort-explorations-select .sort-order {
 /* Rules for the tiles in the creator dashboard. */
 
 .oppia-dashboard-intro-button {
-  background-color: #015c53;
+  background-color: #00645c;
   border-radius: 4px;
   color: #fff;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.7px;
   margin-top: 10px;
   text-transform: uppercase;
   width: 200px;
@@ -1727,11 +1756,13 @@ pre.oppia-pre-wrapped-text {
   padding: 6px 6px 6px 3px;
 }
 .btn.oppia-navbar-button {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   color: rgba(255,255,255,1.0);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.7px;
   margin-left: 5px;
   margin-right: 5px;
   padding: 6px 12px 6px 12px;
@@ -1739,8 +1770,8 @@ pre.oppia-pre-wrapped-text {
 }
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
-  background-color: rgba(5, 190, 178, 1);
-  color: rgba(255,255,255,1);
+  background-color: #fff;
+  color: #009688;
 }
 .btn:focus, .btn:active:focus {
   outline: 0;
@@ -2293,9 +2324,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-rule-block {
   background-color: white;
-  border-left: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  border-top: 1px solid #ccc;
+  border: 1px solid #ccc;
 }
 
 .oppia-rule-block.active {
@@ -2687,8 +2716,10 @@ div#ng-curtain {
 }
 .nav-link.oppia-navbar-tab,
 .nav-item > div.oppia-navbar-tab {
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.7px;
   padding: 17px 12px 10px 12px;
   text-transform: uppercase;
 }
@@ -3925,11 +3956,13 @@ oppia-noninteractive-link {
 }
 
 .oppia-about-button {
-  background-color: rgb(0, 121, 109);
+  background-color: #00645c;
   border-radius: 4px;
   color: rgba(255,255,255,1.0);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.7px;
   margin: 0 15px 15px 15px;
   max-width: 90%;
   min-width: 200px;
@@ -3941,7 +3974,7 @@ oppia-noninteractive-link {
 
 .oppia-about-button:hover,
 .oppia-about-button:focus {
-  background-color: rgba(5,190,178,1);
+  background-color: #3d9991;
   color: rgba(255,255,255,1);
 }
 
