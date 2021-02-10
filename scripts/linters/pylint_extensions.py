@@ -1962,7 +1962,7 @@ class ConcatenationChecker(checkers.BaseChecker):
                     continue
                 line = line.strip()
                 # Regex evaluates to True if the line is of the form
-                # 'text' + or + 'text'
+                # ('text' +) or (+ 'text')
                 if re.search(
                         r'(\'[^\']*\'(\s*)\+(\s*))|((\s*)\+(\s*)\'[^\']*\')',
                         line):
