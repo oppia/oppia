@@ -1123,9 +1123,6 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             # and if that is True then we are replacing "error" with empty
             # string('') which is at the index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', line.lstrip()):
-                # Replacing message-id with an empty string('').
-                if not 'Parsing error:' in line:
-                    line = re.sub(r'(\w+-*)+$', '', line)
                 error_string = re.search(r'error', line).group(0)
                 error_message = line.replace(error_string, '', 1)
             else:

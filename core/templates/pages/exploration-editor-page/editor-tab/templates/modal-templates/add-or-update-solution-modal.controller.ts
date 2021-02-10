@@ -80,10 +80,10 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
         StateSolutionService.savedMemento.answerIsExclusive),
       correctAnswer: null,
       explanationHtml: (
-        StateSolutionService.savedMemento.explanation.getHtml()),
+        StateSolutionService.savedMemento.explanation.html),
       explanationContentId: (
         StateSolutionService.savedMemento.explanation
-          .getContentId())
+          .contentId)
     } : angular.copy(EMPTY_SOLUTION_DATA);
 
     $scope.onSubmitFromSubmitButton = function() {

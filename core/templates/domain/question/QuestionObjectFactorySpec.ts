@@ -229,17 +229,17 @@ describe('Question object factory', function() {
       ['abc-123']);
     var stateData = sampleQuestion.getStateData();
     expect(stateData.name).toEqual('question');
-    expect(stateData.content.getHtml()).toEqual('Question 1');
+    expect(stateData.content.html).toEqual('Question 1');
     var interaction = stateData.interaction;
     expect(interaction.id).toEqual('TextInput');
-    expect(interaction.hints[0].hintContent.getHtml()).toEqual('Hint 1');
-    expect(interaction.solution.explanation.getHtml()).toEqual(
+    expect(interaction.hints[0].hintContent.html).toEqual('Hint 1');
+    expect(interaction.solution.explanation.html).toEqual(
       'Solution explanation');
     expect(interaction.solution.correctAnswer).toEqual(
       'This is the correct answer');
     var defaultOutcome = interaction.defaultOutcome;
     expect(defaultOutcome.labelledAsCorrect).toEqual(false);
-    expect(defaultOutcome.feedback.getHtml()).toEqual('Correct Answer');
+    expect(defaultOutcome.feedback.html).toEqual('Correct Answer');
   });
 
   it('should correctly get backend dict', function() {
@@ -275,6 +275,12 @@ describe('Question object factory', function() {
 
     expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
 
+    interaction.defaultOutcome.feedback.html = '';
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'Please enter a feedback for the default outcome.');
+
+    interaction.defaultOutcome.feedback.html = 'feedback';
+
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'At least one answer should be marked correct');
@@ -290,6 +296,11 @@ describe('Question object factory', function() {
     interaction.id = null;
     expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'An interaction must be specified');
+
+    var questionContent = sampleQuestion.getStateData().content;
+    questionContent.html = '';
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'Please enter a question.');
   });
 
   it('should correctly create a Default Question', function() {

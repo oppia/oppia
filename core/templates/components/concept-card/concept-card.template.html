@@ -2,7 +2,7 @@
   <div class="concept-card-explanation">
     <div class="oppia-concept-card-explanation-container">
       <angular-html-bind class="protractor-test-concept-card-explanation"
-                         html-data="$ctrl.currentConceptCard.getExplanation().getHtml()">
+                         html-data="$ctrl.currentConceptCard.getExplanation().html">
       </angular-html-bind>
     </div>
   </div>
@@ -12,7 +12,7 @@
          ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
          ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
       <strong> Question: </strong>
-      <angular-html-bind class="example-content" html-data="example.getQuestion().getHtml()"></angular-html-bind>
+      <angular-html-bind class="example-content" html-data="example.getQuestion().html"></angular-html-bind>
 
       <button class="btn btn-secondary show-example-explanation-button"
               ng-if="!$ctrl.explanationIsShown && $index == $ctrl.numberOfWorkedExamplesShown - 1"
@@ -21,7 +21,7 @@
       </button>
       <div ng-if="$ctrl.explanationIsShown || $index < $ctrl.numberOfWorkedExamplesShown - 1">
         <strong> Explanation: </strong>
-        <angular-html-bind class="example-content" html-data="example.getExplanation().getHtml()"></angular-html-bind>
+        <angular-html-bind class="example-content" html-data="example.getExplanation().html"></angular-html-bind>
       </div>
     </div>
     <button class="btn btn-secondary show-more-worked-examples-button"
