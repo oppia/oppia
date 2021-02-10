@@ -44,9 +44,23 @@ export class SiteAnalyticsService {
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
     if (this.windowRef.nativeWindow.gtag && this.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.gtag('event', eventAction, {
-        event_category: eventCategory,
-        event_label: eventLabel
+      this.windowRef.nativeWindow.gtag('event', eventCategory, {
+        action: eventAction,
+        label: eventLabel
+      });
+    }
+  }
+
+  // For definitions of the various arguments, please see:
+  // developers.google.com/analytics/devguides/collection/analyticsjs/
+  // social-interactions.
+  _sendSocialEventToGoogleAnalytics(
+      network: string, action: string, targetUrl: string): void {
+    if (this.windowRef.nativeWindow.gtag && this.CAN_SEND_ANALYTICS_EVENTS) {
+      this.windowRef.nativeWindow.gtag('event', 'social', {
+        network: network,
+        action: action,
+        label: targetUrl
       });
     }
   }
@@ -58,8 +72,7 @@ export class SiteAnalyticsService {
       this.windowRef.nativeWindow.location.pathname + ' ' + srcElement);
   }
   registerNewSignupEvent(): void {
-    this._sendEventToGoogleAnalytics(
-      'OnboardingEngagement', 'signup', 'AccountSignUp');
+    this._sendEventToGoogleAnalytics('SignupButton', 'click', '');
   }
   registerClickBrowseLessonsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
@@ -123,11 +136,11 @@ export class SiteAnalyticsService {
       'CommitToPrivateExploration', 'click', explorationId);
   }
   registerShareExplorationEvent(network: string): void {
-    this._sendEventToGoogleAnalytics(
+    this._sendSocialEventToGoogleAnalytics(
       network, 'share', this.windowRef.nativeWindow.location.pathname);
   }
   registerShareCollectionEvent(network: string): void {
-    this._sendEventToGoogleAnalytics(
+    this._sendSocialEventToGoogleAnalytics(
       network, 'share', this.windowRef.nativeWindow.location.pathname);
   }
   registerOpenEmbedInfoEvent(explorationId: string): void {
@@ -228,6 +241,9 @@ export class SiteAnalyticsService {
         'PlayerNewCard', 'click', cardNum.toString());
     }
   }
+  registerFinishExploration(): void {
+    this._sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
+  }
   registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
     this._sendEventToGoogleAnalytics(
       'OpenFractionsFromLandingPage', 'click', collectionId);
@@ -271,46 +287,6 @@ export class SiteAnalyticsService {
   registerContributorDashboardRejectSuggestion(contributionType: string): void {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardRejectSuggestion', 'click', contributionType);
-  }
-
-  registerLessonActiveUse(): void {
-    this._sendEventToGoogleAnalytics(
-      'ActiveUserStartAndSawCards', 'engage', '');
-  }
-
-  registerStartExploration(explorationId: string): void {
-    this._sendEventToGoogleAnalytics(
-      'PlayerStartExploration', 'engage', explorationId);
-  }
-
-  registerFinishExploration(explorationId: string): void {
-    this._sendEventToGoogleAnalytics(
-      'PlayerFinishExploration', 'engage', explorationId);
-  }
-
-  registerCuratedLessonCompleted(explorationId: string): void {
-    this._sendEventToGoogleAnalytics(
-      'CuratedLessonCompleted', 'engage', explorationId);
-  }
-
-  registerClassroomLessonActiveUse(): void {
-    this._sendEventToGoogleAnalytics(
-      'ClassroomActiveUserStartAndSawCards', 'engage', '');
-  }
-
-  registerClassoomHeaderClickEvent(): void {
-    this._sendEventToGoogleAnalytics(
-      'ClassroomEngagement', 'click', 'ClickOnClassroom');
-  }
-
-  registerClassroomPageViewed(): void {
-    this._sendEventToGoogleAnalytics(
-      'ClassroomEngagement', 'impression', 'ViewClassroom');
-  }
-
-  registerAccountDeletion(): void {
-    this._sendEventToGoogleAnalytics(
-      'OnboardingEngagement', 'delete', 'AccountDeletion');
   }
 }
 
