@@ -274,11 +274,12 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.showPublishButton()).toBe(true);
   });
 
-  it('should add prevent reload event listener when a bio is changed',
-    function() {
-      spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
-      spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-      $scope.$apply();
-      expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
-    });
+  it('should add PreventPageUnloadEventService when changelist' +
+    ' is greater than 50', function() {
+    spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    $scope.getChangeListLength();
+    $scope.$apply();
+    expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
+  });
 });

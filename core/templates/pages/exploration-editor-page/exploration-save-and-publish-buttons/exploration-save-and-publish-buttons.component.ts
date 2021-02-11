@@ -67,7 +67,13 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
       };
 
       $scope.getChangeListLength = function() {
-        return ChangeListService.getChangeList().length;
+        var changeListLength = ChangeListService.getChangeList().length;
+        if (changeListLength > 50) {
+          PreventPageUnloadEventService.addListener();
+        } else {
+          PreventPageUnloadEventService.removeListener();
+        }
+        return changeListLength;
       };
 
       $scope.isExplorationSaveable = function() {
@@ -148,17 +154,6 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
 
         return $scope.explorationCanBePublished && $scope.isPrivate();
       };
-
-      $scope.$watch(function() {
-        if ($scope.getChangeListLength() > 50) {
-          PreventPageUnloadEventService.addListener();
-        } else {
-          PreventPageUnloadEventService.removeListener();
-        }
-        // TODO(#8521): Remove the use of $rootScope.$apply()
-        // once the controller is migrated to angular.
-        $rootScope.$applyAsync();
-      });
     }
   ]
 });
