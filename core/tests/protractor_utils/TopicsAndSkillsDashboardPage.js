@@ -157,8 +157,6 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.navigateToTopicWithIndex = async function(index) {
     await this.waitForTopicsToLoad();
-    await waitFor.visibilityOf(
-      topicEditOptions, 'Topic edit options taking to long to appear');
     await action.click(
       'Topic edit option', topicEditOptions.get(index));
     await action.click(
@@ -392,8 +390,10 @@ var TopicsAndSkillsDashboardPage = function() {
     if (number > 0) {
       await waitFor.visibilityOf(
         topicsListItems, 'Topics table taking too long to appear');
+      expect(await topicsListItems.count()).toBe(number);
+    } else {
+      expect(await topicsTable.isPresent()).toBe(false);
     }
-    expect(await topicsListItems.count()).toBe(number);
   };
 
   this.expectTopicNameToBe = async function(topicName, index) {
