@@ -132,7 +132,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
         });
       },
       saveModeratorChangeToBackend: function(
-          emailBody, onUnpublishingcallback) {
+          emailBody, onExplorationRightsUpdatedcallback) {
         var that = this;
         var explorationModeratorRightsUrl = (
           '/createhandler/moderatorrights/' +
@@ -149,8 +149,8 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
-          if (onUnpublishingcallback) {
-            onUnpublishingcallback();
+          if (onExplorationRightsUpdatedcallback) {
+            onExplorationRightsUpdatedcallback();
           }
         });
       }
