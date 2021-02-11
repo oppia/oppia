@@ -26,24 +26,28 @@ require(
 require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('filters/string-utility-filters/capitalize.filter.ts');
+require('pages/library-page/search-bar/search-bar.component.ts');
 require('services/alerts.service.ts');
-require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('pages/library-page/search-bar/search-bar.component.ts');
+require('services/page-title.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
-    '$filter', 'AlertsService', 'LoaderService', 'PageTitleService',
-    'UrlInterpolationService', 'UrlService', 'FATAL_ERROR_CODES',
+    '$filter', 'AlertsService', 'LoaderService',
+    'SiteAnalyticsService', 'UrlInterpolationService',
+    'UrlService', 'FATAL_ERROR_CODES',
     function(
-        $filter, AlertsService, LoaderService, PageTitleService,
-        UrlInterpolationService, UrlService, FATAL_ERROR_CODES) {
+        $filter, AlertsService, LoaderService,
+        SiteAnalyticsService, UrlInterpolationService,
+        UrlService, FATAL_ERROR_CODES) {
       var ctrl = this;
 
       ctrl.classroomBackendApiService = (
         OppiaAngularRootComponent.classroomBackendApiService);
+      ctrl.pageTitleService = OppiaAngularRootComponent.pageTitleService;
 
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -62,10 +66,11 @@ angular.module('oppia').component('classroomPage', {
           ctrl.classroomData = classroomData;
           ctrl.classroomDisplayName = (
             $filter('capitalize')(classroomData.getName()));
-          PageTitleService.setPageTitle(
-            ctrl.classroomDisplayName + ' Classroom | Oppia');
+          ctrl.pageTitleService.setPageTitle(
+            `Learn ${ctrl.classroomDisplayName} with Oppia | Oppia`);
           LoaderService.hideLoadingScreen();
           ctrl.classroomBackendApiService.onInitializeTranslation.emit();
+          SiteAnalyticsService.registerClassroomPageViewed();
         }, function(errorResponse) {
           if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
             AlertsService.addWarning('Failed to get dashboard data');

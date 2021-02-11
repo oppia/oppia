@@ -44,9 +44,7 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -85,9 +83,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionModel doesn't contain any data directly corresponding to
-        a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -97,7 +93,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_state_data_schema_version':
@@ -226,10 +222,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question-skill link should be kept since questions are only
-        anonymized and are not deleted whe user is deleted.
-        """
-        return base_models.DELETION_POLICY.KEEP
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
@@ -238,25 +232,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_difficulty': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether QuestionSkillLinkModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -663,7 +644,8 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -723,9 +705,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -738,9 +718,10 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model data has already been exported as a part of the QuestionModel
-        export_data function, and thus a new export_data function does not
-        need to be defined here.
+        """Model contains data corresponding to a user, but this isn't exported
+        because because noteworthy details that belong to this model have
+        already been exported as a part of the QuestionModel export_data
+        function.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'question_model_last_updated':

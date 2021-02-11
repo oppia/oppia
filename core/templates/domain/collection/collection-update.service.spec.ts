@@ -40,7 +40,6 @@ describe('Collection update service', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', Change);
   }));

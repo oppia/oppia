@@ -39,7 +39,7 @@ describe('DragAndDropSortInputValidationService', () => {
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let customOutcome: Outcome;
-  let equalsListWithEmptyValuesRule: Rule, equalsListWithDuplicatesRule: Rule,
+  let equalsListWithEmptyListRule: Rule, equalsListWithDuplicatesRule: Rule,
     equalsListWithAllowedValuesRule: Rule, equalsListWithValuesRule: Rule,
     goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule,
     hasElementXAtPositionYRule: Rule;
@@ -87,10 +87,10 @@ describe('DragAndDropSortInputValidationService', () => {
     customizationArgs = {
       choices: {
         value: [
-          new SubtitledHtml('a', ''),
-          new SubtitledHtml('b', ''),
-          new SubtitledHtml('c', ''),
-          new SubtitledHtml('d', '')
+          new SubtitledHtml('a', 'ca_0'),
+          new SubtitledHtml('b', 'ca_1'),
+          new SubtitledHtml('c', 'ca_2'),
+          new SubtitledHtml('d', 'ca_3')
         ]
       },
       allowMultipleItemsInSamePosition: {
@@ -101,60 +101,71 @@ describe('DragAndDropSortInputValidationService', () => {
     goodRule1 = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a'], ['b'], ['c'], ['d']]
+        x: [
+          ['ca_0'], ['ca_1'], ['ca_2'], ['ca_3']
+        ]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     goodRule2 = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['d'], ['c'], ['b'], ['a']]
+        x: [
+          ['ca_3'], ['ca_2'], ['ca_1'], ['ca_0']
+        ]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     equalsListWithAllowedValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a', 'b'], ['d'], ['c']]
+        x: [
+          ['ca_0', 'ca_1'], ['ca_3'], ['ca_2']
+        ]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     equalsListWithValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
-        x: [['a'], ['d'], ['c'], ['b']]
+        x: [
+          ['ca_0'], ['ca_3'], ['ca_2'], ['ca_1']
+        ]
       }
-    });
+    }, 'DragAndDropSortInput');
 
-    equalsListWithEmptyValuesRule = rof.createFromBackendDict({
+    equalsListWithEmptyListRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a', ''], [], ['c', 'b', 'd']]
+        x: [['ca_0'], [], ['ca_2', 'ca_1', 'ca_3']]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     equalsListWithDuplicatesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
-        x: [['a', 'b'], ['b'], ['c', 'a', 'd']]
+        x: [
+          ['ca_0', 'ca_1'], ['ca_1'],
+          ['ca_2', 'ca_0', 'ca_3']
+        ]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     hasXBeforeYRule = rof.createFromBackendDict({
       rule_type: 'HasElementXBeforeElementY',
       inputs: {
-        x: 'b',
-        y: 'b'
+        x: 'ca_1',
+        y: 'ca_1'
       }
-    });
+    }, 'DragAndDropSortInput');
 
     hasElementXAtPositionYRule = rof.createFromBackendDict({
       rule_type: 'HasElementXAtPositionY',
       inputs: {
-        x: 'x',
+        x: 'ca_5',
         y: '5'
       }
-    });
+    }, 'DragAndDropSortInput');
 
     answerGroups = [
       agof.createNew(
@@ -182,9 +193,9 @@ describe('DragAndDropSortInputValidationService', () => {
     var rules = [rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a', 'b'], ['c', 'd']]
+        x: [['ca_0', 'ca_1'], ['ca_2', 'ca_3']]
       }
-    })];
+    }, 'DragAndDropSortInput')];
     answerGroups = [
       agof.createNew(rules, customOutcome, null, null),
       agof.createNew(rules, customOutcome, null, null)
@@ -201,19 +212,15 @@ describe('DragAndDropSortInputValidationService', () => {
     customizationArgs.allowMultipleItemsInSamePosition.value = true;
   });
 
-  it('should expect all items to be nonempty', () => {
+  it('should expect all lists to be nonempty', () => {
     // Add rule containing empty items.
-    answerGroups[0].rules = [equalsListWithEmptyValuesRule];
+    answerGroups[0].rules = [equalsListWithEmptyListRule];
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Please ensure the items are nonempty.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 options do not match ' +
-        'customization argument choices.'
+      message: 'Please ensure the list is nonempty.'
     }]);
   });
 
@@ -248,7 +255,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
-    customizationArgs.choices.value[0].setHtml('');
+    customizationArgs.choices.value[0].html = '';
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, [], goodDefaultOutcome);

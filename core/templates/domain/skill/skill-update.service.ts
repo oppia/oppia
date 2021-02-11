@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,322 +16,440 @@
  * @fileoverview Service to handle the updating of a skill.
  */
 
-import { Change } from
-  'domain/editor/undo_redo/change.model';
+import cloneDeep from 'lodash/cloneDeep';
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/skill-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('SkillUpdateService', [
-  'UndoRedoService', 'CMD_ADD_PREREQUISITE_SKILL',
-  'CMD_ADD_SKILL_MISCONCEPTION', 'CMD_DELETE_PREREQUISITE_SKILL',
-  'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_RUBRICS',
-  'CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
-  'CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
-  'CMD_UPDATE_SKILL_PROPERTY',
-  'SKILL_CONTENTS_PROPERTY_EXPLANATION',
-  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'SKILL_DIFFICULTIES',
-  'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK',
-  'SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED',
-  'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
-  'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'SKILL_PROPERTY_DESCRIPTION',
-  function(
-      UndoRedoService, CMD_ADD_PREREQUISITE_SKILL,
-      CMD_ADD_SKILL_MISCONCEPTION, CMD_DELETE_PREREQUISITE_SKILL,
-      CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_RUBRICS,
-      CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-      CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-      CMD_UPDATE_SKILL_PROPERTY,
-      SKILL_CONTENTS_PROPERTY_EXPLANATION,
-      SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES, SKILL_DIFFICULTIES,
-      SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
-      SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED,
-      SKILL_MISCONCEPTIONS_PROPERTY_NAME,
-      SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION) {
-    var _applyChange = function(skill, command, params, apply, reverse) {
-      var changeDict = angular.copy(params);
-      changeDict.cmd = command;
-      var changeObj = new Change(changeDict, apply, reverse);
-      UndoRedoService.applyChange(changeObj, skill);
-    };
+import {
+  BackendChangeObject,
+  Change,
+} from 'domain/editor/undo_redo/change.model';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-    var _applyPropertyChange = function(
-        skill, propertyName, newValue, oldValue, apply, reverse) {
-      _applyChange(skill, CMD_UPDATE_SKILL_PROPERTY, {
+@Injectable({
+  providedIn: 'root',
+})
+export class SkillUpdateService {
+  constructor(private undoRedoService: UndoRedoService) {}
+
+  private _applyChange = (
+      skill,
+      command: string,
+      params,
+      apply,
+      reverse
+  ) => {
+    const changeDict = cloneDeep(params);
+    changeDict.cmd = command;
+    const changeObj = new Change(changeDict, apply, reverse);
+    this.undoRedoService.applyChange(changeObj, skill);
+  };
+
+  private _applyPropertyChange = (
+      skill,
+      propertyName: string,
+      newValue: string,
+      oldValue: string,
+      apply,
+      reverse
+  ) => {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_SKILL_PROPERTY,
+      {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-      }, apply, reverse);
-    };
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
+      },
+      apply,
+      reverse
+    );
+  };
 
-    var _applyMisconceptionPropertyChange = function(
-        skill, misconceptionId, propertyName, newValue, oldValue,
-        apply, reverse) {
-      _applyChange(skill, CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY, {
+  private _applyMisconceptionPropertyChange = (
+      skill,
+      misconceptionId: string,
+      propertyName: string,
+      newValue: string | boolean,
+      oldValue: string | boolean,
+      apply,
+      reverse
+  ) => {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+      {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
         misconception_id: misconceptionId,
-      }, apply, reverse);
-    };
+      },
+      apply,
+      reverse
+    );
+  };
 
-    var _applyRubricPropertyChange = function(
-        skill, difficulty, explanations, apply, reverse) {
-      _applyChange(skill, CMD_UPDATE_RUBRICS, {
-        difficulty: angular.copy(difficulty),
-        explanations: angular.copy(explanations)
-      }, apply, reverse);
-    };
+  private _applyRubricPropertyChange = (
+      skill,
+      difficulty: string,
+      explanations: string[],
+      apply,
+      reverse
+  ) => {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_RUBRICS,
+      {
+        difficulty: cloneDeep(difficulty),
+        explanations: cloneDeep(explanations),
+      },
+      apply,
+      reverse
+    );
+  };
 
-    var _applySkillContentsPropertyChange = function(
-        skill, propertyName, newValue, oldValue, apply, reverse) {
-      _applyChange(skill, CMD_UPDATE_SKILL_CONTENTS_PROPERTY, {
+  private _applySkillContentsPropertyChange = (
+      skill,
+      propertyName: string,
+      newValue,
+      oldValue,
+      apply,
+      reverse
+  ) => {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+      {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-      }, apply, reverse);
-    };
-
-    var _getParameterFromChangeDict = function(changeDict, paramName) {
-      return changeDict[paramName];
-    };
-
-    var _getNewPropertyValueFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'new_value');
-    };
-
-    return {
-      setSkillDescription: function(skill, newDescription) {
-        var oldDescription = angular.copy(skill.getDescription());
-        _applyPropertyChange(
-          skill, SKILL_PROPERTY_DESCRIPTION, newDescription, oldDescription,
-          function(changeDict, skill) {
-            var description = _getNewPropertyValueFromChangeDict(changeDict);
-            skill.setDescription(description);
-          }, function(changeDict, skill) {
-            skill.setDescription(oldDescription);
-          });
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
       },
+      apply,
+      reverse
+    );
+  };
 
-      setConceptCardExplanation: function(skill, newExplanation) {
-        var oldExplanation = skill.getConceptCard().getExplanation();
-        _applySkillContentsPropertyChange(
-          skill, SKILL_CONTENTS_PROPERTY_EXPLANATION,
-          newExplanation.toBackendDict(), oldExplanation.toBackendDict(),
-          function(changeDict, skill) {
-            var explanation = newExplanation;
-            skill.getConceptCard().setExplanation(explanation);
-          }, function(changeDict, skill) {
-            skill.getConceptCard().setExplanation(oldExplanation);
-          });
+  private _getParameterFromChangeDict = (
+      changeDict: BackendChangeObject,
+      paramName: string
+  ) => changeDict[paramName];
+
+  private _getNewPropertyValueFromChangeDict = (
+      changeDict: BackendChangeObject
+  ) => this._getParameterFromChangeDict(changeDict, 'new_value');
+
+  setSkillDescription(skill: Skill, newDescription: string): void {
+    let oldDescription = cloneDeep(skill.getDescription());
+    this._applyPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_PROPERTY_DESCRIPTION,
+      newDescription,
+      oldDescription,
+      (changeDict, skill) => {
+        let description = this._getNewPropertyValueFromChangeDict(changeDict);
+        skill.setDescription(description);
       },
-
-      addWorkedExample: function(skill, newWorkedExample) {
-        var oldWorkedExamples = angular.copy(
-          skill.getConceptCard().getWorkedExamples());
-        var newWorkedExamples = angular.copy(oldWorkedExamples);
-        newWorkedExamples.push(newWorkedExample);
-        _applySkillContentsPropertyChange(
-          skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-          newWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }), oldWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }),
-          function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-          }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-          });
-      },
-
-      deleteWorkedExample: function(skill, index) {
-        var oldWorkedExamples = angular.copy(
-          skill.getConceptCard().getWorkedExamples());
-        var newWorkedExamples = angular.copy(oldWorkedExamples);
-        newWorkedExamples.splice(index, 1);
-        _applySkillContentsPropertyChange(
-          skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-          newWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }), oldWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }),
-          function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-          }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-          });
-      },
-
-      updateWorkedExample: function(
-          skill, workedExampleIndex, newWorkedExampleQuestionHtml,
-          newWorkedExampleAnswerHtml) {
-        var oldWorkedExamples = angular.copy(
-          skill.getConceptCard().getWorkedExamples());
-        var newWorkedExamples = angular.copy(oldWorkedExamples);
-        newWorkedExamples[workedExampleIndex].getQuestion().setHtml(
-          newWorkedExampleQuestionHtml);
-        newWorkedExamples[workedExampleIndex].getExplanation().setHtml(
-          newWorkedExampleAnswerHtml);
-        _applySkillContentsPropertyChange(
-          skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-          newWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }), oldWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }),
-          function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-          }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-          });
-      },
-
-      updateWorkedExamples: function(skill, newWorkedExamples) {
-        var oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
-        _applySkillContentsPropertyChange(
-          skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-          newWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }), oldWorkedExamples.map(function(workedExample) {
-            return workedExample.toBackendDict();
-          }),
-          function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-          }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-          });
-      },
-
-      addMisconception: function(skill, newMisconception) {
-        var params = {
-          new_misconception_dict: newMisconception.toBackendDict()
-        };
-        var misconceptionId = newMisconception.getId();
-        _applyChange(
-          skill, CMD_ADD_SKILL_MISCONCEPTION, params,
-          function(changeDict, skill) {
-            skill.appendMisconception(newMisconception);
-          }, function(changeDict, skill) {
-            skill.deleteMisconception(misconceptionId);
-          });
-      },
-
-      deleteMisconception: function(skill, misconceptionId) {
-        var params = {
-          misconception_id: misconceptionId
-        };
-        var oldMisconception = skill.findMisconceptionById(misconceptionId);
-        _applyChange(
-          skill, CMD_DELETE_SKILL_MISCONCEPTION, params,
-          function(changeDict, skill) {
-            skill.deleteMisconception(misconceptionId);
-          }, function(changeDict, skill) {
-            skill.appendMisconception(oldMisconception);
-          });
-      },
-
-      addPrerequisiteSkill: function(skill, skillId) {
-        var params = {
-          skill_id: skillId
-        };
-        _applyChange(
-          skill, CMD_ADD_PREREQUISITE_SKILL, params,
-          function(changeDict, skill) {
-            skill.addPrerequisiteSkill(skillId);
-          }, function(changeDict, skill) {
-            skill.deletePrerequisiteSkill(skillId);
-          });
-      },
-
-      deletePrerequisiteSkill: function(skill, skillId) {
-        var params = {
-          skill_id: skillId
-        };
-        _applyChange(
-          skill, CMD_DELETE_PREREQUISITE_SKILL, params,
-          function(changeDict, skill) {
-            skill.deletePrerequisiteSkill(skillId);
-          }, function(changeDict, skill) {
-            skill.addPrerequisiteSkill(skillId);
-          });
-      },
-
-      updateMisconceptionName: function(
-          skill, misconceptionId, oldName, newName) {
-        var misconception = skill.findMisconceptionById(misconceptionId);
-        if (misconception) {
-          _applyMisconceptionPropertyChange(
-            skill, misconceptionId, SKILL_MISCONCEPTIONS_PROPERTY_NAME,
-            newName, oldName,
-            function(changeDict, skill) {
-              misconception.setName(newName);
-            }, function(changeDict, skill) {
-              misconception.setName(oldName);
-            });
-        }
-      },
-
-      updateMisconceptionMustBeAddressed: function(
-          skill, misconceptionId, oldValue, newValue) {
-        var misconception = skill.findMisconceptionById(misconceptionId);
-        if (misconception) {
-          _applyMisconceptionPropertyChange(
-            skill, misconceptionId,
-            SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED, newValue, oldValue,
-            function(changeDict, skill) {
-              misconception.setMustBeAddressed(newValue);
-            }, function(changeDict, skill) {
-              misconception.setMustBeAddressed(oldValue);
-            });
-        }
-      },
-
-      updateMisconceptionNotes: function(
-          skill, misconceptionId, oldNotes, newNotes) {
-        var misconception = skill.findMisconceptionById(misconceptionId);
-        if (misconception) {
-          _applyMisconceptionPropertyChange(
-            skill, misconceptionId, SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
-            newNotes, oldNotes,
-            function(changeDict, skill) {
-              misconception.setNotes(newNotes);
-            }, function(changeDict, skill) {
-              misconception.setNotes(oldNotes);
-            });
-        }
-      },
-
-      updateMisconceptionFeedback: function(
-          skill, misconceptionId, oldFeedback, newFeedback) {
-        var misconception = skill.findMisconceptionById(misconceptionId);
-        if (misconception) {
-          _applyMisconceptionPropertyChange(
-            skill, misconceptionId, SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
-            newFeedback, oldFeedback,
-            function(changeDict, skill) {
-              misconception.setFeedback(newFeedback);
-            }, function(changeDict, skill) {
-              misconception.setFeedback(oldFeedback);
-            });
-        }
-      },
-
-      updateRubricForDifficulty: function(skill, difficulty, explanations) {
-        if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
-          throw new Error('Invalid difficulty value passed');
-        }
-        var oldExplanations = skill.getRubricExplanations(difficulty);
-        _applyRubricPropertyChange(
-          skill, difficulty, explanations,
-          function(changeDict, skill) {
-            skill.updateRubricForDifficulty(difficulty, explanations);
-          }, function(changeDict, skill) {
-            skill.updateRubricForDifficulty(difficulty, oldExplanations);
-          });
+      (changeDict, skill) => {
+        skill.setDescription(oldDescription);
       }
-    };
+    );
   }
-]);
+
+  setConceptCardExplanation(skill: Skill, newExplanation: SubtitledHtml): void {
+    const oldExplanation = skill.getConceptCard().getExplanation();
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_EXPLANATION,
+      newExplanation.toBackendDict(),
+      oldExplanation.toBackendDict(),
+      (changeDict, skill) => {
+        skill.getConceptCard().setExplanation(newExplanation);
+      },
+      (changeDict, skill) => {
+        skill.getConceptCard().setExplanation(oldExplanation);
+      }
+    );
+  }
+
+  addWorkedExample(skill: Skill, newWorkedExample: WorkedExample): void {
+    const oldWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    const newWorkedExamples = cloneDeep(oldWorkedExamples);
+    newWorkedExamples.push(newWorkedExample);
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      newWorkedExamples.map((workedExample) => {
+        return workedExample.toBackendDict();
+      }),
+      oldWorkedExamples.map((workedExample) => workedExample.toBackendDict()),
+      (changeDict, skill) => {
+        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+      },
+      (changeDict, skill) => {
+        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+      }
+    );
+  }
+
+  deleteWorkedExample(skill: Skill, index: number): void {
+    const oldWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    const newWorkedExamples = cloneDeep(oldWorkedExamples);
+    newWorkedExamples.splice(index, 1);
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      newWorkedExamples.map((workedExample) => {
+        return workedExample.toBackendDict();
+      }),
+      oldWorkedExamples.map((workedExample) => {
+        return workedExample.toBackendDict();
+      }),
+      (changeDict, skill) => {
+        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+      },
+      (changeDict, skill) => {
+        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+      }
+    );
+  }
+
+  updateWorkedExamples(skill: Skill, newWorkedExamples: WorkedExample[]): void {
+    const oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      newWorkedExamples.map((workedExample) => {
+        return workedExample.toBackendDict();
+      }),
+      oldWorkedExamples.map((workedExample) => {
+        return workedExample.toBackendDict();
+      }),
+      (changeDict, skill) => {
+        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+      },
+      (changeDict, skill) => {
+        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+      }
+    );
+  }
+
+  updateWorkedExample(
+      skill: Skill,
+      workedExampleIndex: number,
+      newWorkedExampleQuestionHtml: string,
+      newWorkedExampleAnswerHtml: string
+  ): void {
+    const newWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    newWorkedExamples[workedExampleIndex]
+      .getQuestion()
+      .html = newWorkedExampleQuestionHtml;
+    newWorkedExamples[workedExampleIndex]
+      .getExplanation()
+      .html = newWorkedExampleAnswerHtml;
+    this.updateWorkedExamples(skill, newWorkedExamples);
+  }
+
+  addMisconception(skill: Skill, newMisconception: Misconception): void {
+    const params = {
+      new_misconception_dict: newMisconception.toBackendDict(),
+    };
+
+    const misconceptionId = newMisconception.getId();
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_ADD_SKILL_MISCONCEPTION,
+      params,
+      (changeDict, skill) => {
+        skill.appendMisconception(newMisconception);
+      },
+      (changeDict, skill) => {
+        skill.deleteMisconception(misconceptionId);
+      }
+    );
+  }
+
+  deleteMisconception(skill: Skill, misconceptionId: string): void {
+    const params = {
+      misconception_id: misconceptionId,
+    };
+    const oldMisconception = skill.findMisconceptionById(misconceptionId);
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_DELETE_SKILL_MISCONCEPTION,
+      params,
+      (changeDict, skill) => {
+        skill.deleteMisconception(misconceptionId);
+      },
+      (changeDict, skill) => {
+        skill.appendMisconception(oldMisconception);
+      }
+    );
+  }
+
+  addPrerequisiteSkill(skill: Skill, skillId: string): void {
+    const params = {
+      skill_id: skillId,
+    };
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_ADD_PREREQUISITE_SKILL,
+      params,
+      (changeDict, skill) => {
+        skill.addPrerequisiteSkill(skillId);
+      },
+      (changeDict, skill) => {
+        skill.deletePrerequisiteSkill(skillId);
+      }
+    );
+  }
+
+  deletePrerequisiteSkill(skill: Skill, skillId: string): void {
+    const params = {
+      skill_id: skillId,
+    };
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_DELETE_PREREQUISITE_SKILL,
+      params,
+      (changeDict, skill) => {
+        skill.deletePrerequisiteSkill(skillId);
+      },
+      (changeDict, skill) => {
+        skill.addPrerequisiteSkill(skillId);
+      }
+    );
+  }
+
+  updateMisconceptionName(
+      skill: Skill,
+      misconceptionId: string,
+      oldName: string,
+      newName: string
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_NAME,
+        newName,
+        oldName,
+        () => {
+          misconception.setName(newName);
+        },
+        () => {
+          misconception.setName(oldName);
+        }
+      );
+    }
+  }
+
+  updateMisconceptionMustBeAddressed(
+      skill: Skill,
+      misconceptionId: string,
+      oldValue: boolean,
+      newValue: boolean
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED,
+        newValue,
+        oldValue,
+        () => {
+          misconception.setMustBeAddressed(newValue);
+        },
+        () => {
+          misconception.setMustBeAddressed(oldValue);
+        }
+      );
+    }
+  }
+
+  updateMisconceptionNotes(
+      skill: Skill,
+      misconceptionId: string,
+      oldNotes: string,
+      newNotes: string
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
+        newNotes,
+        oldNotes,
+        () => {
+          misconception.setNotes(newNotes);
+        },
+        () => {
+          misconception.setNotes(oldNotes);
+        }
+      );
+    }
+  }
+
+  updateMisconceptionFeedback(
+      skill: Skill,
+      misconceptionId: string,
+      oldFeedback: string,
+      newFeedback: string
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
+        newFeedback,
+        oldFeedback,
+        () => {
+          misconception.setFeedback(newFeedback);
+        },
+        () => {
+          misconception.setFeedback(oldFeedback);
+        }
+      );
+    }
+  }
+
+  updateRubricForDifficulty(
+      skill: Skill,
+      difficulty: string,
+      explanations: string[]
+  ): void {
+    if (skill.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
+      throw new Error('Invalid difficulty value passed');
+    }
+    const oldExplanations = skill.getRubricExplanations(difficulty);
+    this._applyRubricPropertyChange(
+      skill,
+      difficulty,
+      explanations,
+      (changeDict, skill) => {
+        skill.updateRubricForDifficulty(difficulty, explanations);
+      },
+      (changeDict, skill) => {
+        skill.updateRubricForDifficulty(difficulty, oldExplanations);
+      }
+    );
+  }
+}
+
+angular.module('oppia')
+  .factory('SkillUpdateService', downgradeInjectable(SkillUpdateService));

@@ -22,10 +22,12 @@ import random
 
 from constants import constants
 from core.domain import config_services
+from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -34,7 +36,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.suggestion])
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):
@@ -425,7 +428,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, 'Assigned', None,
                 None, None, None))
-        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].topic_names, ['topic1'])
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
@@ -479,10 +482,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, None, 'math', None,
                 None, None))
-        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].topic_names, ['topic1'])
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
         self.assertEqual(
-            augmented_skill_summaries[0].classroom_name, 'math')
+            augmented_skill_summaries[0].classroom_names, ['math'])
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
@@ -633,6 +636,61 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         self.assertEqual(len(topic_assignments_dict), 0)
 
+    def test_successfully_replace_skill_id_in_all_topics(self):
+        topic_id = topic_services.get_new_topic_id()
+        topic_id_1 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five', url_fragment='topic-five',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID],
+            subtopics=[], next_subtopic_id=1)
+
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'url_fragment': 'subtopic-one'
+        })
+        self.save_new_topic(
+            topic_id_1, self.USER_ID, name='Topic2',
+            abbreviated_name='topic-six', url_fragment='topic-six',
+            description='Description2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        topic_assignments_dict = (
+            skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
+        self.assertEqual(len(topic_assignments_dict), 0)
+        skill_services.replace_skill_id_in_all_topics(
+            self.USER_ID, self.SKILL_ID, 'new_skill_id')
+        topic_assignments_dict = (
+            skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
+        self.assertEqual(len(topic_assignments_dict), 2)
+
+    def test_failure_replace_skill_id_in_all_topics(self):
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five', url_fragment='topic-five',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID, 'new_skill_id'],
+            subtopics=[], next_subtopic_id=1)
+        error_message = (
+            'Found topic \'Topic1\' contains the two skills to be merged. '
+            'Please unassign one of these skills from topic '
+            'and retry this operation.')
+        with self.assertRaisesRegexp(Exception, error_message):
+            skill_services.replace_skill_id_in_all_topics(
+                self.USER_ID, self.SKILL_ID, 'new_skill_id')
+
     def test_update_skill(self):
         changelist = [
             skill_domain.SkillChange({
@@ -774,6 +832,70 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
+
+    def test_delete_skill_marked_deleted(self):
+        skill_models.SkillModel.delete_multi(
+            [self.SKILL_ID], self.USER_ID, '', force_deletion=False)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertTrue(skill_model.deleted)
+
+        skill_services.delete_skill(
+            self.USER_ID, self.SKILL_ID, force_deletion=True)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertEqual(skill_model, None)
+        self.assertEqual(
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
+
+    def test_delete_skill_model_with_deleted_summary_model(self):
+        skill_summary_model = (
+            skill_models.SkillSummaryModel.get(self.SKILL_ID))
+        skill_summary_model.delete()
+        skill_summary_model = (
+            skill_models.SkillSummaryModel.get(self.SKILL_ID, False))
+        self.assertIsNone(skill_summary_model)
+
+        skill_services.delete_skill(
+            self.USER_ID, self.SKILL_ID, force_deletion=True)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertEqual(skill_model, None)
+        self.assertEqual(
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
+
+    def test_delete_skill_model_with_linked_suggestion(self):
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': self.SKILL_ID,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.SKILL_ID, 1,
+            self.user_id_a, suggestion_change, 'test description'
+        )
+        skill_services.delete_skill(
+            self.user_id_a, self.SKILL_ID, force_deletion=True)
+
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertEqual(skill_model, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'The suggestion with id %s has already been accepted/'
+            'rejected.' % suggestion.suggestion_id):
+            suggestion_services.auto_reject_question_suggestions_for_skill_id(
+                self.SKILL_ID)
 
     def test_cannot_update_skill_with_no_commit_message(self):
         changelist = [

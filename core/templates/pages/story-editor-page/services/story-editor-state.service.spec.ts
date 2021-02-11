@@ -63,7 +63,7 @@ class MockEditableStoryBackendApiService {
   changeStoryPublicationStatus() {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
-        resolve();
+        resolve({});
       } else {
         reject();
       }
@@ -79,10 +79,10 @@ describe('Story editor state service', () => {
   var secondBackendStoryObject = null;
   var testSubscriptions: Subscription;
 
+  importAllAngularServices();
+
   const storyInitializedSpy = jasmine.createSpy('storyInitialized');
   const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
-
-  importAllAngularServices();
 
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));

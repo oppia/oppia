@@ -23,6 +23,7 @@ import datetime
 
 from core.domain import base_model_validators
 from core.platform import models
+import feconf
 
 (
     base_models, email_models, feedback_models,
@@ -44,11 +45,14 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'recipient_id',
-                user_models.UserSettingsModel, [item.recipient_id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'sender_id', user_models.UserSettingsModel, [item.sender_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'recipient_id', [item.recipient_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'sender_id', [item.sender_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -126,11 +130,14 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'recipient_id',
-                user_models.UserSettingsModel, item.recipient_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'sender_id', user_models.UserSettingsModel, [item.sender_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'recipient_id', item.recipient_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'sender_id', [item.sender_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -211,17 +218,18 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
         return (
             '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
-                base_model_validators.USER_ID_REGEX,
-                ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
+                feconf.USER_ID_REGEX,
+                ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'item.id.user_id',
-                user_models.UserSettingsModel, [
-                    item.id[:item.id.find('.')]]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'item.id.user_id', [
+                    item.id[:item.id.find('.')]],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'item.id.thread_id',
                 feedback_models.GeneralFeedbackThreadModel, [

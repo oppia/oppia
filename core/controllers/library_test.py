@@ -82,6 +82,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         # Load a public demo exploration.
         exp_services.load_demo('0')
+        self.process_and_flush_pending_tasks()
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -109,6 +110,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'new_value': 'A new category'
             })],
             'Change title and category')
+        self.process_and_flush_pending_tasks()
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -238,8 +240,8 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exp_services.index_explorations_given_ids([exp_id])
         response_dict = self.get_json(
             feconf.LIBRARY_SEARCH_DATA_URL, params={
-                'category': 'A category',
-                'language_code': 'en'
+                'category': '("A category")',
+                'language_code': '("en")'
             })
         activity_list = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -248,6 +250,30 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['activity_list'], activity_list)
 
         self.logout()
+
+    def test_library_handler_with_invalid_category(self):
+        response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': 'missing-outer-parens',
+            'language_code': '("en")'
+        }, expected_status_int=400)
+        self.assertEqual(response_1['error'], 'Invalid search query.')
+        response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': '(missing-inner-quotes)',
+            'language_code': '("en")'
+        }, expected_status_int=400)
+        self.assertEqual(response_2['error'], 'Invalid search query.')
+
+    def test_library_handler_with_invalid_language_code(self):
+        response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': '("A category")',
+            'language_code': 'missing-outer-parens'
+        }, expected_status_int=400)
+        self.assertEqual(response_1['error'], 'Invalid search query.')
+        response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': '("A category")',
+            'language_code': '(missing-inner-quotes)'
+        }, expected_status_int=400)
+        self.assertEqual(response_2['error'], 'Invalid search query.')
 
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):

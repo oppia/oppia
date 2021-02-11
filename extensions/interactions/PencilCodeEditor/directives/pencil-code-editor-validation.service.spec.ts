@@ -83,7 +83,9 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome2 = oof.createNew(
         'Introduction', 'feedback_0', '<p>YES</p>', []);
-      let rulesDict = rof.createNew('CodeString', inputBackend);
+      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+        x: 'CodeString'
+      });
       let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
 
       // It also returns the error when feedback is not provided.
@@ -105,7 +107,9 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome = oof.createNew(
         'Introduction', 'feedback_0', '<p>YES</p>', []);
-      let rulesDict = rof.createNew('CodeString', inputBackend);
+      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+        x: 'CodeString'
+      });
       let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',

@@ -163,7 +163,7 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" ng-if="!iframed">
   <div class="row">
     <div class="col-sm-5">
-      <ul class="author-profile" ng-if="!windowIsNarrow">
+      <ul class="author-profile">
         <li>
           <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>"
                class="exploration-footer-img"
@@ -178,13 +178,11 @@
           <div uib-dropdown class="dropup" ng-class="{'open':hovering}">
             <a uib-dropdown-toggle id="dropdownMenu2"
                ng-class="{'hovered-text':hovering}"
-               data-toggle="dropdown"
                ng-if="contributorNames.length > 0"
                aria-haspopup="true"
                aria-expanded="false">
               <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
-                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"
-                  data-toggle="dropdown">
+                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}">
               </h4>
             </a>
             <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu"

@@ -90,7 +90,7 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
           InteractionAttributesExtractorService.getValuesFromAttributes(
             'NumericExpressionInput', $attrs));
         GuppyInitializationService.init(
-          'guppy-div-learner', placeholder.getUnicode());
+          'guppy-div-learner', placeholder.unicode);
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

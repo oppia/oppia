@@ -45,9 +45,9 @@ describe('Collection editor state service', function() {
   var $q = null;
   var testSubscriptions: Subscription;
 
-  const collectionInitializedSpy = jasmine.createSpy('collectionInitialized');
-
   importAllAngularServices();
+
+  const collectionInitializedSpy = jasmine.createSpy('collectionInitialized');
 
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {

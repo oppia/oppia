@@ -30,9 +30,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-datastore_services = models.Registry.import_datastore_services()
-gae_search_services = models.Registry.import_search_services()
-
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
@@ -42,6 +39,8 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 
 
 class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    USER_ID = 'uid_%s' % ('a' * 32)
 
     def setUp(self):
         super(TaskEntryModelValidatorTests, self).setUp()
@@ -134,14 +133,15 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             feconf.DEFAULT_INIT_STATE_NAME,
             issue_description='issue description',
             status=improvements_models.TASK_STATUS_RESOLVED,
-            resolver_id='invalid_user_id',
+            resolver_id=self.USER_ID,
             resolved_on=CURRENT_DATETIME)
         self.run_job_and_check_output(
             ['failed validation check for resolver_ids field check of '
              'TaskEntryModel',
              ['Entity id %s: based on field resolver_ids having value '
-              'invalid_user_id, expected model UserSettingsModel with id '
-              'invalid_user_id but it doesn\'t exist' % (task_id,)]])
+              '%s, expected model UserSettingsModel with id '
+              '%s but it doesn\'t exist' % (
+                  task_id, self.USER_ID, self.USER_ID)]])
 
     def test_invalid_id(self):
         improvements_models.TaskEntryModel(

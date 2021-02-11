@@ -65,7 +65,7 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
               'Continue',
               $attrs
             );
-            ctrl.buttonText = buttonText.getUnicode();
+            ctrl.buttonText = buttonText.unicode;
 
             ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
 

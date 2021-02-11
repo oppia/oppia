@@ -23,12 +23,14 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   '$scope', '$uibModalInstance', 'SiteAnalyticsService',
   'SuggestionModalService', 'authorName', 'contentHtml',
   'misconceptionsBySkill', 'question', 'questionHeader', 'reviewable',
-  'skillDifficulty', 'skillRubrics', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'skillDifficulty', 'skillRubrics', 'ACTION_ACCEPT_SUGGESTION',
+  'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $scope, $uibModalInstance, SiteAnalyticsService,
       SuggestionModalService, authorName, contentHtml,
       misconceptionsBySkill, question, questionHeader, reviewable,
-      skillDifficulty, skillRubrics, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      skillDifficulty, skillRubrics, ACTION_ACCEPT_SUGGESTION,
+      ACTION_REJECT_SUGGESTION, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT);
@@ -83,7 +85,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
         {
-          action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+          action: ACTION_ACCEPT_SUGGESTION,
           reviewMessage: $scope.reviewMessage,
           skillDifficulty: skillDifficulty
         });
@@ -95,7 +97,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       SuggestionModalService.rejectSuggestion(
         $uibModalInstance,
         {
-          action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+          action: ACTION_REJECT_SUGGESTION,
           reviewMessage: $scope.reviewMessage
         });
     };

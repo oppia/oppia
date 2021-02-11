@@ -723,6 +723,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED),
             'old_value': False,
             'new_value': True
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB),
+            'old_value': '',
+            'new_value': 'topic page title'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -737,6 +743,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic.practice_tab_is_displayed, True)
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
+        self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
@@ -1074,8 +1081,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self._create_valid_question_data('dest'),
             [self.skill_id_1])
         suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_TOPIC,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_TOPIC,
             self.TOPIC_ID,
             1,
             self.user_id_admin,

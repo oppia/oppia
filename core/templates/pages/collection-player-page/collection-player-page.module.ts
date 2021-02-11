@@ -16,18 +16,6 @@
  * @fileoverview Module for the collection player page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -39,6 +27,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { CollectionFooterComponent } from
   'pages/collection-player-page/collection-footer/collection-footer.component';
+import { CollectionLocalNavComponent } from 'pages/collection-player-page/collection-local-nav/collection-local-nav.component';
 import { CollectionNavbarComponent } from
   'pages/collection-player-page/collection-navbar/collection-navbar.component';
 import { CollectionNodeListComponent } from
@@ -56,12 +45,14 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAngularRootComponent,
     CollectionFooterComponent,
+    CollectionLocalNavComponent,
     CollectionNavbarComponent,
     CollectionNodeListComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CollectionFooterComponent,
+    CollectionLocalNavComponent,
     CollectionNodeListComponent,
     CollectionNavbarComponent
   ],

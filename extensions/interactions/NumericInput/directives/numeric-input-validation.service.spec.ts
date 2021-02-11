@@ -70,20 +70,20 @@ describe('NumericInputValidationService', () => {
       inputs: {
         x: 0
       }
-    });
+    }, 'NumericInput');
     betweenNegativeOneAndOneRule = rof.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: -1,
         b: 1
       }
-    });
+    }, 'NumericInput');
     lessThanOneRule = rof.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         x: 1
       }
-    });
+    }, 'NumericInput');
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,

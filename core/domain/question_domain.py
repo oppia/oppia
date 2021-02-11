@@ -351,7 +351,8 @@ class Question(python_utils.OBJECT):
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.add_math_content_to_math_rte_components,
-            state_uses_old_interaction_cust_args_schema=True)
+            state_uses_old_interaction_cust_args_schema=True,
+            state_uses_old_rule_template_schema=True)
         return question_state_dict
 
     @classmethod
@@ -792,6 +793,242 @@ class Question(python_utils.OBJECT):
                 'rule_type': rule_type,
                 'inputs': {'x': list(rule_type_to_inputs[rule_type])}
             } for rule_type in rule_type_to_inputs]
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v40_dict_to_v41_dict(cls, question_state_dict):
+        """Converts from version 40 to 41. Version 41 adds
+        TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
+        objects to RuleSpec domain objects to allow for translations.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        class ContentIdCounter(python_utils.OBJECT):
+            """This helper class is used to keep track of
+            next_content_id_index and new_content_ids, and provides a
+            function to generate new content_ids.
+            """
+
+            def __init__(self, next_content_id_index):
+                """Initializes a ContentIdCounter object.
+
+                Args:
+                    next_content_id_index: int. The next content id index.
+                """
+                self.new_content_ids = []
+                self.next_content_id_index = next_content_id_index
+
+            def generate_content_id(self, content_id_prefix):
+                """Generate a new content_id from the prefix provided and
+                the next content id index.
+
+                Args:
+                    content_id_prefix: str. The prefix of the content_id.
+
+                Returns:
+                    str. The generated content_id.
+                """
+                content_id = '%s%i' % (
+                    content_id_prefix,
+                    self.next_content_id_index)
+                self.next_content_id_index += 1
+                self.new_content_ids.append(content_id)
+                return content_id
+
+        # As of Jan 2021, which is when this migration is to be run, only
+        # TextInput and SetInput have translatable rule inputs, and every rule
+        # for these interactions takes exactly one translatable input named x.
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id not in ['TextInput', 'SetInput']:
+            return question_state_dict
+
+        content_id_counter = ContentIdCounter(
+            question_state_dict['next_content_id_index'])
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                content_id = content_id_counter.generate_content_id(
+                    'rule_input_')
+                if interaction_id == 'TextInput':
+                    # Convert to TranslatableSetOfNormalizedString.
+                    rule_spec_dict['inputs']['x'] = {
+                        'contentId': content_id,
+                        'normalizedStrSet': rule_spec_dict['inputs']['x']
+                    }
+                elif interaction_id == 'SetInput':
+                    # Convert to TranslatableSetOfUnicodeString.
+                    rule_spec_dict['inputs']['x'] = {
+                        'contentId': content_id,
+                        'unicodeStrSet': rule_spec_dict['inputs']['x']
+                    }
+        question_state_dict['next_content_id_index'] = (
+            content_id_counter.next_content_id_index)
+        for new_content_id in content_id_counter.new_content_ids:
+            question_state_dict[
+                'written_translations'][
+                    'translations_mapping'][new_content_id] = {}
+            question_state_dict[
+                'recorded_voiceovers'][
+                    'voiceovers_mapping'][new_content_id] = {}
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v41_dict_to_v42_dict(cls, question_state_dict):
+        """Converts from version 41 to 42. Version 42 changes rule input types
+        for DragAndDropSortInput and ItemSelectionInput interactions to better
+        support translations. Specifically, the rule inputs will store content
+        ids of the html rather than the raw html. Solution answers for
+        DragAndDropSortInput and ItemSelectionInput interactions are also
+        updated.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        def migrate_rule_inputs_and_answers(new_type, value, choices):
+            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
+            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
+            and DragAndDropHtmlString to TranslatableHtmlContentId. These
+            migrations are necessary to have rules work easily for multiple
+            languages; instead of comparing html for equality, we compare
+            content_ids for equality.
+
+            Args:
+                new_type: str. The type to migrate to.
+                value: *. The value to migrate.
+                choices: list(dict). The list of subtitled html dicts to extract
+                    content ids from.
+
+            Returns:
+                *. The migrated rule input.
+            """
+
+            def extract_content_id_from_choices(html):
+                """Given a html, find its associated content id in choices,
+                which is a list of subtitled html dicts.
+
+                Args:
+                    html: str. The html to find the content id of.
+
+                Returns:
+                    str. The content id of html.
+                """
+                for subtitled_html_dict in choices:
+                    if subtitled_html_dict['html'] == html:
+                        return subtitled_html_dict['content_id']
+                # If there is no match, we discard the rule input. The frontend
+                # will handle invalid content ids similar to how it handled
+                # non-matching html.
+                return feconf.INVALID_CONTENT_ID
+
+            if new_type == 'TranslatableHtmlContentId':
+                return extract_content_id_from_choices(value)
+            elif new_type == 'SetOfTranslatableHtmlContentIds':
+                return [
+                    migrate_rule_inputs_and_answers(
+                        'TranslatableHtmlContentId', html, choices
+                    ) for html in value
+                ]
+            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
+                return [
+                    migrate_rule_inputs_and_answers(
+                        'SetOfTranslatableHtmlContentIds', html_set, choices
+                    ) for html_set in value
+                ]
+
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id not in [
+                'DragAndDropSortInput', 'ItemSelectionInput']:
+            return question_state_dict
+
+        solution = question_state_dict['interaction']['solution']
+        choices = question_state_dict['interaction']['customization_args'][
+            'choices']['value']
+
+        if interaction_id == 'ItemSelectionInput':
+            # The solution type will be migrated from SetOfHtmlString to
+            # SetOfTranslatableHtmlContentIds.
+            if solution is not None:
+                solution['correct_answer'] = (
+                    migrate_rule_inputs_and_answers(
+                        'SetOfTranslatableHtmlContentIds',
+                        solution['correct_answer'],
+                        choices)
+                )
+        if interaction_id == 'DragAndDropSortInput':
+            # The solution type will be migrated from ListOfSetsOfHtmlString
+            # to ListOfSetsOfTranslatableHtmlContentIds.
+            if solution is not None:
+                solution['correct_answer'] = (
+                    migrate_rule_inputs_and_answers(
+                        'ListOfSetsOfTranslatableHtmlContentIds',
+                        solution['correct_answer'],
+                        choices)
+                )
+
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                rule_type = rule_spec_dict['rule_type']
+                rule_inputs = rule_spec_dict['inputs']
+
+                if interaction_id == 'ItemSelectionInput':
+                    # All rule inputs for ItemSelectionInput will be
+                    # migrated from SetOfHtmlString to
+                    # SetOfTranslatableHtmlContentIds.
+                    rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                        'SetOfTranslatableHtmlContentIds',
+                        rule_inputs['x'],
+                        choices)
+                if interaction_id == 'DragAndDropSortInput':
+                    rule_types_with_list_of_sets = [
+                        'IsEqualToOrdering',
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                    ]
+                    if rule_type in rule_types_with_list_of_sets:
+                        # For rule type IsEqualToOrdering and
+                        # IsEqualToOrderingWithOneItemAtIncorrectPosition,
+                        # the x input will be migrated from
+                        # ListOfSetsOfHtmlStrings to
+                        # ListOfSetsOfTranslatableHtmlContentIds.
+                        rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                            'ListOfSetsOfTranslatableHtmlContentIds',
+                            rule_inputs['x'],
+                            choices)
+                    elif rule_type == 'HasElementXAtPositionY':
+                        # For rule type HasElementXAtPositionY,
+                        # the x input will be migrated from
+                        # DragAndDropHtmlString to
+                        # TranslatableHtmlContentId, and the y input will
+                        # remain as DragAndDropPositiveInt.
+                        rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                            'TranslatableHtmlContentId',
+                            rule_inputs['x'],
+                            choices)
+                    elif rule_type == 'HasElementXBeforeElementY':
+                        # For rule type HasElementXBeforeElementY,
+                        # the x and y inputs will be migrated from
+                        # DragAndDropHtmlString to
+                        # TranslatableHtmlContentId.
+                        for rule_input_name in ['x', 'y']:
+                            rule_inputs[rule_input_name] = (
+                                migrate_rule_inputs_and_answers(
+                                    'TranslatableHtmlContentId',
+                                    rule_inputs[rule_input_name],
+                                    choices))
 
         return question_state_dict
 

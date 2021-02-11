@@ -8,11 +8,8 @@ beautifulSoup4==4.9.1
 bleach==3.1.5
 callbacks==0.3.0
 contextlib2==0.6.0.post1
+firebase-admin==3.2.1
 future==0.18.2
-google-api-python-client==1.11.0
-google-auth==1.21.1
-google-auth-httplib2==0.0.4
-google-auth-oauthlib==0.4.1
 GoogleAppEngineCloudStorageClient==1.9.22.1
 GoogleAppEngineMapReduce==1.9.22.0
 GoogleAppEnginePipeline==1.9.22.1

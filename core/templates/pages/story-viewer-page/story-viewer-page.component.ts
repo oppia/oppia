@@ -96,16 +96,6 @@ angular.module('oppia').component('storyViewerPage', {
         return iconParametersArray;
       };
 
-      ctrl.isChapterLocked = function(node) {
-        if (
-          node.isCompleted() || (
-            node.getId() ===
-            ctrl.storyPlaythroughObject.getNextPendingNodeId())) {
-          return false;
-        }
-        return true;
-      };
-
       ctrl.signIn = function() {
         UserService.getLoginUrlAsync().then(
           loginUrl => {

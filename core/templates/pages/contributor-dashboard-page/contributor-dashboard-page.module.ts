@@ -16,20 +16,6 @@
  * @fileoverview Module for the contributor dashboard page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-import ngInfiniteScroll from 'ng-infinite-scroll';
-import 'third-party-imports/ui-tree.import';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate', ngInfiniteScroll,
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -43,6 +29,8 @@ import { OppiaAngularRootComponent } from
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
+import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
+import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -55,12 +43,16 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent
+    LoginRequiredMessageComponent,
+    LoginRequiredModalContent,
+    TranslationLanguageSelectorComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
-    TranslationLanguageSelectorComponent
+    LoginRequiredMessageComponent,
+    LoginRequiredModalContent,
+    TranslationLanguageSelectorComponent,
   ],
   providers: [
     {

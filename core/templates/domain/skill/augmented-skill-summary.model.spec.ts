@@ -30,8 +30,8 @@ describe('Augmented Skill Summary Model', () => {
       description: 'Dummy Skill 1',
       misconception_count: 0,
       version: 1,
-      classroom_name: 'classroom',
-      topic_name: 'topic'
+      classroom_names: ['classroom'],
+      topic_names: ['topic']
     };
 
     let skillSummary = AugmentedSkillSummary.createFromBackendDict(backendDict);
@@ -44,7 +44,7 @@ describe('Augmented Skill Summary Model', () => {
     expect(skillSummary.version).toEqual(1);
     expect(skillSummary.skillModelCreatedOn).toEqual(1594649197855.059);
     expect(skillSummary.skillModelLastUpdated).toEqual(1594649197855.071);
-    expect(skillSummary.classroomName).toEqual('classroom');
-    expect(skillSummary.topicName).toEqual('topic');
+    expect(skillSummary.classroomNames).toEqual(['classroom']);
+    expect(skillSummary.topicNames).toEqual(['topic']);
   });
 });

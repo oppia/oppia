@@ -1187,26 +1187,12 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.delete_json(
                 '/createhandler/data/%s' % exp_id)
 
-            # Observed_log_messaged[0] is 'adding the following docs to
-            # index %s: %s' % (index.name, documents). It is logged from the
-            # function add_documents_to_index in
-            # oppia/core/platform/search/gae_search_services.py,
-            # not to be checked here (same for admin and moderator). The
-            # function is called when an exploration is saved.
-            # Observed_log_messages[2] is 'Attempting to delete documents
-            # from index %s, ids: %s' % (index.name, ', '.join(doc_ids)). It
-            # is logged by function delete_documents_from_index in
-            # oppia/core/platform/search/gae_search_services.py,
-            # not to be checked here (same for admin and moderator).
-            self.assertEqual(len(observed_log_messages), 4)
-            self.assertEqual(
-                observed_log_messages[1],
+            self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id))
-            self.assertEqual(
-                observed_log_messages[3],
+                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id))
+                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id)
+            ])
             self.logout()
 
             # Checking for admin.
@@ -1218,15 +1204,13 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.login(self.ADMIN_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
-            self.assertEqual(len(observed_log_messages), 4)
-            self.assertEqual(
-                observed_log_messages[1],
+            self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
-            self.assertEqual(
-                observed_log_messages[3],
+                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
+                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id)
+            ])
+
             self.logout()
 
             # Checking for moderator.
@@ -1238,15 +1222,12 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.login(self.MODERATOR_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
-            self.assertEqual(len(observed_log_messages), 4)
-            self.assertEqual(
-                observed_log_messages[1],
+            self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id))
-            self.assertEqual(
-                observed_log_messages[3],
+                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id))
+                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id)
+            ])
             self.logout()
 
 
@@ -1695,7 +1676,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             {
                 'version': exploration.version,
                 'commit_message':
-                    'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                    'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
@@ -1711,7 +1692,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.assertEqual(
             response_dict['error'],
-            'Commit messages must be at most 1000 characters long.')
+            'Commit messages must be at most 375 characters long.')
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
@@ -2133,10 +2114,12 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 1})
-        self.assertEqual(len(response), 2)
-        self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
+        self.assertEqual(len(response['unresolved_issues']), 2)
         self.assertEqual(
-            response[1]['issue_type'], 'MultipleIncorrectSubmissions')
+            response['unresolved_issues'][0]['issue_type'], 'EarlyQuit')
+        self.assertEqual(
+            response['unresolved_issues'][1]['issue_type'],
+            'MultipleIncorrectSubmissions')
 
     def test_invalid_issues_are_not_retrieved(self):
         """Test that invalid issues are not retrieved."""
@@ -2149,8 +2132,9 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 1})
-        self.assertEqual(len(response), 1)
-        self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
+        self.assertEqual(len(response['unresolved_issues']), 1)
+        self.assertEqual(
+            response['unresolved_issues'][0]['issue_type'], 'EarlyQuit')
 
     def test_fetch_playthrough_handler(self):
         """Test that the playthrough gets fetched correctly."""
@@ -2443,6 +2427,21 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         # Draft changes None.
         self.assertIsNone(response['draft_changes'])
 
+    def test_exploration_not_updated_because_cmd_is_invalid(self):
+        changelist = [dict(self.NEW_CHANGELIST[0])]
+        changelist[0]['cmd'] = 'edit_exploration_propert'
+        payload = {
+            'change_list': changelist,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/data/%s' % self.EXP_ID3, payload,
+            csrf_token=self.csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Command edit_exploration_propert is not allowed'
+        )
+
     def test_draft_not_updated_because_newer_draft_exists(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
@@ -2458,6 +2457,21 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 1)
+
+    def test_draft_not_updated_because_cmd_is_invalid(self):
+        changelist = [dict(self.NEW_CHANGELIST[0])]
+        changelist[0]['cmd'] = 'edit_exploration_propert'
+        payload = {
+            'change_list': changelist,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
+            csrf_token=self.csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Command edit_exploration_propert is not allowed'
+        )
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(

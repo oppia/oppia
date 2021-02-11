@@ -23,6 +23,7 @@ import inspect
 
 from core.domain import email_manager
 from core.tests import test_utils
+import feconf
 import python_utils
 import schema_utils
 
@@ -176,6 +177,7 @@ VALIDATOR_SPECS = {
         'is_nonempty': {},
         'is_regex': {},
         'is_valid_email': {},
+        'is_valid_user_id': {},
         'is_valid_math_expression': {
             'algebraic': {
                 'type': SCHEMA_TYPE_BOOL
@@ -359,6 +361,28 @@ def validate_schema(schema):
 
 class SchemaValidationUnitTests(test_utils.GenericTestBase):
     """Test validation of schemas."""
+
+    GLOBAL_VALIDATORS_SCHEMA = {
+        'type': schema_utils.SCHEMA_TYPE_DICT,
+        'properties': [{
+            'name': 'unicodeListProp',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_LIST,
+                'items': {
+                    'type': schema_utils.SCHEMA_TYPE_UNICODE
+                }
+            },
+        }, {
+            'name': 'unicodeProp',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
+            },
+        }]
+    }
+
+    GLOBAL_VALIDATORS = [{
+        'id': 'does_not_contain_email'
+    }]
 
     def test_schemas_are_correctly_validated(self):
         """Test validation of schemas."""
@@ -645,6 +669,45 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(validate_url_fragment('Abc'))
         self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
 
+    def test_global_validators_raise_exception_when_error_in_dict(self):
+        with self.assertRaisesRegexp(
+            AssertionError,
+            r'^Validation failed: does_not_contain_email .* email@email.com$'
+        ):
+            obj = {
+                'unicodeListProp': ['not email', 'not email 2'],
+                'unicodeProp': 'email@email.com'
+            }
+            schema_utils.normalize_against_schema(
+                obj, self.GLOBAL_VALIDATORS_SCHEMA,
+                global_validators=self.GLOBAL_VALIDATORS
+            )
+
+    def test_global_validators_raise_exception_when_error_in_list(self):
+        with self.assertRaisesRegexp(
+            AssertionError,
+            r'^Validation failed: does_not_contain_email .* email2@email.com$'
+        ):
+            obj = {
+                'unicodeListProp': ['email2@email.com', 'not email 2'],
+                'unicodeProp': 'not email'
+            }
+            schema_utils.normalize_against_schema(
+                obj, self.GLOBAL_VALIDATORS_SCHEMA,
+                global_validators=self.GLOBAL_VALIDATORS
+            )
+
+    def test_global_validators_pass_when_no_error(self):
+        obj = {
+            'unicodeListProp': ['not email', 'not email 2'],
+            'unicodeProp': 'not email'
+        }
+        normalized_obj = schema_utils.normalize_against_schema(
+            obj, self.GLOBAL_VALIDATORS_SCHEMA,
+            global_validators=self.GLOBAL_VALIDATORS
+        )
+        self.assertEqual(obj, normalized_obj)
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
@@ -886,33 +949,32 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_notification_email_list_validator(self):
-        schema = email_manager.NOTIFICATION_EMAIL_LIST_SCHEMA
-        valid_email_list = [
-            u'user{}@oppia.com'.format(i) for i in python_utils.RANGE(0, 5)]
-        big_email_list = [
-            u'user{}@oppia.com'.format(i) for i in python_utils.RANGE(0, 7)]
+    def test_notification_user_ids_list_validator(self):
+        schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
+        valid_user_id_list = [
+            'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
+            for i in python_utils.RANGE(0, 5)
+        ]
+        big_user_id_list = [
+            'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
+            for i in python_utils.RANGE(0, 7)
+        ]
         mappings = [
-            ([u'admin@oppia.com'], [u'admin@oppia.com']),
-            (valid_email_list, valid_email_list)]
+            (
+                ['uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)],
+                ['uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)]
+            ),
+            (valid_user_id_list, valid_user_id_list)]
         invalid_values_with_error_messages = [
             (
-                [u'admin@oppia'],
-                r'Validation failed: is_valid_email \({}\) for object '
-                r'admin@oppia'),
+                [u'uid_%s' % ('a' * 28)],
+                r'Validation failed: is_valid_user_id \({}\) for object '
+                r'%s' % 'uid_%s' % ('a' * 28)),
             (
-                big_email_list,
+                big_user_id_list,
                 r'Validation failed: has_length_at_most \({u\'max_value\': 5}\)'
-                r' for object \[\'user0@oppia.com\', \'user1@oppia.com\', '
-                r'\'user2@oppia.com\', \'user3@oppia.com\', \'user4@oppia.com\''
-                r', \'user5@oppia.com\', \'user6@oppia.com\'\]'),
-            (
-                [u'admin@oppia.commmm'],
-                r'is_valid_email \({}\) for object admin@oppia.commmm'),
-            (
-                [u'a@.com'],
-                r'Validation failed: is_valid_email \({}\) for object '
-                r'a@.com')]
+                r' for object \[.*\]'),
+        ]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 

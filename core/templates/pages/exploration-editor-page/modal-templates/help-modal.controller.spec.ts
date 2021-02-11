@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+
 /**
  * @fileoverview Unit tests for HelpModalController.
  */
@@ -20,7 +22,9 @@ describe('Help Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
-  var SiteAnalyticsService = null;
+  var SiteAnalyticsService: SiteAnalyticsService = null;
+  var registerOpenTutorialFromHelpCenterEventSpy = null;
+  var registerVisitHelpCenterEventSpy = null;
 
   var explorationId = 'exp1';
 
@@ -35,7 +39,10 @@ describe('Help Modal Controller', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    spyOnAllFunctions(SiteAnalyticsService);
+    registerOpenTutorialFromHelpCenterEventSpy = spyOn(
+      SiteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
+    registerVisitHelpCenterEventSpy = spyOn(
+      SiteAnalyticsService, 'registerVisitHelpCenterEvent');
 
     $scope = $rootScope.$new();
     $controller('HelpModalController', {
@@ -47,7 +54,7 @@ describe('Help Modal Controller', function() {
   it('should begin editor tutorial when closing the modal', function() {
     $scope.beginEditorTutorial();
 
-    expect(SiteAnalyticsService.registerOpenTutorialFromHelpCenterEvent)
+    expect(registerOpenTutorialFromHelpCenterEventSpy)
       .toHaveBeenCalledWith(explorationId);
     expect($uibModalInstance.close).toHaveBeenCalledWith('editor');
   });
@@ -55,7 +62,7 @@ describe('Help Modal Controller', function() {
   it('should begin translation tutorial when closing the modal', function() {
     $scope.beginTranslationTutorial();
 
-    expect(SiteAnalyticsService.registerOpenTutorialFromHelpCenterEvent)
+    expect(registerOpenTutorialFromHelpCenterEventSpy)
       .toHaveBeenCalledWith(explorationId);
     expect($uibModalInstance.close).toHaveBeenCalledWith('translation');
   });
@@ -63,8 +70,7 @@ describe('Help Modal Controller', function() {
   it('should dismiss modal when changing to help center', function() {
     $scope.goToHelpCenter();
 
-    expect(SiteAnalyticsService.registerVisitHelpCenterEvent)
-      .toHaveBeenCalledWith(explorationId);
+    expect(registerVisitHelpCenterEventSpy).toHaveBeenCalledWith(explorationId);
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
 });
