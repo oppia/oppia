@@ -283,7 +283,8 @@ jobs:
     steps:
       - checkout
       - check_release_changelog_update_branch
-      - merge_target_branch - install_chrome
+      - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
