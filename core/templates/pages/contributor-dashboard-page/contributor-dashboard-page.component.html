@@ -64,7 +64,7 @@
           </div>
           <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
             <span class="oppia-dashboard-language-container-label">Translate to</span>
-            <translation-language-selector [active-language-code]="$ctrl.languageCode"
+            <translation-language-selector class="oppia-language-selector" [active-language-code]="$ctrl.languageCode"
                                            (set-active-language-code)="$ctrl.onChangeLanguage($event)">
             </translation-language-selector>
           </div>
@@ -199,7 +199,7 @@
   .oppia-mascot-avatar-container,
   .oppia-profile-details-container {
     margin-right: 20px;
-    max-width: 65px;
+    max-width: 75px;
     padding: 2% 1%;
     width: 18%;
   }
@@ -296,6 +296,7 @@
     padding: 1px 5px;
   }
   .oppia-contributor-home {
+    position: -webkit-sticky;
     position: sticky;
     top: 56px;
     z-index: 3;
@@ -319,7 +320,7 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 15px;
     position: relative;
-    width: 390px
+    width: 500px
   }
   .collapsed-oppia-dashboard-language-container-label {
     color: #4a4a4a;
@@ -343,6 +344,14 @@
   .oppia-contributor-dashboard-collapsible-header {
     display: none;
   }
+  .oppia-fade-in {
+      -webkit-animation: fadein 0.5s ease-out alternate;
+      -moz-animation: fadein 0.5s ease-out alternate;
+      animation: fadein 0.5s ease-out alternate;
+  }
+  .oppia-language-selector {
+    padding-bottom: 10px;
+  }
   @-webkit-keyframes fadein {
     from { transform: translateY(-100%); }
     to { transform: translateY(0); }
@@ -354,10 +363,5 @@
   @keyframes fadein {
       from { transform: translateY(-100%); }
       to { transform: translateY(0); }
-  }
-  .oppia-fade-in {
-      -webkit-animation: fadein 0.5s ease-out alternate;
-      -moz-animation: fadein 0.5s ease-out alternate;
-      animation: fadein 0.5s ease-out alternate;
   }
 </style>
