@@ -23,6 +23,7 @@ import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboar
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Suggestion } from 'domain/suggestion/Suggestion.model';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
