@@ -84,7 +84,6 @@ export class TranslateTextService {
     this.stateNamesList = [];
     this.activeExpId = expId;
     this.activeExpVersion = null;
-
     this._translatableTextBackedApiService.getTranslatableTextsAsync(
       expId, languageCode).then((response) => {
       this.stateWiseContents = response.state_names_to_content_id_mapping;

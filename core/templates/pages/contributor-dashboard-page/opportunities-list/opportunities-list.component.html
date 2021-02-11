@@ -1,7 +1,7 @@
 <div class="oppia-opportunities-list">
   <div *ngFor="let opportunity of visibleOpportunities; trackBy: $index">
     <opportunities-list-item [opportunity]="opportunity"
-                             (on-click-action-button)="onClickActionButton"
+                             [clickActionButton]="clickActionButton"
                              [progressBarRequired]="progressBarRequired"
                              [labelRequired]="labelRequired"
                              [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength">
@@ -31,6 +31,7 @@
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
+
 <style>
   .oppia-opportunity-availablity-message {
     color: #ababab;

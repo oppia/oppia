@@ -36,7 +36,7 @@ export class OpportunitiesListComponent {
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() loadMoreOpportunities;
-  @Input() onClickActionButton;
+  @Input() clickActionButton;
   @Input() opportunityHeadingTruncationLength: number;
 
   loadingOpportunityData: boolean;

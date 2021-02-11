@@ -16,7 +16,7 @@
  * @fileoverview Component for the translation modal.
 */
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -41,9 +41,10 @@ class UiConfig {
   selector: 'translation-modal',
   templateUrl: './translation-modal.directive.html',
   styleUrls: [],
-  providers: [TranslationOpportunityDict]
+  providers: []
 })
 export class TranslationModalContent {
+  @Input() opportunity: TranslationOpportunityDict;
   activeWrittenTranslation: {html: string} = {html: ''};
   uploadingTranslation = false;
   subheading: string;
@@ -65,23 +66,24 @@ export class TranslationModalContent {
     private readonly imageLocalStorageService: ImageLocalStorageService,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
-    private readonly translationLanguageService: TranslationLanguageService,
-    opportunity: TranslationOpportunityDict) {
+    private readonly translationLanguageService: TranslationLanguageService,) {}
+
+  ngOnInit(): void {
     // We need to set the context here so that the rte fetches
     // images for the given ENTITY_TYPE and targetId.
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.EXPLORATION, opportunity.id);
-    this.subheading = opportunity.subheading;
-    this.heading = opportunity.heading;
+      AppConstants.ENTITY_TYPE.EXPLORATION, this.opportunity.id);
+    this.subheading = this.opportunity.subheading;
+    this.heading = this.opportunity.heading;
     this.contextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription = (
-      translationLanguageService.getActiveLanguageDescription());
-    translateTextService.init(
-      opportunity.id,
-      translationLanguageService.getActiveLanguageCode(),
+      this.translationLanguageService.getActiveLanguageDescription());
+    this.translateTextService.init(
+      this.opportunity.id,
+      this.translationLanguageService.getActiveLanguageCode(),
       () => {
         const textAndAvailability = (
-          translateTextService.getTextToTranslate());
+          this.translateTextService.getTextToTranslate());
         this.textToTranslate = textAndAvailability.text;
         this.moreAvailable = textAndAvailability.more;
         this.loadingData = false;

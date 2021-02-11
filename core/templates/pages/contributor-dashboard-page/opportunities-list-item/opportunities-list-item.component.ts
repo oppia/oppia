@@ -33,7 +33,7 @@ export class ExplorationOpportunityDict {
 })
 export class OpportunitiesListItemComponent {
   @Input() opportunity: ExplorationOpportunityDict;
-  @Input() onClickActionButton;
+  @Input() clickActionButton;
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() opportunityHeadingTruncationLength: number;
@@ -61,6 +61,7 @@ export class OpportunitiesListItemComponent {
           this.opportunity.progressPercentage + '%');
         this.progressBarStyle = {width: this.progressPercentage};
       }
+      this.opportunityDataIsLoading = false;
     } else {
       this.opportunityDataIsLoading = true;
     }

@@ -92,22 +92,17 @@ export class TranslationOpportunities {
     this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
       'Translation');
     const opportunity = this.getOpportunitySummary(expId);
-    this.modalService.open(
+    const modalRef = this.modalService.open(
       TranslationModalContent, {
         size: 'lg',
         backdrop: 'static',
-        injector: Injector.create({
-          providers: [
-            {provide: 'opportunity', useFactory: () => opportunity}
-          ]
-        })
       });
+    modalRef.componentInstance.opportunity = opportunity;
   }
 
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
-      this.contributionOpportunitiesService.showRequiresLoginModal();
     });
   }
 
@@ -118,17 +113,17 @@ export class TranslationOpportunities {
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode())
-      .then(this.getPresentableOpportunitiesData);
+      .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
-  public loadOpportunities(): Promise<{
+  loadOpportunities(): Promise<{
     opportunitiesDicts: TranslationOpportunityDict[];
     more: boolean;
   }> {
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode())
-      .then(this.getPresentableOpportunitiesData);
+      .then(this.getPresentableOpportunitiesData.bind(this));
   }
 }
 

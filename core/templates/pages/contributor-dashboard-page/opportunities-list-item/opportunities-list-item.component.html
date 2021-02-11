@@ -3,7 +3,7 @@
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading"
-            *ngIf="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
+            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
@@ -23,7 +23,7 @@
     </div>
     <div class="oppia-opportunities-progress-label">
       <span class="protractor-test-opportunity-list-item-progress-percentage"
-            [hidden]="!opportunityDataIsLoading">
+            [hidden]="opportunityDataIsLoading">
         ({{ progressPercentage }})
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
@@ -37,8 +37,8 @@
   </div>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <button class="oppia-opportunities-button protractor-test-opportunity-list-item-button"
-            [hidden]="!opportunityDataIsLoading"
-            (click)="onClickActionButton(opportunity?.id)">
+            [hidden]="opportunityDataIsLoading"
+            (click)="clickActionButton(opportunity.id)">
       {{ opportunity?.actionButtonTitle }}
     </button>
   </div>
