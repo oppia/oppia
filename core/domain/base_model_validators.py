@@ -23,6 +23,7 @@ import collections
 import datetime
 import re
 
+from constants import constants
 from core.domain import cron_services
 from core.domain import rights_manager
 from core.platform import models
@@ -36,6 +37,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
+ERROR_CATEGORY_COMMIT_MESSAGE_CHECK = 'commit message check'
 ERROR_CATEGORY_COUNT_CHECK = 'count check'
 ERROR_CATEGORY_CURRENT_TIME_CHECK = 'current time check'
 ERROR_CATEGORY_DATETIME_CHECK = 'datetime check'
@@ -767,6 +769,22 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
                         item.id, commit_cmd_dict, e))
 
     @classmethod
+    def _validate_commit_message_length(cls, item):
+        """Validates that commit_message length is less than
+        MAX_COMMIT_MESSAGE_LENGTH.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+        """
+
+        if item.commit_message and (
+                len(item.commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+            cls._add_error(
+                ERROR_CATEGORY_COMMIT_MESSAGE_CHECK,
+                'Entity id %s: Commit message larger than accepted length'
+                % (item.id))
+
+    @classmethod
     def validate(cls, item):
         """Run _fetch_field_name_to_external_model_references and all
         _validate functions.
@@ -778,6 +796,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
 
         cls._validate_commit_type(item)
         cls._validate_commit_cmds_schema(item)
+        cls._validate_commit_message_length(item)
 
 
 class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
