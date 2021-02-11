@@ -44,23 +44,9 @@ export class SiteAnalyticsService {
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
     if (this.windowRef.nativeWindow.gtag && this.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.gtag('event', eventCategory, {
-        action: eventAction,
-        label: eventLabel
-      });
-    }
-  }
-
-  // For definitions of the various arguments, please see:
-  // developers.google.com/analytics/devguides/collection/analyticsjs/
-  // social-interactions.
-  _sendSocialEventToGoogleAnalytics(
-      network: string, action: string, targetUrl: string): void {
-    if (this.windowRef.nativeWindow.gtag && this.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.gtag('event', 'social', {
-        network: network,
-        action: action,
-        label: targetUrl
+      this.windowRef.nativeWindow.gtag('event', eventAction, {
+        event_category: eventCategory,
+        event_label: eventLabel
       });
     }
   }
@@ -136,11 +122,11 @@ export class SiteAnalyticsService {
       'CommitToPrivateExploration', 'click', explorationId);
   }
   registerShareExplorationEvent(network: string): void {
-    this._sendSocialEventToGoogleAnalytics(
+    this._sendEventToGoogleAnalytics(
       network, 'share', this.windowRef.nativeWindow.location.pathname);
   }
   registerShareCollectionEvent(network: string): void {
-    this._sendSocialEventToGoogleAnalytics(
+    this._sendEventToGoogleAnalytics(
       network, 'share', this.windowRef.nativeWindow.location.pathname);
   }
   registerOpenEmbedInfoEvent(explorationId: string): void {
