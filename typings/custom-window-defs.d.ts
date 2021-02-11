@@ -22,7 +22,6 @@ interface Window {
     __fixtures__: KarmaFixtures;
     decodeURIComponent: (encodedURIComponent: string) => string;
     encodeURIComponent: (decodedURIComponent: string) => string;
-    ga: Function;
     gtag: Function;
     $: JQueryStatic;
     Base64Binary: Base64Binary;
