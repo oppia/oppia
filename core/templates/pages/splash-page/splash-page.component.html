@@ -1,51 +1,49 @@
 <div class="splash-page">
   <div class="oppia-splash-section-one" dir="auto">
     <div class="oppia-splash-section-one-left">
-      <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE_LINE_1"></h1>
-      <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE_LINE_2"></h1>
+      <h1 class="oppia-splash-h1" [innerHTML]="'I18N_SPLASH_TITLE_LINE_1' | translate"></h1>
+      <h1 class="oppia-splash-h1" [innerHTML]="'I18N_SPLASH_TITLE_LINE_2' | translate"></h1>
       <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2 oppia-splash-h2-text" translate="I18N_SPLASH_SUBTITLE"></h2>
+        <h2 class="oppia-splash-h2 oppia-splash-h2-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></h2>
       </div>
       <div class="oppia-splash-button-container">
-        <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" ng-click="$ctrl.onClickBrowseLessonsButton()"
-                  class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                  translate="I18N_ACTION_BROWSE_LESSONS">
-          </button>
-        </form>
+        <button type="submit" (click)="onClickBrowseLessonsButton()"
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate">
+        </button>
       </div>
     </div>
     <div class="oppia-splash-section-one-right">
       <picture class="oppia-splash-main-image image-desktop">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/splashMainDesktop.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/splashMainDesktop.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/splashMainDesktop.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainDesktop.webp')">
+        <source type="image/jpeg" [srcset]="getStaticImageUrl('/splash/splashMainDesktop.png')">
+        <img [src]="getStaticImageUrl('/splash/splashMainDesktop.png')" alt="">
       </picture>
       <picture class="oppia-splash-main-image image-mobile">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/splashMainMobile.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/splashMainMobile.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/splashMainMobile.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainMobile.webp')">
+        <source type="image/jpeg" [srcset]="getStaticImageUrl('/splash/splashMainMobile.png')">
+        <img [src]="getStaticImageUrl('/splash/splashMainMobile.png')" alt="">
       </picture>
     </div>
   </div>
 
   <div class="oppia-splash-section-two">
     <div class="oppia-splash-icon-1-container">
-      <img ng-src="<[$ctrl.getStaticImageUrl('/splash/userIcon.svg')]>" class="oppia-splash-icon-1" alt="">
+      <img [src]="getStaticImageUrl('/splash/userIcon.svg')" class="oppia-splash-icon-1" alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" translate="I18N_SPLASH_ICON_ONE_TEXT"></span>
+        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_ONE_TEXT' | translate"></span>
       </div>
     </div>
     <div class="oppia-splash-icon-2-container">
-      <img ng-src="<[$ctrl.getStaticImageUrl('/splash/languageIcon.svg')]>" class="oppia-splash-icon-2" alt="">
+      <img [src]="getStaticImageUrl('/splash/languageIcon.svg')" class="oppia-splash-icon-2" alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" translate="I18N_SPLASH_ICON_TWO_TEXT" translate-values="{languageCount: 4}"></span>
+        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_TWO_TEXT' | translate:{languageCount: 4}"></span>
       </div>
     </div>
     <div class="oppia-splash-icon-3-container">
-      <img ng-src="<[$ctrl.getStaticImageUrl('/splash/lessonIcon.svg')]>" class="oppia-splash-icon-3" alt="">
+      <img [src]="getStaticImageUrl('/splash/lessonIcon.svg')" class="oppia-splash-icon-3" alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" translate="I18N_SPLASH_ICON_THREE_TEXT" translate-values="{lessonCount: 40}"></span>
+        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_THREE_TEXT' | translate:{lessonCount: 40}"></span>
       </div>
     </div>
   </div>
@@ -53,87 +51,85 @@
 
   <div class="oppia-splash-section-three">
     <div class="oppia-splash-section-three-left">
-      <h3 ng-if="$ctrl.isWindowNarrow()" translate="I18N_SPLASH_BENEFITS_TITLE"></h3>
+      <h3 *ngIf="isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
       <picture class="splash-matthew-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
+        <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-three-right">
-      <h3 ng-if="!$ctrl.isWindowNarrow()" translate="I18N_SPLASH_BENEFITS_TITLE"></h3>
+      <h3 *ngIf="!isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
       <div class="splash-benefits-section">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet1.svg')]>" alt="">
-        <h2 translate="I18N_SPLASH_BENEFITS_ONE" class="splash-benefits"></h2>
+        <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_ONE' | translate" class="splash-benefits"></h2>
       </div>
       <div class="splash-benefits-section">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet2.svg')]>" alt="">
-        <h2 translate="I18N_SPLASH_BENEFITS_TWO" class="splash-benefits"></h2>
+        <img [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
+        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_TWO' | translate" class="splash-benefits"></h2>
       </div>
       <div class="splash-benefits-section">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet3.svg')]>" alt="">
-        <h2 translate="I18N_SPLASH_BENEFITS_THREE" class="splash-benefits"></h2>
+        <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
+        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_THREE' | translate" class="splash-benefits"></h2>
       </div>
     </div>
   </div>
 
   <div class="oppia-splash-section-four">
-    <div class="oppia-splash-section-four-image-mobile" ng-if="$ctrl.isWindowNarrow()">
+    <div class="oppia-splash-section-four-image-mobile" *ngIf="isWindowNarrow">
       <picture class="splash-student-desk-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk_mobile.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk_mobile.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/student_desk_mobile.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/student_desk_mobile.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/student_desk_mobile.png')">
+        <img [src]="getStaticImageUrl('/splash/student_desk_mobile.png')" alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-four-left">
-      <h3 translate="I18N_SPLASH_FOR_STUDENTS"></h3>
-      <h2 translate="I18N_SPLASH_STUDENTS_TITLE"></h2>
-      <p translate="I18N_SPLASH_STUDENTS_CONTENT"></p>
+      <h3 [innerHTML]="'I18N_SPLASH_FOR_STUDENTS' | translate"></h3>
+      <h2 [innerHTML]="'I18N_SPLASH_STUDENTS_TITLE' | translate"></h2>
+      <p [innerHTML]="'I18N_SPLASH_STUDENTS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
-        <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit"
-                  class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                  translate="I18N_SPLASH_START_LEARNING">
-          </button>
-        </form>
+        <button type="submit"
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_SPLASH_START_LEARNING' | translate" (click)="onClickBrowseLessonsButton()">
+        </button>
       </div>
     </div>
-    <div class="oppia-splash-section-four-right" ng-if="!$ctrl.isWindowNarrow()">
+    <div class="oppia-splash-section-four-right" *ngIf="!isWindowNarrow">
       <picture class="splash-student-desk-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/student_desk.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/student_desk.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/student_desk.png')">
+        <img [src]="getStaticImageUrl('/splash/student_desk.png')" alt="">
       </picture>
     </div>
   </div>
 
-  <div class="oppia-splash-section-five" ng-style="{'background-image': '<[$ctrl.getTestimonialBackgroundUrl()]>'}">
-    <div class="oppia-splash-section-five-image" ng-if="$ctrl.isWindowNarrow()">
+  <div class="oppia-splash-section-five" [ngStyle]="{'background-image': 'getTestimonialBackgroundUrl()'}">
+    <div class="oppia-splash-section-five-image" *ngIf="isWindowNarrow">
       <picture class="splash-student-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlWebp)]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlPng)]>" ng-class="{'image-with-border': $ctrl.testimonials[$ctrl.displayedTestimonialId].borderPresent}" alt="">
+        <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
+        <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
+        <img [src]="testimonials[displayedTestimonialId].imageUrlPng" ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-five-left">
       <div>
-        <h2><[$ctrl.testimonials[$ctrl.displayedTestimonialId].quote]></h2>
-        <h3><[$ctrl.testimonials[$ctrl.displayedTestimonialId].studentDetails]></h3>
+        <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
+        <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
       </div>
       <div class="splash-arrows-container">
-        <span ng-click="$ctrl.decrementDisplayedTestimonialId()" class="material-icons">
+        <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
           arrow_back_ios
         </span>
-        <span ng-click="$ctrl.incrementDisplayedTestimonialId()" class="material-icons">
+        <span (click)="incrementDisplayedTestimonialId()" class="material-icons">
           arrow_forward_ios
         </span>
       </div>
     </div>
-    <div class="oppia-splash-section-five-right" ng-if="!$ctrl.isWindowNarrow()">
+    <div class="oppia-splash-section-five-right" *ngIf="!isWindowNarrow">
       <picture class="splash-student-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlWebp)]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlPng)]>" ng-class="{'image-with-border': $ctrl.testimonials[$ctrl.displayedTestimonialId].borderPresent}" alt="">
+        <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
+        <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
+        <img [src]="testimonials[displayedTestimonialId].imageUrlPng" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
   </div>
@@ -141,52 +137,48 @@
   <div class="oppia-splash-section-six">
     <div class="oppia-splash-section-six-left">
       <picture class="splash-books-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/books_dsk.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/books_dsk.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/books_dsk.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/books_dsk.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/books_dsk.png')">
+        <img [src]="getStaticImageUrl('/splash/books_dsk.png')" alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-six-right">
-      <h3 translate="I18N_SPLASH_FOR_TEACHERS"></h3>
-      <h2 translate="I18N_SPLASH_TEACHERS_TITLE"></h2>
-      <p translate="I18N_SPLASH_TEACHERS_CONTENT"></p>
+      <h3 [innerHTML]="'I18N_SPLASH_FOR_TEACHERS' | translate"></h3>
+      <h2 [innerHTML]="'I18N_SPLASH_TEACHERS_TITLE' | translate"></h2>
+      <p [innerHTML]="'I18N_SPLASH_TEACHERS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
-        <form action="/teach">
-          <button type="submit"
-                  class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                  translate="I18N_SPLASH_START_TEACHING">
-          </button>
-        </form>
+        <button type="submit"
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_SPLASH_START_TEACHING' | translate" (click)="onClickStartTeachingButton()">
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="oppia-splash-section-seven" ng-style="{'background-image': '<[$ctrl.getCommunityBackgroundUrl()]>'}">
-    <div class="oppia-splash-section-seven-image" ng-if="$ctrl.isWindowNarrow()">
+  <div class="oppia-splash-section-seven" [ngStyle]="{'background-image': 'getCommunityBackgroundUrl()'}">
+    <div class="oppia-splash-section-seven-image" *ngIf="isWindowNarrow">
       <picture class="splash-vol-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/volunteer_section.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/volunteer_section.png')">
+        <img [src]="getStaticImageUrl('/splash/volunteer_section.png')" alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-seven-left">
-      <h3 translate="I18N_SPLASH_FOR_VOLUNTEERS"></h3>
-      <h2 translate="I18N_SPLASH_VOLUNTEERS_TITLE"></h2>
-      <p translate="I18N_SPLASH_VOLUNTEERS_CONTENT"></p>
+      <h3 [innerHTML]="'I18N_SPLASH_FOR_VOLUNTEERS' | translate"></h3>
+      <h2 [innerHTML]="'I18N_SPLASH_VOLUNTEERS_TITLE' | translate"></h2>
+      <p [innerHTML]="'I18N_SPLASH_VOLUNTEERS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
-        <form action="https://www.oppiafoundation.org/volunteer">
-          <button type="submit"
-                  class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                  translate="I18N_SPLASH_START_CONTRIBUTING">
-          </button>
-        </form>
+        <button type="submit"
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_SPLASH_START_CONTRIBUTING' | translate" (click)="onClickStartContributingButton()">
+        </button>
       </div>
     </div>
-    <div class="oppia-splash-section-seven-right" ng-if="!$ctrl.isWindowNarrow()">
+    <div class="oppia-splash-section-seven-right" *ngIf="!isWindowNarrow">
       <picture class="splash-vol-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/volunteer_section.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/volunteer_section.png')">
+        <img [src]="getStaticImageUrl('/splash/volunteer_section.png')" alt="">
       </picture>
     </div>
   </div>
