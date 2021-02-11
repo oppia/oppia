@@ -117,15 +117,21 @@ angular.module('oppia').component('contributorDashboardPage', {
 
         ctrl.scrollFunction = function() {
           if ($win.scrollTop() >= 5) {
+            defaultHeader.removeClass('oppia-fade-in');
             defaultHeader.addClass('oppia-contributor-dashboard-header');
             collapsibleHeader.removeClass(
               'oppia-contributor-dashboard-collapsible-header');
+            collapsibleHeader.addClass(
+              'oppia-fade-in');
             ctrl.defaultHeaderVisible = false;
             ctrl.collapsibleHeaderVisible = true;
           } else {
+            collapsibleHeader.remove(
+              'oppia-fade-in');
             collapsibleHeader.addClass(
               'oppia-contributor-dashboard-collapsible-header');
             defaultHeader.removeClass('oppia-contributor-dashboard-header');
+            defaultHeader.addClass('oppia-fade-in');
             ctrl.defaultHeaderVisible = true;
             ctrl.collapsibleHeaderVisible = false;
           }

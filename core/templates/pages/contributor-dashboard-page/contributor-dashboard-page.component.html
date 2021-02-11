@@ -199,7 +199,7 @@
   .oppia-mascot-avatar-container,
   .oppia-profile-details-container {
     margin-right: 20px;
-    max-width: 130px;
+    max-width: 65px;
     padding: 2% 1%;
     width: 18%;
   }
@@ -210,6 +210,8 @@
   .oppia-opportunities-tabs {
     background-color: #ffffff;
     padding-top: 5px;
+    position: relative;
+    z-index: 5;
   }
   .oppia-opportunities-tabs-list {
     display: flex;
@@ -340,5 +342,22 @@
   }
   .oppia-contributor-dashboard-collapsible-header {
     display: none;
+  }
+  @-webkit-keyframes fadein {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+  @-moz-keyframes fadein {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes fadein {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+  }
+  .oppia-fade-in {
+      -webkit-animation: fadein 0.5s ease-out alternate;
+      -moz-animation: fadein 0.5s ease-out alternate;
+      animation: fadein 0.5s ease-out alternate;
   }
 </style>
