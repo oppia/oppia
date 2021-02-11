@@ -7,12 +7,14 @@
   Forced to use !important here as it makes the code easy to understand, but does not align with design principles.
   A solution could be added using CSS, but for some reason the styles defined in this file seem to be overriden by Guppy.
   Only way to fix this is to override the specificity using !important and force the component to take the styles from here
-  and not the styles defined by Guppy.
+  and not the styles defined by Guppy. It seems that even customizing the guppy active or guppy inactive classes has no
+  effect on the styles of the textbox. Again, !important is required to break the specificity for height.
 -->
 <style>
   .guppy-div-learner {
+    min-height: 100px;
     height: auto !important;
-    width: 100% !important;
+    width: 100%;
   }
 
   .base {
