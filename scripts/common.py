@@ -158,6 +158,25 @@ COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
 # will be identical.
 REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 
+DIRS_TO_ADD_TO_SYS_PATH = [
+    GOOGLE_APP_ENGINE_SDK_HOME,
+    PYLINT_PATH,
+
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
+    PSUTIL_DIR,
+    os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
+    CURR_DIR,
+    THIRD_PARTY_PYTHON_LIBS_DIR
+]
+
 
 def is_windows_os():
     """Check if the running system is Windows."""
@@ -640,29 +659,6 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
-@contextlib.contextmanager
-def managed_elasticsearch_dev_server():
-    """Returns a context manager for ElasticSearch server for running tests
-    in development mode and running a local dev server. This is only required
-    in a development environment.
-
-    Yields:
-        psutil.Process. The ElasticSearch server process.
-    """
-    # Clear previous data stored in the local cluster.
-    if os.path.exists(ES_PATH_DATA_DIR):
-        shutil.rmtree(ES_PATH_DATA_DIR)
-
-    # Override the default path to ElasticSearch config files.
-    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
-    es_args = [
-        '%s/bin/elasticsearch' % ES_PATH,
-        '-d'
-    ]
-    with managed_process(es_args, shell=True) as proc:
-        yield proc
-
-
 def wait_for_port_to_be_closed(port_number):
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
@@ -794,7 +790,9 @@ def swap_env(key, value):
 
 
 @contextlib.contextmanager
-def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
+def managed_process(
+        command_args, shell=False, timeout_secs=60, proc_name_to_kill=None,
+        **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -811,6 +809,10 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
+        proc_name_to_kill: str|None. If given, the name of a string which
+            matches all additional processes that should be killed when the
+            given process is terminated. (This is needed for, e.g.,
+            elasticsearch.)
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -825,6 +827,7 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
+    python_utils.PRINT('Starting new process: %s' % command)
     popen_proc = psutil.Popen(command, shell=shell, **kwargs)
 
     try:
@@ -833,6 +836,7 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         procs_to_kill = (
             popen_proc.children(recursive=True) if popen_proc.is_running() else
             [])
+
         # Children must be terminated before the parent, otherwise they risk
         # becoming zombies.
         procs_to_kill.append(popen_proc)
@@ -857,6 +861,17 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         for proc in procs_still_alive:
             proc.kill()
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
+
+        if proc_name_to_kill is not None:
+            python_utils.PRINT(
+                'Killing remaining %s processes' % proc_name_to_kill)
+            for proc in psutil.process_iter():
+                proc_should_be_killed = any(
+                    proc_name_to_kill in cmd_part
+                    for cmd_part in proc.cmdline())
+                if proc_should_be_killed:
+                    proc.kill()
+                    logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
 
 @contextlib.contextmanager
@@ -941,3 +956,27 @@ def managed_firebase_auth_emulator():
         # OK to use shell=True here because we are passing string literals and
         # constants, so no risk of shell-injection attacks.
         yield stack.enter_context(managed_process(emulator_args, shell=True))
+
+
+@contextlib.contextmanager
+def managed_elasticsearch_dev_server():
+    """Returns a context manager for ElasticSearch server for running tests
+    in development mode and running a local dev server. This is only required
+    in a development environment.
+
+    Yields:
+        psutil.Process. The ElasticSearch server process.
+    """
+    # Clear previous data stored in the local cluster.
+    if os.path.exists(ES_PATH_DATA_DIR):
+        shutil.rmtree(ES_PATH_DATA_DIR)
+
+    # Override the default path to ElasticSearch config files.
+    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
+    es_args = [
+        '%s/bin/elasticsearch' % ES_PATH,
+        '-d'
+    ]
+    with managed_process(
+        es_args, shell=True, proc_name_to_kill='elasticsearch') as proc:
+        yield proc

@@ -58,6 +58,20 @@ describe('Site Analytics Service', () => {
       'send', 'event', 'BrowseLessonsButton', 'click', '/context.html');
   });
 
+  it('should register click start learning button event', () => {
+    sas.registerClickStartLearningButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'StartLearningButton', 'click', '/context.html');
+  });
+
+  it('should register click start contributing button event', () => {
+    sas.registerClickStartContributingButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'StartContributingButton', 'click', '/context.html');
+  });
+
   it('should register go to donation site event', () => {
     const donationSite = 'https://donation.com';
     sas.registerGoToDonationSiteEvent(donationSite);
@@ -334,6 +348,13 @@ describe('Site Analytics Service', () => {
 
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'PlayerFinishExploration', 'engage', '123');
+  });
+
+  it('should register finish curated lesson event', () => {
+    sas.registerCuratedLessonCompleted('123');
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'CuratedLessonCompleted', 'engage', '123');
   });
 
   it('should register open collection from landing page event', () => {

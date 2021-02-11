@@ -95,6 +95,16 @@ export class SiteAnalyticsService {
       'StartLearningButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
+  registerClickStartContributingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartContributingButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartTeachingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartTeachingButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
   registerClickVisitClassroomButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
       'ClassroomButton', 'click',
@@ -295,6 +305,11 @@ export class SiteAnalyticsService {
   registerFinishExploration(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'PlayerFinishExploration', 'engage', explorationId);
+  }
+
+  registerCuratedLessonCompleted(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'CuratedLessonCompleted', 'engage', explorationId);
   }
 
   registerClassroomLessonActiveUse(): void {

@@ -77,7 +77,7 @@ describe('Topic viewer backend API service', () => {
         thumbnail_bg_color: '#F8BF74',
         published: true,
         completed_node_titles: ['Chapter 1'],
-        pending_node_dicts: []
+        all_node_dicts: []
       }],
       additional_story_dicts: [{
         id: '1',
@@ -88,7 +88,7 @@ describe('Topic viewer backend API service', () => {
         thumbnail_bg_color: '#F8BF74',
         published: true,
         completed_node_titles: ['Chapter 1'],
-        pending_node_dicts: []
+        all_node_dicts: []
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{

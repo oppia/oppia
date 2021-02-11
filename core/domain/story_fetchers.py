@@ -293,7 +293,7 @@ def get_completed_nodes_in_story(user_id, story_id):
     return completed_nodes
 
 
-def get_pending_nodes_in_story(user_id, story_id):
+def get_pending_and_all_nodes_in_story(user_id, story_id):
     """Returns the nodes that are pending in a story
 
     Args:
@@ -311,7 +311,10 @@ def get_pending_nodes_in_story(user_id, story_id):
         if node.id not in completed_node_ids:
             pending_nodes.append(node)
 
-    return pending_nodes
+    return {
+        'all_nodes': story.story_contents.nodes,
+        'pending_nodes': pending_nodes
+    }
 
 
 def get_completed_node_ids(user_id, story_id):
