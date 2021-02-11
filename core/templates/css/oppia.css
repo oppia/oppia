@@ -2191,6 +2191,10 @@ pre.oppia-pre-wrapped-text {
   padding: 6px;
   position: relative;
   text-align: center;
+  height: 58px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .oppia-interaction-customization-label {
   font-size: 1em;
