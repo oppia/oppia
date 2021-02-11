@@ -222,14 +222,16 @@ def modify_constants(
             the maintenance mode.
     """
     dev_mode_variable = (
-        '"DEV_MODE": false,' if prod_env else '"DEV_MODE": true,')
+        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
     common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*,', dev_mode_variable)
+        common.CONSTANTS_FILE_PATH,
+        r'"DEV_MODE": (true|false)',
+        dev_mode_variable)
     emulator_mode_variable = (
         '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
-        r'"EMULATOR_MODE": .*',
+        r'"EMULATOR_MODE": (true|false)',
         emulator_mode_variable
     )
 
@@ -237,7 +239,7 @@ def modify_constants(
         'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
     common.inplace_replace_file(
         common.FECONF_PATH,
-        r'ENABLE_MAINTENANCE_MODE = .*',
+        r'ENABLE_MAINTENANCE_MODE = (True|False)',
         enable_maintenance_mode_variable)
 
 

@@ -21,10 +21,10 @@ workflows:
       - setup_and_typescript_tests
       - e2e_miscellaneous_tests:
           requires:
-            - setup_and_typescript_tests
+            - e2e_navigation_and_misc
       - e2e_new_structure_tests:
           requires:
-            - setup_and_typescript_tests
+            - e2e_navigation_and_misc
       - e2e_navigation_and_misc:
           requires:
             - setup_and_typescript_tests
@@ -242,9 +242,6 @@ jobs:
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
       - upload_screenshots
 
-  # Non-prod e2e Tests
-  # The following tests must be run in a non-production environment because they are uploading files.
-  # All other e2e tests should be run in prod mode.
   e2e_miscellaneous_tests:
     <<: *job_defaults
     steps:
@@ -278,7 +275,7 @@ jobs:
       - run:
           name: Run e2e feature gating test
           command: |
-            python -m scripts.run_e2e_tests --suite="featureGating"
+            python -m scripts.run_e2e_tests --skip_install --suite="featureGating"
       - upload_screenshots
 
   e2e_new_structure_tests:
