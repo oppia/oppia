@@ -60,7 +60,6 @@ describe('Creator dashboard controller', () => {
   var CsrfService = null;
   var feedbackThreadObjectFactory = null;
   var SuggestionModalForCreatorDashboardService = null;
-  var suggestionObjectFactory = null;
   var suggestionsService = null;
   var SuggestionThreadObjectFactory = null;
   var ThreadMessageObjectFactory = null;
@@ -90,8 +89,6 @@ describe('Creator dashboard controller', () => {
       'FeedbackThreadObjectFactory');
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
-    suggestionObjectFactory = $injector.get(
-      'SuggestionObjectFactory');
     suggestionsService = $injector.get(
       'SuggestionsService');
     SuggestionThreadObjectFactory = $injector.get(
@@ -294,11 +291,11 @@ describe('Creator dashboard controller', () => {
                   .createFromBackendDict(feedbackThread))),
             createdSuggestionsList: (
               dashboardData.created_suggestions_list.map(
-                suggestionDict => suggestionObjectFactory
+                suggestionDict => Suggestion
                   .createFromBackendDict(suggestionDict))),
             suggestionsToReviewList: (
               dashboardData.suggestions_to_review_list.map(
-                suggestionDict => suggestionObjectFactory
+                suggestionDict => Suggestion
                   .createFromBackendDict(suggestionDict))),
             createdSuggestionThreadsList: _getSuggestionThreads(
               dashboardData.threads_for_created_suggestions_list,
@@ -596,11 +593,11 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(feedbackThread))),
           createdSuggestionsList: (
             dashboardData.created_suggestions_list.map(
-              suggestionDict => suggestionObjectFactory
+              suggestionDict => Suggestion
                 .createFromBackendDict(suggestionDict))),
           suggestionsToReviewList: (
             dashboardData.suggestions_to_review_list.map(
-              suggestionDict => suggestionObjectFactory
+              suggestionDict => Suggestion
                 .createFromBackendDict(suggestionDict))),
           createdSuggestionThreadsList: _getSuggestionThreads(
             dashboardData.threads_for_created_suggestions_list,
@@ -695,11 +692,11 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(feedbackThread))),
           createdSuggestionsList: (
             dashboardData.created_suggestions_list.map(
-              suggestionDict => suggestionObjectFactory
+              suggestionDict => Suggestion
                 .createFromBackendDict(suggestionDict))),
           suggestionsToReviewList: (
             dashboardData.suggestions_to_review_list.map(
-              suggestionDict => suggestionObjectFactory
+              suggestionDict => Suggestion
                 .createFromBackendDict(suggestionDict))),
           createdSuggestionThreadsList: _getSuggestionThreads(
             dashboardData.threads_for_created_suggestions_list,

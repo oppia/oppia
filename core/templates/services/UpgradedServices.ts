@@ -477,8 +477,6 @@ import { SubtopicPageObjectFactory } from
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { SuggestionsService } from 'services/suggestions.service';
@@ -850,8 +848,6 @@ export class UpgradedServices {
       new StoryContentsObjectFactory();
     upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory(
       upgradedServices['ShortSkillSummaryObjectFactory']);
-    upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
-      upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -975,7 +971,6 @@ export class UpgradedServices {
       new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory(
-        upgradedServices['SuggestionObjectFactory'],
         upgradedServices['ThreadMessageSummaryObjectFactory']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
@@ -1062,7 +1057,6 @@ export class UpgradedServices {
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['FeedbackThreadObjectFactory'],
-        upgradedServices['SuggestionObjectFactory'],
         upgradedServices['SuggestionThreadObjectFactory'],
         upgradedServices['SuggestionsService'],
         upgradedServices['LoggerService']);

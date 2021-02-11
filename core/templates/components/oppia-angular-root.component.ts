@@ -440,8 +440,6 @@ import { SubtopicPageObjectFactory } from
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { SuggestionsService } from 'services/suggestions.service';
@@ -757,7 +755,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
   static subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
   static suggestionModalService: SuggestionModalService;
-  static suggestionObjectFactory: SuggestionObjectFactory;
   static suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
   static suggestionsService: SuggestionsService;
   static textInputPredictionService: TextInputPredictionService;
@@ -1053,7 +1050,6 @@ private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
 private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
 private suggestionModalService: SuggestionModalService,
-private suggestionObjectFactory: SuggestionObjectFactory,
 private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
 private suggestionsService: SuggestionsService,
 private textInputPredictionService: TextInputPredictionService,
@@ -1509,8 +1505,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.subtopicViewerBackendApiService);
     OppiaAngularRootComponent.suggestionModalService = (
       this.suggestionModalService);
-    OppiaAngularRootComponent.suggestionObjectFactory = (
-      this.suggestionObjectFactory);
     OppiaAngularRootComponent.suggestionThreadObjectFactory = (
       this.suggestionThreadObjectFactory);
     OppiaAngularRootComponent.suggestionsService = this.suggestionsService;
