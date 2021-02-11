@@ -435,14 +435,14 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_models.QuestionModel.delete_multi(
             [self.question_id], self.editor_id,
             feconf.COMMIT_MESSAGE_QUESTION_DELETED, force_deletion=False)
-        question_model = question_models.QuestionModel.get_by_id(
-            self.question_id)
+        question_model = question_models.QuestionModel.get(
+            self.question_id, strict=False)
         self.assertTrue(question_model.deleted)
 
         question_services.delete_question(
             self.editor_id, self.question_id, force_deletion=True)
-        question_model = question_models.QuestionModel.get_by_id(
-            self.question_id)
+        question_model = question_models.QuestionModel.get(
+            self.question_id, strict=False)
         self.assertEqual(question_model, None)
         self.assertEqual(
             question_models.QuestionSummaryModel.get(
@@ -458,8 +458,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_services.delete_question(
             self.editor_id, self.question_id, force_deletion=True)
-        question_model = question_models.QuestionModel.get_by_id(
-            self.question_id)
+        question_model = question_models.QuestionModel.get(
+            self.question_id, strict=False)
         self.assertEqual(question_model, None)
         self.assertEqual(
             question_models.QuestionSummaryModel.get(

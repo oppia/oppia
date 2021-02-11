@@ -660,7 +660,7 @@ class MockTopicRightsModel(topic_models.TopicRightsModel):
         base_models.VersionedModel._trusted_commit(  # pylint: disable=protected-access
             self, committer_id, commit_type, commit_message, commit_cmds)
 
-        topic_rights = MockTopicRightsModel.get_by_id(self.id)
+        topic_rights = MockTopicRightsModel.get(self.id, strict=False)
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
@@ -753,11 +753,11 @@ class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).content_user_ids)
+            .get('%s-1' % self.COL_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).content_user_ids)
+            .get('%s-2' % self.COL_1_ID, strict=False).content_user_ids)
 
     def test_add_content_user_ids_to_exploration_rights_snapshot(self):
         with self.exploration_rights_model_swap:
@@ -790,11 +790,11 @@ class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).content_user_ids)
+            .get('%s-1' % self.EXP_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).content_user_ids)
+            .get('%s-2' % self.EXP_1_ID, strict=False).content_user_ids)
 
     def test_add_content_user_ids_to_topic_rights_snapshot(self):
         with self.topic_rights_model_swap:
@@ -820,11 +820,11 @@ class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).content_user_ids)
+            .get('%s-1' % self.TOP_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_2_ID, self.USER_3_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).content_user_ids)
+            .get('%s-2' % self.TOP_1_ID, strict=False).content_user_ids)
 
     def test_add_content_user_ids_to_multiple_rights_snapshots(self):
         with self.collection_rights_model_swap:
@@ -918,35 +918,35 @@ class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).content_user_ids)
+            .get('%s-1' % self.COL_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_4_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).content_user_ids)
+            .get('%s-2' % self.COL_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).content_user_ids)
+            .get('%s-1' % self.EXP_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).content_user_ids)
+            .get('%s-2' % self.EXP_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).content_user_ids)
+            .get('%s-1' % self.TOP_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_2_ID, self.USER_3_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).content_user_ids)
+            .get('%s-2' % self.TOP_1_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_2_ID).content_user_ids)
+            .get('%s-1' % self.TOP_2_ID, strict=False).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_4_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_2_ID).content_user_ids)
+            .get('%s-2' % self.TOP_2_ID, strict=False).content_user_ids)
 
 
 class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
@@ -1699,11 +1699,11 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
 
-        parent_model = exp_models.ExplorationRightsModel.get_by_id(
-            self.EXP_ID)
+        parent_model = exp_models.ExplorationRightsModel.get(
+            self.EXP_ID, strict=False)
         snapshot_model = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                '%s-%s' % (self.EXP_ID, 1)))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-%s' % (self.EXP_ID, 1), strict=False))
 
         self.assertIsNone(parent_model)
         self.assertIsNone(snapshot_model)
@@ -1742,11 +1742,11 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
 
-        parent_model = skill_models.SkillModel.get_by_id(
-            self.SKILL_ID)
+        parent_model = skill_models.SkillModel.get(
+            self.SKILL_ID, strict=False)
         snapshot_model = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '%s-%s' % (self.SKILL_ID, 1)))
+            skill_models.SkillSnapshotMetadataModel.get(
+                '%s-%s' % (self.SKILL_ID, 1), strict=False))
 
         self.assertIsNone(parent_model)
         self.assertIsNone(snapshot_model)
@@ -1781,11 +1781,11 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
 
-        parent_model = question_models.QuestionModel.get_by_id(
-            self.QUESTION_ID)
+        parent_model = question_models.QuestionModel.get(
+            self.QUESTION_ID, strict=False)
         snapshot_model = (
-            question_models.QuestionSnapshotContentModel.get_by_id(
-                '%s-%s' % (self.QUESTION_ID, 1)))
+            question_models.QuestionSnapshotContentModel.get(
+                '%s-%s' % (self.QUESTION_ID, 1), strict=False))
 
         self.assertIsNone(parent_model)
         self.assertIsNone(snapshot_model)
@@ -1818,8 +1818,8 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
         commit_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'rights-%s-%s' % (self.EXP_ID, 1)))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'rights-%s-%s' % (self.EXP_ID, 1), strict=False))
 
         expected_output = [
             [
@@ -1904,8 +1904,8 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
         commit_model = (
-            question_models.QuestionCommitLogEntryModel.get_by_id(
-                'question-%s-%s' % (self.QUESTION_ID, 1)))
+            question_models.QuestionCommitLogEntryModel.get(
+                'question-%s-%s' % (self.QUESTION_ID, 1), strict=False))
 
         expected_output = [
             [
@@ -1957,8 +1957,8 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
         commit_model = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-%s-%s' % (self.SKILL_ID, 1)))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-%s-%s' % (self.SKILL_ID, 1), strict=False))
 
         expected_output = [
             [
@@ -1996,8 +1996,8 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
         commit_model = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-%s-%s' % (self.SKILL_ID, 1)))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-%s-%s' % (self.SKILL_ID, 1), strict=False))
 
         expected_output = [
             [
@@ -2142,7 +2142,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
             commit_message='a' * 400).put()
         self._run_one_off_job()
         self.assertEqual(
-            len(model_class.get_by_id('model_id-0').commit_message),
+            len(model_class.get('model_id-0', strict=False).commit_message),
             375)
 
     def test_message_truncated_correctly_commit_log_entry(self):
@@ -2158,8 +2158,8 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
         self._run_one_off_job()
         self.assertEqual(
             len(
-                collection_models.CollectionCommitLogEntryModel.get_by_id(
-                    commit.id).commit_message),
+                collection_models.CollectionCommitLogEntryModel.get(
+                    commit.id, strict=False).commit_message),
             375)
 
         # Ensure nothing happens to messages of proper length.
@@ -2167,5 +2167,5 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
         self.assertEqual(
             len(
                 collection_models.CollectionCommitLogEntryModel.get_by_id(
-                    commit.id).commit_message),
+                    commit.id, strict=False).commit_message),
             375)

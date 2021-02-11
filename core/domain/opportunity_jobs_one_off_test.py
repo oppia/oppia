@@ -574,8 +574,8 @@ class RenameExplorationOpportunitySummaryModelPropertiesJobTest(
                     ' 1]'])
 
             new_model = (
-                opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                    'opportunity_id'))
+                opportunity_models.ExplorationOpportunitySummaryModel.get(
+                    'opportunity_id', strict=False))
 
             self.assertEqual(
                 old_model.assigned_voice_artist_in_language_codes,
@@ -621,8 +621,8 @@ class RenameExplorationOpportunitySummaryModelPropertiesJobTest(
         self.assertEqual(output, [])
 
         new_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                'opportunity_id'))
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                'opportunity_id', strict=False))
 
         self.assertEqual(
             new_model.language_codes_with_assigned_voice_artists, ['hi'])

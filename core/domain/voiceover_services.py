@@ -133,8 +133,8 @@ def get_voiceover_application_by_id(voiceover_application_id):
         application id.
     """
     voiceover_application_model = (
-        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-            voiceover_application_id))
+        suggestion_models.GeneralVoiceoverApplicationModel.get(
+            voiceover_application_id, strict=False))
     return _get_voiceover_application_from_model(voiceover_application_model)
 
 

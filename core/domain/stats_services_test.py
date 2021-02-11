@@ -1035,8 +1035,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             ['Z', 'B', 'Z'])
         self.assertEqual(len(exp_issue.playthrough_ids), 1)
 
-        playthrough = stats_models.PlaythroughModel.get_by_id(
-            exp_issue.playthrough_ids[0])
+        playthrough = stats_models.PlaythroughModel.get(
+            exp_issue.playthrough_ids[0], strict=False)
         self.assertEqual(
             playthrough.issue_customization_args['state_names']['value'],
             ['Z', 'B', 'Z'])
@@ -1098,8 +1098,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             exp_issue.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(exp_issue.playthrough_ids), 1)
 
-        playthrough = stats_models.PlaythroughModel.get_by_id(
-            exp_issue.playthrough_ids[0])
+        playthrough = stats_models.PlaythroughModel.get(
+            exp_issue.playthrough_ids[0], strict=False)
         self.assertEqual(
             playthrough.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(playthrough.actions), 2)
@@ -1152,8 +1152,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             exp_issue.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(exp_issue.playthrough_ids), 1)
 
-        playthrough = stats_models.PlaythroughModel.get_by_id(
-            exp_issue.playthrough_ids[0])
+        playthrough = stats_models.PlaythroughModel.get(
+            exp_issue.playthrough_ids[0], strict=False)
         self.assertEqual(
             playthrough.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(playthrough.actions), 4)

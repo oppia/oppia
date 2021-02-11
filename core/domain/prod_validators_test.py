@@ -79,9 +79,12 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        self.model_instance_0 = exp_models.ExplorationModel.get_by_id('0')
-        self.model_instance_1 = exp_models.ExplorationModel.get_by_id('1')
-        self.model_instance_2 = exp_models.ExplorationModel.get_by_id('2')
+        self.model_instance_0 = exp_models.ExplorationModel.get(
+            '0', strict=False)
+        self.model_instance_1 = exp_models.ExplorationModel.get(
+            '1', strict=False)
+        self.model_instance_2 = exp_models.ExplorationModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob)
@@ -178,8 +181,8 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'title',
                 'new_value': 'New title'
             })], 'Changes.')
-        exp_models.ExplorationCommitLogEntryModel.get_by_id(
-            'exploration-0-1').delete()
+        exp_models.ExplorationCommitLogEntryModel.get(
+            'exploration-0-1', strict=False).delete()
 
         expected_output = [
             (
@@ -196,7 +199,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
-        exp_models.ExpSummaryModel.get_by_id('0').delete()
+        exp_models.ExpSummaryModel.get('0', strict=False).delete()
 
         expected_output = [
             (
@@ -210,8 +213,8 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_rights_model_failure(self):
-        exp_models.ExplorationRightsModel.get_by_id(
-            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get(
+            '0', strict=False).delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
             (
@@ -225,8 +228,8 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
+        exp_models.ExplorationSnapshotMetadataModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -239,8 +242,8 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        exp_models.ExplorationSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        exp_models.ExplorationSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -277,14 +280,14 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 exp_services.save_new_exploration(self.user_id, exp)
 
         self.model_instance_0 = (
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -359,7 +362,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -377,7 +380,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -453,7 +456,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 })], 'Changes.')
         self.process_and_flush_pending_tasks()
 
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, '', [])
 
         job_id = self.job_class.create_new()
@@ -505,14 +508,14 @@ class ExplorationSnapshotContentModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance_0 = (
-            exp_models.ExplorationSnapshotContentModel.get_by_id(
-                '0-1'))
+            exp_models.ExplorationSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            exp_models.ExplorationSnapshotContentModel.get_by_id(
-                '1-1'))
+            exp_models.ExplorationSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            exp_models.ExplorationSnapshotContentModel.get_by_id(
-                '2-1'))
+            exp_models.ExplorationSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -567,7 +570,8 @@ class ExplorationSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(self.owner_id, '', [])
+        exp_models.ExplorationModel.get(
+            '0', strict=False).delete(self.owner_id, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -640,9 +644,12 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
-        self.model_instance_0 = exp_models.ExplorationRightsModel.get_by_id('0')
-        self.model_instance_1 = exp_models.ExplorationRightsModel.get_by_id('1')
-        self.model_instance_2 = exp_models.ExplorationRightsModel.get_by_id('2')
+        self.model_instance_0 = exp_models.ExplorationRightsModel.get(
+            '0', strict=False)
+        self.model_instance_1 = exp_models.ExplorationRightsModel.get(
+            '1', strict=False)
+        self.model_instance_2 = exp_models.ExplorationRightsModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.ExplorationRightsModelAuditOneOffJob)
@@ -712,7 +719,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -743,7 +750,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
             self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for owner_user_ids '
@@ -756,7 +763,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        user_models.UserSettingsModel.get(self.editor_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for editor_user_ids '
@@ -770,7 +777,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
+        user_models.UserSettingsModel.get(self.viewer_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for viewer_user_ids '
@@ -784,8 +791,8 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
+        exp_models.ExplorationRightsSnapshotMetadataModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -800,8 +807,8 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        exp_models.ExplorationRightsSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -840,14 +847,14 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
                 exp_services.save_new_exploration(self.user_id, exp)
 
         self.model_instance_0 = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -918,7 +925,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_rights_model_failure(self):
-        exp_models.ExplorationRightsModel.get_by_id('0').delete(
+        exp_models.ExplorationRightsModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -936,7 +943,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -1026,14 +1033,14 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance_0 = (
-            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-                '0-1'))
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-                '1-1'))
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-                '2-1'))
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1082,7 +1089,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationRightsModel.get_by_id('0').delete(
+        exp_models.ExplorationRightsModel.get('0', strict=False).delete(
             self.owner_id, '', [])
         expected_output = [
             (
@@ -1154,14 +1161,14 @@ class ExplorationCommitLogEntryModelValidatorTests(
         self.rights_model_instance.put()
 
         self.model_instance_0 = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-1', strict=False))
         self.model_instance_1 = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-1-1'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-1-1', strict=False))
         self.model_instance_2 = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-2-1'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1237,7 +1244,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1254,7 +1261,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_rights_model_failure(self):
-        exp_models.ExplorationRightsModel.get_by_id('1').delete(
+        exp_models.ExplorationRightsModel.get('1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1462,9 +1469,12 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         rating_services.assign_rating_to_exploration(self.user_id, '0', 3)
         rating_services.assign_rating_to_exploration(self.viewer_id, '0', 4)
 
-        self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
-        self.model_instance_1 = exp_models.ExpSummaryModel.get_by_id('1')
-        self.model_instance_2 = exp_models.ExpSummaryModel.get_by_id('2')
+        self.model_instance_0 = exp_models.ExpSummaryModel.get(
+            '0', strict=False)
+        self.model_instance_1 = exp_models.ExpSummaryModel.get(
+            '1', strict=False)
+        self.model_instance_2 = exp_models.ExpSummaryModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob)
@@ -1501,9 +1511,9 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
-        exp_models.ExplorationModel.get_by_id('1').delete(
+        exp_models.ExplorationModel.get('1', strict=False).delete(
             self.owner_id, '')
-        exp_models.ExplorationModel.get_by_id('2').delete(
+        exp_models.ExplorationModel.get('2', strict=False).delete(
             self.owner_id, '')
         self.model_instance_1.delete()
         self.model_instance_2.delete()
@@ -1524,12 +1534,13 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             self):
         rights_manager.publish_exploration(self.owner, '0')
         rights_manager.publish_exploration(self.owner, '1')
-        self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
+        self.model_instance_0 = exp_models.ExpSummaryModel.get(
+            '0', strict=False)
         self.model_instance_0.first_published_msec = (
             self.model_instance_0.first_published_msec * 1000000.0)
         self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
-        rights_model = exp_models.ExplorationRightsModel.get_by_id('0')
+        rights_model = exp_models.ExplorationRightsModel.get('0', strict=False)
         rights_model.first_published_msec = (
             self.model_instance_0.first_published_msec)
         rights_model.commit(self.owner_id, '', [])
@@ -1546,7 +1557,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1562,7 +1573,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
             self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for owner_user_ids '
@@ -1575,7 +1586,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        user_models.UserSettingsModel.get(self.editor_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for editor_user_ids '
@@ -1589,7 +1600,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
+        user_models.UserSettingsModel.get(self.viewer_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for viewer_user_ids '
@@ -1603,7 +1614,8 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_contributor_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
+        user_models.UserSettingsModel.get(
+            self.contributor_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for contributor_user_ids '
@@ -1790,7 +1802,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('1').delete(
+        story_models.StoryModel.get('1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1804,7 +1816,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_exp_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('2').delete(
+        exp_models.ExplorationModel.get('2', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1888,11 +1900,11 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            subtopic_models.SubtopicPageModel.get_by_id('0-1'))
+            subtopic_models.SubtopicPageModel.get('0-1', strict=False))
         self.model_instance_1 = (
-            subtopic_models.SubtopicPageModel.get_by_id('1-1'))
+            subtopic_models.SubtopicPageModel.get('1-1', strict=False))
         self.model_instance_2 = (
-            subtopic_models.SubtopicPageModel.get_by_id('2-1'))
+            subtopic_models.SubtopicPageModel.get('2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob)
@@ -1972,7 +1984,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
-        topic_models.TopicModel.get_by_id('0').delete(
+        topic_models.TopicModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -1998,8 +2010,8 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 },
                 'old_value': {}
             })], 'Changes.')
-        subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
-            'subtopicpage-0-1-1').delete()
+        subtopic_models.SubtopicPageCommitLogEntryModel.get(
+            'subtopicpage-0-1-1', strict=False).delete()
 
         expected_output = [
             (
@@ -2016,8 +2028,8 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
-            '0-1-1').delete()
+        subtopic_models.SubtopicPageSnapshotMetadataModel.get(
+            '0-1-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -2030,8 +2042,8 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
-            '0-1-1').delete()
+        subtopic_models.SubtopicPageSnapshotContentModel.get(
+            '0-1-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -2121,14 +2133,14 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
-                '0-1-1'))
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get(
+                '0-1-1', strict=False))
         self.model_instance_1 = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
-                '1-1-1'))
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get(
+                '1-1-1', strict=False))
         self.model_instance_2 = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
-                '2-1-1'))
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get(
+                '2-1-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -2210,7 +2222,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get('0-1', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -2228,7 +2240,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -2357,14 +2369,14 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
-                '0-1-1'))
+            subtopic_models.SubtopicPageSnapshotContentModel.get(
+                '0-1-1', strict=False))
         self.model_instance_1 = (
-            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
-                '1-1-1'))
+            subtopic_models.SubtopicPageSnapshotContentModel.get(
+                '1-1-1', strict=False))
         self.model_instance_2 = (
-            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
-                '2-1-1'))
+            subtopic_models.SubtopicPageSnapshotContentModel.get(
+                '2-1-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -2424,7 +2436,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get('0-1', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -2538,14 +2550,14 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
-                'subtopicpage-0-1-1'))
+            subtopic_models.SubtopicPageCommitLogEntryModel.get(
+                'subtopicpage-0-1-1', strict=False))
         self.model_instance_1 = (
-            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
-                'subtopicpage-1-1-1'))
+            subtopic_models.SubtopicPageCommitLogEntryModel.get(
+                'subtopicpage-1-1-1', strict=False))
         self.model_instance_2 = (
-            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
-                'subtopicpage-2-1-1'))
+            subtopic_models.SubtopicPageCommitLogEntryModel.get(
+                'subtopicpage-2-1-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -2625,7 +2637,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get('0-1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (

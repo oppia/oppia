@@ -309,7 +309,8 @@ def delete_question(
 
     def delete_question_model(question_id, committer_id, force_deletion):
         """Inner function that is to be done in a transaction."""
-        question_model = question_models.QuestionModel.get_by_id(question_id)
+        question_model = question_models.QuestionModel.get(
+            question_id, strict=False)
         if question_model is not None:
             opportunity_services.increment_question_counts(
                 question_model.linked_skill_ids, -1)

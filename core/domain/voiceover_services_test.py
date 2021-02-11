@@ -140,8 +140,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             content='<p>content</p>',
             rejection_message=None).put()
         voiceover_application_model = (
-            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-                'application_id'))
+            suggestion_models.GeneralVoiceoverApplicationModel.get(
+                'application_id', strict=False))
         voiceover_application_model.target_type = 'invalid_type'
         voiceover_application_model.update_timestamps()
         voiceover_application_model.put()

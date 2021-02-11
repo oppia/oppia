@@ -578,9 +578,9 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
     if algorithm_ids_to_upgrade:
         for algorithm_id in algorithm_ids_to_upgrade:
             classifier_training_job = (
-                classifier_models.ClassifierTrainingJobModel.get_by_id(
+                classifier_models.ClassifierTrainingJobModel.get(
                     state_training_jobs_mapping.algorithm_ids_to_job_ids[
-                        algorithm_id]))
+                        algorithm_id], strict=False))
             classifier_training_job.algorithm_version = (
                 algorithm_id_to_algorithm_version[algorithm_id])
             classifier_training_job.next_scheduled_check_time = (

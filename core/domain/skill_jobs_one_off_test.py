@@ -293,18 +293,18 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             })], 'Changes.')
 
         self.commit_model_instance_0 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-skill_id-1'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-skill_id-1', strict=False))
         self.commit_model_instance_1 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-skill_id-2'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-skill_id-2', strict=False))
 
         self.metadata_model_instance_0 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                'skill_id-1'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                'skill_id-1', strict=False))
         self.metadata_model_instance_1 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                'skill_id-2'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                'skill_id-2', strict=False))
 
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -385,8 +385,8 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.commit_model_instance_0.commit_cmds, self.default_commit_cmd0)
         self.commit_model_instance_1 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-skill_id-2'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-skill_id-2', strict=False))
         self.assertEqual(
             self.commit_model_instance_1.commit_cmds,
             self.default_commit_cmd1)
@@ -416,8 +416,8 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.metadata_model_instance_0.commit_cmds,
             self.default_commit_cmd0)
         self.metadata_model_instance_1 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                'skill_id-2'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                'skill_id-2', strict=False))
         self.assertEqual(
             self.metadata_model_instance_1.commit_cmds,
             self.default_commit_cmd1)
@@ -450,14 +450,14 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         skill_services.save_new_skill(self.albert_id, skill)
 
         self.commit_model_instance = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-skill_id-1'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-skill_id-1', strict=False))
         self.metadata_model_instance = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                'skill_id-1'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                'skill_id-1', strict=False))
         self.content_model_instance = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                'skill_id-1'))
+            skill_models.SkillSnapshotContentModel.get(
+                'skill_id-1', strict=False))
 
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -504,7 +504,7 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_migration_job_removes_sub_models_if_skill_model_is_missing(
             self):
-        skill = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        skill = skill_models.SkillModel.get(self.SKILL_ID)
         skill.deleted = True
         skill.update_timestamps(update_last_updated_time=False)
         base_models.BaseModel.put_multi([skill])
@@ -526,14 +526,14 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             ]
         ]
         self.commit_model_instance = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-skill_id-1'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-skill_id-1', strict=False))
         self.metadata_model_instance = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                'skill_id-1'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                'skill_id-1', strict=False))
         self.content_model_instance = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                'skill_id-1'))
+            skill_models.SkillSnapshotContentModel.get(
+                'skill_id-1', strict=False))
 
         self.assertItemsEqual(output, expected_output)
         self.assertIsNone(self.commit_model_instance)

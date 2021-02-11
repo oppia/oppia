@@ -208,8 +208,8 @@ class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
             stats_models.ExplorationIssuesModel.get_entity_id(
                 self.exp.id, self.exp.version)
         )
-        exp_issues = stats_models.ExplorationIssuesModel.get_by_id(
-            exp_issues_id)
+        exp_issues = stats_models.ExplorationIssuesModel.get(
+            exp_issues_id, strict=False)
 
         exp_issues.delete()
         expected_output = [

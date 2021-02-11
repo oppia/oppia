@@ -74,9 +74,12 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
 
-        self.model_instance_0 = collection_models.CollectionModel.get_by_id('0')
-        self.model_instance_1 = collection_models.CollectionModel.get_by_id('1')
-        self.model_instance_2 = collection_models.CollectionModel.get_by_id('2')
+        self.model_instance_0 = collection_models.CollectionModel.get(
+            '0', strict=False)
+        self.model_instance_1 = collection_models.CollectionModel.get(
+            '1', strict=False)
+        self.model_instance_2 = collection_models.CollectionModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.CollectionModelAuditOneOffJob)
@@ -182,7 +185,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('1').delete(
+        exp_models.ExplorationModel.get('1', strict=False).delete(
             self.owner_id, '', [])
         expected_output = [
             (
@@ -203,8 +206,8 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'title',
                 'new_value': 'New title'
             }], 'Changes.')
-        collection_models.CollectionCommitLogEntryModel.get_by_id(
-            'collection-0-1').delete()
+        collection_models.CollectionCommitLogEntryModel.get(
+            'collection-0-1', strict=False).delete()
 
         expected_output = [
             (
@@ -220,7 +223,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
-        collection_models.CollectionSummaryModel.get_by_id('0').delete()
+        collection_models.CollectionSummaryModel.get('0', strict=False).delete()
 
         expected_output = [
             (
@@ -234,8 +237,8 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_rights_model_failure(self):
-        collection_models.CollectionRightsModel.get_by_id(
-            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get(
+            '0', strict=False).delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
             (
@@ -249,8 +252,8 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        collection_models.CollectionSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
+        collection_models.CollectionSnapshotMetadataModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -263,8 +266,8 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        collection_models.CollectionSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        collection_models.CollectionSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -316,14 +319,14 @@ class CollectionSnapshotMetadataModelValidatorTests(
                     self.user_id, collection)
 
         self.model_instance_0 = (
-            collection_models.CollectionSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            collection_models.CollectionSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            collection_models.CollectionSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            collection_models.CollectionSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            collection_models.CollectionSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            collection_models.CollectionSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -400,7 +403,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get_by_id('0').delete(
+        collection_models.CollectionModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -418,7 +421,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -516,14 +519,14 @@ class CollectionSnapshotContentModelValidatorTests(
             collection_services.save_new_collection(self.owner_id, collection)
 
         self.model_instance_0 = (
-            collection_models.CollectionSnapshotContentModel.get_by_id(
-                '0-1'))
+            collection_models.CollectionSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            collection_models.CollectionSnapshotContentModel.get_by_id(
-                '1-1'))
+            collection_models.CollectionSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            collection_models.CollectionSnapshotContentModel.get_by_id(
-                '2-1'))
+            collection_models.CollectionSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -578,7 +581,7 @@ class CollectionSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get_by_id('0').delete(
+        collection_models.CollectionModel.get('0', strict=False).delete(
             self.owner_id, '', [])
         expected_output = [
             (
@@ -665,11 +668,11 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
-            collection_models.CollectionRightsModel.get_by_id('0'))
+            collection_models.CollectionRightsModel.get('0', strict=False))
         self.model_instance_1 = (
-            collection_models.CollectionRightsModel.get_by_id('1'))
+            collection_models.CollectionRightsModel.get('1', strict=False))
         self.model_instance_2 = (
-            collection_models.CollectionRightsModel.get_by_id('2'))
+            collection_models.CollectionRightsModel.get('2', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off.CollectionRightsModelAuditOneOffJob)
@@ -739,7 +742,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get_by_id('0').delete(
+        collection_models.CollectionModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -755,7 +758,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
             self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for owner_user_ids '
@@ -768,7 +771,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        user_models.UserSettingsModel.get(self.editor_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for editor_user_ids '
@@ -782,7 +785,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
+        user_models.UserSettingsModel.get(self.viewer_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for viewer_user_ids '
@@ -796,8 +799,8 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
+        collection_models.CollectionRightsSnapshotMetadataModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -812,8 +815,8 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        collection_models.CollectionRightsSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        collection_models.CollectionRightsSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -867,14 +870,14 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
                     self.user_id, collection)
 
         self.model_instance_0 = (
-            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            collection_models.CollectionRightsSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            collection_models.CollectionRightsSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            collection_models.CollectionRightsSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -945,7 +948,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_rights_model_failure(self):
-        collection_models.CollectionRightsModel.get_by_id('0').delete(
+        collection_models.CollectionRightsModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -963,7 +966,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -1066,14 +1069,14 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             collection_services.save_new_collection(self.owner_id, collection)
 
         self.model_instance_0 = (
-            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
-                '0-1'))
+            collection_models.CollectionRightsSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
-                '1-1'))
+            collection_models.CollectionRightsSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
-                '2-1'))
+            collection_models.CollectionRightsSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1122,7 +1125,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionRightsModel.get_by_id('0').delete(
+        collection_models.CollectionRightsModel.get('0', strict=False).delete(
             self.owner_id, '', [])
         expected_output = [
             (
@@ -1205,14 +1208,14 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.rights_model_instance.put()
 
         self.model_instance_0 = (
-            collection_models.CollectionCommitLogEntryModel.get_by_id(
-                'collection-0-1'))
+            collection_models.CollectionCommitLogEntryModel.get(
+                'collection-0-1', strict=False))
         self.model_instance_1 = (
-            collection_models.CollectionCommitLogEntryModel.get_by_id(
-                'collection-1-1'))
+            collection_models.CollectionCommitLogEntryModel.get(
+                'collection-1-1', strict=False))
         self.model_instance_2 = (
-            collection_models.CollectionCommitLogEntryModel.get_by_id(
-                'collection-2-1'))
+            collection_models.CollectionCommitLogEntryModel.get(
+                'collection-2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1288,7 +1291,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get_by_id('0').delete(
+        collection_models.CollectionModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1304,7 +1307,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, literal_eval=True)
 
     def test_missing_collection_rights_model_failure(self):
-        collection_models.CollectionRightsModel.get_by_id('1').delete(
+        collection_models.CollectionRightsModel.get('1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1521,14 +1524,14 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
-            collection_models.CollectionSummaryModel.get_by_id('0'))
+            collection_models.CollectionSummaryModel.get('0', strict=False))
         self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         self.model_instance_1 = (
-            collection_models.CollectionSummaryModel.get_by_id('1'))
+            collection_models.CollectionSummaryModel.get('1', strict=False))
         self.model_instance_2 = (
-            collection_models.CollectionSummaryModel.get_by_id('2'))
+            collection_models.CollectionSummaryModel.get('2', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob)
@@ -1581,7 +1584,8 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_model = collection_models.CollectionModel.get_by_id('0')
+        collection_model = collection_models.CollectionModel.get(
+            '0', strict=False)
         collection_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.collection_model_last_updated = (
             collection_model.last_updated)
@@ -1601,7 +1605,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
             self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for owner_user_ids '
@@ -1614,7 +1618,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        user_models.UserSettingsModel.get(self.editor_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for editor_user_ids '
@@ -1628,7 +1632,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
+        user_models.UserSettingsModel.get(self.viewer_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for viewer_user_ids '
@@ -1642,7 +1646,8 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_contributor_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
+        user_models.UserSettingsModel.get(
+            self.contributor_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for contributor_user_ids '

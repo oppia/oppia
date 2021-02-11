@@ -66,7 +66,7 @@ def get_pending_deletion_request(user_id):
         PendingDeletionRequest. The pending deletion request domain object.
     """
     pending_deletion_request_model = (
-        user_models.PendingDeletionRequestModel.get_by_id(user_id))
+        user_models.PendingDeletionRequestModel.get(user_id, strict=False))
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,

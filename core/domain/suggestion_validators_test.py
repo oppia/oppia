@@ -83,7 +83,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
             self.admin_id, change, score_category, self.thread_id, None)
         self.model_instance = (
-            suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_id))
+            suggestion_models.GeneralSuggestionModel.get(
+                self.thread_id, strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob)
@@ -170,7 +171,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -183,8 +184,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_feedback_thread_model_failure(self):
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id).delete()
+        feedback_models.GeneralFeedbackThreadModel.get(
+            self.thread_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for feedback_thread_ids field '
@@ -197,7 +198,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        user_models.UserSettingsModel.get(self.owner_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for author_ids field '
@@ -210,7 +211,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_reviewer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        user_models.UserSettingsModel.get(self.admin_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for reviewer_ids field '
@@ -224,8 +225,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_bot_as_final_reviewer_does_not_fail_reviewer_id_validation(self):
         self.assertEqual(
-            user_models.UserSettingsModel.get_by_id(
-                feconf.SUGGESTION_BOT_USER_ID), None)
+            user_models.UserSettingsModel.get(
+                feconf.SUGGESTION_BOT_USER_ID, strict=False), None)
 
         self.model_instance.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
         self.model_instance.update_timestamps()
@@ -384,7 +385,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
             self.admin_id, change, score_category, thread_id, 'en')
         model_instance = (
-            suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
+            suggestion_models.GeneralSuggestionModel.get(
+                thread_id, strict=False))
         expected_output = [(
             u'[u\'failed validation check for score category check of '
             'GeneralSuggestionModel\', [u\'Entity id %s: Score category'
@@ -425,8 +427,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
             content='<p>Text to voiceover</p>',
             rejection_message=None).put()
         self.model_instance = (
-            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-                'valid_id'))
+            suggestion_models.GeneralVoiceoverApplicationModel.get(
+                'valid_id', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -492,7 +494,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -505,7 +507,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        user_models.UserSettingsModel.get(self.owner_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for author_ids field '
@@ -545,7 +547,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_reviewer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        user_models.UserSettingsModel.get(self.admin_id, strict=False).delete()
         expected_output = [
             (
                 '[u\'failed validation check for final_reviewer_ids field '

@@ -49,7 +49,8 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
+        admin_model = user_models.UserSettingsModel.get(
+            self.admin_id, strict=False)
         admin_model.role = feconf.ROLE_ID_ADMIN
         admin_model.update_timestamps()
         admin_model.put()
@@ -145,7 +146,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
+        admin_model = user_models.UserSettingsModel.get(
+            self.admin_id, strict=False)
         admin_model.role = feconf.ROLE_ID_ADMIN
         admin_model.update_timestamps()
         admin_model.put()

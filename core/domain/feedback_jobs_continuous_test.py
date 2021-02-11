@@ -332,8 +332,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
-            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                thread_id_1)
+            thread = feedback_models.GeneralFeedbackThreadModel.get(
+                thread_id_1, strict=False)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.update_timestamps()
             thread.put()
@@ -374,8 +374,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
-            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                thread_id_1)
+            thread = feedback_models.GeneralFeedbackThreadModel.get(
+                thread_id_1, strict=False)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.update_timestamps()
             thread.put()
@@ -394,8 +394,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Reopen thread.
-            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                thread_id_1)
+            thread = feedback_models.GeneralFeedbackThreadModel.get(
+                thread_id_1, strict=False)
             thread.status = feedback_models.STATUS_CHOICES_OPEN
             thread.update_timestamps()
             thread.put()
@@ -435,8 +435,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
-            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                thread_id_1)
+            thread = feedback_models.GeneralFeedbackThreadModel.get(
+                thread_id_1, strict=False)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.update_timestamps()
             thread.put()
@@ -455,8 +455,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Change thread status.
-            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                thread_id_1)
+            thread = feedback_models.GeneralFeedbackThreadModel.get(
+                thread_id_1, strict=False)
             thread.status = feedback_models.STATUS_CHOICES_IGNORED
             thread.update_timestamps()
             thread.put()

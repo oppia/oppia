@@ -156,7 +156,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         new_topic_id = topic_services.get_new_topic_id()
 
         self.assertEqual(len(new_topic_id), 12)
-        self.assertEqual(topic_models.TopicModel.get_by_id(new_topic_id), None)
+        self.assertEqual(topic_models.TopicModel.get(
+            new_topic_id, strict=False), None)
 
     def test_get_topic_from_model(self):
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)

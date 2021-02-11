@@ -112,7 +112,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         new_story_id = story_services.get_new_story_id()
 
         self.assertEqual(len(new_story_id), 12)
-        self.assertEqual(story_models.StoryModel.get_by_id(new_story_id), None)
+        self.assertEqual(story_models.StoryModel.get(
+            new_story_id, strict=False), None)
 
     def test_commit_log_entry(self):
         story_commit_log_entry = (

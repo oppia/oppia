@@ -764,7 +764,7 @@ def get_thread(thread_id):
         FeedbackThread. The resulting FeedbackThread domain object.
     """
     return _get_thread_from_model(
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+        feedback_models.GeneralFeedbackThreadModel.get(thread_id, strict=False))
 
 
 def get_closed_threads(entity_type, entity_id, has_suggestion):
@@ -1136,7 +1136,8 @@ def _add_message_to_email_buffer(
         old_status: str. One of STATUS_CHOICES. Value of old thread status.
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
     """
-    thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+    thread = feedback_models.GeneralFeedbackThreadModel.get(
+        thread_id, strict=False)
     exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
     feedback_message_reference = feedback_domain.FeedbackMessageReference(

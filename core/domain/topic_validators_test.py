@@ -119,9 +119,9 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
 
-        self.model_instance_0 = topic_models.TopicModel.get_by_id('0')
-        self.model_instance_1 = topic_models.TopicModel.get_by_id('1')
-        self.model_instance_2 = topic_models.TopicModel.get_by_id('2')
+        self.model_instance_0 = topic_models.TopicModel.get('0', strict=False)
+        self.model_instance_1 = topic_models.TopicModel.get('1', strict=False)
+        self.model_instance_2 = topic_models.TopicModel.get('2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.TopicModelAuditOneOffJob)
@@ -223,7 +223,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('1').delete(
+        story_models.StoryModel.get('1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -238,7 +238,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('1').delete(
+        skill_models.SkillModel.get('1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -253,7 +253,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get('0-1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -275,8 +275,8 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'new description',
                 'old_value': None
             })], 'Changes.')
-        topic_models.TopicCommitLogEntryModel.get_by_id(
-            'topic-0-1').delete()
+        topic_models.TopicCommitLogEntryModel.get(
+            'topic-0-1', strict=False).delete()
 
         expected_output = [
             (
@@ -292,7 +292,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
-        topic_models.TopicSummaryModel.get_by_id('0').delete()
+        topic_models.TopicSummaryModel.get('0', strict=False).delete()
 
         expected_output = [
             (
@@ -306,8 +306,8 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_rights_model_failure(self):
-        topic_models.TopicRightsModel.get_by_id(
-            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+        topic_models.TopicRightsModel.get(
+            '0', strict=False).delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
             (
@@ -321,8 +321,8 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        topic_models.TopicSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
+        topic_models.TopicSnapshotMetadataModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -335,8 +335,8 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        topic_models.TopicSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        topic_models.TopicSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -451,14 +451,14 @@ class TopicSnapshotMetadataModelValidatorTests(
                 topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
-            topic_models.TopicSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            topic_models.TopicSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            topic_models.TopicSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            topic_models.TopicSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            topic_models.TopicSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            topic_models.TopicSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -534,7 +534,7 @@ class TopicSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
-        topic_models.TopicModel.get_by_id('0').delete(
+        topic_models.TopicModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -552,7 +552,7 @@ class TopicSnapshotMetadataModelValidatorTests(
             expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -672,14 +672,14 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
-            topic_models.TopicSnapshotContentModel.get_by_id(
-                '0-1'))
+            topic_models.TopicSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            topic_models.TopicSnapshotContentModel.get_by_id(
-                '1-1'))
+            topic_models.TopicSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            topic_models.TopicSnapshotContentModel.get_by_id(
-                '2-1'))
+            topic_models.TopicSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -735,7 +735,8 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
-        topic_models.TopicModel.get_by_id('0').delete(self.owner_id, '', [])
+        topic_models.TopicModel.get(
+            '0', strict=False).delete(self.owner_id, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for topic_ids '
@@ -862,9 +863,12 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
         topic_services.assign_role(
             self.admin, self.manager2, topic_domain.ROLE_MANAGER, '1')
 
-        self.model_instance_0 = topic_models.TopicRightsModel.get_by_id('0')
-        self.model_instance_1 = topic_models.TopicRightsModel.get_by_id('1')
-        self.model_instance_2 = topic_models.TopicRightsModel.get_by_id('2')
+        self.model_instance_0 = topic_models.TopicRightsModel.get(
+            '0', strict=False)
+        self.model_instance_1 = topic_models.TopicRightsModel.get(
+            '1', strict=False)
+        self.model_instance_2 = topic_models.TopicRightsModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.TopicRightsModelAuditOneOffJob)
@@ -914,7 +918,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
-        topic_models.TopicModel.get_by_id('0').delete(
+        topic_models.TopicModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -928,7 +932,8 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_manager_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
+        user_models.UserSettingsModel.get(
+            self.manager1_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for manager_user_ids '
@@ -942,7 +947,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
+        topic_models.TopicRightsSnapshotMetadataModel.get(
             '0-1').delete()
         expected_output = [
             (
@@ -958,8 +963,8 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        topic_models.TopicRightsSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        topic_models.TopicRightsSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -1050,14 +1055,14 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            topic_models.TopicRightsSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            topic_models.TopicRightsSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            topic_models.TopicRightsSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1126,7 +1131,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_rights_model_failure(self):
-        topic_models.TopicRightsModel.get_by_id('0').delete(
+        topic_models.TopicRightsModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -1144,7 +1149,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -1284,14 +1289,14 @@ class TopicRightsSnapshotContentModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.TopicRightsSnapshotContentModel.get_by_id(
-                '0-1'))
+            topic_models.TopicRightsSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            topic_models.TopicRightsSnapshotContentModel.get_by_id(
-                '1-1'))
+            topic_models.TopicRightsSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            topic_models.TopicRightsSnapshotContentModel.get_by_id(
-                '2-1'))
+            topic_models.TopicRightsSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1340,7 +1345,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
-        topic_models.TopicRightsModel.get_by_id('0').delete(
+        topic_models.TopicRightsModel.get('0', strict=False).delete(
             self.owner_id, '', [])
         expected_output = [
             (
@@ -1439,23 +1444,23 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
-            topic_models.TopicCommitLogEntryModel.get_by_id(
-                'topic-0-1'))
+            topic_models.TopicCommitLogEntryModel.get(
+                'topic-0-1', strict=False))
         self.model_instance_1 = (
-            topic_models.TopicCommitLogEntryModel.get_by_id(
-                'topic-1-1'))
+            topic_models.TopicCommitLogEntryModel.get(
+                'topic-1-1', strict=False))
         self.model_instance_2 = (
-            topic_models.TopicCommitLogEntryModel.get_by_id(
-                'topic-2-1'))
+            topic_models.TopicCommitLogEntryModel.get(
+                'topic-2-1', strict=False))
         self.rights_model_instance_0 = (
-            topic_models.TopicCommitLogEntryModel.get_by_id(
-                'rights-0-1'))
+            topic_models.TopicCommitLogEntryModel.get(
+                'rights-0-1', strict=False))
         self.rights_model_instance_1 = (
-            topic_models.TopicCommitLogEntryModel.get_by_id(
-                'rights-1-1'))
+            topic_models.TopicCommitLogEntryModel.get(
+                'rights-1-1', strict=False))
         self.rights_model_instance_2 = (
-            topic_models.TopicCommitLogEntryModel.get_by_id(
-                'rights-2-1'))
+            topic_models.TopicCommitLogEntryModel.get(
+                'rights-2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1534,7 +1539,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
-        topic_models.TopicModel.get_by_id('0').delete(
+        topic_models.TopicModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1553,7 +1558,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=True)
 
     def test_missing_topic_rights_model_failure(self):
-        topic_models.TopicRightsModel.get_by_id('0').delete(
+        topic_models.TopicRightsModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1783,9 +1788,12 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
 
-        self.model_instance_0 = topic_models.TopicSummaryModel.get_by_id('0')
-        self.model_instance_1 = topic_models.TopicSummaryModel.get_by_id('1')
-        self.model_instance_2 = topic_models.TopicSummaryModel.get_by_id('2')
+        self.model_instance_0 = topic_models.TopicSummaryModel.get(
+            '0', strict=False)
+        self.model_instance_1 = topic_models.TopicSummaryModel.get(
+            '1', strict=False)
+        self.model_instance_2 = topic_models.TopicSummaryModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob)
@@ -1838,7 +1846,7 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
-        topic_model = topic_models.TopicModel.get_by_id('0')
+        topic_model = topic_models.TopicModel.get('0', strict=False)
         topic_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.topic_model_last_updated = (
             topic_model.last_updated)

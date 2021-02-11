@@ -175,8 +175,8 @@ class DeleteAllExplorationRecommendationsOneOffJobTests(
         self.assertItemsEqual([['DELETED', 1]], output)
 
         self.assertIsNone(
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                self.RECOMMENDATION_1_ID))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.RECOMMENDATION_1_ID, strict=False))
 
     def test_delete_multiple_explorations_recommendations_is_successful(self):
         recommendations_models.ExplorationRecommendationsModel(
@@ -196,14 +196,14 @@ class DeleteAllExplorationRecommendationsOneOffJobTests(
         self.assertItemsEqual([['DELETED', 3]], output)
 
         self.assertIsNone(
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                self.RECOMMENDATION_1_ID))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.RECOMMENDATION_1_ID, strict=False))
         self.assertIsNone(
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                self.RECOMMENDATION_2_ID))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.RECOMMENDATION_2_ID, strict=False))
         self.assertIsNone(
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                self.RECOMMENDATION_3_ID))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.RECOMMENDATION_3_ID, strict=False))
 
 
 class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
@@ -242,20 +242,20 @@ class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
         self.assertEqual(output, [])
 
         recommendation_model = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '0', strict=False))
         self.assertEqual(
             recommendation_model.recommended_exploration_ids, ['1', '2'])
 
     def test_migration_job_skips_deleted_model(self):
         recommendation_model = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '0', strict=False))
         recommendation_model.deleted = True
         recommendation_model.update_timestamps()
         recommendation_model.put()
 
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, 'Delete')
         job_id = (
             recommendations_jobs_one_off
@@ -272,12 +272,12 @@ class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
 
     def test_job_deletes_model_if_exp_model_is_deleted(self):
         recommendation_model = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '0', strict=False))
         self.assertEqual(
             recommendation_model.recommended_exploration_ids, ['1', '2'])
 
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, 'Delete')
         job_id = (
             recommendations_jobs_one_off
@@ -294,17 +294,17 @@ class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
             output, ['[u\'Removed recommendation model\', [u\'0\']]'])
 
         self.assertIsNone(
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '0', strict=False))
 
     def test_job_removes_deleted_exp_ids_from_recommendation_list(self):
         recommendation_model = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '0', strict=False))
         self.assertEqual(
             recommendation_model.recommended_exploration_ids, ['1', '2'])
 
-        exp_models.ExplorationModel.get_by_id('1').delete(
+        exp_models.ExplorationModel.get('1', strict=False).delete(
             self.user_id, 'Delete')
         job_id = (
             recommendations_jobs_one_off
@@ -322,7 +322,7 @@ class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
             ['[u\'Removed deleted exp ids from recommendations\', [u\'0\']]'])
 
         recommendation_model = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '0', strict=False))
         self.assertEqual(
             recommendation_model.recommended_exploration_ids, ['2'])

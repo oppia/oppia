@@ -859,7 +859,8 @@ class CleanUpCollectionProgressModelOneOffJob(
             return
 
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(item.user_id))
+            user_models.CompletedActivitiesModel.get(
+                item.user_id, strict=False))
 
         if completed_activities_model is None:
             completed_activities_model = (
@@ -883,8 +884,8 @@ class CleanUpCollectionProgressModelOneOffJob(
                     'Added missing exp ids in CompletedActivitiesModel',
                     item.id)
 
-        col_model = collection_models.CollectionModel.get_by_id(
-            item.collection_id)
+        col_model = collection_models.CollectionModel.get(
+            item.collection_id, strict=False)
 
         collection_node_ids = [
             node['exploration_id'] for node in (

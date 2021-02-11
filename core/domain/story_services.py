@@ -752,7 +752,7 @@ def save_story_summary(story_summary):
     }
 
     story_summary_model = (
-        story_models.StorySummaryModel.get_by_id(story_summary.id))
+        story_models.StorySummaryModel.get(story_summary.id, strict=False))
     if story_summary_model is not None:
         story_summary_model.populate(**story_summary_dict)
         story_summary_model.update_timestamps()

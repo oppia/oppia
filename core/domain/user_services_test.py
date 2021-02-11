@@ -331,7 +331,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         email = 'user@example.com'
         user_id = 'user_id'
         user_id = user_services.create_new_user(auth_id, email).user_id
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings_model = user_models.UserSettingsModel.get(
+            user_id, strict=False)
         user_settings = user_services.get_user_settings_by_auth_id(auth_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
@@ -344,8 +345,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         auth_id = 'auth_id'
         email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, email).user_id
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            user_id)
+        user_settings_model = user_models.UserSettingsModel.get(
+            user_id, strict=False)
         user_settings = (
             user_services.get_user_settings_by_auth_id(auth_id, strict=True))
         self.assertEqual(user_settings_model.id, user_settings.user_id)
@@ -1021,12 +1022,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_auth_details = auth_models.UserAuthDetailsModel.get_by_id(user_id)
+        user_auth_details = auth_models.UserAuthDetailsModel.get(
+            user_id, strict=False)
         self.assertFalse(user_auth_details.deleted)
 
         user_services.mark_user_for_deletion(user_id)
 
-        user_auth_details = auth_models.UserAuthDetailsModel.get_by_id(user_id)
+        user_auth_details = auth_models.UserAuthDetailsModel.get(
+            user_id, strict=False)
         self.assertTrue(user_auth_details.deleted)
 
     def test_mark_user_for_deletion_deletes_user_identifiers_entry(self):
@@ -1964,14 +1967,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_settings = user_services.create_new_user(
             'auth_id', 'user@example.com')
 
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            user_settings.user_id)
+        user_settings_model = user_models.UserSettingsModel.get(
+            user_settings.user_id, strict=False)
         time_of_creation = user_settings_model.created_on
 
         user_services.update_user_bio(user_settings.user_id, 'New bio.')
 
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            user_settings.user_id)
+        user_settings_model = user_models.UserSettingsModel.get(
+            user_settings.user_id, strict=False)
         self.assertEqual(user_settings_model.created_on, time_of_creation)
 
 
@@ -2711,15 +2714,15 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
         user_services.remove_question_review_rights(self.translator_id)
 
-        right_model = user_models.UserContributionRightsModel.get_by_id(
-            self.translator_id)
+        right_model = user_models.UserContributionRightsModel.get(
+            self.translator_id, strict=False)
         self.assertFalse(right_model is None)
 
         user_services.remove_translation_review_rights_in_language(
             self.translator_id, 'hi')
 
-        right_model = user_models.UserContributionRightsModel.get_by_id(
-            self.translator_id)
+        right_model = user_models.UserContributionRightsModel.get(
+            self.translator_id, strict=False)
         self.assertTrue(right_model is None)
 
     def test_get_question_reviewer_usernames_with_lanaguge_code_raise_error(

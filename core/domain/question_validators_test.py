@@ -86,9 +86,12 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
             question_services.create_new_question(
                 self.owner_id, question, 'test question')
 
-        self.model_instance_0 = question_models.QuestionModel.get_by_id('0')
-        self.model_instance_1 = question_models.QuestionModel.get_by_id('1')
-        self.model_instance_2 = question_models.QuestionModel.get_by_id('2')
+        self.model_instance_0 = question_models.QuestionModel.get(
+            '0', strict=False)
+        self.model_instance_1 = question_models.QuestionModel.get(
+            '1', strict=False)
+        self.model_instance_2 = question_models.QuestionModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.QuestionModelAuditOneOffJob)
@@ -163,7 +166,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_linked_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('111111111111').delete(
+        skill_models.SkillModel.get('111111111111', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -184,8 +187,8 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'en',
                 'old_value': 'ar'
             })], 'Changes.')
-        question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-0-1').delete()
+        question_models.QuestionCommitLogEntryModel.get(
+            'question-0-1', strict=False).delete()
 
         expected_output = [
             (
@@ -201,7 +204,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
-        question_models.QuestionSummaryModel.get_by_id('0').delete()
+        question_models.QuestionSummaryModel.get('0', strict=False).delete()
 
         expected_output = [
             (
@@ -215,8 +218,8 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
+        question_models.QuestionSnapshotMetadataModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -229,8 +232,8 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        question_models.QuestionSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        question_models.QuestionSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -388,7 +391,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('2').delete(
+        skill_models.SkillModel.get('2', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -402,7 +405,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
-        question_models.QuestionModel.get_by_id('0').delete(
+        question_models.QuestionModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -474,14 +477,14 @@ class QuestionSnapshotMetadataModelValidatorTests(
                     self.owner_id, question, 'test question')
 
         self.model_instance_0 = (
-            question_models.QuestionSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            question_models.QuestionSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            question_models.QuestionSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            question_models.QuestionSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            question_models.QuestionSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            question_models.QuestionSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -559,7 +562,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
-        question_models.QuestionModel.get_by_id('0').delete(
+        question_models.QuestionModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -577,7 +580,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
             expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -681,14 +684,14 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.owner_id, question, 'test question')
 
         self.model_instance_0 = (
-            question_models.QuestionSnapshotContentModel.get_by_id(
-                '0-1'))
+            question_models.QuestionSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            question_models.QuestionSnapshotContentModel.get_by_id(
-                '1-1'))
+            question_models.QuestionSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            question_models.QuestionSnapshotContentModel.get_by_id(
-                '2-1'))
+            question_models.QuestionSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -744,7 +747,7 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
-        question_models.QuestionModel.get_by_id('0').delete(
+        question_models.QuestionModel.get('0', strict=False).delete(
             self.owner_id, '', [])
         expected_output = [
             (
@@ -818,14 +821,14 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.owner_id, question, 'test question')
 
         self.model_instance_0 = (
-            question_models.QuestionCommitLogEntryModel.get_by_id(
-                'question-0-1'))
+            question_models.QuestionCommitLogEntryModel.get(
+                'question-0-1', strict=False))
         self.model_instance_1 = (
-            question_models.QuestionCommitLogEntryModel.get_by_id(
-                'question-1-1'))
+            question_models.QuestionCommitLogEntryModel.get(
+                'question-1-1', strict=False))
         self.model_instance_2 = (
-            question_models.QuestionCommitLogEntryModel.get_by_id(
-                'question-2-1'))
+            question_models.QuestionCommitLogEntryModel.get(
+                'question-2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -901,7 +904,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
-        question_models.QuestionModel.get_by_id('0').delete(
+        question_models.QuestionModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1078,12 +1081,12 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             question_services.create_new_question(
                 self.owner_id, question, 'test question')
 
-        self.model_instance_0 = question_models.QuestionSummaryModel.get_by_id(
-            '0')
-        self.model_instance_1 = question_models.QuestionSummaryModel.get_by_id(
-            '1')
-        self.model_instance_2 = question_models.QuestionSummaryModel.get_by_id(
-            '2')
+        self.model_instance_0 = question_models.QuestionSummaryModel.get(
+            '0', strict=False)
+        self.model_instance_1 = question_models.QuestionSummaryModel.get(
+            '1', strict=False)
+        self.model_instance_2 = question_models.QuestionSummaryModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob)
@@ -1136,7 +1139,7 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
-        question_model = question_models.QuestionModel.get_by_id('0')
+        question_model = question_models.QuestionModel.get('0', strict=False)
         question_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.question_model_last_updated = (
             question_model.last_updated)

@@ -1178,7 +1178,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'last_updated_msec': utils.get_time_in_millisecs(
                     feedback_models.
                     GeneralFeedbackThreadModel.
-                    get_by_id(thread_id).last_updated)
+                    get(thread_id, strict=False).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {

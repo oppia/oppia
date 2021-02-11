@@ -161,8 +161,8 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         reconstituted_rights_model = (
             collection_models.CollectionRightsModel(**content_dict))
         snapshot_metadata_model = (
-            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
-                snapshot_content_model.id))
+            collection_models.CollectionRightsSnapshotMetadataModel.get(
+                snapshot_content_model.id, strict=False))
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(reconstituted_rights_model.owner_ids) |
             set(reconstituted_rights_model.editor_ids) |
@@ -183,8 +183,8 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         reconstituted_rights_model = (
             exp_models.ExplorationRightsModel(**content_dict))
         snapshot_metadata_model = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                snapshot_content_model.id))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                snapshot_content_model.id, strict=False))
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(reconstituted_rights_model.owner_ids) |
             set(reconstituted_rights_model.editor_ids) |
@@ -202,8 +202,8 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **snapshot_content_model.content)
         snapshot_metadata_model = (
-            topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
-                snapshot_content_model.id))
+            topic_models.TopicRightsSnapshotMetadataModel.get(
+                snapshot_content_model.id, strict=False))
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             reconstituted_rights_model.manager_ids)))
         snapshot_metadata_model.update_timestamps(
@@ -438,10 +438,10 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
         commit_log_id = (
             model_properties['id_string_format'] % (model_id, version))
         parent_model_class = (
-            model_properties['parent_model_class'].get_by_id(model_id))
+            model_properties['parent_model_class'].get(model_id, strict=False))
         commit_log_model_class = (
-            model_properties['commit_log_model_class'].get_by_id(
-                commit_log_id))
+            model_properties['commit_log_model_class'].get(
+                commit_log_id, strict=False))
         if class_name in job_class.MODEL_NAMES_WITH_PARTIAL_COMMIT_LOGS:
             if snapshot_model.commit_type in ['create', 'delete']:
                 missing_commit_log_msg = (
@@ -534,12 +534,12 @@ class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         commit_log_id = (
             model_properties['id_string_format'] % (model_id, version))
         commit_log_model = (
-            model_properties['commit_log_model_class'].get_by_id(
-                commit_log_id))
+            model_properties['commit_log_model_class'].get(
+                commit_log_id, strict=False))
         commit_logs_should_exist = True
 
         parent_model = (
-            model_properties['parent_model_class'].get_by_id(model_id))
+            model_properties['parent_model_class'].get(model_id, strict=False))
         if model_class_name == 'ExplorationRightsSnapshotMetadataModel':
             if snapshot_model.commit_type in ['create', 'delete']:
                 commit_logs_should_exist = False

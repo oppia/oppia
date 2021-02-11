@@ -1665,8 +1665,8 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
             content='<p>content</p>',
             rejection_message=None).put()
         self.voiceover_application_model = (
-            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-                'application_id'))
+            suggestion_models.GeneralVoiceoverApplicationModel.get(
+                'application_id', strict=False))
 
     def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
             self):

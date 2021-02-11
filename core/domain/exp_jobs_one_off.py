@@ -596,8 +596,8 @@ def regenerate_exp_commit_log_model(exp_model, version):
         ExplorationCommitLogEntryModel. The regenerated commit log model.
     """
     metadata_model = (
-        exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-            '%s-%s' % (exp_model.id, version)))
+        exp_models.ExplorationSnapshotMetadataModel.get(
+            '%s-%s' % (exp_model.id, version), strict=False))
 
     required_rights_model = exp_models.ExplorationRightsModel.get(
         exp_model.id, strict=True, version=1)
@@ -641,8 +641,8 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
 
         for version in python_utils.RANGE(1, item.version + 1):
             commit_log_model = (
-                exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                    'exploration-%s-%s' % (item.id, version)))
+                exp_models.ExplorationCommitLogEntryModel.get(
+                    'exploration-%s-%s' % (item.id, version), strict=False))
             if commit_log_model is None:
                 commit_log_model = regenerate_exp_commit_log_model(
                     item, version)
@@ -683,8 +683,8 @@ class ExpCommitLogModelRegenerationValidator(
 
         for version in python_utils.RANGE(1, item.version + 1):
             commit_log_model = (
-                exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                    'exploration-%s-%s' % (item.id, version)))
+                exp_models.ExplorationCommitLogEntryModel.get(
+                    'exploration-%s-%s' % (item.id, version), strict=False))
             if commit_log_model is None:
                 continue
             regenerated_commit_log_model = regenerate_exp_commit_log_model(

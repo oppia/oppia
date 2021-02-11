@@ -142,9 +142,11 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
 
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                thread_id, strict=False))
         self.assertIsNone(
-            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+            feedback_models.FeedbackAnalyticsModel.get(
+                self.EXP_1_ID, strict=False))
 
     def test_status_of_newly_created_thread_is_open(self):
         exp_id = '0'
@@ -207,57 +209,61 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
 
     def test_delete_feedback_threads_deletes_thread(self):
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.thread_1_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                self.thread_1_id, strict=False))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.thread_1_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                self.thread_1_id, strict=False))
 
     def test_delete_feedback_threads_deletes_suggestion(self):
         self.assertIsNotNone(
-            suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_1_id)
+            suggestion_models.GeneralSuggestionModel.get(
+                self.thread_1_id, strict=False)
         )
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
         self.assertIsNone(
-            suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_1_id)
+            suggestion_models.GeneralSuggestionModel.get(
+                self.thread_1_id, strict=False)
         )
 
     def test_delete_feedback_threads_deletes_message(self):
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackMessageModel.get_by_id(
-                '%s.%s' % (self.thread_1_id, 0)))
+            feedback_models.GeneralFeedbackMessageModel.get(
+                '%s.%s' % (self.thread_1_id, 0), strict=False))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
         self.assertIsNone(
-            feedback_models.GeneralFeedbackMessageModel.get_by_id(
-                '%s.%s' % (self.thread_1_id, 0)))
+            feedback_models.GeneralFeedbackMessageModel.get(
+                '%s.%s' % (self.thread_1_id, 0), strict=False))
 
     def test_delete_feedback_threads_deletes_feedback_analytics(self):
         self.assertIsNotNone(
-            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+            feedback_models.FeedbackAnalyticsModel.get(
+                self.EXP_1_ID, strict=False))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
         self.assertIsNone(
-            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+            feedback_models.FeedbackAnalyticsModel.get(
+                self.EXP_1_ID, strict=False))
 
     def test_delete_feedback_threads_deletes_multiple_feedbacks(self):
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.thread_1_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                self.thread_1_id, strict=False))
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.thread_2_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                self.thread_2_id, strict=False))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID, self.EXP_2_ID])
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.thread_1_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                self.thread_1_id, strict=False))
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.thread_2_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                self.thread_2_id, strict=False))
 
 
 class MockFeedbackAnalyticsAggregator(
@@ -436,8 +442,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             """Closes the thread corresponding to its thread id by updating its
             status.
             """
-            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                thread_id)
+            thread = feedback_models.GeneralFeedbackThreadModel.get(
+                thread_id, strict=False)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.update_timestamps()
             thread.put()

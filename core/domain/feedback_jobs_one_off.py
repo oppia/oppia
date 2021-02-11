@@ -121,8 +121,8 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJob(
     def map(item):
         if item.deleted:
             return
-        exp_model = exp_models.ExplorationModel.get_by_id(
-            item.id)
+        exp_model = exp_models.ExplorationModel.get(
+            item.id, strict=False)
         if exp_model is None or exp_model.deleted:
             yield ('Deleted Feedback Analytics Model', item.id)
             item.delete()
@@ -151,7 +151,7 @@ class CleanUpGeneralFeedbackThreadModelOneOffJob(
             return
         target_model = (
             prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
-                item.entity_type].get_by_id(item.entity_id))
+                item.entity_type].get(item.entity_id, strict=False))
         if target_model is None or target_model.deleted:
             yield ('Deleted GeneralFeedbackThreadModel', item.id)
             item.delete()

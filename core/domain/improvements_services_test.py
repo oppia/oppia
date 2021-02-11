@@ -139,7 +139,8 @@ class GetTaskEntryFromModelTests(ImprovementsServicesTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
-        task_entry_model = improvements_models.TaskEntryModel.get_by_id(task_id)
+        task_entry_model = improvements_models.TaskEntryModel.get(
+            task_id, strict=False)
         task_entry = (
             improvements_services.get_task_entry_from_model(task_entry_model))
 
@@ -380,11 +381,14 @@ class PutTasksTests(ImprovementsServicesTestBase):
             [open_task, obsolete_task, resolved_task])
 
         open_task_model = (
-            improvements_models.TaskEntryModel.get_by_id(open_task.task_id))
+            improvements_models.TaskEntryModel.get(
+                open_task.task_id, strict=False))
         obsolete_task_model = (
-            improvements_models.TaskEntryModel.get_by_id(obsolete_task.task_id))
+            improvements_models.TaskEntryModel.get(
+                obsolete_task.task_id, strict=False))
         resolved_task_model = (
-            improvements_models.TaskEntryModel.get_by_id(resolved_task.task_id))
+            improvements_models.TaskEntryModel.get(
+                resolved_task.task_id, strict=False))
 
         self.assertEqual(
             open_task.to_dict(),
@@ -407,7 +411,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.TaskEntryModel.get(
+            task_entry.task_id, strict=False)
         self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -417,7 +422,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.TaskEntryModel.get(
+            task_entry.task_id, strict=False)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, updated_on)
@@ -430,7 +436,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.TaskEntryModel.get(
+            task_entry.task_id, strict=False)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -438,7 +445,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.TaskEntryModel.get(
+            task_entry.task_id, strict=False)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -451,7 +459,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.TaskEntryModel.get(
+            task_entry.task_id, strict=False)
         self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -462,7 +471,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
             improvements_services.put_tasks(
                 [task_entry], update_last_updated_time=False)
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.TaskEntryModel.get(
+            task_entry.task_id, strict=False)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -475,7 +485,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.TaskEntryModel.get(
+                task_entry.task_id, strict=False))
         task_entry.target_id = 'Different State'
 
         with self.assertRaisesRegexp(Exception, 'Wrong model provided'):
@@ -486,7 +497,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.TaskEntryModel.get(
+                task_entry.task_id, strict=False))
 
         self.assertFalse(
             improvements_services.apply_changes_to_model(
@@ -496,7 +508,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.TaskEntryModel.get(
+                task_entry.task_id, strict=False))
         task_entry.issue_description = 'new issue description'
 
         self.assertTrue(
@@ -510,7 +523,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.TaskEntryModel.get(
+                task_entry.task_id, strict=False))
         task_entry = self._new_resolved_task()
 
         self.assertTrue(
@@ -525,7 +539,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.TaskEntryModel.get(
+                task_entry.task_id, strict=False))
         task_entry.resolver_id = self.owner_id
 
         self.assertFalse(
@@ -540,7 +555,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.TaskEntryModel.get(
+                task_entry.task_id, strict=False))
         task_entry.resolved_on = self.owner_id
 
         self.assertFalse(

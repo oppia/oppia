@@ -942,7 +942,7 @@ def save_topic_summary(topic_summary):
     }
 
     topic_summary_model = (
-        topic_models.TopicSummaryModel.get_by_id(topic_summary.id))
+        topic_models.TopicSummaryModel.get(topic_summary.id, strict=False))
     if topic_summary_model is not None:
         topic_summary_model.populate(**topic_summary_dict)
         topic_summary_model.update_timestamps()

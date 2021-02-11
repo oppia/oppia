@@ -104,7 +104,8 @@ def _save_completed_activities(activities_completed):
     }
 
     completed_activities_model = (
-        user_models.CompletedActivitiesModel.get_by_id(activities_completed.id))
+        user_models.CompletedActivitiesModel.get(
+            activities_completed.id, strict=False))
     if completed_activities_model is not None:
         completed_activities_model.populate(**activities_completed_dict)
         completed_activities_model.update_timestamps()

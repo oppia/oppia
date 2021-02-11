@@ -930,7 +930,7 @@ def save_skill_summary(skill_summary):
     }
 
     skill_summary_model = (
-        skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
+        skill_models.SkillSummaryModel.get(skill_summary.id, strict=False))
     if skill_summary_model is not None:
         skill_summary_model.populate(**skill_summary_dict)
         skill_summary_model.update_timestamps()

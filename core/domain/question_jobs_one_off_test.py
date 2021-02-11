@@ -206,7 +206,7 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         self.model_instance = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
-                'question-question_id-1'))
+                'question-question_id-1', strict=False))
 
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -270,5 +270,5 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                     '[u\'question-question_id-1\']]'])
             self.model_instance = (
                 question_models.QuestionCommitLogEntryModel.get_by_id(
-                    'question-question_id-1'))
+                    'question-question_id-1', strict=False))
             self.assertIsNone(self.model_instance)

@@ -178,7 +178,8 @@ def get_suggestion_by_id(suggestion_id):
         Suggestion|None. The corresponding suggestion, or None if no suggestion
         is found.
     """
-    model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
+    model = suggestion_models.GeneralSuggestionModel.get(
+        suggestion_id, strict=False)
 
     return get_suggestion_from_model(model) if model else None
 
@@ -1105,8 +1106,8 @@ def get_voiceover_application(voiceover_application_id):
         application model object.
     """
     voiceover_application_model = (
-        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-            voiceover_application_id))
+        suggestion_models.GeneralVoiceoverApplicationModel.get(
+            voiceover_application_id, strict=False))
     voiceover_application_class = _get_voiceover_application_class(
         voiceover_application_model.target_type)
     return voiceover_application_class(

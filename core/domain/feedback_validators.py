@@ -106,7 +106,8 @@ class GeneralFeedbackThreadModelValidator(
         """
         if not item.has_suggestion:
             suggestion_model = (
-                suggestion_models.GeneralSuggestionModel.get_by_id(item.id))
+                suggestion_models.GeneralSuggestionModel.get(
+                    item.id, strict=False))
             if suggestion_model is not None and not suggestion_model.deleted:
                 cls._add_error(
                     'has suggestion check',

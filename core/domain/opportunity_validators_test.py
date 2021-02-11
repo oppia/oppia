@@ -137,13 +137,13 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
         self.model_instance_1 = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_by_id('1'))
+            .get('1', strict=False))
         self.model_instance_2 = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_by_id('2'))
+            .get('2', strict=False))
         self.model_instance_3 = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_by_id('3'))
+            .get('3', strict=False))
 
     def test_standard_operation(self):
         expected_output = [
@@ -191,7 +191,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 expected_output, sort=True, literal_eval=True)
 
     def test_missing_story_model_failure(self):
-        story_model = story_models.StoryModel.get_by_id(self.STORY_ID)
+        story_model = story_models.StoryModel.get(self.STORY_ID, strict=False)
         story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -210,7 +210,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             expected_output, sort=True, literal_eval=True)
 
     def test_missing_topic_model_failure(self):
-        topic_model = topic_models.TopicModel.get_by_id(self.TOPIC_ID)
+        topic_model = topic_models.TopicModel.get(self.TOPIC_ID, strict=False)
         topic_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -229,7 +229,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             expected_output, sort=True, literal_eval=True)
 
     def test_missing_exp_model_failure(self):
-        exp_model = exp_models.ExplorationModel.get_by_id('1')
+        exp_model = exp_models.ExplorationModel.get('1', strict=False)
         exp_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [(
@@ -382,7 +382,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=True)
 
     def test_missing_skill_model_failure(self):
-        skill_model = skill_models.SkillModel.get_by_id('0')
+        skill_model = skill_models.SkillModel.get('0', strict=False)
         skill_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [

@@ -417,7 +417,7 @@ class RemoveCollectionRightsTranslatorIdsOneOffJobTests(
                 [['SUCCESS_REMOVED - CollectionRightsModel', 1]], output)
 
             migrated_collection_rights_model = (
-                collection_models.CollectionRightsModel.get_by_id('id'))
+                collection_models.CollectionRightsModel.get('id', strict=False))
 
             self.assertNotIn(
                 'translator_ids', migrated_collection_rights_model._values)  # pylint: disable=protected-access
@@ -457,7 +457,7 @@ class RemoveCollectionRightsTranslatorIdsOneOffJobTests(
             [['SUCCESS_ALREADY_REMOVED - CollectionRightsModel', 1]], output)
 
         migrated_collection_rights_model = (
-            collection_models.CollectionRightsModel.get_by_id('id'))
+            collection_models.CollectionRightsModel.get('id', strict=False))
         self.assertNotIn(
             'translator_ids', migrated_collection_rights_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
@@ -565,7 +565,8 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
                 [['SUCCESS_REMOVED - CollectionModel', 1]], output)
 
             migrated_collection_model = (
-                collection_models.CollectionModel.get_by_id(self.COLLECTION_ID))
+                collection_models.CollectionModel.get(
+                    self.COLLECTION_ID, strict=False))
 
             self.assertNotIn('nodes', migrated_collection_model._values)  # pylint: disable=protected-access
             self.assertNotIn(
@@ -602,7 +603,8 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
             [['SUCCESS_ALREADY_REMOVED - CollectionModel', 1]], output)
 
         migrated_collection_model = (
-            collection_models.CollectionModel.get_by_id(self.COLLECTION_ID))
+            collection_models.CollectionModel.get(
+                self.COLLECTION_ID, strict=False))
         self.assertNotIn('nodes', migrated_collection_model._values)  # pylint: disable=protected-access
         self.assertNotIn('nodes', migrated_collection_model._properties)  # pylint: disable=protected-access
         self.assertEqual(

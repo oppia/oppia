@@ -69,7 +69,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
         fs_services.save_classifier_data(
             'TextClassifier', id0, classifier_data_proto)
         self.model_instance_0 = (
-            classifier_models.ClassifierTrainingJobModel.get_by_id(id0))
+            classifier_models.ClassifierTrainingJobModel.get(id0, strict=False))
         id1 = classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', '1', 1,
             next_scheduled_check_time,
@@ -78,7 +78,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
         fs_services.save_classifier_data(
             'TextClassifier', id1, classifier_data_proto)
         self.model_instance_1 = (
-            classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
+            classifier_models.ClassifierTrainingJobModel.get(id1, strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -124,7 +124,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -206,11 +206,13 @@ class StateTrainingJobsMappingModelValidatorTests(
         id0 = classifier_models.StateTrainingJobsMappingModel.create(
             '0', 1, 'StateTest0', {'TextClassifier': 'job0'})
         self.model_instance_0 = (
-            classifier_models.StateTrainingJobsMappingModel.get_by_id(id0))
+            classifier_models.StateTrainingJobsMappingModel.get(
+                id0, strict=False))
         id1 = classifier_models.StateTrainingJobsMappingModel.create(
             '1', 1, 'StateTest1', {'TextClassifier': 'job1'})
         self.model_instance_1 = (
-            classifier_models.StateTrainingJobsMappingModel.get_by_id(id1))
+            classifier_models.StateTrainingJobsMappingModel.get(
+                id1, strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -256,7 +258,7 @@ class StateTrainingJobsMappingModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (

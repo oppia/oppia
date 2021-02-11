@@ -152,7 +152,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         new_skill_id = skill_services.get_new_skill_id()
 
         self.assertEqual(len(new_skill_id), 12)
-        self.assertEqual(skill_models.SkillModel.get_by_id(new_skill_id), None)
+        self.assertEqual(skill_models.SkillModel.get(
+            new_skill_id, strict=False), None)
 
     def test_get_descriptions_of_skills(self):
         example_1 = skill_domain.WorkedExample(
@@ -836,12 +837,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_skill_marked_deleted(self):
         skill_models.SkillModel.delete_multi(
             [self.SKILL_ID], self.USER_ID, '', force_deletion=False)
-        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        skill_model = skill_models.SkillModel.get(self.SKILL_ID, strict=False)
         self.assertTrue(skill_model.deleted)
 
         skill_services.delete_skill(
             self.USER_ID, self.SKILL_ID, force_deletion=True)
-        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        skill_model = skill_models.SkillModel.get(self.SKILL_ID, strict=False)
         self.assertEqual(skill_model, None)
         self.assertEqual(
             skill_services.get_skill_summary_by_id(
@@ -857,7 +858,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         skill_services.delete_skill(
             self.USER_ID, self.SKILL_ID, force_deletion=True)
-        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        skill_model = skill_models.SkillModel.get(self.SKILL_ID, strict=False)
         self.assertEqual(skill_model, None)
         self.assertEqual(
             skill_services.get_skill_summary_by_id(
@@ -888,7 +889,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_services.delete_skill(
             self.user_id_a, self.SKILL_ID, force_deletion=True)
 
-        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        skill_model = skill_models.SkillModel.get(self.SKILL_ID, strict=False)
         self.assertEqual(skill_model, None)
 
         with self.assertRaisesRegexp(

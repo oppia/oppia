@@ -369,7 +369,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
                 'title': 'title',
                 'category': 'category',
             }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_rights = exp_models.ExplorationRightsModel.get(exp_id, strict=False)
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,
             title='title',
@@ -2341,7 +2341,7 @@ class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(self.run_job(), [['ExplorationModel', 1]])
 
-        exp_model = exp_models.ExplorationModel.get_by_id('exp1')
+        exp_model = exp_models.ExplorationModel.get('exp1', strict=False)
         self.assertEqual(exp_model.version, 1)
 
 
@@ -2374,8 +2374,8 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-1', strict=False))
         commit_log_model.delete()
         exp_services.delete_exploration(self.user_id, '0')
 
@@ -2393,8 +2393,8 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
                 'new_value': 'New title'
             })], 'Updated title.')
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-2'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-2', strict=False))
         actual_commit_log_details = [
             commit_log_model.user_id, commit_log_model.commit_type,
             commit_log_model.commit_message, commit_log_model.commit_cmds,
@@ -2418,8 +2418,8 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
             exp_jobs_one_off
             .RegenerateMissingExpCommitLogModels.get_output(job_id))
         regenerated_commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-2'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-2', strict=False))
         regenerated_commit_log_details = [
             regenerated_commit_log_model.user_id,
             regenerated_commit_log_model.commit_type,
@@ -2458,8 +2458,8 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
                 'new_value': 'New title 2'
             })], 'Updated title.')
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-2'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-2', strict=False))
         actual_commit_log_details = [
             commit_log_model.user_id, commit_log_model.commit_type,
             commit_log_model.commit_message, commit_log_model.commit_cmds,
@@ -2483,8 +2483,8 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
             exp_jobs_one_off
             .RegenerateMissingExpCommitLogModels.get_output(job_id))
         regenerated_commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-2'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-2', strict=False))
         regenerated_commit_log_details = [
             regenerated_commit_log_model.user_id,
             regenerated_commit_log_model.commit_type,
@@ -2523,8 +2523,8 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
                 'new_value': 'New title 2'
             })], 'Updated title.')
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-3'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-3', strict=False))
         actual_commit_log_details = [
             commit_log_model.user_id, commit_log_model.commit_type,
             commit_log_model.commit_message, commit_log_model.commit_cmds,
@@ -2548,8 +2548,8 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
             exp_jobs_one_off
             .RegenerateMissingExpCommitLogModels.get_output(job_id))
         regenerated_commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-3'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0-3', strict=False))
         regenerated_commit_log_details = [
             regenerated_commit_log_model.user_id,
             regenerated_commit_log_model.commit_type,
@@ -2603,8 +2603,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-%s-1' % self.exp_id))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-1' % self.exp_id, strict=False))
         commit_log_model.delete()
         exp_services.delete_exploration(self.user_id, self.exp_id)
 
@@ -2620,8 +2620,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
         )
         exp_services.save_new_exploration(self.user_id, exp)
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0z-1'))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-0z-1', strict=False))
         commit_log_model.delete()
 
         job_id = (
@@ -2639,8 +2639,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
 
     def test_validation_job_skips_check_for_deleted_commit_log_model(self):
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-%s-1' % self.exp_id))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-1' % self.exp_id, strict=False))
         commit_log_model.delete()
 
         job_id = (
@@ -2658,8 +2658,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
 
     def test_validation_job_catches_mismatch_in_non_datetime_fields(self):
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-%s-1' % self.exp_id))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-1' % self.exp_id, strict=False))
         commit_log_model.commit_message = 'Test change'
         commit_log_model.update_timestamps()
         commit_log_model.put()
@@ -2684,8 +2684,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
 
     def test_validation_job_catches_mismatch_in_datetime_fields(self):
         commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-%s-1' % self.exp_id))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-1' % self.exp_id, strict=False))
         commit_log_model.created_on = commit_log_model.created_on + (
             datetime.timedelta(days=1))
         commit_log_model.update_timestamps()
@@ -2703,8 +2703,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             exp_jobs_one_off
             .ExpCommitLogModelRegenerationValidator.get_output(job_id))
 
-        metadata_model = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.exp_id)
+        metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            '%s-1' % self.exp_id, strict=False)
         expected_output = [(
             '[u\'Mismatch between original model and regenerated model\', '
             '[u\'created_on in original model: %s, '

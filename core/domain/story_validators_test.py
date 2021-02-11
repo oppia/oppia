@@ -109,9 +109,9 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                     'new_value': explorations[index * 2 + 1].id
                 })], 'Changes.')
 
-        self.model_instance_0 = story_models.StoryModel.get_by_id('0')
-        self.model_instance_1 = story_models.StoryModel.get_by_id('1')
-        self.model_instance_2 = story_models.StoryModel.get_by_id('2')
+        self.model_instance_0 = story_models.StoryModel.get('0', strict=False)
+        self.model_instance_1 = story_models.StoryModel.get('1', strict=False)
+        self.model_instance_2 = story_models.StoryModel.get('2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.StoryModelAuditOneOffJob)
@@ -185,7 +185,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('1').delete(
+        exp_models.ExplorationModel.get('1', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -207,8 +207,8 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New title',
                 'old_value': 'title 0'
             })], 'Changes.')
-        story_models.StoryCommitLogEntryModel.get_by_id(
-            'story-0-1').delete()
+        story_models.StoryCommitLogEntryModel.get(
+            'story-0-1', strict=False).delete()
 
         expected_output = [
             (
@@ -224,7 +224,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
-        story_models.StorySummaryModel.get_by_id('0').delete()
+        story_models.StorySummaryModel.get('0', strict=False).delete()
 
         expected_output = [
             (
@@ -238,8 +238,8 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        story_models.StorySnapshotMetadataModel.get_by_id(
-            '0-1').delete()
+        story_models.StorySnapshotMetadataModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -252,8 +252,8 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        story_models.StorySnapshotContentModel.get_by_id(
-            '0-1').delete()
+        story_models.StorySnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -299,14 +299,14 @@ class StorySnapshotMetadataModelValidatorTests(
         topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
-            story_models.StorySnapshotMetadataModel.get_by_id(
-                '0-1'))
+            story_models.StorySnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            story_models.StorySnapshotMetadataModel.get_by_id(
-                '1-1'))
+            story_models.StorySnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            story_models.StorySnapshotMetadataModel.get_by_id(
-                '2-1'))
+            story_models.StorySnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -382,7 +382,7 @@ class StorySnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('0').delete(
+        story_models.StoryModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -400,7 +400,7 @@ class StorySnapshotMetadataModelValidatorTests(
             expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -493,14 +493,14 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
-            story_models.StorySnapshotContentModel.get_by_id(
-                '0-1'))
+            story_models.StorySnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            story_models.StorySnapshotContentModel.get_by_id(
-                '1-1'))
+            story_models.StorySnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            story_models.StorySnapshotContentModel.get_by_id(
-                '2-1'))
+            story_models.StorySnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -556,7 +556,8 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('0').delete(self.owner_id, '', [])
+        story_models.StoryModel.get(
+            '0', strict=False).delete(self.owner_id, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for story_ids '
@@ -620,14 +621,14 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
-            story_models.StoryCommitLogEntryModel.get_by_id(
-                'story-0-1'))
+            story_models.StoryCommitLogEntryModel.get(
+                'story-0-1', strict=False))
         self.model_instance_1 = (
-            story_models.StoryCommitLogEntryModel.get_by_id(
-                'story-1-1'))
+            story_models.StoryCommitLogEntryModel.get(
+                'story-1-1', strict=False))
         self.model_instance_2 = (
-            story_models.StoryCommitLogEntryModel.get_by_id(
-                'story-2-1'))
+            story_models.StoryCommitLogEntryModel.get(
+                'story-2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -703,7 +704,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('0').delete(
+        story_models.StoryModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -889,9 +890,12 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         topic_services.save_new_topic(self.owner_id, topic)
 
-        self.model_instance_0 = story_models.StorySummaryModel.get_by_id('0')
-        self.model_instance_1 = story_models.StorySummaryModel.get_by_id('1')
-        self.model_instance_2 = story_models.StorySummaryModel.get_by_id('2')
+        self.model_instance_0 = story_models.StorySummaryModel.get(
+            '0', strict=False)
+        self.model_instance_1 = story_models.StorySummaryModel.get(
+            '1', strict=False)
+        self.model_instance_2 = story_models.StorySummaryModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob)
@@ -915,7 +919,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             story_id, 'Title', 'Description', 'topic_id', 'url')
         story.add_node('node_1', 'Node title')
         story_services.save_new_story(self.owner_id, story)
-        story_model = story_models.StoryModel.get_by_id(story_id)
+        story_model = story_models.StoryModel.get(story_id, strict=False)
         nodes = story_model.story_contents['nodes']
         with self.assertRaisesRegexp(
             Exception, '\'dict\' object has no attribute \'title\''):
@@ -956,7 +960,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
-        story_model = story_models.StoryModel.get_by_id('0')
+        story_model = story_models.StoryModel.get('0', strict=False)
         story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.story_model_last_updated = (
             story_model.last_updated)

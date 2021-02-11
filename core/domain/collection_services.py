@@ -1017,10 +1017,11 @@ def _compute_summary_of_collection(collection):
     Returns:
         CollectionSummary. The computed summary for the given collection.
     """
-    collection_rights = collection_models.CollectionRightsModel.get_by_id(
-        collection.id)
+    collection_rights = collection_models.CollectionRightsModel.get(
+        collection.id, strict=False)
     collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(collection.id))
+        collection_models.CollectionSummaryModel.get(
+            collection.id, strict=False))
 
     contributors_summary = (
         collection_summary_model.contributors_summary
@@ -1111,8 +1112,8 @@ def save_collection_summary(collection_summary):
     }
 
     collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(
-            collection_summary.id))
+        collection_models.CollectionSummaryModel.get(
+            collection_summary.id, strict=False))
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
         collection_summary_model.update_timestamps()

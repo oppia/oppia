@@ -92,180 +92,208 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
     def test_cache_update_to_thread_with_1_message(self):
         thread_id = self._create_thread(self.editor_id, 'first text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_text = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
     def test_cache_update_to_thread_with_2_messages(self):
         thread_id = self._create_thread(self.editor_id, 'first text')
         self._create_message(thread_id, self.editor_id, 'second text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_text = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'second text')
 
     def test_cache_update_to_thread_with_1_empty_message(self):
         thread_id = self._create_thread(self.editor_id, '')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_text = 'Non-empty'
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, None)
 
     def test_cache_update_to_thread_with_2_empty_messages(self):
         thread_id = self._create_thread(self.editor_id, '')
         self._create_message(thread_id, self.editor_id, '')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_text = 'Non-empty'
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, None)
 
     def test_cache_update_to_thread_with_empty_then_nonempty_messages(self):
         thread_id = self._create_thread(self.editor_id, '')
         self._create_message(thread_id, self.editor_id, 'first text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_text = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
     def test_cache_update_to_thread_with_nonempty_then_empty_messages(self):
         thread_id = self._create_thread(self.editor_id, 'first text')
         self._create_message(thread_id, self.editor_id, '')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_text = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
     def test_cache_update_to_thread_with_1_user_message(self):
         thread_id = self._create_thread(self.editor_id, 'first text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_cache_update_to_thread_with_2_user_messages(self):
         thread_id = self._create_thread(self.editor_id, 'first text')
         self._create_message(thread_id, self.editor_id, 'second text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_cache_update_to_thread_with_1_anon_message(self):
         thread_id = self._create_thread(None, 'first text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = self.editor_id
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
     def test_cache_update_to_thread_with_2_anon_messages(self):
         thread_id = self._create_thread(None, 'first text')
         self._create_message(thread_id, None, 'second text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = self.editor_id
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
     def test_cache_update_to_thread_with_user_then_anon_messages(self):
         thread_id = self._create_thread(self.editor_id, 'first text')
         self._create_message(thread_id, None, 'second text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = self.editor_id
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
     def test_cache_update_to_thread_with_anon_then_user_messages(self):
         thread_id = self._create_thread(None, 'first text')
         self._create_message(thread_id, self.editor_id, 'second text')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_cache_update_to_thread_with_user_then_empty_messages(self):
         thread_id = self._create_thread(self.editor_id, 'first text')
         self._create_message(thread_id, None, '')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = None
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_cache_update_to_thread_with_anon_then_empty_messages(self):
         thread_id = self._create_thread(None, 'first text')
         self._create_message(thread_id, self.editor_id, '')
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         model.last_nonempty_message_author_id = self.editor_id
         model.update_timestamps()
         model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
     def test_no_cache_update_to_thread_with_1_message(self):
@@ -273,7 +301,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
     def test_no_cache_update_to_thread_with_2_messages(self):
@@ -282,7 +311,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'second text')
 
     def test_no_cache_update_to_thread_with_1_empty_message(self):
@@ -290,7 +320,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, None)
 
     def test_no_cache_update_to_thread_with_2_empty_messages(self):
@@ -299,7 +330,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, None)
 
     def test_no_cache_update_to_thread_with_empty_then_nonempty_messages(self):
@@ -308,7 +340,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
     def test_no_cache_update_to_thread_with_nonempty_then_empty_messages(self):
@@ -317,7 +350,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
     def test_no_cache_update_to_thread_with_1_user_message(self):
@@ -325,7 +359,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_no_cache_update_to_thread_with_2_user_messages(self):
@@ -334,7 +369,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_no_cache_update_to_thread_with_1_anon_message(self):
@@ -342,7 +378,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
     def test_no_cache_update_to_thread_with_2_anon_messages(self):
@@ -351,7 +388,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
     def test_no_cache_update_to_thread_with_user_then_anon_messages(self):
@@ -360,7 +398,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
     def test_no_cache_update_to_thread_with_anon_then_user_messages(self):
@@ -369,7 +408,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_no_cache_update_to_thread_with_user_then_empty_messages(self):
@@ -378,7 +418,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
     def test_no_cache_update_to_thread_with_anon_then_empty_messages(self):
@@ -387,7 +428,8 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
 
-        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get(
+            thread_id, strict=False)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
 
@@ -423,16 +465,18 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
             .CleanUpFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
         self.assertEqual(output, [])
 
-        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        model_instance = feedback_models.FeedbackAnalyticsModel.get(
+            '0', strict=False)
         self.assertFalse(model_instance is None)
 
     def test_migration_job_skips_deleted_model(self):
-        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        model_instance = feedback_models.FeedbackAnalyticsModel.get(
+            '0', strict=False)
         model_instance.deleted = True
         model_instance.update_timestamps()
         model_instance.put()
 
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, 'Delete')
 
         job_id = (
@@ -449,10 +493,11 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
         self.assertEqual(output, [])
 
     def test_job_removes_analytics_model_for_deleted_explorations(self):
-        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        model_instance = feedback_models.FeedbackAnalyticsModel.get(
+            '0', strict=False)
         self.assertFalse(model_instance is None)
 
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, 'Delete')
         job_id = (
             feedback_jobs_one_off
@@ -468,7 +513,8 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
         self.assertEqual(
             output, ['[u\'Deleted Feedback Analytics Model\', [u\'0\']]'])
 
-        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        model_instance = feedback_models.FeedbackAnalyticsModel.get(
+            '0', strict=False)
         self.assertIsNone(model_instance)
 
 
@@ -507,13 +553,13 @@ class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
         self.assertEqual(output, [])
 
     def test_migration_job_skips_deleted_model(self):
-        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id)
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get(
+            self.thread_id, strict=False)
         model_instance.deleted = True
         model_instance.update_timestamps()
         model_instance.put()
 
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, 'Delete')
         job_id = (
             feedback_jobs_one_off
@@ -529,11 +575,11 @@ class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
         self.assertEqual(output, [])
 
     def test_job_removes_thread_model_for_deleted_explorations(self):
-        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id)
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get(
+            self.thread_id, strict=False)
         self.assertFalse(model_instance is None)
 
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             self.user_id, 'Delete')
         job_id = (
             feedback_jobs_one_off
@@ -551,6 +597,6 @@ class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
                 '[u\'Deleted GeneralFeedbackThreadModel\', [u\'%s\']]' % (
                     self.thread_id)])
 
-        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id)
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get(
+            self.thread_id, strict=False)
         self.assertIsNone(model_instance)

@@ -109,11 +109,13 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 skill.all_questions_merged = True
             skill_services.save_new_skill(self.owner_id, skill)
 
-        self.model_instance_0 = skill_models.SkillModel.get_by_id('0')
-        self.model_instance_1 = skill_models.SkillModel.get_by_id('1')
-        self.model_instance_2 = skill_models.SkillModel.get_by_id('2')
-        self.superseding_skill_0 = skill_models.SkillModel.get_by_id('3')
-        self.superseding_skill_1 = skill_models.SkillModel.get_by_id('4')
+        self.model_instance_0 = skill_models.SkillModel.get('0', strict=False)
+        self.model_instance_1 = skill_models.SkillModel.get('1', strict=False)
+        self.model_instance_2 = skill_models.SkillModel.get('2', strict=False)
+        self.superseding_skill_0 = skill_models.SkillModel.get(
+            '3', strict=False)
+        self.superseding_skill_1 = skill_models.SkillModel.get(
+            '4', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.SkillModelAuditOneOffJob)
@@ -227,8 +229,8 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'old_value': 'description 0'
             })], 'Changes.')
         self.process_and_flush_pending_mapreduce_tasks()
-        skill_models.SkillCommitLogEntryModel.get_by_id(
-            'skill-0-1').delete()
+        skill_models.SkillCommitLogEntryModel.get(
+            'skill-0-1', strict=False).delete()
 
         expected_output = [
             (
@@ -244,7 +246,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
-        skill_models.SkillSummaryModel.get_by_id('0').delete()
+        skill_models.SkillSummaryModel.get('0', strict=False).delete()
 
         expected_output = [
             (
@@ -258,7 +260,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        skill_models.SkillSnapshotMetadataModel.get_by_id(
+        skill_models.SkillSnapshotMetadataModel.get(
             '0-1').delete()
         expected_output = [
             (
@@ -272,8 +274,8 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        skill_models.SkillSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        skill_models.SkillSnapshotContentModel.get(
+            '0-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -352,14 +354,14 @@ class SkillSnapshotMetadataModelValidatorTests(
                 skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '0-1'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '1-1'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '2-1'))
+            skill_models.SkillSnapshotMetadataModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -438,7 +440,7 @@ class SkillSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(
+        skill_models.SkillModel.get('0', strict=False).delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -456,7 +458,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -581,14 +583,14 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                '0-1'))
+            skill_models.SkillSnapshotContentModel.get(
+                '0-1', strict=False))
         self.model_instance_1 = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                '1-1'))
+            skill_models.SkillSnapshotContentModel.get(
+                '1-1', strict=False))
         self.model_instance_2 = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                '2-1'))
+            skill_models.SkillSnapshotContentModel.get(
+                '2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -645,7 +647,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(self.owner_id, '', [])
+        skill_models.SkillModel.get(
+            '0', strict=False).delete(self.owner_id, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for skill_ids '
@@ -740,14 +743,14 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-0-1'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-0-1', strict=False))
         self.model_instance_1 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-1-1'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-1-1', strict=False))
         self.model_instance_2 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-2-1'))
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-2-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -825,7 +828,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(
+        skill_models.SkillModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1020,9 +1023,12 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
-        self.model_instance_0 = skill_models.SkillSummaryModel.get_by_id('0')
-        self.model_instance_1 = skill_models.SkillSummaryModel.get_by_id('1')
-        self.model_instance_2 = skill_models.SkillSummaryModel.get_by_id('2')
+        self.model_instance_0 = skill_models.SkillSummaryModel.get(
+            '0', strict=False)
+        self.model_instance_1 = skill_models.SkillSummaryModel.get(
+            '1', strict=False)
+        self.model_instance_2 = skill_models.SkillSummaryModel.get(
+            '2', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.SkillSummaryModelAuditOneOffJob)
@@ -1076,7 +1082,7 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
-        skill_model = skill_models.SkillModel.get_by_id('0')
+        skill_model = skill_models.SkillModel.get('0', strict=False)
         skill_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.skill_model_last_updated = (
             skill_model.last_updated)

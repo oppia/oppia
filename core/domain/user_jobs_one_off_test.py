@@ -1484,7 +1484,7 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
                 [['SUCCESS_REMOVED - UserSubscriptionsModel', 1]], output)
 
             migrated_subscription_model = (
-                user_models.UserSubscriptionsModel.get_by_id('id'))
+                user_models.UserSubscriptionsModel.get('id', strict=False))
 
             self.assertNotIn(
                 'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
@@ -1513,7 +1513,7 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
             [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
 
         migrated_subscription_model = (
-            user_models.UserSubscriptionsModel.get_by_id('id'))
+            user_models.UserSubscriptionsModel.get('id', strict=False))
         self.assertNotIn(
             'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
@@ -1541,7 +1541,7 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
             [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
 
         migrated_subscription_model = (
-            user_models.UserSubscriptionsModel.get_by_id('id'))
+            user_models.UserSubscriptionsModel.get('id', strict=False))
         self.assertNotIn(
             'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
@@ -1555,7 +1555,7 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
             [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
 
         migrated_subscription_model = (
-            user_models.UserSubscriptionsModel.get_by_id('id'))
+            user_models.UserSubscriptionsModel.get('id', strict=False))
         self.assertNotIn(
             'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
@@ -1617,7 +1617,7 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
                 [['SUCCESS_REMOVED - UserSubscriptionsModel', 1]], output)
 
             migrated_subscription_model = (
-                user_models.UserSubscriptionsModel.get_by_id('id'))
+                user_models.UserSubscriptionsModel.get('id', strict=False))
 
             self.assertNotIn(
                 'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
@@ -1646,7 +1646,7 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
             [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
 
         migrated_subscription_model = (
-            user_models.UserSubscriptionsModel.get_by_id('id'))
+            user_models.UserSubscriptionsModel.get('id', strict=False))
         self.assertNotIn(
             'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
@@ -1749,7 +1749,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
         self.assertItemsEqual(expected_output, actual_output)
         migrated_user_model = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+            user_models.UserSettingsModel.get(self.USER_ID_1, strict=False))
         self.assertEqual(
             migrated_user_model.created_on, final_created_on_timestamp)
 
@@ -1843,7 +1843,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
         self.assertItemsEqual(expected_output, actual_output)
         migrated_user_model = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+            user_models.UserSettingsModel.get(self.USER_ID_1, strict=False))
         self.assertEqual(
             migrated_user_model.created_on, final_created_on_timestamp)
 
@@ -1875,7 +1875,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
         self.assertItemsEqual(expected_output, actual_output)
         migrated_user_model = (
-            user_models.UserSettingsModel.get_by_id(user_id))
+            user_models.UserSettingsModel.get(user_id, strict=False))
         self.assertNotEqual(
             migrated_user_model.created_on, user_auth_details_model.created_on)
 
@@ -1920,9 +1920,9 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
         self.assertItemsEqual(actual_output, expected_output)
         migrated_user_model_1 = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+            user_models.UserSettingsModel.get(self.USER_ID_1, strict=False))
         migrated_user_model_2 = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_2))
+            user_models.UserSettingsModel.get(self.USER_ID_2, strict=False))
         self.assertEqual(
             migrated_user_model_1.created_on, final_created_on_timestamp_1)
         self.assertEqual(
@@ -1960,9 +1960,9 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
         self.assertItemsEqual(actual_output, expected_output)
         migrated_user_model_1 = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+            user_models.UserSettingsModel.get(self.USER_ID_1, strict=False))
         migrated_user_model_2 = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_2))
+            user_models.UserSettingsModel.get(self.USER_ID_2, strict=False))
         self.assertEqual(
             migrated_user_model_1.created_on, final_created_on_timestamp_1)
         self.assertEqual(
@@ -2148,8 +2148,8 @@ class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 
         subscription_services.subscribe_to_creator(self.user_id, self.owner_id)
 
-        self.model_instance = user_models.UserSubscribersModel.get_by_id(
-            self.owner_id)
+        self.model_instance = user_models.UserSubscribersModel.get(
+            self.owner_id, strict=False)
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
@@ -2195,8 +2195,8 @@ class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
             output, [
                 '[u\'Removed user from their own subscribers list\', '
                 '[u\'%s\']]' % self.owner_id])
-        self.model_instance = user_models.UserSubscribersModel.get_by_id(
-            self.owner_id)
+        self.model_instance = user_models.UserSubscribersModel.get(
+            self.owner_id, strict=False)
         self.assertTrue(self.user_id in self.model_instance.subscriber_ids)
         self.assertTrue(self.owner_id not in self.model_instance.subscriber_ids)
 
@@ -2240,8 +2240,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         collection_services.record_played_exploration_in_collection_context(
             self.user_id, 'col', '1')
 
-        self.model_instance = user_models.CollectionProgressModel.get_by_id(
-            '%s.col' % self.user_id)
+        self.model_instance = user_models.CollectionProgressModel.get(
+            '%s.col' % self.user_id, strict=False)
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
@@ -2279,7 +2279,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
 
     def test_job_cleans_up_exploration_ids_not_present_in_collection(self):
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1'])
 
@@ -2310,25 +2311,28 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             '[u"Model id: %s.col, Collection id: col, Removed exploration ids: '
             '[u\'3\']"]]' % self.user_id)]
         self.assertEqual(output, expected_output)
-        self.model_instance = user_models.CollectionProgressModel.get_by_id(
-            '%s.col' % self.user_id)
+        self.model_instance = user_models.CollectionProgressModel.get(
+            '%s.col' % self.user_id, strict=False)
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
 
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1', '3'])
 
     def test_job_creates_completed_activities_model_if_it_is_missing(self):
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1'])
         completed_activities_model.delete()
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
 
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
@@ -2352,7 +2356,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             self.model_instance.completed_explorations, ['0', '1'])
 
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1'])
 
@@ -2361,7 +2366,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, '2')
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1', '2'])
         completed_activities_model.exploration_ids = ['0', '2']
@@ -2369,7 +2375,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         completed_activities_model.put()
 
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '2'])
 
@@ -2395,7 +2402,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             self.model_instance.completed_explorations, ['0', '1'])
 
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '2', '1'])
 
@@ -2441,21 +2449,21 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         self.assertEqual(output, [])
 
-        model_instance_1 = user_models.UserContributionsModel.get_by_id(
-            self.user_id)
+        model_instance_1 = user_models.UserContributionsModel.get(
+            self.user_id, strict=False)
         self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
         self.assertEqual(
             model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
 
-        model_instance_2 = user_models.UserContributionsModel.get_by_id(
-            self.owner_id)
+        model_instance_2 = user_models.UserContributionsModel.get(
+            self.owner_id, strict=False)
         self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
         self.assertEqual(
             model_instance_2.edited_exploration_ids, ['exp1'])
 
     def test_migration_job_skips_deleted_model(self):
-        model_instance = user_models.UserContributionsModel.get_by_id(
-            self.user_id)
+        model_instance = user_models.UserContributionsModel.get(
+            self.user_id, strict=False)
         model_instance.deleted = True
         model_instance.update_timestamps()
         model_instance.put()
@@ -2473,14 +2481,14 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 
     def test_job_removes_deleted_exp_from_created_explorations(self):
         exp_services.delete_exploration(self.user_id, 'exp0')
-        model_instance_1 = user_models.UserContributionsModel.get_by_id(
-            self.user_id)
+        model_instance_1 = user_models.UserContributionsModel.get(
+            self.user_id, strict=False)
         self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
         self.assertEqual(
             model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
 
-        model_instance_2 = user_models.UserContributionsModel.get_by_id(
-            self.owner_id)
+        model_instance_2 = user_models.UserContributionsModel.get(
+            self.owner_id, strict=False)
         self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
         self.assertEqual(
             model_instance_2.edited_exploration_ids, ['exp1'])
@@ -2500,27 +2508,27 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
                 '[u"Model id: %s, Removed exploration ids: [u\'exp0\', '
                 'u\'exp0\']"]]' % self.user_id])
 
-        model_instance_1 = user_models.UserContributionsModel.get_by_id(
-            self.user_id)
+        model_instance_1 = user_models.UserContributionsModel.get(
+            self.user_id, strict=False)
         self.assertEqual(model_instance_1.created_exploration_ids, [])
         self.assertEqual(model_instance_1.edited_exploration_ids, ['exp1'])
 
-        model_instance_2 = user_models.UserContributionsModel.get_by_id(
-            self.owner_id)
+        model_instance_2 = user_models.UserContributionsModel.get(
+            self.owner_id, strict=False)
         self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
         self.assertEqual(
             model_instance_2.edited_exploration_ids, ['exp1'])
 
     def test_job_removes_deleted_exp_from_edited_explorations(self):
         exp_services.delete_exploration(self.owner_id, 'exp1')
-        model_instance_1 = user_models.UserContributionsModel.get_by_id(
-            self.user_id)
+        model_instance_1 = user_models.UserContributionsModel.get(
+            self.user_id, strict=False)
         self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
         self.assertEqual(
             model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
 
-        model_instance_2 = user_models.UserContributionsModel.get_by_id(
-            self.owner_id)
+        model_instance_2 = user_models.UserContributionsModel.get(
+            self.owner_id, strict=False)
         self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
         self.assertEqual(
             model_instance_2.edited_exploration_ids, ['exp1'])
@@ -2545,13 +2553,13 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
                 '[u\'Removed deleted exp ids from UserContributionsModel\', '
                 '[u"%s", u"%s"]]' % (removed_exp_list[0], removed_exp_list[1])])
 
-        model_instance_1 = user_models.UserContributionsModel.get_by_id(
-            self.user_id)
+        model_instance_1 = user_models.UserContributionsModel.get(
+            self.user_id, strict=False)
         self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
         self.assertEqual(model_instance_1.edited_exploration_ids, ['exp0'])
 
-        model_instance_2 = user_models.UserContributionsModel.get_by_id(
-            self.owner_id)
+        model_instance_2 = user_models.UserContributionsModel.get(
+            self.owner_id, strict=False)
         self.assertEqual(model_instance_2.created_exploration_ids, [])
         self.assertEqual(
             model_instance_2.edited_exploration_ids, [])
@@ -2646,7 +2654,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_not_registered_user_has_not_registered_value(self):
         user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(self.owner_id))
+            user_models.UserSettingsModel.get(self.owner_id, strict=False))
         user_settings_model.username = None
         user_settings_model.update_timestamps()
         user_settings_model.put()
@@ -2655,7 +2663,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_deleted_user_has_deleted_value(self):
         user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(self.owner_id))
+            user_models.UserSettingsModel.get(self.owner_id, strict=False))
         user_settings_model.deleted = True
         user_settings_model.update_timestamps()
         user_settings_model.put()
@@ -2680,7 +2688,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_services.update_profile_picture_data_url(editor_id, None)
 
         user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(moderator_id))
+            user_models.UserSettingsModel.get(moderator_id, strict=False))
         user_settings_model.deleted = True
         user_settings_model.update_timestamps()
         user_settings_model.put()

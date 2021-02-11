@@ -223,8 +223,8 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             self.model_id, self.recipient_ids, self.sender_id,
             self.sender_email, feconf.BULK_EMAIL_INTENT_MARKETING,
             'Email Subject', 'Email Body', datetime.datetime.utcnow())
-        self.model_instance = email_models.BulkEmailModel.get_by_id(
-            self.model_id)
+        self.model_instance = email_models.BulkEmailModel.get(
+            self.model_id, strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob)
@@ -404,7 +404,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_user_id(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
         expected_output = [(
             u'[u\'failed validation check for item.id.user_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
@@ -417,8 +417,8 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_thread_id(self):
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id).delete()
+        feedback_models.GeneralFeedbackThreadModel.get(
+            self.thread_id, strict=False).delete()
         expected_output = [(
             u'[u\'failed validation check for item.id.thread_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '

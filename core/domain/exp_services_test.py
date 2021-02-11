@@ -562,33 +562,34 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # But the model still exists in the backend.
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get_by_id(self.EXP_0_ID))
+            exp_models.ExplorationModel.get(self.EXP_0_ID, strict=False))
 
         # The exploration summary is deleted, however.
-        self.assertIsNone(exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
+        self.assertIsNone(exp_models.ExpSummaryModel.get(
+            self.EXP_0_ID, strict=False))
 
         # The delete commit exists.
         self.assertIsNotNone(
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-%s-%s' % (self.EXP_0_ID, 1)))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-%s' % (self.EXP_0_ID, 1), strict=False))
 
         # The snapshot models exist.
         exp_snapshot_id = (
             exp_models.ExplorationModel.get_snapshot_id(self.EXP_0_ID, 1))
         self.assertIsNotNone(
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                exp_snapshot_id))
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                exp_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationSnapshotContentModel.get_by_id(
-                exp_snapshot_id))
+            exp_models.ExplorationSnapshotContentModel.get(
+                exp_snapshot_id, strict=False))
         exp_rights_snapshot_id = (
             exp_models.ExplorationRightsModel.get_snapshot_id(self.EXP_0_ID, 1))
         self.assertIsNotNone(
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                exp_rights_snapshot_id))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                exp_rights_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-                exp_rights_snapshot_id))
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                exp_rights_snapshot_id, strict=False))
 
     def test_deletion_of_multiple_explorations_empty(self):
         """Test that delete_explorations with empty list works correctly."""
@@ -624,21 +625,23 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # But the models still exist in the backend.
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get_by_id(self.EXP_0_ID))
+            exp_models.ExplorationModel.get(self.EXP_0_ID, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get_by_id(self.EXP_1_ID))
+            exp_models.ExplorationModel.get(self.EXP_1_ID, strict=False))
 
         # The exploration summaries are deleted, however.
-        self.assertIsNone(exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
-        self.assertIsNone(exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID))
+        self.assertIsNone(exp_models.ExpSummaryModel.get(
+            self.EXP_0_ID, strict=False))
+        self.assertIsNone(exp_models.ExpSummaryModel.get(
+            self.EXP_1_ID, strict=False))
 
         # The delete commits exist.
         self.assertIsNotNone(
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-%s-%s' % (self.EXP_0_ID, 1)))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-%s' % (self.EXP_0_ID, 1), strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-%s-%s' % (self.EXP_1_ID, 1)))
+            exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-%s' % (self.EXP_1_ID, 1), strict=False))
 
         # The snapshot models exist.
         exp_0_snapshot_id = (
@@ -646,33 +649,33 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exp_1_snapshot_id = (
             exp_models.ExplorationModel.get_snapshot_id(self.EXP_1_ID, 1))
         self.assertIsNotNone(
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                exp_0_snapshot_id))
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                exp_0_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationSnapshotContentModel.get_by_id(
-                exp_0_snapshot_id))
+            exp_models.ExplorationSnapshotContentModel.get(
+                exp_0_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                exp_1_snapshot_id))
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                exp_1_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationSnapshotContentModel.get_by_id(
-                exp_1_snapshot_id))
+            exp_models.ExplorationSnapshotContentModel.get(
+                exp_1_snapshot_id, strict=False))
         exp_0_rights_snapshot_id = (
             exp_models.ExplorationRightsModel.get_snapshot_id(self.EXP_0_ID, 1))
         exp_1_rights_snapshot_id = (
             exp_models.ExplorationRightsModel.get_snapshot_id(self.EXP_1_ID, 1))
         self.assertIsNotNone(
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                exp_0_rights_snapshot_id))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                exp_0_rights_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-                exp_0_rights_snapshot_id))
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                exp_0_rights_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                exp_1_rights_snapshot_id))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                exp_1_rights_snapshot_id, strict=False))
         self.assertIsNotNone(
-            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-                exp_1_rights_snapshot_id))
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                exp_1_rights_snapshot_id, strict=False))
 
     def test_hard_deletion_of_exploration(self):
         """Test that hard deletion of exploration works correctly."""
@@ -695,7 +698,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The exploration model has been purged from the backend.
         self.assertIsNone(
-            exp_models.ExplorationModel.get_by_id(self.EXP_0_ID))
+            exp_models.ExplorationModel.get(self.EXP_0_ID, strict=False))
 
     def test_hard_deletion_of_multiple_explorations(self):
         """Test that hard deletion of explorations works correctly."""
@@ -724,15 +727,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The exploration models have been purged from the backend.
         self.assertIsNone(
-            exp_models.ExplorationModel.get_by_id(self.EXP_0_ID))
+            exp_models.ExplorationModel.get(self.EXP_0_ID, strict=False))
         self.assertIsNone(
-            exp_models.ExplorationModel.get_by_id(self.EXP_1_ID))
+            exp_models.ExplorationModel.get(self.EXP_1_ID, strict=False))
 
         # The exploration summary models have been purged from the backend.
         self.assertIsNone(
-            exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
+            exp_models.ExpSummaryModel.get(self.EXP_0_ID, strict=False))
         self.assertIsNone(
-            exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID))
+            exp_models.ExpSummaryModel.get(self.EXP_1_ID, strict=False))
 
     def test_summaries_of_hard_deleted_explorations(self):
         """Test that summaries of hard deleted explorations are
@@ -754,7 +757,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The exploration summary model has been purged from the backend.
         self.assertIsNone(
-            exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
+            exp_models.ExpSummaryModel.get(self.EXP_0_ID, strict=False))
 
     def test_recommendations_of_deleted_explorations_are_deleted(self):
         """Test that recommendations for deleted explorations are correctly
@@ -776,11 +779,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The recommendations model has been purged from the backend.
         self.assertIsNone(
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                self.EXP_0_ID))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_0_ID, strict=False))
         self.assertIsNone(
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                self.EXP_1_ID))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False))
 
     def test_opportunity_of_deleted_explorations_are_deleted(self):
         """Test that opportunity summary for deleted explorations are correctly
@@ -812,11 +815,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The opportunity model has been purged from the backend.
         self.assertIsNone(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                self.EXP_0_ID))
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.EXP_0_ID, strict=False))
         self.assertIsNone(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                self.EXP_1_ID))
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.EXP_1_ID, strict=False))
 
     def test_feedbacks_belonging_to_exploration_are_deleted(self):
         """Tests that feedbacks belonging to exploration are deleted."""
@@ -838,10 +841,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(self.owner_id, [self.EXP_0_ID])
 
-        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            thread_1_id))
-        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            thread_2_id))
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get(
+            thread_1_id, strict=False))
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get(
+            thread_2_id, strict=False))
 
     def test_exploration_is_removed_from_index_when_deleted(self):
         """Tests that exploration is removed from the search index when
@@ -4689,27 +4692,27 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_draft_cleared_after_change_list_applied(self):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID1, self.draft_change_list, '')
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.USER_ID, self.EXP_ID1))
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=False)
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
     def test_draft_version_valid_returns_true(self):
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.USER_ID, self.EXP_ID1))
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=False)
         self.assertTrue(exp_services.is_version_of_draft_valid(
             self.EXP_ID1, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_returns_false(self):
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.USER_ID, self.EXP_ID2))
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            '%s.%s' % (self.USER_ID, self.EXP_ID2), strict=False)
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID2, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_when_no_draft_exists(self):
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.USER_ID, self.EXP_ID3))
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            '%s.%s' % (self.USER_ID, self.EXP_ID3), strict=False)
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
@@ -4784,8 +4787,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_draft_discarded(self):
         exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.USER_ID, self.EXP_ID1))
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=False)
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)

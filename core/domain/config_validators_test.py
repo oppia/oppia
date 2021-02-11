@@ -42,8 +42,8 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
             id='config_model', value='c')
         self.model_instance.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
-        self.csrf_model_instance = config_models.ConfigPropertyModel.get_by_id(
-            'oppia_csrf_secret')
+        self.csrf_model_instance = config_models.ConfigPropertyModel.get(
+            'oppia_csrf_secret', strict=False)
 
         self.job_class = (
             prod_validation_jobs_one_off.ConfigPropertyModelAuditOneOffJob)
@@ -89,8 +89,8 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
-            'config_model-1').delete()
+        config_models.ConfigPropertySnapshotMetadataModel.get(
+            'config_model-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
@@ -105,8 +105,8 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        config_models.ConfigPropertySnapshotContentModel.get_by_id(
-            'config_model-1').delete()
+        config_models.ConfigPropertySnapshotContentModel.get(
+            'config_model-1', strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -138,11 +138,11 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             id=feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
-                'config_model-1'))
+            config_models.ConfigPropertySnapshotMetadataModel.get(
+                'config_model-1', strict=False))
         self.csrf_model_instance = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
-                'oppia_csrf_secret-1'))
+            config_models.ConfigPropertySnapshotMetadataModel.get(
+                'oppia_csrf_secret-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -229,7 +229,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             expected_output, sort=False, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        user_models.UserSettingsModel.get(self.admin_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -304,11 +304,11 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             id=feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
-            config_models.ConfigPropertySnapshotContentModel.get_by_id(
-                'config_model-1'))
+            config_models.ConfigPropertySnapshotContentModel.get(
+                'config_model-1', strict=False))
         self.csrf_model_instance = (
-            config_models.ConfigPropertySnapshotContentModel.get_by_id(
-                'oppia_csrf_secret-1'))
+            config_models.ConfigPropertySnapshotContentModel.get(
+                'oppia_csrf_secret-1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -455,8 +455,8 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.parameter_model.id).delete()
+        config_models.PlatformParameterSnapshotMetadataModel.get(
+            '%s-1' % self.parameter_model.id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids field'
@@ -470,8 +470,8 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        config_models.PlatformParameterSnapshotContentModel.get_by_id(
-            '%s-1' % self.parameter_model.id).delete()
+        config_models.PlatformParameterSnapshotContentModel.get(
+            '%s-1' % self.parameter_model.id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids field'
@@ -508,8 +508,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
             id=feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.parameter_model.id))
+            config_models.PlatformParameterSnapshotMetadataModel.get(
+                '%s-1' % self.parameter_model.id, strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -594,7 +594,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
             expected_output, sort=False, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        user_models.UserSettingsModel.get(self.admin_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for committer_ids field '
@@ -674,8 +674,8 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             id=feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
-            config_models.PlatformParameterSnapshotContentModel.get_by_id(
-                '%s-1' % self.parameter_model.id))
+            config_models.PlatformParameterSnapshotContentModel.get(
+                '%s-1' % self.parameter_model.id, strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off

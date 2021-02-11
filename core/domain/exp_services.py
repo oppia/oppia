@@ -246,8 +246,8 @@ def get_story_id_linked_to_exploration(exp_id):
         str|None. The ID of the story if the exploration is linked to some
         story, otherwise None.
     """
-    exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
-        exp_id)
+    exploration_context_model = exp_models.ExplorationContextModel.get(
+        exp_id, strict=False)
     if exploration_context_model is not None:
         return exploration_context_model.story_id
     return None
@@ -1015,8 +1015,10 @@ def _compute_summary_of_exploration(exploration):
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
     """
-    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
-    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
+    exp_rights = exp_models.ExplorationRightsModel.get(
+        exploration.id, strict=False)
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration.id, strict=False)
     if exp_summary_model:
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
@@ -1123,7 +1125,8 @@ def save_exploration_summary(exp_summary):
             exp_summary.first_published_msec)
     }
 
-    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    exp_summary_model = (exp_models.ExpSummaryModel.get(
+        exp_summary.id, strict=False))
     if exp_summary_model is not None:
         exp_summary_model.populate(**exp_summary_dict)
         exp_summary_model.update_timestamps()

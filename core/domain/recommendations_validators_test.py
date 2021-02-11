@@ -63,11 +63,11 @@ class ExplorationRecommendationsModelValidatorTests(
         recommendations_services.set_exploration_recommendations('1', ['5'])
 
         self.model_instance_0 = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '0', strict=False))
         self.model_instance_1 = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '1'))
+            recommendations_models.ExplorationRecommendationsModel.get(
+                '1', strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -113,7 +113,7 @@ class ExplorationRecommendationsModelValidatorTests(
                 expected_output, sort=False, literal_eval=False)
 
     def test_model_with_missing_recommended_exploration(self):
-        exp_models.ExplorationModel.get_by_id('3').delete(
+        exp_models.ExplorationModel.get('3', strict=False).delete(
             self.user_id, '', [{}])
         expected_output = [
             (
