@@ -2190,11 +2190,11 @@ pre.oppia-pre-wrapped-text {
   font-size: 15px;
   padding: 6px;
   position: relative;
-  text-align: center;
-  height: 58px;
   display: flex;
-  justify-content: center;
+  height: 58px;
+  text-align: center;
   align-items: center;
+  justify-content: center;
 }
 .oppia-interaction-customization-label {
   font-size: 1em;
