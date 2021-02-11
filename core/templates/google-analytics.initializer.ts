@@ -16,12 +16,12 @@
  * @fileoverview Initialization of Google Analytics (gtag.js).
  */
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 (function() {
-  console.log('init gtag');
   if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
-    console.log('init gtag successful');
+    // Reference doc:
+    // https://developers.google.com/analytics/devguides/collection/gtagjs
     window.dataLayer = window.dataLayer || [];
     function gtag() {
       dataLayer.push(arguments);
