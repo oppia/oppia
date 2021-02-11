@@ -33,6 +33,8 @@ import { TranslationModalContent } from './modal-templates/translation-modal.com
 import { TranslationOpportunities } from './translation-opportunities/translation-opportunities.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
+import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
+import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -47,6 +49,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
+    OpportunitiesListComponent,
+    OpportunitiesListItemComponent,
     TranslationLanguageSelectorComponent,
     TranslationModalContent,
     TranslationOpportunities,
@@ -56,6 +60,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
+    OpportunitiesListComponent,
+    OpportunitiesListItemComponent,
     TranslationLanguageSelectorComponent,
     TranslationModalContent,
     TranslationOpportunities,

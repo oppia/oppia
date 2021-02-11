@@ -56,3 +56,15 @@ angular.module('oppia').directive('angularHtmlBind', [
       }
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+  @Directive({
+    selector: 'angular-html-bind'
+  })
+export class AngularHtmlBindDirective extends UpgradeComponent {
+  @Input() htmlData: string;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('angularHtmlBind', elementRef, injector);
+  }
+}

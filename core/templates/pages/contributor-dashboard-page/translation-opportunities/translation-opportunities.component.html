@@ -1,7 +1,7 @@
 <div>
-  <opportunities-list [load-opportunities]="loadOpportunities"
-                      [on-click-action-button]="onClickButton"
-                      [load-more-opportunities]="loadMoreOpportunities"
-                      [progress-bar-required]="true">
+  <opportunities-list [loadOpportunities]="loadOpportunities"
+                      (on-click-action-button)="onClickButton"
+                      [loadMoreOpportunities]="loadMoreOpportunities"
+                      [progressBarRequired]="true">
   </opportunities-list>
 </div>

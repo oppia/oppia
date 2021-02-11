@@ -35,6 +35,7 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -52,6 +53,7 @@ import { SocialButtonsComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
+import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive.ts';
 import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
@@ -59,6 +61,7 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { AngularHtmlBindDirective } from '../directives/angular-html-bind.directive';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -90,6 +93,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   ],
 
   declarations: [
+    AngularHtmlBindDirective,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
@@ -99,13 +103,15 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     LoadingDotsComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
     TranslatePipe,
-    TakeBreakModalComponent
+    TakeBreakModalComponent,
+    WrapTextWithEllipsisPipe,
   ],
 
   entryComponents: [
@@ -127,14 +133,17 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FormsModule,
     MaterialModule,
     // Components, directives, and pipes.
+    AngularHtmlBindDirective,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    WrapTextWithEllipsisPipe,
   ],
 })
 

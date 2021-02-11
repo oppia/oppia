@@ -1,31 +1,31 @@
 <div class="oppia-opportunities-list">
-  <div ng-repeat="opportunity in $ctrl.visibleOpportunities track by $index">
-    <opportunities-list-item opportunity="opportunity"
-                             on-click-action-button="$ctrl.onClickActionButton"
-                             progress-bar-required="$ctrl.progressBarRequired"
-                             label-required="$ctrl.labelRequired"
-                             opportunity-heading-truncation-length="$ctrl.opportunityHeadingTruncationLength">
+  <div *ngFor="let opportunity of visibleOpportunities; trackBy: $index">
+    <opportunities-list-item [opportunity]="opportunity"
+                             (on-click-action-button)="onClickActionButton"
+                             [progressBarRequired]="progressBarRequired"
+                             [labelRequired]="labelRequired"
+                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength">
     </opportunities-list-item>
   </div>
-  <div ng-show="$ctrl.loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
+  <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
     <opportunities-list-item></opportunities-list-item>
     <opportunities-list-item></opportunities-list-item>
   </div>
-  <div class="oppia-opportunity-pagination-contaniner" ng-if="$ctrl.visibleOpportunities.length > 0">
+  <div class="oppia-opportunity-pagination-contaniner" *ngIf="visibleOpportunities.length > 0">
     <button type="button"
             class="oppia-pagination-button"
-            ng-click="$ctrl.gotoPage($ctrl.activePageNumber - 1)"
-            ng-disabled="$ctrl.activePageNumber == 1">
+            (click)="gotoPage(activePageNumber - 1)"
+            [disabled]="activePageNumber == 1">
       <span class="material-icons">navigate_before</span>Previous
     </button>
     <button type="button"
             class="oppia-pagination-button"
-            ng-click="$ctrl.gotoPage($ctrl.activePageNumber + 1)"
-            ng-disabled="$ctrl.loadingOpportunityData || $ctrl.activePageNumber >= $ctrl.lastPageNumber">
+            (click)="gotoPage(activePageNumber + 1)"
+            [disabled]="loadingOpportunityData || activePageNumber >= lastPageNumber">
       Next<span class="material-icons">navigate_next</span>
     </button>
   </div>
-  <div class="oppia-end-availability" ng-show="$ctrl.visibleOpportunities.length === 0 && !$ctrl.loadingOpportunityData">
+  <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
     <div class="oppia-end-availability-line"></div>
     <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message">No opportunity available!</div>
     <div class="oppia-end-availability-line"></div>

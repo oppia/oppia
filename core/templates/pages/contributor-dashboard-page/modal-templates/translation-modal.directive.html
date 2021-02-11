@@ -27,9 +27,10 @@
       <a class="oppia-skip-button" href="" *ngIf="moreAvailable" (click)="skipActiveTranslation()">skip</a>
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
+      <!-- textToTranslate contains the html content of an exploration state -->
       <angular-html-bind [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
                          (click)="onContentClick($event)"
-                        [html-data]="textToTranslate"
+                        [htmlData]="textToTranslate"
                          class="oppia-rte-editor">
       </angular-html-bind>
     </div>

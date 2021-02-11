@@ -69,3 +69,23 @@ angular.module('oppia').directive('schemaBasedEditor', [
       controller: [function() {}]
     };
   }]);
+
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+import { Schema } from 'services/schema-default-value.service';
+@Directive({
+  selector: 'schema-based-editor'
+})
+export class SchemaBasedEditorDirective extends UpgradeComponent {
+  @Input() schema: Schema;
+  @Input() isDisabled: boolean;
+  @Input() localValue: string;
+  @Input() labelForFocusTarget: string;
+  @Input() onInputBlur: string;
+  @Input() onInputFocus: string;
+
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedEditorDirective', elementRef, injector);
+  }
+}

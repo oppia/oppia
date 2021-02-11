@@ -62,7 +62,7 @@ export class TranslationOpportunities {
     opportunitiesDicts: TranslationOpportunityDict[];
     more: boolean;
   } {
-    let opportunitiesDicts: TranslationOpportunityDict[] = [];
+    const opportunitiesDicts: TranslationOpportunityDict[] = [];
     for (let index in opportunities) {
       const opportunity = opportunities[index];
       const subheading = opportunity.getOpportunitySubheading();
@@ -121,7 +121,7 @@ export class TranslationOpportunities {
       .then(this.getPresentableOpportunitiesData);
   }
 
-  loadOpportunities(): Promise<{
+  public loadOpportunities(): Promise<{
     opportunitiesDicts: TranslationOpportunityDict[];
     more: boolean;
   }> {
