@@ -275,7 +275,7 @@ jobs:
       - run:
           name: Run e2e feature gating test
           command: |
-            python -m scripts.run_e2e_tests --skip_install --suite="featureGating"
+            python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
       - upload_screenshots
 
   e2e_new_structure_tests:
@@ -283,8 +283,7 @@ jobs:
     steps:
       - checkout
       - check_release_changelog_update_branch
-      - merge_target_branch
-      - install_chrome
+      - merge_target_branch - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
