@@ -324,6 +324,14 @@ describe('Learner dashboard page', function() {
         expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
       });
 
+    it('should test playlist delay for mobiles', function() {
+      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+      ctrl.$onInit();
+      expect(ctrl.checkMobileView()).toBe(true);
+      ctrl.collectionPlaylistSortableOptions;
+      expect(ctrl.collectionPlaylistSortableOptions.delay).toBe(1000);
+    });
+
     it('should sort collection playlist by index', function() {
       var mockedUi = {
         item: {
@@ -916,6 +924,19 @@ describe('Learner dashboard page', function() {
         removeClass: 'ng-hide'
       }).start();
       expect(elementSlideDownSpy).toHaveBeenCalled();
+    });
+
+    it('should test the playlist message placeholder for mobiles', function() {
+      spyOn(ctrl, 'checkMobileView').and.returnValue(true);
+      expect(ctrl.getPlaceholder()).toBe(
+        'I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE_MOBILE');
+    });
+
+    it('should test the playlist message placeholder for desktops', function() {
+      expect(ctrl.checkMobileView()).toBe(false);
+
+      expect(ctrl.getPlaceholder()).toBe(
+        'I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE');
     });
   });
 });
