@@ -205,7 +205,7 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), [self.skill_id])
 
         self.model_instance = (
-            question_models.QuestionCommitLogEntryModel.get_by_id(
+            question_models.QuestionCommitLogEntryModel.get(
                 'question-question_id-1', strict=False))
 
         self.process_and_flush_pending_mapreduce_tasks()
@@ -269,6 +269,6 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                     '[u\'Question Commit Model deleted\', '
                     '[u\'question-question_id-1\']]'])
             self.model_instance = (
-                question_models.QuestionCommitLogEntryModel.get_by_id(
+                question_models.QuestionCommitLogEntryModel.get(
                     'question-question_id-1', strict=False))
             self.assertIsNone(self.model_instance)

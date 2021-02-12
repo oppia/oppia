@@ -2166,6 +2166,6 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
         self._run_one_off_job()
         self.assertEqual(
             len(
-                collection_models.CollectionCommitLogEntryModel.get_by_id(
+                collection_models.CollectionCommitLogEntryModel.get(
                     commit.id, strict=False).commit_message),
             375)

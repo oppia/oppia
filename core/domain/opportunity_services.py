@@ -641,7 +641,7 @@ def create_skill_opportunity(skill_id, skill_description):
             skill_id already exists.
     """
     skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(
+        opportunity_models.SkillOpportunityModel.get(
             skill_id, strict=False))
     if skill_opportunity_model is not None:
         raise Exception(
@@ -708,7 +708,7 @@ def _get_skill_opportunity(skill_id):
         exist.
     """
     skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(
+        opportunity_models.SkillOpportunityModel.get(
             skill_id, strict=False))
     if skill_opportunity_model is not None:
         return get_skill_opportunity_from_model(skill_opportunity_model)
@@ -723,7 +723,7 @@ def delete_skill_opportunity(skill_id):
             SkillOpportunityModel.
     """
     skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(
+        opportunity_models.SkillOpportunityModel.get(
             skill_id, strict=False))
     if skill_opportunity_model is not None:
         opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
