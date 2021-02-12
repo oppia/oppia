@@ -232,10 +232,17 @@ angular.module('oppia').component('learnerDashboardPage', {
         return value;
       };
 
+      var changeDelay = function() {
+        if (ctrl.checkMobileView()) {
+          return 1000;
+        }
+        return 0;
+      };
+
       var getPlaylistSortableOptions = function(activityType) {
         return {
           'ui-floating': 'auto',
-          delay: 1000,
+          delay: changeDelay(),
           start: function(e, ui) {
             ui.placeholder.height(ui.item.height());
             $scope.$apply();
