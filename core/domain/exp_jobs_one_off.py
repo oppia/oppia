@@ -98,8 +98,11 @@ class RegenerateStringPropertyIndexOneOffJob(
             # Change the method resolution order of model to use BaseModel's
             # implementation of `put`.
             model = super(base_models.VersionedModel, model)
-        model.update_timestamps(update_last_updated_time=False)
-        model.put()
+        if isinstance(model, base_models.BaseHumanMaintainedModel):
+            model.put_for_bot()
+        else:
+            model.update_timestamps(update_last_updated_time=False)
+            model.put()
         yield (model_kind, 1)
 
     @staticmethod
@@ -646,9 +649,7 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
             if commit_log_model is None:
                 commit_log_model = regenerate_exp_commit_log_model(
                     item, version)
-                commit_log_model.update_timestamps(
-                    update_last_updated_time=False)
-                commit_log_model.put()
+                commit_log_model.put_for_bot()
                 yield (
                     'Regenerated Exploration Commit Log Model: version %s' % (
                         version), item.id)

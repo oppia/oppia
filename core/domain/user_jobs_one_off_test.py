@@ -166,8 +166,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.user_a_id, commit_type='create')
-        model1.update_timestamps()
-        model1.put()
+        model1.put_for_human()
         user_models.UserContributionsModel(
             id=self.user_a_id,
             created_exploration_ids=['exp_id']
@@ -190,8 +189,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     def test_user_contributions_get_created_after_running_the_job(self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id='new_user', commit_type='create')
-        model1.update_timestamps()
-        model1.put()
+        model1.put_for_human()
 
         user_contributions_model = user_models.UserContributionsModel.get(
             'new_user', strict=False)
@@ -1192,8 +1190,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self):
         model1 = exp_models.ExplorationRightsSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.owner_id, commit_type='create')
-        model1.update_timestamps()
-        model1.put()
+        model1.put_for_human()
 
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)

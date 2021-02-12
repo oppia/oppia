@@ -191,8 +191,7 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
         snapshot = exp_models.ExplorationModel.SNAPSHOT_METADATA_CLASS.get(
             exp_models.ExplorationModel.get_snapshot_id(exp.id, 2))
         snapshot.commit_cmds[0]['old_state_name'] = fake_old_state_name
-        snapshot.update_timestamps()
-        snapshot.put()
+        snapshot.put_for_human()
 
         v2_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))

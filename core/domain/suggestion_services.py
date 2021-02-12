@@ -295,7 +295,6 @@ def _update_suggestions(suggestions):
     suggestion_models.GeneralSuggestionModel.put_multi_for_human(
         suggestion_models_to_update)
 
-
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
 

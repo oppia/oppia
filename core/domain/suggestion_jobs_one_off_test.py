@@ -163,8 +163,7 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
 
         # Adding some invalid values in suggestion.
         suggestion_model.language_code = None
-        suggestion_model.update_timestamps(update_last_updated_time=False)
-        suggestion_model.put()
+        suggestion_model.put_for_bot()
 
         expected_output = [
             u'[u\'POST_MIGRATION_VALIDATION_FALIURE\', '
@@ -1208,8 +1207,7 @@ class PopulateContributionStatsOneOffJobTests(
             question_suggestion.suggestion_id
         )
         suggestion_model.deleted = True
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
+        suggestion_model.put_for_human()
 
         self._run_job_and_verify_output(expected_output)
 
@@ -1563,8 +1561,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
         suggestion_model.deleted = True
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
+        suggestion_model.put_for_human()
 
         expected_output = [u'[u\'DELETED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)

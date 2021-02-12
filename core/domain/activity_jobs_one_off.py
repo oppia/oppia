@@ -168,9 +168,7 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.update_timestamps(
-            update_last_updated_time=False)
-        snapshot_metadata_model.put()
+        snapshot_metadata_model.put_for_bot()
 
     @staticmethod
     def _add_exploration_user_ids(snapshot_content_model):
@@ -190,9 +188,7 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.update_timestamps(
-            update_last_updated_time=False)
-        snapshot_metadata_model.put()
+        snapshot_metadata_model.put_for_bot()
 
     @staticmethod
     def _add_topic_user_ids(snapshot_content_model):
@@ -206,9 +202,7 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
                 snapshot_content_model.id))
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             reconstituted_rights_model.manager_ids)))
-        snapshot_metadata_model.update_timestamps(
-            update_last_updated_time=False)
-        snapshot_metadata_model.put()
+        snapshot_metadata_model.put_for_bot()
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
@@ -586,8 +580,7 @@ class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         commit_log_model.post_commit_is_private = (
             commit_log_model.post_commit_status == (
                 constants.ACTIVITY_STATUS_PRIVATE))
-        commit_log_model.update_timestamps(update_last_updated_time=False)
-        commit_log_model.put()
+        commit_log_model.put_for_bot()
         yield (
             'SUCCESS-Added missing commit log model-%s' % model_class_name,
             snapshot_model.id)
@@ -703,8 +696,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
                 model_name, model_id, item.commit_message))
         if item.commit_message and len(item.commit_message) > 375:
             item.commit_message = item.commit_message[:375]
-            item.update_timestamps(update_last_updated_time=False)
-            item.put()
+            item.put_for_bot()
             yield ('TRUNCATED', identifier_message.encode('utf-8'))
         else:
             yield ('NOT_TRUNCATED', 1)
