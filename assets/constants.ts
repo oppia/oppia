@@ -5215,13 +5215,14 @@ export default {
   },
 
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput",
-      "DragAndDropSortInput"
+      "DragAndDropSortInput",
+      "NumericInput"
     ]
   }, {
     "name": "Math",
@@ -5235,13 +5236,14 @@ export default {
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
   "ALLOWED_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "Continue",
       "EndExploration",
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
+      "NumericInput",
       "TextInput",
       "DragAndDropSortInput"
     ]
@@ -5277,12 +5279,13 @@ export default {
     ]
   }],
 
-  "REVIEW_CATEGORY_TRANSLATION": "translation",
-  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
-  "REVIEW_CATEGORY_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION": "submit_question",
 
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
-  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
   "USER_FILTER_CRITERION_USERNAME": "username",
   "USER_FILTER_CRITERION_ROLE": "role",
 
@@ -5431,6 +5434,8 @@ export default {
   // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
+
+  "FIREBASE_AUTH_ENABLED": false,
 
   // Data required for Firebase authentication.
   //

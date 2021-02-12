@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from constants import constants
 from core import jobs_registry
 from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
@@ -260,18 +261,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             user_settings_model.model_id_errors,
             ['The user id User-1 in the field \'mock_field\' is invalid'])
 
-    def test_may_contain_system_users_filters_system_ids(self):
-        user_settings_model = (
-            base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids',
-                [feconf.MIGRATION_BOT_USER_ID, self.USER_ID],
-                may_contain_system_ids=True,
-                may_contain_pseudonymous_ids=False
-            ))
-
-        self.assertItemsEqual(
-            user_settings_model.model_ids, [self.USER_ID])
-
     def test_user_setting_model_fetcher_with_system_id(self):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
@@ -284,17 +273,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         self.assertItemsEqual(
             user_settings_model.model_id_errors,
             ['The field \'committer_ids\' should not contain system IDs'])
-
-    def test_may_contain_pseudonymous_users_filters_pseudonymous_users(self):
-        user_settings_model = (
-            base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', [self.USER_ID, self.PSEUDONYMOUS_ID],
-                may_contain_system_ids=False,
-                may_contain_pseudonymous_ids=True
-            ))
-
-        self.assertItemsEqual(
-            user_settings_model.model_ids, [self.USER_ID])
 
     def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
         user_settings_model = (
@@ -367,6 +345,26 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
                     'Entity id mock-12345: '
                     'The user id invalid_user_id in the field \'user_id\' is '
                     'invalid'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_error_raised_when_commit_message_large(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=feconf.MIGRATION_BOT_USER_ID,
+            commit_cmds=[],
+            commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'commit message check': [
+                    'Entity id mock-12345: '
+                    'Commit message larger than accepted length'
                 ]
             },
             mock_validator.errors
