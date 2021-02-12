@@ -217,6 +217,7 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service.ts';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
+import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { EmailDashboardDataService } from 'pages/email-dashboard-pages/email-dashboard-data.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -228,6 +229,8 @@ import { AngularNameService } from 'pages/exploration-editor-page/services/angul
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
+import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
@@ -385,6 +388,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
+  ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
@@ -621,6 +625,9 @@ export const angularServices: [string, Type<{}>][] = [
     StateTopAnswersStatsBackendApiService],
   ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],
   ['StateTopAnswersStatsService', StateTopAnswersStatsService],
+  ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
+  ['TutorialEventsBackendApiService',
+    TutorialEventsBackendApiService],
   ['StateWrittenTranslationsService', StateWrittenTranslationsService],
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
