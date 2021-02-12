@@ -963,7 +963,6 @@ def _update_user_proficiency(user_proficiency):
             user_proficiency.onboarding_email_sent
         )
 
-        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
 
     else:
@@ -1235,7 +1234,6 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     stats = create_community_contribution_stats_from_model(stats_model)
     stats.validate()
 
-    stats_model.update_timestamps()
     stats_model.put()
 
     logging.info('Updated translation_suggestion_counts_by_lang_code: %s' % (

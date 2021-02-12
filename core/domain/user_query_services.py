@@ -86,7 +86,6 @@ def send_email_to_qualified_users(
         email_body, email_intent)
     query_model.sent_email_model_id = bulk_email_model_id
     query_model.deleted = True
-    query_model.update_timestamps()
     query_model.put()
 
     # Store BulkEmailModel in UserBulkEmailsModel of each recipient.
@@ -100,5 +99,4 @@ def send_email_to_qualified_users(
 
         recipient_bulk_email_model.sent_email_model_ids.append(
             bulk_email_model_id)
-        recipient_bulk_email_model.update_timestamps()
         recipient_bulk_email_model.put()

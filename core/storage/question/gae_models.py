@@ -155,7 +155,6 @@ class QuestionModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
-        question_commit_log.update_timestamps()
         question_commit_log.put()
 
     @classmethod

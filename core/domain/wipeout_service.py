@@ -121,7 +121,6 @@ def save_pending_deletion_requests(pending_deletion_requests):
             )
         final_pending_deletion_request_models.append(deletion_request_model)
 
-    user_models.PendingDeletionRequestModel.update_timestamps_multi(
         final_pending_deletion_request_models)
     user_models.PendingDeletionRequestModel.put_multi(
         final_pending_deletion_request_models)
@@ -904,7 +903,6 @@ def _pseudonymize_activity_models_with_associated_rights_models(
                     for field_id in model_dict[field_name]
                 ]
             rights_snapshot_content_model.content = model_dict
-            rights_snapshot_content_model.update_timestamps()
 
         commit_log_models = [
             model for model in activity_related_models
@@ -990,7 +988,6 @@ def _remove_user_id_from_contributors_in_summary_models(
             if user_id in summary_model.contributors_summary:
                 del summary_model.contributors_summary[user_id]
 
-        summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)
 
     for i in python_utils.RANGE(
@@ -1152,7 +1149,6 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
                 voiceover_application_model.final_reviewer_id = (
                     suggestion_ids_to_pids[voiceover_application_model.id]
                 )
-        voiceover_application_class.update_timestamps_multi(
             voiceover_application_models)
         voiceover_application_class.put_multi(voiceover_application_models)
 

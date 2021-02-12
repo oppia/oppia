@@ -207,7 +207,6 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
                 '%s is not an authorized user for this query.' % self.user_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
         query_model.deleted = True
-        query_model.update_timestamps()
         query_model.put()
         self.render_json({})
 

@@ -121,7 +121,6 @@ def _save_multi_exploration_opportunity_summary(
 
     (
         opportunity_models.ExplorationOpportunitySummaryModel
-        .update_timestamps_multi(exploration_opportunity_summary_model_list))
     opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
         exploration_opportunity_summary_model_list)
 
@@ -675,7 +674,6 @@ def _save_skill_opportunities(skill_opportunities):
             question_count=skill_opportunity.question_count,
         )
         skill_opportunity_models.append(model)
-    opportunity_models.SkillOpportunityModel.update_timestamps_multi(
         skill_opportunity_models)
     opportunity_models.SkillOpportunityModel.put_multi(skill_opportunity_models)
 

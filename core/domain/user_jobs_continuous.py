@@ -413,7 +413,6 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 else:
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
-                model.update_timestamps()
                 model.put()
 
         def _increment_total_plays_count(user_id):
@@ -434,7 +433,6 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_layer=active_realtime_layer).put()
             else:
                 model.total_plays += 1
-                model.update_timestamps()
                 model.put()
 
         exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
@@ -701,5 +699,4 @@ class UserStatsMRJobManager(
             average_ratings = python_utils.divide(
                 sum_of_ratings, float(num_ratings))
             mr_model.average_ratings = average_ratings
-        mr_model.update_timestamps()
         mr_model.put()

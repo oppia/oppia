@@ -137,7 +137,6 @@ class BaseJobManager(python_utils.OBJECT):
             """
             job_id = job_models.JobModel.get_new_id(cls.__name__)
             model = job_models.JobModel(id=job_id, job_type=cls.__name__)
-            model.update_timestamps()
             model.put()
             return job_id
 
@@ -171,7 +170,6 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
         model.additional_job_params = additional_job_params
-        model.update_timestamps()
         model.put()
 
     @classmethod
@@ -192,7 +190,6 @@ class BaseJobManager(python_utils.OBJECT):
         model.metadata = metadata
         model.status_code = STATUS_CODE_STARTED
         model.time_started_msec = utils.get_current_time_in_millisecs()
-        model.update_timestamps()
         model.put()
 
     @classmethod
@@ -220,7 +217,6 @@ class BaseJobManager(python_utils.OBJECT):
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.output = cls._compress_output_list(
             output_list, _max_output_len_chars)
-        model.update_timestamps()
         model.put()
 
         cls._post_completed_hook(job_id)
@@ -291,7 +287,6 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_FAILED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = error
-        model.update_timestamps()
         model.put()
 
         cls._post_failure_hook(job_id)
@@ -318,7 +313,6 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_CANCELED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = cancel_message
-        model.update_timestamps()
         model.put()
 
         cls._post_cancel_hook(job_id, cancel_message)
@@ -1291,7 +1285,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             if cc_model is None:
                 cc_model = job_models.ContinuousComputationModel(
                     id=cls.__name__)
-                cc_model.update_timestamps()
                 cc_model.put()
 
             return cc_model.active_realtime_layer_index
@@ -1346,7 +1339,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 cls.__name__)
             cc_model.active_realtime_layer_index = (
                 1 - cc_model.active_realtime_layer_index)
-            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -1398,7 +1390,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
                 cc_model.status_code = (
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-                cc_model.update_timestamps()
                 cc_model.put()
 
             return cc_model.status_code
@@ -1442,7 +1433,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.status_code = (
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
             cc_model.last_started_msec = utils.get_current_time_in_millisecs()
-            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -1479,7 +1469,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
             cc_model.status_code = new_status_code
             cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
-            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -1536,7 +1525,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             """
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
             cc_model.last_finished_msec = utils.get_current_time_in_millisecs()
-            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(

@@ -189,7 +189,6 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights.community_owned
         )
         collection_commit_log.collection_id = self.id
-        collection_commit_log.update_timestamps()
         collection_commit_log.put()
 
     @classmethod
@@ -227,7 +226,6 @@ class CollectionModel(base_models.VersionedModel):
                 )
                 collection_commit_log.collection_id = model.id
                 commit_log_models.append(collection_commit_log)
-            CollectionCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
@@ -516,7 +514,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
 
     @classmethod

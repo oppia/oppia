@@ -90,41 +90,14 @@ class BaseModel(datastore_services.Model):
     # the model's id is not used as the key for the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY = False
 
-    # When this entity was first created. This value should only be modified by
-    # the update_timestamps method.
+    # When this entity was first created. This value should not be modified.
     created_on = (
-        datastore_services.DateTimeProperty(indexed=True, required=True))
-    # When this entity was last updated. This value should only be modified by
-    # the update_timestamps method.
+        datastore_services.DateTimeProperty(auto_now_add=True, indexed=True, required=True))
+    # When this entity was last updated. This value should not be modified.
     last_updated = (
-        datastore_services.DateTimeProperty(indexed=True, required=True))
+        datastore_services.DateTimeProperty(auto_now=True, indexed=True, required=True))
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
-
-    def __init__(self, *args, **kwargs):
-        super(BaseModel, self).__init__(*args, **kwargs)
-        self._last_updated_timestamp_is_fresh = False
-
-    def _pre_put_hook(self):
-        """Operations to perform just before the model is `put` into storage.
-
-        Raises:
-            Exception. The model has not refreshed the value of last_updated.
-        """
-        super(BaseModel, self)._pre_put_hook()
-
-        if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
-
-        if self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-            self._last_updated_timestamp_is_fresh = True
-
-        if not self._last_updated_timestamp_is_fresh:
-            raise Exception(
-                '%s did not call update_timestamps() yet' % type(self).__name__)
-
-        self._last_updated_timestamp_is_fresh = False
 
     @property
     def id(self):
@@ -276,34 +249,6 @@ class BaseModel(datastore_services.Model):
                     entities[i] = None
         return entities
 
-    def update_timestamps(self, update_last_updated_time=True):
-        """Update the created_on and last_updated fields.
-
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the model.
-        """
-        self._last_updated_timestamp_is_fresh = True
-
-        if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
-
-        if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-
-    @classmethod
-    def update_timestamps_multi(cls, entities, update_last_updated_time=True):
-        """Update the created_on and last_updated fields of all given entities.
-
-        Args:
-            entities: list(datastore_services.Model). List of model instances to
-                be stored.
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the model.
-        """
-        datastore_services.update_timestamps_multi(
-            entities, update_last_updated_time=update_last_updated_time)
-
     @classmethod
     def put_multi(cls, entities):
         """Stores the given datastore_services.Model instances.
@@ -402,13 +347,11 @@ class BaseHumanMaintainedModel(BaseModel):
 
     def put_for_human(self):
         """Stores the model instance on behalf of a human."""
-        self.update_timestamps()
         self.last_updated_by_human = datetime.datetime.utcnow()
         return super(BaseHumanMaintainedModel, self).put()
 
     def put_for_bot(self):
         """Stores the model instance on behalf of a non-human."""
-        self.update_timestamps()
         return super(BaseHumanMaintainedModel, self).put()
 
     @classmethod
@@ -427,7 +370,6 @@ class BaseHumanMaintainedModel(BaseModel):
         Returns:
             list(future). A list of futures.
         """
-        cls.update_timestamps_multi(instances)
         now = datetime.datetime.utcnow()
         for instance in instances:
             instance.last_updated_by_human = now
@@ -443,7 +385,6 @@ class BaseHumanMaintainedModel(BaseModel):
         Returns:
             list(future). A list of futures.
         """
-        cls.update_timestamps_multi(instances)
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
 
 
@@ -824,7 +765,6 @@ class VersionedModel(BaseHumanMaintainedModel):
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self]
-        self.update_timestamps_multi(entities)
         transaction_services.run_in_transaction(BaseModel.put_multi, entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
@@ -953,9 +893,10 @@ class VersionedModel(BaseHumanMaintainedModel):
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
             entities = (
-                snapshot_metadata_models + snapshot_content_models +
-                versioned_models)
-            cls.update_timestamps_multi(entities)
+                snapshot_metadata_models +
+                snapshot_content_models +
+                versioned_models
+            )
             transaction_services.run_in_transaction(
                 BaseModel.put_multi, entities)
 

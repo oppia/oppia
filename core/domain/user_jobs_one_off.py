@@ -359,7 +359,6 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if user_commits:
             user_model.last_edited_an_exploration = user_commits[0].created_on
 
-        user_model.update_timestamps()
         user_model.put()
 
 
@@ -390,7 +389,6 @@ class CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob(
                     exp_ids_removed.append(exp_id)
                     model_instance.exploration_ids.remove(exp_id)
             if exp_ids_removed:
-                model_instance.update_timestamps()
                 model_instance.put()
                 yield (
                     'Successfully cleaned up UserSubscriptionsModel %s and '
@@ -429,8 +427,6 @@ class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del user_subscriptions_model._properties['activity_ids']  # pylint: disable=protected-access
             if 'activity_ids' in user_subscriptions_model._values:  # pylint: disable=protected-access
                 del user_subscriptions_model._values['activity_ids']  # pylint: disable=protected-access
-            user_subscriptions_model.update_timestamps(
-                update_last_updated_time=False)
             user_subscriptions_model.put()
             yield (
                 'SUCCESS_REMOVED - UserSubscriptionsModel',
@@ -471,8 +467,6 @@ class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del user_subscriptions_model._properties['feedback_thread_ids']  # pylint: disable=protected-access
             if 'feedback_thread_ids' in user_subscriptions_model._values:  # pylint: disable=protected-access
                 del user_subscriptions_model._values['feedback_thread_ids']  # pylint: disable=protected-access
-            user_subscriptions_model.update_timestamps(
-                update_last_updated_time=False)
             user_subscriptions_model.put()
             yield (
                 'SUCCESS_REMOVED - UserSubscriptionsModel',
@@ -629,8 +623,6 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         correction_cutoff_timestamp = datetime.datetime.strptime(
             'Jul 1 2020', '%b %d %Y')
         if user_settings_model.created_on - min_date > time_delta_for_update:
-            user_settings_model.update_timestamps(
-                update_last_updated_time=False)
             user_settings_model.created_on = min_date
             user_settings_model.put()
             yield (
@@ -826,7 +818,6 @@ class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         if item.id in item.subscriber_ids:
             item.subscriber_ids.remove(item.id)
-            item.update_timestamps()
             item.put()
             yield ('Removed user from their own subscribers list', item.id)
 
@@ -866,7 +857,6 @@ class CleanUpCollectionProgressModelOneOffJob(
                 user_models.CompletedActivitiesModel(id=item.user_id))
             completed_activities_model.exploration_ids = (
                 item.completed_explorations)
-            completed_activities_model.update_timestamps()
             completed_activities_model.put()
             yield ('Regenerated Missing CompletedActivitiesModel', item.id)
         else:
@@ -877,7 +867,6 @@ class CleanUpCollectionProgressModelOneOffJob(
             if missing_exp_ids:
                 completed_activities_model.exploration_ids.extend(
                     missing_exp_ids)
-                completed_activities_model.update_timestamps()
                 completed_activities_model.put()
                 yield (
                     'Added missing exp ids in CompletedActivitiesModel',
@@ -898,7 +887,6 @@ class CleanUpCollectionProgressModelOneOffJob(
             item.completed_explorations = [
                 exp_id for exp_id in item.completed_explorations
                 if exp_id not in exp_ids_to_remove]
-            item.update_timestamps()
             item.put()
             yield (
                 'Invalid Exploration IDs cleaned from '
@@ -954,7 +942,6 @@ class CleanUpUserContributionsModelOneOffJob(
                 item.edited_exploration_ids.remove(exp_id)
 
         if exp_ids_removed:
-            item.update_timestamps()
             item.put()
             yield (
                 'Removed deleted exp ids from UserContributionsModel',

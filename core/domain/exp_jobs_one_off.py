@@ -101,7 +101,6 @@ class RegenerateStringPropertyIndexOneOffJob(
         if isinstance(model, base_models.BaseHumanMaintainedModel):
             model.put_for_bot()
         else:
-            model.update_timestamps(update_last_updated_time=False)
             model.put()
         yield (model_kind, 1)
 
