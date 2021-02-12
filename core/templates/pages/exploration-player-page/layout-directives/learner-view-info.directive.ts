@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EditableTopicBackendApiService } from "domain/topic/editable-topic-backend-api.service";
-
 /**
  * @fileoverview Directive for the learner view info section of the
  * footer.
@@ -31,13 +29,14 @@ require(
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/date-time-format.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('domain/story_viewer/story-viewer-backend-api.service.ts');
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('learnerViewInfo', [
@@ -48,55 +47,20 @@ angular.module('oppia').directive('learnerViewInfo', [
       template: require('./learner-view-info.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$rootScope', '$scope', '$uibModal', 'ContextService',
-        'ReadOnlyExplorationBackendApiService', 'StoryEditorStateService', 'StoryViewerBackendApiService',
-        'UrlService', 'UrlInterpolationService',
-        'TOPIC_VIEWER_STORY_URL_TEMPLATE','EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        '$http', '$log', '$rootScope', '$uibModal', 'ContextService',
+        'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
+        'UrlService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'TOPIC_VIEWER_STORY_URL_TEMPLATE',
         function(
-            $http, $log, $rootScope, $scope, $uibModal, ContextService,
-            ReadOnlyExplorationBackendApiService, StoryEditorStateService, StoryViewerBackendApiService,
-            UrlService, UrlInterpolationService,
-            TOPIC_VIEWER_STORY_URL_TEMPLATE, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+            $http, $log, $rootScope, $uibModal, ContextService,
+            ReadOnlyExplorationBackendApiService, UrlInterpolationService,
+            UrlService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+            TOPIC_VIEWER_STORY_URL_TEMPLATE
+        ) {
           var ctrl = this;
           var explorationId = ContextService.getExplorationId();
           var expInfo = null;
           ctrl.directiveSubscriptions = new Subscription();
-          /*var topicUrlFragment = (
-            UrlService.getTopicUrlFragmentFromLearnerUrl());
-          ctrl.topicName = result.data.topic_name;
-          var topicViewerUrl = UrlInterpolationService.interpolateUrl(
-            TOPIC_VIEWER_PAGE, {
-              topic_url_fragment: topicUrlFragment,
-              classroom_url_fragment: (
-                UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-            });*/
-
-            /*$scope.getTopicName = function() {
-              return StoryEditorStateService.getTopicName();
-            };*/
-          //var topicUrlFragment = null;
-          //var classroomUrlFragment = null;
-
-
-          /*ctrl.getTopicUrl = function() {
-            return UrlInterpolationService.interpolateUrl(
-              TOPIC_VIEWER_STORY_URL_TEMPLATE, {
-                topic_url_fragment: (
-                  UrlService.getTopicUrlFragmentFromLearnerUrl()),
-                classroom_url_fragment: (
-                  UrlService.getClassroomUrlFragmentFromLearnerUrl())
-              });
-          };*/
-
-          /*ctrl.getTopicUrl = function() {
-              UrlInterpolationService.interpolateUrl(
-                $http.get(TOPIC_VIEWER_STORY_URL_TEMPLATE, {
-                  topic_url_fragment: (
-                    UrlService.getTopicUrlFragmentFromLearnerUrl()),
-                  classroom_url_fragment: (
-                    UrlService.getClassroomUrlFragmentFromLearnerUrl()) 
-                })  );
-          };*/
 
           ctrl.showInformationCard = function() {
             if (expInfo) {
@@ -138,23 +102,16 @@ angular.module('oppia').directive('learnerViewInfo', [
               // No further action is needed.
             });
           };
-          /*var getTopicUrl = function(): string {
-            return this.UrlInterpolationService.interpolateUrl(
-              ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
-                topic_url_fragment: ctrl.topicUrlFragment,
-                classroom_url_fragment: this.classroomUrlFragment
-              });
-          }*/
+
           ctrl.getTopicUrl = function() {
             return UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_STORY_URL_TEMPLATE, {
                 topic_url_fragment: (
                   UrlService.getTopicUrlFragmentFromLearnerUrl()),
                 classroom_url_fragment: (
-                  UrlService.getClassroomUrlFragmentFromLearnerUrl())
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl()),
               });
           };
-    
           ctrl.$onInit = function() {
             ctrl.explorationTitle = 'Loading...';
             ReadOnlyExplorationBackendApiService.fetchExploration(
@@ -163,22 +120,23 @@ angular.module('oppia').directive('learnerViewInfo', [
                 ctrl.explorationTitle = response.exploration.title;
                 $rootScope.$applyAsync();
               });
-            /*ctrl.topicUrlFragment = (
-              ctrl.UrlService.getTopicUrlFragmentFromLearnerUrl());
-            ctrl.topicName = getTopicUrl();
-            ctrl.classroomUrlFragment = (
-              ctrl.UrlService.getClassroomUrlFragmentFromLearnerUrl());*/
-              /*ctrl.directiveSubscriptions.add(
-                StoryViewerBackendApiService.onSendStoryData.subscribe((data) => {
-                  ctrl.topicName = data.topicName;
-                })
-              );*/
-              ctrl.directiveSubscriptions.add(
-                StoryViewerBackendApiService.onSendStoryData.subscribe((data) => {
-                  ctrl.topicName = data.topicName;
-                  //ctrl.storyTitle = data.storyTitle;
-                })
-              );
+            ctrl.storyViewerBackendApiService = (
+              OppiaAngularRootComponent.storyViewerBackendApiService);
+            var topicUrlFragment = (
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
+            var classroomUrlFragment = (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl());
+            var storyUrlFragment = (
+              UrlService.getStoryUrlFragmentFromLearnerUrl());
+            ctrl.storyViewerBackendApiService.fetchStoryData(
+              topicUrlFragment,
+              classroomUrlFragment,
+              storyUrlFragment).then(
+              function(storyDataDict) {
+                ctrl.storyPlaythroughObject = storyDataDict;
+                var topicName = ctrl.storyPlaythroughObject.topicName;
+                ctrl.topicName = topicName;
+              });
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();

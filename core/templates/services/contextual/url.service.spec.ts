@@ -182,6 +182,13 @@ describe('Url Service', () => {
     expect(function() {
       urlService.getTopicUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for topic');
+
+    mockLocation.pathname = '/explore/16';
+    mockLocation.search = (
+      '?topic_url_fragment=topic');
+    expect(
+      urlService.getTopicUrlFragmentFromLearnerUrl()
+    ).toBe('topic');
   });
 
   it('should correctly retrieve classroom name from url', () => {
@@ -193,6 +200,14 @@ describe('Url Service', () => {
     expect(function() {
       urlService.getClassroomUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for classroom');
+
+    mockLocation.pathname = '/explore/16';
+    mockLocation.search = (
+      // eslint-disable-next-line max-len
+      '?topic_url_fragment=topic&story_url_fragment=story-one&classroom_url_fragment=math');
+    expect(
+      urlService.getClassroomUrlFragmentFromLearnerUrl()
+    ).toBe('math');
   });
 
   it('should correctly retrieve selected subtopics from url', () => {
