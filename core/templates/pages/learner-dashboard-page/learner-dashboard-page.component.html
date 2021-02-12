@@ -298,7 +298,7 @@
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 ng-if="$ctrl.explorationPlaylist.length > 0">
-            <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
+            <span translate="<[$ctrl.getPlaceholder()]>"></span>
           </span>
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 ng-if="$ctrl.numberNonexistentExplorationsFromPlaylist !== 0">
