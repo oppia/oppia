@@ -235,6 +235,7 @@ angular.module('oppia').component('learnerDashboardPage', {
       var getPlaylistSortableOptions = function(activityType) {
         return {
           'ui-floating': 'auto',
+          delay: 1500,
           start: function(e, ui) {
             ui.placeholder.height(ui.item.height());
             $scope.$apply();
