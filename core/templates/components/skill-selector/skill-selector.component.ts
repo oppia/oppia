@@ -38,31 +38,27 @@ export class SkillSelectorComponent implements OnInit {
   @Input() countOfSkillsToPrioritize: number;
   @Input() categorizedSkills: CategorizedSkills;
   @Input() untriagedSkillSummaries: SkillSummary[];
-  @Input() allowSkillsFromOtherTopics: boolean;
+  @Input() canAllowSkillsFromOtherTopics: boolean;
   @Output() selectedSkillIdChanged: EventEmitter<string> = new EventEmitter();
-  scopeCategorizedSkills: CategorizedSkills = {}
-  scopeUntriagedSkillSummaries: SkillSummary[] = []
   selectedSkill = null;
   skillFilterText = '';
   
   topicFilterList = [];
   subTopicFilterDict: { [topicName: string]:
-     {subTopicName: string; checked: boolean}[] } = {};
+     { subTopicName: string; checked: boolean }[] } = {};
   intialSubTopicFilterDict = {};
 
-  constructor() {
-    this.scopeCategorizedSkills = this.categorizedSkills
-    this.scopeUntriagedSkillSummaries = this.untriagedSkillSummaries
-  }
+  constructor() {}
 
   ngOnInit(): void {
-    for (let topicName in this.scopeCategorizedSkills) {
+    console.log("untriagedSkillSummaries = " + this.untriagedSkillSummaries)
+    for (let topicName in this.categorizedSkills) {
       var topicNameDict = {
         topicName: topicName,
         checked: false
       };
       this.topicFilterList.push(topicNameDict);
-      var subTopics = this.scopeCategorizedSkills[topicName];
+      var subTopics = this.categorizedSkills[topicName];
       this.subTopicFilterDict[topicName] = [];
       for (let subTopic in subTopics) {
         var subTopicNameDict = {
@@ -80,8 +76,8 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   checkIfTopicIsEmpty(topicName: string): boolean {
-    for (let key in this.scopeCategorizedSkills[topicName]) {
-      if (Object.keys(this.scopeCategorizedSkills[topicName][key]).length) {
+    for (let key in this.categorizedSkills[topicName]) {
+      if (Object.keys(this.categorizedSkills[topicName][key]).length) {
         return true;
       }
     }
@@ -125,15 +121,15 @@ export class SkillSelectorComponent implements OnInit {
         }
       }
       if (isAnyTopicChecked) {
-        this.scopeCategorizedSkills = angular.copy(updatedSkillsDict);
+        this.categorizedSkills = angular.copy(updatedSkillsDict);
       } else {
         // If no filter is applied on both subtopics and topics, we
         // need to display all the skills (the original list).
         // This might not be needed below...
-        this.scopeCategorizedSkills = this.categorizedSkills
+        this.categorizedSkills = this.categorizedSkills
       }
     } else {
-      this.scopeCategorizedSkills = angular.copy(updatedSkillsDict);
+      this.categorizedSkills = angular.copy(updatedSkillsDict);
     }
   }
 
@@ -184,5 +180,7 @@ export class SkillSelectorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'conceptCard', downgradeComponent(
-    { component: SkillSelectorComponent }));
+  'skillSelector', downgradeComponent(
+    { component: SkillSelectorComponent }
+  )
+);

@@ -1,108 +1,112 @@
-<div class="skill-selector-parent skill-container oppia-skill-container protractor-test-skill-container">
-  <div class="list-group oppia-list-group">
-    <mat-card layout="row" class="list-view-item protractor-test-skill-select-header">
-      Search By Skill
-      <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" [(ngModel)]="skillFilterText" autofocus>
-    </mat-card>
-    <div class="skill-list-box">
-      <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
-        <div *ngFor="let topic of categorizedSkills | keyvalue">
-          <mat-card class="list-view-item" *ngIf="checkIfTopicIsEmpty(topicName)">
-            <mat-card layout="row" class="list-view-item">
-              <h2><label class="oppia-topic-name-text">{{ topic.key }}</label></h2>
-            </mat-card>
-            <div *ngFor="let subtopic of topic.value | keyvalue" class="list-view-item ">
-              <div *ngIf="!checkIfEmpty(subtopic.value)">
-                <mat-card class="list-view-item">
-                  <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
-                  <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of skills | filterForMatchingText:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
-                    {{ skill.description }}
-                  </mat-radio-button>
-                </mat-card>
+<div class="skill-selector">
+  <div class="skill-selector-parent skill-container oppia-skill-container protractor-test-skill-container">
+    <div class="list-group oppia-list-group">
+      <mat-card layout="row" class="list-view-item protractor-test-skill-select-header">
+        Search By Skill
+        <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" [(ngModel)]="skillFilterText" autofocus>
+      </mat-card>
+      <div class="skill-list-box">
+        <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
+          <div *ngFor="let topic of categorizedSkills | keyvalue">
+            <mat-card class="list-view-item" *ngIf="checkIfTopicIsEmpty(topicName)">
+              <mat-card layout="row" class="list-view-item">
+                <h2><label class="oppia-topic-name-text">{{ topic.key }}</label></h2>
+              </mat-card>
+              <div *ngFor="let subtopic of topic.value | keyvalue" class="list-view-item ">
+                <div *ngIf="!checkIfEmpty(subtopic.value)">
+                  <mat-card class="list-view-item">
+                    <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
+                    <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of skills | filterForMatchingText:skillFilterText" [value]="skill.id" aria-label="{{ skill.description }}">
+                      {{ skill.description }}
+                    </mat-radio-button>
+                  </mat-card>
+                </div>
               </div>
+            </mat-card>
+          </div>
+          <mat-card *ngIf="untriagedSkillSummaries.length" class="list-view-item">
+            <mat-card layout="row" class="list-view-item">
+              <h2><label class="oppia-heading-text">Untriaged Skills</label></h2>
+            </mat-card>
+            <div *ngIf="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
+              <mat-card class="list-view-item">
+                <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of untriagedSkillSummaries | filterForMatchingText:skillFilterText" [value]="skill.id" aria-label="{{ skill.description }}">
+                  {{ skill.description }}
+                </mat-radio-button>
+              </mat-card>
             </div>
           </mat-card>
-        </div>
-        <mat-card *ngIf="untriagedSkillSummaries.length" class="list-view-item">
-          <mat-card layout="row" class="list-view-item">
-            <h2><label class="oppia-heading-text">Untriaged Skills</label></h2>
-          </mat-card>
-          <div *ngIf="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
+        </mat-radio-group>
+      </div>
+    </div>
+    <div class="list-group oppia-filter-list-group">
+      <mat-card *ngIf="canAllowSkillsFromOtherTopics" layout="row" class="list-view-item oppia-list-view-item">
+        <label>Filter By Topics</label>
+      </mat-card>
+      <div *ngIf="canAllowSkillsFromOtherTopics" class="oppia-list-view-item-container">
+        <mat-card class="list-view-item ">
+          <mat-checkbox class="oppia-skills-list-item" *ngFor="let topic of topicFilterList" [(ngModel)]="topic.checked" (change)="updateSkillsListOnTopicFilterChange()">{{ topic.topicName }}</mat-checkbox>
+        </mat-card>
+      </div>
+      <br>
+      <mat-card layout="row" class="list-view-item oppia-list-view-item">
+        <label>Filter By Subtopic</label>
+      </mat-card>
+      <div class="oppia-list-view-item-container">
+        <mat-card class="list-view-item">
+          <div *ngFor="let topic of subTopicFilterDict | keyvalue">
+            <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>
             <mat-card class="list-view-item">
-              <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of untriagedSkillSummaries | filterForMatchingText:skillFilterText" ng-value="skill.id" aria-label="{{ skill.description }}">
-                {{ skill.description }}
-              </mat-radio-button>
+              <mat-checkbox class="oppia-skills-list-item" *ngFor="let subtopic of topic.value" [(ngModel)]="subtopic.checked" (change)="updateSkillsListOnSubtopicFilterChange()">{{ subtopic.subTopicName }}</mat-checkbox>
             </mat-card>
           </div>
         </mat-card>
-      </mat-radio-group>
+      </div>
+      <br>
+      <button class="btn btn-secondary" (click)="clearAllFilters()">Clear All Filters</button>
     </div>
-  </div>
-  <div class="list-group oppia-filter-list-group">
-    <mat-card *ngIf="canAllowSkillsFromOtherTopics()" layout="row" class="list-view-item oppia-list-view-item">
-      <label>Filter By Topics</label>
-    </mat-card>
-    <div *ngIf="canAllowSkillsFromOtherTopics()" class="oppia-list-view-item-container">
-      <mat-card class="list-view-item ">
-        <mat-checkbox class="oppia-skills-list-item" *ngFor="let topic of topicFilterList" [(ngModel)]="topic.checked" (change)="updateSkillsListOnTopicFilterChange()">{{ topic.topicName }}</mat-checkbox>
-      </mat-card>
-    </div>
-    <br>
-    <mat-card layout="row" class="list-view-item oppia-list-view-item">
-      <label>Filter By Subtopic</label>
-    </mat-card>
-    <div class="oppia-list-view-item-container">
-      <mat-card class="list-view-item">
-        <div *ngFor="let topic of subTopicFilterDict | keyvalue">
-          <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>
-          <mat-card class="list-view-item">
-            <mat-checkbox class="oppia-skills-list-item" *ngFor="let subtopic of topic.value" [(ngModel)]="subtopic.checked" (change)="updateSkillsListOnSubtopicFilterChange()">{{ subtopic.subTopicName }}</mat-checkbox>
-          </mat-card>
-        </div>
-      </mat-card>
-    </div>
-    <br>
-    <button class="btn btn-secondary" (click)="clearAllFilters()">Clear All Filters</button>
   </div>
 </div>
 <style>
-  skill-selector .skill-selector-parent,
-  skill-selector .skill-list-box {
+  .skill-selector .skill-selector-parent,
+  .skill-selector .skill-list-box {
     max-height: 50vh;
     overflow-y: auto;
   }
-  skill-selector .oppia-skill-container {
+  .skill-selector .oppia-skill-container {
     display: flex;
     flex-direction: row;
   }
-  skill-selector .oppia-list-group {
+  .skill-selector .oppia-list-group {
     width: 70%;
   }
-  skill-selector .oppia-topic-name-text,
-  skill-selector .oppia-heading-text,
-  skill-selector .oppia-list-view-item {
+  .skill-selector .oppia-topic-name-text,
+  .skill-selector .oppia-heading-text,
+  .skill-selector .oppia-list-view-item {
     padding-left: 10px;
   }
-  skill-selector .oppia-subtopic-name-text {
+  .skill-selector .oppia-subtopic-name-text {
     padding-bottom: 20px;
     padding-left: 10px;
     padding-top: 20px;
   }
-  skill-selector .oppia-skills-list-item {
+  .skill-selector .oppia-skills-list-item {
     margin-left: 10px;
   }
-  skill-selector .oppia-filter-list-group {
+  .skill-selector .oppia-filter-list-group {
     padding-left: 20px;
     width: 30%;
   }
-  skill-selector .oppia-list-view-item-container {
+  .skill-selector .oppia-list-view-item-container {
     height: 15vh;
     overflow-y: auto;
     word-break: break-word;
   }
   @media screen and (max-width: 768px) {
-    skill-selector .skill-selector-parent,
-    skill-selector .skill-list-box {
+    .skill-selector .skill-selector-parent,
+    .skill-selector .skill-list-box {
+      max-height: initial;
+    }
       max-height: initial;
     }
   }

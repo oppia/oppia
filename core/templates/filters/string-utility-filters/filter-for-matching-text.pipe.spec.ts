@@ -29,7 +29,7 @@ describe('Testing FilterForMatchingTextPipe', () => {
     expect(pipe).not.toEqual(null);
   });
 
-  it('should convert camelCase to hyphens properly', () => {
+  it('should get items that include search text', () => {
     let list = ["cat", "dog", "caterpillar"]
     expect(pipe.transform(list, "cat")).toEqual(["cat", "caterpillar"]);
     expect(pipe.transform(list, "dog")).toEqual(["dog"]);
