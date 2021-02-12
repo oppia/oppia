@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ import utils
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.story
 ])
-
 
 
 class ExplorationModelValidator(base_model_validators.BaseModelValidator):
