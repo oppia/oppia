@@ -287,7 +287,7 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should fetch userExplorationPermissions when ' +
-    'showPublishExplorationModal is called', function () {
+    'showPublishExplorationModal is called', function() {
     var userPermissions = {
       canPublish: true
     };
