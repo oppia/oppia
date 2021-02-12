@@ -226,7 +226,6 @@ class CollectionModel(base_models.VersionedModel):
                 )
                 collection_commit_log.collection_id = model.id
                 commit_log_models.append(collection_commit_log)
-                commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
 

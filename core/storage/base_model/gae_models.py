@@ -92,10 +92,12 @@ class BaseModel(datastore_services.Model):
 
     # When this entity was first created. This value should not be modified.
     created_on = (
-        datastore_services.DateTimeProperty(auto_now_add=True, indexed=True, required=True))
+        datastore_services.DateTimeProperty(
+            auto_now_add=True, indexed=True, required=True))
     # When this entity was last updated. This value should not be modified.
     last_updated = (
-        datastore_services.DateTimeProperty(auto_now=True, indexed=True, required=True))
+        datastore_services.DateTimeProperty(
+            auto_now=True, indexed=True, required=True))
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 

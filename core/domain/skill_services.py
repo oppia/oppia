@@ -987,7 +987,6 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
                 user_id, skill_id),
             user_id=user_id, skill_id=skill_id,
             degree_of_mastery=degree_of_mastery))
-        user_skill_mastery_models)
     user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
 
 

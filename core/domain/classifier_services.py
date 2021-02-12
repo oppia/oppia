@@ -292,7 +292,6 @@ def _update_classifier_training_jobs_status(job_ids, status):
 
         classifier_training_job_models[index].status = status
 
-        classifier_training_job_models)
     classifier_models.ClassifierTrainingJobModel.put_multi(
         classifier_training_job_models)
 

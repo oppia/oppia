@@ -619,7 +619,6 @@ def update_story(
         id=exp_id,
         story_id=story_id
     ) for exp_id in exp_ids_added_to_story]
-        new_exploration_context_models)
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 

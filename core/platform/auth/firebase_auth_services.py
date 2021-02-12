@@ -367,7 +367,6 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
-        assoc_by_auth_id_models)
     auth_models.UserIdByFirebaseAuthIdModel.put_multi(assoc_by_auth_id_models)
 
     # The {user_id: auth_id} mapping needs to be created, but the model used to
@@ -385,5 +384,4 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
             assoc_by_user_id_model.firebase_auth_id is None)
     ]
     if assoc_by_user_id_models:
-            assoc_by_user_id_models)
         auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)

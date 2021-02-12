@@ -220,7 +220,6 @@ class ExplorationModel(base_models.VersionedModel):
                 )
                 exploration_commit_log.exploration_id = model.id
                 commit_log_models.append(exploration_commit_log)
-                commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
 

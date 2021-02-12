@@ -256,7 +256,6 @@ def create_messages(
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
-        message_models)
     feedback_models.GeneralFeedbackMessageModel.put_multi_for_human(
         message_models)
 
@@ -283,7 +282,8 @@ def create_messages(
                         updated_subject != thread_model.subject):
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
-    feedback_models.GeneralFeedbackThreadModel.put_multi_for_human(thread_models)
+    feedback_models.GeneralFeedbackThreadModel.put_multi_for_human(
+        thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
     # the thread, so that the last_updated time changes to show that there is
@@ -302,7 +302,6 @@ def create_messages(
         # we need not update the suggestion.
         if suggestion_model:
             suggestion_models_to_update.append(suggestion_model)
-        suggestion_models_to_update)
     suggestion_models.GeneralSuggestionModel.put_multi_for_human(
         suggestion_models_to_update)
 
@@ -478,7 +477,6 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     # Update both the new and previously existing models in the datastore.
     current_feedback_thread_user_models.extend(
         new_feedback_thread_user_models)
-        current_feedback_thread_user_models)
     feedback_models.GeneralFeedbackThreadUserModel.put_multi(
         current_feedback_thread_user_models)
 
