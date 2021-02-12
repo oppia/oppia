@@ -16,6 +16,8 @@
  * @fileoverview Directive for the exploration save & publish buttons.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
@@ -45,6 +47,8 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ExplorationWarningsService, PreventPageUnloadEventService,
         UserExplorationPermissionsService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
+
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
       };
@@ -106,7 +110,13 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
 
       var hideLoadingDots = function() {
         $scope.loadingDotsAreShown = false;
-        UserExplorationPermissionsService.fetchPermissionsAsync();
+        UserExplorationPermissionsService.fetchPermissionsAsync()
+          .then(function(permissions) {
+            $scope.explorationCanBePublished = permissions.canPublish;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
+          });
       };
 
       $scope.showPublishExplorationModal = function() {
@@ -139,20 +149,24 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = false;
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
-      };
-
-      $scope.explorationCanBePublished = false;
-
-      $scope.showPublishButton = function() {
+        $scope.explorationCanBePublished = false;
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
             $scope.explorationCanBePublished = permissions.canPublish;
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
           });
-
-        return $scope.explorationCanBePublished && $scope.isPrivate();
+        ctrl.directiveSubscriptions.add(
+          ExplorationRightsService.onExplorationUnpublished.subscribe(
+            () => {
+              UserExplorationPermissionsService.getPermissionsAsync()
+                .then(function(permissions) {
+                  $scope.explorationCanBePublished = permissions.canPublish;
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
+                });
+            }
+          )
+        );
       };
     }
   ]

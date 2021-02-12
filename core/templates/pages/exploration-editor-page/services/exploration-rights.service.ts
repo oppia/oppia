@@ -16,6 +16,7 @@
  * @fileoverview A data service that stores data
  * about the rights for this exploration.
  */
+import { EventEmitter } from '@angular/core';
 
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
@@ -26,6 +27,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
   function(
       $http, AlertsService, ExplorationDataService,
       ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
+    var explorationUnpublishedEventEmitter = new EventEmitter();
     return {
       init: function(
           ownerNames, editorNames, voiceArtistNames, viewerNames, status,
@@ -152,8 +154,12 @@ angular.module('oppia').factory('ExplorationRightsService', [
           if (onExplorationRightsUpdatedcallback) {
             onExplorationRightsUpdatedcallback();
           }
+          explorationUnpublishedEventEmitter.emit();
         });
-      }
+      },
+      get onExplorationUnpublished() {
+        return explorationUnpublishedEventEmitter;
+      },
     };
   }
 ]);

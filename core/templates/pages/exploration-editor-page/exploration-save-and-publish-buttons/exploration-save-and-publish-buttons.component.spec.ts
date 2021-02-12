@@ -267,11 +267,14 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should display publish button', function() {
-    $scope.showPublishButton();
+    $scope.explorationCanBePublished = false;
+
+    explorationRightsService.onExplorationUnpublished.emit();
     $scope.$apply();
-    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
+
+    expect(userExplorationPermissionsService.getPermissionsAsync)
+      .toHaveBeenCalled();
     expect($scope.explorationCanBePublished).toBe(true);
-    expect($scope.showPublishButton()).toBe(true);
   });
 
   it('should add PreventPageUnloadEventService when changelist' +
@@ -281,5 +284,24 @@ describe('Exploration save and publish buttons component', function() {
     $scope.getChangeListLength();
     $scope.$apply();
     expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
+  });
+
+  it('should fetch userExplorationPermissions when ' +
+    'showPublishExplorationModal is called', function () {
+    var userPermissions = {
+      canPublish: true
+    };
+    $scope.explorationCanBePublished = false;
+    spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+      .returnValue($q.resolve(userPermissions));
+    $scope.showPublishExplorationModal();
+
+    $scope.$apply();
+
+    expect($scope.publishIsInProcess).toBe(false);
+    expect($scope.loadingDotsAreShown).toBe(false);
+    expect(userExplorationPermissionsService.fetchPermissionsAsync)
+      .toHaveBeenCalled();
+    expect($scope.explorationCanBePublished).toBe(true);
   });
 });

@@ -16,6 +16,8 @@
  * @fileoverview Directive for the exploration settings tab.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -82,8 +84,6 @@ require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('settingsTab', {
   bindings: {
