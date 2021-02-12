@@ -55,6 +55,10 @@ def string_io(buffer_value=b''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
 
+    Args:
+        buffer_value: str. A string that is to be converted to in-memory text
+            stream.
+
     Returns:
         StringIO.StringIO or io.StringIO. The StringIO object.
     """
@@ -62,7 +66,7 @@ def string_io(buffer_value=b''):
         from StringIO import StringIO  # pylint: disable=import-only-modules
     except ImportError:
         from io import StringIO  # pylint: disable=import-only-modules
-    return StringIO(buffer_value)
+    return StringIO(buffer_value) # pylint: disable=disallowed-function-calls
 
 
 def get_args_of_function(function_node, args_to_ignore):
@@ -126,7 +130,7 @@ def url_join(base_url, relative_url):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urljoin(base_url, relative_url)
+    return urlparse.urljoin(base_url, relative_url) # pylint: disable=disallowed-function-calls
 
 
 def url_split(urlstring):
@@ -143,7 +147,7 @@ def url_split(urlstring):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urlsplit(urlstring)
+    return urlparse.urlsplit(urlstring) # pylint: disable=disallowed-function-calls
 
 
 def url_parse(urlstring):
@@ -162,7 +166,7 @@ def url_parse(urlstring):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urlparse(urlstring)
+    return urlparse.urlparse(urlstring) # pylint: disable=disallowed-function-calls
 
 
 def url_unsplit(url_parts):
@@ -180,7 +184,7 @@ def url_unsplit(url_parts):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urlunsplit(url_parts)
+    return urlparse.urlunsplit(url_parts) # pylint: disable=disallowed-function-calls
 
 
 def parse_query_string(query_string):
@@ -199,7 +203,7 @@ def parse_query_string(query_string):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.parse_qs(query_string)
+    return urlparse.parse_qs(query_string) # pylint: disable=disallowed-function-calls
 
 
 def urllib_unquote(content):
@@ -216,11 +220,11 @@ def urllib_unquote(content):
     try:
         import urllib
 
-        return urllib.unquote(content)
+        return urllib.unquote(content) # pylint: disable=disallowed-function-calls
     except ImportError:
         import urllib.parse
 
-        return urllib.urlparse.unquote(content)
+        return urllib.urlparse.unquote(content) # pylint: disable=disallowed-function-calls
 
 
 def url_quote(content):
@@ -430,7 +434,7 @@ def _recursively_convert_to_str(value):
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
     elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
-        temp = str(value.encode('utf-8'))
+        temp = str(value.encode('utf-8')) # pylint: disable=disallowed-function-calls
         # Remove the b'' prefix from the string.
         return temp[2:-1].decode('utf-8')
     elif type(value) == future.types.newbytes:  # pylint: disable=unidiomatic-typecheck
