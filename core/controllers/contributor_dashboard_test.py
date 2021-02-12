@@ -535,9 +535,21 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     def test_can_suggest_questions_flag_in_response(self):
         user_email = 'user@example.com'
         self.signup(user_email, 'user')
+        user_id = self.get_user_id_from_email(user_email)
         self.login(user_email)
         config_services.set_property(
             'admin', 'contributor_can_suggest_questions', False)
+
+        response = self.get_json('/usercontributionrightsdatahandler')
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False,
+                'can_suggest_questions': False
+            })
+
+        user_services.allow_user_to_submit_question(user_id)
 
         response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(

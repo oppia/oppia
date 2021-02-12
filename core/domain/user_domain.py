@@ -316,13 +316,15 @@ class UserContributionRights(python_utils.OBJECT):
 
     def __init__(
             self, user_id, can_review_translation_for_language_codes,
-            can_review_voiceover_for_language_codes, can_review_questions):
+            can_review_voiceover_for_language_codes, can_review_questions,
+            can_submit_questions):
         self.id = user_id
         self.can_review_translation_for_language_codes = (
             can_review_translation_for_language_codes)
         self.can_review_voiceover_for_language_codes = (
             can_review_voiceover_for_language_codes)
         self.can_review_questions = can_review_questions
+        self.can_submit_questions = can_submit_questions
 
     def can_review_at_least_one_item(self):
         """Checks whether user has rights to review at least one item.
@@ -373,6 +375,11 @@ class UserContributionRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected can_review_questions to be a boolean value, '
                 'found: %s' % type(self.can_review_questions))
+
+        if not isinstance(self.can_submit_questions, bool):
+            raise utils.ValidationError(
+                'Expected can_submit_questions to be a boolean value, '
+                'found: %s' % type(self.can_submit_questions))
 
 
 class ModifiableUserData(python_utils.OBJECT):

@@ -28,16 +28,22 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 angular.module('oppia').directive('adminRolesTab', [
   '$http', '$rootScope', 'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService',
-  'ACTION_REMOVE_ALL_REVIEW_RIGHTS', 'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
-  'ADMIN_ROLE_HANDLER_URL', 'REVIEW_CATEGORY_QUESTION',
-  'REVIEW_CATEGORY_TRANSLATION', 'REVIEW_CATEGORY_VOICEOVER',
+  'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
+  'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
+  'ADMIN_ROLE_HANDLER_URL', 'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
+  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
+  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
+  'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
       $http, $rootScope, AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService,
-      ACTION_REMOVE_ALL_REVIEW_RIGHTS, ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS,
-      ADMIN_ROLE_HANDLER_URL, REVIEW_CATEGORY_QUESTION,
-      REVIEW_CATEGORY_TRANSLATION, REVIEW_CATEGORY_VOICEOVER,
+      ACTION_REMOVE_ALL_REVIEW_RIGHTS,
+      ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
+      ADMIN_ROLE_HANDLER_URL, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+      CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
@@ -68,8 +74,8 @@ angular.module('oppia').directive('adminRolesTab', [
 
         ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
           return (
-            reviewCategory === REVIEW_CATEGORY_TRANSLATION ||
-            reviewCategory === REVIEW_CATEGORY_VOICEOVER);
+            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
+            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
         };
 
         ctrl.submitRoleViewForm = function(formResponse) {
@@ -120,14 +126,14 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitAddContributionReviewerForm = function(formResponse) {
+        ctrl.submitAddContributionRightsForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
-          $http.post('/addcontributionreviewerhandler', {
-            review_category: formResponse.category,
+          $http.post('/addcontributionrightshandler', {
+            category: formResponse.category,
             username: formResponse.username,
             language_code: formResponse.languageCode
           }).then(function(response) {
@@ -139,7 +145,7 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitViewContributionReviewersForm = function(formResponse) {
+        ctrl.submitViewContributorUsersForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -147,21 +153,22 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.startTask();
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             $http.get(
-              '/getcontributionreviewershandler', {
+              '/getcontributorusershandler', {
                 params: {
-                  review_category: formResponse.category,
+                  category: formResponse.category,
                   language_code: formResponse.languageCode
                 }
               }).then(function(response) {
               ctrl.result.usernames = response.data.usernames;
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
+              refreshFormData();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
             var voiceoverLanguages = [];
             $http.get(
-              '/contributionreviewerrightsdatahandler', {
+              '/contributionrightsdatahandler', {
                 params: {
                   username: formResponse.username
                 }
@@ -173,7 +180,8 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
-                questions: response.data.can_review_questions
+                questions: response.data.can_review_questions,
+                can_submit_questions: response.data.can_submit_questions
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
@@ -182,17 +190,17 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitRemoveContributionReviewerForm = function(formResponse) {
+        ctrl.submitRemoveContributionRightsForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
           $http.put(
-            '/removecontributionreviewerhandler', {
+            '/removecontributionrightshandler', {
               username: formResponse.username,
               removal_type: formResponse.method,
-              review_category: formResponse.category,
+              category: formResponse.category,
               language_code: formResponse.languageCode
             }).then(function(response) {
             ctrl.setStatusMessage('Success.');
@@ -296,16 +304,17 @@ angular.module('oppia').directive('adminRolesTab', [
         ctrl.$onInit = function() {
           ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
             ACTION_REMOVE_ALL_REVIEW_RIGHTS);
-          ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS = (
-            ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS);
+          ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
+            ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
           ctrl.USER_FILTER_CRITERION_ROLE = USER_FILTER_CRITERION_ROLE;
           ctrl.UPDATABLE_ROLES = {};
           ctrl.VIEWABLE_ROLES = {};
-          ctrl.REVIEW_CATEGORIES = {
-            TRANSLATION: REVIEW_CATEGORY_TRANSLATION,
-            VOICEOVER: REVIEW_CATEGORY_VOICEOVER,
-            QUESTION: REVIEW_CATEGORY_QUESTION
+          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+            REVIEW_TRANSLATION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            REVIEW_VOICEOVER: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+            REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+            SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
           };
           refreshFormData();
           ctrl.resultRolesVisible = false;

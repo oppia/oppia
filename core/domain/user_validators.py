@@ -1445,7 +1445,8 @@ class UserContributionRightsModelValidator(
         return user_domain.UserContributionRights(
             item.id, item.can_review_translation_for_language_codes,
             item.can_review_voiceover_for_language_codes,
-            item.can_review_questions)
+            item.can_review_questions,
+            item.can_submit_questions)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

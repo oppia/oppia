@@ -70,6 +70,8 @@ describe('Contributor dashboard page', function() {
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
+    await adminPage.assignQuestionContributor('user0');
+    await adminPage.assignQuestionContributor('user1');
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
@@ -223,7 +225,7 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-describe('Admin page contributor reviewer form', function() {
+describe('Admin page contribution rights form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var contributorDashboardPage = null;
@@ -295,6 +297,17 @@ describe('Admin page contributor reviewer form', function() {
     await users.login(questionReviewerEmail);
     await contributorDashboardPage.get();
     await contributorDashboardPage.expectUserToBeQuestionReviewer();
+    await users.logout();
+  });
+
+  it('should allow admin to add question contributor', async function() {
+    await adminPage.get();
+    await adminPage.assignQuestionContributor(questionReviewerUsername);
+    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
+
+    // Confirm rights persist on page reload.
+    await browser.refresh();
+    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
     await users.logout();
   });
 

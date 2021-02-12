@@ -49,7 +49,7 @@ def log_new_error(*args, **kwargs):
 
 
 NEW_REVIEWER_EMAIL_DATA = {
-    constants.REVIEW_CATEGORY_TRANSLATION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'review_category': 'translations',
         'to_check': 'translation suggestions',
         'description_template': '%s language translations',
@@ -57,7 +57,7 @@ NEW_REVIEWER_EMAIL_DATA = {
             'review translation suggestions made by contributors in the %s '
             'language')
     },
-    constants.REVIEW_CATEGORY_VOICEOVER: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
         'review_category': 'voiceovers',
         'to_check': 'voiceover applications',
         'description_template': '%s language voiceovers',
@@ -65,7 +65,7 @@ NEW_REVIEWER_EMAIL_DATA = {
             'review voiceover applications made by contributors in the %s '
             'language')
     },
-    constants.REVIEW_CATEGORY_QUESTION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
         'review_category': 'questions',
         'to_check': 'question suggestions',
         'description': 'questions',
@@ -74,7 +74,7 @@ NEW_REVIEWER_EMAIL_DATA = {
 }
 
 REMOVED_REVIEWER_EMAIL_DATA = {
-    constants.REVIEW_CATEGORY_TRANSLATION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'review_category': 'translation',
         'role_description_template': (
             'translation reviewer role in the %s language'),
@@ -83,7 +83,7 @@ REMOVED_REVIEWER_EMAIL_DATA = {
             'language'),
         'contribution_allowed': 'translations'
     },
-    constants.REVIEW_CATEGORY_VOICEOVER: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
         'review_category': 'voiceover',
         'role_description_template': (
             'voiceover reviewer role in the %s language'),
@@ -92,7 +92,7 @@ REMOVED_REVIEWER_EMAIL_DATA = {
             'language'),
         'contribution_allowed': 'voiceovers'
     },
-    constants.REVIEW_CATEGORY_QUESTION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
         'review_category': 'question',
         'role_description': 'question reviewer role',
         'rights_message': 'review question suggestions made by contributors',
@@ -1767,8 +1767,8 @@ def send_email_to_new_contribution_reviewer(
         review_category_data['review_category'])
 
     if review_category in [
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER]:
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         review_category_description = (
@@ -1831,8 +1831,8 @@ def send_email_to_removed_contribution_reviewer(
         review_category_data['review_category'])
 
     if review_category in [
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER]:
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         reviewer_role_description = (

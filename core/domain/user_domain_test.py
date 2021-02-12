@@ -497,7 +497,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(UserContributionRightsTests, self).setUp()
         self.user_contribution_rights = user_domain.UserContributionRights(
-            'user_id', ['hi'], [], True)
+            'user_id', ['hi'], [], True, False)
 
     def test_initialization(self):
         """Testing init method."""
@@ -574,6 +574,13 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_questions to be a boolean value'):
+            self.user_contribution_rights.validate()
+
+    def test_incorrect_type_for_can_submit_questions_raise_error(self):
+        self.user_contribution_rights.can_submit_questions = 5
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_submit_questions to be a boolean value'):
             self.user_contribution_rights.validate()
 
 
