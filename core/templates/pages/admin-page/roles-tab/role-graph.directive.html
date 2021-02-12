@@ -97,7 +97,7 @@
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-view-contribution-rights-form">
         <form class="form-horizontal" ng-submit="$ctrl.submitViewContributorUsersForm($ctrl.formData.viewContributionReviewers)">
-          <legend class="text-center">View Contribution Reviewers</legend>
+          <legend class="text-center">View Contributor Dashboard Users</legend>
           <div class="d-xl-inline-flex form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="label-target-view-reviewer-method">
               Select Method
@@ -167,14 +167,14 @@
                     <span ng-if="$ctrl.result.translationLanguages.length === 0"><i>None</i></span>
                     <span ng-repeat="language in $ctrl.result.translationLanguages"
                           class="protractor-test-translation-reviewer-language">
-                      <[language]>
+                      <[language]><[$last ? '' : ', ']>
                     </span>
                   </td>
                   <td>
                     <span ng-if="$ctrl.result.voiceoverLanguages.length === 0"><i>None</i></span>
                     <span ng-repeat="language in $ctrl.result.voiceoverLanguages"
                           class="protractor-test-voiceover-reviewer-language">
-                      <[language]>
+                      <[language]><[$last ? '' : ', ']>
                     </span>
                   </td>
                   <td>

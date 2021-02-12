@@ -304,6 +304,10 @@ describe('Admin page contribution rights form', function() {
     await adminPage.get();
     await adminPage.assignQuestionContributor(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
+
+    // Confirm rights persist on page reload.
+    await browser.refresh();
+    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
     await users.logout();
   });
 

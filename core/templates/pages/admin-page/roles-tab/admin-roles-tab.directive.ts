@@ -162,6 +162,7 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.result.usernames = response.data.usernames;
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
+              refreshFormData();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];

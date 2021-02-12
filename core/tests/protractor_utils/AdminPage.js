@@ -502,7 +502,8 @@ var AdminPage = function() {
     var contributionRights = await _getUserContributionRightsElement(
       username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
     await waitFor.visibilityOf(
-      contributionRights, 'Review Right Element taking too long to appear');
+      contributionRights,
+      'Review Question Right Element taking too long to appear');
     expect(await contributionRights.getText()).toBe('Allowed');
   };
 
@@ -510,7 +511,8 @@ var AdminPage = function() {
     var contributionRights = await _getUserContributionRightsElement(
       username, CATEGORY_SUBMIT_QUESTION);
     await waitFor.visibilityOf(
-      contributionRights, 'Review Right Element taking too long to appear');
+      contributionRights,
+      'Submit Question Right Element taking too long to appear');
     expect(await contributionRights.getText()).toBe('Allowed');
   };
 };
