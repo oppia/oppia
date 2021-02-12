@@ -329,18 +329,15 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_0 = (
             question_models.QuestionSkillLinkModel(
                 id='0:2', question_id='0', skill_id='2', skill_difficulty=0.5))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         self.model_instance_1 = (
             question_models.QuestionSkillLinkModel(
                 id='1:1', question_id='1', skill_id='1', skill_difficulty=0.5))
-        self.model_instance_1.update_timestamps()
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_human()
         self.model_instance_2 = (
             question_models.QuestionSkillLinkModel(
                 id='2:0', question_id='2', skill_id='0', skill_difficulty=0.5))
-        self.model_instance_2.update_timestamps()
-        self.model_instance_2.put()
+        self.model_instance_2.put_for_human()
 
         self.job_class = (
             prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob)
@@ -354,8 +351,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for time field relation check '
@@ -418,8 +414,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_invalid_id_failure(self):
         model_with_invalid_id = question_models.QuestionSkillLinkModel(
             id='0:1', question_id='1', skill_id='2', skill_difficulty=0.5)
-        model_with_invalid_id.update_timestamps()
-        model_with_invalid_id.put()
+        model_with_invalid_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for model id check of '
@@ -502,8 +497,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
 
     def test_model_with_user_id_migration_bot(self):
         self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated QuestionSnapshotMetadataModel\', 3]'
@@ -513,8 +507,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_user_id(self):
         self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated QuestionSnapshotMetadataModel\', 3]'
@@ -525,8 +518,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of QuestionSnapshotMetadataModel\', '
@@ -596,8 +588,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
             question_models.QuestionSnapshotMetadataModel(
                 id='0-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
+        model_with_invalid_version_in_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for question model '
@@ -618,8 +609,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
             'cmd': 'create_new_fully_specified_question',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -846,8 +836,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_user_id_migration_bot(self):
         self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated QuestionCommitLogEntryModel\', 3]'
@@ -857,8 +846,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_pseudo_user_id(self):
         self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated QuestionCommitLogEntryModel\', 3]'
@@ -869,8 +857,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of QuestionCommitLogEntryModel\', '
@@ -922,8 +909,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.question_id = '0'
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
+        model_with_invalid_version_in_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for question model '
@@ -947,8 +933,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.question_id = '0'
-        model_with_invalid_id.update_timestamps()
-        model_with_invalid_id.put()
+        model_with_invalid_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for model id check of '
@@ -965,8 +950,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
@@ -979,8 +963,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
@@ -993,8 +976,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_private_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
@@ -1012,8 +994,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             'cmd': 'create_new_fully_specified_question',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '

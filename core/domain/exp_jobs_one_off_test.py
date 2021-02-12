@@ -2661,8 +2661,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-%s-1' % self.exp_id))
         commit_log_model.commit_message = 'Test change'
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
+        commit_log_model.put_for_human()
 
         job_id = (
             exp_jobs_one_off
@@ -2688,8 +2687,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
                 'exploration-%s-1' % self.exp_id))
         commit_log_model.created_on = commit_log_model.created_on + (
             datetime.timedelta(days=1))
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
+        commit_log_model.put_for_human()
 
         job_id = (
             exp_jobs_one_off

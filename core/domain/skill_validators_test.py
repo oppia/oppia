@@ -381,8 +381,7 @@ class SkillSnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 3]']
@@ -392,8 +391,7 @@ class SkillSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 3]']
@@ -404,8 +402,7 @@ class SkillSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of SkillSnapshotMetadataModel\', '
@@ -496,8 +493,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             'cmd': 'delete_skill_misconception',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -769,8 +765,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_user_id_migration_bot(self):
         self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 3]'
@@ -780,8 +775,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_pseudo_user_id(self):
         self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 3]'
@@ -792,8 +786,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of SkillCommitLogEntryModel\', '
@@ -846,8 +839,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.skill_id = '0'
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
+        model_with_invalid_version_in_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for skill model '
@@ -871,8 +863,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.skill_id = '0'
-        model_with_invalid_id.update_timestamps()
-        model_with_invalid_id.put()
+        model_with_invalid_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for model id check of '
@@ -889,8 +880,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
@@ -903,8 +893,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
@@ -917,8 +906,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_private_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
@@ -936,8 +924,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             'cmd': 'delete_skill_misconception',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '

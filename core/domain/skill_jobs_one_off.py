@@ -151,8 +151,7 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         if update_required:
             item.commit_cmds = updated_commit_cmds
-            item.update_timestamps(update_last_updated_time=False)
-            item.put()
+            item.put_for_bot()
             yield (
                 'Commit Commands Updated-%s' % item.__class__.__name__,
                 item.id

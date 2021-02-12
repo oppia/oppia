@@ -92,8 +92,7 @@ def _create_models_for_thread_and_first_message(
     thread.subject = subject
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
-    thread.update_timestamps()
-    thread.put()
+    thread.put_for_human()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
         subject, text)
@@ -284,9 +283,7 @@ def create_messages(
                         updated_subject != thread_model.subject):
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
-    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
-        thread_models)
-    feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
+    feedback_models.GeneralFeedbackThreadModel.put_multi_for_human(thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
     # the thread, so that the last_updated time changes to show that there is

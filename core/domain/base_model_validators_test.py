@@ -312,8 +312,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         model = MockCommitLogEntryModel(
             id='mock-12345',
             user_id=feconf.MIGRATION_BOT_USER_ID,
-            commit_cmds=[])
-        model.update_timestamps()
+            commit_cmds=[],
+            post_commit_status='public',
+            commit_type='create')
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
@@ -331,8 +333,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         model = MockCommitLogEntryModel(
             id='mock-12345',
             user_id=self.PSEUDONYMOUS_ID,
-            commit_cmds=[])
-        model.update_timestamps()
+            commit_cmds=[],
+            post_commit_status='public',
+            commit_type='create')
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
@@ -350,8 +354,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         model = MockCommitLogEntryModel(
             id='mock-12345',
             user_id='invalid_user_id',
-            commit_cmds=[])
-        model.update_timestamps()
+            commit_cmds=[],
+            post_commit_status='public',
+            commit_type='create')
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
