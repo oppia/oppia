@@ -75,6 +75,8 @@ VALID_STATUS_CODE_TRANSITIONS = {
 DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 # The maximum number of previously-run jobs to show in the admin dashboard.
 NUM_JOBS_IN_DASHBOARD_LIMIT = 100
+# The default retention time is 2 days.
+MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
 
 
 class BaseJobManager(python_utils.OBJECT):
@@ -630,10 +632,11 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                     results_list.append(json.loads(item))
             job_class.register_completion(job_id, results_list)
         except Exception as e:
-            logging.error(traceback.format_exc())
-            logging.error(
-                'Job %s failed at %s' %
-                (job_id, utils.get_current_time_in_millisecs()))
+            logging.exception(
+                'Job %s failed at %s' % (
+                    job_id, utils.get_current_time_in_millisecs()
+                )
+            )
             job_class.register_failure(
                 job_id,
                 '%s\n%s' % (python_utils.UNICODE(e), traceback.format_exc()))
@@ -1462,7 +1465,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         """
         # This is not an ancestor query, so it must be run outside a
         # transaction.
-        do_unfinished_jobs_exist = (
+        unfinished_jobs_exist = (
             job_models.JobModel.do_unfinished_jobs_exist(
                 cls._get_batch_job_manager_class().__name__))
 
@@ -1474,7 +1477,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             # If there is no job currently running, go to IDLE immediately.
             new_status_code = (
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if
-                do_unfinished_jobs_exist else
+                unfinished_jobs_exist else
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
             cc_model.status_code = new_status_code
             cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
@@ -1486,7 +1489,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         # The cancellation must be done after the continuous computation
         # status update.
-        if do_unfinished_jobs_exist:
+        if unfinished_jobs_exist:
             unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
                 cls._get_batch_job_manager_class().__name__)
             for job_model in unfinished_job_models:
@@ -1683,6 +1686,78 @@ def get_data_for_unfinished_jobs():
         NUM_JOBS_IN_DASHBOARD_LIMIT)
     return [_get_job_dict_from_job_model(model)
             for model in unfinished_job_models]
+
+
+def cleanup_old_jobs_pipelines():
+    """Clean the pipelines of old jobs."""
+    num_cleaned = 0
+    max_age_msec = (
+        MAX_MAPREDUCE_METADATA_RETENTION_MSECS + 7 * 24 * 60 * 60 * 1000)
+    # Only consider jobs that started at most 1 week before recency_msec.
+    # The latest start time that a job scheduled for cleanup may have.
+    max_start_time_msec = (
+        utils.get_current_time_in_millisecs() -
+        MAX_MAPREDUCE_METADATA_RETENTION_MSECS
+    )
+    # Get all pipeline ids from jobs that started between max_age_msecs
+    # and max_age_msecs + 1 week, before now.
+    pipeline_id_to_job_instance = {}
+
+    job_instances = job_models.JobModel.get_recent_jobs(1000, max_age_msec)
+    for job_instance in job_instances:
+        if (
+                job_instance.time_started_msec < max_start_time_msec and
+                not job_instance.has_been_cleaned_up
+        ):
+            if 'root_pipeline_id' in job_instance.metadata:
+                pipeline_id = job_instance.metadata['root_pipeline_id']
+                pipeline_id_to_job_instance[pipeline_id] = job_instance
+
+    # Clean up pipelines.
+    for pline in pipeline.get_root_list()['pipelines']:
+        pipeline_id = pline['pipelineId']
+        job_definitely_terminated = (
+            pline['status'] == 'done' or
+            pline['status'] == 'aborted' or
+            pline['currentAttempt'] > pline['maxAttempts']
+        )
+        have_start_time = 'startTimeMs' in pline
+        job_started_too_long_ago = (
+            have_start_time and
+            pline['startTimeMs'] < max_start_time_msec
+        )
+
+        if (job_started_too_long_ago or
+                (not have_start_time and job_definitely_terminated)):
+            # At this point, the map/reduce pipeline is either in a
+            # terminal state, or has taken so long that there's no
+            # realistic possibility that there might be a race condition
+            # between this and the job actually completing.
+            if pipeline_id in pipeline_id_to_job_instance:
+                job_instance = pipeline_id_to_job_instance[pipeline_id]
+                job_instance.has_been_cleaned_up = True
+                job_instance.update_timestamps()
+                job_instance.put()
+
+            # This enqueues a deferred cleanup item.
+            p = pipeline.Pipeline.from_id(pipeline_id)
+            if p:
+                p.cleanup()
+                num_cleaned += 1
+
+    logging.warning('%s MR jobs cleaned up.' % num_cleaned)
+
+
+def do_unfinished_jobs_exist(job_type):
+    """Checks if unfinished jobs exist.
+
+    Args:
+        job_type: str. Type of job for which to check.
+
+    Returns:
+        bool. True if unfinished jobs exist, otherwise false.
+    """
+    return job_models.JobModel.do_unfinished_jobs_exist(job_type)
 
 
 def get_job_output(job_id):

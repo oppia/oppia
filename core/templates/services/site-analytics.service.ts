@@ -67,11 +67,52 @@ export class SiteAnalyticsService {
       this.windowRef.nativeWindow.location.pathname + ' ' + srcElement);
   }
   registerNewSignupEvent(): void {
-    this._sendEventToGoogleAnalytics('SignupButton', 'click', '');
+    this._sendEventToGoogleAnalytics(
+      'OnboardingEngagement', 'signup', 'AccountSignUp');
   }
   registerClickBrowseLessonsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
       'BrowseLessonsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickGuideParentsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'GuideParentsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickTipforParentsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'TipforParentsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickExploreLessonsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'ExploreLessonsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartLearningButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartLearningButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartContributingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartContributingButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartTeachingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartTeachingButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickVisitClassroomButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickBrowseLibraryButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'BrowseLibraryButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerGoToDonationSiteEvent(donationSiteName: string): void {
@@ -206,9 +247,6 @@ export class SiteAnalyticsService {
         'PlayerNewCard', 'click', cardNum.toString());
     }
   }
-  registerFinishExploration(): void {
-    this._sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
-  }
   registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
     this._sendEventToGoogleAnalytics(
       'OpenFractionsFromLandingPage', 'click', collectionId);
@@ -252,6 +290,46 @@ export class SiteAnalyticsService {
   registerContributorDashboardRejectSuggestion(contributionType: string): void {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardRejectSuggestion', 'click', contributionType);
+  }
+
+  registerLessonActiveUse(): void {
+    this._sendEventToGoogleAnalytics(
+      'ActiveUserStartAndSawCards', 'engage', '');
+  }
+
+  registerStartExploration(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'PlayerStartExploration', 'engage', explorationId);
+  }
+
+  registerFinishExploration(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'PlayerFinishExploration', 'engage', explorationId);
+  }
+
+  registerCuratedLessonCompleted(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'CuratedLessonCompleted', 'engage', explorationId);
+  }
+
+  registerClassroomLessonActiveUse(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomActiveUserStartAndSawCards', 'engage', '');
+  }
+
+  registerClassoomHeaderClickEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomEngagement', 'click', 'ClickOnClassroom');
+  }
+
+  registerClassroomPageViewed(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomEngagement', 'impression', 'ViewClassroom');
+  }
+
+  registerAccountDeletion(): void {
+    this._sendEventToGoogleAnalytics(
+      'OnboardingEngagement', 'delete', 'AccountDeletion');
   }
 }
 
