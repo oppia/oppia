@@ -21,7 +21,6 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
-const { browser } = require('protractor');
 var adminPage = new AdminPage.AdminPage();
 
 var login = async function(
@@ -52,9 +51,9 @@ var login = async function(
   await action.clear('Email input', emailInput);
   await action.sendKeys('Email input', emailInput, email);
   if (isSuperAdmin) {
-    var testAdminButton = element(protractor.By.name('admin'));
-    await action.click('Test admin button', testAdminButton);
-    let adminCheckboxStatus = await testAdminButton.getAttribute('checked');
+    var adminCheckbox = element(protractor.By.name('admin'));
+    await action.click('Test admin checkbox', adminCheckbox);
+    let adminCheckboxStatus = await adminCheckbox.getAttribute('checked');
     expect(adminCheckboxStatus).toBeTruthy();
   }
   await action.click(
@@ -78,8 +77,8 @@ var logout = async function() {
   var driver = browser.driver;
   browser.waitForAngularEnabled(false);
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
-  var testSubmitButton = element(protractor.By.id('submit-logout'));
-  await action.click('Test Submit button', testSubmitButton);
+  var logoutButton = element(protractor.By.id('submit-logout'));
+  await action.click('Test Submit button', logoutButton);
 };
 
 // The user needs to log in immediately before this method is called. Note
@@ -109,7 +108,7 @@ var _completeSignup = async function(username, manualNavigation = true) {
 };
 
 var completeLoginFlowFromStoryViewerPage = async function(email, username) {
-  await login(email, true);
+  await login(email, false);
   await _completeSignup(username);
 };
 
