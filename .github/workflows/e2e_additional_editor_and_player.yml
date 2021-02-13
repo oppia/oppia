@@ -21,6 +21,10 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - uses: actions/upload-artifact@v2
+        with:
+          name: protractor-screenshots
+          path: core/protractor-screenshots
       - name: Setup python by installing wheel
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install wheel==0.35.0
