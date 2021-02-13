@@ -1,4 +1,4 @@
-<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}">
+<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
@@ -7,7 +7,7 @@
             <i class="fas fa-undo audio-undo-icon"></i>
             <span class="oppia-five-icon">5</span>
           </span>
-        </a>
+        </a> 
         <a ng-click="onPlayButtonClicked()"
            uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
            tooltip-append-to-body="true" tooltip-placement="right">
@@ -251,7 +251,9 @@
   .audio-header-margin {
     top: 3.5em;
   }
-
+  headroom--not-top.audio-header-margin {
+    top: 0em
+  }
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;
