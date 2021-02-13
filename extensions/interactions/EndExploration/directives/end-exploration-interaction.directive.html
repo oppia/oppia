@@ -1,3 +1,7 @@
+<div class="end-exploration-tile">
+    <i class="material-icons tick-symbol">&#xE86C;</i>
+    <span class="inner-content protractor-test-correct-feedback">Congratualtions you have completed the exploration!</span>
+</div>
 <div ng-if="$ctrl.isInEditorPage" class="oppia-error-message-text">
   <span><[$ctrl.errorMessage]></span>
 </div>
@@ -6,6 +10,24 @@
   oppia-interactive-end-exploration .oppia-error-message-text {
     color: #ff0000;
     font-size: 0.8em;
-    margin-top: 20px;
+  }
+
+  oppia-interactive-end-exploration .end-exploration-tile{
+    background-color: rgb(224, 245, 236);
+    border: 2px;
+    border-color: #00B269;
+    border-radius: 3px;
+    border-style: solid;
+    color: #00B269;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    height: auto;
+    line-height: normal;
+    margin: 0 auto;
+    padding-top: 5px;
+    position: relative;
+    text-align: center;
   }
 </style>
