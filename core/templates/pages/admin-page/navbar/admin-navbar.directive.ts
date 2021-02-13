@@ -31,9 +31,6 @@ angular.module('oppia').directive('adminNavbar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        getUserEmail: '&userEmail'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
