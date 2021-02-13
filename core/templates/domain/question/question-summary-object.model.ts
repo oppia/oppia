@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
+ * @fileoverview Model class for creating frontend instances of
  * question summary domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export interface QuestionSummaryBackendDict {
   'id': string;
@@ -61,13 +58,8 @@ export class QuestionSummary {
   setQuestionContent(questionContent: string): void {
     this._questionContent = questionContent;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class QuestionSummaryObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: QuestionSummaryBackendDict): QuestionSummary {
     return new QuestionSummary(
       backendDict.id,
@@ -76,7 +68,3 @@ export class QuestionSummaryObjectFactory {
       backendDict.misconception_ids);
   }
 }
-
-angular.module('oppia').factory(
-  'QuestionSummaryObjectFactory',
-  downgradeInjectable(QuestionSummaryObjectFactory));

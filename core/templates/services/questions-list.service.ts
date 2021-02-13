@@ -25,8 +25,8 @@ import { EventEmitter } from '@angular/core';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
-import { QuestionSummaryForOneSkill, QuestionSummaryForOneSkillObjectFactory } from
-  'domain/question/QuestionSummaryForOneSkillObjectFactory';
+import { QuestionSummaryForOneSkill } from
+  'domain/question/question-summary-for-one-skill-object.model';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
 @Injectable({
@@ -42,8 +42,6 @@ export class QuestionsListService {
   constructor(
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private questionBackendApiService: QuestionBackendApiService,
-    private questionSummaryForOneSkillObjectFactory:
-      QuestionSummaryForOneSkillObjectFactory,
     private truncatePipe: TruncatePipe) {}
 
   private _setQuestionSummariesForOneSkill(
@@ -91,7 +89,7 @@ export class QuestionsListService {
         skillId, this._nextCursorForQuestions).then(response => {
         let questionSummaries = response.questionSummaries.map(summary => {
           return (
-            this.questionSummaryForOneSkillObjectFactory.
+            QuestionSummaryForOneSkill.
               createFromBackendDict(summary));
         });
 

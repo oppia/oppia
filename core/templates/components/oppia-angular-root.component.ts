@@ -330,10 +330,6 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
-import { QuestionSummaryForOneSkillObjectFactory }
-  from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
-import { QuestionSummaryObjectFactory } from
-  'domain/question/QuestionSummaryObjectFactory';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
@@ -686,9 +682,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static pythonProgramTokenizer: PythonProgramTokenizer;
   static questionBackendApiService: QuestionBackendApiService;
-  static questionSummaryForOneSkillObjectFactory:
-    QuestionSummaryForOneSkillObjectFactory;
-  static questionSummaryObjectFactory: QuestionSummaryObjectFactory;
   static readOnlyCollectionBackendApiService:
     ReadOnlyCollectionBackendApiService;
   static ratioExpressionInputRulesService: RatioExpressionInputRulesService;
@@ -984,9 +977,6 @@ private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
-private questionSummaryForOneSkillObjectFactory:
-  QuestionSummaryForOneSkillObjectFactory,
-private questionSummaryObjectFactory: QuestionSummaryObjectFactory,
 private readOnlyCollectionBackendApiService:
   ReadOnlyCollectionBackendApiService,
 private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
@@ -1395,10 +1385,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.pythonProgramTokenizer);
     OppiaAngularRootComponent.questionBackendApiService = (
       this.questionBackendApiService);
-    OppiaAngularRootComponent.questionSummaryForOneSkillObjectFactory = (
-      this.questionSummaryForOneSkillObjectFactory);
-    OppiaAngularRootComponent.questionSummaryObjectFactory = (
-      this.questionSummaryObjectFactory);
     OppiaAngularRootComponent.readOnlyCollectionBackendApiService = (
       this.readOnlyCollectionBackendApiService);
     OppiaAngularRootComponent.ratioExpressionInputRulesService = (

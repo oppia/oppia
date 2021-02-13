@@ -28,7 +28,7 @@ import { QuestionBackendDict } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { QuestionSummaryForOneSkillBackendDict } from
-  'domain/question/QuestionSummaryForOneSkillObjectFactory';
+  'domain/question/question-summary-for-one-skill-object.model';
 
 interface QuestionCountBackendResponse {
   'total_question_count': number;
