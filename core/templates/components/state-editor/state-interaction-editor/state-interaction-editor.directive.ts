@@ -112,11 +112,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
           $scope.adjustPageHeight = function() {};
 
           $scope.getCurrentInteractionName = function() {
-            return (
-              StateInteractionIdService.savedMemento ?
+            return {
+              header: StateInteractionIdService.savedMemento ?
+              '(' +
+              INTERACTION_SPECS[StateInteractionIdService.savedMemento].name +
+            ')' : '',
+              body: StateInteractionIdService.savedMemento ?
                 INTERACTION_SPECS[StateInteractionIdService.savedMemento].name :
-                '');
+                '',
+            };
           };
+
           $scope.doesCurrentInteractionHaveCustomizations = function() {
             var interactionSpec = INTERACTION_SPECS[
               StateInteractionIdService.savedMemento];
