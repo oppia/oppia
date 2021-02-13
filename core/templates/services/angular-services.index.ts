@@ -336,6 +336,8 @@ import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
+import { UserEmailPreferencesService } from 'pages/exploration-editor-page/services/user-email-preferences.service';
+
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -673,6 +675,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['UrlService', UrlService],
   ['UserBackendApiService', UserBackendApiService],
   ['UserService', UserService],
+  ['UserEmailPreferencesService', UserEmailPreferencesService],
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],

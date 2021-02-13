@@ -18,16 +18,14 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { UserEmailPreferencesService } from './user-email-preferences.service';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 // ^^^ This block is to be removed.
 
-require(
-  'pages/exploration-editor-page/services/user-email-preferences.service.ts');
-
-describe('User Email Preferences Service', function() {
+describe('User Email Preferences Service', () => {
   var UserEmailPreferencesService = null;
-  var httpBackend = null;
-  var CsrfService = null;
   var expId = '12345';
   var sampleResponse = {
     email_preferences: {
@@ -36,81 +34,192 @@ describe('User Email Preferences Service', function() {
     }
   };
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
+  var serviceInstance: UserEmailPreferencesService;
+  var httpTestingController: HttpTestingController;
 
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
     });
-
-    angular.mock.inject(function($injector, $q) {
-      UserEmailPreferencesService = $injector
-        .get('UserEmailPreferencesService');
-      CsrfService = $injector.get('CsrfTokenService');
-      httpBackend = $injector.get('$httpBackend');
-
-      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve('sample-csrf-token');
-        return deferred.promise;
-      });
-    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    serviceInstance = TestBed.get(UserEmailPreferencesService);
   });
 
-  afterEach(function() {
-    httpBackend.verifyNoOutstandingExpectation();
-    httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
+
+  // BeforeEach(function() {
+  //   angular.mock.module('oppia');
+
+  //   angular.mock.module(function($provide) {
+  //     $provide.value('ExplorationDataService', {
+  //       explorationId: expId
+  //     });
+  //     var ugs = new UpgradedServices();
+  //     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+  //       $provide.value(key, value);
+  //     }
+  //   });
+
+  //   angular.mock.inject(function($injector, $q) {
+  //     UserEmailPreferencesService = $injector
+  //       .get('UserEmailPreferencesService');
+  //     CsrfService = $injector.get('CsrfTokenService');
+  //     httpBackend = $injector.get('$httpBackend');
+
+  //     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+  //       var deferred = $q.defer();
+  //       deferred.resolve('sample-csrf-token');
+  //       return deferred.promise;
+  //     });
+  //   });
+  // });
+
+  // afterEach(function() {
+  //   httpBackend.verifyNoOutstandingExpectation();
+  //   httpBackend.verifyNoOutstandingRequest();
+  // });
 
   it('should successfully intialise the service', function() {
-    expect(UserEmailPreferencesService.feedbackNotificationsMuted)
+    expect(serviceInstance.feedbackNotificationsMuted)
       .toBeUndefined();
-    expect(UserEmailPreferencesService.suggestionNotificationsMuted)
+    expect(serviceInstance.suggestionNotificationsMuted)
       .toBeUndefined();
 
-    UserEmailPreferencesService.init(true, true);
+    serviceInstance.init(true, true);
 
-    expect(UserEmailPreferencesService.feedbackNotificationsMuted).toBe(true);
-    expect(UserEmailPreferencesService.suggestionNotificationsMuted).toBe(true);
+    expect(serviceInstance.feedbackNotificationsMuted).toBe(true);
+    expect(serviceInstance.suggestionNotificationsMuted).toBe(true);
   });
 
   it('should successfully return the feedbackNotificationsMuted value',
     function() {
-      UserEmailPreferencesService.init(true, true);
-      expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+      serviceInstance.init(true, true);
+      expect(serviceInstance.areFeedbackNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully return the suggestionNotificationsMuted value',
     function() {
-      UserEmailPreferencesService.init(true, true);
-      expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+      serviceInstance.init(true, true);
+      expect(serviceInstance.areSuggestionNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully set the feedback notification preferences',
     function() {
-      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-        .respond(200, sampleResponse);
-      UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
-      httpBackend.flush();
-      expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+      var req = httpTestingController.expectOne(
+        '/createhandler/notificationpreferences/' + expId);
+      expect(req.request.method).toEqual('PUT');
+      serviceInstance.setFeedbackNotificationPreferences(false);
+      req.flush(sampleResponse);
+      expect(serviceInstance.areFeedbackNotificationsMuted())
         .toBe(false);
     });
 
   it('should successfully set the suggestion notification preferences',
     function() {
-      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-        .respond(200, sampleResponse);
-      UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
-      httpBackend.flush();
-      expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+      var req = httpTestingController.expectOne(
+        '/createhandler/notificationpreferences/' + expId);
+      expect(req.request.method).toEqual('PUT');
+      serviceInstance.setSuggestionNotificationPreferences(false);
+      req.flush(sampleResponse);
+      expect(serviceInstance.areSuggestionNotificationsMuted())
         .toBe(false);
     });
 });
+
+// Require(
+//   'pages/exploration-editor-page/services/user-email-preferences.service.ts');
+
+// describe('User Email Preferences Service', function() {
+//   var UserEmailPreferencesService = null;
+//   var httpBackend = null;
+//   var CsrfService = null;
+//   var expId = '12345';
+//   var sampleResponse = {
+//     email_preferences: {
+//       mute_feedback_notifications: false,
+//       mute_suggestion_notifications: false
+//     }
+//   };
+
+//   beforeEach(function() {
+//     angular.mock.module('oppia');
+
+//     angular.mock.module(function($provide) {
+//       $provide.value('ExplorationDataService', {
+//         explorationId: expId
+//       });
+//       var ugs = new UpgradedServices();
+//       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+//         $provide.value(key, value);
+//       }
+//     });
+
+//     angular.mock.inject(function($injector, $q) {
+//       UserEmailPreferencesService = $injector
+//         .get('UserEmailPreferencesService');
+//       CsrfService = $injector.get('CsrfTokenService');
+//       httpBackend = $injector.get('$httpBackend');
+
+//       spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+//         var deferred = $q.defer();
+//         deferred.resolve('sample-csrf-token');
+//         return deferred.promise;
+//       });
+//     });
+//   });
+
+//   afterEach(function() {
+//     httpBackend.verifyNoOutstandingExpectation();
+//     httpBackend.verifyNoOutstandingRequest();
+//   });
+
+//   it('should successfully intialise the service', function() {
+//     expect(UserEmailPreferencesService.feedbackNotificationsMuted)
+//       .toBeUndefined();
+//     expect(UserEmailPreferencesService.suggestionNotificationsMuted)
+//       .toBeUndefined();
+
+//     UserEmailPreferencesService.init(true, true);
+
+//     expect(UserEmailPreferencesService.feedbackNotificationsMuted).toBe(true);
+//     expect(UserEmailPreferencesService.suggestionNotificationsMuted).toBe(true);
+//   });
+
+//   it('should successfully return the feedbackNotificationsMuted value',
+//     function() {
+//       UserEmailPreferencesService.init(true, true);
+//       expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+//         .toBe(true);
+//     });
+
+//   it('should successfully return the suggestionNotificationsMuted value',
+//     function() {
+//       UserEmailPreferencesService.init(true, true);
+//       expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+//         .toBe(true);
+//     });
+
+//   it('should successfully set the feedback notification preferences',
+//     function() {
+//       httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
+//         .respond(200, sampleResponse);
+//       UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
+//       httpBackend.flush();
+//       expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+//         .toBe(false);
+//     });
+
+//   it('should successfully set the suggestion notification preferences',
+//     function() {
+//       httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
+//         .respond(200, sampleResponse);
+//       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
+//       httpBackend.flush();
+//       expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+//         .toBe(false);
+//     });
+// });
