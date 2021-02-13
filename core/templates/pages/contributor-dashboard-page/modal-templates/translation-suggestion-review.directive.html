@@ -23,25 +23,36 @@
     Review message (required if rejecting):
     <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
   </div>
+  <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
+    <strong>Review message: </strong><[reviewMessage]>
+  </div>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Close</button>
   <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
-    <button class="btn btn-danger" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="rejectAndReviewNext()">
-      <[lastSuggestionToReview ? 'Reject' : 'Reject and review next']>
+    <button class="btn btn-danger oppia-suggestion-resolve-button" ng-if="reviewable" ng-disabled="reviewMessage.length == 0 || resolvingSuggestion" ng-click="rejectAndReviewNext()">
+      <i ng-show="resolvingSuggestion" class="fa fa-spinner"></i>
+      <span ng-show="!resolvingSuggestion"><[lastSuggestionToReview ? 'Reject' : 'Reject and review next']></span>
     </button>
   </span>
   <span>
-    <button class="btn btn-success" ng-if="reviewable" ng-click="acceptAndReviewNext()">
-      <[lastSuggestionToReview ? 'Accept' : 'Accept and review next']>
+    <button class="btn btn-success oppia-suggestion-resolve-button" ng-disabled="resolvingSuggestion" ng-if="reviewable" ng-click="acceptAndReviewNext()">
+      <i ng-show="resolvingSuggestion" class="fa fa-spinner"></i>
+      <span ng-show="!resolvingSuggestion"><[lastSuggestionToReview ? 'Accept' : 'Accept and review next']></span>
     </button>
   </span>
 </div>
 
 <style>
+  .oppia-suggestion-review-panel {
+    border: 1px solid #ccc;
+  }
   .oppia-suggestion-review-message {
     margin-left: 10px;
     margin-top: 20px;
+  }
+  .oppia-suggestion-resolve-button {
+    min-width: 165px;
   }
 </style>

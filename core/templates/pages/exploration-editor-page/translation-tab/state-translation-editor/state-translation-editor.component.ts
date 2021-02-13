@@ -89,6 +89,16 @@ angular.module('oppia').component('stateTranslationEditor', {
         contentId = (
           TranslationTabActiveContentIdService.getActiveContentId());
         languageCode = TranslationLanguageService.getActiveLanguageCode();
+
+        $scope.HTML_SCHEMA = {
+          type: 'html',
+          ui_config: {
+            language: TranslationLanguageService.getActiveLanguageCode(),
+            languageDirection: (
+              TranslationLanguageService.getActiveLanguageDirection())
+          }
+        };
+
         if (StateWrittenTranslationsService.displayed.hasWrittenTranslation(
           contentId, languageCode)) {
           $scope.activeWrittenTranslation = (
@@ -166,15 +176,7 @@ angular.module('oppia').component('stateTranslationEditor', {
       ctrl.$onInit = function() {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
-        $scope.HTML_SCHEMA = {
-          type: 'html',
-          ui_config: {
-            activeLanguage: (
-              TranslationLanguageService.getActiveLanguageCode()),
-            activeLanguageDirection: (
-              TranslationLanguageService.getActiveLanguageDirection())
-          }
-        };
+
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
         };

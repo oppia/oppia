@@ -20,8 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { Exploration, ExplorationObjectFactory } from
-  'domain/exploration/ExplorationObjectFactory';
+import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -148,15 +147,8 @@ describe('Exploration object factory', () => {
       },
     };
 
-    const explorationDict = {
-      id: 1,
+    const explorationDict: ExplorationBackendDict = {
       title: 'My Title',
-      category: 'Art',
-      objective: 'Your objective',
-      tags: [],
-      blurb: '',
-      author_notes: '',
-      states_schema_version: 15,
       init_state_name: 'Introduction',
       language_code: 'en',
       states: {
@@ -164,7 +156,9 @@ describe('Exploration object factory', () => {
         'second state': secondState},
       param_specs: {},
       param_changes: [],
-      version: 1
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      version: '1'
     };
 
     exploration = eof.createFromBackendDict(explorationDict);
