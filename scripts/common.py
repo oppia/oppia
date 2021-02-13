@@ -865,9 +865,9 @@ def managed_process(
         if proc_name_to_kill is not None:
             python_utils.PRINT(
                 'Killing remaining %s processes' % proc_name_to_kill)
-            # We go through all the all running processes on the local machine
+            # We go through all the running processes on the local machine
             # and find out which ones belong to the process we want to kill (eg.
-            # elastic search). While doing going through the list we can
+            # elastic search). While going through the list we can
             # encounter some processes for which we don't have the appropriate
             # access level to get info about it and the proc.cmdline() raises
             # the access denied error. Similarly psutil.ZombieProcess is also an
