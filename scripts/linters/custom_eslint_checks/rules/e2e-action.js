@@ -38,9 +38,6 @@ module.exports = {
       directElemSendKeys: (
         '{{elementName}}.sendKeys() is called instead of using ' +
         'action.sendKeys()'),
-      directElemClear: (
-        '{{elementName}}.clear() is called instead of using ' +
-        'action.clear()'),
     },
   },
 
@@ -72,15 +69,6 @@ module.exports = {
             node: callee,
             loc: callee.loc,
             messageId: 'directElemSendKeys',
-            data: {
-              elementName: elementName,
-            },
-          });
-        } else if (callee.property.name === 'clear') {
-          context.report({
-            node: callee,
-            loc: callee.loc,
-            messageId: 'directElemClear',
             data: {
               elementName: elementName,
             },
