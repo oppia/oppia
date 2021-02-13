@@ -868,11 +868,11 @@ def managed_process(
             # We go through all the all running processes on the local machine
             # and find out which ones belong to the process we want to kill (eg.
             # elastic search). While doing going through the list we can
-            # encounter some processes for which we don't have the apropiate
+            # encounter some processes for which we don't have the appropriate
             # access level to get info about it and the proc.cmdline() raises
             # the access denied error. Similarly psutil.ZombieProcess is also an
-            # exception that has been noticed. Hence these exceptions are
-            # ignored. You can learn more about these exceptions here:
+            # exception that has been noticed. Hence we want to ignore these
+            # exceptions. You can learn more about these exceptions here:
             # https://psutil.readthedocs.io/en/latest/#exceptions
             for proc in psutil.process_iter():
                 try:
