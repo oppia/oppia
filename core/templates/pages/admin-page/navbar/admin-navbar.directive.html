@@ -27,9 +27,6 @@
   admin-navbar .oppia-dropdown-toggle-icon {
     margin-top: -1px;
   }
-  admin-navbar .oppia-user-email-text {
-    display: none;
-  }
   @media screen and (max-width: 710px) {
     admin-navbar .oppia-admin-page-dropdown {
       display: block;
@@ -173,9 +170,6 @@
                   </div>
                   <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
                     <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
-                  </div>
-                  <div class="oppia-user-email oppia-user-email-text">
-                    <[$ctrl.getUserEmail()]>
                   </div>
                 </div>
               </a>
