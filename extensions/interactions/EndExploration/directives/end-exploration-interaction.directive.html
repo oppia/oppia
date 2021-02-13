@@ -1,6 +1,6 @@
-<div class="end-exploration-tile">
+<div class="end-exploration-modal">
   <i class="material-icons tick-symbol">&#xE86C;</i>
-  <span class="inner-content protractor-test-correct-feedback">Congratualtions you have completed the exploration!</span>
+  <span class="inner-content protractor-test-correct-feedback"><['I18N_MODAL_END_EXPLORATION' | translate]></span>
 </div>
 <div ng-if="$ctrl.isInEditorPage" class="oppia-error-message-text">
   <span><[$ctrl.errorMessage]></span>
@@ -12,7 +12,7 @@
     font-size: 0.8em;
   }
 
-  oppia-interactive-end-exploration .end-exploration-tile {
+  oppia-interactive-end-exploration .end-exploration-modal {
     background-color: rgb(224, 245, 236);
     border: 2px;
     border-color: #00B269;
@@ -28,5 +28,9 @@
     padding-top: 5px;
     position: relative;
     text-align: center;
+  }
+
+  oppia-interactive-end-exploration .tick-symbol {
+    padding-bottom: 4px;
   }
 </style>
