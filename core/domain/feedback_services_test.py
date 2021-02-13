@@ -780,8 +780,11 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             reference_dict['entity_type'], reference_dict['entity_id'],
             reference_dict['thread_id'], reference_dict['message_id'])
 
-        feedback_services.enqueue_feedback_message_instant_email_task(
-            user_id, reference)
+        (
+            feedback_services
+            .enqueue_feedback_message_instant_email_task_transactional(
+                user_id, reference)
+        )
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_EMAILS),

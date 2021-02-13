@@ -1907,7 +1907,8 @@ class StateAnswersModel(base_models.BaseModel):
             return None
 
     @classmethod
-    def _insert_submitted_answers_unsafe(
+    @transaction_services.run_in_transaction_wrapper
+    def _insert_submitted_answers_unsafe_transactional(
             cls, exploration_id, exploration_version, state_name,
             interaction_id, new_submitted_answer_dict_list):
         """See the insert_submitted_answers for general documentation of what
@@ -2026,10 +2027,9 @@ class StateAnswersModel(base_models.BaseModel):
             new_submitted_answer_dict_list: list(dict). List of new submitted
                 answers each of which is stored as a JSON blob.
         """
-        transaction_services.run_in_transaction(
-            cls._insert_submitted_answers_unsafe, exploration_id,
-            exploration_version, state_name, interaction_id,
-            new_submitted_answer_dict_list)
+        cls._insert_submitted_answers_unsafe_transactional(
+            exploration_id, exploration_version, state_name,
+            interaction_id, new_submitted_answer_dict_list)
 
     @classmethod
     def _get_entity_id(

@@ -307,7 +307,9 @@ def delete_question(
             one.
     """
 
-    def delete_question_model(question_id, committer_id, force_deletion):
+    @transaction_services.run_in_transaction_wrapper
+    def delete_question_model_transactional(
+            question_id, committer_id, force_deletion):
         """Inner function that is to be done in a transaction."""
         question_model = question_models.QuestionModel.get_by_id(question_id)
         if question_model is not None:
@@ -318,9 +320,8 @@ def delete_question(
             feconf.COMMIT_MESSAGE_QUESTION_DELETED,
             force_deletion=force_deletion)
 
-    transaction_services.run_in_transaction(
-        delete_question_model, question_id,
-        committer_id, force_deletion=force_deletion)
+    delete_question_model_transactional(
+        question_id, committer_id, force_deletion)
 
     question_summary_model = (
         question_models.QuestionSummaryModel.get(question_id, False))
