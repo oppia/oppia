@@ -865,13 +865,28 @@ def managed_process(
         if proc_name_to_kill is not None:
             python_utils.PRINT(
                 'Killing remaining %s processes' % proc_name_to_kill)
+            # We go through all the all running processes on the local machine
+            # and find out which ones belong to the process we want to kill (eg.
+            # elastic search). While doing going through the list we can
+            # encounter some processes for which we don't have the apropiate
+            # access level to get info about it and the proc.cmdline() raises
+            # the access denied error. Similarly psutil.ZombieProcess is also an
+            # exception that has been noticed. Hence these exceptions are
+            # ignored. You can learn more about these exceptions here:
+            # https://psutil.readthedocs.io/en/latest/#exceptions
             for proc in psutil.process_iter():
-                proc_should_be_killed = any(
-                    proc_name_to_kill in cmd_part
-                    for cmd_part in proc.cmdline())
-                if proc_should_be_killed:
-                    proc.kill()
-                    logging.warn('Forced to kill %s!' % get_debug_info(proc))
+                try:
+                    proc_should_be_killed = any(
+                        proc_name_to_kill in cmd_part
+                        for cmd_part in proc.cmdline())
+                    if proc_should_be_killed:
+                        proc.kill()
+                        logging.warn(
+                            'Forced to kill %s!' % get_debug_info(proc))
+                except psutil.AccessDenied:
+                    pass
+                except psutil.ZombieProcess:
+                    pass
 
 
 @contextlib.contextmanager
