@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for QuestionSummaryModelClass.
+ * @fileoverview Unit tests for QuestionSummaryModel.
  */
 
 import { QuestionSummaryBackendDict, QuestionSummary } from
