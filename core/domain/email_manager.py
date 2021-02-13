@@ -49,7 +49,7 @@ def log_new_error(*args, **kwargs):
 
 
 NEW_REVIEWER_EMAIL_DATA = {
-    constants.REVIEW_CATEGORY_TRANSLATION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'review_category': 'translations',
         'to_check': 'translation suggestions',
         'description_template': '%s language translations',
@@ -57,7 +57,7 @@ NEW_REVIEWER_EMAIL_DATA = {
             'review translation suggestions made by contributors in the %s '
             'language')
     },
-    constants.REVIEW_CATEGORY_VOICEOVER: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
         'review_category': 'voiceovers',
         'to_check': 'voiceover applications',
         'description_template': '%s language voiceovers',
@@ -65,7 +65,7 @@ NEW_REVIEWER_EMAIL_DATA = {
             'review voiceover applications made by contributors in the %s '
             'language')
     },
-    constants.REVIEW_CATEGORY_QUESTION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
         'review_category': 'questions',
         'to_check': 'question suggestions',
         'description': 'questions',
@@ -74,7 +74,7 @@ NEW_REVIEWER_EMAIL_DATA = {
 }
 
 REMOVED_REVIEWER_EMAIL_DATA = {
-    constants.REVIEW_CATEGORY_TRANSLATION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'review_category': 'translation',
         'role_description_template': (
             'translation reviewer role in the %s language'),
@@ -83,7 +83,7 @@ REMOVED_REVIEWER_EMAIL_DATA = {
             'language'),
         'contribution_allowed': 'translations'
     },
-    constants.REVIEW_CATEGORY_VOICEOVER: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
         'review_category': 'voiceover',
         'role_description_template': (
             'voiceover reviewer role in the %s language'),
@@ -92,7 +92,7 @@ REMOVED_REVIEWER_EMAIL_DATA = {
             'language'),
         'contribution_allowed': 'voiceovers'
     },
-    constants.REVIEW_CATEGORY_QUESTION: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
         'review_category': 'question',
         'role_description': 'question reviewer role',
         'rights_message': 'review question suggestions made by contributors',
@@ -455,8 +455,8 @@ def _send_email(
             'Details:\n%s %s\n%s\n\n' %
             (recipient_id, email_subject, cleaned_plaintext_body))
         return
-
-    def _send_email_in_transaction():
+    @transaction_services.run_in_transaction_wrapper
+    def _send_email_transactional():
         """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
@@ -468,7 +468,7 @@ def _send_email(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    transaction_services.run_in_transaction(_send_email_in_transaction)
+    _send_email_transactional()
 
 
 def _send_bulk_mail(
@@ -504,7 +504,8 @@ def _send_bulk_mail(
         '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
-    def _send_bulk_mail_in_transaction(instance_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _send_bulk_mail_transactional(instance_id):
         """Sends the emails in bulk to the recipients.
 
         Args:
@@ -520,8 +521,7 @@ def _send_bulk_mail(
             instance_id, recipient_ids, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    transaction_services.run_in_transaction(
-        _send_bulk_mail_in_transaction, instance_id)
+    _send_bulk_mail_transactional(instance_id)
 
 
 def send_job_failure_email(job_id):
@@ -1732,6 +1732,23 @@ def send_account_deleted_email(user_id, user_email):
         recipient_email=user_email)
 
 
+def send_account_deletion_failed_email(user_id, user_email):
+    """Sends an email to admin about the failure of the job that is supposed to
+    delete the user.
+
+    Args:
+        user_id: str. The id of the user whose account failed to get deleted.
+        user_email: str. The email of the user whose account failed to
+            get deleted.
+    """
+    email_subject = 'WIPEOUT: Account deletion failed'
+    email_body_template = (
+        'The Wipeout process failed for the user '
+        'with ID \'%s\' and email \'%s\'.' % (user_id, user_email)
+    )
+    send_mail_to_admin(email_subject, email_body_template)
+
+
 def send_email_to_new_contribution_reviewer(
         recipient_id, review_category, language_code=None):
     """Sends an email to user who is assigned as a reviewer.
@@ -1750,8 +1767,8 @@ def send_email_to_new_contribution_reviewer(
         review_category_data['review_category'])
 
     if review_category in [
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER]:
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         review_category_description = (
@@ -1814,8 +1831,8 @@ def send_email_to_removed_contribution_reviewer(
         review_category_data['review_category'])
 
     if review_category in [
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER]:
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         reviewer_role_description = (

@@ -1080,6 +1080,8 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'objective',
                 'new_value': 'The objective'
             })], 'Test edit 2')
+        self.process_and_flush_pending_tasks()
+
         rights_manager.publish_exploration(self.owner, 'exp0')
         rights_manager.publish_exploration(self.owner, 'exp1')
 
@@ -2400,20 +2402,20 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.query_id = user_query_services.save_new_query_model(
+        self.user_query_id = user_query_services.save_new_user_query(
             self.admin_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         self.model_instance = user_models.UserQueryModel.get_by_id(
-            self.query_id)
+            self.user_query_id)
         self.model_instance.user_ids = [self.owner_id, self.user_id]
         self.model_instance.update_timestamps()
         self.model_instance.put()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             user_query_services.send_email_to_qualified_users(
-                self.query_id, 'subject', 'body',
+                self.user_query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.sent_mail_id = self.model_instance.sent_email_model_id
 
@@ -2441,7 +2443,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
-                self.query_id, self.model_instance.created_on,
+                self.user_query_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
         self.run_job_and_check_output(
@@ -2453,7 +2455,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             'UserQueryModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
-        ) % (self.query_id, self.model_instance.last_updated)]
+        ) % (self.user_query_id, self.model_instance.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -2470,8 +2472,9 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expected model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.query_id, self.user_id, self.user_id)]
+                'with id %s but it doesn\'t exist"]]'
+            ) % (self.user_query_id, self.user_id, self.user_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2484,8 +2487,9 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on '
                 'field sent_email_model_ids having value '
                 '%s, expected model BulkEmailModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.query_id, self.sent_mail_id, self.sent_mail_id)]
+                'with id %s but it doesn\'t exist"]]'
+            ) % (self.user_query_id, self.sent_mail_id, self.sent_mail_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2495,12 +2499,14 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model.recipient_ids.append('invalid')
         bulk_email_model.update_timestamps()
         bulk_email_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for recipient check of '
-            'UserQueryModel\', [u"Entity id %s: Email model %s '
-            'for query has following extra recipients [u\'invalid\'] '
-            'which are not qualified as per the query"]]') % (
-                self.query_id, self.sent_mail_id)]
+        expected_output = [
+            (
+                u'[u\'failed validation check for recipient check of '
+                'UserQueryModel\', [u"Entity id %s: Email model %s '
+                'for query has following extra recipients [u\'invalid\'] '
+                'which are not qualified as per the query"]]'
+            ) % (self.user_query_id, self.sent_mail_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2510,22 +2516,26 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model.sender_id = 'invalid'
         bulk_email_model.update_timestamps()
         bulk_email_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for sender check of '
-            'UserQueryModel\', [u\'Entity id %s: Sender id invalid in '
-            'email model with id %s does not match submitter id '
-            '%s of query\']]') % (
-                self.query_id, self.sent_mail_id, self.admin_id)]
+        expected_output = [
+            (
+                u'[u\'failed validation check for sender check of '
+                'UserQueryModel\', [u\'Entity id %s: Sender id invalid in '
+                'email model with id %s does not match submitter id '
+                '%s of query\']]'
+            ) % (self.user_query_id, self.sent_mail_id, self.admin_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_bulk_email_model(self):
         user_models.UserBulkEmailsModel.get_by_id(self.owner_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for user bulk email check of '
-            'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
-            'is missing for recipient with id %s\']]') % (
-                self.query_id, self.owner_id)]
+        expected_output = [
+            (
+                u'[u\'failed validation check for user bulk email check of '
+                'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
+                'is missing for recipient with id %s\']]'
+            ) % (self.user_query_id, self.owner_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2539,7 +2549,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             '[u\'failed validation check for entity stale check of '
             'UserQueryModel\', [u\'Entity id %s: '
-            'Model older than 4 weeks\']]') % self.query_id]
+            'Model older than 4 weeks\']]') % self.user_query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2551,7 +2561,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             '[u\'failed validation check for entity stale check of '
             'UserQueryModel\', [u\'Entity id %s: '
-            'Archived model not marked as deleted\']]') % self.query_id]
+            'Archived model not marked as deleted\']]') % self.user_query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2569,20 +2579,20 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.query_id = user_query_services.save_new_query_model(
+        self.user_query_id = user_query_services.save_new_user_query(
             self.admin_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         query_model = user_models.UserQueryModel.get_by_id(
-            self.query_id)
+            self.user_query_id)
         query_model.user_ids = [self.owner_id, self.user_id]
         query_model.update_timestamps()
         query_model.put()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             user_query_services.send_email_to_qualified_users(
-                self.query_id, 'subject', 'body',
+                self.user_query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.model_instance = user_models.UserBulkEmailsModel.get_by_id(
             self.user_id)
