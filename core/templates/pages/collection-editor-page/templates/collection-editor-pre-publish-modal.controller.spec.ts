@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for CollectionEditorPrePublishModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+import { fakeAsync, TestBed } from '@angular/core/testing';
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
+import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 
 describe('Collection Editor Pre Publish Modal Controller', function() {
   var ctrl = null;
@@ -29,7 +31,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
   var $uibModalInstance = null;
   var AlertsService = null;
   var CollectionEditorStateService = null;
-  var CollectionUpdateService = null;
+  let collectionUpdateService = null;
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -62,7 +64,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       var $rootScope = $injector.get('$rootScope');
       CollectionEditorStateService = $injector.get(
         'CollectionEditorStateService');
-      CollectionUpdateService = $injector.get('CollectionUpdateService');
+      collectionUpdateService = TestBed.get(CollectionUpdateService);
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -91,7 +93,12 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
 
     it('should allow saving a collection when it has a title, objective and' +
-      ' category', function() {
+      ' category', fakeAsync(() => {
+      spyOn(collectionUpdateService, 'setCollectionTitle').and.callThrough();
+      spyOn(
+        collectionUpdateService, 'setCollectionObjective').and.callThrough();
+      spyOn(
+        collectionUpdateService, 'setCollectionCategory').and.callThrough();
       ctrl.newTitle = 'New title';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = 'Algorithm';
@@ -99,15 +106,15 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
 
       ctrl.save();
 
-      expect(CollectionUpdateService.setCollectionTitle).toHaveBeenCalled();
-      expect(CollectionUpdateService.setCollectionObjective)
-        .toHaveBeenCalled();
-      expect(CollectionUpdateService.setCollectionCategory)
-        .toHaveBeenCalled();
+      expect(collectionUpdateService.setCollectionTitle).toHaveBeenCalled();
+      expect(
+        collectionUpdateService.setCollectionObjective).toHaveBeenCalled();
+      expect(
+        collectionUpdateService.setCollectionCategory).toHaveBeenCalled();
 
       expect($uibModalInstance.close).toHaveBeenCalledWith([
         'title', 'objective', 'category']);
-    });
+    }));
 
     it('should cancel the modal on dismiss', function() {
       ctrl.cancel();
