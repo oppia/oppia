@@ -50,6 +50,7 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
+import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -216,6 +217,7 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service.ts';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
+import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { EmailDashboardDataService } from 'pages/email-dashboard-pages/email-dashboard-data.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -227,6 +229,8 @@ import { AngularNameService } from 'pages/exploration-editor-page/services/angul
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
+import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
@@ -304,6 +308,7 @@ import { MessengerService } from 'services/messenger.service';
 import { PageTitleService } from 'services/page-title.service';
 import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
 import { PlaythroughService } from 'services/playthrough.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
@@ -374,6 +379,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionCreationService', CollectionCreationService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
+  ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
@@ -383,6 +389,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
+  ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
@@ -540,6 +547,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlaythroughObjectFactory', PlaythroughObjectFactory],
   ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],
   ['PlaythroughService', PlaythroughService],
+  ['PreventPageUnloadEventService', PreventPageUnloadEventService],
   ['PredictionAlgorithmRegistryService', PredictionAlgorithmRegistryService],
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],
   ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
@@ -617,6 +625,9 @@ export const angularServices: [string, Type<{}>][] = [
     StateTopAnswersStatsBackendApiService],
   ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],
   ['StateTopAnswersStatsService', StateTopAnswersStatsService],
+  ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
+  ['TutorialEventsBackendApiService',
+    TutorialEventsBackendApiService],
   ['StateWrittenTranslationsService', StateWrittenTranslationsService],
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
