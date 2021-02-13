@@ -15,19 +15,15 @@
 /**
  * @fileoverview Object factory for creating frontend instances of
  * question summary for one skill objects. This differs from
- * QuestionSummaryObjectFactory in that, this contains QuestionSummary and the
+ * QuestionSummaryModelClass in that, this contains QuestionSummary and the
  * data for the relevant linked skill (description, difficulty and id), whereas
  * QuestionSummary just contains the question data.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   QuestionSummaryBackendDict,
   QuestionSummary,
-  QuestionSummaryObjectFactory
-} from 'domain/question/QuestionSummaryObjectFactory';
+} from 'domain/question/question-summary-object.model';
 
 export interface QuestionSummaryForOneSkillBackendDict {
   'skill_id': string;
@@ -66,20 +62,13 @@ export class QuestionSummaryForOneSkill {
   getQuestionSummary(): QuestionSummary {
     return this._questionSummary;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class QuestionSummaryForOneSkillObjectFactory {
-  constructor(
-    private questionSummaryObjectFactory: QuestionSummaryObjectFactory) {}
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict:
-      QuestionSummaryForOneSkillBackendDict): QuestionSummaryForOneSkill {
+    QuestionSummaryForOneSkillBackendDict): QuestionSummaryForOneSkill {
     var questionSummary =
-      this.questionSummaryObjectFactory.createFromBackendDict(
-        backendDict.summary);
+    QuestionSummary.createFromBackendDict(
+      backendDict.summary);
     return new QuestionSummaryForOneSkill(
       backendDict.skill_id,
       backendDict.skill_description,
@@ -88,7 +77,3 @@ export class QuestionSummaryForOneSkillObjectFactory {
     );
   }
 }
-
-angular.module('oppia').factory(
-  'QuestionSummaryForOneSkillObjectFactory',
-  downgradeInjectable(QuestionSummaryForOneSkillObjectFactory));
