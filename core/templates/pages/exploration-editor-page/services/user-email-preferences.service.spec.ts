@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@
 import { UserEmailPreferencesService } from './user-email-preferences.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { CsrfTokenService } from 'services/csrf-token.service';
 // ^^^ This block is to be removed.
 
 describe('User Email Preferences Service', () => {
-  var UserEmailPreferencesService = null;
   var expId = '12345';
   var sampleResponse = {
     email_preferences: {
@@ -34,15 +34,23 @@ describe('User Email Preferences Service', () => {
     }
   };
 
-  var serviceInstance: UserEmailPreferencesService;
-  var httpTestingController: HttpTestingController;
+  var serviceInstance: UserEmailPreferencesService = null;
+  var httpTestingController: HttpTestingController = null;
+  var csrfService: CsrfTokenService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule]
     });
     httpTestingController = TestBed.get(HttpTestingController);
     serviceInstance = TestBed.get(UserEmailPreferencesService);
+    csrfService = TestBed.get(CsrfTokenService);
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
+      });
+    });
   });
 
   afterEach(() => {
@@ -81,7 +89,7 @@ describe('User Email Preferences Service', () => {
   //   httpBackend.verifyNoOutstandingRequest();
   // });
 
-  it('should successfully intialise the service', function() {
+  it('should successfully intialise the service', () => {
     expect(serviceInstance.feedbackNotificationsMuted)
       .toBeUndefined();
     expect(serviceInstance.suggestionNotificationsMuted)
@@ -94,40 +102,44 @@ describe('User Email Preferences Service', () => {
   });
 
   it('should successfully return the feedbackNotificationsMuted value',
-    function() {
+    () => {
       serviceInstance.init(true, true);
       expect(serviceInstance.areFeedbackNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully return the suggestionNotificationsMuted value',
-    function() {
+    () => {
       serviceInstance.init(true, true);
       expect(serviceInstance.areSuggestionNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully set the feedback notification preferences',
-    function() {
+    fakeAsync(() => {
       var req = httpTestingController.expectOne(
-        '/createhandler/notificationpreferences/' + expId);
+        { method: 'PUT',
+          url: '/createhandler/notificationpreferences/' + expId});
       expect(req.request.method).toEqual('PUT');
       serviceInstance.setFeedbackNotificationPreferences(false);
       req.flush(sampleResponse);
       expect(serviceInstance.areFeedbackNotificationsMuted())
         .toBe(false);
-    });
+    }));
 
   it('should successfully set the suggestion notification preferences',
-    function() {
+    fakeAsync(() => {
+      // Var req = httpTestingController.expectOne(
+      serviceInstance.setSuggestionNotificationPreferences(false);
+
       var req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId);
       expect(req.request.method).toEqual('PUT');
-      serviceInstance.setSuggestionNotificationPreferences(false);
       req.flush(sampleResponse);
+      flushMicrotasks();
       expect(serviceInstance.areSuggestionNotificationsMuted())
         .toBe(false);
-    });
+    }));
 });
 
 // Require(
