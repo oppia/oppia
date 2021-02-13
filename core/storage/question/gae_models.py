@@ -155,7 +155,7 @@ class QuestionModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
-        question_commit_log.put()
+        question_commit_log.put_depending_on_id(committer_id)
 
     @classmethod
     def create(

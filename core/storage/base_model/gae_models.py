@@ -92,12 +92,10 @@ class BaseModel(datastore_services.Model):
 
     # When this entity was first created. This value should not be modified.
     created_on = (
-        datastore_services.DateTimeProperty(
-            auto_now_add=True, indexed=True, required=True))
+        datastore_services.DateTimeProperty(auto_now_add=True, indexed=True))
     # When this entity was last updated. This value should not be modified.
     last_updated = (
-        datastore_services.DateTimeProperty(
-            auto_now=True, indexed=True, required=True))
+        datastore_services.DateTimeProperty(auto_now=True, indexed=True))
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
@@ -341,7 +339,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     # When this entity was last updated on behalf of a human.
     last_updated_by_human = (
-        datastore_services.DateTimeProperty(indexed=True, required=True))
+        datastore_services.DateTimeProperty(indexed=True))
 
     def put(self):
         """Unsupported operation on human-maintained models."""
@@ -355,6 +353,17 @@ class BaseHumanMaintainedModel(BaseModel):
     def put_for_bot(self):
         """Stores the model instance on behalf of a non-human."""
         return super(BaseHumanMaintainedModel, self).put()
+
+    def put_depending_on_id(self, user_id):
+        """Stores the model instance on behalf of a non-human.
+
+        Args:
+            user_id: str. The ID of the user trying to put this model.
+        """
+        if user_id in feconf.SYSTEM_USERS:
+            self.put_for_bot()
+        else:
+            self.put_for_human()
 
     @classmethod
     def put_multi(cls, unused_instances):
@@ -388,6 +397,22 @@ class BaseHumanMaintainedModel(BaseModel):
             list(future). A list of futures.
         """
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
+
+    def put_multi_depending_on_id(self, user_id, instances):
+        """Stores the model instance on behalf of human or non-human dpeending
+        on the user ID.
+
+        Args:
+            user_id: str. The ID of the user trying to put this model.
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        if user_id in feconf.SYSTEM_USERS:
+            return self.put_multi_for_bot(instances)
+        else:
+            return self.put_multi_for_human(instances)
 
 
 class BaseCommitLogEntryModel(BaseHumanMaintainedModel):

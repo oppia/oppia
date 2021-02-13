@@ -189,7 +189,7 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights.community_owned
         )
         collection_commit_log.collection_id = self.id
-        collection_commit_log.put()
+        collection_commit_log.put_depending_on_id(committer_id)
 
     @classmethod
     def delete_multi(
@@ -489,7 +489,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put()
+            ).put_depending_on_id(committer_id)
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
@@ -513,7 +513,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.put()
+        snapshot_metadata_model.put_depending_on_id(committer_id)
 
     @classmethod
     def export_data(cls, user_id):
