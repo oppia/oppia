@@ -155,7 +155,7 @@ angular.module('oppia').controller('TranslationModalController', [
           const descriptionTextFound = translatedImageDescriptions.some(
             translatedDescText => (
               translatedDescText === descriptionText && descriptionText !== '')
-            );
+          );
           states.push(found);
           duplicateImgAltTextStates.push(altTextFound);
           duplicateImgDescriptionStates.push(descriptionTextFound);
