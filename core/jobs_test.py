@@ -283,7 +283,6 @@ class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
     def _post_failure_hook(cls, job_id):
         model = MockSumModel.get_by_id(SUM_MODEL_ID)
         model.failed = True
-        model.update_timestamps()
         model.put()
 
 

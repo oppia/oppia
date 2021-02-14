@@ -495,7 +495,6 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             if isinstance(model, base_models.BaseHumanMaintainedModel):
                 model.put_for_human()
             else:
-                model.update_timestamps()
                 model.put()
 
         output = self._run_one_off_job()

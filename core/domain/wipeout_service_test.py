@@ -1062,7 +1062,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {self.user_1_id: 2}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(
@@ -1089,7 +1088,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(
@@ -1447,7 +1445,6 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {self.user_1_id: 2}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(
@@ -1472,7 +1469,6 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(

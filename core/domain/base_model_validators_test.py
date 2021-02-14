@@ -146,7 +146,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
         self.invalid_model = MockModel(id='mockmodel')
-        self.invalid_model.update_timestamps()
         self.invalid_model.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
@@ -174,7 +173,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             r'The _get_change_domain_class\(\) method is missing from the '
             'derived class. It should be implemented in the derived class.'):
             snapshot_model = MockSnapshotModel(id='mockmodel')
-            snapshot_model.update_timestamps()
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
@@ -201,7 +199,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')
-        user.update_timestamps()
         user.put()
         MockBaseUserModelValidator().validate(user)
 
@@ -212,7 +209,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             deleted=True,
             last_updated=year_ago
         )
-        model.update_timestamps(update_last_updated_time=False)
         model.put()
         validator = MockBaseUserModelValidator()
         validator.validate_deleted(model)
@@ -356,7 +352,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             user_id=feconf.MIGRATION_BOT_USER_ID,
             commit_cmds=[],
             commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
-        model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)

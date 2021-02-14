@@ -1235,7 +1235,6 @@ class PopulateContributionStatsOneOffJobTests(
                 self.reviewer_1_id)
         )
         user_contribution_rights_model.deleted = True
-        user_contribution_rights_model.update_timestamps()
         user_contribution_rights_model.put()
 
         self._run_job_and_verify_output(expected_output)

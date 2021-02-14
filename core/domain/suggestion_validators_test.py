@@ -428,7 +428,6 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 
     def test_model_with_pseudo_author_id(self):
         self.model_instance.author_id = self.PSEUDONYMOUS_ID
-        self.model_instance.update_timestamps(update_last_updated_time=False)
         self.model_instance.put()
 
         expected_output = [
@@ -439,7 +438,6 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 
     def test_model_with_pseudo_final_reviewer_id(self):
         self.model_instance.final_reviewer_id = self.PSEUDONYMOUS_ID
-        self.model_instance.update_timestamps(update_last_updated_time=False)
         self.model_instance.put()
 
         expected_output = [
@@ -451,7 +449,6 @@ class GeneralVoiceoverApplicationModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -507,7 +504,6 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 
     def test_wrong_final_reviewer_id_format(self):
         self.model_instance.final_reviewer_id = 'wrong_id'
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -521,7 +517,6 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 
     def test_wrong_author_id_format(self):
         self.model_instance.author_id = 'wrong_id'
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -710,7 +705,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_reviewer_counts_by_lang_code = {
             self.sample_language_code: self.negative_count}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for translation reviewer count check '
@@ -741,7 +735,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_suggestion_counts_by_lang_code = {
             self.sample_language_code: self.negative_count}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for translation suggestion count '
@@ -771,7 +764,6 @@ class CommunityContributionStatsModelValidatorTests(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.question_reviewer_count = self.negative_count
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for question reviewer count check '
@@ -794,7 +786,6 @@ class CommunityContributionStatsModelValidatorTests(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.question_suggestion_count = self.negative_count
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for question suggestion count check '
@@ -819,7 +810,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_reviewer_counts_by_lang_code = {
             self.sample_language_code: self.non_integer_count}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for translation reviewer count check '
@@ -850,7 +840,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_suggestion_counts_by_lang_code = {
             self.sample_language_code: self.non_integer_count}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for translation suggestion count '
@@ -881,7 +870,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_suggestion_counts_by_lang_code = {
             self.sample_language_code: 1}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for translation suggestion count '
@@ -902,7 +890,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_reviewer_counts_by_lang_code = {
             self.sample_language_code: 1}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for translation reviewer count '
@@ -922,7 +909,6 @@ class CommunityContributionStatsModelValidatorTests(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.question_reviewer_count = 1
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for question reviewer count check '
@@ -939,7 +925,6 @@ class CommunityContributionStatsModelValidatorTests(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.question_suggestion_count = 1
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for question suggestion count check '
@@ -1000,7 +985,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_reviewer_counts_by_lang_code = {
             self.invalid_language_code: 1}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
@@ -1018,7 +1002,6 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_suggestion_counts_by_lang_code = {
             self.invalid_language_code: 1}
-        stats_model.update_timestamps()
         stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '

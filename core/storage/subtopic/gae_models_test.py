@@ -93,7 +93,6 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.subtopic_page_id = 'b'
-        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             subtopic_models.SubtopicPageCommitLogEntryModel

@@ -517,7 +517,6 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -572,7 +571,6 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             story_models.StorySnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -909,7 +907,6 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -945,7 +942,6 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.story_model_last_updated = (
             story_model.last_updated)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -960,7 +956,6 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_node_titles(self):
         self.model_instance_0.node_titles = ['Title 1']
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -974,7 +969,6 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_story_related_property(self):
         self.model_instance_0.title = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (

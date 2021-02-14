@@ -415,7 +415,6 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
     def test_migration_job_skips_deleted_model(self):
         model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
         model_instance.deleted = True
-        model_instance.update_timestamps()
         model_instance.put()
 
         exp_models.ExplorationModel.get_by_id('0').delete(

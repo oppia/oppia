@@ -1497,7 +1497,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.model_instance_0 = (
             collection_models.CollectionSummaryModel.get_by_id('0'))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         self.model_instance_1 = (
@@ -1524,7 +1523,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1560,7 +1558,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         collection_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.collection_model_last_updated = (
             collection_model.last_updated)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1634,7 +1631,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         sorted_contributor_ids = sorted(
             self.model_instance_0.contributors_summary.keys())
         self.model_instance_0.contributors_summary = {'invalid': 1}
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1650,7 +1646,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_node_count(self):
         self.model_instance_0.node_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1665,10 +1660,8 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_ratings(self):
         self.model_instance_0.ratings = {'1': 0, '2': 1}
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         self.model_instance_1.ratings = {}
-        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [(
             u'[u\'failed validation check for ratings check of '
@@ -1681,7 +1674,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_collection_related_property(self):
         self.model_instance_0.title = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1696,7 +1688,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_collection_rights_related_property(self):
         self.model_instance_0.status = 'public'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (

@@ -607,7 +607,6 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -662,7 +661,6 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             skill_models.SkillSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1031,7 +1029,6 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1067,7 +1064,6 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         skill_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.skill_model_last_updated = (
             skill_model.last_updated)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1082,7 +1078,6 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_misconception_count(self):
         self.model_instance_0.misconception_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1099,7 +1094,6 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_worked_examples_count(self):
         self.model_instance_0.worked_examples_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1117,7 +1111,6 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_skill_related_property(self):
         self.model_instance_0.description = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (

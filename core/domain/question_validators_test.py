@@ -700,7 +700,6 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -756,7 +755,6 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             question_models.QuestionSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1085,7 +1083,6 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1121,7 +1118,6 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         question_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.question_model_last_updated = (
             question_model.last_updated)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1136,7 +1132,6 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_question_content(self):
         self.model_instance_0.question_content = '<p>invalid</p>'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1153,7 +1148,6 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             days=2)
         actual_time = self.model_instance_0.question_model_created_on
         self.model_instance_0.question_model_created_on = mock_time
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (

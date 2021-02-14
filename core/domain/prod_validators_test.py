@@ -483,7 +483,6 @@ class ExplorationSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_message_length(self):
         self.model_instance_0.commit_message = 'a' * (
             constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1051,7 +1050,6 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1107,7 +1105,6 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             exp_models.ExplorationRightsSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1404,7 +1401,6 @@ class ExplorationCommitLogEntryModelValidatorTests(
     def test_model_with_invalid_commit_message_length(self):
         self.model_instance_0.commit_message = 'a' * (
             constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1492,7 +1488,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1534,7 +1529,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
         self.model_instance_0.first_published_msec = (
             self.model_instance_0.first_published_msec * 1000000.0)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         rights_model = exp_models.ExplorationRightsModel.get_by_id('0')
         rights_model.first_published_msec = (
@@ -1628,7 +1622,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             self.model_instance_0.exploration_model_last_updated)
         self.model_instance_0.exploration_model_last_updated = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1647,7 +1640,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_schema(self):
         self.model_instance_0.ratings = {'10': 4, '5': 15}
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1664,7 +1656,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         sorted_contributor_ids = sorted(
             self.model_instance_0.contributors_summary.keys())
         self.model_instance_0.contributors_summary = {'invalid': 1}
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1681,7 +1672,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_exploration_related_property(self):
         self.model_instance_0.title = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1696,7 +1686,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_exploration_rights_related_property(self):
         self.model_instance_0.status = 'public'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1740,15 +1729,12 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.model_instance_0 = (
             exp_models.ExplorationContextModel(id='0', story_id='0'))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         self.model_instance_1 = (
             exp_models.ExplorationContextModel(id='1', story_id='0'))
-        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         self.model_instance_2 = (
             exp_models.ExplorationContextModel(id='2', story_id='1'))
-        self.model_instance_2.update_timestamps()
         self.model_instance_2.put()
 
         self.job_class = (
@@ -1763,7 +1749,6 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -2392,7 +2377,6 @@ class SubtopicPageSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -2446,7 +2430,6 @@ class SubtopicPageSnapshotContentModelValidatorTests(
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             subtopic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (

@@ -434,7 +434,6 @@ class GeneralFeedbackThreadUserModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -507,7 +506,6 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
         exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance = feedback_models.FeedbackAnalyticsModel(id='0')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -522,7 +520,6 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -594,7 +591,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             id=self.owner_id,
             feedback_message_references=feedback_message_references,
             retries=1)
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -609,7 +605,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -667,7 +662,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_message_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('message_id')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -682,7 +676,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_thread_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('thread_id')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -697,7 +690,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_entity_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('entity_id')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -712,7 +704,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_entity_type_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('entity_type')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -729,7 +720,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_entity_type_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0]['entity_type'] = (
             'invalid')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -745,7 +735,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_entity_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0]['entity_id'] = (
             'invalid')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (

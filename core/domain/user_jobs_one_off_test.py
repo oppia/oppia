@@ -408,7 +408,6 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         model1 = user_models.UserSettingsModel(
             id=user_id_a,
             email=self.USER_A_EMAIL)
-        model1.update_timestamps()
         model1.put()
 
         result = self._run_one_off_job()
@@ -1466,7 +1465,6 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
                     activity_ids=['exp_1', 'exp_2', 'exp_3']
                 )
             )
-            original_subscription_model.update_timestamps()
             original_subscription_model.put()
 
             self.assertIsNotNone(
@@ -1497,7 +1495,6 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
                 id='id'
             )
         )
-        original_subscription_model.update_timestamps()
         original_subscription_model.put()
 
         self.assertNotIn(
@@ -1525,7 +1522,6 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
                 id='id'
             )
         )
-        original_subscription_model.update_timestamps()
         original_subscription_model.put()
 
         self.assertNotIn(
@@ -1599,7 +1595,6 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
                     feedback_thread_ids=['some_id']
                 )
             )
-            original_subscription_model.update_timestamps()
             original_subscription_model.put()
 
             self.assertIsNotNone(
@@ -1630,7 +1625,6 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
                 id='id'
             )
         )
-        original_subscription_model.update_timestamps()
         original_subscription_model.put()
 
         self.assertNotIn(
@@ -1707,7 +1701,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_1,
             )
         )
-        user_settings_model.update_timestamps()
         original_created_on_timestamp = user_settings_model.created_on
         # last_agreed_to_terms is set to have the absolute minimum
         # timestamp value.
@@ -1753,7 +1746,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
     def test_update_using_datetime_attributes_of_all_other_models(self):
         user_subscriptions_model = user_models.UserSubscriptionsModel(
             id=self.USER_ID_1)
-        user_subscriptions_model.update_timestamps()
         # We are sequentially creating the models, so the timestamps will
         # be in increasing order, and hence created_on attribute for
         # user_subscriptions_model will have the smallest timestamp value.
@@ -1772,7 +1764,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_1,
             )
         )
-        user_settings_model.update_timestamps()
         user_settings_model.created_on = (
             final_created_on_timestamp + datetime.timedelta(hours=10)
         )
@@ -1793,7 +1784,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             draft_change_list_exp_version=3,
             draft_change_list_id=1
         )
-        exploration_user_data_model.update_timestamps()
         exploration_user_data_model.created_on = (
             final_created_on_timestamp + datetime.timedelta(hours=5)
         )
@@ -1804,7 +1794,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         user_contributions_model = user_models.UserContributionsModel(
             id=self.USER_ID_1)
-        user_contributions_model.update_timestamps()
         user_contributions_model.last_updated = (
             final_created_on_timestamp + datetime.timedelta(hours=5)
         )
@@ -1812,7 +1801,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         user_email_preferences_model = user_models.UserEmailPreferencesModel(
             id=self.USER_ID_1)
-        user_email_preferences_model.update_timestamps()
         user_email_preferences_model.last_updated = (
             final_created_on_timestamp + datetime.timedelta(hours=6)
         )
@@ -1820,7 +1808,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         user_stats_model = user_models.UserStatsModel(
             id=self.USER_ID_1)
-        user_stats_model.update_timestamps()
         user_stats_model.created_on = (
             final_created_on_timestamp + datetime.timedelta(hours=10)
         )
@@ -1850,7 +1837,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         user_auth_details_model = (
             auth_models.UserAuthDetailsModel.get(user_id))
-        user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
 
         user_settings_model = (
@@ -1859,7 +1845,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                 email=self.NEW_USER_EMAIL,
             )
         )
-        user_settings_model.update_timestamps()
         user_settings_model.put()
 
         # UserAuthDetails model was created before UserSettingsModel, but the
@@ -1883,7 +1868,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_1,
             )
         )
-        user_settings_model_1.update_timestamps()
         user_settings_model_1.created_on += datetime.timedelta(hours=10)
         final_created_on_timestamp_1 = user_settings_model_1.last_updated
         user_settings_model_1.put()
@@ -1894,7 +1878,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_2,
             )
         )
-        user_settings_model_2.update_timestamps()
         original_created_on_timestamp_2 = user_settings_model_2.created_on
         user_settings_model_2.created_on = (
             original_created_on_timestamp_2 + datetime.timedelta(hours=5))
@@ -1932,7 +1915,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_1,
             )
         )
-        user_settings_model_1.update_timestamps()
         user_settings_model_1.created_on += datetime.timedelta(hours=10)
         final_created_on_timestamp_1 = user_settings_model_1.last_updated
         user_settings_model_1.put()
@@ -1943,7 +1925,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_2,
             )
         )
-        user_settings_model_2.update_timestamps()
         user_settings_model_2.created_on += datetime.timedelta(hours=5)
         final_created_on_timestamp_2 = user_settings_model_2.last_updated
         user_settings_model_2.put()
@@ -1998,7 +1979,6 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_1,
             )
         )
-        self.user_settings_model.update_timestamps()
         self.lowest_timestamp = self.user_settings_model.created_on
         self.user_settings_model.last_agreed_to_terms = (
             self.lowest_timestamp + datetime.timedelta(hours=2))
@@ -2022,7 +2002,6 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.user_subscriptions_model = user_models.UserSubscriptionsModel(
             id=self.USER_ID_1)
-        self.user_subscriptions_model.update_timestamps()
         self.user_subscriptions_model.last_checked = (
             self.lowest_timestamp + datetime.timedelta(hours=1)
         )
@@ -2040,22 +2019,18 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
             draft_change_list_exp_version=3,
             draft_change_list_id=1
         )
-        self.exploration_user_data_model.update_timestamps()
         self.exploration_user_data_model.put()
 
         self.user_contributions_model = user_models.UserContributionsModel(
             id=self.USER_ID_1)
-        self.user_contributions_model.update_timestamps()
         self.user_contributions_model.put()
 
         self.user_email_preferences_model = (
             user_models.UserEmailPreferencesModel(id=self.USER_ID_1))
-        self.user_email_preferences_model.update_timestamps()
         self.user_email_preferences_model.put()
 
         self.user_stats_model = user_models.UserStatsModel(
             id=self.USER_ID_1)
-        self.user_stats_model.update_timestamps()
         self.user_stats_model.put()
 
     def _run_one_off_job(self):
@@ -2082,8 +2057,6 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_created_on_within_delta_from_lowest_value_yields_success(self):
-        self.user_settings_model.update_timestamps(
-            update_last_updated_time=False)
         self.user_settings_model.created_on += datetime.timedelta(minutes=5)
         self.user_settings_model.put()
         self.assertLess(
@@ -2093,8 +2066,6 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_created_on_greater_than_delta_from_lowest_value_yields_error(self):
-        self.user_settings_model.update_timestamps(
-            update_last_updated_time=False)
         self.user_settings_model.created_on += datetime.timedelta(minutes=6)
         self.user_settings_model.put()
         # Since last_updated of user_settings_model was never changed, hence
@@ -2118,7 +2089,6 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
                 email=self.EMAIL_2,
             )
         )
-        user_settings_model_2.update_timestamps()
         user_settings_model_2.created_on += datetime.timedelta(hours=10)
         user_settings_model_2.put()
 
@@ -2163,7 +2133,6 @@ class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
     def test_migration_job_skips_deleted_model(self):
         self.model_instance.subscriber_ids.append(self.owner_id)
         self.model_instance.deleted = True
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         job_id = (
@@ -2178,7 +2147,6 @@ class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 
     def test_job_removes_user_id_from_subscriber_ids(self):
         self.model_instance.subscriber_ids.append(self.owner_id)
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         job_id = (
             user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
@@ -2259,7 +2227,6 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
     def test_migration_job_skips_deleted_model(self):
         self.model_instance.completed_explorations.append('3')
         self.model_instance.deleted = True
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         job_id = (
@@ -2283,7 +2250,6 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
         self.model_instance.completed_explorations.append('3')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1', '3'])
@@ -2362,7 +2328,6 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1', '2'])
         completed_activities_model.exploration_ids = ['0', '2']
-        completed_activities_model.update_timestamps()
         completed_activities_model.put()
 
         completed_activities_model = (
@@ -2454,7 +2419,6 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
         model_instance = user_models.UserContributionsModel.get_by_id(
             self.user_id)
         model_instance.deleted = True
-        model_instance.update_timestamps()
         model_instance.put()
         exp_services.delete_exploration(self.user_id, 'exp0')
         job_id = (
@@ -2645,7 +2609,6 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model = (
             user_models.UserSettingsModel.get_by_id(self.owner_id))
         user_settings_model.username = None
-        user_settings_model.update_timestamps()
         user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS - NOT REGISTERED', 1]])
@@ -2654,7 +2617,6 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model = (
             user_models.UserSettingsModel.get_by_id(self.owner_id))
         user_settings_model.deleted = True
-        user_settings_model.update_timestamps()
         user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS - DELETED', 1]])
@@ -2679,7 +2641,6 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model = (
             user_models.UserSettingsModel.get_by_id(moderator_id))
         user_settings_model.deleted = True
-        user_settings_model.update_timestamps()
         user_settings_model.put()
 
         output = self._run_one_off_job()
@@ -2728,7 +2689,6 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
 
     def test_audit_user_with_username_is_successful(self):
         model = user_models.UserSettingsModel(id='id', email='email@email.com')
-        model.update_timestamps()
         model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS USERNAME NONE', 1]])
@@ -2741,7 +2701,6 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
                 email='email%s@email.com' % i,
                 normalized_username='username%s' % i
             )
-            model.update_timestamps()
             model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [])
@@ -2754,7 +2713,6 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
                 email='email%s@email.com' % i,
                 normalized_username='username%s' % i
             )
-            model.update_timestamps()
             model.put()
 
         def mock_convert_to_hash(*_):
@@ -2778,7 +2736,6 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
                 email='email%s@email.com' % i,
                 normalized_username='username%s' % i
             )
-            model.update_timestamps()
             model.put()
 
         def mock_convert_to_hash(username, _):

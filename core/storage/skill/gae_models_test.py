@@ -56,7 +56,6 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False
         )
         commit.skill_id = 'b'
-        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             skill_models.SkillCommitLogEntryModel

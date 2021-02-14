@@ -696,7 +696,6 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -751,7 +750,6 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             topic_models.TopicSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1296,7 +1294,6 @@ class TopicRightsSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1352,7 +1349,6 @@ class TopicRightsSnapshotContentModelValidatorTests(
             topic_models.TopicRightsSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1786,7 +1782,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1822,7 +1817,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         topic_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.topic_model_last_updated = (
             topic_model.last_updated)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1837,7 +1831,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_canonical_story_count(self):
         self.model_instance_0.canonical_story_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1852,7 +1845,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_additional_story_count(self):
         self.model_instance_0.additional_story_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1867,7 +1859,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_uncategorized_skill_count(self):
         self.model_instance_0.uncategorized_skill_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1888,7 +1879,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_total_skill_count(self):
         self.model_instance_0.total_skill_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1904,7 +1894,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_subtopic_count(self):
         self.model_instance_0.subtopic_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1920,7 +1909,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_topic_related_property(self):
         self.model_instance_0.name = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (

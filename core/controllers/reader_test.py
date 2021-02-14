@@ -1563,7 +1563,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
-        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1632,7 +1631,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
-        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1675,7 +1673,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5'
         ]
-        model.update_timestamps()
         model.put()
 
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {

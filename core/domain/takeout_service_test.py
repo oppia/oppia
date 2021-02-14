@@ -568,7 +568,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         with user_two_fake_hash_one:
             model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_1)
-            model.update_timestamps()
             model.put()
 
         user_two_deterministic_hash_lambda_two = (
@@ -578,7 +577,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         with user_two_deterministic_hash_two:
             model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_2)
-            model.update_timestamps()
             model.put()
 
         suggestion_models.GeneralVoiceoverApplicationModel(

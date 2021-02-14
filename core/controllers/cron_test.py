@@ -341,8 +341,6 @@ class CronJobTests(test_utils.GenericTestBase):
             last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
             deleted=True
         )
-        completed_activities_model.update_timestamps(
-            update_last_updated_time=False)
         completed_activities_model.put()
 
         with self.testapp_swap:
@@ -378,7 +376,6 @@ class CronJobTests(test_utils.GenericTestBase):
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
             last_updated=datetime.datetime.utcnow() - self.FIVE_WEEKS
         )
-        user_query_model.update_timestamps(update_last_updated_time=False)
         user_query_model.put()
 
         with self.testapp_swap:
