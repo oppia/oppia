@@ -24,7 +24,6 @@ import logging
 
 from core import jobs
 from core.domain import question_domain
-from core.domain import question_fetchers
 from core.domain import question_services
 from core.platform import models
 import feconf
@@ -144,7 +143,8 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
         question_id = item.get_unversioned_instance_id()
 
-        latest_question = question_fetchers.get_question_by_id(question_id)
+        latest_question = question_services.get_question_by_id(
+            question_id, strict=False)
         if latest_question is None:
             yield ('SUCCESS - Question does not exist', 1)
 
@@ -231,7 +231,8 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
         question_id = item.get_unversioned_instance_id()
 
-        latest_question = question_fetchers.get_question_by_id(question_id)
+        latest_question = question_services.get_question_by_id(
+            question_id, strict=False)
         if latest_question is None:
             yield ('SUCCESS - Question does not exist', 1)
 
@@ -286,8 +287,7 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             if target_state_schema_version == current_state_schema_version:
                 yield ('SUCCESS - Model upgraded', 1)
 
-        item.content['question_state_data'] = versioned_question_state[
-            'question_state_data']
+        item.content['question_state_data'] = versioned_question_state['state']
         item.content['question_state_data_schema_version'] = (
             current_state_schema_version)
         item.update_timestamps(update_last_updated_time=False)

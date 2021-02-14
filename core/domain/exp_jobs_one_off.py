@@ -753,7 +753,8 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
         exp_id = item.get_unversioned_instance_id()
 
-        latest_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        latest_exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, strict=False)
         if latest_exploration is None:
             yield ('SUCCESS - Exploration does not exist', 1)
 
@@ -847,7 +848,8 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
         exp_id = item.get_unversioned_instance_id()
 
-        latest_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        latest_exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, strict=False)
         if latest_exploration is None:
             yield ('SUCCESS - Exploration does not exist', 1)
 
