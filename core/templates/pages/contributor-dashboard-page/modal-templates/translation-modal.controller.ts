@@ -140,7 +140,8 @@ angular.module('oppia').controller('TranslationModalController', [
       [].forEach.call($scope.originalElements, function(ctlTranslated) {
         if (ctlTranslated.localName === 'oppia-noninteractive-image') {
           var rawAltText = ctlTranslated.attributes['alt-with-value'].value;
-          var rawDescriptionText = ctlTranslated.attributes['caption-with-value'].value;
+          var rawDescriptionText = ctlTranslated.attributes[
+            'caption-with-value'].value;
           var altText = rawAltText.substring(
             6, rawAltText.length - 6);
           var descriptionText = rawDescriptionText.substring(
@@ -153,7 +154,8 @@ angular.module('oppia').controller('TranslationModalController', [
               translatedAltText === altText && altText !== ''));
           const descriptionTextFound = translatedImageDescriptions.some(
             translatedDescText => (
-              translatedDescText === descriptionText && descriptionText !== ''));
+              translatedDescText === descriptionText && descriptionText !== '')
+            );
           states.push(found);
           duplicateImgAltTextStates.push(altTextFound);
           duplicateImgDescriptionStates.push(descriptionTextFound);

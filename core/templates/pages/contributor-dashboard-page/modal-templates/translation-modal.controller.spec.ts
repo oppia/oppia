@@ -17,7 +17,7 @@
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-fdescribe('Translation Modal Controller', function() {
+describe('Translation Modal Controller', function() {
   let $httpBackend = null;
   let $q = null;
   let $scope = null;
