@@ -428,6 +428,8 @@
 
 
 # Infrastructure.
+/beam_jobs/base_model_validators.py @brianrodri
+/beam_jobs/base_model_validators_test.py @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
