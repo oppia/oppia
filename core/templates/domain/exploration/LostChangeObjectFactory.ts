@@ -24,8 +24,14 @@ import isEqual from 'lodash/isEqual';
 
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtml } from
+import { SubtitledHtml, SubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { ExplorationChange } from './exploration-draft.model';
+import { InteractionBackendDict } from './InteractionObjectFactory';
+import { ParamChangeBackendDict } from './ParamChangeObjectFactory';
+import { ParamSpecBackendDict } from './ParamSpecObjectFactory';
+import { RecordedVoiceOverBackendDict } from './RecordedVoiceoversObjectFactory';
+import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFactory';
 
 interface LostChangeValues {
   'outcome'?: Outcome;
@@ -35,11 +41,15 @@ interface LostChangeValues {
   'html'?: string;
 }
 
-type LostChangeValue = string | string[] | LostChangeValues;
+type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
+  InteractionBackendDict | ParamChangeBackendDict[] |
+  RecordedVoiceOverBackendDict | WrittenTranslationsBackendDict |
+  ParamChangeBackendDict[] | ParamSpecBackendDict | boolean | number | string |
+  string[];
 
 // Properties are optional in 'LostChangeBackendDict' because all of them may
 // not be present in the dict and may change according to the cmd.
-interface LostChangeBackendDict {
+export interface LostChangeBackendDict {
   'cmd': string;
   'new_state_name'?: string;
   'old_state_name'?: string;
@@ -185,7 +195,9 @@ export class LostChangeObjectFactory {
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(lostChangeDict: LostChangeBackendDict): LostChange {
+  createNew(
+      lostChangeDict: ExplorationChange | LostChangeBackendDict): LostChange {
+    lostChangeDict = lostChangeDict as unknown as LostChangeBackendDict;
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,

@@ -4812,6 +4812,10 @@ export default {
     "description": "हिन्दी (Hindi)",
     "direction": "ltr"
   }, {
+    "code": "hi-en",
+    "description": "Hinglish",
+    "direction": "ltr"
+  }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
     "direction": "ltr"
@@ -5215,13 +5219,14 @@ export default {
   },
 
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput",
-      "DragAndDropSortInput"
+      "DragAndDropSortInput",
+      "NumericInput"
     ]
   }, {
     "name": "Math",
@@ -5235,13 +5240,14 @@ export default {
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
   "ALLOWED_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "Continue",
       "EndExploration",
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
+      "NumericInput",
       "TextInput",
       "DragAndDropSortInput"
     ]
@@ -5277,12 +5283,13 @@ export default {
     ]
   }],
 
-  "REVIEW_CATEGORY_TRANSLATION": "translation",
-  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
-  "REVIEW_CATEGORY_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION": "submit_question",
 
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
-  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
   "USER_FILTER_CRITERION_USERNAME": "username",
   "USER_FILTER_CRITERION_ROLE": "role",
 
@@ -5367,6 +5374,7 @@ export default {
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
+  "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
@@ -5431,16 +5439,19 @@ export default {
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
+  "FIREBASE_AUTH_ENABLED": false,
+
   // Data required for Firebase authentication.
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
-  "FIREBASE_CONFIG_API_KEY": "",
-  "FIREBASE_CONFIG_APP_ID": "",
+  "FIREBASE_CONFIG_API_KEY": "dev-api-key",
+  "FIREBASE_CONFIG_APP_ID": "dev-app-id",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
   "FIREBASE_CONFIG_DATABASE_URL": "",
+  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
-  "FIREBASE_CONFIG_PROJECT_ID": "",
+  "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",
   "FIREBASE_CONFIG_STORAGE_BUCKET": "",
   "FIREBASE_EMULATOR_ENABLED": true,
 
@@ -5602,6 +5613,11 @@ export default {
     "^(\\d+(?:\\.\\d+){2})$",
   "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
+
+  // Maximum allowed commit message length. 375 characters because indexed
+  // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
+  // up to 4 bytes long.
+  "MAX_COMMIT_MESSAGE_LENGTH": 375,
 
   "DEV_MODE": true
 } as const;

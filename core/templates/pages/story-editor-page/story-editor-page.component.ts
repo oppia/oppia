@@ -55,14 +55,17 @@ angular.module('oppia').component('storyEditorPage', {
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'StoryValidationService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService', 'WindowRef',
+    'MAX_COMMIT_MESSAGE_LENGTH',
     function(
         $uibModal, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService, LoaderService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, StoryValidationService, UndoRedoService,
-        UrlInterpolationService, UrlService, WindowRef) {
+        UrlInterpolationService, UrlService, WindowRef,
+        MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
         if (UndoRedoService.getChangeCount() > 0) {

@@ -1,7 +1,7 @@
 <div class="topic-card"
      ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}"
      ng-class="{'faded-topic-card': !$ctrl.isPublished()}">
-  <a ng-href="<[$ctrl.getTopicPageUrl()]>">
+  <a ng-href="<[$ctrl.getTopicPageUrl()]>" class="protractor-test-topic-link">
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
       <picture class="fx-row" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
