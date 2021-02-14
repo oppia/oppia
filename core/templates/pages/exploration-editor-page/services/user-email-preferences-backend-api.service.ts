@@ -88,8 +88,8 @@ export class UserEmailPreferencesBackendApiService {
     var that = this;
     var emailPreferencesUrl = '/createhandler/notificationpreferences/12345';
     return this.http.put(emailPreferencesUrl, requestParams).toPromise().then(
-      function(response) {
-        var data: ResponseData = response;
+      function(response: ResponseData) {
+        var data = response;
         that.alertsService.clearWarnings(),
         that.init(
           data.email_preferences.mute_feedback_notifications,
