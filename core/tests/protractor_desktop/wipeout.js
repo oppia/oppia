@@ -47,7 +47,6 @@ describe('When account is deleted it', function() {
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.login('user1@delete.com');
-    await browser.waitForAngularEnabled(false);
     await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
