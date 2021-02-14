@@ -18,20 +18,21 @@
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 
-import { LearnerAnswerDetailsDataService } from
+import { LearnerAnswerDetailsDataBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/services/learner-answer-details-data-backend-api.service';
 import { CsrfTokenService } from
   'services/csrf-token.service';
 import { ExplorationDataService } from './exploration-data.service';
+import { HttpResponse } from '@angular/common/http';
 
 
-describe('Learner answer details service', () => {
+describe('Learner answer details data backend api service', () => {
   let expId: string = '12345';
-  let learnerAnswerDetailsDataService: LearnerAnswerDetailsDataService;
-  let sampleDataResults = null;
+  let learnerAnswerDetailsDataBackendApiService
+    : LearnerAnswerDetailsDataBackendApiService;
+  let sampleHttpResponse;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
   beforeEach(() => {
@@ -45,11 +46,10 @@ describe('Learner answer details service', () => {
           }
         }]
     });
-    learnerAnswerDetailsDataService = TestBed.inject(
-      LearnerAnswerDetailsDataService);
+    learnerAnswerDetailsDataBackendApiService = TestBed.inject(
+      LearnerAnswerDetailsDataBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
-
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });
@@ -59,116 +59,49 @@ describe('Learner answer details service', () => {
     httpTestingController.verify();
   });
 
-  describe('when fetchLearnerAnswerInfoData is called', () => {
+  describe('when _fetchLearnerAnswerInfoData is called', () => {
     beforeEach(() => {
-      sampleDataResults = {
-        learner_answer_info_data: [{
-          state_name: 'fakeStateName',
-          interaction_id: 'fakeInteractionId',
-          customization_args: 'fakeCustomizationArgs',
-          learner_answer_info_dicts: []
-        }]
-      };
+      sampleHttpResponse = new HttpResponse({
+        url: '/learneranswerinfohandler/' +
+          'learner_answer_details/exploration/12345',
+        body: 'Sample Body'
+      });
     });
 
     it('should successfully fetch learner answer info data from the backend',
       fakeAsync(() => {
-        sampleDataResults.learner_answer_info_data[0]
-          .learner_answer_info_dicts = [{
-            id: '123',
-            answer: 'My answer',
-            answer_details: 'My answer details',
-            created_on: 123456
-          }];
-
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
-        let createFromBackendDictSpy = spyOn(
-          LearnerAnswerInfo, 'createFromBackendDict');
         let requestUrl = '/learneranswerinfohandler/' +
           'learner_answer_details/exploration/12345';
-        learnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
-          successHandler, failHandler);
+        learnerAnswerDetailsDataBackendApiService
+          ._fetchLearnerAnswerInfoData().then(
+            successHandler, failHandler);
         const req = httpTestingController.expectOne(requestUrl);
         expect(req.request.method).toEqual('GET');
-        req.flush(sampleDataResults);
+        req.flush('Sample Body');
         flushMicrotasks();
-        expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+        expect(successHandler).toHaveBeenCalledWith(sampleHttpResponse);
         expect(failHandler).not.toHaveBeenCalled();
-
-
-        expect(createFromBackendDictSpy).toHaveBeenCalledTimes(
-          sampleDataResults.learner_answer_info_data[0]
-            .learner_answer_info_dicts.length);
-        expect(learnerAnswerDetailsDataService.getData().length)
-          .toBe(sampleDataResults.learner_answer_info_data.length);
-      }));
-
-    it('should not create info dicts if it is not in learner answer info',
-      fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let failHandler = jasmine.createSpy('fail');
-
-        let createFromBackendDictSpy = spyOn(
-          LearnerAnswerInfo, 'createFromBackendDict');
-
-        let requestUrl = '/learneranswerinfohandler/' +
-          'learner_answer_details/exploration/12345';
-        learnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
-          successHandler, failHandler);
-        const req = httpTestingController.expectOne(requestUrl);
-        expect(req.request.method).toEqual('GET');
-        req.flush(sampleDataResults);
-
-        flushMicrotasks();
-
-        expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-        expect(failHandler).not.toHaveBeenCalled();
-
-
-        expect(createFromBackendDictSpy).not.toHaveBeenCalled();
-        expect(learnerAnswerDetailsDataService.getData().length)
-          .toBe(sampleDataResults.learner_answer_info_data.length);
       }));
   });
 
-  it('should delete learner answer info when correct id is provided',
+  it('should successfully make a http request with delete method',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       let requestUrl = '/learneranswerinfohandler/' +
         'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
         'learner_answer_info_id=fakeId';
-      learnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
+      learnerAnswerDetailsDataBackendApiService._deleteLearnerAnswerInfo(
         '12345', 'fakeStateName', 'fakeId').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(requestUrl);
       expect(req.request.method).toEqual('DELETE');
       req.flush(200);
       flushMicrotasks();
-      expect(successHandler).toHaveBeenCalledWith(200);
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
-
-  it('should not delete learner answer info when incorrect id is provided',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let requestUrl = '/learneranswerinfohandler/' +
-        'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
-        'learner_answer_info_id=fakeId';
-      learnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
-        '12345', 'fakeStateName', 'fakeId').then(
-        successHandler, failHandler);
-      const req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('DELETE');
-      req.flush(null, {
-        status: 404, statusText: 'Error deleting learner answer'
-      });
-      flushMicrotasks();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(undefined);
     }
     ));
 });

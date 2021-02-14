@@ -21,7 +21,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { LearnerAnswerDetails } from 'domain/statistics/learner-answer-details.model';
 import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 import { ExplorationDataService } from './exploration-data.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -38,7 +37,7 @@ export interface ILearnerAnswerDetails{
   providedIn: 'root'
 })
 
-export class LearnerAnswerDetailsDataService {
+export class LearnerAnswerDetailsDataBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
@@ -52,7 +51,7 @@ export class LearnerAnswerDetailsDataService {
     '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
     '<entity_id>');
 
-  private _fetchLearnerAnswerInfoData()
+  _fetchLearnerAnswerInfoData()
   :Promise<HttpResponse<ILearnerAnswerDetails>> {
     let learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
       this.LEARNER_ANSWER_INFO_DATA_URL, {
@@ -64,10 +63,10 @@ export class LearnerAnswerDetailsDataService {
     }).toPromise();
   }
 
-  private _deleteLearnerAnswerInfo(
-      entityId,
-      stateName,
-      learnerAnswerInfoId): Promise<HttpResponse<void>> {
+  _deleteLearnerAnswerInfo(
+      entityId : string,
+      stateName : string,
+      learnerAnswerInfoId : string): Promise<HttpResponse<void>> {
     let learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
       this.LEARNER_ANSWER_INFO_DATA_URL, {
         entity_type: 'exploration',
@@ -82,47 +81,8 @@ export class LearnerAnswerDetailsDataService {
       observe: 'response'
     }).toPromise();
   }
-
-  getData() : LearnerAnswerDetails[] {
-    return this._data;
-  }
-
-  fetchLearnerAnswerInfoData() :Promise<ILearnerAnswerDetails> {
-    return this._fetchLearnerAnswerInfoData().then((response) => {
-      this.learnerAnswerInfoData = response.body.learner_answer_info_data;
-      for (let i = 0; i < this.learnerAnswerInfoData.length; i++) {
-        let stateName = this.learnerAnswerInfoData[i].state_name;
-        let interactionId = this.learnerAnswerInfoData[i].interaction_id;
-        let customizationArgs = this.learnerAnswerInfoData[i]
-          .customization_args;
-        let learnerAnswerInfoDicts = (
-          this.learnerAnswerInfoData[i].learner_answer_info_dicts
-        );
-        let learnerAnswerDetails = (
-          // eslint-disable-next-line max-len
-          LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
-            this._expId, stateName, interactionId, customizationArgs,
-            learnerAnswerInfoDicts.map(
-              LearnerAnswerInfo.createFromBackendDict)));
-        this._data.push(learnerAnswerDetails);
-      }
-      return response.body;
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  deleteLearnerAnswerInfo(
-      entityId : string, stateName : string, learnerAnswerInfoId : string) {
-    return this._deleteLearnerAnswerInfo(
-      entityId, stateName, learnerAnswerInfoId)
-      .then((response) => {
-        return response.status;
-      }, (errorResponse) => {
-        return Promise.reject(errorResponse.body);
-      });
-  }
 }
 
 angular.module('oppia').factory(
-  'LearnerAnswerDetailsDataService',
-  downgradeInjectable(LearnerAnswerDetailsDataService));
+  'LearnerAnswerDetailsDataBackendApiService',
+  downgradeInjectable(LearnerAnswerDetailsDataBackendApiService));
