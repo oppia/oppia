@@ -1757,8 +1757,8 @@ class WrittenTranslations(python_utils.OBJECT):
                                         language_code]['translation'])
                             )
                 elif 'html' in translation_dict:
-                    # TODO: Delete this once old schema migration functions are
-                    # deleted.
+                    # TODO(#11950): Delete this once old schema migration
+                    # functions are deleted.
                     # This "elif" branch is needed because, in states schema
                     # v33, this function is called but the dict is still in the
                     # old format (that doesn't have a "data_format" key).

@@ -753,16 +753,12 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
         exp_id = item.get_unversioned_instance_id()
 
-        # FOR TESTING PURPOSES ONLY.
-        if not exp_id[10:12] == ('0-'):
-            return
-
         latest_exploration = exp_fetchers.get_exploration_by_id(exp_id)
         if latest_exploration is None:
             yield ('SUCCESS - Exploration does not exist', 1)
 
         if (latest_exploration.states_schema_version !=
-            feconf.CURRENT_STATE_SCHEMA_VERSION):
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
             yield (
                 'FAILURE - Exploration is not at latest schema version', exp_id)
             return
@@ -781,6 +777,12 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_state_schema_version = item.content['states_schema_version']
+        if current_state_schema_version == target_state_schema_version:
+            yield (
+                'SUCCESS - Snapshot is already at latest schema version',
+                item.id)
+            return
+
         versioned_exploration_states = {
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
@@ -819,7 +821,7 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all snapshots of all existing explorations
-    from the data store and immediately store them back into the data store.
+    from the datastore and immediately store them back into the datastore.
     The loading process of an exploration in exp_services automatically
     performs schema updating. This job persists that conversion work, keeping
     explorations up-to-date and improving the load time of new explorations.
@@ -840,20 +842,17 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
+            yield ('FAILURE - Snapshot %s is deleted', item.id)
             return
 
         exp_id = item.get_unversioned_instance_id()
-
-        # FOR TESTING PURPOSES ONLY.
-        if not exp_id[10:12] == ('0-'):
-            return
 
         latest_exploration = exp_fetchers.get_exploration_by_id(exp_id)
         if latest_exploration is None:
             yield ('SUCCESS - Exploration does not exist', 1)
 
         if (latest_exploration.states_schema_version !=
-            feconf.CURRENT_STATE_SCHEMA_VERSION):
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
             yield (
                 'FAILURE - Exploration is not at latest schema version', exp_id)
             return
@@ -874,6 +873,12 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         # up-to-date states schema version, then update it.
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_state_schema_version = item.content['states_schema_version']
+        if current_state_schema_version == target_state_schema_version:
+            yield (
+                'SUCCESS - Snapshot is already at latest schema version',
+                item.id)
+            return
+
         versioned_exploration_states = {
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
