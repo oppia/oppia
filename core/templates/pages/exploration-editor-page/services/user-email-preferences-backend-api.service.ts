@@ -83,9 +83,11 @@ export class UserEmailPreferencesBackendApiService {
       function(response) {
         var data = response;
         that.alertsService.clearWarnings(),
+        /* tslint:disable */
         that.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
+        /* tslint:enable */
       });
   }
 }
