@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/* eslint-disable oppia/no-multiline-disable */
+/* eslint-disable capitalized-comments */
 
 import { HttpClient } from '@angular/common/http';
 import { AlertsService } from 'services/alerts.service';
@@ -83,14 +85,12 @@ export class UserEmailPreferencesBackendApiService {
       function(response) {
         var data = response;
         that.alertsService.clearWarnings(),
-        // eslint-disable-line
         /* tslint:disable */
         that.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
-        // eslint-disable-line
-        /* tslint:enable */
       });
+    /* tslint:enable */
   }
 }
 
