@@ -35,7 +35,6 @@ import apache_beam as beam
 datastore_services = models.Registry.import_datastore_services()
 
 
-
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
 ERROR_CATEGORY_COUNT_CHECK = 'count check'
@@ -75,161 +74,166 @@ class ValidateModelIdWithRegex(beam.DoFn):
     """DoFn to validate model ids against a given regex string"""
 
     def __init__(self, regex_string):
-      """Initializes the ValidateModelIdWithRegex DoFn.
-
-      Args:
-        regex_string: str. A regex pattern for valid ids.
-      """
-      self.regex_string = regex_string
-
-    def process(self, model):
-      """Function that defines how to process each element in a pipeline
-          of models.
+        """Initializes the ValidateModelIdWithRegex DoFn.
 
         Args:
-          model: datastore_services.Model. Entity to validate.
-        
-        Yields: 
-          beam.pvalue.TaggedOutput. an element of the output PCollection for
-          the doFn which represents an error as a key value pair.
-      """
-      element = model.clone()
-      regex_string = self.regex_string
+          regex_string: str. A regex pattern for valid ids.
+        """
+        super(init)
+        self.regex_string = regex_string
 
-      if not re.compile(regex_string).match(element.id):
-        yield beam.pvalue.TaggedOutput('error_category_id_check',(
-          'model %s' % ERROR_CATEGORY_ID_CHECK,
-          'Entity id %s: Entity id does not match regex pattern' % (
-              element.id)
-        ))
-      yield element
+    def process(self, model):
+        """Function that defines how to process each element in a pipeline
+            of models.
+
+          Args:
+            model: datastore_services.Model. Entity to validate.
+
+          Yields: 
+            beam.pvalue.TaggedOutput. An element of the output PCollection for
+            the doFn which represents an error as a key value pair.
+        """
+        element = model.clone()
+        regex_string = self.regex_string
+
+        if not re.compile(regex_string).match(element.id):
+            yield beam.pvalue.TaggedOutput('error_category_id_check', (
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
+                'Entity id %s: Entity id does not match regex pattern' % (
+                    element.id)
+            ))
+        yield element
 
 
 class ValidateDeleted(beam.DoFn):
     """DoFn to check whether models marked for deletion are stale"""
 
     def process(self, model):
-      """Function that defines how to process each element in a pipeline
-          of models.
+        """Function that defines how to process each element in a pipeline
+            of models.
 
-        Args:
-          model: datastore_services.Model. Entity to validate.
-        
-        Yields: 
-          beam.pvalue.TaggedOutput. an element of the output PCollection for
-          the doFn which represents an error as a key value pair.
-      """
-      element = model.clone()
-      date_now = datetime.datetime.utcnow()
+          Args:
+            model: datastore_services.Model. Entity to validate.
 
-      date_before_which_models_should_be_deleted = (
-        date_now -
-        cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
-      )
+          Yields: 
+            beam.pvalue.TaggedOutput. An element of the output PCollection for
+            the doFn which represents an error as a key value pair.
+        """
+        element = model.clone()
+        date_now = datetime.datetime.utcnow()
 
-      period_to_hard_delete_models_in_days = (
-              cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+        date_before_which_models_should_be_deleted = (
+            date_now -
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
+        )
 
-      if element.last_updated < date_before_which_models_should_be_deleted:
-        yield beam.pvalue.TaggedOutput('error_category_stale_check',(
-          'entity %s' % ERROR_CATEGORY_STALE_CHECK,
-          'Entity id %s: model marked as deleted is older than %s weeks'
-          % (element.id, python_utils.divide(
-              period_to_hard_delete_models_in_days, 7))
-        ))
-      yield element
+        period_to_hard_delete_models_in_days = (
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+
+        if element.last_updated < date_before_which_models_should_be_deleted:
+            yield beam.pvalue.TaggedOutput('error_category_stale_check', (
+                'entity %s' % ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: model marked as deleted is older than %s weeks'
+                % (element.id, python_utils.divide(
+                    period_to_hard_delete_models_in_days, 7))
+            ))
+        yield element
+
 
 class ValidateModelTimeFields(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are valid"""
 
     def process(self, model):
-      """Function that defines how to process each element in a pipeline
-          of models.
+        """Function that defines how to process each element in a pipeline
+            of models.
 
-        Args:
-          model: datastore_services.Model. Entity to validate.
-        
-        Yields: 
-          beam.pvalue.TaggedOutput. an element of the output PCollection for
-          the doFn which represents an error as a key value pair.
-      """
+          Args:
+            model: datastore_services.Model. Entity to validate.
 
-      element = model.clone()
-      if element.created_on > (element.last_updated
-        + datetime.timedelta(seconds=1)):
-          yield beam.pvalue.TaggedOutput(
-            'error_category_time_field_check', (
-              ERROR_CATEGORY_TIME_FIELD_CHECK,
-              'Entity id %s: The created_on field has a value %s which '
-              'is greater than the value %s of last_updated field'
-                % (element.id, element.created_on, element.last_updated)
-            ))
+          Yields: 
+            beam.pvalue.TaggedOutput. An element of the output PCollection for
+            the doFn which represents an error as a key value pair.
+        """
 
-      current_datetime = datetime.datetime.utcnow()
-      if element.last_updated > current_datetime:
-        yield beam.pvalue.TaggedOutput(
-          'error_category_current_time_check', (
-            ERROR_CATEGORY_CURRENT_TIME_CHECK,
-            'Entity id %s: The last_updated field has a value %s which '
-            'is greater than the time when the job was run'
-            % (element.id, element.last_updated)
-          ))
-      yield element
+        element = model.clone()
+        if element.created_on > (element.last_updated
+                                 + datetime.timedelta(seconds=1)):
+            yield beam.pvalue.TaggedOutput(
+                'error_category_time_field_check', (
+                    ERROR_CATEGORY_TIME_FIELD_CHECK,
+                    'Entity id %s: The created_on field has a value %s which '
+                    'is greater than the value %s of last_updated field'
+                    % (element.id, element.created_on, element.last_updated)
+                ))
+
+        current_datetime = datetime.datetime.utcnow()
+        if element.last_updated > current_datetime:
+            yield beam.pvalue.TaggedOutput(
+                'error_category_current_time_check', (
+                    ERROR_CATEGORY_CURRENT_TIME_CHECK,
+                    'Entity id %s: The last_updated field has a value %s which '
+                    'is greater than the time when the job was run'
+                    % (element.id, element.last_updated)
+                ))
+        yield element
 
 
 class BaseModelValidator(beam.PTransform):
-  """Composite Beam Transform which returns a pipeline of validation errors"""
+    """Composite Beam Transform which returns a pipeline of validation errors"""
 
-  def expand(self, model_pipe):
-    """ Function that takes in a beam.PCollection of datastore models and
-    returns a beam.PCollection of validation errors.
+    def expand(self, model_pipe):
+        """ Function that takes in a beam.PCollection of datastore models and
+        returns a beam.PCollection of validation errors.
 
-    Args: 
-      model_pipe: beam.PCollection. A collection of models.
-
-    Returns:
-      beam.PCollection. A collection of errors represented as key-value pairs.
-    """
-    models, deleted = (model_pipe | beam.Map(
-      self._check_deletion_status)
-      .with_outputs('not_deleted','deleted'))
-    
-    deletion_errors = deleted | beam.ParDo(ValidateDeleted()).with_outputs()
-
-    time_field_validation_errors = (models | beam.ParDo(
-      ValidateModelTimeFields()).with_outputs())
-
-    model_id_validation_errors = (models | beam.ParDo(
-      ValidateModelIdWithRegex(self._get_model_id_regex()))
-      .with_outputs())
-    
-    merged = ((deletion_errors.error_category_stale_check, 
-              time_field_validation_errors.error_category_time_field_check,
-              time_field_validation_errors.error_category_current_time_check,
-              model_id_validation_errors.error_category_id_check) 
-              | beam.Flatten())
-    
-    return merged
-  def _get_model_id_regex(self):
-    """Returns a regex for model id.
+        Args: 
+          model_pipe: beam.PCollection. A collection of models.
 
         Returns:
-            str. A regex pattern to be followed by the model id.
-    """
-    return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
+          beam.PCollection. A collection of errors represented as
+          key-value pairs.
+        """
+        models, deleted = (model_pipe | beam.Map(
+            self._check_deletion_status)
+            .with_outputs('not_deleted', 'deleted'))
 
-  def _check_deletion_status(self, model):
-    """ Function that splits model PCollection based on deletion status.
-    
-    Args:
-      model. datastore_services.Model. Entity to validate.
+        deletion_errors = deleted | beam.ParDo(ValidateDeleted()).with_outputs()
 
-    Returns: 
-      beam.pvalue.TaggedOutput. a model which element of the output
-      PCollection for the doFn.
-    """
+        time_field_validation_errors = (models | beam.ParDo(
+            ValidateModelTimeFields()).with_outputs())
 
-    if not model.deleted:
-      return beam.pvalue.TaggedOutput('not_deleted', model)
-    else:
-      return beam.pvalue.TaggedOutput('deleted', model)
+        model_id_validation_errors = (models | beam.ParDo(
+            ValidateModelIdWithRegex(self._get_model_id_regex()))
+            .with_outputs())
+
+        merged = ((
+                  deletion_errors.error_category_stale_check,
+                  time_field_validation_errors.error_category_time_field_check,
+                  time_field_validation_errors.error_category_current_time_check,
+                  model_id_validation_errors.error_category_id_check)
+                  | beam.Flatten())
+
+        return merged
+
+    def _get_model_id_regex(self):
+        """Returns a regex for model id.
+
+            Returns:
+                str. A regex pattern to be followed by the model id.
+        """
+        return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
+
+    def _check_deletion_status(self, model):
+        """ Function that splits model PCollection based on deletion status.
+
+        Args:
+          model. datastore_services.Model. Entity to validate.
+
+        Returns: 
+          beam.pvalue.TaggedOutput. A model which element of the output
+          PCollection for the doFn.
+        """
+
+        if not model.deleted:
+            return beam.pvalue.TaggedOutput('not_deleted', model)
+        else:
+            return beam.pvalue.TaggedOutput('deleted', model)
