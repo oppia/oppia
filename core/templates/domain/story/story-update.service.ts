@@ -36,14 +36,14 @@ import { StoryNode } from './story-node.model';
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange : StoryChange, story: Story) => void;
 
-type Params = {
+interface Params {
   'node_id' ?: string;
   'title' ?: string;
-  'old_value' ?: string | string[] | boolean | number ;
-  'new_value' ?: string | string[] | boolean | number ;
+  'old_value' ?: string | string[] | boolean | number;
+  'new_value' ?: string | string[] | boolean | number;
   'property_name' ?: string;
   'cmd' ?: string;
-};
+}
 
 type Command = BackendChangeObject['cmd'];
 
