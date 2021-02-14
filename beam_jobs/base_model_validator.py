@@ -71,7 +71,7 @@ VALIDATION_MODE_NON_STRICT = 'non-strict'
 
 
 class ValidateModelIdWithRegex(beam.DoFn):
-    """DoFn to validate model ids against a given regex string"""
+    """DoFn to validate model ids against a given regex string."""
 
     def __init__(self, regex_string):
         """Initializes the ValidateModelIdWithRegex DoFn.
@@ -83,15 +83,15 @@ class ValidateModelIdWithRegex(beam.DoFn):
         self.regex_string = regex_string
 
     def process(self, model):
-        """Function that defines how to process each element in a pipeline
-            of models.
+        """Function that defines how to process each element in a pipeline of
+        models.
 
-          Args:
-            model: datastore_services.Model. Entity to validate.
+        Args:
+          model: datastore_services.Model. Entity to validate.
 
-          Yields: 
-            beam.pvalue.TaggedOutput. An element of the output PCollection for
-            the doFn which represents an error as a key value pair.
+        Yields:
+          beam.pvalue.TaggedOutput. An element of the output PCollection for
+          the doFn which represents an error as a key value pair.
         """
         element = model.clone()
         regex_string = self.regex_string
@@ -106,18 +106,18 @@ class ValidateModelIdWithRegex(beam.DoFn):
 
 
 class ValidateDeleted(beam.DoFn):
-    """DoFn to check whether models marked for deletion are stale"""
+    """DoFn to check whether models marked for deletion are stale."""
 
     def process(self, model):
-        """Function that defines how to process each element in a pipeline
-            of models.
+        """Function that defines how to process each element in a pipeline of
+        models.
 
-          Args:
-            model: datastore_services.Model. Entity to validate.
+        Args:
+          model: datastore_services.Model. Entity to validate.
 
-          Yields: 
-            beam.pvalue.TaggedOutput. An element of the output PCollection for
-            the doFn which represents an error as a key value pair.
+        Yields:
+          beam.pvalue.TaggedOutput. An element of the output PCollection for
+          the doFn which represents an error as a key value pair.
         """
         element = model.clone()
         date_now = datetime.datetime.utcnow()
@@ -141,18 +141,19 @@ class ValidateDeleted(beam.DoFn):
 
 
 class ValidateModelTimeFields(beam.DoFn):
-    """DoFn to check whether created_on and last_updated timestamps are valid"""
+    """DoFn to check whether created_on and last_updated timestamps are
+    valid."""
 
     def process(self, model):
-        """Function that defines how to process each element in a pipeline
-            of models.
+        """Function that defines how to process each element in a pipeline of
+        models.
 
-          Args:
-            model: datastore_services.Model. Entity to validate.
+        Args:
+          model: datastore_services.Model. Entity to validate.
 
-          Yields: 
-            beam.pvalue.TaggedOutput. An element of the output PCollection for
-            the doFn which represents an error as a key value pair.
+        Yields:
+          beam.pvalue.TaggedOutput. An element of the output PCollection for
+          the doFn which represents an error as a key value pair.
         """
 
         element = model.clone()
@@ -179,13 +180,14 @@ class ValidateModelTimeFields(beam.DoFn):
 
 
 class BaseModelValidator(beam.PTransform):
-    """Composite Beam Transform which returns a pipeline of validation errors"""
+    """Composite Beam Transform which returns a pipeline of validation
+    errors."""
 
     def expand(self, model_pipe):
-        """ Function that takes in a beam.PCollection of datastore models and
+        """Function that takes in a beam.PCollection of datastore models and
         returns a beam.PCollection of validation errors.
 
-        Args: 
+        Args:
           model_pipe: beam.PCollection. A collection of models.
 
         Returns:
@@ -217,18 +219,18 @@ class BaseModelValidator(beam.PTransform):
     def _get_model_id_regex(self):
         """Returns a regex for model id.
 
-            Returns:
-                str. A regex pattern to be followed by the model id.
+        Returns:
+            str. A regex pattern to be followed by the model id.
         """
         return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 
     def _check_deletion_status(self, model):
-        """ Function that splits model PCollection based on deletion status.
+        """Function that splits model PCollection based on deletion status.
 
         Args:
           model. datastore_services.Model. Entity to validate.
 
-        Returns: 
+        Returns:
           beam.pvalue.TaggedOutput. A model which element of the output
           PCollection for the doFn.
         """
