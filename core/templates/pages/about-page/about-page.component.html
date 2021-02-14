@@ -57,9 +57,10 @@
       <div class="oppia-about-section-three-image-1 oppia-about-section-three-right">
         <div class="oppia-about-section-three-image">
           <picture class="about-graph-image">
-            <source type="image/webp" [srcset]="getStaticImageUrl('/about/graph1_2_30.webp')">
-            <source type="image/png" [srcset]="getStaticImageUrl('/about/graph1_2_30.png')">
-            <img [src]="getStaticImageUrl('/about/graph1_2_30.png')" alt="">
+            <!--<source type="image/webp" [srcset]="getStaticImageUrl('/about/graph1_2_30.webp')">
+            <source type="image/png" [srcset]="getStaticImageUrl('/about/graph1_2_30.png')">-->
+            <!--<img [src]="getStaticImageUrl('/about/graph1_2_30.png')" alt="">-->
+            <img [src]="getStaticImageUrl('/about/g8.png')" alt="">
           </picture>
         </div>
       </div>
@@ -234,6 +235,11 @@
     align-content: center;
     width: 1440px;
   }
+  .oppia-about-page-section-two .section-two-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
   .oppia-about-page-section-two .oppia-about-title {
     color: #333333;
     font-family: "Capriola", Arial, sans-serif;
@@ -248,10 +254,9 @@
     font-size: 20px;
     line-height: 1.5;
     margin-bottom: 4vw;
-    padding-left: 4vw;
-    padding-right: 4vw;
     padding-top: 4vh;
     text-align: center;
+    width: 768px;
   }
   .oppia-about-page-section-two .oppia-about-icons {
     display: flex;
@@ -296,10 +301,11 @@
     background-color: #009688;
     clear: both;
     display: flex;
-    height: 50vh;
+    height: 65vh;
     justify-content: center;
     margin: 0 auto;
     max-width: 100%;
+    padding-right: 2vw;
     padding-top: 6vh;
     width: 100vw;
   }
@@ -338,7 +344,7 @@
     width: 30vw;
   }
   .oppia-about-page-section-three .about-graph-image img {
-    max-width: 480px;
+    /*max-width: 480px;*/
     width: 100%;
   }
   .about-page .oppia-about-page-section-four {
