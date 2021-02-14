@@ -775,6 +775,10 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 item.id, e)
             return
 
+        if 'states_schema_version' not in item.content:
+            yield ('INFO - Item has no states_schema_version', item.id)
+            item.content['states_schema_version'] = 0
+
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_state_schema_version = item.content['states_schema_version']
         versioned_exploration_states = {
@@ -861,6 +865,10 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'FAILURE - Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
             return
+
+        if 'states_schema_version' not in item.content:
+            yield ('INFO - Item has no states_schema_version', item.id)
+            item.content['states_schema_version'] = 0
 
         # If the snapshot being stored in the datastore does not have the most
         # up-to-date states schema version, then update it.
