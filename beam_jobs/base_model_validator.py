@@ -32,39 +32,13 @@ import python_utils
 datastore_services = models.Registry.import_datastore_services()
 
 
-ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
-ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
-ERROR_CATEGORY_COUNT_CHECK = 'count check'
-ERROR_CATEGORY_CURRENT_TIME_CHECK = 'current time check'
-ERROR_CATEGORY_DATETIME_CHECK = 'datetime check'
-ERROR_CATEGORY_DOMAIN_OBJECT_CHECK = 'domain object check'
-ERROR_CATEGORY_EMAIL_CHECK = 'email check'
-ERROR_CATEGORY_ERROR_CHECK = 'error check'
-ERROR_CATEGORY_FIELD_CHECK = 'field check'
-ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK = 'first published msec check'
-ERROR_CATEGORY_ID_CHECK = 'id check'
-ERROR_CATEGORY_LAST_UPDATED_CHECK = 'last updated check'
-ERROR_CATEGORY_LENGTH_CHECK = 'length check'
-ERROR_CATEGORY_NAME_CHECK = 'name check'
-ERROR_CATEGORY_OUTPUT_CHECK = 'output check'
-ERROR_CATEGORY_PRIVATE_COMMIT_CHECK = 'post commit is private check'
-ERROR_CATEGORY_PROPERTY_FETCH_CHECK = 'fetch properties'
-ERROR_CATEGORY_RATED_ON_CHECK = 'rated on check'
-ERROR_CATEGORY_RATINGS_CHECK = 'ratings check'
-ERROR_CATEGORY_REFERENCE_CHECK = 'reference check'
-ERROR_CATEGORY_AUTHOR_CHECK = 'author check'
-ERROR_CATEGORY_REVIEWER_CHECK = 'reviewer check'
-ERROR_CATEGORY_STATE_NAME_CHECK = 'state name check'
-ERROR_CATEGORY_SUMMARY_CHECK = 'summary check'
-ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
-ERROR_CATEGORY_TYPE_CHECK = 'type check'
-ERROR_CATEGORY_VERSION_CHECK = 'version check'
-ERROR_CATEGORY_STALE_CHECK = 'stale check'
-ERROR_CATEGORY_INVALID_IDS_IN_FIELD = 'invalid ids in field'
 
-VALIDATION_MODE_NEUTRAL = 'neutral'
-VALIDATION_MODE_STRICT = 'strict'
-VALIDATION_MODE_NON_STRICT = 'non-strict'
+ERROR_CATEGORY_CURRENT_TIME_CHECK = 'current time check'
+ERROR_CATEGORY_ID_CHECK = 'id check'
+ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
+ERROR_CATEGORY_STALE_CHECK = 'stale check'
+
+MAX_CLOCK_SKEW_SECS = 1
 
 
 class ValidateModelIdWithRegex(beam.DoFn):
@@ -99,7 +73,6 @@ class ValidateModelIdWithRegex(beam.DoFn):
                 'Entity id %s: Entity id does not match regex pattern' % (
                     element.id)
             ))
-        yield element
 
 
 class ValidateDeleted(beam.DoFn):
@@ -134,7 +107,6 @@ class ValidateDeleted(beam.DoFn):
                 % (element.id, python_utils.divide(
                     period_to_hard_delete_models_in_days, 7))
             ))
-        yield element
 
 
 class ValidateModelTimeFields(beam.DoFn):
@@ -155,7 +127,8 @@ class ValidateModelTimeFields(beam.DoFn):
 
         element = model.clone()
         if element.created_on > (element.last_updated
-                                 + datetime.timedelta(seconds=1)):
+                                 + datetime.timedelta(
+                                     seconds=MAX_CLOCK_SKEW_SECS)):
             yield beam.pvalue.TaggedOutput(
                 'error_category_time_field_check', (
                     ERROR_CATEGORY_TIME_FIELD_CHECK,
@@ -173,7 +146,6 @@ class ValidateModelTimeFields(beam.DoFn):
                     'is greater than the time when the job was run'
                     % (element.id, element.last_updated)
                 ))
-        yield element
 
 
 class BaseModelValidator(beam.PTransform):
@@ -191,25 +163,25 @@ class BaseModelValidator(beam.PTransform):
             beam.PCollection. A collection of errors represented as
             key-value pairs.
         """
-        models, deleted = (model_pipe | beam.Map(
+        not_deleted, deleted = (model_pipe | beam.Map(
             self._check_deletion_status)
-                           .with_outputs('not_deleted', 'deleted'))
+            .with_outputs('not_deleted', 'deleted'))
 
         deletion_errors = deleted | beam.ParDo(ValidateDeleted()).with_outputs()
 
-        time_field_validation_errors = (models | beam.ParDo(
+        time_field_validation_errors = (not_deleted | beam.ParDo(
             ValidateModelTimeFields()).with_outputs())
 
-        model_id_validation_errors = (models | beam.ParDo(
+        model_id_validation_errors = (not_deleted | beam.ParDo(
             ValidateModelIdWithRegex(self._get_model_id_regex()))
-                                      .with_outputs())
+            .with_outputs())
 
         merged = ((
             deletion_errors.error_category_stale_check,
             time_field_validation_errors.error_category_time_field_check,
             time_field_validation_errors.error_category_current_time_check,
             model_id_validation_errors.error_category_id_check)
-                  | beam.Flatten())
+            | beam.Flatten())
 
         return merged
 

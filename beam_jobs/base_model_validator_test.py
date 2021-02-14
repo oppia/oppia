@@ -23,8 +23,7 @@ import unittest
 import apache_beam as beam
 from apache_beam.runners.direct.direct_runner import DirectRunner
 from apache_beam.testing.test_pipeline import TestPipeline
-from apache_beam.testing.util import assert_that
-from apache_beam.testing.util import equal_to
+from apache_beam.testing import util as beam_testing_util
 
 from beam_jobs import base_model_validator
 from core.platform import models
@@ -61,9 +60,9 @@ class BaseModelValidatorTests(unittest.TestCase):
             errors = (pcoll | beam.ParDo(
                 base_model_validator.ValidateDeleted()).with_outputs())
 
-            assert_that(
+            beam_testing_util.assert_that(
                 errors.error_category_stale_check,
-                equal_to([(
+                beam_testing_util.equal_to([(
                         'entity stale check',
                         'Entity id 123:'
                         ' model marked as deleted is older than 8 weeks'
@@ -83,9 +82,9 @@ class BaseModelValidatorTests(unittest.TestCase):
             errors = (pcoll | beam.ParDo(
                 base_model_validator.ValidateModelTimeFields()).with_outputs())
 
-            assert_that(
+            beam_testing_util.assert_that(
                 errors.error_category_time_field_check,
-                equal_to([
+                beam_testing_util.equal_to([
                     (
                         'time field relation check',
                         'Entity id 123: The created_on field has a value %s which '
@@ -108,9 +107,9 @@ class BaseModelValidatorTests(unittest.TestCase):
             errors = (pcoll | beam.ParDo(
                 base_model_validator.ValidateModelTimeFields()).with_outputs())
 
-            assert_that(
+            beam_testing_util.assert_that(
                 errors.error_category_current_time_check,
-                equal_to([
+                beam_testing_util.equal_to([
                     (
                         'current time check',
                         'Entity id 124:'
@@ -136,9 +135,9 @@ class BaseModelValidatorTests(unittest.TestCase):
                     '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH))
                       .with_outputs())
 
-            assert_that(
+            beam_testing_util.assert_that(
                 errors.error_category_id_check,
-                equal_to([(
+                beam_testing_util.equal_to([(
                         'model id check',
                         'Entity id 123@?!*:'
                         ' Entity id does not match regex pattern'
@@ -176,9 +175,9 @@ class BaseModelValidatorTests(unittest.TestCase):
 
             output = pcoll | base_model_validator.BaseModelValidator()
 
-            assert_that(
+            beam_testing_util.assert_that(
                 output,
-                equal_to([
+                beam_testing_util.equal_to([
                     (
                         'model id check',
                         'Entity id 123@?!*:'
