@@ -21,6 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 
 import { LearnerAnswerDetailsDataService } from
+  // eslint-disable-next-line max-len
   'pages/exploration-editor-page/services/learner-answer-details-data-backend-api.service';
 import { CsrfTokenService } from
   'services/csrf-token.service';
