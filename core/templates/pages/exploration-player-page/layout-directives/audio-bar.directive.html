@@ -7,7 +7,7 @@
             <i class="fas fa-undo audio-undo-icon"></i>
             <span class="oppia-five-icon">5</span>
           </span>
-        </a> 
+        </a>
         <a ng-click="onPlayButtonClicked()"
            uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
            tooltip-append-to-body="true" tooltip-placement="right">
@@ -251,7 +251,7 @@
   .audio-header-margin {
     top: 3.5em;
   }
-  
+
   @media(max-width: 768px) {
     .headroom--unpinned.audio-header.audio-header-margin {
       margin-top: 8px;
