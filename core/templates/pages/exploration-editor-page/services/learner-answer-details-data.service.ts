@@ -18,14 +18,13 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { LearnerAnswerDetails } from 'domain/statistics/learner-answer-details.model';
 import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 import { ExplorationDataService } from './exploration-data.service';
 import { LearnerAnswerDetailsDataBackendApiService } from
-  './learner-answer-details-data-backend-api.service'
+  './learner-answer-details-data-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
@@ -42,7 +41,6 @@ export interface ILearnerAnswerDetails{
 
 export class LearnerAnswerDetailsDataService {
   constructor(
-    private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
     private explorationDataService: ExplorationDataService,
     private laddbas :
