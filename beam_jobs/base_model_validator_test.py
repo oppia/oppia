@@ -20,17 +20,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import unittest
 
-from core import jobs_registry
-from beam_jobs import base_model_validator
-from core.platform import models
-from core.tests import test_utils
-import feconf
-
-
 import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from apache_beam.runners.direct.direct_runner import DirectRunner
+
+from beam_jobs import base_model_validator
+from core.platform import models
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])

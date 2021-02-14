@@ -17,18 +17,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import collections
 import datetime
 import re
 
-from core.domain import cron_services
-from core.domain import rights_manager
-from core.platform import models
-import feconf
-import python_utils
-import utils
-
 import apache_beam as beam
+
+from core.domain import cron_services
+from core.platform import models
+import python_utils
+
+
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
