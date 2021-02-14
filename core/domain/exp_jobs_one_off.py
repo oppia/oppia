@@ -834,7 +834,7 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(ExpSnapshotsMigrationJobManager, cls).enqueue(
+        super(ExpSnapshotsMigrationJob, cls).enqueue(
             job_id, shard_count=64)
 
     @staticmethod
