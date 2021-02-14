@@ -451,7 +451,8 @@ angular.module('oppia').component('settingsTab', {
         ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
         ctrl.explorationParamChangesService = (
           ExplorationParamChangesService);
-        ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
+        ctrl.UserEmailPreferencesService =
+        UserEmailPreferencesBackendApiService;
 
         ctrl.refreshSettingsTab();
 
