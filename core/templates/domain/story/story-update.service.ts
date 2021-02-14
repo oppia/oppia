@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,664 +19,693 @@
  * undo/redo service.
  */
 
-import { Change } from
-  'domain/editor/undo_redo/change.model';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/story/story-domain.constants.ajs.ts');
+import { AlertsService } from 'services/alerts.service';
+import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
+import cloneDeep from 'lodash/cloneDeep';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
+import { StoryChange } from 'domain/editor/undo_redo/change.model';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
+import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service.ts';
+import { Story } from 'domain/story/StoryObjectFactory.ts';
+import { StoryContents } from 'domain/story/StoryContentsObjectFactory.ts';
+import { StoryNode } from './story-node.model';
 
-angular.module('oppia').factory('StoryUpdateService', [
-  'AlertsService', 'StoryEditorStateService',
-  'UndoRedoService', 'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
-  'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
-  'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
-  'INITIAL_NODE_ID', 'NODE', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
-  'STORY_NODE_PROPERTY_DESCRIPTION', 'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
-  'STORY_NODE_PROPERTY_EXPLORATION_ID',
-  'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
-  'STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR',
-  'STORY_NODE_PROPERTY_THUMBNAIL_FILENAME', 'STORY_NODE_PROPERTY_TITLE',
-  'STORY_PROPERTY_DESCRIPTION', 'STORY_PROPERTY_LANGUAGE_CODE',
-  'STORY_PROPERTY_META_TAG_CONTENT',
-  'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_THUMBNAIL_BG_COLOR',
-  'STORY_PROPERTY_THUMBNAIL_FILENAME', 'STORY_PROPERTY_TITLE',
-  'STORY_PROPERTY_URL_FRAGMENT', function(
-      AlertsService, StoryEditorStateService,
-      UndoRedoService, CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
-      CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
-      CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
-      INITIAL_NODE_ID, NODE, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
-      STORY_NODE_PROPERTY_DESCRIPTION, STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
-      STORY_NODE_PROPERTY_EXPLORATION_ID,
-      STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
-      STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
-      STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, STORY_NODE_PROPERTY_TITLE,
-      STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_LANGUAGE_CODE,
-      STORY_PROPERTY_META_TAG_CONTENT,
-      STORY_PROPERTY_NOTES, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
-      STORY_PROPERTY_THUMBNAIL_FILENAME, STORY_PROPERTY_TITLE,
-      STORY_PROPERTY_URL_FRAGMENT) {
-    // Creates a change using an apply function, reverse function, a change
-    // command and related parameters. The change is applied to a given
-    // story.
-    var _applyChange = function(story, command, params, apply, reverse) {
-      var changeDict = angular.copy(params);
-      changeDict.cmd = command;
-      var changeObj = new Change(changeDict, apply, reverse);
-      try {
-        UndoRedoService.applyChange(changeObj, story);
-      } catch (err) {
-        AlertsService.addWarning(err.message);
-        throw err;
-      }
-    };
+type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
+type StoryUpdateReverse = (storyChange : StoryChange, story: Story) => void;
 
-    var _getParameterFromChangeDict = function(changeDict, paramName) {
-      return changeDict[paramName];
-    };
+interface Params {
+  'node_id' ?: string;
+  'title' ?: string;
+  'old_value' ?: string | string[] | boolean | number;
+  'new_value' ?: string | string[] | boolean | number;
+  'property_name' ?: string;
+  'cmd' ?: string;
+}
 
-    var _getNodeIdFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'node_id');
-    };
+type Command = BackendChangeObject['cmd'];
 
-    var _getStoryNode = function(storyContents, nodeId) {
-      var storyNodeIndex = storyContents.getNodeIndex(nodeId);
-      if (storyNodeIndex === -1) {
-        throw new Error('The given node doesn\'t exist');
-      }
-      return storyContents.getNodes()[storyNodeIndex];
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class StoryUpdateService {
+  constructor(
+    private _undoRedoService: UndoRedoService,
+    private _alertsService: AlertsService,
+    private _storyEditorStateService: StoryEditorStateService
+  ) {}
+  // Creates a change using an apply function, reverse function, a change
+  // command and related parameters. The change is applied to a given
+  // story.
+  _applyChange(
+      story: Story, command: Command, params: Params,
+      apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
+    let changeDict = cloneDeep(params) as BackendChangeObject;
+    changeDict.cmd = command;
+    let changeObj = new Change(changeDict, apply, reverse);
+    try {
+      this._undoRedoService.applyChange(changeObj, story);
+    } catch (err) {
+      this._alertsService.addWarning(err.message);
+      throw err;
+    }
+  }
 
-    // Applies a story property change, specifically. See _applyChange()
-    // for details on the other behavior of this function.
-    var _applyStoryPropertyChange = function(
-        story, propertyName, oldValue, newValue, apply, reverse) {
-      _applyChange(story, CMD_UPDATE_STORY_PROPERTY, {
+  _getParameterFromChangeDict(
+      changeDict: BackendChangeObject, paramName: string): string {
+    return changeDict[paramName];
+  }
+
+  _getNodeIdFromChangeDict(changeDict: BackendChangeObject): string {
+    return this._getParameterFromChangeDict(changeDict, 'node_id');
+  }
+  _getStoryNode(storyContents: StoryContents, nodeId: string): StoryNode {
+    let storyNodeIndex = storyContents.getNodeIndex(nodeId);
+    if (storyNodeIndex === -1) {
+      throw new Error('The given node doesn\'t exist');
+    }
+    return storyContents.getNodes()[storyNodeIndex];
+  }
+
+  // Applies a story property change, specifically. See _applyChange()
+  // for details on the other behavior of this function.
+  _applyStoryPropertyChange(
+      story: Story, propertyName: string,
+      oldValue: string, newValue: string,
+      apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
+    this._applyChange(story, StoryDomainConstants.CMD_UPDATE_STORY_PROPERTY, {
+      property_name: propertyName,
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue)
+    }, apply, reverse);
+  }
+
+  _applyStoryContentsPropertyChange(
+      story: Story, propertyName: string,
+      oldValue: string | number, newValue: string | number,
+      apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
+    this._applyChange(
+      story, StoryDomainConstants.CMD_UPDATE_STORY_CONTENTS_PROPERTY, {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue)
       }, apply, reverse);
-    };
+  }
 
-    var _applyStoryContentsPropertyChange = function(
-        story, propertyName, oldValue, newValue, apply, reverse) {
-      _applyChange(story, CMD_UPDATE_STORY_CONTENTS_PROPERTY, {
-        property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
-      }, apply, reverse);
-    };
-
-    var _applyStoryNodePropertyChange = function(
-        story, propertyName, nodeId, oldValue, newValue, apply, reverse) {
-      _applyChange(story, CMD_UPDATE_STORY_NODE_PROPERTY, {
+  _applyStoryNodePropertyChange(
+      story: Story, propertyName: string,
+      nodeId: string, oldValue: string | string[],
+      newValue: string | string[],
+      apply: StoryUpdateApply, reverse: StoryUpdateReverse):void {
+    this._applyChange(
+      story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
         node_id: nodeId,
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue)
       }, apply, reverse);
-    };
+  }
 
-    var _getNewPropertyValueFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'new_value');
-    };
+  _getNewPropertyValueFromChangeDict(changeDict: BackendChangeObject): string {
+    return this._getParameterFromChangeDict(changeDict, 'new_value');
+  }
 
-    // These functions are associated with updates available in
-    // core.domain.story_services.apply_change_list.
-    return {
-      /**
-       * Changes the title of a story and records the change in the
-       * undo/redo service.
-       */
-      setStoryTitle: function(story, title) {
-        var oldTitle = angular.copy(story.getTitle());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_TITLE, oldTitle, title,
-          function(changeDict, story) {
-            // ---- Apply ----
-            var title = _getNewPropertyValueFromChangeDict(changeDict);
-            story.setTitle(title);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setTitle(oldTitle);
-          });
-      },
+  // These functions are associated with updates available in
+  // core.domain.story_services.apply_change_list.
 
-      /**
-       * Changes the url fragment of a story and records the change in the
-       * undo/redo service.
-       */
-      setStoryUrlFragment: function(story, urlFragment) {
-        var oldUrlFragment = angular.copy(story.getUrlFragment());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_URL_FRAGMENT, oldUrlFragment, urlFragment,
-          function(changeDict, story) {
-            // ---- Apply ----
-            var newUrlFragment = _getNewPropertyValueFromChangeDict(changeDict);
-            story.setUrlFragment(newUrlFragment);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setUrlFragment(oldUrlFragment);
-          });
-      },
+  /**
+   * Changes the title of a story and records the change in the
+   * undo/redo service.
+   */
+  setStoryTitle(story: Story, title: string): void {
+    let oldTitle = cloneDeep(story.getTitle());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_TITLE, oldTitle, title,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let title = this._getNewPropertyValueFromChangeDict(changeDict);
+        story.setTitle(title);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setTitle(oldTitle);
+      });
+  }
 
-      /**
-       * Changes the thumbnail filename of a story and records the change
-       * in the undo/redo service.
-       */
-      setThumbnailFilename: function(story, newThumbnailFilename) {
-        var oldThumbnailFilename = angular.copy(story.getThumbnailFilename());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_THUMBNAIL_FILENAME, oldThumbnailFilename,
-          newThumbnailFilename, function(changeDict, story) {
-            // ---- Apply ----
-            var thumbnailFilename = (
-              _getNewPropertyValueFromChangeDict(changeDict));
-            story.setThumbnailFilename(thumbnailFilename);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setThumbnailFilename(oldThumbnailFilename);
-          });
-      },
+  /**
+   * Changes the url fragment of a story and records the change in the
+   * undo/redo service.
+   */
+  setStoryUrlFragment(story: Story, urlFragment: string): void {
+    let oldUrlFragment = cloneDeep(story.getUrlFragment());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_URL_FRAGMENT,
+      oldUrlFragment, urlFragment,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let newUrlFragment = (
+          this._getNewPropertyValueFromChangeDict(changeDict));
+        story.setUrlFragment(newUrlFragment);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setUrlFragment(oldUrlFragment);
+      });
+  }
 
-      /**
-       * Changes the thumbnail background color of a story and records the
-       * change in the undo/redo service.
-       */
-      setThumbnailBgColor: function(story, newThumbnailBgColor) {
-        var oldThumbnailBgColor = angular.copy(story.getThumbnailBgColor());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_THUMBNAIL_BG_COLOR, oldThumbnailBgColor,
-          newThumbnailBgColor, function(changeDict, story) {
-            // ---- Apply ----
-            var thumbnailBgColor = (
-              _getNewPropertyValueFromChangeDict(changeDict));
-            story.setThumbnailBgColor(thumbnailBgColor);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setThumbnailBgColor(oldThumbnailBgColor);
-          });
-      },
+  /**
+   * Changes the thumbnail filename of a story and records the change
+   * in the undo/redo service.
+   */
+  setThumbnailFilename(story: Story, newThumbnailFilename: string): void {
+    let oldThumbnailFilename = cloneDeep(story.getThumbnailFilename());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_FILENAME,
+      oldThumbnailFilename, newThumbnailFilename,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let thumbnailFilename = (
+          this._getNewPropertyValueFromChangeDict(changeDict));
+        story.setThumbnailFilename(thumbnailFilename);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setThumbnailFilename(oldThumbnailFilename);
+      });
+  }
 
-      /**
-       * Changes the description of a story and records the change in the
-       * undo/redo service.
-       */
-      setStoryDescription: function(story, description) {
-        var oldDescription = angular.copy(story.getDescription());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_DESCRIPTION, oldDescription, description,
-          function(changeDict, story) {
-            // ---- Apply ----
-            var description = _getNewPropertyValueFromChangeDict(changeDict);
-            story.setDescription(description);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setDescription(oldDescription);
-          });
-      },
+  /**
+   * Changes the thumbnail background color of a story and records the
+   * change in the undo/redo service.
+   */
+  setThumbnailBgColor(story: Story, newThumbnailBgColor: string): void {
+    let oldThumbnailBgColor = cloneDeep(story.getThumbnailBgColor());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_THUMBNAIL_BG_COLOR,
+      oldThumbnailBgColor, newThumbnailBgColor,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let thumbnailBgColor = (
+          this._getNewPropertyValueFromChangeDict(changeDict));
+        story.setThumbnailBgColor(thumbnailBgColor);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setThumbnailBgColor(oldThumbnailBgColor);
+      });
+  }
 
-      /**
-       * Changes the notes for a story and records the change in the
-       * undo/redo service.
-       */
-      setStoryNotes: function(story, notes) {
-        var oldNotes = angular.copy(story.getNotes());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_NOTES, oldNotes, notes,
-          function(changeDict, story) {
-            // ---- Apply ----
-            var notes = _getNewPropertyValueFromChangeDict(changeDict);
-            story.setNotes(notes);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setNotes(oldNotes);
-          });
-      },
+  /**
+   * Changes the description of a story and records the change in the
+   * undo/redo service.
+   */
+  setStoryDescription(story: Story, description: string): void {
+    let oldDescription = cloneDeep(story.getDescription());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_DESCRIPTION,
+      oldDescription, description,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let description = this._getNewPropertyValueFromChangeDict(changeDict);
+        story.setDescription(description);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setDescription(oldDescription);
+      });
+  }
 
-      /**
-       * Changes the language code of a story and records the change in
-       * the undo/redo service.
-       */
-      setStoryLanguageCode: function(story, languageCode) {
-        var oldLanguageCode = angular.copy(story.getLanguageCode());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_LANGUAGE_CODE, oldLanguageCode, languageCode,
-          function(changeDict, story) {
-            // ---- Apply ----
-            var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
-            story.setLanguageCode(languageCode);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setLanguageCode(oldLanguageCode);
-          });
-      },
+  /**
+   * Changes the notes for a story and records the change in the
+   * undo/redo service.
+   */
+  setStoryNotes(story: Story, notes: string): void {
+    let oldNotes = cloneDeep(story.getNotes());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_NOTES, oldNotes, notes,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let notes = this._getNewPropertyValueFromChangeDict(changeDict);
+        story.setNotes(notes);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setNotes(oldNotes);
+      });
+  }
 
-      /**
-       * Changes the meta tag content of a story and records the change in
-       * the undo/redo service.
-       */
-      setStoryMetaTagContent: function(story, metaTagContent) {
-        var oldMetaTagContent = angular.copy(story.getMetaTagContent());
-        _applyStoryPropertyChange(
-          story, STORY_PROPERTY_META_TAG_CONTENT, oldMetaTagContent,
-          metaTagContent,
-          function(changeDict, story) {
-            // ---- Apply ----
-            var metaTagContent = _getNewPropertyValueFromChangeDict(changeDict);
-            story.setMetaTagContent(metaTagContent);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.setMetaTagContent(oldMetaTagContent);
-          });
-      },
+  /**
+   * Changes the language code of a story and records the change in
+   * the undo/redo service.
+   */
+  setStoryLanguageCode(story: Story, languageCode: string): void {
+    let oldLanguageCode = cloneDeep(story.getLanguageCode());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_LANGUAGE_CODE,
+      oldLanguageCode, languageCode,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
+        story.setLanguageCode(languageCode);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setLanguageCode(oldLanguageCode);
+      });
+  }
 
-      /**
-       * Sets the initial node of the story and records the change in
-       * the undo/redo service.
-       */
-      setInitialNodeId: function(story, newInitialNodeId) {
-        var oldInitialNodeId =
-          angular.copy(story.getStoryContents().getInitialNodeId());
-        _applyStoryContentsPropertyChange(
-          story, INITIAL_NODE_ID, oldInitialNodeId,
-          newInitialNodeId,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().setInitialNodeId(newInitialNodeId);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().setInitialNodeId(oldInitialNodeId);
-          });
-      },
+  /**
+   * Changes the meta tag content of a story and records the change in
+   * the undo/redo service.
+   */
+  setStoryMetaTagContent(story: Story, metaTagContent: string): void {
+    let oldMetaTagContent = cloneDeep(story.getMetaTagContent());
+    this._applyStoryPropertyChange(
+      story, StoryDomainConstants.STORY_PROPERTY_META_TAG_CONTENT,
+      oldMetaTagContent, metaTagContent,
+      (changeDict, story) => {
+        // ---- Apply ----
+        let metaTagContent = (
+          this._getNewPropertyValueFromChangeDict(changeDict));
+        story.setMetaTagContent(metaTagContent);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.setMetaTagContent(oldMetaTagContent);
+      });
+  }
 
-      /**
-       * Creates a story node, adds it to the story and records the change in
-       * the undo/redo service.
-       */
-      addStoryNode: function(story, nodeTitle) {
-        var nextNodeId = story.getStoryContents().getNextNodeId();
-        _applyChange(story, CMD_ADD_STORY_NODE, {
-          node_id: nextNodeId,
-          title: nodeTitle
-        }, function(changeDict, story) {
-          // ---- Apply ----
-          story.getStoryContents().addNode(nodeTitle);
-          StoryEditorStateService.setExpIdsChanged();
-        }, function(changeDict, story) {
-          // ---- Undo ----
-          var nodeId = _getNodeIdFromChangeDict(changeDict);
-          story.getStoryContents().deleteNode(nodeId);
-          StoryEditorStateService.setExpIdsChanged();
-        });
-      },
+  /**
+   * Sets the initial node of the story and records the change in
+   * the undo/redo service.
+   */
+  setInitialNodeId(story: Story, newInitialNodeId: string): void {
+    let oldInitialNodeId =
+      cloneDeep(story.getStoryContents().getInitialNodeId());
+    this._applyStoryContentsPropertyChange(
+      story, StoryDomainConstants.INITIAL_NODE_ID, oldInitialNodeId,
+      newInitialNodeId,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setInitialNodeId(newInitialNodeId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setInitialNodeId(oldInitialNodeId);
+      });
+  }
 
-      /**
-       * Removes a story node, and records the change in the undo/redo service.
-       */
-      deleteStoryNode: function(story, nodeId) {
-        _applyChange(story, CMD_DELETE_STORY_NODE, {
-          node_id: nodeId
-        }, function(changeDict, story) {
-          // ---- Apply ----
-          story.getStoryContents().deleteNode(nodeId);
-          StoryEditorStateService.setExpIdsChanged();
-        }, function(changeDict, story) {
-          // ---- Undo ----
-          throw new Error('A deleted story node cannot be restored.');
-        });
-      },
+  /**
+   * Creates a story node, adds it to the story and records the change in
+   * the undo/redo service.
+   */
+  addStoryNode(story: Story, nodeTitle: string): void {
+    let nextNodeId = story.getStoryContents().getNextNodeId();
+    this._applyChange(story, StoryDomainConstants.CMD_ADD_STORY_NODE, {
+      node_id: nextNodeId,
+      title: nodeTitle
+    }, (changeDict, story) => {
+      // ---- Apply ----
+      story.getStoryContents().addNode(nodeTitle);
+      this._storyEditorStateService.setExpIdsChanged();
+    }, (changeDict, story) => {
+      // ---- Undo ----
+      let nodeId = this._getNodeIdFromChangeDict(changeDict);
+      story.getStoryContents().deleteNode(nodeId);
+      this._storyEditorStateService.setExpIdsChanged();
+    });
+  }
 
-      /**
-       * Marks the node outline of a node as finalized and records the change
-       * in the undo/redo service.
-       */
-      finalizeStoryNodeOutline: function(story, nodeId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        if (storyNode.getOutlineStatus()) {
-          throw new Error('Node outline is already finalized.');
-        }
-        _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
-          node_id: nodeId,
-          old_value: false,
-          new_value: true
-        }, function(changeDict, story) {
-          // ---- Apply ----
-          story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
-        }, function(changeDict, story) {
-          // ---- Undo ----
-          story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
-        });
-      },
+  /**
+   * Removes a story node, and records the change in the undo/redo service.
+   */
+  deleteStoryNode(story: Story, nodeId: string): void {
+    this._applyChange(story, StoryDomainConstants.CMD_DELETE_STORY_NODE, {
+      node_id: nodeId
+    }, (changeDict, story) => {
+      // ---- Apply ----
+      story.getStoryContents().deleteNode(nodeId);
+      this._storyEditorStateService.setExpIdsChanged();
+    }, (changeDict, story) => {
+      // ---- Undo ----
+      throw new Error('A deleted story node cannot be restored.');
+    });
+  }
 
-      /**
-       * Marks the node outline of a node as not finalized and records the
-       * change in the undo/redo service.
-       */
-      unfinalizeStoryNodeOutline: function(story, nodeId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        if (!storyNode.getOutlineStatus()) {
-          throw new Error('Node outline is already not finalized.');
-        }
-        _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
-          node_id: nodeId,
-          old_value: true,
-          new_value: false
-        }, function(changeDict, story) {
-          // ---- Apply ----
-          story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
-        }, function(changeDict, story) {
-          // ---- Undo ----
-          story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
-        });
-      },
+  /**
+   * Marks the node outline of a node as finalized and records the change
+   * in the undo/redo service.
+   */
+  finalizeStoryNodeOutline(story: Story, nodeId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    if (storyNode.getOutlineStatus()) {
+      throw new Error('Node outline is already finalized.');
+    }
+    this._applyChange(
+      story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
+        node_id: nodeId,
+        old_value: false,
+        new_value: true
+      }, (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+      });
+  }
 
-      /**
-       * Sets the outline of a node of the story and records the change
-       * in the undo/redo service.
-       */
-      setStoryNodeOutline: function(story, nodeId, newOutline) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldOutline = storyNode.getOutline();
+  /**
+   * Marks the node outline of a node as not finalized and records the
+   * change in the undo/redo service.
+   */
+  unfinalizeStoryNodeOutline(story: Story, nodeId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    if (!storyNode.getOutlineStatus()) {
+      throw new Error('Node outline is already not finalized.');
+    }
+    this._applyChange(
+      story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
+        node_id: nodeId,
+        old_value: true,
+        new_value: false
+      }, (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_OUTLINE, nodeId,
-          oldOutline, newOutline,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().setNodeOutline(nodeId, newOutline);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().setNodeOutline(
-              nodeId, oldOutline);
-          });
-      },
+  /**
+   * Sets the outline of a node of the story and records the change
+   * in the undo/redo service.
+   */
+  setStoryNodeOutline(story: Story, nodeId: string, newOutline: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldOutline = storyNode.getOutline();
 
-      /**
-       * Sets the title of a node of the story and records the change
-       * in the undo/redo service.
-       */
-      setStoryNodeTitle: function(story, nodeId, newTitle) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldTitle = storyNode.getTitle();
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_OUTLINE, nodeId,
+      oldOutline, newOutline,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeOutline(nodeId, newOutline);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeOutline(
+          nodeId, oldOutline);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_TITLE, nodeId,
-          oldTitle, newTitle,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().setNodeTitle(nodeId, newTitle);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().setNodeTitle(nodeId, oldTitle);
-          });
-      },
+  /**
+   * Sets the title of a node of the story and records the change
+   * in the undo/redo service.
+   */
+  setStoryNodeTitle(story: Story, nodeId: string, newTitle: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldTitle = storyNode.getTitle();
 
-      /**
-       * Sets the description of a node of the story and records the change
-       * in the undo/redo service.
-       */
-      setStoryNodeDescription: function(story, nodeId, newDescription) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldDescription = storyNode.getDescription();
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_TITLE, nodeId,
+      oldTitle, newTitle,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeTitle(nodeId, newTitle);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeTitle(nodeId, oldTitle);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
-          oldDescription, newDescription,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().setNodeDescription(nodeId, newDescription);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().setNodeDescription(nodeId, oldDescription);
-          });
-      },
+  /**
+   * Sets the description of a node of the story and records the change
+   * in the undo/redo service.
+   */
+  setStoryNodeDescription(
+      story: Story, nodeId: string, newDescription: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldDescription = storyNode.getDescription();
 
-      /**
-       * Sets the thumbnail filename of a node of the story and records the
-       * change in the undo/redo service.
-       */
-      setStoryNodeThumbnailFilename: function(
-          story, nodeId, newThumbnailFilename) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldThumbnailFilename = storyNode.getThumbnailFilename();
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
+      oldDescription, newDescription,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeDescription(nodeId, newDescription);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeDescription(nodeId, oldDescription);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, nodeId,
-          oldThumbnailFilename, newThumbnailFilename,
-          function(changeDict, story) {
-            // ---- Apply ----
-            storyNode.setThumbnailFilename(newThumbnailFilename);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            storyNode.setThumbnailFilename(oldThumbnailFilename);
-          });
-      },
+  /**
+   * Sets the thumbnail filename of a node of the story and records the
+   * change in the undo/redo service.
+   */
+  setStoryNodeThumbnailFilename(
+      story: Story, nodeId: string, newThumbnailFilename: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldThumbnailFilename = storyNode.getThumbnailFilename();
 
-      /**
-       * Sets the thumbnail background color of a node of the story and records
-       * the change in the undo/redo service.
-       */
-      setStoryNodeThumbnailBgColor: function(
-          story, nodeId, newThumbnailBgColor) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldThumbnailBgColor = storyNode.getThumbnailBgColor();
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
+      nodeId, oldThumbnailFilename, newThumbnailFilename,
+      (changeDict, story) => {
+        // ---- Apply ----
+        storyNode.setThumbnailFilename(newThumbnailFilename);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        storyNode.setThumbnailFilename(oldThumbnailFilename);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR, nodeId,
-          oldThumbnailBgColor, newThumbnailBgColor,
-          function(changeDict, story) {
-            // ---- Apply ----
-            storyNode.setThumbnailBgColor(newThumbnailBgColor);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            storyNode.setThumbnailBgColor(oldThumbnailBgColor);
-          });
-      },
+  /**
+   * Sets the thumbnail background color of a node of the story and records
+   * the change in the undo/redo service.
+   */
+  setStoryNodeThumbnailBgColor(
+      story: Story, nodeId: string, newThumbnailBgColor: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldThumbnailBgColor = storyNode.getThumbnailBgColor();
 
-      /**
-       * Sets the id of the exploration that of a node of the story is linked
-       * to and records the change in the undo/redo service.
-       */
-      setStoryNodeExplorationId: function(story, nodeId, newExplorationId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldExplorationId = storyNode.getExplorationId();
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
+      nodeId, oldThumbnailBgColor, newThumbnailBgColor,
+      (changeDict, story) => {
+        // ---- Apply ----
+        storyNode.setThumbnailBgColor(newThumbnailBgColor);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        storyNode.setThumbnailBgColor(oldThumbnailBgColor);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_EXPLORATION_ID, nodeId,
-          oldExplorationId, newExplorationId,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().setNodeExplorationId(
-              nodeId, newExplorationId);
-            StoryEditorStateService.setExpIdsChanged();
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().setNodeExplorationId(
-              nodeId, oldExplorationId);
-            StoryEditorStateService.setExpIdsChanged();
-          });
-      },
+  /**
+   * Sets the id of the exploration that of a node of the story is linked
+   * to and records the change in the undo/redo service.
+   */
+  setStoryNodeExplorationId(
+      story: Story, nodeId: string, newExplorationId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldExplorationId = storyNode.getExplorationId();
 
-      /**
-       * Adds a destination node id to a node of a story and records the change
-       * in the undo/redo service.
-       */
-      addDestinationNodeIdToNode: function(story, nodeId, destinationNodeId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldDestinationNodeIds = angular.copy(
-          storyNode.getDestinationNodeIds());
-        var newDestinationNodeIds = angular.copy(oldDestinationNodeIds);
-        newDestinationNodeIds.push(destinationNodeId);
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_EXPLORATION_ID,
+      nodeId, oldExplorationId, newExplorationId,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeExplorationId(
+          nodeId, newExplorationId);
+        this._storyEditorStateService.setExpIdsChanged();
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeExplorationId(
+          nodeId, oldExplorationId);
+        this._storyEditorStateService.setExpIdsChanged();
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_DESTINATION_NODE_IDS, nodeId,
-          oldDestinationNodeIds, newDestinationNodeIds,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().addDestinationNodeIdToNode(
-              nodeId, destinationNodeId);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().removeDestinationNodeIdFromNode(
-              nodeId, destinationNodeId);
-          });
-      },
+  /**
+   * Adds a destination node id to a node of a story and records the change
+   * in the undo/redo service.
+   */
+  addDestinationNodeIdToNode(
+      story: Story, nodeId: string, destinationNodeId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldDestinationNodeIds = cloneDeep(
+      storyNode.getDestinationNodeIds());
+    let newDestinationNodeIds = cloneDeep(oldDestinationNodeIds);
+    newDestinationNodeIds.push(destinationNodeId);
 
-      /**
-       * Removes a destination node id from a node of a story and records the
-       * change in the undo/redo service.
-       */
-      removeDestinationNodeIdFromNode: function(
-          story, nodeId, destinationNodeId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldDestinationNodeIds = angular.copy(
-          storyNode.getDestinationNodeIds());
-        var newDestinationNodeIds = angular.copy(oldDestinationNodeIds);
-        var index = newDestinationNodeIds.indexOf(destinationNodeId);
-        if (index === -1) {
-          throw new Error('The given destination node is not part of the node');
-        }
-        newDestinationNodeIds.splice(index, 1);
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
+      nodeId, oldDestinationNodeIds, newDestinationNodeIds,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().addDestinationNodeIdToNode(
+          nodeId, destinationNodeId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().removeDestinationNodeIdFromNode(
+          nodeId, destinationNodeId);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_DESTINATION_NODE_IDS, nodeId,
-          oldDestinationNodeIds, newDestinationNodeIds,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().removeDestinationNodeIdFromNode(
-              nodeId, destinationNodeId);
-            StoryEditorStateService.setExpIdsChanged();
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().addDestinationNodeIdToNode(
-              nodeId, destinationNodeId);
-            StoryEditorStateService.setExpIdsChanged();
-          });
-      },
-      /**
-       * Removes a node of a story and records the change in the
-       * undo/redo service.
-       */
-      rearrangeNodeInStory: function(story, fromIndex, toIndex) {
-        _applyStoryContentsPropertyChange(
-          story, NODE, fromIndex, toIndex,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
-          });
-      },
+  /**
+   * Removes a destination node id from a node of a story and records the
+   * change in the undo/redo service.
+   */
+  removeDestinationNodeIdFromNode(
+      story: Story, nodeId: string, destinationNodeId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldDestinationNodeIds = cloneDeep(
+      storyNode.getDestinationNodeIds());
+    let newDestinationNodeIds = cloneDeep(oldDestinationNodeIds);
+    let index = newDestinationNodeIds.indexOf(destinationNodeId);
+    if (index === -1) {
+      throw new Error('The given destination node is not part of the node');
+    }
+    newDestinationNodeIds.splice(index, 1);
 
-      /**
-       * Adds a prerequisite skill id to a node of a story and records the
-       * change in the undo/redo service.
-       */
-      addPrerequisiteSkillIdToNode: function(story, nodeId, skillId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldPrerequisiteSkillIds = angular.copy(
-          storyNode.getPrerequisiteSkillIds());
-        var newPrerequisiteSkillIds = angular.copy(oldPrerequisiteSkillIds);
-        newPrerequisiteSkillIds.push(skillId);
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, nodeId,
-          oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().addPrerequisiteSkillIdToNode(
-              nodeId, skillId);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().removePrerequisiteSkillIdFromNode(
-              nodeId, skillId);
-          });
-      },
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
+      nodeId, oldDestinationNodeIds, newDestinationNodeIds,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().removeDestinationNodeIdFromNode(
+          nodeId, destinationNodeId);
+        this._storyEditorStateService.setExpIdsChanged();
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().addDestinationNodeIdToNode(
+          nodeId, destinationNodeId);
+        this._storyEditorStateService.setExpIdsChanged();
+      });
+  }
+  /**
+   * Removes a node of a story and records the change in the
+   * undo/redo service.
+   */
+  rearrangeNodeInStory(story: Story, fromIndex: number, toIndex: number): void {
+    this._applyStoryContentsPropertyChange(
+      story, StoryDomainConstants.NODE, fromIndex, toIndex,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
+      });
+  }
 
-      /**
-       * Removes a prerequisite skill id from a node of a story and records the
-       * change in the undo/redo service.
-       */
-      removePrerequisiteSkillIdFromNode: function(story, nodeId, skillId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldPrerequisiteSkillIds = angular.copy(
-          storyNode.getPrerequisiteSkillIds());
-        var newPrerequisiteSkillIds = angular.copy(oldPrerequisiteSkillIds);
-        var index = newPrerequisiteSkillIds.indexOf(skillId);
-        if (index === -1) {
-          throw new Error(
-            'The given prerequisite skill is not part of the node');
-        }
-        newPrerequisiteSkillIds.splice(index, 1);
+  /**
+   * Adds a prerequisite skill id to a node of a story and records the
+   * change in the undo/redo service.
+   */
+  addPrerequisiteSkillIdToNode(
+      story: Story, nodeId: string, skillId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldPrerequisiteSkillIds = cloneDeep(
+      storyNode.getPrerequisiteSkillIds());
+    let newPrerequisiteSkillIds = cloneDeep(oldPrerequisiteSkillIds);
+    newPrerequisiteSkillIds.push(skillId);
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
+      nodeId, oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().addPrerequisiteSkillIdToNode(
+          nodeId, skillId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().removePrerequisiteSkillIdFromNode(
+          nodeId, skillId);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, nodeId,
-          oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().removePrerequisiteSkillIdFromNode(
-              nodeId, skillId);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().addPrerequisiteSkillIdToNode(
-              nodeId, skillId);
-          });
-      },
+  /**
+   * Removes a prerequisite skill id from a node of a story and records the
+   * change in the undo/redo service.
+   */
+  removePrerequisiteSkillIdFromNode(
+      story: Story, nodeId: string, skillId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldPrerequisiteSkillIds = cloneDeep(
+      storyNode.getPrerequisiteSkillIds());
+    let newPrerequisiteSkillIds = cloneDeep(oldPrerequisiteSkillIds);
+    let index = newPrerequisiteSkillIds.indexOf(skillId);
+    if (index === -1) {
+      throw new Error(
+        'The given prerequisite skill is not part of the node');
+    }
+    newPrerequisiteSkillIds.splice(index, 1);
 
-      /**
-       * Adds an acquired skill id to a node of a story and records the change
-       * in the undo/redo service.
-       */
-      addAcquiredSkillIdToNode: function(story, nodeId, skillId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldAcquiredSkillIds = angular.copy(
-          storyNode.getAcquiredSkillIds());
-        var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
-        newAcquiredSkillIds.push(skillId);
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
+      nodeId, oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().removePrerequisiteSkillIdFromNode(
+          nodeId, skillId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().addPrerequisiteSkillIdToNode(
+          nodeId, skillId);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS, nodeId,
-          oldAcquiredSkillIds, newAcquiredSkillIds,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().addAcquiredSkillIdToNode(
-              nodeId, skillId);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().removeAcquiredSkillIdFromNode(
-              nodeId, skillId);
-          });
-      },
+  /**
+   * Adds an acquired skill id to a node of a story and records the change
+   * in the undo/redo service.
+   */
+  addAcquiredSkillIdToNode(
+      story: Story, nodeId: string, skillId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldAcquiredSkillIds = cloneDeep(
+      storyNode.getAcquiredSkillIds());
+    let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
+    newAcquiredSkillIds.push(skillId);
 
-      /**
-       * Removes an acquired skill id from a node of a story and records the
-       * change in the undo/redo service.
-       */
-      removeAcquiredSkillIdFromNode: function(story, nodeId, skillId) {
-        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-        var oldAcquiredSkillIds = angular.copy(
-          storyNode.getAcquiredSkillIds());
-        var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
-        var index = newAcquiredSkillIds.indexOf(skillId);
-        if (index === -1) {
-          throw new Error(
-            'The given acquired skill id is not part of the node');
-        }
-        newAcquiredSkillIds.splice(index, 1);
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
+      nodeId, oldAcquiredSkillIds, newAcquiredSkillIds,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().addAcquiredSkillIdToNode(
+          nodeId, skillId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().removeAcquiredSkillIdFromNode(
+          nodeId, skillId);
+      });
+  }
 
-        _applyStoryNodePropertyChange(
-          story, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS, nodeId,
-          oldAcquiredSkillIds, newAcquiredSkillIds,
-          function(changeDict, story) {
-            // ---- Apply ----
-            story.getStoryContents().removeAcquiredSkillIdFromNode(
-              nodeId, skillId);
-          }, function(changeDict, story) {
-            // ---- Undo ----
-            story.getStoryContents().addAcquiredSkillIdToNode(
-              nodeId, skillId);
-          });
-      }
-    };
-  }]);
+  /**
+   * Removes an acquired skill id from a node of a story and records the
+   * change in the undo/redo service.
+   */
+  removeAcquiredSkillIdFromNode(
+      story: Story, nodeId: string, skillId: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldAcquiredSkillIds = cloneDeep(
+      storyNode.getAcquiredSkillIds());
+    let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
+    let index = newAcquiredSkillIds.indexOf(skillId);
+    if (index === -1) {
+      throw new Error(
+        'The given acquired skill id is not part of the node');
+    }
+    newAcquiredSkillIds.splice(index, 1);
+
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
+      nodeId, oldAcquiredSkillIds, newAcquiredSkillIds,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().removeAcquiredSkillIdFromNode(
+          nodeId, skillId);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().addAcquiredSkillIdToNode(
+          nodeId, skillId);
+      });
+  }
+}
+
+angular.module('oppia').factory(
+  'StoryUpdateService', downgradeInjectable(StoryUpdateService));
