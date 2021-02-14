@@ -17,7 +17,7 @@
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Translation Modal Controller', function() {
+fdescribe('Translation Modal Controller', function() {
   let $httpBackend = null;
   let $q = null;
   let $scope = null;
@@ -125,7 +125,7 @@ describe('Translation Modal Controller', function() {
   });
 
   it('should not register Contributor Dashboard submit suggestion event when' +
-    ' alt text of images are not present when suggesting translated text',
+    ' alt text or description of images are not changed when suggesting translated text',
   function() {
     $httpBackend.flush();
     spyOn(
@@ -138,8 +138,8 @@ describe('Translation Modal Controller', function() {
       '</oppia-noninteractive-image>';
     $scope.activeWrittenTranslation.html =
       '<oppia-noninteractive-image alt-with-value=' +
-      '"" caption-with-value=' +
-      '"" filepath-with-value="&amp;quot;' +
+      '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
+      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
       'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
     $scope.suggestTranslatedText();
@@ -149,7 +149,7 @@ describe('Translation Modal Controller', function() {
   });
 
   it('should register Contributor Dashboard submit suggestion event when' +
-    ' alt test of images are not present and all imgs are copied when ' +
+    ' alt text or description of images are changed and all imgs are copied when ' +
     'suggesting translated text',
   function() {
     $httpBackend.flush();

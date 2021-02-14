@@ -125,6 +125,8 @@ angular.module('oppia').controller('TranslationModalController', [
       var translatedImageAltTxts = [];
       var translatedImageDescriptions = [];
       var states = [];
+      var duplicateImgAltTextStates = [];
+      var duplicateImgDescriptionStates = [];
       [].forEach.call($scope.translatedElements, function(ctl) {
         if (ctl.localName === 'oppia-noninteractive-image') {
           var altText = ctl.attributes['alt-with-value'].value;
@@ -137,20 +139,31 @@ angular.module('oppia').controller('TranslationModalController', [
       });
       [].forEach.call($scope.originalElements, function(ctlTranslated) {
         if (ctlTranslated.localName === 'oppia-noninteractive-image') {
+          var rawAltText = ctlTranslated.attributes['alt-with-value'].value;
+          var rawDescriptionText = ctlTranslated.attributes['caption-with-value'].value;
+          var altText = rawAltText.substring(6, rawAltText.length - 6);
+          var descriptionText = rawDescriptionText.substring(6, rawDescriptionText.length - 6);
           const found = translatedImageDetails.some(
             detail => detail.value === ctlTranslated.attributes[
               'filepath-with-value'].value);
+          const altTextFound = translatedImageAltTxts.some(
+            translatedAltText => (translatedAltText === altText
+              && altText != ''));
+          const descriptionTextFound = translatedImageDescriptions.some(
+            translatedDescText => (translatedDescText === descriptionText
+              && descriptionText != ''));
           states.push(found);
+          duplicateImgAltTextStates.push(altTextFound);
+          duplicateImgDescriptionStates.push(descriptionTextFound);
         }
       });
       const uncopiedImgLefts = states.some(state => state === false);
-      const blankAltText = translatedImageAltTxts.some(
-        text => text === '' || text === ' ');
-      const blankDescription = translatedImageDescriptions.some(
-        text => text === '' || text === ' ');
+      const duplicateAltTexts = duplicateImgAltTextStates.some(state => state === true);
+      const duplicateDescriptions = duplicateImgDescriptionStates.some(state => state === true);
       if (uncopiedImgLefts) {
         $scope.imgCopyError = true;
-      } else if (blankAltText || blankDescription) {
+      } else if (duplicateAltTexts || duplicateDescriptions) {
+        console.log("Duplicated err");
         $scope.imgTextError = true;
       } else {
         if (!$scope.uploadingTranslation && !$scope.loadingData) {
