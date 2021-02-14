@@ -849,8 +849,8 @@ def managed_process(
         for proc in procs_to_kill:
             if proc.is_running():
                 procs_still_alive.append(proc)
-                proc.terminate()
                 logging.info('Terminating %s...' % get_debug_info(proc))
+                proc.terminate()
             else:
                 logging.info('%s has ended.' % get_debug_info(proc))
 
@@ -859,8 +859,8 @@ def managed_process(
         for proc in procs_gone:
             logging.info('%s has ended.' % get_debug_info(proc))
         for proc in procs_still_alive:
-            proc.kill()
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
+            proc.kill()
 
         if proc_name_to_kill is not None:
             python_utils.PRINT(
@@ -870,8 +870,8 @@ def managed_process(
                     proc_name_to_kill in cmd_part
                     for cmd_part in proc.cmdline())
                 if proc_should_be_killed:
-                    proc.kill()
                     logging.warn('Forced to kill %s!' % get_debug_info(proc))
+                    proc.kill()
 
 
 @contextlib.contextmanager
