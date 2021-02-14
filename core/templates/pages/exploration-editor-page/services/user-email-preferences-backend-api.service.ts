@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +12,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* eslint-disable oppia/no-multiline-disable */
-/* eslint-disable capitalized-comments */
 
 import { HttpClient } from '@angular/common/http';
 import { AlertsService } from 'services/alerts.service';
@@ -21,6 +20,15 @@ import { Injectable } from '@angular/core';
 /**
  * @fileoverview User exploration emails service for the exploration settings.
  */
+
+interface ResponseData {
+  email_preferences: {
+    mute_feedback_notifications: boolean,
+    // eslint-disable-next-line camelcase
+    mute_suggestion_notifications: boolean
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -83,14 +91,12 @@ export class UserEmailPreferencesBackendApiService {
     var emailPreferencesUrl = '/createhandler/notificationpreferences/12345';
     return this.http.put(emailPreferencesUrl, requestParams).toPromise().then(
       function(response) {
-        var data = response;
+        var data: ResponseData = response;
         that.alertsService.clearWarnings(),
-        /* tslint:disable */
         that.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
       });
-    /* tslint:enable */
   }
 }
 
