@@ -36,9 +36,6 @@ jobs:
           sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
           sudo dpkg -i google-chrome.deb
           google-chrome --version
-          echo ${{ github.workspace }}
-          pwd
-          ls
       - name: Run Additional Editor E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env
