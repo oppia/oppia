@@ -125,7 +125,8 @@ fdescribe('Translation Modal Controller', function() {
   });
 
   it('should not register Contributor Dashboard submit suggestion event when' +
-    ' alt text or description of images are not changed when suggesting translated text',
+    ' alt text or description of images are not changed when suggesting' +
+    ' translated text',
   function() {
     $httpBackend.flush();
     spyOn(
@@ -149,8 +150,8 @@ fdescribe('Translation Modal Controller', function() {
   });
 
   it('should register Contributor Dashboard submit suggestion event when' +
-    ' alt text or description of images are changed and all imgs are copied when ' +
-    'suggesting translated text',
+    ' alt text or description of images are changed and all imgs are copied' +
+    ' when suggesting translated text',
   function() {
     $httpBackend.flush();
     spyOn(
