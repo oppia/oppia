@@ -27,7 +27,7 @@ import { CsrfTokenService } from
 import { ExplorationDataService } from './exploration-data.service';
 
 
-fdescribe('Learner answer details service', () => {
+describe('Learner answer details service', () => {
   let expId: string = '12345';
   let learnerAnswerDetailsDataService: LearnerAnswerDetailsDataService;
   let sampleDataResults = null;
