@@ -124,7 +124,7 @@ class BaseModel(datastore_services.Model):
         cls = self.__class__
         props = {k: v.__get__(self, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
         props.update(new_values)
-        return cls(**props)
+        return cls(id=self.id, **props)
 
     def _pre_put_hook(self):
         """Operations to perform just before the model is `put` into storage.
