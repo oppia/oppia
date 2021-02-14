@@ -147,6 +147,7 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             question_id, strict=False)
         if latest_question is None:
             yield ('SUCCESS - Question does not exist', 1)
+            return
 
         if (latest_question.question_state_data_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
@@ -235,6 +236,7 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             question_id, strict=False)
         if latest_question is None:
             yield ('SUCCESS - Question does not exist', 1)
+            return
 
         if (latest_question.question_state_data_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):

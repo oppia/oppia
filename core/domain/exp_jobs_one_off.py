@@ -757,6 +757,7 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             exp_id, strict=False)
         if latest_exploration is None:
             yield ('SUCCESS - Exploration does not exist', 1)
+            return
 
         if (latest_exploration.states_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
@@ -852,6 +853,7 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             exp_id, strict=False)
         if latest_exploration is None:
             yield ('SUCCESS - Exploration does not exist', 1)
+            return
 
         if (latest_exploration.states_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
