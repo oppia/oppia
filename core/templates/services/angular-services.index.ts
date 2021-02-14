@@ -50,6 +50,7 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
+import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -96,9 +97,7 @@ import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/p
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformFeatureDummyBackendApiService } from 'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
-import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service.ts';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
@@ -229,6 +228,8 @@ import { AngularNameService } from 'pages/exploration-editor-page/services/angul
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
+import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
@@ -377,6 +378,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionCreationService', CollectionCreationService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
+  ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
@@ -556,9 +558,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],
-  ['QuestionSummaryForOneSkillObjectFactory',
-    QuestionSummaryForOneSkillObjectFactory],
-  ['QuestionSummaryObjectFactory', QuestionSummaryObjectFactory],
   ['RatingComputationService', RatingComputationService],
   ['RatioExpressionInputRulesService', RatioExpressionInputRulesService],
   ['RatioExpressionInputValidationService',
@@ -622,6 +621,9 @@ export const angularServices: [string, Type<{}>][] = [
     StateTopAnswersStatsBackendApiService],
   ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],
   ['StateTopAnswersStatsService', StateTopAnswersStatsService],
+  ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
+  ['TutorialEventsBackendApiService',
+    TutorialEventsBackendApiService],
   ['StateWrittenTranslationsService', StateWrittenTranslationsService],
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
