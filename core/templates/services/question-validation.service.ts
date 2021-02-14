@@ -56,10 +56,6 @@ angular.module('oppia').factory(
 //   function(StateEditorService) {
 //     return {
 //       isQuestionValid: function(question, misconceptionsBySkill) {
-//     console.log('\n\n\n\n\n\n\n\n\n\n');
-//     console.log(StateEditorService);
-//     console.log(StateEditorService.isCurrentSolutionValid());
-//     console.log('\n\n\n\n\n\n\n\n');
 //         return !(
 //           question.getValidationErrorMessage() ||
 //           question.getUnaddressedMisconceptionNames(
