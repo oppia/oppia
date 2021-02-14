@@ -39,12 +39,6 @@ ruleTester.run('e2e-action', rule, {
     {
       code:
       `it('should test a feature', function() {
-        action.clear("Element", elem);
-      });`,
-    },
-    {
-      code:
-      `it('should test a feature', function() {
         console.log(elem.click);
       });`,
     },
@@ -54,12 +48,6 @@ ruleTester.run('e2e-action', rule, {
         console.log(elem.sendKeys);
       });`,
     },
-    {
-      code:
-      `it('should test a feature', function() {
-        console.log(elem.clear);
-      });`,
-    }
   ],
 
   invalid: [
@@ -86,16 +74,6 @@ ruleTester.run('e2e-action', rule, {
     {
       code:
       `it('should test a feature', function() {
-        elem.clear();
-      });`,
-      errors: [{
-        message: 'elem.clear() is called instead of using action.clear()',
-        type: 'MemberExpression',
-      }],
-    },
-    {
-      code:
-      `it('should test a feature', function() {
         element(by.css('.protractor-test')).click();
       });`,
       errors: [{
@@ -114,18 +92,6 @@ ruleTester.run('e2e-action', rule, {
         message: (
           '(some expression).sendKeys() is called instead of using ' +
           'action.sendKeys()'),
-        type: 'MemberExpression',
-      }],
-    },
-    {
-      code:
-      `it('should test a feature', function() {
-        element(by.css('.protractor-test')).clear();
-      });`,
-      errors: [{
-        message: (
-          '(some expression).clear() is called instead of using ' +
-          'action.clear()'),
         type: 'MemberExpression',
       }],
     },
