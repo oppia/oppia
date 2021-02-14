@@ -20,6 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
 import { MessengerService } from 'services/messenger.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -36,7 +37,8 @@ export class StatsReportingService {
       private messengerService: MessengerService,
       private playthroughService: PlaythroughService,
       private siteAnalyticsService: SiteAnalyticsService,
-      private statsReportingBackendApiService: StatsReportingBackendApiService
+      private statsReportingBackendApiService: StatsReportingBackendApiService,
+      private urlService: UrlService
   ) {
     StatsReportingService.editorPreviewMode = (
       this.contextService.isInExplorationEditorPage());
@@ -61,6 +63,7 @@ export class StatsReportingService {
   static nextStateName: string = null;
   private static editorPreviewMode: boolean = null;
   private static questionPlayerMode: boolean = null;
+  private MINIMUM_NUMBER_OF_VISITED_STATES = 3;
 
   // The following dict will contain all stats data accumulated over the
   // interval time and will be reset when the dict is sent to backend for
@@ -187,6 +190,8 @@ export class StatsReportingService {
 
     StatsReportingService.stateStopwatch.reset();
     StatsReportingService.explorationStarted = true;
+    this.siteAnalyticsService.registerStartExploration(
+      StatsReportingService.explorationId);
   }
 
   recordExplorationActuallyStarted(stateName: string): void {
@@ -297,6 +302,14 @@ export class StatsReportingService {
       this.siteAnalyticsService.registerNewCard(
         StatsReportingService.statesVisited.size);
     }
+    let numberOfStatesVisited = StatsReportingService.statesVisited.size;
+    if (numberOfStatesVisited === this.MINIMUM_NUMBER_OF_VISITED_STATES) {
+      let urlParams = this.urlService.getUrlParams();
+      if (urlParams.hasOwnProperty('classroom_url_fragment')) {
+        this.siteAnalyticsService.registerClassroomLessonActiveUse();
+      }
+      this.siteAnalyticsService.registerLessonActiveUse();
+    }
 
     StatsReportingService.stateStopwatch.reset();
   }
@@ -349,7 +362,13 @@ export class StatsReportingService {
         paramValues: params
       });
 
-    this.siteAnalyticsService.registerFinishExploration();
+    this.siteAnalyticsService.registerFinishExploration(
+      StatsReportingService.explorationId);
+    let urlParams = this.urlService.getUrlParams();
+    if (urlParams.hasOwnProperty('classroom_url_fragment')) {
+      this.siteAnalyticsService.registerCuratedLessonCompleted(
+        StatsReportingService.explorationId);
+    }
 
     this.postStatsToBackend();
     this.playthroughService.recordExplorationQuitAction(

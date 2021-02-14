@@ -24,7 +24,6 @@ import re
 from constants import constants
 from core.domain import base_model_validators
 from core.domain import suggestion_services
-from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 import feconf
@@ -80,35 +79,27 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         field_name_to_external_model_references = [
             base_model_validators.ExternalModelFetcherDetails(
                 'feedback_thread_ids',
-                feedback_models.GeneralFeedbackThreadModel, [item.id])
-        ]
-        if user_services.is_user_id_valid(item.author_id):
-            field_name_to_external_model_references.append(
-                base_model_validators.UserSettingsModelFetcherDetails(
-                    'author_ids', [item.author_id],
-                    may_contain_system_ids=True,
-                    may_contain_pseudonymous_ids=True
-                )
+                feedback_models.GeneralFeedbackThreadModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'author_ids', [item.author_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )
+        ]
+
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
-        if item.final_reviewer_id and user_services.is_user_id_valid(
-                item.final_reviewer_id):
-
-            # Bot rejects suggestions when the suggestion's targeted entity gets
-            # removed from the topic. The bot doesn't have a UserSettingsModel
-            # for their user_id. Exclude external model validation for bot.
-            if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
-                field_name_to_external_model_references.append(
-                    base_model_validators.UserSettingsModelFetcherDetails(
-                        'reviewer_ids', [item.final_reviewer_id],
-                        may_contain_system_ids=True,
-                        may_contain_pseudonymous_ids=True
-                    ))
+        if item.final_reviewer_id:
+            field_name_to_external_model_references.append(
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'reviewer_ids', [item.final_reviewer_id],
+                    may_contain_system_ids=True,
+                    may_contain_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -300,25 +291,20 @@ class GeneralVoiceoverApplicationModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        field_name_to_external_model_references = []
-        if user_services.is_user_id_valid(item.author_id):
-            field_name_to_external_model_references.append(
-                base_model_validators.UserSettingsModelFetcherDetails(
-                    'author_ids', [item.author_id],
-                    may_contain_system_ids=False,
-                    may_contain_pseudonymous_ids=True
-                )
+        field_name_to_external_model_references = [
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'author_ids', [item.author_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=True
             )
+        ]
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
-        if (
-                item.final_reviewer_id and
-                user_services.is_user_id_valid(item.final_reviewer_id)
-        ):
+        if item.final_reviewer_id is not None:
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'final_reviewer_ids', [item.final_reviewer_id],
@@ -326,40 +312,6 @@ class GeneralVoiceoverApplicationModelValidator(
                     may_contain_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references
-
-    @classmethod
-    def _validate_final_reviewer_id(cls, item):
-        """Validate that final reviewer ID is in correct format.
-
-        Args:
-            item: GeneralSuggestionModel. The model to validate.
-        """
-        if not user_services.is_user_or_pseudonymous_id(item.final_reviewer_id):
-            cls._add_error(
-                'final %s' % (
-                    base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
-                'Entity id %s: Final reviewer ID %s is in a wrong format. '
-                'It should be either pid_<32 chars> or uid_<32 chars>.'
-                % (item.id, item.final_reviewer_id))
-
-    @classmethod
-    def _validate_author_id(cls, item):
-        """Validate that author ID is in correct format.
-
-        Args:
-            item: GeneralSuggestionModel. The model to validate.
-        """
-        if not user_services.is_user_or_pseudonymous_id(item.author_id):
-            cls._add_error(
-                'final %s' % (
-                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
-                'Entity id %s: Author ID %s is in a wrong format. '
-                'It should be either pid_<32 chars> or uid_<32 chars>.'
-                % (item.id, item.author_id))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_final_reviewer_id, cls._validate_author_id]
 
 
 class CommunityContributionStatsModelValidator(

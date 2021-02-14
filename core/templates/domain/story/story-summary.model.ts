@@ -31,7 +31,7 @@ export interface StorySummaryBackendDict {
   'story_is_published': boolean;
   'completed_node_titles': string[],
   'url_fragment': string,
-  'pending_node_dicts': StoryNodeBackendDict[]
+  'all_node_dicts': StoryNodeBackendDict[]
 }
 
 export class StorySummary {
@@ -45,7 +45,7 @@ export class StorySummary {
     private _storyIsPublished: boolean,
     private _completedNodeTitles: string[],
     private _urlFragment: string,
-    private _pendingNodes: StoryNode[]
+    private _allNodes: StoryNode[]
   ) {}
 
   getId(): string {
@@ -84,14 +84,14 @@ export class StorySummary {
     return this._urlFragment;
   }
 
-  getPendingNodes(): StoryNode[] {
-    return this._pendingNodes;
+  getAllNodes(): StoryNode[] {
+    return this._allNodes;
   }
 
   static createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
-    let pendingNodes = (
-      storySummaryBackendDict.pending_node_dicts.map(storyNodeDict => {
+    let allNodes = (
+      storySummaryBackendDict.all_node_dicts.map(storyNodeDict => {
         return StoryNode.createFromBackendDict(
           storyNodeDict);
       }));
@@ -105,7 +105,7 @@ export class StorySummary {
       storySummaryBackendDict.story_is_published,
       storySummaryBackendDict.completed_node_titles,
       storySummaryBackendDict.url_fragment,
-      pendingNodes
+      allNodes
     );
   }
 }

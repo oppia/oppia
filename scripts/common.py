@@ -89,6 +89,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
+ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -125,6 +126,13 @@ REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
 
+ES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
+ES_PATH_CONFIG_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
+ES_PATH_DATA_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
+
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
@@ -133,7 +141,8 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60
+MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
@@ -148,6 +157,25 @@ COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
 # "requirements.txt" file so that all installations using "requirements.txt"
 # will be identical.
 REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
+
+DIRS_TO_ADD_TO_SYS_PATH = [
+    GOOGLE_APP_ENGINE_SDK_HOME,
+    PYLINT_PATH,
+
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
+    PSUTIL_DIR,
+    os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
+    CURR_DIR,
+    THIRD_PARTY_PYTHON_LIBS_DIR
+]
 
 
 def is_windows_os():
@@ -613,7 +641,7 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
 
 def wait_for_port_to_be_open(port_number):
     """Wait until the port is open and exit if port isn't open after
-    1000 seconds.
+    MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
     Args:
         port_number: int. The port number to wait.
@@ -629,6 +657,24 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
+
+
+def wait_for_port_to_be_closed(port_number):
+    """Wait until the port is closed or
+    MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+
+    Returns:
+        bool. Whether the port closed in time.
+    """
+    waited_seconds = 0
+    while (is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    return not is_port_open(port_number)
 
 
 def start_redis_server():
@@ -744,7 +790,9 @@ def swap_env(key, value):
 
 
 @contextlib.contextmanager
-def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
+def managed_process(
+        command_args, shell=False, timeout_secs=60, proc_name_to_kill=None,
+        **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -761,6 +809,10 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
+        proc_name_to_kill: str|None. If given, the name of a string which
+            matches all additional processes that should be killed when the
+            given process is terminated. (This is needed for, e.g.,
+            elasticsearch.)
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -775,20 +827,51 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
+    python_utils.PRINT('Starting new process: %s' % command)
     popen_proc = psutil.Popen(command, shell=shell, **kwargs)
 
     try:
         yield popen_proc
     finally:
-        if popen_proc.is_running():
-            procs = popen_proc.children(recursive=True) + [popen_proc]
-            for proc in procs:
-                proc.terminate()
+        procs_to_kill = (
+            popen_proc.children(recursive=True) if popen_proc.is_running() else
+            [])
 
-            _, still_running = psutil.wait_procs(procs, timeout=timeout_secs)
-            for proc in still_running:
-                proc.kill()
-                logging.warn('Process killed (pid=%d)' % proc.pid)
+        # Children must be terminated before the parent, otherwise they risk
+        # becoming zombies.
+        procs_to_kill.append(popen_proc)
+
+        get_debug_info = lambda proc: (
+            'Process(name=%r, pid=%d)' % (proc.name(), proc.pid)
+            if proc.is_running() else 'Process(pid=%d)' % (proc.pid,))
+
+        procs_still_alive = []
+        for proc in procs_to_kill:
+            if proc.is_running():
+                procs_still_alive.append(proc)
+                proc.terminate()
+                logging.info('Terminating %s...' % get_debug_info(proc))
+            else:
+                logging.info('%s has ended.' % get_debug_info(proc))
+
+        procs_gone, procs_still_alive = (
+            psutil.wait_procs(procs_still_alive, timeout=timeout_secs))
+        for proc in procs_gone:
+            logging.info('%s has ended.' % get_debug_info(proc))
+        for proc in procs_still_alive:
+            proc.kill()
+            logging.warn('Forced to kill %s!' % get_debug_info(proc))
+
+        if proc_name_to_kill is not None:
+            python_utils.PRINT(
+                'Killing remaining %s processes' % proc_name_to_kill)
+            for proc in psutil.process_iter():
+                proc_should_be_killed = any(
+                    proc_name_to_kill in cmd_part
+                    for cmd_part in proc.cmdline())
+                if proc_should_be_killed:
+                    proc.kill()
+                    logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
 
 @contextlib.contextmanager
@@ -873,3 +956,27 @@ def managed_firebase_auth_emulator():
         # OK to use shell=True here because we are passing string literals and
         # constants, so no risk of shell-injection attacks.
         yield stack.enter_context(managed_process(emulator_args, shell=True))
+
+
+@contextlib.contextmanager
+def managed_elasticsearch_dev_server():
+    """Returns a context manager for ElasticSearch server for running tests
+    in development mode and running a local dev server. This is only required
+    in a development environment.
+
+    Yields:
+        psutil.Process. The ElasticSearch server process.
+    """
+    # Clear previous data stored in the local cluster.
+    if os.path.exists(ES_PATH_DATA_DIR):
+        shutil.rmtree(ES_PATH_DATA_DIR)
+
+    # Override the default path to ElasticSearch config files.
+    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
+    es_args = [
+        '%s/bin/elasticsearch' % ES_PATH,
+        '-d'
+    ]
+    with managed_process(
+        es_args, shell=True, proc_name_to_kill='elasticsearch') as proc:
+        yield proc

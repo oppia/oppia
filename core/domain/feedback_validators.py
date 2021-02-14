@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
 from core.domain import prod_validators
-from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
@@ -54,10 +53,7 @@ class GeneralFeedbackThreadModelValidator(
                 ['%s.%s' % (item.id, i) for i in python_utils.RANGE(
                     item.message_count)])
         ]
-        if (
-                item.original_author_id and
-                user_services.is_user_id_valid(item.original_author_id)
-        ):
+        if item.original_author_id:
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.original_author_id],
@@ -75,16 +71,12 @@ class GeneralFeedbackThreadModelValidator(
                     '%s_ids' % item.entity_type,
                     prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
                         item.entity_type], [item.entity_id]))
-        if (
-                item.last_nonempty_message_author_id and
-                user_services.is_user_id_valid(
-                    item.last_nonempty_message_author_id)
-        ):
+        if item.last_nonempty_message_author_id:
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'last_nonempty_message_author_ids',
                     [item.last_nonempty_message_author_id],
-                    may_contain_system_ids=False,
+                    may_contain_system_ids=True,
                     may_contain_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references
@@ -123,51 +115,11 @@ class GeneralFeedbackThreadModelValidator(
                         item.id))
 
     @classmethod
-    def _validate_original_author_id(cls, item):
-        """Validate that original author ID is in correct format.
-
-        Args:
-            item: GeneralFeedbackThreadModel. The model to validate.
-        """
-        if (
-                item.original_author_id and
-                not user_services.is_user_or_pseudonymous_id(
-                    item.original_author_id)
-        ):
-            cls._add_error(
-                'final %s' % (
-                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
-                'Entity id %s: Original author ID %s is in a wrong format. '
-                'It should be either pid_<32 chars> or uid_<32 chars>.'
-                % (item.id, item.original_author_id))
-
-    @classmethod
-    def _validate_last_nonempty_message_author_id(cls, item):
-        """Validate that last nonempty message author ID is in correct format.
-
-        Args:
-            item: GeneralFeedbackThreadModel. The model to validate.
-        """
-        if (
-                item.last_nonempty_message_author_id and
-                not user_services.is_user_or_pseudonymous_id(
-                    item.last_nonempty_message_author_id)
-        ):
-            cls._add_error(
-                'final %s' % (
-                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
-                'Entity id %s: Last non-empty message author ID %s is in a '
-                'wrong format. It should be either pid_<32 chars> or '
-                'uid_<32 chars>.' % (
-                    item.id, item.last_nonempty_message_author_id))
-
-    @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_entity_type,
-            cls._validate_has_suggestion,
-            cls._validate_original_author_id,
-            cls._validate_last_nonempty_message_author_id]
+            cls._validate_has_suggestion
+        ]
 
 
 class GeneralFeedbackMessageModelValidator(
@@ -189,36 +141,15 @@ class GeneralFeedbackMessageModelValidator(
                 [item.thread_id]
             )
         ]
-        if (
-                item.author_id and
-                user_services.is_user_id_valid(item.author_id)
-        ):
+        if item.author_id:
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.author_id],
-                    may_contain_system_ids=False,
+                    may_contain_system_ids=True,
                     may_contain_pseudonymous_ids=True
                 )
             )
         return field_name_to_external_model_references
-
-    @classmethod
-    def _validate_author_id(cls, item):
-        """Validate that author ID is in correct format.
-
-        Args:
-            item: GeneralFeedbackMessageModel. The model to validate.
-        """
-        if (
-                item.author_id and
-                not user_services.is_user_or_pseudonymous_id(item.author_id)
-        ):
-            cls._add_error(
-                'final %s' % (
-                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
-                'Entity id %s: Author ID %s is in a wrong format. '
-                'It should be either pid_<32 chars> or uid_<32 chars>.'
-                % (item.id, item.author_id))
 
     @classmethod
     def _validate_message_id(
@@ -273,10 +204,6 @@ class GeneralFeedbackMessageModelValidator(
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_message_id]
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_author_id]
-
 
 class GeneralFeedbackThreadUserModelValidator(
         base_model_validators.BaseModelValidator):
@@ -289,7 +216,7 @@ class GeneralFeedbackThreadUserModelValidator(
             ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
         regex_string = '^%s\\.%s$' % (
-            base_model_validators.USER_ID_REGEX, thread_id_string)
+            feconf.USER_ID_REGEX, thread_id_string)
         return regex_string
 
     @classmethod
@@ -328,7 +255,7 @@ class UnsentFeedbackEmailModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^%s$' % base_model_validators.USER_ID_REGEX
+        return '^%s$' % feconf.USER_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):

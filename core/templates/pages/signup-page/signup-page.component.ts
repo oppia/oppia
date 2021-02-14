@@ -164,12 +164,13 @@ angular.module('oppia').component('signupPage', {
           }
         }
 
-        SiteAnalyticsService.registerNewSignupEvent();
-
         ctrl.submissionInProcess = true;
         $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-          $window.location.href = decodeURIComponent(
-            UrlService.getUrlParams().return_url);
+          SiteAnalyticsService.registerNewSignupEvent();
+          setTimeout(() => {
+            $window.location.href = decodeURIComponent(
+              UrlService.getUrlParams().return_url);
+          }, SiteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
         }, function(rejection) {
           if (rejection.data && rejection.data.status_code === 401) {
             ctrl.showRegistrationSessionExpiredModal();

@@ -92,6 +92,7 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
+        """Handles POST requests."""
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.payload.get('suggestion_type'),
@@ -154,6 +155,12 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
+        """Handles PUT requests.
+
+        Args:
+            target_id: str. The ID of the suggestion target.
+            suggestion_id: str. The ID of the suggestion.
+        """
         if (
                 suggestion_id.split('.')[0] !=
                 feconf.ENTITY_TYPE_EXPLORATION):
@@ -176,10 +183,10 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.payload.get('commit_message')
             if (commit_message is not None and
-                    len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                    len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
                 raise self.InvalidInputException(
                     'Commit messages must be at most %s characters long.'
-                    % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                    % constants.MAX_COMMIT_MESSAGE_LENGTH)
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
@@ -197,6 +204,11 @@ class ResubmitSuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
+        """Handles PUT requests.
+
+        Args:
+            suggestion_id: str. The ID of the suggestion.
+        """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         new_change = self.payload.get('change')
         change_cls = type(suggestion.change)
@@ -213,6 +225,12 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
+        """Handles PUT requests.
+
+        Args:
+            target_id: str. The ID of the suggestion target.
+            suggestion_id: str. The ID of the suggestion.
+        """
         if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_SKILL:
             raise self.InvalidInputException(
                 'This handler allows actions only on suggestions to skills.')
@@ -297,7 +315,12 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            target_type: str. The type of the suggestion target.
+            suggestion_type: str. The type of the suggestion.
+        """
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
         suggestions = suggestion_services.get_reviewable_suggestions(
@@ -312,7 +335,12 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
 
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            target_type: str. The type of the suggestion target.
+            suggestion_type: str. The type of the suggestion.
+        """
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
         suggestions = suggestion_services.get_submitted_suggestions(
@@ -327,6 +355,7 @@ class SuggestionListHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
+        """Handles GET requests."""
         # The query_fields_and_values variable is a list of tuples. The first
         # element in each tuple is the field being queried and the second
         # element is the value of the field being queried.

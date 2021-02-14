@@ -60,20 +60,24 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        html: 'newValue'
+        html: 'newValue',
+        content_id: ''
       },
       old_value: {
-        html: 'oldValue'
+        html: 'oldValue',
+        content_id: ''
       },
       property_name: 'content'
     });
 
     expect(lostChange.getRelativeChangeToGroups()).toBe('edited');
     expect(lostChange.getStatePropertyValue(lostChange.newValue)).toEqual({
-      html: 'newValue'
+      html: 'newValue',
+      content_id: ''
     });
     expect(lostChange.getStatePropertyValue(lostChange.oldValue)).toEqual({
-      html: 'oldValue'
+      html: 'oldValue',
+      content_id: ''
     });
     expect(lostChange.isOutcomeFeedbackEqual()).toBe(false);
     expect(lostChange.isFeedbackEqual()).toBe(false);

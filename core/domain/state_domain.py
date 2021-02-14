@@ -558,9 +558,8 @@ class InteractionInstance(python_utils.OBJECT):
                 interaction instance.
             default_outcome: Outcome. The default outcome of the interaction
                 instance.
-            confirmed_unclassified_answers: list(AnswerGroup). List of answers
-                which have been confirmed to be associated with the default
-                outcome.
+            confirmed_unclassified_answers: list(*). List of answers which have
+                been confirmed to be associated with the default outcome.
             hints: list(Hint). List of hints for this interaction.
             solution: Solution. A possible solution for the question asked in
                 this interaction.
@@ -1448,9 +1447,6 @@ class WrittenTranslation(python_utils.OBJECT):
         self.data_format = data_format
         self.translation = translation
         self.needs_update = needs_update
-
-        if data_format == self.DATA_FORMAT_HTML:
-            self.translation = html_cleaner.clean(self.translation)
 
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
@@ -2542,9 +2538,9 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info(
+            logging.exception(
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
-            raise Exception('Could not convert state dict to YAML.')
+            python_utils.reraise_exception()
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
