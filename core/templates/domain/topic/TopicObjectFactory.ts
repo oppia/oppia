@@ -36,7 +36,7 @@ import {
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
 
-interface TopicBackendDict {
+export interface TopicBackendDict {
   'id': string;
   'name': string;
   'abbreviated_name': string;
@@ -53,9 +53,10 @@ interface TopicBackendDict {
   'url_fragment': string;
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
+  'page_title_fragment_for_web': string;
 }
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 export class Topic {
   _id: string;
@@ -74,6 +75,7 @@ export class Topic {
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
+  _pageTitleFragmentForWeb: string;
   skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -91,7 +93,7 @@ export class Topic {
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string) {
+      metaTagContent: string, pageTitleFragmentForWeb: string) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
@@ -115,6 +117,7 @@ export class Topic {
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
+    this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
   // ---- Instance methods ----
@@ -152,6 +155,14 @@ export class Topic {
 
   setMetaTagContent(metaTagContent: string): void {
     this._metaTagContent = metaTagContent;
+  }
+
+  getPageTitleFragmentForWeb(): string {
+    return this._pageTitleFragmentForWeb;
+  }
+
+  setPageTitleFragmentForWeb(pageTitleFragmentForWeb: string): void {
+    this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
   getUrlFragment(): string {
@@ -274,6 +285,8 @@ export class Topic {
 
   prepublishValidate(): string[] {
     const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
+    const pageTitleFragForWebCharLimit = (
+      constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -284,6 +297,14 @@ export class Topic {
           'Subtopic with title ' + this._subtopics[i].getTitle() +
           ' does not have any skill IDs linked.');
       }
+    }
+    let pageTitleFragForWebNumChars = this._pageTitleFragmentForWeb.length;
+    if (!this._pageTitleFragmentForWeb) {
+      issues.push('Topic should have page title fragment.');
+    } else if (pageTitleFragForWebNumChars > pageTitleFragForWebCharLimit) {
+      issues.push(
+        'Topic page title fragment should not be longer than ' +
+        `${constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
     }
     if (!this._metaTagContent) {
       issues.push('Topic should have meta tag content.');
@@ -527,6 +548,7 @@ export class Topic {
     this.setLanguageCode(otherTopic.getLanguageCode());
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
+    this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -591,7 +613,8 @@ export class TopicObjectFactory {
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
-      topicBackendDict.meta_tag_content
+      topicBackendDict.meta_tag_content,
+      topicBackendDict.page_title_fragment_for_web
     );
   }
 
@@ -603,7 +626,7 @@ export class TopicObjectFactory {
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
-      this.storyReferenceObjectFactory, false, ''
+      this.storyReferenceObjectFactory, false, '', ''
     );
   }
 }

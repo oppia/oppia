@@ -33,14 +33,15 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
     '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*',
-    'core/tests/release_sources/tmp_unzip.zip', 'scripts/linters/test_files/*',
+    'assets/scripts/*', 'core/domain/proto/*.py', 'core/tests/data/*',
+    'core/tests/build_sources/*', '*.mp3', '*.mp4', 'node_modules/*',
+    'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
+    'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
+    'scripts/linters/test_files/*', 'proto/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
-    'auth.json.enc',
+    'core/templates/google-analytics.initializer.ts',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -267,7 +268,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/pages/exploration-editor-page/translation-tab/'
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
             'core/templates/pages/library-page/search-bar/'
-            'search-bar.component.spec.ts'),
+            'search-bar.component.spec.ts',
+            'core/templates/pages/splash-page/splash-page.component.spec.ts'),
         'excluded_dirs': ()
     },
     {
@@ -286,6 +288,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
+            'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }
@@ -365,13 +368,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'datetime.datetime.now\(\)'),
-        'message': 'Please use datetime.datetime.utcnow() instead of '
-                   'datetime.datetime.now().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'ndb\.'),
         'message': (
             'Please use datastore_services instead of ndb, for example:\n'
@@ -392,39 +388,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
-        'regexp': re.compile(r'\sprint\('),
-        'message': 'Please use python_utils.PRINT().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'# pylint:\s*disable=[A-Z][0-9]{4}'),
         'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
                    'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'self.assertEquals\('),
-        'message': 'Please do not use self.assertEquals method. ' +
-                   'This method has been deprecated. Instead use ' +
-                   'self.assertEqual method.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'with open\(|= open\('),
-        'message': 'Please use python_utils.open_file() instead of open().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'StringIO'),
-        'message': 'Please use python_utils.string_io() instead of ' +
-                   'import StringIO.',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
@@ -458,63 +427,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'urlsplit'),
-        'message': 'Please use python_utils.url_split().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urlparse'),
-        'message': 'Please use python_utils.url_parse().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urlunsplit'),
-        'message': 'Please use python_utils.url_unsplit().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'parse_qs'),
-        'message': 'Please use python_utils.parse_query_string().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wunquote\('),
-        'message': 'Please use python_utils.urllib_unquote().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urljoin'),
-        'message': 'Please use python_utils.url_join().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w]input\('),
-        'message': 'Please use python_utils.INPUT.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w|\s]map\('),
-        'message': 'Please use python_utils.MAP.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wnext\('),
-        'message': 'Please use python_utils.NEXT.',
-        'excluded_files': (),
         'excluded_dirs': ()
     },
     {
@@ -524,63 +439,11 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\Wrange\('),
-        'message': 'Please use python_utils.RANGE.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wround\('),
-        'message': 'Please use python_utils.ROUND.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wstr\('),
-        'message': (
-            'Please try to use python_utils.convert_to_bytes() for the strings '
-            'used in webapp2\'s built-in methods or for strings used directly '
-            'in NDB datastore models. If you need to cast ints/floats to '
-            'strings, please use python_utils.UNICODE() instead.'),
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wzip\('),
-        'message': 'Please use python_utils.ZIP.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'basestring'),
-        'message': 'Please use python_utils.BASESTRING.',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'__metaclass__'),
         'message': 'Please use python_utils.with_metaclass().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
-    {
-        'regexp': re.compile(r'iteritems'),
-        'message': 'Please use items() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'itervalues'),
-        'message': 'Please use values() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'iterkeys'),
-        'message': 'Please use keys() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    }
 ]
 
 BAD_PATTERNS_MAP = {

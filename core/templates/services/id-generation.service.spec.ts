@@ -19,7 +19,7 @@
 import { IdGenerationService } from 'services/id-generation.service';
 
 describe('IdGenerationService', () => {
-  let idGenerationService = null;
+  let idGenerationService : IdGenerationService;
 
   beforeEach(() => {
     idGenerationService = new IdGenerationService();

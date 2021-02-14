@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,53 +16,65 @@
  * @fileoverview Tests for Collection update service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// collection-update.service.ts is upgraded to Angular 8.
-import { Change } from
-  'domain/editor/undo_redo/change.model';
-import { Collection, CollectionBackendDict } from
-  'domain/collection/collection.model';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/collection/collection-update.service.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
+import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
+import { CollectionUpdateService } from 'domain/collection/collection-update.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
-describe('Collection update service', function() {
-  var CollectionUpdateService = null;
-  var UndoRedoService = null;
-  var _sampleCollection = null;
-  var _sampleExplorationSummaryBackendObject = {
-    title: 'Title',
-    status: 'public'
-  };
+describe('Collection update service', () => {
+  let collectionUpdateService: CollectionUpdateService = null;
+  let undoRedoService: UndoRedoService = null;
+  let learnerExplorationSummaryBackendDict:
+    LearnerExplorationSummaryBackendDict = null;
+  let _sampleCollection = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', Change);
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: []
+    });
+    collectionUpdateService = TestBed.get(CollectionUpdateService);
+    undoRedoService = TestBed.get(UndoRedoService);
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionUpdateService = $injector.get('CollectionUpdateService');
-    UndoRedoService = $injector.get('UndoRedoService');
-
-    const sampleCollectionBackendObject = {
+  beforeEach(() => {
+    learnerExplorationSummaryBackendDict = {
+      activity_type: 'exploration',
+      category: 'a category',
+      community_owned: false,
+      created_on_msec: 1591296635736.666,
+      id: 'collection_id',
+      last_updated_msec: 1591296737470.528,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0
+      },
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      num_views: 0,
+      objective: 'Test Objective',
+      status: 'public',
+      tags: [],
+      thumbnail_bg_color: '#cd672b',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      title: 'a title'
+    };
+    let sampleCollectionBackendObject: CollectionBackendDict = {
       id: 'collection_id',
       title: 'a title',
       objective: 'an objective',
       language_code: 'en',
       tags: [],
       category: 'a category',
-      version: '1',
+      version: 1,
+      schema_version: 1,
       nodes: [{
         exploration_id: 'exp_id0',
-        exploration: {}
+        exploration_summary: learnerExplorationSummaryBackendDict
       }],
       playthrough_dict: {
         next_exploration_id: 'expId',
@@ -70,69 +82,68 @@ describe('Collection update service', function() {
       }
     };
     _sampleCollection = Collection.create(
-      // TODO(#10875): Fix type mismatch.
-      sampleCollectionBackendObject as unknown as CollectionBackendDict);
-  }));
+      sampleCollectionBackendObject);
+  });
 
   it('should add/remove a new collection node to/from a collection',
-    function() {
+    () => {
       expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
-      CollectionUpdateService.addCollectionNode(
-        _sampleCollection, 'exp_id1', _sampleExplorationSummaryBackendObject);
+      collectionUpdateService.addCollectionNode(
+        _sampleCollection, 'exp_id1', learnerExplorationSummaryBackendDict);
       expect(_sampleCollection.getExplorationIds()).toEqual([
         'exp_id0', 'exp_id1'
       ]);
 
-      UndoRedoService.undoChange(_sampleCollection);
+      undoRedoService.undoChange(_sampleCollection);
       expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
     }
   );
 
   it('should create a proper backend change dict for adding collection nodes',
-    function() {
-      CollectionUpdateService.addCollectionNode(
-        _sampleCollection, 'exp_id1', _sampleExplorationSummaryBackendObject);
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    () => {
+      collectionUpdateService.addCollectionNode(
+        _sampleCollection, 'exp_id1', learnerExplorationSummaryBackendDict);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'add_collection_node',
         exploration_id: 'exp_id1'
       }]);
     }
   );
 
-  it('should remove/add a collection node from/to a collection', function() {
+  it('should remove/add a collection node from/to a collection', ()=> {
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
-    CollectionUpdateService.deleteCollectionNode(_sampleCollection, 'exp_id0');
+    collectionUpdateService.deleteCollectionNode(_sampleCollection, 'exp_id0');
     expect(_sampleCollection.getExplorationIds()).toEqual([]);
 
-    UndoRedoService.undoChange(_sampleCollection);
+    undoRedoService.undoChange(_sampleCollection);
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
   });
 
   it('should create a proper backend change dict for deleting collection nodes',
-    function() {
-      CollectionUpdateService
+    () => {
+      collectionUpdateService
         .deleteCollectionNode(_sampleCollection, 'exp_id0');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_collection_node',
         exploration_id: 'exp_id0'
       }]);
     }
   );
 
-  it('should set/unset changes to a collection\'s title', function() {
+  it('should set/unset changes to a collection\'s title', () => {
     expect(_sampleCollection.getTitle()).toEqual('a title');
-    CollectionUpdateService.setCollectionTitle(_sampleCollection, 'new title');
+    collectionUpdateService.setCollectionTitle(_sampleCollection, 'new title');
     expect(_sampleCollection.getTitle()).toEqual('new title');
 
-    UndoRedoService.undoChange(_sampleCollection);
+    undoRedoService.undoChange(_sampleCollection);
     expect(_sampleCollection.getTitle()).toEqual('a title');
   });
 
   it('should create a proper backend change dict for changing titles',
-    function() {
-      CollectionUpdateService
+    () => {
+      collectionUpdateService
         .setCollectionTitle(_sampleCollection, 'new title');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_property',
         property_name: 'title',
         new_value: 'new title',
@@ -141,21 +152,21 @@ describe('Collection update service', function() {
     }
   );
 
-  it('should set/unset changes to a collection\'s category', function() {
+  it('should set/unset changes to a collection\'s category', () => {
     expect(_sampleCollection.getCategory()).toEqual('a category');
-    CollectionUpdateService.setCollectionCategory(
+    collectionUpdateService.setCollectionCategory(
       _sampleCollection, 'new category');
     expect(_sampleCollection.getCategory()).toEqual('new category');
 
-    UndoRedoService.undoChange(_sampleCollection);
+    undoRedoService.undoChange(_sampleCollection);
     expect(_sampleCollection.getCategory()).toEqual('a category');
   });
 
   it('should create a proper backend change dict for changing categories',
-    function() {
-      CollectionUpdateService.setCollectionCategory(
+    () => {
+      collectionUpdateService.setCollectionCategory(
         _sampleCollection, 'new category');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_property',
         property_name: 'category',
         new_value: 'new category',
@@ -164,21 +175,21 @@ describe('Collection update service', function() {
     }
   );
 
-  it('should set/unset changes to a collection\'s objective', function() {
+  it('should set/unset changes to a collection\'s objective', () => {
     expect(_sampleCollection.getObjective()).toEqual('an objective');
-    CollectionUpdateService.setCollectionObjective(
+    collectionUpdateService.setCollectionObjective(
       _sampleCollection, 'new objective');
     expect(_sampleCollection.getObjective()).toEqual('new objective');
 
-    UndoRedoService.undoChange(_sampleCollection);
+    undoRedoService.undoChange(_sampleCollection);
     expect(_sampleCollection.getObjective()).toEqual('an objective');
   });
 
   it('should create a proper backend change dict for changing objectives',
-    function() {
-      CollectionUpdateService.setCollectionObjective(
+    () => {
+      collectionUpdateService.setCollectionObjective(
         _sampleCollection, 'new objective');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_property',
         property_name: 'objective',
         new_value: 'new objective',
@@ -187,20 +198,20 @@ describe('Collection update service', function() {
     }
   );
 
-  it('should set/unset changes to a collection\'s language code', function() {
+  it('should set/unset changes to a collection\'s language code', () => {
     expect(_sampleCollection.getLanguageCode()).toEqual('en');
-    CollectionUpdateService.setCollectionLanguageCode(_sampleCollection, 'fi');
+    collectionUpdateService.setCollectionLanguageCode(_sampleCollection, 'fi');
     expect(_sampleCollection.getLanguageCode()).toEqual('fi');
 
-    UndoRedoService.undoChange(_sampleCollection);
+    undoRedoService.undoChange(_sampleCollection);
     expect(_sampleCollection.getLanguageCode()).toEqual('en');
   });
 
   it('should create a proper backend change dict for changing language codes',
-    function() {
-      CollectionUpdateService
+    () => {
+      collectionUpdateService
         .setCollectionLanguageCode(_sampleCollection, 'fi');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_property',
         property_name: 'language_code',
         new_value: 'fi',
@@ -209,19 +220,19 @@ describe('Collection update service', function() {
     }
   );
 
-  it('should set/unset changes to a collection\'s tags', function() {
+  it('should set/unset changes to a collection\'s tags', () => {
     expect(_sampleCollection.getTags()).toEqual([]);
-    CollectionUpdateService.setCollectionTags(_sampleCollection, ['test']);
+    collectionUpdateService.setCollectionTags(_sampleCollection, ['test']);
     expect(_sampleCollection.getTags()).toEqual(['test']);
 
-    UndoRedoService.undoChange(_sampleCollection);
+    undoRedoService.undoChange(_sampleCollection);
     expect(_sampleCollection.getTags()).toEqual([]);
   });
 
   it('should create a proper backend change dict for changing tags',
-    function() {
-      CollectionUpdateService.setCollectionTags(_sampleCollection, ['test']);
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+    () => {
+      collectionUpdateService.setCollectionTags(_sampleCollection, ['test']);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_property',
         property_name: 'tags',
         new_value: ['test'],

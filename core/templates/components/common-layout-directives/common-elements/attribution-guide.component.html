@@ -2,15 +2,102 @@
   <div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
     <div class="oppia-neutral-element protractor-test-neutral-element"></div>
 
-    <a class="oppia-attribution-image-link" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+    <a class="oppia-attribution-image-link" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
       <img alt="Creative Commons License" class="oppia-creative-commons-image" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
     </a><br>
-    <a class="oppia-attribution-link oppia-attribution-guide-text" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
+    <!-- This tag represents machine-readable license metadata. It should not be visible to users. -->
+    <div *ngIf="generateAttibutionIsAllowed" class="d-none">
+      <span xmlns:dct="http://purl.org/dc/terms/"
+            property="dct:title">
+        {{getExplorationTitle()}}
+      </span> by
+      <a xmlns:cc="http://creativecommons.org/ns#"
+         href="https://www.oppia.org"
+         property="cc:attributionName"
+         rel="cc:attributionURL">
+        Oppia
+      </a> is licensed under a
+      <a rel="license"
+         href="http://creativecommons.org/licenses/by-sa/4.0/">
+        Creative Commons Attribution-ShareAlike 4.0 International License
+      </a>.<br>Based on a work at
+      <a xmlns:dct="http://purl.org/dc/terms/"
+         href="{{getPageUrl()}}"
+         rel="dct:source">
+        {{getPageUrl()}}
+      </a>.
+    </div>
+    <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="#" (click)="showAttributionModal()">Generate Attribution</a>
+    <a *ngIf="!generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
+  </div>
+  <div *ngIf="getAttributionModalStatus()" class="attribution-modal-container">
+    <div (click)="hideAttributionModal()"></div>
+    <div>
+      <div class="attribution-mask" (click)="hideAttributionModal()"></div>
+      <div class="attribution-modal">
+        <button (click)="hideAttributionModal()" type="button" class="close p-1" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <div class="container pt-4">
+          <div class="font-weight-bold">How to attribute this lesson for sharing or reusing</div>
+          <span class="oppia-attribution-guide-description">You can find more information about how to attribute our lessons in our </span>
+          <a href="https://www.oppia.org/about#foundation" rel="noopener" target="_blank">
+            <span class="oppia-attribution-guide-link">Oppia Attribution Guide</span>
+            <span class="material-icons oppia-open-new-tab-icon">open_in_new</span>
+          </a>
+          <div class="attribution-html-section">
+            <div class="font-weight-bold">Attribute in HTML</div>
+            <ol class="attribute-instructions">
+              <li>Copy and paste the HTML</li>
+              <li>Make sure the link appears as "<u>Oppia</u> // <u>CC BY 4.0</u>"</li>
+            </ol>
+            <div data-trigger="manual"
+                 data-toggle="tooltip"
+                 data-title="Copied!"
+                 data-placement="bottom"
+                 data-offset="0 20"
+                 class="attribution-html-code text-monospace text-nowrap border border-secondary p-1 overflow-auto">
+              &lt;a href="{{getPageUrl()}}"&gt;Oppia&lt;/a&gt; // &lt;a href="https://creativecommons.org/licenses/by-sa/4.0"&gt;CC BY SA 4.0&lt;/a&gt;
+            </div>
+            <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
+          </div>
+          <div class="attribution-print-section">
+            <div class="font-weight-bold">Attribute in print</div>
+            <ol class="attribute-instructions">
+              <li>Copy and paste the credit</li>
+              <li>
+                Attach a copy of the
+                <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">
+                  <span class="oppia-attribution-licence-link">CC BY 4.0 license</span>
+                  <span class="material-icons oppia-open-new-tab-icon">open_in_new</span>
+                </a>
+              </li>
+            </ol>
+            <div data-trigger="manual"
+                 data-toggle="tooltip"
+                 data-title="Copied!"
+                 data-placement="bottom"
+                 data-offset="0 20"
+                 class="attribution-print-text text-monospace text-nowrap border border-secondary p-1 overflow-auto">
+              "{{getExplorationTitle()}}" by {{getAuthors()}}. Oppia. {{getPageUrl()}}
+            </div>
+            <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-print-text')">COPY</button>
+          </div>
+          <div class="sharing-section">
+            <div class="font-weight-bold">Share this lesson</div>
+            <sharing-links [layoutType]="'row center'"
+                           [layoutAlignType]="'end'"
+                           [shareType]="'exploration'"
+                           [explorationId]="123">
+            </sharing-links>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <style>
-  .oppia-cc-icon a.oppia-attribution-image-link,
-  .oppia-cc-icon a.oppia-attribution-link {
+  .oppia-cc-icon a.oppia-attribution-image-link {
     text-decoration: none;
   }
   .oppia-cc-icon a.oppia-attribution-image-link:focus > img {
@@ -23,13 +110,11 @@
   }
   .oppia-attribution-guide .oppia-cc-icon {
     bottom: 50px;
-    opacity: 0.4;
     position: fixed;
     right: 25px;
   }
 
   .oppia-attribution-guide .oppia-cc-icon:hover {
-    opacity: 0.7;
     text-decoration: none;
   }
 
@@ -40,10 +125,92 @@
 
   .oppia-attribution-guide .oppia-creative-commons-image {
     border-width: 0;
-    height: 24px;
+    height: 31px;
   }
 
   .oppia-attribution-guide .oppia-attribution-guide-text {
+    color: #008080;
     font-size: 10px;
+    text-decoration: underline;
+  }
+
+  .oppia-attribution-guide .attribution-modal {
+    background-color: #FFF;
+    -moz-box-shadow: 0 3px 5px 1px #ccc;
+    -webkit-box-shadow: 0 3px 5px 1px #ccc;
+    box-shadow: 0 3px 5px 1px #ccc;
+    margin: 0 10px 120px 10px;
+    max-height: 600px;
+    overflow: auto;
+    position: relative;
+    top: 68px;
+    z-index: 1200;
+  }
+
+  .oppia-attribution-guide .oppia-attribution-guide-link,
+  .oppia-attribution-guide .oppia-attribution-licence-link {
+    color: #000;
+    font-size: 0.8rem;
+    text-decoration: underline;
+  }
+
+  .oppia-attribution-guide .oppia-attribution-guide-description {
+    font-size: 0.8rem;
+  }
+
+  .oppia-attribution-guide .oppia-open-new-tab-icon {
+    color: #000;
+    font-size: 1rem;
+  }
+
+  .oppia-attribution-guide .attribution-mask {
+    height: 100%;
+    position: fixed;
+    width: 100%;
+    z-index: 1100;
+  }
+
+  .oppia-attribution-guide .attribution-modal-container {
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr minmax(auto, 320px);
+    height: 100%;
+    overflow: auto;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+  }
+
+  .oppia-attribution-guide .attribution-html-section {
+    padding-top: 1rem;
+  }
+
+  .oppia-attribution-guide .attribution-print-section {
+    padding-top: 2.7rem;
+  }
+
+  .oppia-attribution-guide .attribute-instructions {
+    font-size: 0.8rem;
+    padding-inline-start: 1rem;
+  }
+
+  .oppia-attribution-guide .attribution-copy-button {
+    background: #0D48A1;
+    border: none;
+    border-radius: 3px;
+    color: #ffffff;
+    min-width: 55px;
+  }
+
+  .oppia-attribution-guide .attribution-copy-button:hover {
+    background-color: #115fd4;
+  }
+
+  .oppia-attribution-guide .sharing-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-bottom: 1rem;
+    padding-top: 2rem;
+    width: 100%;
   }
 </style>

@@ -43,8 +43,8 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             content_count=20,
             incomplete_translation_language_codes=['hi', 'ar'],
             translation_counts={},
-            need_voice_artist_in_language_codes=['en'],
-            assigned_voice_artist_in_language_codes=[]
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
         ).put()
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='opportunity_id2',
@@ -56,20 +56,15 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             content_count=120,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
-            need_voice_artist_in_language_codes=['en'],
-            assigned_voice_artist_in_language_codes=[]
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
         ).put()
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (
@@ -180,12 +175,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             opportunity_models.SkillOpportunityModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            opportunity_models.SkillOpportunityModel
-            .has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_skill_opportunities(self):
         results, cursor, more = (

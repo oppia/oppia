@@ -40,10 +40,13 @@ require(
 angular.module('oppia').factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
-  'TranslationTabActiveModeService', 'INTERACTION_SPECS', function(
+  'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
+  'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
+  function(
       ExplorationStatesService, StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
-      TranslationTabActiveModeService, INTERACTION_SPECS) {
+      TranslationTabActiveModeService, COMPONENT_NAME_HINT,
+      COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
     var ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
@@ -61,7 +64,7 @@ angular.module('oppia').factory('TranslationStatusService', [
         available: false,
         needsUpdate: false,
       };
-      var availableLanguages = recordedVoiceovers.getVoiceoverLanguageCodes(
+      var availableLanguages = recordedVoiceovers.getLanguageCodes(
         contentId);
       if (availableLanguages.indexOf(langCode) !== -1) {
         availabilityStatus.available = true;
@@ -79,7 +82,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       };
       langCode = TranslationLanguageService.getActiveLanguageCode();
       var availableLanguages = (
-        writtenTranslations.getTranslationsLanguageCodes(contentId));
+        writtenTranslations.getLanguageCodes(contentId));
       if (availableLanguages.indexOf(langCode) !== -1) {
         var writtenTranslation = (
           writtenTranslations.getWrittenTranslation(contentId, langCode));
@@ -125,7 +128,7 @@ angular.module('oppia').factory('TranslationStatusService', [
           var noTranslationCount = 0;
           var recordedVoiceovers = (
             ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
-          var allContentId = recordedVoiceovers.getAllContentId();
+          var allContentIds = recordedVoiceovers.getAllContentIds();
           var interactionId = ExplorationStatesService.getInteractionIdMemento(
             stateName);
           // This is used to prevent users from adding unwanted hints audio, as
@@ -135,10 +138,28 @@ angular.module('oppia').factory('TranslationStatusService', [
           if (!interactionId ||
             INTERACTION_SPECS[interactionId].is_linear ||
             INTERACTION_SPECS[interactionId].is_terminal) {
-            allContentId = ['content'];
+            var contentIdToRemove = _getContentIdListRelatedToComponent(
+              COMPONENT_NAME_HINT, allContentIds);
+            // Excluding default_outcome content status as default outcome's
+            // content is left empty so the translation or voiceover is not
+            // required.
+            contentIdToRemove.push('default_outcome');
+            allContentIds = allContentIds.filter(function(contentId) {
+              return contentIdToRemove.indexOf(contentId) < 0;
+            });
           }
-          explorationContentRequiredCount += allContentId.length;
-          allContentId.forEach(function(contentId) {
+
+          // As of now, there are no ways of contributing rule input
+          // translations. To have an accurate representation of the progress
+          // bar, we remove rule input content ids.
+          const contentIdsToRemove = _getContentIdListRelatedToComponent(
+            COMPONENT_NAME_RULE_INPUT, allContentIds);
+          allContentIds = allContentIds.filter(function(contentId) {
+            return contentIdsToRemove.indexOf(contentId) < 0;
+          });
+
+          explorationContentRequiredCount += allContentIds.length;
+          allContentIds.forEach(function(contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(
               stateName, contentId);
             if (!availabilityStatus.available) {
@@ -160,7 +181,7 @@ angular.module('oppia').factory('TranslationStatusService', [
           if (noTranslationCount === 0 && !stateNeedsUpdate) {
             stateWiseStatusColor[stateName] = ALL_ASSETS_AVAILABLE_COLOR;
           } else if (
-            noTranslationCount === allContentId.length && !stateNeedsUpdate) {
+            noTranslationCount === allContentIds.length && !stateNeedsUpdate) {
             stateWiseStatusColor[stateName] = NO_ASSETS_AVAILABLE_COLOR;
           } else {
             stateWiseStatusColor[stateName] = FEW_ASSETS_AVAILABLE_COLOR;
@@ -169,17 +190,9 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
-    var _getContentIdListRelatedToComponent = function(componentName) {
+    var _getContentIdListRelatedToComponent = function(
+        componentName, availableContentIds) {
       var contentIdList = [];
-      var availableContentIds = [];
-
-      if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        var writtenTranslations = StateWrittenTranslationsService.displayed;
-        availableContentIds = writtenTranslations.getAllContentId();
-      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-        var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
-        availableContentIds = recordedVoiceovers.getAllContentId();
-      }
 
       if (availableContentIds.length > 0) {
         if (componentName === 'solution' || componentName === 'content') {
@@ -201,7 +214,8 @@ angular.module('oppia').factory('TranslationStatusService', [
     };
 
     var _getActiveStateComponentStatus = function(componentName) {
-      var contentIdList = _getContentIdListRelatedToComponent(componentName);
+      var contentIdList = _getContentIdListRelatedToComponent(
+        componentName, _getAvailableContentIds());
       var availableAudioCount = 0;
       if (contentIdList) {
         contentIdList.forEach(function(contentId) {
@@ -221,8 +235,22 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
+    var _getAvailableContentIds = function() {
+      var availableContentIds = [];
+      if (TranslationTabActiveModeService.isTranslationModeActive()) {
+        var writtenTranslations = StateWrittenTranslationsService.displayed;
+        availableContentIds = writtenTranslations.getAllContentIds();
+      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
+        availableContentIds = recordedVoiceovers.getAllContentIds();
+      }
+
+      return availableContentIds;
+    };
+
     var _getActiveStateComponentNeedsUpdateStatus = function(componentName) {
-      var contentIdList = _getContentIdListRelatedToComponent(componentName);
+      var contentIdList = _getContentIdListRelatedToComponent(
+        componentName, _getAvailableContentIds());
       var contentId = null;
       if (contentIdList) {
         for (var index in contentIdList) {

@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 import {
   StoryContentsBackendDict,
@@ -28,7 +28,7 @@ import {
   StoryContentsObjectFactory
 } from 'domain/story/StoryContentsObjectFactory';
 
-interface StoryBackendDict {
+export interface StoryBackendDict {
   'id': string;
   'title': string;
   'description': string;

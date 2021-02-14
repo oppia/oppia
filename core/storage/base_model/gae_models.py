@@ -46,15 +46,32 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'DELETE_AT_END',
     # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
-    # Models that should only be kept if published.
-    'KEEP_IF_PUBLIC',
+    # Models that should be pseudonymized if they are published and otherwise
+    # (when private) deleted.
+    'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE',
     # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
 )
 
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    # Indicates that a model's field is to be exported.
     'EXPORTED',
+    # Indicates that the value of the field is exported as the key in the
+    # Takeout dict.
+    'EXPORTED_AS_KEY_FOR_TAKEOUT_DICT',
+    # Indicates that a model's field should not be exported.
     'NOT_APPLICABLE'
+)
+
+MODEL_ASSOCIATION_TO_USER = utils.create_enum(  # pylint: disable=invalid-name
+    # Indicates that a model has a single instance per user.
+    'ONE_INSTANCE_PER_USER',
+    # Indicates that a model can be shared by multiple users.
+    'ONE_INSTANCE_SHARED_ACROSS_USERS',
+    # Indicates that a model has multiple instances, specific to a user.
+    'MULTIPLE_INSTANCES_PER_USER',
+    # Indicates that a model should not be exported.
+    'NOT_CORRESPONDING_TO_USER'
 )
 
 # Constant used when retrieving big number of models.
@@ -68,6 +85,10 @@ ID_LENGTH = 12
 
 class BaseModel(datastore_services.Model):
     """Base model for all persistent object storage classes."""
+
+    # Specifies whether the model's id is used as a key in Takeout. By default,
+    # the model's id is not used as the key for the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = False
 
     # When this entity was first created. This value should only be modified by
     # the update_timestamps method.
@@ -164,14 +185,34 @@ class BaseModel(datastore_services.Model):
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
+    @staticmethod
+    def get_model_association_to_user():
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_model_association_to_user() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
+
     @classmethod
     def get_export_policy(cls):
-        """Model creation time is not relevant to user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return {
             'created_on': EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': EXPORT_POLICY.NOT_APPLICABLE
         }
+
+    @classmethod
+    def get_field_names_for_takeout(cls):
+        """Returns a dictionary containing a mapping from field names to
+        export dictionary keys for fields whose export dictionary key does
+        not match their field name.
+        """
+        return {}
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -260,9 +301,8 @@ class BaseModel(datastore_services.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the model.
         """
-        for entity in entities:
-            entity.update_timestamps(
-                update_last_updated_time=update_last_updated_time)
+        datastore_services.update_timestamps_multi(
+            entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def put_multi(cls, entities):
@@ -273,19 +313,6 @@ class BaseModel(datastore_services.Model):
                 be stored.
         """
         datastore_services.put_multi(entities)
-
-    @classmethod
-    def put_multi_async(cls, entities):
-        """Stores the given datastore_services.Model instances asynchronously.
-
-        Args:
-            entities: list(datastore_services.Model). The list of model
-                instances to be stored.
-
-        Returns:
-            list(future). A list of futures.
-        """
-        return datastore_services.put_multi_async(entities)
 
     @classmethod
     def delete_multi(cls, entities):
@@ -392,6 +419,69 @@ class BaseModel(datastore_services.Model):
             result[2])
 
 
+class BaseHumanMaintainedModel(BaseModel):
+    """A model that tracks the last time it was updated by a human.
+
+    When the model is updated by a human, use `self.put_for_human()` to store
+    it. For example: after the title of an exploration is changed
+    by its creator.
+
+    Otherwise, when the model is updated by some non-human or automated process,
+    use `self.put_for_bot()`. For example: by a one-off job updating the
+    schema version of a property.
+    """
+
+    # When this entity was last updated on behalf of a human.
+    last_updated_by_human = (
+        datastore_services.DateTimeProperty(indexed=True, required=True))
+
+    def put(self):
+        """Unsupported operation on human-maintained models."""
+        raise NotImplementedError('Use put_for_human or put_for_bot instead')
+
+    def put_for_human(self):
+        """Stores the model instance on behalf of a human."""
+        self.last_updated_by_human = datetime.datetime.utcnow()
+        return super(BaseHumanMaintainedModel, self).put()
+
+    def put_for_bot(self):
+        """Stores the model instance on behalf of a non-human."""
+        return super(BaseHumanMaintainedModel, self).put()
+
+    @classmethod
+    def put_multi(cls, unused_instances):
+        """Unsupported operation on human-maintained models."""
+        raise NotImplementedError(
+            'Use put_multi_for_human or put_multi_for_bot instead')
+
+    @classmethod
+    def put_multi_for_human(cls, instances):
+        """Stores the given model instances on behalf of a human.
+
+        Args:
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        now = datetime.datetime.utcnow()
+        for instance in instances:
+            instance.last_updated_by_human = now
+        return super(BaseHumanMaintainedModel, cls).put_multi(instances)
+
+    @classmethod
+    def put_multi_for_bot(cls, instances):
+        """Stores the given model instances on behalf of a non-human.
+
+        Args:
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        return super(BaseHumanMaintainedModel, cls).put_multi(instances)
+
+
 class BaseCommitLogEntryModel(BaseModel):
     """Base Model for the models that store the log of commits to a
     construct.
@@ -419,10 +509,26 @@ class BaseCommitLogEntryModel(BaseModel):
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of
+        Takeout, since commits do not contain any personal data of the user.
+        """
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data corresponding to a user that
+        requires pseudonymization: user_id field.
+        """
+        return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def get_export_policy(cls):
-        """The history of commits is not relevant for the purposes of
-        Takeout.
+        """Model contains data corresponding to a user,
+        but this isn't exported because the history of commits is not
+        relevant to a user for the purposes of Takeout, since commits do not
+        contain any personal user data.
         """
         return dict(BaseModel.get_export_policy(), **{
             'user_id': EXPORT_POLICY.NOT_APPLICABLE,
@@ -978,10 +1084,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError as e:
+        except cls.EntityNotFoundError:
             if not strict:
                 return None
-            raise e
+            python_utils.reraise_exception()
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):
@@ -1117,10 +1223,18 @@ class VersionedModel(BaseModel):
             'created_on_ms': utils.get_time_in_millisecs(model.created_on),
         } for (ind, model) in enumerate(returned_models)]
 
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of
+        Takeout, since commits do not contain any personal user data.
+        """
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """The history of commits is not relevant for the purposes of
-        Takeout.
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits is not relevant for the purposes of
+        Takeout, since commits do not contain any personal user data.
         """
         return dict(BaseModel.get_export_policy(), **{
             'version': EXPORT_POLICY.NOT_APPLICABLE
@@ -1132,6 +1246,9 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     The id of this model is computed using VersionedModel.get_snapshot_id().
     """
+
+    # The ids of SnapshotMetadataModels are used as Takeout keys.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The id of the user who committed this revision.
     committer_id = (
@@ -1154,14 +1271,19 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Metadata models should always be pseudonymized in the context of
-        their parent models.
+        """Model contains data corresponding to a user that requires
+        pseudonymization: committer_id field.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """There are multiple SnapshotMetadataModels per user."""
+        return MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Snapshot Metadata is relevant to the user for Takeout."""
+        """Model contains data to export/delete corresponding to a user."""
         return dict(BaseModel.get_export_policy(), **{
             'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': EXPORT_POLICY.EXPORTED,
@@ -1259,27 +1381,16 @@ class BaseSnapshotContentModel(BaseModel):
     content = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
-    def get_deletion_policy():
-        """The content models do not contain any user ID fields directly,
-        the user ID fields might be hidden inside the content field (because
-        content field contains all the fields from the parent model), e.g. the
-        owner_ids or viewer_ids in the ExplorationRightsModel that are then in
-        the content field of ExplorationRightsSnapshotContentModel.
-
-        The pseudonymization of these models is handled in the wipeout service
-        (in the relevant pseudonymization function, e.g. in
-        _pseudonymize_activity_models_with_associated_rights_models() for
-        CollectionRightsModel or ExplorationRightsModel), based on
-        the content_user_ids field of the relevant metadata model.
-        E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
-        used to pseudonymize the relevant fields in the corresponding
-        ExplorationRightsSnapshotContentModel.
+    def get_model_association_to_user():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
         """
-        return DELETION_POLICY.NOT_APPLICABLE
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """The contents of snapshots are not relevant to the user for
+        """Model contains data corresponding to a user, but this isn't exported
+        because the contents of snapshots are note relevant to the user for
         Takeout.
         """
         return dict(BaseModel.get_export_policy(), **{

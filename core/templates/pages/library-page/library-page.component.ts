@@ -44,13 +44,13 @@ require('pages/library-page/library-page.constants.ajs.ts');
 angular.module('oppia').component('libraryPage', {
   template: require('./library-page.component.html'),
   controller: [
-    '$http', '$log', '$scope', '$timeout', '$window',
+    '$http', '$log', '$rootScope', '$scope', '$timeout', '$window',
     'I18nLanguageCodeService', 'KeyboardShortcutService', 'LoaderService',
     'SearchService', 'UrlInterpolationService',
     'UserService', 'WindowDimensionsService', 'LIBRARY_PAGE_MODES',
     'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
     function(
-        $http, $log, $scope, $timeout, $window,
+        $http, $log, $rootScope, $scope, $timeout, $window,
         I18nLanguageCodeService, KeyboardShortcutService, LoaderService,
         SearchService, UrlInterpolationService,
         UserService, WindowDimensionsService, LIBRARY_PAGE_MODES,
@@ -307,6 +307,9 @@ angular.module('oppia').component('libraryPage', {
               } else {
                 LoaderService.hideLoadingScreen();
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
 
             I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(

@@ -35,7 +35,10 @@ class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class SkillModel(base_models.VersionedModel):
@@ -89,21 +92,8 @@ class SkillModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Skill should be kept if it is published."""
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether SkillModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_merged_skills(cls):
@@ -146,9 +136,14 @@ class SkillModel(base_models.VersionedModel):
         skill_commit_log_entry.update_timestamps()
         skill_commit_log_entry.put()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconceptions_schema_version':
@@ -166,6 +161,22 @@ class SkillModel(base_models.VersionedModel):
             'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    @classmethod
+    def get_by_description(cls, description):
+        """Gets SkillModel by description. Returns None if the skill with
+        description doesn't exist.
+
+        Args:
+            description: str. The description of the skill.
+
+        Returns:
+            SkillModel|None. The skill model of the skill or None if not
+            found.
+        """
+        return SkillModel.query().filter(
+            cls.description == description).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
+
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.
@@ -178,13 +189,6 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     # The id of the skill being edited.
     skill_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """Skill commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def _get_instance_id(cls, skill_id, version):
@@ -200,9 +204,17 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'skill-%s-%s' % (skill_id, version)
 
+    @staticmethod
+    def get_model_association_to_user():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -248,25 +260,17 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Skill summary should be kept if associated skill is published."""
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether SkillSummaryModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,

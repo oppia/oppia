@@ -35,17 +35,17 @@ export class AdminDataService {
     this.dataPromise = null;
   }
 
-  _getDataAsync(): Promise<AdminPageData> {
+  async _getDataAsync(): Promise<AdminPageData> {
     if (this.dataPromise) {
       return this.dataPromise;
     }
 
-    this.dataPromise = this.adminBackendApiService.getData();
+    this.dataPromise = this.adminBackendApiService.getDataAsync();
 
     return this.dataPromise;
   }
 
-  getDataAsync(): Promise<AdminPageData> {
+  async getDataAsync(): Promise<AdminPageData> {
     return this._getDataAsync();
   }
 }

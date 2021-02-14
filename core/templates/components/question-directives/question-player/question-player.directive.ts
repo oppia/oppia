@@ -120,6 +120,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/user.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -140,8 +141,8 @@ angular.module('oppia').directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$sanitize', '$sce', '$scope', '$uibModal', '$window',
-        'ExplorationPlayerStateService', 'PlayerPositionService',
+        '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
+        '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
         'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
         'UserService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
@@ -149,8 +150,8 @@ angular.module('oppia').directive('questionPlayer', [
         'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
         'WRONG_ANSWER_PENALTY_FOR_MASTERY',
         function(
-            $location, $sanitize, $sce, $scope, $uibModal, $window,
-            ExplorationPlayerStateService, PlayerPositionService,
+            $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
+            $window, ExplorationPlayerStateService, PlayerPositionService,
             QuestionPlayerStateService, SkillMasteryBackendApiService,
             UserService, COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
@@ -192,12 +193,12 @@ angular.module('oppia').directive('questionPlayer', [
             var iconHtml = '';
             if (actionButtonType === 'BOOST_SCORE') {
               iconHtml = `<picture>
-              <source type="image/webp" 
+              <source type="image/webp"
               srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
-              <source type="image/png" 
+              <source type="image/png"
               srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
               <img alt=""
-                   class="action-button-icon" 
+                   class="action-button-icon"
                    src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
               </picture>`;
             } else if (actionButtonType === 'RETRY_SESSION') {
@@ -465,7 +466,7 @@ angular.module('oppia').directive('questionPlayer', [
               updateMasteryPerSkillMapping(masteryChangePerQuestion);
             }
 
-            SkillMasteryBackendApiService.updateSkillMasteryDegrees(
+            SkillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
               ctrl.masteryPerSkillMapping);
           };
 
@@ -579,6 +580,9 @@ angular.module('oppia').directive('questionPlayer', [
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
             // The initResults function is written separately since it is also
             // called in $scope.$on when some external events are triggered.

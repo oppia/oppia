@@ -131,6 +131,7 @@
         font-size: 1.2em;
         padding-bottom: 4vh;
         padding-left: 60px;
+        padding-right: 45px;
         text-align: left;
       }
 
@@ -166,7 +167,7 @@
       }
 
       .oppia-story-viewer-mobile-card-description-box {
-        max-height: 180px;
+        max-height: 220px;
         min-height: 120px;
         padding: 15px;
         width: 185px;
@@ -187,15 +188,28 @@
         font-size: 26px;
         font-weight: 600;
         letter-spacing: 0.43px;
-        margin-left: 14px;
         padding-top: 3px;
+      }
+
+      @media (max-width: 850px) {
+        .oppia-chapter-title {
+          text-decoration: underline;
+        }
       }
 
       @media (max-width: 640px) {
         .oppia-story-viewer-title {
+          font-size: 2em;
           margin-top: 20px;
           padding-left: 40px;
           padding-top: 0px;
+        }
+
+        .oppia-story-viewer-description {
+          font-size: 1em;
+          padding-left: 40px;
+          padding-right: 40px;
+          text-align: justify;
         }
 
         .oppia-lesson-track {

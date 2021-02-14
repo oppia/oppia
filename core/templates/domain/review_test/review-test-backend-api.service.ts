@@ -38,8 +38,8 @@ export class ReviewTestBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
-
-  _fetchReviewTestData(storyUrlFragment: string): Promise<ReviewTest> {
+  async _fetchReviewTestDataAsync(storyUrlFragment: string):
+    Promise<ReviewTest> {
     return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
@@ -58,9 +58,9 @@ export class ReviewTestBackendApiService {
       throw new Error(errorResponse.error.error);
     });
   }
-
-  fetchReviewTestData(storyUrlFragment: string): Promise<ReviewTest> {
-    return this._fetchReviewTestData(storyUrlFragment);
+  async fetchReviewTestDataAsync(storyUrlFragment: string):
+    Promise<ReviewTest> {
+    return this._fetchReviewTestDataAsync(storyUrlFragment);
   }
 }
 

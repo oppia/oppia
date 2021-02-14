@@ -28,6 +28,10 @@ import python_utils
 
 from .. import concurrent_task_utils
 
+STRICT_TS_CONFIG_FILE_NAME = 'tsconfig-strict.json'
+STRICT_TS_CONFIG_FILEPATH = os.path.join(
+    os.getcwd(), STRICT_TS_CONFIG_FILE_NAME)
+
 WEBPACK_CONFIG_FILE_NAME = 'webpack.common.config.ts'
 WEBPACK_CONFIG_FILEPATH = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
 
@@ -237,6 +241,37 @@ class CustomLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_filenames_in_tsconfig_strict_are_sorted(self):
+        """Checks if the files in strict TS config are sorted
+        alphabetically.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
+        """
+        name = 'Sorted strict TS config'
+
+        failed = False
+        error_messages = []
+
+        with python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
+            strict_ts_config = json.load(f)
+
+        # Remove .ts extension from filepath for sorting to ensure that
+        # spec files are always below the main files.
+        files = [path[:-3] for path in strict_ts_config['files']]
+        sorted_files = sorted(files)
+
+        if files != sorted_files:
+            failed = True
+            error_message = (
+                'Files in %s are not alphabetically sorted.' % (
+                    STRICT_TS_CONFIG_FILE_NAME))
+            error_messages.append(error_message)
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -250,6 +285,8 @@ class CustomLintChecksManager(python_utils.OBJECT):
         linter_stdout.append(self.check_skip_files_in_app_dev_yaml())
         linter_stdout.append(self.check_third_party_libs_type_defs())
         linter_stdout.append(self.check_webpack_config_file())
+        linter_stdout.append(
+            self.check_filenames_in_tsconfig_strict_are_sorted())
 
         return linter_stdout
 

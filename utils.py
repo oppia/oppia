@@ -30,6 +30,7 @@ import string
 import sys
 import time
 import unicodedata
+import zlib
 
 from constants import constants
 import feconf
@@ -212,7 +213,7 @@ def dict_from_yaml(yaml_str):
         retrieved_dict = yaml.safe_load(yaml_str)
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
-    except yaml.YAMLError as e:
+    except (AssertionError, yaml.YAMLError) as e:
         raise InvalidInputException(e)
 
 
@@ -728,6 +729,28 @@ def require_valid_meta_tag_content(meta_tag_content):
             % constants.MAX_CHARS_IN_META_TAG_CONTENT)
 
 
+def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
+    """Generic page title fragment validation.
+
+    Args:
+        page_title_fragment_for_web: str. The page title fragment to validate.
+
+    Raises:
+        Exception. Page title fragment is not a string.
+        Exception. Page title fragment is too lengthy.
+    """
+    max_chars_in_page_title_frag_for_web = (
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
+        raise ValidationError(
+            'Expected page title fragment to be a string, received %s'
+            % page_title_fragment_for_web)
+    if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
+        raise ValidationError(
+            'Page title fragment should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+
+
 def capitalize_string(input_string):
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
@@ -824,6 +847,29 @@ def get_supported_audio_language_description(language_code):
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
+def is_user_id_valid(
+        user_id, allow_system_user_id=False, allow_pseudonymous_id=False):
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
+
+    Args:
+        user_id: str. The user ID to be checked.
+        allow_system_user_id: bool. Whether to allow system user ID.
+        allow_pseudonymous_id: bool. Whether to allow pseudonymized ID.
+
+    Returns:
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
+    """
+    if allow_system_user_id and user_id in feconf.SYSTEM_USERS.keys():
+        return True
+
+    if allow_pseudonymous_id and is_pseudonymous_id(user_id):
+        return True
+
+    return bool(re.match(feconf.USER_ID_REGEX, user_id))
+
+
 def is_pseudonymous_id(user_id):
     """Check that the ID is a pseudonymous one.
 
@@ -833,10 +879,7 @@ def is_pseudonymous_id(user_id):
     Returns:
         bool. Whether the ID represents a pseudonymous user.
     """
-    return all((
-        user_id.islower(),
-        user_id.startswith('pid_'),
-        len(user_id) == feconf.USER_ID_LENGTH))
+    return bool(re.match(feconf.PSEUDONYMOUS_ID_REGEX, user_id))
 
 
 def unescape_encoded_uri_component(escaped_string):
@@ -906,6 +949,30 @@ def get_hashable_value(value):
             (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
+
+
+def compress_to_zlib(data):
+    """Compress the data to zlib format for efficient storage and communication.
+
+    Args:
+        data: str. Data to be compressed.
+
+    Returns:
+        str. Compressed data string.
+    """
+    return zlib.compress(data)
+
+
+def decompress_from_zlib(data):
+    """Decompress the zlib compressed data.
+
+    Args:
+        data: str. Data to be decompressed.
+
+    Returns:
+        str. Decompressed data string.
+    """
+    return zlib.decompress(data)
 
 
 def compute_list_difference(list_a, list_b):

@@ -81,7 +81,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               SkillEditorStateService.getSkill().getDescription());
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
-                $scope.skill.getConceptCard().getExplanation().getHtml(),
+                $scope.skill.getConceptCard().getExplanation().html,
               displayedWorkedExamples:
                 $scope.skill.getConceptCard().getWorkedExamples()
             };
@@ -143,13 +143,13 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                   result.workedExampleQuestionHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(
-                    ).getAllContentId(),
+                    ).getAllContentIds(),
                     COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
                 SubtitledHtmlObjectFactory.createDefault(
                   result.workedExampleExplanationHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(
-                    ).getAllContentId(),
+                    ).getAllContentIds(),
                     COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
               );
               SkillUpdateService.addWorkedExample(
@@ -181,6 +181,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 skillWorkedExamples: () => skillWorkedExamples
               },
               controller: 'SkillPreviewModalController'
+            }).result.then(() => {}, () => {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

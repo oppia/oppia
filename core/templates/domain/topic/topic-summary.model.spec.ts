@@ -38,7 +38,8 @@ describe('Topic summary model', () => {
       classroom: 'math',
       url_fragment: 'topic-name',
       thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA'
+      thumbnail_bg_color: '#C6DCDA',
+      is_published: false
     };
     _sampleTopicSummary = TopicSummary.createFromBackendDict(
       sampleTopicSummaryBackendDict);
@@ -61,5 +62,6 @@ describe('Topic summary model', () => {
     expect(_sampleTopicSummary.getClassroom()).toEqual('math');
     expect(_sampleTopicSummary.getThumbnailFilename()).toEqual('image.svg');
     expect(_sampleTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
+    expect(_sampleTopicSummary.isTopicPublished()).toBeFalse();
   });
 });

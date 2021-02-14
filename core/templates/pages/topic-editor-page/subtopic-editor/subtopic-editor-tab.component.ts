@@ -23,7 +23,7 @@ require('domain/utilities/url-interpolation.service.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const subtopicConstants2 = require('constants.ts');
+import subtopicConstants2 from 'assets/constants';
 
 require('domain/question/question-backend-api.service.ts');
 require('domain/topic/topic-update.service.ts');
@@ -187,7 +187,7 @@ angular.module('oppia').component('subtopicEditorTab', {
                 ctrl.subtopicPage.getPageContents().getHtml()) {
           var subtitledHtml = angular.copy(
             ctrl.subtopicPage.getPageContents().getSubtitledHtml());
-          subtitledHtml.setHtml(ctrl.htmlData);
+          subtitledHtml.html = ctrl.htmlData;
           TopicUpdateService.setSubtopicPageContentsHtml(
             ctrl.subtopicPage, ctrl.subtopic.getId(), subtitledHtml);
           TopicEditorStateService.setSubtopicPage(ctrl.subtopicPage);

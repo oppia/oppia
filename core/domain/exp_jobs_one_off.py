@@ -31,7 +31,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import html_validation_service
-from core.domain import image_validation_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
@@ -200,7 +199,8 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states, states_schema_version,
+                    versioned_exploration_states,
+                    states_schema_version,
                     item.id)
                 states_schema_version += 1
             except Exception as e:
@@ -547,74 +547,6 @@ class RTECustomizationArgsValidationOneOffJob(
         yield (key, output_values)
 
 
-class PopulateXmlnsAttributeInExplorationMathSvgImagesJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to populate xmlns attribute in the math-expression svg
-    images.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, item.id))
-        filepaths = fs.listdir('image')
-        count_of_unchanged_svgs = 0
-        filenames_of_modified_svgs = []
-        for filepath in filepaths:
-            filename = filepath.split('/')[-1]
-            if not re.match(constants.MATH_SVG_FILENAME_REGEX, filename):
-                continue
-            old_svg_image = fs.get(filepath)
-            new_svg_image = (
-                html_validation_service.get_svg_with_xmlns_attribute(
-                    old_svg_image))
-            if new_svg_image == old_svg_image:
-                count_of_unchanged_svgs += 1
-                continue
-            try:
-                image_validation_services.validate_image_and_filename(
-                    new_svg_image, filename)
-            except Exception as e:
-                yield (
-                    'FAILED validation',
-                    'Exploration with id %s failed image validation for the '
-                    'filename %s with following error: %s' % (
-                        item.id, filename, e))
-            else:
-                fs.commit(
-                    filepath.encode('utf-8'), new_svg_image,
-                    mimetype='image/svg+xml')
-                filenames_of_modified_svgs.append(filename)
-        if count_of_unchanged_svgs:
-            yield ('UNCHANGED', count_of_unchanged_svgs)
-        if len(filenames_of_modified_svgs) > 0:
-            yield (
-                'SUCCESS - CHANGED Exp Id: %s' % item.id,
-                filenames_of_modified_svgs)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == 'UNCHANGED':
-            final_values = [ast.literal_eval(value) for value in values]
-            yield (key, sum(final_values))
-        else:
-            exp_id_index = key.find('Exp Id:')
-            if exp_id_index == -1:
-                yield (key, values)
-            else:
-                final_values = [ast.literal_eval(value) for value in values]
-                output_values = list(set().union(*final_values))
-                output_values.append(key[exp_id_index:])
-                yield (key[:exp_id_index - 1], output_values)
-
-
 class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to audit math SVGs on the server that do not have xmlns
@@ -647,37 +579,6 @@ class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the translator_ids from the ExpSummaryModel.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExpSummaryModel]
-
-    @staticmethod
-    def map(exp_summary_model):
-        # This is the only way to remove the field from the model,
-        # see https://stackoverflow.com/a/15116016/3688189 and
-        # https://stackoverflow.com/a/12701172/3688189.
-        if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
-            del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
-            if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
-                del exp_summary_model._values['translator_ids']  # pylint: disable=protected-access
-            exp_summary_model.update_timestamps(update_last_updated_time=False)
-            exp_summary_model.put()
-            yield ('SUCCESS_REMOVED - ExpSummaryModel', exp_summary_model.id)
-        else:
-            yield (
-                'SUCCESS_ALREADY_REMOVED - ExpSummaryModel',
-                exp_summary_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        """Implements the reduce function for this job."""
-        yield (key, len(values))
 
 
 def regenerate_exp_commit_log_model(exp_model, version):

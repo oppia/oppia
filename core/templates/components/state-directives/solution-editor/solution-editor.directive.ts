@@ -35,6 +35,12 @@ require(
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solution.service');
 
 angular.module('oppia').directive('solutionEditor', [
   'ExplorationHtmlFormatterService',

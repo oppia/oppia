@@ -104,27 +104,6 @@ describe('Story contents object factory', () => {
     expect(storyContents.getNodes()[0].getTitle()).toEqual('Title 1');
   });
 
-  it('should correctly correctly validate case where prerequisite skills ' +
-     'are not acquired by the user', () => {
-    _sampleStoryContents.addNode('Title 2');
-    _sampleStoryContents.addDestinationNodeIdToNode('node_1', 'node_3');
-    _sampleStoryContents.addPrerequisiteSkillIdToNode('node_3', 'skill_3');
-    expect(_sampleStoryContents.validate()).toEqual([
-      'The prerequisite skill with id skill_3 was not completed before node ' +
-      'with id node_3 was unlocked'
-    ]);
-  });
-
-  it('should correctly correctly validate the case where the story graph ' +
-    'has loops', () => {
-    _sampleStoryContents.addNode('Title 2');
-    _sampleStoryContents.addDestinationNodeIdToNode('node_2', 'node_3');
-    _sampleStoryContents.addDestinationNodeIdToNode('node_3', 'node_1');
-    expect(_sampleStoryContents.validate()).toEqual([
-      'Loops are not allowed in the node graph'
-    ]);
-  });
-
   it('should correctly throw error when node id is invalid for any function',
     () => {
       expect(() => {

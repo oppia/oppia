@@ -18,12 +18,8 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-
 import { StateGraphLayoutService } from
   'components/graph-services/graph-layout.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from
@@ -45,12 +41,19 @@ import { StateRecordedVoiceoversService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 import * as d3 from 'd3';
 import { of } from 'rxjs';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+
 
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
@@ -99,18 +102,17 @@ describe('State Graph Visualization directive', function() {
       reachableFromEnd: false
     }
   };
-
-  beforeEach(angular.mock.module('directiveTemplates'));
+  beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('directiveTemplates'));
 
   beforeEach(function() {
     stateGraphLayoutService = TestBed.get(StateGraphLayoutService);
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
@@ -140,6 +142,9 @@ describe('State Graph Visualization directive', function() {
       'RouterService', {
         onCenterGraph: mockCenterGraphEventEmitter
       });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');

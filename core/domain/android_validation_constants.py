@@ -27,7 +27,7 @@ VALID_INTERACTION_IDS = [
     'AlgebraicExpressionInput', 'Continue', 'DragAndDropSortInput',
     'EndExploration', 'FractionInput', 'ImageClickInput', 'ItemSelectionInput',
     'MathEquationInput', 'MultipleChoiceInput', 'NumericExpressionInput',
-    'NumericInput', 'NumberWithUnits', 'TextInput'
+    'NumericInput', 'NumberWithUnits', 'RatioExpressionInput', 'TextInput'
 ]
 
 SUPPORTED_LANGUAGES = ['en']

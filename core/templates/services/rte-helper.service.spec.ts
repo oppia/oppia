@@ -99,7 +99,8 @@ describe('Rte Helper Service', function() {
           }],
           ui_config: {
             placeholder: 'Description of Image (Example : George Handel,' +
-            ' 18th century baroque composer)'
+            ' 18th century baroque composer)',
+            rows: 3
           }
         },
         default_value: ''

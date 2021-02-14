@@ -30,7 +30,8 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(GaeAppIdentityServicesTests, self).setUp()
-        self.expected_application_id = test_utils.TestBase.EXPECTED_TEST_APP_ID
+        self.expected_application_id = (
+            test_utils.AppEngineTestBase.EXPECTED_TEST_APP_ID)
         self.expected_bucket_name = (
             '%s-resources' % self.expected_application_id)
 

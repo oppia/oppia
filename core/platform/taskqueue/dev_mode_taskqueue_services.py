@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from core.platform.taskqueue import cloud_tasks_emulator
+import feconf
 
 import requests
 
@@ -54,7 +55,8 @@ def _task_handler(url, payload, queue_name, task_name=None):
     requests.post(
         complete_url,
         json=payload,
-        headers=headers)
+        headers=headers,
+        timeout=feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)
 
 
 CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)

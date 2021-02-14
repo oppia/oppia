@@ -34,17 +34,21 @@ import feconf
     [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
 
 
+class ExplorationSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            exp_models.ExplorationSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class ExplorationModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationModel class."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExplorationModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            exp_models.ExplorationModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -67,12 +71,49 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExplorationContextModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
+class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    EXP_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self):
+        self.assertEqual(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
+        exp_models.ExplorationRightsModel(
+            id=self.EXP_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.1
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+        self.assertTrue(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_2))
         self.assertFalse(
-            exp_models.ExplorationContextModel
-            .has_reference_to_user_id('any_id'))
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+        self.assertFalse(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id('x_id'))
 
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
@@ -166,7 +207,8 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExplorationRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -424,7 +466,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exp_models.ExplorationCommitLogEntryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         commit = exp_models.ExplorationCommitLogEntryModel.create(
@@ -528,7 +571,8 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExpSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         exp_models.ExpSummaryModel(

@@ -10,7 +10,7 @@
 
       <span ng-if="$ctrl.StateNameService.isStateNameEditorShown()">
         <form class="form-horizontal" role="form" ng-submit="$ctrl.saveStateNameAndRefresh($ctrl.tmpStateName)">
-          <input type="text" ng-model="$ctrl.tmpStateName" focus-on="stateNameEditorOpened" class="protractor-test-state-name-input">
+          <input type="text" ng-model="$ctrl.tmpStateName" maxlength="{{$ctrl.maxLen}}" focus-on="stateNameEditorOpened" class="protractor-test-state-name-input">
           <button type="submit" class="btn btn-success btn-sm protractor-test-state-name-submit">Save</button>
         </form>
       </span>

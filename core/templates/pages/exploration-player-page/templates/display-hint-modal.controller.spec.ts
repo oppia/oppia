@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for DisplayHintModalController.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
 import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -25,6 +30,8 @@ import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 
 import { Subscription } from 'rxjs';
 
@@ -42,12 +49,15 @@ describe('Display Hint Modal Controller', function() {
   var recordedVoiceoversObjectFactory = null;
   var stateCardObjectFactory = null;
   var subtitledHtmlObjectFactory = null;
+  var writtenTranslationsObjectFactory = null;
 
   var card = null;
   var hintContent = null;
 
   var testSubscriptions = null;
   const autoplayAudioSpy = jasmine.createSpy('autoplayAudio');
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -56,6 +66,8 @@ describe('Display Hint Modal Controller', function() {
       RecordedVoiceoversObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    writtenTranslationsObjectFactory = TestBed.get(
+      WrittenTranslationsObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -88,9 +100,10 @@ describe('Display Hint Modal Controller', function() {
       id: null
     });
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
+    var writtenTranslations = writtenTranslationsObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
-      recordedVoiceovers, 'content_id');
+      recordedVoiceovers, writtenTranslations, 'content_id');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
     testSubscriptions = new Subscription();

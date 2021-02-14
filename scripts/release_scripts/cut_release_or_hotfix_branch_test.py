@@ -367,7 +367,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             cut_release_or_hotfix_branch.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_exception_is_raised_if_travis_is_failing(self):
+    def test_exception_is_raised_if_actions_ci_is_failing(self):
         def mock_input():
             return 'n'
 

@@ -11,12 +11,11 @@
 
         <div ng-if="$ctrl.showChapters()" class="d-md-block oppia-story-viewer-card-container">
           <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes();"
-             ng-href="<[$ctrl.getExplorationUrl(node)]>"
-             ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+             ng-href="<[$ctrl.getExplorationUrl(node)]>">
 
             <div>
-              <div ng-style="($index > 0 && !$ctrl.storyPlaythroughObject.getStoryNodes()[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
-                <div class="oppia-lesson-track">
+              <div class="fx-row">
+                <div class="oppia-lesson-track protractor-test-lesson-track">
                   <svg ng-if="!$last"
                        width="9px"
                        height="530px"
@@ -30,32 +29,32 @@
                     </path>
                   </svg>
 
-                  <img class="oppia-lesson-icon-completed"
+                  <img class="oppia-lesson-icon-completed protractor-test-lesson-icon-completed"
                        ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>"
                        ng-if="node.isCompleted()">
                   <div ng-if="!node.isCompleted() && (node.getId() === $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted">
+                       class="oppia-lesson-icon-uncompleted protractor-test-lesson-icon-uncompleted">
                   </div>
                   <div ng-if="!node.isCompleted() && (node.getId() !== $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable">
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable protractor-test-lesson-icon-uncompleted">
                   </div>
                 </div>
 
                 <div class="oppia-story-viewer-card">
-                  <span class="oppia-chapter-title" aria-live="assertive">
+                  <span class="oppia-chapter-title protractor-chapter-title" aria-live="assertive">
                     <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
                   </span>
 
                   <div class="oppia-story-viewer-card-content">
-                    <svg width="240"
+                    <svg width="320"
                          height="180"
                          xmlns="http://www.w3.org/1600/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink"
                          version="1.1"
                          class="oppia-story-viewer-card-content-img">
                       <defs>
-                        <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
-                          <rect width="240"
+                        <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="180" width="320">
+                          <rect width="320"
                                 height="180"
                                 ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
                           </rect>
@@ -63,14 +62,17 @@
                           <image x="0"
                                  y="0"
                                  height="180"
-                                 width="240"
+                                 width="320"
                                  ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
                                  xlink:href="">
                           </image>
                         </pattern>
+                        <filter id="blur" x="0" y="0">
+                          <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
+                        </filter>
                       </defs>
-                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
-                        <rect width="240"
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
+                        <rect width="320"
                               height="180"
                               fill="url(#image<[$index]>)"
                               rx="4">
@@ -84,31 +86,33 @@
                   </div>
 
                   <div class="oppia-story-viewer-mobile-card-content">
-                    <svg width="185"
-                         height="150"
+                    <svg width="192"
+                         height="108"
                          xmlns="http://www.w3.org/1600/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink"
-                         version="1.1"
-                        >
+                         version="1.1">
                       <defs>
-                        <pattern id="image2<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
-                          <rect width="185"
-                                height="150"
+                        <pattern id="image2<[$index]>" patternUnits="userSpaceOnUse" height="108" width="192">
+                          <rect width="192"
+                                height="108"
                                 ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
                           </rect>
 
                           <image x="0"
                                  y="0"
-                                 width="185"
-                                 height="150"
+                                 width="192"
+                                 height="108"
                                  ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
                                  xlink:href="">
                           </image>
                         </pattern>
+                        <filter id="blur-mobile" x="0" y="0">
+                          <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
+                        </filter>
                       </defs>
-                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
-                        <rect width="185"
-                              height="150"
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
+                        <rect width="192"
+                              height="108"
                               fill="url(#image2<[$index]>)"
                         ></rect>
                       </a>
@@ -126,6 +130,18 @@
       </div>
     </div>
     <attribution-guide></attribution-guide>
+    <div ng-if="!$ctrl.isLoggedIn" class="story-viewer-login-container">
+      <h2>Learn More about <[$ctrl.storyPlaythroughObject.topicName]></h2>
+      <div class="mt-2">
+        <md-button class="md-raised oppia-login-button text-light protractor-test-login-button" ng-click="$ctrl.signIn()">
+          LOG IN
+        </md-button>
+        <span class="m-2 oppia-login-or-signup-text">or</span>
+        <md-button class="md-raised oppia-sign-up-button text-light" ng-click="$ctrl.signIn()">
+          SIGN UP
+        </md-button>
+      </div>
+    </div>
   </div>
 </div>
 <style>
@@ -137,17 +153,46 @@
     color: #0844aa;
   }
 
-  story-viewer-page .disabled-link {
-    cursor: default;
-    pointer-events: none;
-  }
-
-  story-viewer-page .oppia-story-viewer-card-content-img {
-    margin-bottom: 10px;
-    margin-right: 10px;
-  }
-
   story-viewer-page .oppia-story-description-text {
     font-size: 20px;
   }
+
+  story-viewer-page .oppia-story-viewer-card-description-box {
+    margin-left: 10px;
+  }
+
+  .story-viewer-login-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    bottom: 0;
+    padding: 2em;
+    position: sticky;
+    text-align: center;
+    width: 100%;
+  }
+
+  .story-viewer-login-container .md-raised {
+    font-size: 1.2em;
+    min-width: max-content;
+    padding: 1em;
+    width: 8em;
+  }
+
+  .story-viewer-login-container .oppia-login-button.md-raised {
+    background-color: #00645C;
+  }
+
+  .story-viewer-login-container .oppia-login-or-signup-text {
+    display: inline;
+  }
+
+  .story-viewer-login-container .oppia-sign-up-button.md-raised {
+    background-color: #00609C;
+  }
+
+  @media screen and (max-width: 450px) {
+    .story-viewer-login-container .oppia-login-or-signup-text {
+      display: block;
+    }
+  }
+
 </style>

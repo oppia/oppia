@@ -162,8 +162,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               return;
             }
             // Update the state's content.
-            StateContentService.displayed.setHtml(
-              DEFAULT_TERMINAL_STATE_CONTENT);
+            StateContentService.displayed.html = DEFAULT_TERMINAL_STATE_CONTENT;
             StateContentService.saveDisplayedValue();
             $scope.onSaveStateContent(StateContentService.displayed);
           };
@@ -228,6 +227,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                   showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
                     $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired
                 },
+                keyboard: false,
                 backdrop: 'static',
                 windowClass: 'customize-interaction-modal',
                 controller: 'CustomizeInteractionModalController'

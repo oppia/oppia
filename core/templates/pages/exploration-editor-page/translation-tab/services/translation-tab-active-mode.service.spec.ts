@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,51 +18,56 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-tab-active-mode.service.ts');
+import { TestBed } from '@angular/core/testing';
+import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 
-describe('Translation tab active mode service', function() {
+describe('Translation tab active mode service', () => {
+  let translationTabActiveModeService : TranslationTabActiveModeService = null;
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  var ttams = null;
+  importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ttams = $injector.get('TranslationTabActiveModeService');
-  }));
-
-  it('should correctly activate translation mode', function() {
-    expect(ttams.isTranslationModeActive()).toBeFalsy();
-    ttams.activateTranslationMode();
-    expect(ttams.isTranslationModeActive()).toBeTruthy();
+  beforeEach(()=> {
+    translationTabActiveModeService = TestBed.get(
+      TranslationTabActiveModeService);
   });
 
-  it('should correctly activate voiceover mode', function() {
-    expect(ttams.isVoiceoverModeActive()).toBeFalsy();
-    ttams.activateVoiceoverMode();
-    expect(ttams.isVoiceoverModeActive()).toBeTruthy();
+  it('should correctly activate translation mode', () => {
+    expect(
+      translationTabActiveModeService.isTranslationModeActive()).toBeFalsy();
+    translationTabActiveModeService.activateTranslationMode();
+    expect(
+      translationTabActiveModeService.isTranslationModeActive()).toBeTruthy();
   });
 
-  it('should correctly report the active mode', function() {
-    expect(ttams.isVoiceoverModeActive()).toBeFalsy();
-    expect(ttams.isTranslationModeActive()).toBeFalsy();
+  it('should correctly activate voiceover mode', () => {
+    expect(
+      translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
+    translationTabActiveModeService.activateVoiceoverMode();
+    expect(
+      translationTabActiveModeService.isVoiceoverModeActive()).toBeTruthy();
+  });
 
-    ttams.activateVoiceoverMode();
+  it('should correctly report the active mode', () => {
+    expect(
+      translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
+    expect(
+      translationTabActiveModeService.isTranslationModeActive()).toBeFalsy();
 
-    expect(ttams.isVoiceoverModeActive()).toBeTruthy();
-    expect(ttams.isTranslationModeActive()).toBeFalsy();
+    translationTabActiveModeService.activateVoiceoverMode();
 
-    ttams.activateTranslationMode();
+    expect(
+      translationTabActiveModeService.isVoiceoverModeActive()).toBeTruthy();
+    expect(
+      translationTabActiveModeService.isTranslationModeActive()).toBeFalsy();
 
-    expect(ttams.isVoiceoverModeActive()).toBeFalsy();
-    expect(ttams.isTranslationModeActive()).toBeTruthy();
+    translationTabActiveModeService.activateTranslationMode();
+
+    expect(
+      translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
+    expect(
+      translationTabActiveModeService.isTranslationModeActive()).toBeTruthy();
   });
 });

@@ -178,6 +178,16 @@ class ExplorationDisplayableSummariesTest(
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
 
+    def test_get_human_readable_contributors_summary_with_deleted_user(self):
+        contributors_summary = {self.albert_id: 10}
+        user_services.mark_user_for_deletion(self.albert_id)
+        self.assertEqual(
+            {'[User being deleted]': {'num_commits': 10}},
+            summary_services.get_human_readable_contributors_summary(
+                contributors_summary
+            )
+        )
+
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
         # EXP_ID_1 -- private exploration owned by Albert.
@@ -768,6 +778,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
     def test_for_recently_published_explorations(self):
         """Tests for recently published explorations."""
 
+        self.process_and_flush_pending_tasks()
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(
                 feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
@@ -829,6 +840,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
                 'property_name': 'title',
                 'new_value': 'New title'
             })], 'Changed title.')
+        self.process_and_flush_pending_tasks()
 
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(

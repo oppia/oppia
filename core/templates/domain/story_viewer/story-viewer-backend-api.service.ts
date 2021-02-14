@@ -45,7 +45,7 @@ interface StoryChapterCompletionResponse {
   summaries: LearnerExplorationSummary[];
 }
 
-interface StoryDataDict {
+export interface StoryDataDict {
   topicName: string;
   storyTitle: string;
 }

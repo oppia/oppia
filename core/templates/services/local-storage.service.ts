@@ -25,7 +25,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ExplorationChangeList,
+  ExplorationChange,
   ExplorationDraft
 } from 'domain/exploration/exploration-draft.model';
 
@@ -76,7 +76,7 @@ export class LocalStorageService {
    * @param {Integer} draftChangeListId - The id of the draft to be saved.
    */
   saveExplorationDraft(
-      explorationId: string, changeList: ExplorationChangeList[],
+      explorationId: string, changeList: ExplorationChange[],
       draftChangeListId: number): void {
     let localSaveKey = this._createExplorationDraftKey(explorationId);
     if (this.isStorageAvailable()) {

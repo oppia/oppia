@@ -33,10 +33,14 @@ docstrings in this file.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+
 from constants import constants
 from core import platform_feature_list
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
+from core.platform import models
+
+current_user_services = models.Registry.import_current_user_services()
 
 
 ALL_FEATURES_LIST = (
@@ -159,12 +163,12 @@ def _create_evaluation_context_for_server():
     Returns:
         EvaluationContext. The context for evaluation.
     """
+    # TODO(#11208): Properly set app version below using GAE app version as
+    # part of the server & client context.
     return platform_parameter_domain.EvaluationContext.from_dict(
         {
-            'client_type': None,
-            'browser_type': None,
+            'platform_type': 'Backend',
             'app_version': None,
-            'user_locale': None,
         },
         {
             'server_mode': _get_server_mode()

@@ -48,11 +48,11 @@
                            is-learn-again-button="isLearnAgainButton()">
         </supplemental-card>
       </div>
-      <div ng-if="canAskLearnerForAnswerInfo()">
+      <div ng-if="getCanAskLearnerForAnswerInfo()">
         <learner-answer-info-card submit-answer="submitAnswer">
         </learner-answer-info-card>
       </div>
-      <div ng-if="!canAskLearnerForAnswerInfo()">
+      <div ng-if="!getCanAskLearnerForAnswerInfo()">
         <progress-nav on-submit="submitAnswerFromProgressNav()"
                       is-learn-again-button="isLearnAgainButton()"
                       submit-button-is-disabled="isSubmitButtonDisabled()"
@@ -78,16 +78,18 @@
 
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
-      <supplemental-card on-click-continue-button="showUpcomingCard()"
-                         displayed-card="displayedCard"
-                         is-learn-again-button="isLearnAgainButton()">
-      </supplemental-card>
-      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !canAskLearnerForAnswerInfo()">
-        <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
-                   ng-click="submitAnswerFromProgressNav()"
-                   ng-disabled="isSubmitButtonDisabled()"
-                   translate="I18N_INTERACTIONS_SUBMIT">
-        </md-button>
+      <div class="supplemental-card-parent-container">
+        <supplemental-card on-click-continue-button="showUpcomingCard()"
+                           displayed-card="displayedCard"
+                           is-learn-again-button="isLearnAgainButton()">
+        </supplemental-card>
+        <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
+          <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
+                     ng-click="submitAnswerFromProgressNav()"
+                     ng-disabled="isSubmitButtonDisabled()"
+                     translate="I18N_INTERACTIONS_SUBMIT">
+          </md-button>
+        </div>
       </div>
     </div>
   </div>
@@ -146,6 +148,18 @@
   <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
     <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
   </div>
+  <div ng-if="inStoryMode && !isLoggedIn" class="conversation-skin-login-container">
+    <div class="conversation-skin-congratulations-text">Congratulations on completing the chapter!</div>
+    <span class="conversation-skin-login-text text-secondary">Log in or sign up to save your progress and play through the next lesson.</span>
+    <div class="mt-2">
+      <md-button class="md-raised oppia-login-button text-light protractor-test-login-button" ng-click="signIn()">
+        LOGIN
+      </md-button>
+      <md-button class="md-raised oppia-sign-up-button text-light" ng-click="signIn()">
+        SIGN UP
+      </md-button>
+    </div>
+  </div>
 </div>
 
 <!-- These styles must be embedded within the directive script tags, since
@@ -172,6 +186,27 @@ otherwise they will interfere with the iframed conversation skin directive.
     position: fixed;
     width: 100%;
     z-index: 16;
+  }
+
+  .supplemental-card-parent-container {
+    min-width: 50%;
+  }
+
+  .conversation-skin-login-container {
+    background-color: #FFF;
+    margin: -52px auto 92px;
+    padding: 1.5em 2em;
+    text-align: center;
+    width: 38%;
+  }
+
+  .conversation-skin-login-container .conversation-skin-login-text {
+    font-size: 0.8em;
+  }
+
+  .conversation-skin-login-container .conversation-skin-congratulations-text {
+    font-size: 1.2em;
+    font-weight: 500;
   }
 
   .conversation-skin-next-lesson-wrapper {
@@ -223,7 +258,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     display: -webkit-flex;
     display: flex;
     justify-content: center;
-    margin: 0 auto 150px;
+    margin: 0 auto;
     max-width: 1400px;
     padding: 56px 14px 0;
     width: 100%;
@@ -231,6 +266,7 @@ otherwise they will interfere with the iframed conversation skin directive.
 
   .conversation-skin-tutor-card-container {
     flex-shrink: 10000;
+    margin-bottom: 150px;
     max-width: 650px;
     /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
        below should be changed to match. */
@@ -258,6 +294,7 @@ otherwise they will interfere with the iframed conversation skin directive.
   .conversation-skin-supplemental-card-container {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     flex-shrink: 1;
+    margin-bottom: 200px;
     margin-left: 12px;
     position: relative;
     width: 650px;
@@ -417,6 +454,20 @@ otherwise they will interfere with the iframed conversation skin directive.
     margin-left: 10px;
   }
 
+  conversation-skin .oppia-login-button.md-raised {
+    background-color: #00645C;
+    font-size: 1em;
+    min-width: max-content;
+    width: 30%;
+  }
+
+  conversation-skin .oppia-sign-up-button.md-raised {
+    background-color: #00609C;
+    font-size: 1em;
+    min-width: max-content;
+    width: 30%;
+  }
+
   @media screen and (max-width: 959px) {
     .conversation-skin-cards-container {
       display: block;
@@ -438,6 +489,10 @@ otherwise they will interfere with the iframed conversation skin directive.
     .conversation-skin-tutor-card-alone {
       position: relative;
       top: 0;
+    }
+
+    .supplemental-card-parent-container {
+      position: unset;
     }
 
     .conversation-skin-supplemental-card-container {
@@ -482,6 +537,10 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
     .conversation-skin-final-ratings {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+      width: 100%;
+    }
+
+    .conversation-skin-login-container {
       width: 100%;
     }
   }

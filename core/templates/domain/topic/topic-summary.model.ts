@@ -146,4 +146,8 @@ export class TopicSummary {
   getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
   }
+
+  isTopicPublished(): boolean {
+    return this.isPublished;
+  }
 }

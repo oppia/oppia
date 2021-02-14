@@ -80,7 +80,7 @@ var answerObjectType = 'NormalizedString';
 
 var testSuite = [{
   interactionArguments: ['placeholder', 4],
-  ruleArguments: ['StartsWith', 'valid'],
+  ruleArguments: ['StartsWith', ['valid']],
   expectedInteractionDetails: ['placeholder', 4],
   wrongAnswers: ['invalid'],
   correctAnswers: ['valid']

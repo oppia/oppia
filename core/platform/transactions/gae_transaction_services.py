@@ -19,9 +19,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import functools
+
 from google.appengine.ext import ndb
 
 
+# TODO(#11431): Remove this in favor of run_in_transaction_wrapper.
 def run_in_transaction(fn, *args, **kwargs):
     """Runs a function in a transaction. Either all of the operations in
     the transaction are applied, or none of them are applied.
@@ -41,11 +44,34 @@ def run_in_transaction(fn, *args, **kwargs):
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
+    # XG enables cross-group transaction that can handle up to 25 model groups.
     return ndb.transaction(
         lambda: fn(*args, **kwargs),
         xg=True,
         propagation=ndb.TransactionOptions.ALLOWED,
     )
+
+
+def run_in_transaction_wrapper(fn):
+    """Runs a decorated function in a transaction. Either all of the operations
+    in the transaction are applied, or none of them are applied.
+
+    If an exception is raised, the transaction is likely not safe to
+    commit, since TransactionOptions.ALLOWED is used.
+
+    Returns:
+        function. Function wrapped in transaction.
+
+    Raises:
+        Exception. Whatever fn() raises.
+        datastore_errors.TransactionFailedError. The transaction failed.
+    """
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        """Wrapper for the transaction."""
+        return run_in_transaction(fn, *args, **kwargs)
+
+    return wrapper
 
 
 def toplevel_wrapper(*args, **kwargs):

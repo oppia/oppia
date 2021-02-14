@@ -25,6 +25,7 @@ require(
   'pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/context.service.ts');
@@ -45,12 +46,12 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         'hint-and-solution-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'ContextService', 'ExplorationPlayerStateService',
+        '$rootScope', 'ContextService', 'ExplorationPlayerStateService',
         'HintAndSolutionModalService', 'HintsAndSolutionManagerService',
         'PlayerPositionService', 'PlayerTranscriptService',
         'StatsReportingService',
         function(
-            ContextService, ExplorationPlayerStateService,
+            $rootScope, ContextService, ExplorationPlayerStateService,
             HintAndSolutionModalService, HintsAndSolutionManagerService,
             PlayerPositionService, PlayerTranscriptService,
             StatsReportingService) {
@@ -83,6 +84,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             promise.result.then(null, function() {
               ctrl.activeHintIndex = null;
             });
+            ctrl.isVisible = false;
           };
 
           ctrl.onClickSolutionButton = function() {
@@ -134,6 +136,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.displayedCard = null;
             ctrl.solutionModalIsActive = false;
             ctrl.currentlyOnLatestCard = true;
+            ctrl.isVisible = true;
             resetLocalHintsArray();
             ctrl.directiveSubscriptions.add(
               PlayerPositionService.onNewCardOpened.subscribe(
@@ -158,6 +161,10 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
                   }
                 }
               )
+            );
+            ctrl.directiveSubscriptions.add(
+              HintsAndSolutionManagerService.onTimeoutElapsed$.subscribe(
+                () => $rootScope.$apply())
             );
           };
           ctrl.$onDestroy = function() {

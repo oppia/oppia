@@ -97,7 +97,7 @@ describe('Contribution Opportunities backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      contributionOpportunitiesBackendApiService.fetchSkillOpportunities(
+      contributionOpportunitiesBackendApiService.fetchSkillOpportunitiesAsync(
         '').then(
         successHandler, failHandler
       );
@@ -126,10 +126,10 @@ describe('Contribution Opportunities backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      contributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        'hi', '',).then(
-        successHandler, failHandler
-      );
+      contributionOpportunitiesBackendApiService
+        .fetchTranslationOpportunitiesAsync('hi', '',).then(
+          successHandler, failHandler
+        );
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
           '/opportunitiessummaryhandler/<opportunityType>',
@@ -155,10 +155,10 @@ describe('Contribution Opportunities backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        'hi', '',).then(
-        successHandler, failHandler
-      );
+      contributionOpportunitiesBackendApiService
+        .fetchVoiceoverOpportunitiesAsync('hi', '',).then(
+          successHandler, failHandler
+        );
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
           '/opportunitiessummaryhandler/<opportunityType>',
@@ -185,7 +185,7 @@ describe('Contribution Opportunities backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService
-        .fetchFeaturedTranslationLanguages()
+        .fetchFeaturedTranslationLanguagesAsync()
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(

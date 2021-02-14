@@ -251,6 +251,7 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
             file_content = f.read()
             self.assertIsInstance(file_content, python_utils.UNICODE)
 
+
 @unittest.skipUnless(
     sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')
 class PythonUtilsForPython3Tests(test_utils.GenericTestBase):

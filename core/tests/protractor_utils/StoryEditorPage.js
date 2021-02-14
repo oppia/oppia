@@ -83,6 +83,8 @@ var StoryEditorPage = function() {
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
   var nodeOutlineEditorRteContent = element.all(by.css('.oppia-rte'));
+  var nodeOutlineFinalizeCheckbox = element(
+    by.css('.protractor-test-finalize-outline'));
   var nodeOutlineSaveButton = element(
     by.css('.protractor-test-node-outline-save-button'));
   var addPrerequisiteSkillButton = element(
@@ -211,6 +213,7 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToStoryEditorTab = async function() {
+    await general.scrollToTop();
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
 
@@ -365,6 +368,7 @@ var StoryEditorPage = function() {
     await richTextInstructions(editor);
     await action.click('Chapter node editor', nodeOutlineEditor);
     await nodeOutlineSaveButton.click();
+    await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
 
   this.navigateToChapterByIndex = async function(index) {

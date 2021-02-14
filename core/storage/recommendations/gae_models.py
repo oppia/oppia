@@ -41,32 +41,21 @@ class ExplorationRecommendationsModel(
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration recommendations are deleted only if the corresponding
-        exploration is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'recommended_exploration_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """ExplorationRecommendationsModel doesn't reference any user_id
-        directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-                should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
 
 class TopicSimilaritiesModel(base_models.BaseModel):
@@ -86,14 +75,17 @@ class TopicSimilaritiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """There is only a single TopicSimilaritiesModel in the entire
-        codebase.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

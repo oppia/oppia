@@ -138,193 +138,332 @@ describe('TextInputValidationService', () => {
     }]);
   });
 
-  it('should catch redundancy of contains rules with matching inputs', () => {
-    let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'Contains',
-        inputs: {
-          x: 'xyz'
-        }
-      }), rof.createFromBackendDict({
-        rule_type: 'Contains',
-        inputs: {
-          x: 'xyza'
-        }
-      })]
-    )];
+  it('should catch non-unique rule type within one answer group', () => {
+    let answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput'),
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Answer group 1 has multiple rules with ' +
+        'the same type \'Equals\' within the same group.'
+    }]);
+  });
+
+  it('should catch redundancy of contains rules with matching inputs', () => {
+    let answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
+
+    let warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'Contains\' rule with a matching input.'
     }]);
 
-    answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'Contains',
-        inputs: {
-          x: ''
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'Contains',
-        inputs: {
-          x: 'abc'
-        }
-      })]
-    )];
+    answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'Contains\' rule with a matching input.'
     }]);
 
-    answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'Contains',
-        inputs: {
-          x: 'xyz'
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'Contains',
-        inputs: {
-          x: 'xyz'
-        }
-      })]
-    )];
+    answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'Contains\' rule with a matching input.'
     }]);
   });
 
   it('should catch redundancy of startsWith rules with matching inputs', () => {
-    let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'StartsWith',
-        inputs: {
-          x: 'xyz'
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'StartsWith',
-        inputs: {
-          x: 'xyza'
-        }
-      })]
-    )];
+    let answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'StartsWith',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'StartsWith',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'StartsWith\' rule with a matching prefix.'
     }]);
 
-    answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'StartsWith',
-        inputs: {
-          x: ''
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'StartsWith',
-        inputs: {
-          x: 'abc'
-        }
-      })]
-    )];
+    answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'StartsWith',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'StartsWith',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'StartsWith\' rule with a matching prefix.'
     }]);
 
-    answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'Contains',
-        inputs: {
-          x: 'xyz'
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'StartsWith',
-        inputs: {
-          x: 'xyzy'
-        }
-      })]
-    )];
+    answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'StartsWith',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyzy']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'StartsWith\' rule with a matching prefix.'
     }]);
   });
 
   it('should catch redundancy of equals rules with matching inputs', () => {
-    let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'Equals',
-        inputs: {
-          x: 'xyz'
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'Equals',
-        inputs: {
-          x: 'xyz'
-        }
-      })]
-    )];
+    let answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_4',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'Equals\' rule with a matching input.'
     }]);
 
-    answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'FuzzyEquals',
-        inputs: {
-          x: 'xyz'
-        }
-      })]),
-    createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'Equals',
-        inputs: {
-          x: 'xya'
-        }
-      })]
-    )];
+    answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'FuzzyEquals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_4',
+                normalizedStrSet: ['xya']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
@@ -337,51 +476,77 @@ describe('TextInputValidationService', () => {
   });
 
   it('should catch redundancy of fuzzyEquals rules with matching input', () => {
-    let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'FuzzyEquals',
-        inputs: {
-          x: 'xyz'
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'FuzzyEquals',
-        inputs: {
-          x: 'xyz'
-        }
-      })]
-    )];
+    let answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'FuzzyEquals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'FuzzyEquals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
     }]);
 
-    answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
-        rule_type: 'FuzzyEquals',
-        inputs: {
-          x: 'xyz'
-        }
-      }),
-      rof.createFromBackendDict({
-        rule_type: 'FuzzyEquals',
-        inputs: {
-          x: 'xya'
-        }
-      })]
-    )];
+    answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'FuzzyEquals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
+            }
+          }, 'TextInput')
+        ]
+      ),
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'FuzzyEquals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xya']
+              }
+            }
+          }, 'TextInput')
+        ]
+      )];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
       ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
     }]);
   });

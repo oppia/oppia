@@ -188,6 +188,13 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
         'Skill to be merged', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.clickCreateQuestionButton();
     await explorationEditorMainTab.setContent(
@@ -196,9 +203,12 @@ describe('Topics and skills dashboard functionality', function() {
       'TextInput', 'Placeholder', 5);
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', 'correct');
+      'FuzzyEquals', ['correct']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',

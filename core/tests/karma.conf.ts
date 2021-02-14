@@ -14,9 +14,9 @@ module.exports = function(config) {
       // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      'third_party/static/angularjs-1.7.9/angular.js',
+      'third_party/static/angularjs-1.8.2/angular.js',
       'core/templates/karma.module.ts',
-      'third_party/static/angularjs-1.7.9/angular-mocks.js',
+      'third_party/static/angularjs-1.8.2/angular-mocks.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -38,7 +38,7 @@ module.exports = function(config) {
       },
       'extensions/interactions/**/*.directive.html',
       'extensions/interactions/**/*.component.html',
-      'extensions/interactions/rule_templates.json',
+      'extensions/interactions/*.json',
       'core/tests/data/*.json',
       {
         pattern: 'assets/i18n/**/*.json',
@@ -72,7 +72,7 @@ module.exports = function(config) {
       'core/templates/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/**/*.component.html': ['ng-html2js'],
-      'extensions/interactions/rule_templates.json': ['json_fixtures'],
+      'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage-istanbul'],
@@ -150,11 +150,11 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
         alias: {
-          // This is needed because in app.constants.ts we need to import
-          // assets/constants.ts. We can't directly write import 'constants'
-          // because a module named 'constants' is defined in '@types/node'
-          // package.
-          'assets/constants': 'constants.ts'
+          // These both are used so that we can refer to them in imports using
+          // their full path: 'assets/{{filename}}'.
+          'assets/constants': 'constants.ts',
+          'assets/rich_text_components_definitions':
+            'rich_text_components_definitions.ts'
         }
       },
       devtool: 'inline-cheap-source-map',

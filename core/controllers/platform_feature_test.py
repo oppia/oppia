@@ -21,6 +21,7 @@ from constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_parameter_list as param_list
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
@@ -80,27 +81,152 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
             result = self.get_json(
                 '/platform_features_evaluation_handler',
                 params={
-                    'client_type': 'Android',
+                    'platform_type': 'Android',
                     'app_version': '1.0.0',
-                    'user_locale': 'en',
                 }
             )
             self.assertEqual(
                 result,
                 {self.dev_feature.name: False, self.prod_feature.name: True})
 
-    def test_get_with_invalid_client_type_context_raises_400(self):
-        resp_dict = self.get_json(
-            '/platform_features_evaluation_handler',
-            params={
-                'client_type': 'Invalid',
-                'app_version': '1.0.0',
-                'user_locale': 'en',
-            },
-            expected_status_int=400
+    def test_get_features_invalid_platform_type_returns_features_disabled(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'platform_type': 'invalid',
+                },
+                expected_status_int=200
+            )
+            self.assertEqual(
+                result,
+                {self.dev_feature.name: False, self.prod_feature.name: False})
+
+    def test_get_features_missing_platform_type_returns_features_disabled(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                }
+            )
+            self.assertEqual(
+                result,
+                {self.dev_feature.name: False, self.prod_feature.name: False})
+
+    def test_get_features_invalid_version_flavor_raises_400(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            resp_dict = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'platform_type': 'Android',
+                    'app_version': '1.0.0-abcdefg-invalid',
+                },
+                expected_status_int=400
+            )
+            self.assertEqual(
+                resp_dict['error'],
+                'Invalid version flavor \'invalid\', must be one of '
+                '[u\'test\', u\'alpha\', u\'beta\', u\'release\'] if specified.'
+            )
+
+
+class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
+    """Tests for the PlatformFeatureDummyHandler."""
+
+    def setUp(self):
+        super(PlatformFeatureDummyHandlerTest, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def tearDown(self):
+        feature_services.update_feature_flag_rules(
+            param_list.PARAM_NAMES.dummy_feature, self.user_id,
+            'clear rule', []
         )
-        self.assertEqual(
-            resp_dict['error'],
-            'Invalid client type \'Invalid\', must be one of [u\'Web\', '
-            'u\'Android\'].'
+
+        super(PlatformFeatureDummyHandlerTest, self).tearDown()
+
+    def _set_dummy_feature_status_for_mode(self, is_enabled, mode):
+        """Enables the dummy_feature for the dev environment."""
+        feature_services.update_feature_flag_rules(
+            param_list.PARAM_NAMES.dummy_feature, self.user_id,
+            'update rule for testing purpose',
+            [{
+                'value_when_matched': is_enabled,
+                'filters': [{
+                    'type': 'server_mode',
+                    'conditions': [['=', mode]]
+                }]
+            }]
         )
+
+    def _mock_dummy_feature_stage(self, stage):
+        """Creates a mock context in which the dummy_feature is at the
+        specified stage.
+        """
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            [param_list.PARAM_NAMES.dummy_feature])
+
+        feature = registry.Registry.parameter_registry.get(
+            param_list.PARAM_NAMES.dummy_feature)
+        return self.swap(feature, '_feature_stage', stage)
+
+    def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
+        dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.dev)
+
+        with dev_mode_ctx, dummy_feature_dev_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                True, param_domain.SERVER_MODES.dev
+            )
+
+            result = self.get_json(
+                '/platform_feature_dummy_handler',
+            )
+            self.assertEqual(result, {'msg': 'ok'})
+
+    def test_get_with_dummy_feature_disabled_in_dev_raises_404(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
+        dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.dev)
+
+        with dev_mode_ctx, dummy_feature_dev_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                False, param_domain.SERVER_MODES.dev
+            )
+            self.get_json(
+                '/platform_feature_dummy_handler',
+                expected_status_int=404
+            )
+
+    def test_get_with_dummy_feature_enabled_in_prod_returns_ok(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
+        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.prod)
+
+        with dev_mode_ctx, dummy_feature_prod_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                True, param_domain.SERVER_MODES.prod
+            )
+
+            result = self.get_json(
+                '/platform_feature_dummy_handler',
+            )
+            self.assertEqual(result, {'msg': 'ok'})
+
+    def test_get_with_dummy_feature_disabled_in_prod_raises_404(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
+        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.prod)
+
+        with dev_mode_ctx, dummy_feature_prod_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                False, param_domain.SERVER_MODES.prod
+            )
+            self.get_json(
+                '/platform_feature_dummy_handler',
+                expected_status_int=404
+            )

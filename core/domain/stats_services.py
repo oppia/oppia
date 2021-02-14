@@ -117,7 +117,9 @@ def get_exploration_stats(exp_id, exp_version):
     return exploration_stats
 
 
-def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
+@transaction_services.run_in_transaction_wrapper
+def _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats. The model GET and PUT must be done in a transaction to avoid loss of
     updates that come in rapid succession.
@@ -159,8 +161,8 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    transaction_services.run_in_transaction(
-        _update_stats_transactional, exp_id, exp_version, aggregated_stats)
+    _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):
@@ -251,6 +253,66 @@ def get_stats_for_new_exp_version(
     return exploration_stats
 
 
+def assign_playthrough_to_corresponding_issue(
+        playthrough, exp_issues, issue_schema_version):
+    """Stores the given playthrough as a new model into its corresponding
+    exploration issue. When the corresponding exploration issue does not
+    exist, a new one is created.
+
+    Args:
+        playthrough: Playthrough. The playthrough domain object.
+        exp_issues: ExplorationIssues. The exploration issues domain object.
+        issue_schema_version: int. The version of the issue schema.
+
+    Returns:
+        bool. Whether the playthrough was stored successfully.
+    """
+    issue = _get_corresponding_exp_issue(
+        playthrough, exp_issues, issue_schema_version)
+    if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
+        issue.playthrough_ids.append(
+            stats_models.PlaythroughModel.create(
+                playthrough.exp_id, playthrough.exp_version,
+                playthrough.issue_type,
+                playthrough.issue_customization_args,
+                [action.to_dict() for action in playthrough.actions]))
+        return True
+    return False
+
+
+def _get_corresponding_exp_issue(
+        playthrough, exp_issues, issue_schema_version):
+    """Returns the unique exploration issue model expected to own the given
+    playthrough. If it does not exist yet, then it will be created.
+
+    Args:
+        playthrough: Playthrough. The playthrough domain object.
+        exp_issues: ExplorationIssues. The exploration issues domain object
+            which manages each individual exploration issue.
+        issue_schema_version: int. The version of the issue schema.
+
+    Returns:
+        ExplorationIssue. The corresponding exploration issue.
+    """
+    for issue in exp_issues.unresolved_issues:
+        if issue.issue_type == playthrough.issue_type:
+            issue_customization_args = issue.issue_customization_args
+            identifying_arg = (
+                feconf.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+                    issue.issue_type])
+            # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
+            # ordering of the list is important (i.e. [a, b, c] is different
+            # from [b, c, a]).
+            if (issue_customization_args[identifying_arg] ==
+                    playthrough.issue_customization_args[identifying_arg]):
+                return issue
+    issue = stats_domain.ExplorationIssue(
+        playthrough.issue_type, playthrough.issue_customization_args,
+        [], issue_schema_version, is_valid=True)
+    exp_issues.unresolved_issues.append(issue)
+    return issue
+
+
 def create_exp_issues_for_new_exploration(exp_id, exp_version):
     """Creates the ExplorationIssuesModel instance for the exploration.
 
@@ -334,11 +396,8 @@ def update_exp_issues_for_new_exp_version(
         playthrough_model.actions = [
             action.to_dict() for action in playthrough.actions]
 
-    # Run in transaction to help prevent data-races between operations that may
-    # update the playthroughs concurrently.
     stats_models.PlaythroughModel.update_timestamps_multi(playthrough_models)
-    transaction_services.run_in_transaction(
-        stats_models.PlaythroughModel.put_multi, playthrough_models)
+    stats_models.PlaythroughModel.put_multi(playthrough_models)
 
     for exp_issue in exp_issues.unresolved_issues:
         if 'state_names' in exp_issue.issue_customization_args:
@@ -601,6 +660,7 @@ def save_exp_issues_model(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain object.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _save_exp_issues_model_transactional():
         """Implementation to be run in a transaction."""
 
@@ -614,8 +674,7 @@ def save_exp_issues_model(exp_issues):
 
     # Run in transaction to help prevent data-races between concurrent learners
     # who may have a playthrough recorded at the same time.
-    transaction_services.run_in_transaction(
-        _save_exp_issues_model_transactional)
+    _save_exp_issues_model_transactional()
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -654,6 +713,7 @@ def delete_playthroughs_multi(playthrough_ids):
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _delete_playthroughs_multi_transactional():
         """Implementation to be run in a transaction."""
         stats_models.PlaythroughModel.delete_multi(
@@ -661,8 +721,7 @@ def delete_playthroughs_multi(playthrough_ids):
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    transaction_services.run_in_transaction(
-        _delete_playthroughs_multi_transactional)
+    _delete_playthroughs_multi_transactional()
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):

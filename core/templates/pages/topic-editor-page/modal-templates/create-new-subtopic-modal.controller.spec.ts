@@ -18,18 +18,13 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Create new subtopic modal', function() {
-  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(angular.mock.module('oppia'));
 
   var $scope = null;
   var ctrl = null;
@@ -52,12 +47,13 @@ describe('Create new subtopic modal', function() {
       $uibModalInstance: $uibModalInstance,
       topic: topic
     });
+    ctrl.$onInit();
   }));
 
 
   it('should initialize controller properties after its initialization',
     function() {
-      ctrl.init();
+      ctrl.$onInit();
       expect(ctrl.topic).toEqual(topic);
       expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({
         type: 'html',

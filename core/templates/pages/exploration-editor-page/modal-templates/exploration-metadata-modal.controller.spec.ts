@@ -16,6 +16,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Unit tests for ExplorationMetadataModalController.
@@ -32,6 +33,8 @@ describe('Exploration Metadata Modal Controller', function() {
   var ExplorationStatesService = null;
   var ExplorationTagsService = null;
   var ExplorationTitleService = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(

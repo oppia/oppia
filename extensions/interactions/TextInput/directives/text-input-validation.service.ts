@@ -34,6 +34,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
 import { UtilsService } from 'services/utils.service';
 
 interface Warning {
@@ -57,7 +58,7 @@ export class TextInputValidationService {
 
     if (
       !(placeholder instanceof SubtitledUnicode) ||
-      !angular.isString(placeholder.getUnicode())
+      !angular.isString(placeholder.unicode)
     ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -111,16 +112,35 @@ export class TextInputValidationService {
     let seenStringsStartsWith: string[] = [];
     let seenStringsEquals: string[] = [];
     let seenStringsFuzzyEquals: string[] = [];
+    let seenRuleTypes: Set<string>;
 
     for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
+      seenRuleTypes = new Set();
       for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
-        let currentString = <string> rule.inputs.x;
+        if (seenRuleTypes.has(rule.type)) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              `Answer group ${answerGroupIndex + 1} has multiple rules with ` +
+              `the same type \'${rule.type}\' within the same group.`
+            )
+          });
+        }
+        seenRuleTypes.add(rule.type);
+
+
+        let currentStrings = (
+          <TranslatableSetOfNormalizedString>rule.inputs.x).normalizedStrSet;
         if (rule.type === 'Contains') {
-          // Check if the current string contains any of the previously seen
-          // strings as a substring.
-          if (seenStringsContains.some(
-            (seenString) => currentString.includes(seenString)) ||
-            seenStringsStartsWith.includes('')) {
+          // Check if any of the current strings contain any of the previously
+          // seen strings as a substring.
+          const hasCollision = seenStringsContains.some(
+            seenString => currentStrings.some(
+              currentString => currentString.includes(seenString)
+            )
+          );
+
+          if (hasCollision || seenStringsStartsWith.includes('')) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -128,12 +148,19 @@ export class TextInputValidationService {
                 'is preceded by a \'Contains\' rule with a matching input.'
             });
           }
-          seenStringsContains.push(currentString);
+
+          seenStringsContains.push(...currentStrings);
         } else if (rule.type === 'StartsWith') {
-          // Check if the current string contains any of the previously seen
-          // strings as a prefix.
-          if (seenStringsStartsWith.concat(seenStringsContains).some(
-            (seenString) => currentString.indexOf(seenString) === 0)) {
+          // Check if any of the current strings contain any of the previously
+          // seen strings as a prefix.
+          const hasCollision = (
+            seenStringsStartsWith.concat(seenStringsContains).some(
+              seenString => currentStrings.some(
+                currentString => currentString.indexOf(seenString) === 0)
+            )
+          );
+
+          if (hasCollision) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -141,11 +168,13 @@ export class TextInputValidationService {
                 'is preceded by a \'StartsWith\' rule with a matching prefix.'
             });
           }
-          seenStringsStartsWith.push(currentString);
+          seenStringsStartsWith.push(...currentStrings);
         } else if (rule.type === 'Equals') {
           if (seenStringsEquals.some(
             (seenString) => textInputRulesService.Equals(
-              currentString, {x: seenString}))) {
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -154,7 +183,9 @@ export class TextInputValidationService {
             });
           } else if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              currentString, {x: seenString}))) {
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -162,11 +193,13 @@ export class TextInputValidationService {
                 'is preceded by a \'FuzzyEquals\' rule with a matching input.'
             });
           }
-          seenStringsEquals.push(currentString);
+          seenStringsEquals.push(...currentStrings);
         } else if (rule.type === 'FuzzyEquals') {
           if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              currentString, {x: seenString}))) {
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -174,7 +207,7 @@ export class TextInputValidationService {
                 'is preceded by a \'FuzzyEquals\' rule with a matching input.'
             });
           }
-          seenStringsFuzzyEquals.push(currentString);
+          seenStringsFuzzyEquals.push(...currentStrings);
         }
       }
     }

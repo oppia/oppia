@@ -55,9 +55,9 @@ class FailedMLTest(test_utils.EmailTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         config_property = config_domain.Registry.get_config_property(
-            'notification_emails_for_failed_tasks')
+            'notification_user_ids_for_failed_tasks')
         config_property.set_value(
-            'committer_id', ['moderator@example.com'])
+            'committer_id', [self.get_user_id_from_email(self.ADMIN_EMAIL)])
 
     def test_send_failed_ml_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -65,8 +65,7 @@ class FailedMLTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
-            messages = self._get_sent_email_messages(
-                'moderator@example.com')
+            messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
@@ -78,8 +77,7 @@ class FailedMLTest(test_utils.EmailTestBase):
             expected_subject = 'Failed ML Job'
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
-            messages = self._get_sent_email_messages(
-                'moderator@example.com')
+            messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
 
@@ -2097,8 +2095,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         }
 
         translation_suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description')
@@ -2131,8 +2129,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             }
 
         question_suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description')
@@ -3680,8 +3678,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
         with self.mock_datetime_utcnow(submission_datetime):
             translation_suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, add_translation_change_dict,
                 'test description')
@@ -3714,8 +3712,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
         with self.mock_datetime_utcnow(submission_datetime):
             question_suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, add_question_change_dict,
                 'test description')
@@ -4438,8 +4436,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -4463,8 +4461,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -4535,7 +4533,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             logging, 'info', self._mock_logging_info)
 
         self.suggestion_types_needing_reviewers = {
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
         }
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
@@ -4632,7 +4630,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
         expected_email_html_body = (
             'Hi user1,'
             '<br><br>'
@@ -4676,7 +4674,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -4747,7 +4745,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body = (
             'Hi user1,'
             '<br><br>'
@@ -4790,7 +4788,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -4860,7 +4858,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
         expected_email_html_body = (
             'Hi user1,'
@@ -4910,7 +4908,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
@@ -4993,9 +4991,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'fr', 'hi'},
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+                feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
             })
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
@@ -5781,7 +5779,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -5795,9 +5794,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_schema_of_new_reviewer_email_data_constant(self):
         self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA.keys()), [
-            constants.REVIEW_CATEGORY_QUESTION,
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER])
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
         for category_details in email_manager.NEW_REVIEWER_EMAIL_DATA.values():
             self.assertEqual(len(category_details), 4)
             self.assertTrue(
@@ -5828,7 +5827,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5874,7 +5874,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.voiceover_reviewer_id,
-                constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5919,7 +5920,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.question_reviewer_id,
-                constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5949,7 +5951,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -5964,9 +5967,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     def test_schema_of_removed_reviewer_email_data_constant(self):
         self.assertEqual(
             sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA.keys()), [
-                constants.REVIEW_CATEGORY_QUESTION,
-                constants.REVIEW_CATEGORY_TRANSLATION,
-                constants.REVIEW_CATEGORY_VOICEOVER])
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
         for category_details in (
                 email_manager.REMOVED_REVIEWER_EMAIL_DATA.values()):
             self.assertEqual(len(category_details), 4)
@@ -5997,7 +6000,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -6042,7 +6046,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.voiceover_reviewer_id,
-                constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -6084,7 +6089,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
-                self.question_reviewer_id, constants.REVIEW_CATEGORY_QUESTION,
+                self.question_reviewer_id,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.

@@ -19,12 +19,14 @@
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration Objective Editor directive', function() {
   var $scope = null;
   var ExplorationObjectiveService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');

@@ -36,12 +36,15 @@ require('services/editability.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
 
 angular.module('oppia').component('paramChangesEditor', {
   bindings: {
-    paramChangesService: '=',
+    paramChangesService: '<',
     postSaveHook: '=',
-    isCurrentlyInSettingsTab: '&currentlyInSettingsTab'
+    isCurrentlyInSettingsTab: '<'
   },
   template: require('./param-changes-editor.component.html'),
   controller: [
@@ -160,7 +163,7 @@ angular.module('oppia').component('paramChangesEditor', {
 
         ExplorationParamSpecsService.saveDisplayedValue();
         ctrl.paramChangesService.saveDisplayedValue();
-        if (!ctrl.isCurrentlyInSettingsTab()) {
+        if (!ctrl.isCurrentlyInSettingsTab) {
           ExplorationStatesService.saveStateParamChanges(
             ctrl.paramChangesService.stateName,
             angular.copy(ctrl.paramChangesService.displayed));
@@ -270,3 +273,15 @@ angular.module('oppia').component('paramChangesEditor', {
     }
   ]
 });
+
+@Directive({
+  selector: 'param-changes-editor'
+})
+export class ParamChangesEditorDirective extends UpgradeComponent {
+  @Input() paramChangesService: unknown;
+  @Input() postSaveHook: () => void;
+  @Input() currentlyInSettingsTab: boolean;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('paramChangesEditor', elementRef, injector);
+  }
+}

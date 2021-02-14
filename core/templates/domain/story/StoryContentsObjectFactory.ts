@@ -165,62 +165,6 @@ export class StoryContents {
           'Initial node - ' + this._initialNodeId +
           ' - is not present in the story');
       }
-
-      // All the validations above should be successfully completed before
-      // going to validating the story node graph.
-      if (issues.length > 0) {
-        return issues;
-      }
-
-      // Variable nodesQueue stores the pending nodes to visit in a queue form.
-      var nodesQueue = [];
-      var nodeIsVisited = new Array(nodeIds.length).fill(false);
-      var startingNode = nodes[this.getNodeIndex(this._initialNodeId)];
-      nodesQueue.push(startingNode.getId());
-
-      // The user is assumed to have all the prerequisite skills of the
-      // starting node before starting the story. Also, this list models the
-      // skill IDs acquired by a learner as they progress through the story.
-      var simulatedSkillIds = new Set(startingNode.getPrerequisiteSkillIds());
-
-      // The following loop employs a Breadth First Search from the given
-      // starting node and makes sure that the user has acquired all the
-      // prerequisite skills required by the destination nodes 'unlocked' by
-      // visiting a particular node by the time that node is finished.
-      while (nodesQueue.length > 0) {
-        var currentNodeIndex = this.getNodeIndex(nodesQueue.shift());
-        nodeIsVisited[currentNodeIndex] = true;
-        var currentNode = nodes[currentNodeIndex];
-
-        currentNode.getAcquiredSkillIds().forEach((skillId) => {
-          simulatedSkillIds.add(skillId);
-        });
-        for (var i = 0; i < currentNode.getDestinationNodeIds().length; i++) {
-          var nodeId = currentNode.getDestinationNodeIds()[i];
-          var nodeIndex = this.getNodeIndex(nodeId);
-          // The following condition checks whether the destination node
-          // for a particular node, has already been visited, in which case
-          // the story would have loops, which are not allowed.
-          if (nodeIsVisited[nodeIndex]) {
-            issues.push('Loops are not allowed in the node graph');
-            // If a loop is encountered, then all further checks are halted,
-            // since it can lead to same error being reported again.
-            return issues;
-          }
-          var destinationNode = nodes[nodeIndex];
-          destinationNode.getPrerequisiteSkillIds().forEach(
-            (skillId: string) => {
-              if (!simulatedSkillIds.has(skillId)) {
-                issues.push(
-                  'The prerequisite skill with id ' + skillId +
-                  ' was not completed before node with id ' + nodeId +
-                  ' was unlocked');
-              }
-            }
-          );
-          nodesQueue.push(nodeId);
-        }
-      }
     }
     return issues;
   }

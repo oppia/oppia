@@ -16,11 +16,17 @@
  * @fileoverview Unit tests for activityTilesInfinityGrid.
  */
 
+import { HttpClientTestingModule } from
+  '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { UserService } from 'services/user.service';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Activity tiles infinity grid component', function() {
   var ctrl = null;
@@ -36,6 +42,7 @@ describe('Activity tiles infinity grid component', function() {
   };
   var loadingMessageChangeEventEmitter = new EventEmitter();
   var initialSearchResultsLoadedEmitter = new EventEmitter();
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
@@ -45,6 +52,13 @@ describe('Activity tiles infinity grid component', function() {
   }));
 
   beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
+  beforeEach(function() {
+    userService = TestBed.get(UserService);
     windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
@@ -56,13 +70,13 @@ describe('Activity tiles infinity grid component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     searchService = $injector.get('SearchService');
-    userService = $injector.get('UserService');
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
 
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
       of(new Event('resize')));

@@ -63,12 +63,12 @@ describe('Embedding', function() {
     await explorationEditorMainTab.addResponse(
       'TextInput',
       await forms.toRichText('Yes, 3! = 3 x 2 x 1. That\'s 3 x 2 = 6 ways.'),
-      'END', true, 'Contains', 'permutation');
+      'END', true, 'Contains', ['permutation']);
     await explorationEditorMainTab.addResponse(
       'TextInput',
       await forms.toRichText(
         'Yes, 3 factorial, or 3 x 2 x 1. That\'s 3 x 2 = 6 ways.'),
-      'END', false, 'Contains', 'factorial');
+      'END', false, 'Contains', ['factorial']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(

@@ -27,6 +27,15 @@ import feconf
     [models.NAMES.base_model, models.NAMES.config])
 
 
+class ConfigPropertySnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            config_models.ConfigPropertySnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
     """Test ConfigPropertyModel class."""
 
@@ -52,6 +61,15 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         retrieved_model2 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 2)
         self.assertEqual(retrieved_model2.value, 'd')
+
+
+class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            config_models.PlatformParameterSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class PlatformParameterModelUnitTests(test_utils.GenericTestBase):

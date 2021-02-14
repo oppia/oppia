@@ -566,37 +566,44 @@ def get_collection_summaries_where_user_has_role(user_id):
     ]
 
 
-# TODO(bhenning): Update this function to support also matching the query to
-# explorations contained within this collection. Introduce tests to verify this
-# behavior.
-def get_collection_ids_matching_query(query_string, cursor=None):
+def get_collection_ids_matching_query(
+        query_string, categories, language_codes, offset=None):
     """Returns a list with all collection ids matching the given search query
-    string, as well as a search cursor for future fetches.
+    string, as well as a search offset for future fetches.
 
     Args:
         query_string: str. The search query string.
-        cursor: str or None. Cursor indicating where, in the list of
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        offset: str or None. Offset indicating where, in the list of
             collections, to start the search from.
 
     Returns:
-        2-tuple of (returned_collection_ids, search_cursor). Where:
+        2-tuple of (returned_collection_ids, search_offset). Where:
             returned_collection_ids : list(str). A list with all collection ids
                 matching the given search query string, as well as a search
-                cursor for future fetches. The list contains exactly
+                offset for future fetches. The list contains exactly
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_cursor: str. Search cursor for future fetches.
+            search_offset: str. Search offset for future fetches.
     """
     returned_collection_ids = []
-    search_cursor = cursor
+    search_offset = offset
 
     for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
-        collection_ids, search_cursor = search_services.search_collections(
-            query_string, remaining_to_fetch, cursor=search_cursor)
+        collection_ids, search_offset = search_services.search_collections(
+            query_string, categories, language_codes, remaining_to_fetch,
+            offset=search_offset)
 
         # Collection model cannot be None as we are fetching the collection ids
         # through query and there cannot be a collection id for which there is
@@ -606,13 +613,13 @@ def get_collection_ids_matching_query(query_string, cursor=None):
                     collection_ids)):
             returned_collection_ids.append(collection_ids[ind])
 
-        # The number of collections in a page is always lesser or equal to
+        # The number of collections in a page is always less than or equal to
         # feconf.SEARCH_RESULTS_PAGE_SIZE.
         if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
-                search_cursor is None):
+                search_offset is None):
             break
 
-    return (returned_collection_ids, search_cursor)
+    return (returned_collection_ids, search_offset)
 
 
 # Repository SAVE and DELETE methods.
@@ -629,10 +636,12 @@ def apply_change_list(collection_id, change_list):
         Collection. The resulting collection domain object.
     """
     collection = get_collection_by_id(collection_id)
-    try:
-        changes = [collection_domain.CollectionChange(change_dict)
-                   for change_dict in change_list]
 
+    try:
+        changes = [
+            collection_domain.CollectionChange(change_dict)
+            for change_dict in change_list
+        ]
         for change in changes:
             if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
                 collection.add_node(change.exploration_id)
@@ -663,6 +672,7 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
+
         return collection
 
     except Exception as e:
@@ -670,7 +680,7 @@ def apply_change_list(collection_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, collection_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def validate_exps_in_collection_are_public(collection):
@@ -769,7 +779,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             collection_node.to_dict() for collection_node in collection.nodes
         ]
     }
-    collection_model.node_count = len(collection_model.nodes)
+    collection_model.node_count = len(
+        collection_model.collection_contents['nodes'])
     collection_model.commit(committer_id, commit_message, change_list)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])
@@ -811,7 +822,8 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
-    regenerate_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(
+        collection.id, committer_id)
 
 
 def save_new_collection(committer_id, collection):
@@ -954,7 +966,8 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)
-    regenerate_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(
+        collection.id, committer_id)
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
@@ -962,29 +975,44 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def regenerate_collection_summary(collection_id, contributor_id_to_add):
-    """Regenerate a summary of the given collection. If the summary does not
-    exist, this function generates a new one.
+def regenerate_collection_summary_with_new_contributor(
+        collection_id, contributor_id):
+    """Regenerate a summary of the given collection and add a new contributor to
+    the contributors summary. If the summary does not exist, this function
+    generates a new one.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str|None. ID of the contributor to be added to
-            the collection summary.
+        contributor_id: str. ID of the contributor to be added to the collection
+            summary.
     """
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(
-        collection, contributor_id_to_add)
+    collection_summary = _compute_summary_of_collection(collection)
+    collection_summary.add_contribution_by_user(contributor_id)
     save_collection_summary(collection_summary)
 
 
-def compute_summary_of_collection(collection, contributor_id_to_add):
+def regenerate_collection_and_contributors_summaries(collection_id):
+    """Regenerate a summary of the given collection and also regenerate
+    the contributors summary from the snapshots. If the summary does not exist,
+    this function generates a new one.
+
+    Args:
+        collection_id: str. ID of the collection.
+    """
+    collection = get_collection_by_id(collection_id)
+    collection_summary = _compute_summary_of_collection(collection)
+    collection_summary.contributors_summary = (
+        compute_collection_contributors_summary(collection_summary.id))
+    save_collection_summary(collection_summary)
+
+
+def _compute_summary_of_collection(collection):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
 
     Args:
         collection: Collection. The domain object.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
@@ -994,21 +1022,10 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     collection_summary_model = (
         collection_models.CollectionSummaryModel.get_by_id(collection.id))
 
-    # Update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an collection's content).
     contributors_summary = (
         collection_summary_model.contributors_summary
-        if collection_summary_model else {})
-
-    if contributor_id_to_add is None:
-        # Recalculate the contributors because revert was done.
-        contributors_summary = compute_collection_contributors_summary(
-            collection.id)
-    elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        contributors_summary[contributor_id_to_add] = (
-            contributors_summary.get(contributor_id_to_add, 0) + 1)
-
+        if collection_summary_model else {}
+    )
     contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
@@ -1083,7 +1100,7 @@ def save_collection_summary(collection_summary):
         'owner_ids': collection_summary.owner_ids,
         'editor_ids': collection_summary.editor_ids,
         'viewer_ids': collection_summary.viewer_ids,
-        'contributor_ids': collection_summary.contributor_ids,
+        'contributor_ids': list(collection_summary.contributors_summary.keys()),
         'contributors_summary': collection_summary.contributors_summary,
         'version': collection_summary.version,
         'node_count': collection_summary.node_count,

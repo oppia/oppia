@@ -106,8 +106,13 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
     by.css('.protractor-test-topic-meta-tag-content-label'));
+  var topicPageTitleFragmentField = element(
+    by.css('.protractor-test-topic-page-title-fragment-field'));
+  var topicPageTitleFragmentLabel = element(
+    by.css('.protractor-test-topic-page-title-fragment-label'));
   var easyRubricDifficulty = element(
     by.css('.protractor-test-skill-difficulty-easy'));
+  var storyTitleClassname = '.protractor-test-story-title';
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -371,10 +376,16 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
+    if (count) {
+      await waitFor.visibilityOf(
+        storyListTable, 'Story list table takes too long to appear.');
+    }
     expect(await storyListItems.count()).toEqual(count);
   };
 
   this.expectStoryTitleToBe = async function(title, index) {
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
     expect(
       await storyListItems.get(index).all(
         by.css('.protractor-test-story-title')).first().getText()
@@ -382,6 +393,8 @@ var TopicEditorPage = function() {
   };
 
   this.expectStoryPublicationStatusToBe = async function(status, index) {
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
     expect(
       await storyListItems.get(index).all(
         by.css('.protractor-test-story-publication-status')).first().getText()
@@ -393,6 +406,17 @@ var TopicEditorPage = function() {
       storyListTable, 'Story list table takes too long to appear.');
     var storyItem = await storyListItems.get(index);
     await storyItem.click();
+    await waitFor.pageToFullyLoad();
+    await waitFor.invisibilityOf(
+      storyListTable, 'Story list table too long to disappear.');
+  };
+
+  this.navigateToStoryWithTitle = async function(storyName) {
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
+    var storyItem = element(
+      by.cssContainingText(storyTitleClassname, storyName));
+    await action.click('Story Item', storyItem);
     await waitFor.pageToFullyLoad();
     await waitFor.invisibilityOf(
       storyListTable, 'Story list table too long to disappear.');
@@ -425,6 +449,14 @@ var TopicEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.updatePageTitleFragment = async function(newPageTitleFragment) {
+    await action.sendKeys(
+      'Update Page Title Fragment',
+      topicPageTitleFragmentField, newPageTitleFragment);
+    await action.click(
+      'Page Title Fragment label', topicPageTitleFragmentLabel);
+  };
+
   this.updateMetaTagContent = async function(newMetaTagContent) {
     await action.sendKeys(
       'Update Meta Tag Content', topicMetaTagContentField, newMetaTagContent);
@@ -442,6 +474,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeTopicDescription = async function(newDescription) {
+    await general.scrollToTop();
     await topicDescriptionField.clear();
     await topicDescriptionField.sendKeys(newDescription);
     await topicDescriptionHeading.click();

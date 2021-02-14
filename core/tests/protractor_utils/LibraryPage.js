@@ -77,8 +77,8 @@ var LibraryPage = function() {
     var searchInput = (
       browser.isMobile ? await searchInputs.get(1) :
       await searchInputs.first());
-    await searchInput.clear();
-    await searchInput.sendKeys(searchQuery);
+    await action.clear('Search input', searchInput);
+    await action.sendKeys('Search input', searchInput, searchQuery);
     let searchButtonExists = await searchButton.isPresent();
     if (searchButtonExists) {
       await action.click('Search button', searchButton);
@@ -92,7 +92,7 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
-    var addToPlaylistButton = element(by.css(
+    var addToPlayLaterListButton = element(by.css(
       '.protractor-test-add-to-playlist-btn')
     );
 
@@ -100,8 +100,10 @@ var LibraryPage = function() {
       '.protractor-test-exp-summary-tile-title'))).perform();
 
     await waitFor.elementToBeClickable(
-      addToPlaylistButton, 'Add to playlist Icon taking too long to load');
-    await addToPlaylistButton.click();
+      addToPlayLaterListButton,
+      'Add to \'Play Later\' list Icon taking too long to load');
+    await action.click(
+      'Add to play later list button', addToPlayLaterListButton);
   };
 
   this.selectLanguages = async function(languages) {
@@ -148,23 +150,28 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionSummaryTile.first(),
       'Library Page does not have any collections');
+    var collectionCard = allCollectionsTitled(collectionName).first();
     await waitFor.visibilityOf(
-      allCollectionsTitled(collectionName).first(),
+      collectionCard,
       'Unable to find collection ' + collectionName);
-    await allCollectionsTitled(collectionName).first().click();
+    // The Collection summary card is masked by a dummy element. Therefore, a
+    // Javascript click is used.
+    await action.click('Collection Card', collectionCard, true);
     await waitFor.pageToFullyLoad();
   };
 
   this.playExploration = async function(explorationName) {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      await allExplorationSummaryTile.first(),
+      allExplorationSummaryTile.first(),
       'Library Page does not have any explorations');
 
-    var explorationCard = await allExplorationsTitled(explorationName).first();
+    var explorationCard = allExplorationsTitled(explorationName).first();
     await waitFor.visibilityOf(
       explorationCard, 'Unable to find exploration ' + explorationName);
-    await explorationCard.click();
+    // The Exploration summary card is masked by a dummy element. Therefore, a
+    // Javascript click is used.
+    await action.click('Exploration Card', explorationCard, true);
     await waitFor.pageToFullyLoad();
   };
 

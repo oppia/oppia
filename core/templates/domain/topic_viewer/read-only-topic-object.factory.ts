@@ -48,6 +48,7 @@ export interface ReadOnlyTopicBackendDict {
   'topic_description': string;
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
+  'page_title_fragment_for_web': string;
 }
 
 export class ReadOnlyTopic {
@@ -62,6 +63,7 @@ export class ReadOnlyTopic {
   _skillDescriptions: SkillIdToDescriptionMap;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
+  _pageTitleFragmentForWeb: string;
 
   constructor(
       topicName: string, topicId: string, topicDescription: string,
@@ -72,7 +74,7 @@ export class ReadOnlyTopic {
       degreesOfMastery: DegreesOfMastery,
       skillDescriptions: SkillIdToDescriptionMap,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string) {
+      metaTagContent: string, pageTitleFragmentForWeb: string) {
     this._topicName = topicName;
     this._topicId = topicId;
     this._topicDescription = topicDescription;
@@ -84,6 +86,7 @@ export class ReadOnlyTopic {
     this._skillDescriptions = skillDescriptions;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
+    this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
   getTopicName(): string {
@@ -129,6 +132,10 @@ export class ReadOnlyTopic {
   getMetaTagContent(): string {
     return this._metaTagContent;
   }
+
+  getPageTitleFragmentForWeb(): string {
+    return this._pageTitleFragmentForWeb;
+  }
 }
 
 @Injectable({
@@ -155,8 +162,8 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.skill_descriptions;
     let canonicalStories =
         topicDataDict.canonical_story_dicts.map(storyDict => {
-          let pendingNodes = (
-            storyDict.pending_node_dicts.map(storyNodeDict => {
+          let allNodes = (
+            storyDict.all_node_dicts.map(storyNodeDict => {
               return StoryNode.createFromBackendDict(
                 storyNodeDict);
             }));
@@ -164,12 +171,12 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, pendingNodes);
+            storyDict.url_fragment, allNodes);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
-          let pendingNodes = (
-            storyDict.pending_node_dicts.map(storyNodeDict => {
+          let allNodes = (
+            storyDict.all_node_dicts.map(storyNodeDict => {
               return StoryNode.createFromBackendDict(
                 storyNodeDict);
             }));
@@ -177,14 +184,15 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, pendingNodes);
+            storyDict.url_fragment, allNodes);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,
       topicDataDict.topic_description, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
       skillDescriptions, topicDataDict.practice_tab_is_displayed,
-      topicDataDict.meta_tag_content);
+      topicDataDict.meta_tag_content,
+      topicDataDict.page_title_fragment_for_web);
   }
 }
 
