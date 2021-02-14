@@ -252,14 +252,11 @@
     top: 3.5em;
   }
   
-  .headroom--unpinned.audio-header.audio-header-margin {
-    top: 2em
+  @media(max-width: 768px) {
+    .headroom--unpinned.audio-header.audio-header-margin {
+      margin-top: 8px;
+      }
   }
-
-  .headroom--pinned.audio-header.audio-header-margin {
-    top: 3.5em
-  }
-
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;
