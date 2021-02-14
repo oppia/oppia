@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,10 +21,9 @@ import { Injectable } from '@angular/core';
  */
 
 interface ResponseData {
-  email_preferences: {
-    mute_feedback_notifications: boolean,
-    // eslint-disable-next-line camelcase
-    mute_suggestion_notifications: boolean
+  'email_preferences': {
+    'mute_feedback_notifications': boolean,
+    'mute_suggestion_notifications': boolean
   }
 }
 
