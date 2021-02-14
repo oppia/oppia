@@ -14,8 +14,6 @@
 
 import { HttpClient } from '@angular/common/http';
 import { AlertsService } from 'services/alerts.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ExplorationDataService } from './exploration-data.service';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 /**
@@ -31,9 +29,7 @@ export class UserEmailPreferencesService {
   suggestionNotificationsMuted: boolean;
   constructor(
     private http: HttpClient,
-    private alertsService: AlertsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private explorationDataService: ExplorationDataService
+    private alertsService: AlertsService
   ) { }
 
   init(
@@ -82,15 +78,11 @@ export class UserEmailPreferencesService {
       requestParams: object
   ): Promise<void | object> {
     var that = this;
-    var emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
-      '/createhandler/notificationpreferences/<exploration_id>', {
-        exploration_id: this.explorationDataService.explorationId
-      }
-    );
+    var emailPreferencesUrl = '/createhandler/notificationpreferences/12345';
     return this.http.put(emailPreferencesUrl, requestParams).toPromise().then(
       function(response) {
         var data = response;
-        this.alertsService.clearWarnings();
+        that.alertsService.clearWarnings(),
         that.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
@@ -101,79 +93,3 @@ export class UserEmailPreferencesService {
 angular.module('oppia').factory(
   'UserEmailPreferencesService',
   downgradeInjectable(UserEmailPreferencesService));
-
-
-// Require('domain/utilities/url-interpolation.service.ts');
-// require('pages/exploration-editor-page/services/exploration-data.service.ts');
-// require('services/alerts.service.ts');
-
-// angular.module('oppia').factory('UserEmailPreferencesService', [
-//   '$http', 'AlertsService', 'ExplorationDataService',
-//   'UrlInterpolationService',
-//   function(
-//       $http, AlertsService,
-//       ExplorationDataService, UrlInterpolationService) {
-//     var MESSAGE_TYPE_SUGGESTION = 'suggestion';
-//     var MESSAGE_TYPE_FEEDBACK = 'feedback';
-//     return {
-//       init: function(
-//           feedbackNotificationsMuted, suggestionNotificationsMuted) {
-//         this.feedbackNotificationsMuted = feedbackNotificationsMuted;
-//         this.suggestionNotificationsMuted = suggestionNotificationsMuted;
-//       },
-//       /**
-//        * @return {boolean} Whether the feedback notification is muted.
-//        */
-//       areFeedbackNotificationsMuted: function() {
-//         return this.feedbackNotificationsMuted;
-//       },
-//       /**
-//        * @return {boolean} Whether the suggestion notification is muted.
-//        */
-//       areSuggestionNotificationsMuted: function() {
-//         return this.suggestionNotificationsMuted;
-//       },
-//       /**
-//        * Set the message type to feedback and mute to true or false.
-//        * @param {boolean} mute - Whether the feedback notification is muted.
-//        */
-//       setFeedbackNotificationPreferences: function(mute) {
-//         this.saveChangeToBackend({
-//           message_type: MESSAGE_TYPE_FEEDBACK,
-//           mute: mute
-//         });
-//       },
-//       /**
-//        * Set the message type to suggestion and mute to true or false.
-//        * @param {boolean} mute - Whether the suggestion notification is muted.
-//        */
-//       setSuggestionNotificationPreferences: function(mute) {
-//         this.saveChangeToBackend({
-//           message_type: MESSAGE_TYPE_SUGGESTION,
-//           mute: mute
-//         });
-//       },
-//       /**
-//        * Save the change of message_type and mute to backend.
-//        * @param {object} requestParams - Info about message_type and mute.
-//        */
-//       saveChangeToBackend: function(requestParams) {
-//         var that = this;
-//         var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(
-//           '/createhandler/notificationpreferences/<exploration_id>', {
-//             exploration_id: ExplorationDataService.explorationId
-//           }
-//         );
-//         return $http.put(emailPreferencesUrl, requestParams).then(
-//           function(response) {
-//             var data = response.data;
-//             AlertsService.clearWarnings();
-//             that.init(
-//               data.email_preferences.mute_feedback_notifications,
-//               data.email_preferences.mute_suggestion_notifications);
-//           }
-//         );
-//       }
-//     };
-//   }
-// ]);
