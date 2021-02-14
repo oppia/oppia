@@ -201,7 +201,8 @@ angular.module('oppia').component('explorationEditorPage', {
         StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataBackendApiService, UrlInterpolationService,
-        UserEmailPreferencesService, UserExplorationPermissionsService,
+        UserEmailPreferencesBackendApiService,
+        UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -292,7 +293,7 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.rights.cloned_from,
             explorationData.rights.community_owned,
             explorationData.rights.viewable_if_private);
-          UserEmailPreferencesService.init(
+          UserEmailPreferencesBackendApiService.init(
             explorationData.email_preferences.mute_feedback_notifications,
             explorationData.email_preferences
               .mute_suggestion_notifications);
