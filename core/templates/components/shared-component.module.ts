@@ -43,6 +43,8 @@ import { KeyboardShortcutHelpModalComponent } from
   'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
+import { SideNavigationBarComponent } from
+  './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { StorySummaryTileDirective } from
   './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from
@@ -99,6 +101,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
+    SideNavigationBarComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
     SocialButtonsComponent,
@@ -118,7 +121,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    SideNavigationBarComponent
   ],
 
   exports: [
