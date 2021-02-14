@@ -19,6 +19,8 @@
 
 'use strict';
 
+let ACTION_FUNCTIONS_TO_ENFORCE = ['click', 'sendKeys'];
+
 module.exports = {
   meta: {
     type: 'problem',
@@ -32,12 +34,9 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      click: (
-        '{{elementName}}.click() is called instead of using ' +
-        'action.click()'),
-      sendKeys: (
-        '{{elementName}}.sendKeys() is called instead of using ' +
-        'action.sendKeys()'),
+      action: (
+        '{{elementName}}.{{functionName}}() is called instead of using ' +
+        'action.{{functionName}}()'),
     },
   },
 
@@ -55,22 +54,14 @@ module.exports = {
         if (typeof elementName === 'undefined') {
           elementName = '(some expression)';
         }
-        if (callee.property.name === 'click') {
+        if (ACTION_FUNCTIONS_TO_ENFORCE.includes(callee.property.name)) {
           context.report({
             node: callee,
             loc: callee.loc,
-            messageId: 'click',
+            messageId: 'action',
             data: {
               elementName: elementName,
-            },
-          });
-        } else if (callee.property.name === 'sendKeys') {
-          context.report({
-            node: callee,
-            loc: callee.loc,
-            messageId: 'sendKeys',
-            data: {
-              elementName: elementName,
+              functionName: callee.property.name,
             },
           });
         }
