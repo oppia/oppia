@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 
 import { LearnerAnswerDetailsDataService } from
-  'pages/exploration-editor-page/services/learner-answer-details-data.service';
+  'pages/exploration-editor-page/services/learner-answer-details-data-backend-api.service';
 import { CsrfTokenService } from
   'services/csrf-token.service';
 import { ExplorationDataService } from './exploration-data.service';
