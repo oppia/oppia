@@ -32,10 +32,10 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      directElemClick: (
+      click: (
         '{{elementName}}.click() is called instead of using ' +
         'action.click()'),
-      directElemSendKeys: (
+      sendKeys: (
         '{{elementName}}.sendKeys() is called instead of using ' +
         'action.sendKeys()'),
     },
@@ -59,7 +59,7 @@ module.exports = {
           context.report({
             node: callee,
             loc: callee.loc,
-            messageId: 'directElemClick',
+            messageId: 'click',
             data: {
               elementName: elementName,
             },
@@ -68,7 +68,7 @@ module.exports = {
           context.report({
             node: callee,
             loc: callee.loc,
-            messageId: 'directElemSendKeys',
+            messageId: 'sendKeys',
             data: {
               elementName: elementName,
             },
