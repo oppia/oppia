@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UserEmailPreferencesService } from './user-email-preferences.service';
+import { UserEmailPreferencesBackendApiService } from './user-email-preferences-backend-api.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
@@ -34,7 +34,7 @@ describe('User Email Preferences Service', () => {
     }
   };
 
-  var serviceInstance: UserEmailPreferencesService = null;
+  var serviceInstance: UserEmailPreferencesBackendApiService = null;
   var httpTestingController: HttpTestingController = null;
   var csrfService: CsrfTokenService = null;
 
@@ -42,7 +42,7 @@ describe('User Email Preferences Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    serviceInstance = TestBed.get(UserEmailPreferencesService);
+    serviceInstance = TestBed.get(UserEmailPreferencesBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     csrfService = TestBed.get(CsrfTokenService);
 

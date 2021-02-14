@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class UserEmailPreferencesService {
+export class UserEmailPreferencesBackendApiService {
   MESSAGE_TYPE_SUGGESTION = 'suggestion';
   MESSAGE_TYPE_FEEDBACK = 'feedback';
   feedbackNotificationsMuted: boolean;
@@ -91,5 +91,5 @@ export class UserEmailPreferencesService {
 }
 
 angular.module('oppia').factory(
-  'UserEmailPreferencesService',
-  downgradeInjectable(UserEmailPreferencesService));
+  'UserEmailPreferencesBackendApiService',
+  downgradeInjectable(UserEmailPreferencesBackendApiService));
