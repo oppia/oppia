@@ -21,9 +21,10 @@ import datetime
 import unittest
 
 import apache_beam as beam
-from apache_beam.testing.test_pipeline import TestPipeline
-from apache_beam.testing.util import assert_that, equal_to
 from apache_beam.runners.direct.direct_runner import DirectRunner
+from apache_beam.testing.test_pipeline import TestPipeline
+from apache_beam.testing.util import assert_that
+from apache_beam.testing.util import equal_to
 
 from beam_jobs import base_model_validator
 from core.platform import models
@@ -40,8 +41,10 @@ class BaseModelValidatorTests(unittest.TestCase):
 
     def setUp(self):
         self.now = datetime.datetime.utcnow()
-        self.year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
-        self.year_later = datetime.datetime.utcnow() + datetime.timedelta(weeks=52)
+        self.year_ago = (datetime.datetime.utcnow() 
+            - datetime.timedelta(weeks=52))
+        self.year_later = (datetime.datetime.utcnow() 
+            + datetime.timedelta(weeks=52))
 
     def test_validate_deleted_reports_error_for_old_deleted_model(self):
 
@@ -56,15 +59,15 @@ class BaseModelValidatorTests(unittest.TestCase):
             ])
 
             errors = (pcoll | beam.ParDo(
-                base_model_validator.ValidateDeleted())
-                .with_outputs())
+                base_model_validator.ValidateDeleted()).with_outputs())
 
             assert_that(
                 errors.error_category_stale_check,
                 equal_to([(
-                    'entity stale check',
-                    'Entity id 123: model marked as deleted is older than 8 weeks'
-                )])
+                        'entity stale check',
+                        'Entity id 123:'
+                        ' model marked as deleted is older than 8 weeks'
+                    )])
             )
 
     def test_validate_model_time_field_check(self):
@@ -78,8 +81,7 @@ class BaseModelValidatorTests(unittest.TestCase):
             ])
 
             errors = (pcoll | beam.ParDo(
-                base_model_validator.ValidateModelTimeFields())
-                .with_outputs())
+                base_model_validator.ValidateModelTimeFields()).with_outputs())
 
             assert_that(
                 errors.error_category_time_field_check,
@@ -104,15 +106,15 @@ class BaseModelValidatorTests(unittest.TestCase):
             ])
 
             errors = (pcoll | beam.ParDo(
-                base_model_validator.ValidateModelTimeFields())
-                .with_outputs())
+                base_model_validator.ValidateModelTimeFields()).with_outputs())
 
             assert_that(
                 errors.error_category_current_time_check,
                 equal_to([
                     (
                         'current time check',
-                        'Entity id 124: The last_updated field has a value %s which '
+                        'Entity id 124:'
+                        ' The last_updated field has a value %s which '
                         'is greater than the time when the job was run'
                         % (self.year_later)
                     )
@@ -132,14 +134,15 @@ class BaseModelValidatorTests(unittest.TestCase):
             errors = (pcoll | beam.ParDo(
                 base_model_validator.ValidateModelIdWithRegex(
                     '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH))
-                .with_outputs())
+                      .with_outputs())
 
             assert_that(
                 errors.error_category_id_check,
                 equal_to([(
-                    'model id check',
-                    'Entity id 123@?!*: Entity id does not match regex pattern'
-                )])
+                        'model id check',
+                        'Entity id 123@?!*:'
+                        ' Entity id does not match regex pattern'
+                    )])
             )
 
     def test_base_model_validator_ptransform(self):
@@ -178,17 +181,20 @@ class BaseModelValidatorTests(unittest.TestCase):
                 equal_to([
                     (
                         'model id check',
-                        'Entity id 123@?!*: Entity id does not match regex pattern'
+                        'Entity id 123@?!*:'
+                        ' Entity id does not match regex pattern'
                     ),
                     (
                         'current time check',
-                        'Entity id 124: The last_updated field has a value %s which '
+                        'Entity id 124:'
+                        ' The last_updated field has a value %s which '
                         'is greater than the time when the job was run'
                         % (self.year_later)
                     ),
                     (
                         'entity stale check',
-                        'Entity id 123: model marked as deleted is older than 8 weeks'
+                        'Entity id 123:'
+                        ' model marked as deleted is older than 8 weeks'
                     )
                 ]),
                 label='CheckOutput'

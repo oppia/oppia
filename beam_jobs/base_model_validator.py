@@ -27,7 +27,6 @@ from core.platform import models
 import python_utils
 
 
-
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
@@ -75,9 +74,9 @@ class ValidateModelIdWithRegex(beam.DoFn):
         """Initializes the ValidateModelIdWithRegex DoFn.
 
         Args:
-          regex_string: str. A regex pattern for valid ids.
+            regex_string: str. A regex pattern for valid ids.
         """
-        super(init)
+        super(ValidateModelIdWithRegex, self).__init__()
         self.regex_string = regex_string
 
     def process(self, model):
@@ -85,11 +84,11 @@ class ValidateModelIdWithRegex(beam.DoFn):
         models.
 
         Args:
-          model: datastore_services.Model. Entity to validate.
+            model: datastore_services.Model. Entity to validate.
 
         Yields:
-          beam.pvalue.TaggedOutput. An element of the output PCollection for
-          the doFn which represents an error as a key value pair.
+            beam.pvalue.TaggedOutput. An element of the output PCollection for
+            the doFn which represents an error as a key value pair.
         """
         element = model.clone()
         regex_string = self.regex_string
@@ -111,11 +110,11 @@ class ValidateDeleted(beam.DoFn):
         models.
 
         Args:
-          model: datastore_services.Model. Entity to validate.
+            model: datastore_services.Model. Entity to validate.
 
         Yields:
-          beam.pvalue.TaggedOutput. An element of the output PCollection for
-          the doFn which represents an error as a key value pair.
+            beam.pvalue.TaggedOutput. An element of the output PCollection for
+            the doFn which represents an error as a key value pair.
         """
         element = model.clone()
         date_now = datetime.datetime.utcnow()
@@ -147,11 +146,11 @@ class ValidateModelTimeFields(beam.DoFn):
         models.
 
         Args:
-          model: datastore_services.Model. Entity to validate.
+            model: datastore_services.Model. Entity to validate.
 
         Yields:
-          beam.pvalue.TaggedOutput. An element of the output PCollection for
-          the doFn which represents an error as a key value pair.
+            beam.pvalue.TaggedOutput. An element of the output PCollection for
+            the doFn which represents an error as a key value pair.
         """
 
         element = model.clone()
@@ -186,15 +185,15 @@ class BaseModelValidator(beam.PTransform):
         returns a beam.PCollection of validation errors.
 
         Args:
-          model_pipe: beam.PCollection. A collection of models.
+            model_pipe: beam.PCollection. A collection of models.
 
         Returns:
-          beam.PCollection. A collection of errors represented as
-          key-value pairs.
+            beam.PCollection. A collection of errors represented as
+            key-value pairs.
         """
         models, deleted = (model_pipe | beam.Map(
             self._check_deletion_status)
-            .with_outputs('not_deleted', 'deleted'))
+                           .with_outputs('not_deleted', 'deleted'))
 
         deletion_errors = deleted | beam.ParDo(ValidateDeleted()).with_outputs()
 
@@ -203,13 +202,13 @@ class BaseModelValidator(beam.PTransform):
 
         model_id_validation_errors = (models | beam.ParDo(
             ValidateModelIdWithRegex(self._get_model_id_regex()))
-            .with_outputs())
+                                      .with_outputs())
 
         merged = ((
-                  deletion_errors.error_category_stale_check,
-                  time_field_validation_errors.error_category_time_field_check,
-                  time_field_validation_errors.error_category_current_time_check,
-                  model_id_validation_errors.error_category_id_check)
+            deletion_errors.error_category_stale_check,
+            time_field_validation_errors.error_category_time_field_check,
+            time_field_validation_errors.error_category_current_time_check,
+            model_id_validation_errors.error_category_id_check)
                   | beam.Flatten())
 
         return merged
@@ -226,11 +225,11 @@ class BaseModelValidator(beam.PTransform):
         """Function that splits model PCollection based on deletion status.
 
         Args:
-          model. datastore_services.Model. Entity to validate.
+          model: datastore_services.Model. Entity to validate.
 
         Returns:
-          beam.pvalue.TaggedOutput. A model which element of the output
-          PCollection for the doFn.
+            beam.pvalue.TaggedOutput: A model which element of the output
+            PCollection for the doFn.
         """
 
         if not model.deleted:

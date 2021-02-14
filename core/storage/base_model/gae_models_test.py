@@ -121,7 +121,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             model.get(model_id)
 
     def test_clone(self):
-        model = base_models.BaseModel(id="123", deleted=True)
+        model = base_models.BaseModel(id='123', deleted=True)
         clone = model.clone()
 
         self.assertEqual(model.id, clone.id)
