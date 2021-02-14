@@ -98,7 +98,6 @@
         "oppia/e2e-action": "error",
       }
     }
-
   ],
   "rules": {
     "oppia/break-after-parens": "error",
