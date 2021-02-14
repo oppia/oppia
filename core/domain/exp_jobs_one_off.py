@@ -172,7 +172,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
 class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-off job for testing exploration migration from any
     exploration schema version to the latest. This job runs the state
-    migration, but does not commit the new exploration to the store.
+    migration, but does not commit the new exploration to the datastore.
     """
 
     @classmethod
@@ -728,3 +728,76 @@ class ExpCommitLogModelRegenerationValidator(
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-off job for testing the migration of all exp versions
+    to the latest schema version. This job runs the state migration, but does
+    not commit the new exploration to the datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotContentModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        exp_id = item.get_unversioned_instance_id()
+
+        # FOR TESTING PURPOSES ONLY.
+        if not exp_id.startswith('um'):
+            return
+
+        latest_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        if latest_exploration is None:
+            yield ('SUCCESS - Exploration does not exist', 1)
+
+        if (latest_exploration.states_schema_version !=
+            feconf.CURRENT_STATE_SCHEMA_VERSION):
+            yield ('INFO - Exploration is not at latest schema version', exp_id)
+
+        try:
+            latest_exploration.validate()
+        except Exception as e:
+            yield (
+                'FAILURE - Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            return
+
+        target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        current_state_schema_version = item.content['states_schema_version']
+        versioned_exploration_states = {
+            'states_schema_version': current_state_schema_version,
+            'states': item.content['states']
+        }
+        while current_state_schema_version < target_state_schema_version:
+            try:
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states,
+                    current_state_schema_version,
+                    exp_id)
+                current_state_schema_version += 1
+            except Exception as e:
+                error_message = (
+                    'Exploration %s, snapshot %s failed migration to states '
+                    'v%s: %s' % (
+                        item.id, item.get_version_string(),
+                        current_state_schema_version + 1, e))
+                logging.exception(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                break
+
+            if target_state_schema_version == current_state_schema_version:
+                yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
