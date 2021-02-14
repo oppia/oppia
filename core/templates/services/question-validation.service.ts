@@ -12,26 +12,60 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+
 /**
  * @fileoverview Service to validate a question.
  *
  */
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionValidationService {
+  constructor(
+    private stateEditorService: StateEditorService
+  ) { }
 
-angular.module('oppia').factory('QuestionValidationService', [
-  'StateEditorService',
-  function(StateEditorService) {
-    return {
-      isQuestionValid: function(question, misconceptionsBySkill) {
-        return !(
-          question.getValidationErrorMessage() ||
-          question.getUnaddressedMisconceptionNames(
-            misconceptionsBySkill).length > 0 ||
-          !StateEditorService.isCurrentSolutionValid());
-      }
-    };
-  }
-]);
+  isQuestionValid = (
+      question: Question,
+      misconceptionsBySkill: Misconception[]): boolean => {
+    return !(
+      question.getValidationErrorMessage() ||
+      question.getUnaddressedMisconceptionNames(
+        misconceptionsBySkill
+      ).length > 0 ||
+      !this.stateEditorService.isCurrentSolutionValid());
+  };
+}
+
+angular.module('oppia').factory(
+  'QuestionValidationService', downgradeInjectable(QuestionValidationService));
+
+
+// require(
+//   'components/state-editor/state-editor-properties-services/' +
+//   'state-editor.service.ts');
+
+// angular.module('oppia').factory('QuestionValidationService', [
+//   'StateEditorService',
+//   function(StateEditorService) {
+//     return {
+//       isQuestionValid: function(question, misconceptionsBySkill) {
+//     console.log('\n\n\n\n\n\n\n\n\n\n');
+//     console.log(StateEditorService);
+//     console.log(StateEditorService.isCurrentSolutionValid());
+//     console.log('\n\n\n\n\n\n\n\n');
+//         return !(
+//           question.getValidationErrorMessage() ||
+//           question.getUnaddressedMisconceptionNames(
+//             misconceptionsBySkill).length > 0 ||
+//           !StateEditorService.isCurrentSolutionValid());
+//       }
+//     };
+//   }
+// ]);
