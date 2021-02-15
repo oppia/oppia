@@ -2787,6 +2787,11 @@ class Exploration(python_utils.OBJECT):
                 )
             ]
 
+            all_valid_ca_keys = [ca_spec.name for ca_spec in ca_specs]
+            for key in ca_dict:
+                if key not in all_valid_ca_keys:
+                    del ca_dict[key]
+
             for ca_spec in ca_specs:
                 schema = ca_spec.schema
                 ca_name = ca_spec.name

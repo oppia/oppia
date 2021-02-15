@@ -850,7 +850,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
         except Exception:
             logging.exception(
                 'Exploration %s failed to load image: %s' %
-                (exp_id, image['filepath-with-value'].encode('utf-8')))
+                (exp_id, image['filepath-with-value']))
             python_utils.reraise_exception()
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
