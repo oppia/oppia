@@ -2215,14 +2215,11 @@ pre.oppia-pre-wrapped-text {
   outline: 2px solid #009688;
 }
 .oppia-interaction-tile-name {
-  align-items: center;
   background-color: #E0F2F1;
   border: 1px solid #aaa;
   border-radius: 0 0 5px 5px;
-  display: flex;
   font-size: 15px;
   height: 58px;
-  justify-content: center;
   padding: 6px;
   position: relative;
   text-align: center;
