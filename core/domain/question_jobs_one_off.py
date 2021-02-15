@@ -137,10 +137,6 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.deleted:
-            yield ('FAILURE - Snapshot %s is deleted', item.id)
-            return
-
         question_id = item.get_unversioned_instance_id()
 
         latest_question = question_services.get_question_by_id(
@@ -160,9 +156,8 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             latest_question.validate()
         except Exception as e:
             yield (
-                'FAILURE - Question %s failed validation: %s' %
+                'INFO - Question %s failed validation: %s' %
                 (item.id, e))
-            return
 
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_state_schema_version = item.content[
@@ -187,10 +182,9 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
-                    'Question %s, snapshot %s failed migration to state '
+                    'Question snapshot %s failed migration to state '
                     'v%s: %s' % (
-                        item.id, item.get_version_string(),
-                        current_state_schema_version + 1, e))
+                        item.id, current_state_schema_version + 1, e))
                 logging.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
@@ -226,10 +220,6 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.deleted:
-            yield ('FAILURE - Snapshot %s is deleted', item.id)
-            return
-
         question_id = item.get_unversioned_instance_id()
 
         latest_question = question_services.get_question_by_id(
@@ -249,9 +239,8 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             latest_question.validate()
         except Exception as e:
             yield (
-                'FAILURE - Question %s failed validation: %s' %
+                'INFO - Question %s failed validation: %s' %
                 (item.id, e))
-            return
 
         # If the snapshot being stored in the datastore does not have the most
         # up-to-date states schema version, then update it.
@@ -278,10 +267,9 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
-                    'Question %s, snapshot %s failed migration to state '
+                    'Question snapshot %s failed migration to state '
                     'v%s: %s' % (
-                        item.id, item.get_version_string(),
-                        current_state_schema_version + 1, e))
+                        item.id, current_state_schema_version + 1, e))
                 logging.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break

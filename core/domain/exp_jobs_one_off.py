@@ -747,10 +747,6 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.deleted:
-            yield ('FAILURE - Snapshot %s is deleted', item.id)
-            return
-
         exp_id = item.get_unversioned_instance_id()
 
         latest_exploration = exp_fetchers.get_exploration_by_id(
@@ -769,9 +765,8 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             latest_exploration.validate()
         except Exception as e:
             yield (
-                'FAILURE - Exploration %s failed non-strict validation' %
+                'INFO - Exploration %s failed non-strict validation' %
                 item.id, e)
-            return
 
         if 'states_schema_version' not in item.content:
             yield ('INFO - Item has no states_schema_version', item.id)
@@ -801,10 +796,9 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
-                    'Exploration %s, snapshot %s failed migration to states '
+                    'Exploration snapshot %s failed migration to states '
                     'v%s: %s' % (
-                        item.id, item.get_version_string(),
-                        current_state_schema_version + 1, e))
+                        item.id, current_state_schema_version + 1, e))
                 logging.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
@@ -843,10 +837,6 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.deleted:
-            yield ('FAILURE - Snapshot %s is deleted', item.id)
-            return
-
         exp_id = item.get_unversioned_instance_id()
 
         latest_exploration = exp_fetchers.get_exploration_by_id(
@@ -865,9 +855,8 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             latest_exploration.validate()
         except Exception as e:
             yield (
-                'FAILURE - Exploration %s failed non-strict validation: %s' %
-                (item.id, e))
-            return
+                'INFO - Exploration %s failed non-strict validation' % item.id,
+                e)
 
         if 'states_schema_version' not in item.content:
             yield ('INFO - Item has no states_schema_version', item.id)
@@ -888,24 +877,14 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             'states': item.content['states']
         }
         while current_state_schema_version < target_state_schema_version:
-            try:
-                assert (
-                    versioned_exploration_states['states_schema_version'] ==
-                    current_state_schema_version)
-                exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states,
-                    current_state_schema_version,
-                    exp_id)
-                current_state_schema_version += 1
-            except Exception as e:
-                error_message = (
-                    'Exploration %s, snapshot %s failed migration to states '
-                    'v%s: %s' % (
-                        item.id, item.get_version_string(),
-                        current_state_schema_version + 1, e))
-                logging.exception(error_message)
-                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
-                break
+            assert (
+                versioned_exploration_states['states_schema_version'] ==
+                current_state_schema_version)
+            exp_domain.Exploration.update_states_from_model(
+                versioned_exploration_states,
+                current_state_schema_version,
+                exp_id)
+            current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:
                 yield ('SUCCESS - Model upgraded', 1)
