@@ -121,6 +121,7 @@ describe('Collections', function() {
     // In the url a # is added at the end that is not part of collection ID.
     collectionId = pathname[5].slice(0, -1);
     await users.logout();
+    console.log("successfully complete beforeAll Code");
   });
 
   it('should visit the collection editor', async function() {
@@ -129,17 +130,21 @@ describe('Collections', function() {
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateCollectionButton();
     // Add existing explorations.
+    console.log("Add existing explorations.");
     await collectionEditorPage.addExistingExploration(firstExplorationId);
     await collectionEditorPage.addExistingExploration(secondExplorationId);
     await collectionEditorPage.addExistingExploration(thirdExplorationId);
     // Search and add existing explorations.
+    console.log("Search and add existing explorations.");
     await collectionEditorPage.searchForAndAddExistingExploration('Lazy');
     await collectionEditorPage.searchForAndAddExistingExploration('Linear');
     await collectionEditorPage.searchForAndAddExistingExploration('Test');
     // Shifting nodes in the node graph.
+    console.log("Shifting nodes in the node graph.");
     await collectionEditorPage.shiftNodeLeft(1);
     await collectionEditorPage.shiftNodeRight(1);
     // Delete node in the node graph.
+    console.log("Delete node in the node graph");
     await collectionEditorPage.deleteNode(1);
     // Publish the collection.
     await collectionEditorPage.saveDraft();
