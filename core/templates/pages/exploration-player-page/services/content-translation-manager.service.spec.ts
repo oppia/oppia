@@ -32,6 +32,7 @@ import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
@@ -103,6 +104,8 @@ describe('Content translation manager service', () => {
       }
     };
 
+    let interactionId:
+        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS = 'TextInput';
     let interactionDict = {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
@@ -117,7 +120,7 @@ describe('Content translation manager service', () => {
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
-      id: 'TextInput',
+      id: interactionId,
       solution: solutionDict
     };
 
@@ -322,6 +325,12 @@ describe('Content translation manager service', () => {
       writtenTranslations.addWrittenTranslation(
         'ca_1', 'fr', 'unicode', 'fr 2');
 
+      // This throws "Type '"DummyInteraction"' is not assignable to type
+      // '"ImageClickInput" | "NumberWithUnits" | "NumericExpressionInput" |
+      // "NumericInput" | "DragAndDropSortInput" | "ItemSelectionInput" |
+      // "Continue" | "GraphInput" | "EndExploration" | ... 11 more ... |
+      // "RatioExpressionInput"'.""
+      // @ts-expect-error
       interaction.id = 'DummyInteraction';
       interaction.customizationArgs = {
         dummyCustArg: {value: [{

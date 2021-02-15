@@ -29,6 +29,12 @@ describe('InteractionSpecsService', () => {
 
   describe('checking whether an interaction can be trained with ML', () => {
     it('should throw an error when interaction does not exist.', () => {
+      // This throws "Argument of type '"Fake"' is not assignable to parameter
+      // of type '"ImageClickInput" | "NumberWithUnits" |
+      // "NumericExpressionInput" | "NumericInput" | "DragAndDropSortInput" |
+      // "ItemSelectionInput" | "Continue" | "GraphInput" | "EndExploration" |
+      // ... 11 more ... | "RatioExpressionInput"'."
+      // @ts-expect-error
       expect(() => interactionSpecsService.isInteractionTrainable('Fake'))
         .toThrowError('Fake is not a valid interaction id');
     });

@@ -22,6 +22,7 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ImprovementsService } from 'services/improvements.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 
 describe('ImprovementsService', () => {
@@ -39,6 +40,8 @@ describe('ImprovementsService', () => {
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {
     it('should return true for states with TextInput interactions', () => {
+      let interactionId:
+        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS = 'TextInput';
       let mockStateBackendDict = {
         classifier_model_id: null,
         content: {
@@ -46,7 +49,7 @@ describe('ImprovementsService', () => {
           content_id: 'content'
         },
         interaction: {
-          id: 'TextInput',
+          id: interactionId,
           customization_args: {
             rows: {
               value: 1
@@ -101,6 +104,10 @@ describe('ImprovementsService', () => {
     });
 
     it('should return false for states with FractionInput interactions', () => {
+      let interactionId:
+        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS =
+          'FractionInput';
+
       let mockStateBackendDict = {
         classifier_model_id: null,
         content: {
@@ -108,7 +115,7 @@ describe('ImprovementsService', () => {
           content_id: 'content'
         },
         interaction: {
-          id: 'FractionInput',
+          id: interactionId,
           customization_args: {
             requireSimplestForm: { value: false },
             allowImproperFraction: { value: true },

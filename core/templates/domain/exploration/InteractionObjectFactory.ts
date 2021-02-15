@@ -70,6 +70,7 @@ import {
 import {
   SubtitledHtmlObjectFactory, SubtitledHtml
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 
 export interface InteractionBackendDict {
@@ -78,7 +79,7 @@ export interface InteractionBackendDict {
   'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': readonly HintBackendDict[];
-  'id': string;
+  'id': keyof typeof InteractionSpecsConstants.INTERACTION_SPECS;
   'solution': SolutionBackendDict;
 }
 
@@ -88,13 +89,15 @@ export class Interaction {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
-  id: string;
+  id: keyof typeof InteractionSpecsConstants.INTERACTION_SPECS;
   solution: Solution;
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
-      defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
+      defaultOutcome: Outcome, hints: Hint[],
+      id: keyof typeof InteractionSpecsConstants.INTERACTION_SPECS,
+      solution: Solution) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -104,7 +107,9 @@ export class Interaction {
     this.solution = solution;
   }
 
-  setId(newValue: string): void {
+  setId(
+      newValue:
+        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS): void {
     this.id = newValue;
   }
 

@@ -41,6 +41,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { State } from 'domain/state/StateObjectFactory';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;
@@ -161,7 +162,9 @@ export class StateEditorService {
     this.interaction = newInteraction;
   }
 
-  setInteractionId(newId: string): void {
+  setInteractionId(
+      newId:
+        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS): void {
     this.interaction.setId(newId);
   }
 
