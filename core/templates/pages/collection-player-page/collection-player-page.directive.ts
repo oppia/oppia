@@ -164,48 +164,53 @@ angular.module('oppia').directive('collectionPlayerPage', [
           ctrl.generatePathIconParameters = function() {
             var collectionNodes = ctrl.collection.getCollectionNodes();
             var iconParametersArray = [];
-            iconParametersArray.push({
-              thumbnailIconUrl:
-                collectionNodes[0].getExplorationSummaryObject(
-                ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
-              left: '225px',
-              top: '35px',
-              thumbnailBgColor:
-                collectionNodes[0].getExplorationSummaryObject(
-                ).thumbnail_bg_color
-            });
-
-            // Here x and y represent the co-ordinates for the icons in the
-            // path.
-            var x = ctrl.ICON_X_MIDDLE_PX;
-            var y = ctrl.ICON_Y_INITIAL_PX;
-            var countMiddleIcon = 1;
-
-            for (var i = 1; i < ctrl.collection.getCollectionNodeCount(); i++) {
-              if (countMiddleIcon === 0 && x === ctrl.ICON_X_MIDDLE_PX) {
-                x = ctrl.ICON_X_LEFT_PX;
-                y += ctrl.ICON_Y_INCREMENT_PX;
-                countMiddleIcon = 1;
-              } else if (countMiddleIcon === 1 && x === ctrl.ICON_X_MIDDLE_PX) {
-                x = ctrl.ICON_X_RIGHT_PX;
-                y += ctrl.ICON_Y_INCREMENT_PX;
-                countMiddleIcon = 0;
-              } else {
-                x = ctrl.ICON_X_MIDDLE_PX;
-                y += ctrl.ICON_Y_INCREMENT_PX;
-              }
+            if (collectionNodes.length !== 0) {
               iconParametersArray.push({
                 thumbnailIconUrl:
-                  collectionNodes[i].getExplorationSummaryObject(
+                  collectionNodes[0].getExplorationSummaryObject(
                   ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
-                left: x + 'px',
-                top: y + 'px',
+                left: '225px',
+                top: '35px',
                 thumbnailBgColor:
-                  collectionNodes[i].getExplorationSummaryObject(
+                  collectionNodes[0].getExplorationSummaryObject(
                   ).thumbnail_bg_color
               });
+
+              // Here x and y represent the co-ordinates for the icons in the
+              // path.
+              var x = ctrl.ICON_X_MIDDLE_PX;
+              var y = ctrl.ICON_Y_INITIAL_PX;
+              var countMiddleIcon = 1;
+
+              // eslint-disable-next-line max-len
+              for (var i = 1; i < ctrl.collection.getCollectionNodeCount(); i++) {
+                if (countMiddleIcon === 0 && x === ctrl.ICON_X_MIDDLE_PX) {
+                  x = ctrl.ICON_X_LEFT_PX;
+                  y += ctrl.ICON_Y_INCREMENT_PX;
+                  countMiddleIcon = 1;
+                // eslint-disable-next-line max-len
+                } else if (countMiddleIcon === 1 && x === ctrl.ICON_X_MIDDLE_PX) {
+                  x = ctrl.ICON_X_RIGHT_PX;
+                  y += ctrl.ICON_Y_INCREMENT_PX;
+                  countMiddleIcon = 0;
+                } else {
+                  x = ctrl.ICON_X_MIDDLE_PX;
+                  y += ctrl.ICON_Y_INCREMENT_PX;
+                }
+                iconParametersArray.push({
+                  thumbnailIconUrl:
+                    collectionNodes[i].getExplorationSummaryObject(
+                    ).thumbnail_icon_url.replace(
+                      'subjects', 'inverted_subjects'),
+                  left: x + 'px',
+                  top: y + 'px',
+                  thumbnailBgColor:
+                    collectionNodes[i].getExplorationSummaryObject(
+                    ).thumbnail_bg_color
+                });
+              }
+              return iconParametersArray;
             }
-            return iconParametersArray;
           };
 
           ctrl.getExplorationUrl = function(explorationId) {
