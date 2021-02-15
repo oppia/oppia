@@ -30,6 +30,10 @@ sys.path.insert(0, _THIRD_PARTY_PATH)
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
+_CERTIFI_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2020.12.5')
+sys.path.insert(0, _CERTIFI_PATH)
+
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -37,6 +41,9 @@ import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 BASESTRING = past.builtins.basestring
@@ -297,6 +304,7 @@ def url_retrieve(source_url, filename=None):
     Returns:
         urlretrieve. The 'urlretrieve' object.
     """
+    context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib
 
@@ -306,11 +314,13 @@ def url_retrieve(source_url, filename=None):
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
             'Gecko/20100101 Firefox/47.0'
         )
-        return urllib.urlretrieve(source_url, filename=filename)
+        return urllib.urlretrieve(
+            source_url, filename=filename, context=context)
     except ImportError:
         import urllib.request
 
-        return urllib.request.urlretrieve(source_url, filename=filename)
+        return urllib.request.urlretrieve(
+            source_url, filename=filename, context=context)
 
 
 def url_open(source_url):
@@ -324,14 +334,15 @@ def url_open(source_url):
     Returns:
         urlopen. The 'urlopen' object.
     """
+    context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib2
 
-        return urllib2.urlopen(source_url)
+        return urllib2.urlopen(source_url, context=context)
     except ImportError:
         import urllib.request
 
-        return urllib.request.urlopen(source_url)
+        return urllib.request.urlopen(source_url, context=context)
 
 
 def url_request(source_url, data, headers):
