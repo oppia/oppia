@@ -44,4 +44,3 @@ angular.module('oppia').directive(
   'oppiaShortResponseAlgebraicExpressionInput', downgradeComponent({
     component: ShortResponseAlgebraicExpressionInputComponent
   }) as angular.IDirectiveFactory);
-
