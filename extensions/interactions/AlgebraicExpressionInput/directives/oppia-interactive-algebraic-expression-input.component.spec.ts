@@ -56,6 +56,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     onSubmit: (answer, rulesService) => {},
     registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
       submitAnswerFn();
+      validateExpressionFn();
     }
   };
 
@@ -83,14 +84,14 @@ describe('AlgebraicExpressionInputInteractive', () => {
     fixture.detectChanges();
   });
 
-  it('should add the change handler to guppy', function() {
+  it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
-  it('should not submit the answer if invalid', function() {
+  it('should not submit the answer if invalid', () => {
     component.hasBeenTouched = true;
     // Invalid answer.
     component.value = 'x/';
@@ -102,7 +103,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
       'Your answer seems to be missing a variable/number after the "/".');
   });
 
-  it('should correctly validate current answer', function() {
+  it('should correctly validate current answer', () => {
     // This should be validated as true if the editor hasn't been touched.
     component.value = '';
     expect(component.isCurrentAnswerValid()).toBeTrue();
@@ -116,7 +117,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
       component.warningText).toBe('Please enter an answer before submitting.');
   });
 
-  it('should set the value of showOSK to true', function() {
+  it('should set the value of showOSK to true', () => {
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 
