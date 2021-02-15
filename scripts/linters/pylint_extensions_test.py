@@ -1949,115 +1949,201 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
 
 class RestrictedImportCheckerTests(unittest.TestCase):
 
-    def test_detect_restricted_import(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(RestrictedImportCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.RestrictedImportChecker)
-        checker_test_object.setup_method()
+        self.checker_test_object.setup_method()
+        # The spaces are included on purpose so that we properly test
+        # the input sanitization.
+        self.checker_test_object.checker.config.forbidden_imports = (
+            '  core.storage: core.domain  ',
+            'core.domain  : core.controllers',
+            'core.controllers: core.platform  |  core.storage '
+        )
+        self.checker_test_object.checker.open()
 
-        # Tests the case wherein storage layer imports domain layer
-        # in import statements.
+    def test_forbid_domain_import_in_storage_module(self):
         node_err_import = astroid.extract_node(
             """
             import core.domain.activity_domain #@
         """)
         node_err_import.root().name = 'oppia.core.storage.topic'
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
                 args=('domain', 'storage'),
             ),
         ):
-            checker_test_object.checker.visit_import(node_err_import)
+            self.checker_test_object.checker.visit_import(node_err_import)
 
-        # Tests the case wherein storage layer does not import domain layer
-        # in import statements.
+    def test_allow_platform_import_in_storage_module(self):
         node_no_err_import = astroid.extract_node(
             """
             import core.platform.email.mailgun_email_services #@
         """)
         node_no_err_import.root().name = 'oppia.core.storage.topic'
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_import(node_no_err_import)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_import(node_no_err_import)
 
-        # Tests the case wherein storage layer imports domain layer
-        # in import-from statements.
+    def test_forbid_domain_from_import_in_storage_module(self):
         node_err_importfrom = astroid.extract_node(
             """
             from core.domain import activity_domain #@
         """)
         node_err_importfrom.root().name = 'oppia.core.storage.topic'
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_importfrom,
                 args=('domain', 'storage'),
             )
         ):
-            checker_test_object.checker.visit_importfrom(node_err_importfrom)
+            self.checker_test_object.checker.visit_importfrom(
+                node_err_importfrom)
 
-        # Tests the case wherein storage layer does not import domain layer
-        # in import-from statements.
+    def test_allow_platform_from_import_in_storage_module(self):
         node_no_err_importfrom = astroid.extract_node(
             """
             from core.platform.email import mailgun_email_services #@
         """)
         node_no_err_importfrom.root().name = 'oppia.core.storage.topicl'
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node_no_err_importfrom)
 
-        # Tests the case wherein domain layer imports controller layer
-        # in import statements.
+    def test_forbid_controllers_import_in_domain_module(self):
         node_err_import = astroid.extract_node(
             """
             import core.controllers.acl_decorators #@
         """)
         node_err_import.root().name = 'oppia.core.domain'
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('controller', 'domain'),
+                args=('controllers', 'domain'),
             ),
         ):
-            checker_test_object.checker.visit_import(node_err_import)
+            self.checker_test_object.checker.visit_import(node_err_import)
 
-        # Tests the case wherein domain layer does not import controller layer
-        # in import statements.
+    def test_allow_platform_import_in_domain_module(self):
         node_no_err_import = astroid.extract_node(
             """
             import core.platform.email.mailgun_email_services_test #@
         """)
         node_no_err_import.root().name = 'oppia.core.domain'
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_import(node_no_err_import)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_import(node_no_err_import)
 
-        # Tests the case wherein domain layer imports controller layer
-        # in import-from statements.
+    def test_forbid_controllers_from_import_in_domain_module(self):
         node_err_importfrom = astroid.extract_node(
             """
             from core.controllers import acl_decorators #@
         """)
         node_err_importfrom.root().name = 'oppia.core.domain'
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_importfrom,
-                args=('controller', 'domain'),
+                args=('controllers', 'domain'),
             )
         ):
-            checker_test_object.checker.visit_importfrom(node_err_importfrom)
+            self.checker_test_object.checker.visit_importfrom(
+                node_err_importfrom)
 
-        # Tests the case wherein domain layer does not import controller layer
-        # in import-from statements.
+    def test_allow_platform_from_import_in_domain_module(self):
         node_no_err_importfrom = astroid.extract_node(
             """
             from core.platform.email import mailgun_email_services_test #@
         """)
         node_no_err_importfrom.root().name = 'oppia.core.domain'
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node_no_err_importfrom)
+
+    def test_forbid_platform_import_in_controllers_module(self):
+        node_err_import = astroid.extract_node(
+            """
+            import core.platform #@
+        """)
+        node_err_import.root().name = 'oppia.core.controllers.controller'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_err_import,
+                args=('platform', 'controllers'),
+            )
+        ):
+            self.checker_test_object.checker.visit_import(node_err_import)
+
+    def test_forbid_storage_import_in_controllers_module(self):
+        node_err_import = astroid.extract_node(
+            """
+            import core.storage #@
+        """)
+        node_err_import.root().name = 'oppia.core.controllers.controller'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_err_import,
+                args=('storage', 'controllers'),
+            )
+        ):
+            self.checker_test_object.checker.visit_import(node_err_import)
+
+    def test_allow_domain_import_in_controllers_module(self):
+        node_no_err_import = astroid.extract_node(
+            """
+            import core.domain #@
+        """)
+        node_no_err_import.root().name = 'oppia.core.controllers.controller'
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_import(node_no_err_import)
+
+    def test_forbid_platform_from_import_in_controllers_module(self):
+        node_no_err_importfrom = astroid.extract_node(
+            """
+            from core.platform import models #@
+        """)
+        node_no_err_importfrom.root().name = 'oppia.core.controllers.controller'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_no_err_importfrom,
+                args=('platform', 'controllers'),
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node_no_err_importfrom)
+
+    def test_forbid_storage_from_import_in_controllers_module(self):
+        node_no_err_importfrom = astroid.extract_node(
+            """
+            from core.storage.user import gae_models as user_models #@
+        """)
+        node_no_err_importfrom.root().name = 'oppia.core.controllers.controller'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_no_err_importfrom,
+                args=('storage', 'controllers'),
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node_no_err_importfrom)
+
+    def test_allow_domain_from_import_in_controllers_module(self):
+        node_no_err_importfrom = astroid.extract_node(
+            """
+            from core.domain import user_services #@
+        """)
+        node_no_err_importfrom.root().name = 'oppia.core.controllers.controller'
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node_no_err_importfrom)
 
 
 class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
@@ -2915,6 +3001,200 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         compare_node = if_node.test
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
+
+
+class DisallowedFunctionsCheckerTests(unittest.TestCase):
+    """Unit tests for DisallowedFunctionsChecker"""
+
+    def setUp(self):
+        super(DisallowedFunctionsCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowedFunctionsChecker)
+        self.checker_test_object.setup_method()
+
+    def test_disallowed_removals_str(self):
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements_str) = [
+                b'example_func',
+                b'a.example_attr',
+            ]
+        self.checker_test_object.checker.open()
+
+        call1, call2 = astroid.extract_node(
+            """
+        example_func() #@
+        a.example_attr() #@
+        """)
+
+        message_remove_example_func = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call1,
+            args=b'example_func'
+        )
+
+        message_remove_example_attr = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call2,
+            args=b'a.example_attr'
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_remove_example_func,
+            message_remove_example_attr):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+
+    def test_disallowed_replacements_str(self):
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements_str) = [
+                b'datetime.datetime.now=>datetime.datetime.utcnow',
+                b'self.assertEquals=>self.assertEqual',
+                b'b.next=>python_utils.NEXT',
+                b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
+            ]
+        self.checker_test_object.checker.open()
+
+        (
+            call1, call2, call3,
+            call4, call5
+            ) = astroid.extract_node(
+                """
+        datetime.datetime.now() #@
+        self.assertEquals() #@
+        str(1) #@
+        b.next() #@
+        b.a.next() #@
+        """)
+
+        message_replace_disallowed_datetime = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call1,
+            args=(
+                b'datetime.datetime.now',
+                b'datetime.datetime.utcnow')
+        )
+
+        message_replace_disallowed_assert_equals = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call2,
+            args=(
+                b'self.assertEquals',
+                b'self.assertEqual')
+        )
+
+        message_replace_disallowed_str = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call3,
+            args=(
+                b'str',
+                b'python_utils.convert_to_bytes or python_utils.UNICODE')
+        )
+
+        message_replace_disallowed_next = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call4,
+            args=(
+                b'b.next',
+                b'python_utils.NEXT')
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_replace_disallowed_datetime,
+            message_replace_disallowed_assert_equals,
+            message_replace_disallowed_str,
+            message_replace_disallowed_next):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+            self.checker_test_object.checker.visit_call(call3)
+            self.checker_test_object.checker.visit_call(call4)
+            self.checker_test_object.checker.visit_call(call5)
+
+    def test_disallowed_removals_regex(self):
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements_regex) = [
+                r'.*example_func',
+                r'.*\..*example_attr'
+            ]
+        self.checker_test_object.checker.open()
+
+        call1, call2 = astroid.extract_node(
+            """
+        somethingexample_func() #@
+        c.someexample_attr() #@
+        """)
+
+        message_remove_example_func = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call1,
+            args=b'somethingexample_func'
+        )
+
+        message_remove_example_attr = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call2,
+            args=b'c.someexample_attr'
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_remove_example_func,
+            message_remove_example_attr):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+
+    def test_disallowed_replacements_regex(self):
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements_regex) = [
+                r'.*example_func=>other_func',
+                r'.*\.example_attr=>other_attr',
+            ]
+        self.checker_test_object.checker.open()
+
+        call1, call2, call3, call4 = astroid.extract_node(
+            """
+        somethingexample_func() #@
+        d.example_attr() #@
+        d.example_attr() #@
+        d.b.example_attr() #@
+        """)
+
+        message_replace_example_func = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call1,
+            args=(b'somethingexample_func', b'other_func')
+        )
+
+        message_replace_example_attr1 = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call2,
+            args=(b'd.example_attr', b'other_attr')
+        )
+
+        message_replace_example_attr2 = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call3,
+            args=(b'd.example_attr', b'other_attr')
+        )
+
+        message_replace_example_attr3 = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call4,
+            args=(b'd.b.example_attr', b'other_attr')
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_replace_example_func,
+            message_replace_example_attr1,
+            message_replace_example_attr2,
+            message_replace_example_attr3):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+            self.checker_test_object.checker.visit_call(call3)
+            self.checker_test_object.checker.visit_call(call4)
 
 
 class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):

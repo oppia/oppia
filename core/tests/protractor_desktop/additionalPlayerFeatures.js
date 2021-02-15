@@ -165,8 +165,11 @@ describe('Full exploration editor', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
     var backButton = element(by.css('.protractor-test-back-button'));
+    var nextCardButton = element(by.css('.protractor-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('LogicProof');
+    await waitFor.visibilityOf(
+      nextCardButton, 'Next Card button taking too long to show up.');
     await waitFor.invisibilityOf(
       backButton, 'Back button takes too long to disappear.');
 
@@ -219,7 +222,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should give option for redirection when author has specified ' +
-      'a refresher exploration Id', async function() {
+      'a refresher exploration ID', async function() {
     await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
 
     // Create Parent Exploration not added to collection.
@@ -229,7 +232,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(
-      'Parent Exploration not in collection');
+      'Parent Exp not in collection');
     await explorationEditorSettingsTab.setCategory('Algebra');
     await explorationEditorSettingsTab.setObjective(
       'This is a parent exploration');
@@ -306,7 +309,7 @@ describe('Full exploration editor', function() {
 
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(
-      'Parent Exploration not in collection');
+      'Parent Exp not in collection');
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination(null, false, refresherExplorationId);
@@ -328,8 +331,8 @@ describe('Full exploration editor', function() {
 
     // Play-test exploration and visit the refresher exploration.
     await libraryPage.get();
-    await libraryPage.findExploration('Parent Exploration not in collection');
-    await libraryPage.playExploration('Parent Exploration not in collection');
+    await libraryPage.findExploration('Parent Exp not in collection');
+    await libraryPage.playExploration('Parent Exp not in collection');
     await explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Incorrect');
     await explorationPlayerPage.clickConfirmRedirectionButton();

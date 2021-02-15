@@ -90,7 +90,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         """Do some sanity checks on the interaction registry."""
         self.assertEqual(
             len(interaction_registry.Registry.get_all_interactions()),
-            len(interaction_registry.Registry.get_all_interaction_ids()))
+            len(set(interaction_registry.Registry.get_all_interaction_ids())))
 
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
@@ -98,7 +98,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
             len(list(specs_dict.keys())),
-            len(interaction_registry.Registry.get_all_interaction_ids()))
+            len(set(interaction_registry.Registry.get_all_interaction_ids())))
 
         terminal_interactions_count = 0
         for item in specs_dict.values():
@@ -203,8 +203,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_specs_for_state_schema_version_for_unsaved_version(self):
         with self.assertRaisesRegexp(
-            Exception,
-            'No specs json file found for state schema'
+            IOError, 'No specs JSON file found for state schema'
         ):
             (
                 interaction_registry.Registry

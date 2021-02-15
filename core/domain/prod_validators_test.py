@@ -451,10 +451,11 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                     'property_name': 'title',
                     'new_value': 'New title %s' % i
                 })], 'Changes.')
+        self.process_and_flush_pending_tasks()
+
         exp_models.ExplorationModel.get_by_id('0').delete(
             self.user_id, '', [])
 
-        self.process_and_flush_pending_tasks()
         job_id = self.job_class.create_new()
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -483,6 +484,21 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         self.assertEqual(len(actual_error_list), 10)
         for error in actual_error_list:
             assert (error in full_error_list), ('Extra error: %s' % error)
+
+    def test_model_with_invalid_commit_message_length(self):
+        self.model_instance_0.commit_message = 'a' * (
+            constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit message check '
+                'of ExplorationSnapshotMetadataModel\', '
+                '[u\'Entity id 0-1: Commit message larger than '
+                'accepted length\']]'
+            ), u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ExplorationSnapshotContentModelValidatorTests(
@@ -1408,6 +1424,21 @@ class ExplorationCommitLogEntryModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_model_with_invalid_commit_message_length(self):
+        self.model_instance_0.commit_message = 'a' * (
+            constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit message check '
+                'of ExplorationCommitLogEntryModel\', '
+                '[u\'Entity id exploration-0-1: Commit message larger than '
+                'accepted length\']]'
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
 
 class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
@@ -1453,6 +1484,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'title',
                 'new_value': 'New title'
             })], 'Changes.')
+        self.process_and_flush_pending_tasks()
 
         rights_manager.assign_role_for_exploration(
             self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
