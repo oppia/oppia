@@ -123,13 +123,6 @@
           <div class="collapsed-oppia-opportunities-tabs-explanation" ng-if="$ctrl.activeTabName === 'translateTextTab'">
             Translate Text
           </div>
-          <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
-            <span class="collapsed-oppia-dashboard-language-container-label">Translate to</span>
-            <translation-language-selector [active-language-code]="$ctrl.languageCode"
-                                           (set-active-language-code)="$ctrl.onChangeLanguage($event)"
-                                           class="collapsed-translation-language-selector">
-            </translation-language-selector>
-          </div>
         </div>
       </div>
     </div>
@@ -165,7 +158,7 @@
     height: 35px;
   }
   .oppia-opportunities-tabs-explanation {
-    padding-top: 50px;
+    padding-top: 20px;
     position: relative;
   }
   .oppia-opportunities-tabs-explanation::before {
@@ -181,7 +174,7 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     height: 30%;
-    padding-top: 25px;
+    padding-top: 20px;
     position: relative;
     width: 10%;
   }
@@ -198,7 +191,7 @@
   }
   .oppia-mascot-avatar-container,
   .oppia-profile-details-container {
-    margin-right: 20px;
+    margin-right: 5px;
     max-width: 75px;
     padding: 2% 1%;
     width: 18%;
@@ -313,7 +306,9 @@
     width: 10%;
   }
   .collapsed-oppia-contributor-img {
-    height: 50px;
+    display: block;
+    height: 32px;
+    margin: auto;
   }
   .collapsed-oppia-opportunities-tabs-explanation {
     color: #009688;
@@ -334,7 +329,7 @@
     align-items: center;
     background-color: white;
     display: flex;
-    height: auto;
+    height: 45px;
     margin-bottom: 10px;
     width: 100%;
   }
