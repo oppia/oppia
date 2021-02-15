@@ -23,7 +23,7 @@ import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboar
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { Suggestion } from 'domain/suggestion/Suggestion.model';
+import { Suggestion } from 'domain/suggestion/suggestion.model';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
@@ -292,12 +292,14 @@ describe('Creator dashboard controller', () => {
                   .createFromBackendDict(feedbackThread))),
             createdSuggestionsList: (
               dashboardData.created_suggestions_list.map(
-                suggestionDict => Suggestion
-                  .createFromBackendDict(suggestionDict))),
+                suggestionDict => Suggestion.createFromBackendDict(
+                  suggestionDict
+                ))),
             suggestionsToReviewList: (
               dashboardData.suggestions_to_review_list.map(
-                suggestionDict => Suggestion
-                  .createFromBackendDict(suggestionDict))),
+                suggestionDict => Suggestion.createFromBackendDict(
+                  suggestionDict
+                ))),
             createdSuggestionThreadsList: _getSuggestionThreads(
               dashboardData.threads_for_created_suggestions_list,
               dashboardData.created_suggestions_list,
@@ -693,12 +695,14 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(feedbackThread))),
           createdSuggestionsList: (
             dashboardData.created_suggestions_list.map(
-              suggestionDict => Suggestion
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           suggestionsToReviewList: (
             dashboardData.suggestions_to_review_list.map(
-              suggestionDict => Suggestion
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           createdSuggestionThreadsList: _getSuggestionThreads(
             dashboardData.threads_for_created_suggestions_list,
             dashboardData.created_suggestions_list,

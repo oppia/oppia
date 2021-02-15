@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { SuggestionBackendDict, Suggestion } from
-  'domain/suggestion/Suggestion.model';
+  'domain/suggestion/suggestion.model';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from

@@ -41,7 +41,7 @@ import {
 import {
   SuggestionBackendDict,
   Suggestion,
-} from 'domain/suggestion/Suggestion.model';
+} from 'domain/suggestion/suggestion.model';
 import {
   ProfileSummary,
   SubscriberSummaryBackendDict,

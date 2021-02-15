@@ -17,7 +17,7 @@
  */
 
 import { Suggestion } from
-  'domain/suggestion/Suggestion.model';
+  'domain/suggestion/suggestion.model';
 
 describe('Suggestion data model', () => {
 

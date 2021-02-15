@@ -58,11 +58,11 @@ export class Suggestion {
       stateName: string, newValue: SuggestionChangeValue,
       oldValue: SuggestionChangeValue, lastUpdatedMsecs: number) {
     this.suggestionType = suggestionType;
-   this.threadId = threadId;
+    this.threadId = threadId;
     this.targetType = targetType;
     this.targetId = targetId;
-    th  this.suggestionId = suggestionId;
-   is.status = status;
+    this.suggestionId = suggestionId;
+    this.status = status;
     this.authorName = authorName;
     this.stateName = stateName;
     this.newValue = newValue;
@@ -76,9 +76,12 @@ export class Suggestion {
     suggestionBackendDict);
   return new Suggestion(
     suggestionBackendDict.suggestion_type,
-    suggestionBackendDict.suggestion_id, threadId,
-    suggestionBackendDict.target_type, suggestionBackendDict.target_id,
-    suggestionBackendDict.status, suggestionBackendDict.author_name,
+    suggestionBackendDict.suggestion_id,
+    threadId,
+    suggestionBackendDict.target_type,
+    suggestionBackendDict.target_id,
+    suggestionBackendDict.status,
+    suggestionBackendDict.author_name,
     suggestionBackendDict.change.state_name,
     suggestionBackendDict.change.new_value,
     suggestionBackendDict.change.old_value,
