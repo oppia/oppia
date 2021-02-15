@@ -577,10 +577,24 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': False
         }
+        directed_graph = {
+            'vertices': [
+                {'x': 0.0, 'y': 10.0, 'label': ''},
+                {'x': 50.0, 'y': 10.0, 'label': ''},
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1},
+            ],
+            'isLabeled': False,
+            'isDirected': True,
+            'isWeighted': False
+        }
 
         mappings = [
             (empty_graph, empty_graph),
             (cycle_5_graph, cycle_5_graph),
+            (directed_graph, directed_graph),
         ]
 
         invalid_values_with_error_messages = [
@@ -839,7 +853,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 52)
+        self.assertEqual(count, 54)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -920,7 +934,9 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
 
     def test_abstract_base_class_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
-            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
+            NotImplementedError,
+            'The _value_key_name and _value_schema for this class must both '
+            'be set'):
             objects.BaseTranslatableObject.get_schema()
 
         with self.assertRaisesRegexp(
@@ -935,6 +951,67 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
             objects.BaseTranslatableObject.normalize({
                 'contentId': 5
             })
+
+
+class TranslatableUnicodeTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(TypeError, 'Invalid unicode string'):
+            objects.TranslatableUnicode.normalize({
+                'contentId': 'rule_input',
+                'unicodeStr': 5
+            })
+
+        with self.assertRaisesRegexp(TypeError, 'Invalid unicode string'):
+            objects.TranslatableUnicode.normalize({
+                'contentId': 'rule_input',
+                'unicodeStr': ['abc']
+            })
+
+        objects.TranslatableUnicode.normalize({
+            'contentId': 'rule_input',
+            'unicodeStr': 'abc'
+        })
+
+
+class TranslatableHtmlTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(TypeError, 'Invalid HTML'):
+            objects.TranslatableHtml.normalize({
+                'contentId': 'rule_input',
+                'html': 5
+            })
+
+        with self.assertRaisesRegexp(TypeError, 'Invalid HTML'):
+            objects.TranslatableHtml.normalize({
+                'contentId': 'rule_input',
+                'html': ['abc']
+            })
+
+        self.assertEqual(objects.TranslatableHtml.normalize({
+            'contentId': 'rule_input',
+            'html': '<b>This is bold text.</b>'
+        }), {
+            'contentId': 'rule_input',
+            'html': '<b>This is bold text.</b>'
+        })
+
+        self.assertEqual(objects.TranslatableHtml.normalize({
+            'contentId': 'rule_input',
+            'html': '<script>a'
+        }), {
+            'contentId': 'rule_input',
+            'html': 'a'
+        })
+
+        self.assertEqual(objects.TranslatableHtml.normalize({
+            'contentId': 'rule_input',
+            'html': 'good<script src="http://evil.com">text</script>'
+        }), {
+            'contentId': 'rule_input',
+            'html': 'goodtext'
+        })
 
 
 class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
