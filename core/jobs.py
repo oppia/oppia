@@ -130,7 +130,8 @@ class BaseJobManager(python_utils.OBJECT):
                 'Tried to directly create a job using the abstract base '
                 'manager class %s, which is not allowed.' % cls.__name__)
 
-        def _create_new_job():
+        @transaction_services.run_in_transaction_wrapper
+        def _create_new_job_transactional():
             """Creates a new job by generating a unique id and inserting
             it into the model.
 
@@ -142,7 +143,7 @@ class BaseJobManager(python_utils.OBJECT):
             model.put()
             return job_id
 
-        return transaction_services.run_in_transaction(_create_new_job)
+        return _create_new_job_transactional()
 
     @classmethod
     def enqueue(
@@ -1274,6 +1275,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         Returns:
             str. The active realtime layer index of this class.
         """
+        @transaction_services.run_in_transaction_wrapper
         def _get_active_realtime_index_transactional():
             """Finds the Continous Computation Model corresponding to this
             class type or inserts it in the database if not found and extracts
@@ -1291,8 +1293,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
             return cc_model.active_realtime_layer_index
 
-        return transaction_services.run_in_transaction(
-            _get_active_realtime_index_transactional)
+        return _get_active_realtime_index_transactional()
 
     @classmethod
     def get_active_realtime_layer_id(cls, entity_id):
@@ -1333,6 +1334,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         """Switches the currently-active realtime layer for this continuous
         computation.
         """
+        @transaction_services.run_in_transaction_wrapper
         def _switch_active_realtime_class_transactional():
             """Retrieves currently-active realtime layer index, switches it
             and inserts the new model to the database.
@@ -1343,8 +1345,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 1 - cc_model.active_realtime_layer_index)
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _switch_active_realtime_class_transactional)
+        _switch_active_realtime_class_transactional()
 
     @classmethod
     def _clear_inactive_realtime_layer(cls, latest_created_on_datetime):
@@ -1383,6 +1384,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         Processing means the following: if the job is currently 'stopping', its
         status is set to 'idle'; otherwise, its status remains as 'running'.
         """
+        @transaction_services.run_in_transaction_wrapper
         def _register_end_of_batch_job_transactional():
             """Transactionally change the computation's status when a batch job
             ends.
@@ -1396,8 +1398,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
             return cc_model.status_code
 
-        return transaction_services.run_in_transaction(
-            _register_end_of_batch_job_transactional)
+        return _register_end_of_batch_job_transactional()
 
     @classmethod
     def get_status_code(cls):
@@ -1416,6 +1417,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         Raises:
             Exception. The computation wasn't idle before trying to start.
         """
+        @transaction_services.run_in_transaction_wrapper
         def _start_computation_transactional():
             """Transactional implementation for marking a continuous
             computation as started.
@@ -1437,8 +1439,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_started_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _start_computation_transactional)
+        _start_computation_transactional()
 
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
@@ -1459,6 +1460,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             job_models.JobModel.do_unfinished_jobs_exist(
                 cls._get_batch_job_manager_class().__name__))
 
+        @transaction_services.run_in_transaction_wrapper
         def _stop_computation_transactional():
             """Transactional implementation for marking a continuous
             computation as stopping/idle.
@@ -1473,8 +1475,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _stop_computation_transactional)
+        _stop_computation_transactional()
 
         # The cancellation must be done after the continuous computation
         # status update.
@@ -1520,6 +1521,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         cls._switch_active_realtime_class()
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
+        @transaction_services.run_in_transaction_wrapper
         def _update_last_finished_time_transactional():
             """Updates the time at which a batch job for this computation was
             last completed or failed, in milliseconds since the epoch, setting
@@ -1529,8 +1531,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_finished_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _update_last_finished_time_transactional)
+        _update_last_finished_time_transactional()
 
         return cls._register_end_of_batch_job_and_return_status()
 
