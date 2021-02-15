@@ -539,7 +539,7 @@ class CollectionSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionSnapshotContentModel\', '
@@ -594,7 +594,7 @@ class CollectionSnapshotContentModelValidatorTests(
             collection_models.CollectionSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for collection model '
@@ -1076,7 +1076,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionRightsSnapshotContentModel\', '
@@ -1131,7 +1131,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             collection_models.CollectionRightsSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for collection rights model '

@@ -31,10 +31,15 @@ import feconf
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class MockModel(base_models.BaseModel):
     pass
+
+
+class MockNonAutoLastUpdatedModel(base_models.BaseModel):
+    last_updated = datastore_services.DateTimeProperty(indexed=True)
 
 
 class MockSnapshotModel(base_models.BaseModel):
@@ -204,7 +209,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_validate_deleted_reports_error_for_old_deleted_model(self):
         year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
-        model = MockModel(
+        model = MockNonAutoLastUpdatedModel(
             id='123',
             deleted=True,
             last_updated=year_ago
@@ -351,7 +356,11 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             id='mock-12345',
             user_id=feconf.MIGRATION_BOT_USER_ID,
             commit_cmds=[],
-            commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+            commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            commit_type='create',
+            post_commit_status=feconf.POST_COMMIT_STATUS_PRIVATE
+        )
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)

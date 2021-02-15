@@ -1555,7 +1555,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
@@ -1582,7 +1582,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=self.reviewer_id,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         expected_output = [u'[u\'UNCHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
@@ -1603,7 +1603,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.0',
@@ -1611,7 +1611,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
-        ).put()
+        ).put_for_human()
 
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
@@ -1632,7 +1632,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.0',
@@ -1640,7 +1640,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_IGNORED
-        ).put()
+        ).put_for_human()
 
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
@@ -1661,7 +1661,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         expected_output = [
             u'[u\'FAILED_NONE_MESSAGE_MODEL\', '
@@ -1684,7 +1684,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.0',
@@ -1692,14 +1692,14 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
-        ).put()
+        ).put_for_human()
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.1',
             thread_id=self.EXPLORATION_THREAD_ID,
             message_id=1,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
-        ).put()
+        ).put_for_human()
 
         expected_output = [
             u'[u\'FAILED_MULTIPLE_MESSAGE_MODEL\', '

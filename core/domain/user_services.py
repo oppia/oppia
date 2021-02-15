@@ -967,11 +967,11 @@ def _save_user_settings(user_settings):
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
-        user_model.put()
     else:
         user_settings_dict['id'] = user_settings.user_id
-        model = user_models.UserSettingsModel(**user_settings_dict)
-        model.put()
+        del user_settings_dict['created_on']
+        user_model = user_models.UserSettingsModel(**user_settings_dict)
+    user_model.put()
 
 
 def _get_user_settings_from_model(user_settings_model):
