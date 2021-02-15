@@ -28,6 +28,8 @@ import { AdminFeaturesTabComponent } from
   'pages/admin-page/features-tab/admin-features-tab.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { OppiaAdminProdModeActivitiesTabComponent } from
+  './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -39,10 +41,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent
   ],
   entryComponents: [
+    OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent
   ],
