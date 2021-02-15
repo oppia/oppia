@@ -104,6 +104,139 @@ describe('Exploration history', function() {
         highlighted: false
       },
       4: {
+        text: '  html: \'\'',
+        highlighted: true
+      },
+      5: {
+        text: 'interaction:',
+        highlighted: false
+      },
+      6: {
+        text: '  answer_groups: []',
+        highlighted: true
+      },
+      7: {
+        text: '  confirmed_unclassified_answers: []',
+        highlighted: false
+      },
+      8: {
+        text: '  customization_args: {}',
+        highlighted: false
+      },
+      9: {
+        text: '  default_outcome:',
+        highlighted: false
+      },
+      // Note that highlighting *underneath* a line is still considered a
+      // highlight.
+      10: {
+        text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
+        highlighted: true
+      },
+      11: {
+        text: '    feedback:',
+        highlighted: false
+      },
+      12: {
+        text: '      content_id: default_outcome',
+        highlighted: false
+      },
+      13: {
+        text: '      html: \'\'',
+        highlighted: false
+      },
+      14: {
+        text: '    labelled_as_correct: false',
+        highlighted: false
+      },
+      15: {
+        text: '    missing_prerequisite_skill_id: null',
+        highlighted: false
+      },
+      16: {
+        text: '    param_changes: []',
+        highlighted: false
+      },
+      17: {
+        text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      18: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      19: {
+        text: '  id: null',
+        highlighted: true
+      },
+      20: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      21: {
+        text: 'next_content_id_index: 0',
+        highlighted: true
+      },
+      22: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      23: {
+        text: 'recorded_voiceovers:',
+        highlighted: false
+      },
+      24: {
+        text: '  voiceovers_mapping:',
+        highlighted: false
+      },
+      25: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      26: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      27: {
+        text: 'solicit_answer_details: false',
+        highlighted: false
+      },
+      28: {
+        text: 'written_translations:',
+        highlighted: false
+      },
+      29: {
+        text: '  translations_mapping:',
+        highlighted: false
+      },
+      30: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      31: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      32: {
+        text: '',
+        highlighted: false
+      }
+    };
+
+    var VERSION_2_STATE_1_CONTENTS = {
+      1: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
+      2: {
+        text: 'content:',
+        highlighted: false
+      },
+      3: {
+        text: '  content_id: content',
+        highlighted: false
+      },
+      4: {
         text: '  html: <p>enter 6 to continue</p>',
         highlighted: true
       },
@@ -289,139 +422,6 @@ describe('Exploration history', function() {
       }
     };
 
-    var VERSION_2_STATE_1_CONTENTS = {
-      1: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      2: {
-        text: 'content:',
-        highlighted: false
-      },
-      3: {
-        text: '  content_id: content',
-        highlighted: false
-      },
-      4: {
-        text: '  html: \'\'',
-        highlighted: true
-      },
-      5: {
-        text: 'interaction:',
-        highlighted: false
-      },
-      6: {
-        text: '  answer_groups: []',
-        highlighted: true
-      },
-      7: {
-        text: '  confirmed_unclassified_answers: []',
-        highlighted: false
-      },
-      8: {
-        text: '  customization_args: {}',
-        highlighted: false
-      },
-      9: {
-        text: '  default_outcome:',
-        highlighted: false
-      },
-      // Note that highlighting *underneath* a line is still considered a
-      // highlight.
-      10: {
-        text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
-        highlighted: true
-      },
-      11: {
-        text: '    feedback:',
-        highlighted: false
-      },
-      12: {
-        text: '      content_id: default_outcome',
-        highlighted: false
-      },
-      13: {
-        text: '      html: \'\'',
-        highlighted: false
-      },
-      14: {
-        text: '    labelled_as_correct: false',
-        highlighted: false
-      },
-      15: {
-        text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
-      },
-      16: {
-        text: '    param_changes: []',
-        highlighted: false
-      },
-      17: {
-        text: '    refresher_exploration_id: null',
-        highlighted: false
-      },
-      18: {
-        text: '  hints: []',
-        highlighted: false
-      },
-      19: {
-        text: '  id: null',
-        highlighted: true
-      },
-      20: {
-        text: '  solution: null',
-        highlighted: false
-      },
-      21: {
-        text: 'next_content_id_index: 0',
-        highlighted: true
-      },
-      22: {
-        text: 'param_changes: []',
-        highlighted: false
-      },
-      23: {
-        text: 'recorded_voiceovers:',
-        highlighted: false
-      },
-      24: {
-        text: '  voiceovers_mapping:',
-        highlighted: false
-      },
-      25: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      26: {
-        text: '    default_outcome: {}',
-        highlighted: true
-      },
-      27: {
-        text: 'solicit_answer_details: false',
-        highlighted: false
-      },
-      28: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      29: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      30: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      31: {
-        text: '    default_outcome: {}',
-        highlighted: true
-      },
-      32: {
-        text: '',
-        highlighted: false
-      }
-    };
-
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
@@ -483,7 +483,7 @@ describe('Exploration history', function() {
     await historyGraph.closeStateHistory();
 
     await historyGraph.openStateHistory('second');
-    await historyGraph.expectTextToMatch(STATE_2_STRING, '');
+    await historyGraph.expectTextToMatch('', STATE_2_STRING);
     await historyGraph.closeStateHistory();
 
     // Reset all checkboxes.
@@ -519,7 +519,7 @@ describe('Exploration history', function() {
     await historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
     await historyGraph.openStateHistory('second');
-    await historyGraph.expectTextToMatch('', STATE_2_STRING);
+    await historyGraph.expectTextToMatch(STATE_2_STRING, '');
     await historyGraph.closeStateHistory();
 
     // Check renaming a state.

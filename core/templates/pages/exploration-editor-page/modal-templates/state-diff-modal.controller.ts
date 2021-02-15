@@ -51,9 +51,9 @@ angular.module('oppia').controller('StateDiffModalController', [
      */
     $scope.yamlStrs = {};
 
-    if (newState) {
+    if (oldState) {
       $http.post(STATE_YAML_URL, {
-        state_dict: newState.toBackendDict(),
+        state_dict: oldState.toBackendDict(),
         width: 50
       }).then(function(response) {
         $scope.yamlStrs.leftPane = response.data.yaml;
@@ -67,9 +67,9 @@ angular.module('oppia').controller('StateDiffModalController', [
       }, 200);
     }
 
-    if (oldState) {
+    if (newState) {
       $http.post(STATE_YAML_URL, {
-        state_dict: oldState.toBackendDict(),
+        state_dict: newState.toBackendDict(),
         width: 50
       }).then(function(response) {
         $scope.yamlStrs.rightPane = response.data.yaml;
