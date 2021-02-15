@@ -145,7 +145,8 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('INFO - Question does not exist', item.id)
             return
 
-        if (latest_question.question_state_data_schema_version !=
+        question_model = question_models.QuestionModel.get(question_id)
+        if (question_model.question_state_data_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             yield (
                 'FAILURE - Question is not at latest schema version',
@@ -156,8 +157,8 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             latest_question.validate()
         except Exception as e:
             yield (
-                'INFO - Question %s failed validation: %s' %
-                (item.id, e))
+                'INFO - Question %s failed validation' % item.id,
+                e)
 
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_state_schema_version = item.content[
@@ -228,7 +229,8 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('INFO - Question does not exist', item.id)
             return
 
-        if (latest_question.question_state_data_schema_version !=
+        question_model = question_models.QuestionModel.get(question_id)
+        if (question_model.question_state_data_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             yield (
                 'FAILURE - Question is not at latest schema version',
@@ -239,8 +241,8 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             latest_question.validate()
         except Exception as e:
             yield (
-                'INFO - Question %s failed validation: %s' %
-                (item.id, e))
+                'INFO - Question %s failed validation' % item.id,
+                e)
 
         # If the snapshot being stored in the datastore does not have the most
         # up-to-date states schema version, then update it.

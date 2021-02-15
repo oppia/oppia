@@ -3149,7 +3149,7 @@ class State(python_utils.OBJECT):
         if interaction_id is None:
             return state_dict
 
-        # TODO(#11950): Drop the following if clause once all snapshots have
+        # TODO(#11950): Drop the following 'if' clause once all snapshots have
         # been migrated. This is currently causing issues in migrating old
         # snapshots to schema v34 because MathExpressionInput was still around
         # at the time. It is conceptually OK to ignore customization args here

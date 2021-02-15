@@ -2914,9 +2914,8 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         self.assertEqual(sorted(actual_output), sorted(expected_output))
 
     def test_migration_job_audit_failure(self):
-        """Test that the audit job runs correctly on explorations of the
-        previous state schema and catches any errors that occur during the
-        migration.
+        """Test that the audit job catches any errors that would otherwise
+        occur during the migration.
         """
         swap_states_schema_36 = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 36)
@@ -2999,11 +2998,11 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         self.assertIn(expected_output_message, actual_output)
 
     def test_audit_job_detects_exploration_that_is_not_up_to_date(self):
-        swap_states_schema_version = self.swap(
+        swap_states_schema_37 = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
-        swap_exp_schema_version = self.swap(
+        swap_exp_schema_42 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
-        with swap_states_schema_version, swap_exp_schema_version:
+        with swap_states_schema_37, swap_exp_schema_42:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3011,9 +3010,14 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
-        exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
+        swap_states_schema_38 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 38)
+        swap_exp_schema_43 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 43)
+        with swap_states_schema_38, swap_exp_schema_43:
+            job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
@@ -3063,18 +3067,12 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
                 update_last_updated_time=False)
             snapshot_content_model.put()
 
+            # There is no failure due to a missing states schema version.
             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
                 job_id = (
                     exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new())
                 exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
                 self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(job_id))
-        expected_output_message = (
-            '[u\'INFO - Item has no states_schema_version\', '
-            '[u\'%s-1\']]' % self.VALID_EXP_ID)
-        self.assertIn(expected_output_message, actual_output)
 
 
 class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
@@ -3210,11 +3208,11 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
         self.assertIn(expected_output_message, actual_output)
 
     def test_migration_job_detects_exploration_that_is_not_up_to_date(self):
-        swap_states_schema_version = self.swap(
+        swap_states_schema_37 = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
-        swap_exp_schema_version = self.swap(
+        swap_exp_schema_42 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
-        with swap_states_schema_version, swap_exp_schema_version:
+        with swap_states_schema_37, swap_exp_schema_42:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3222,9 +3220,14 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
-        exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
+        swap_states_schema_38 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 38)
+        swap_exp_schema_43 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 43)
+        with swap_states_schema_38, swap_exp_schema_43:
+            job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(
@@ -3274,17 +3277,11 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
                 update_last_updated_time=False)
             snapshot_content_model.put()
 
+            # There is no failure due to a missing states schema version.
             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
                 job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
                 exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
                 self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(
-            job_id)
-        expected_output_message = (
-            '[u\'INFO - Item has no states_schema_version\', '
-            '[u\'%s-1\']]' % self.VALID_EXP_ID)
-        self.assertIn(expected_output_message, actual_output)
 
         # The updated snapshot content model should have a populated states
         # schema version.

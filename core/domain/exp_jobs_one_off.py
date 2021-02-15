@@ -755,7 +755,8 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('INFO - Exploration does not exist', item.id)
             return
 
-        if (latest_exploration.states_schema_version !=
+        exploration_model = exp_models.ExplorationModel.get(exp_id)
+        if (exploration_model.states_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             yield (
                 'FAILURE - Exploration is not at latest schema version', exp_id)
@@ -765,11 +766,11 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             latest_exploration.validate()
         except Exception as e:
             yield (
-                'INFO - Exploration %s failed non-strict validation' %
-                item.id, e)
+                'INFO - Exploration %s failed non-strict validation' % item.id,
+                e)
 
+        # Some old explorations do not have a states schema version.
         if 'states_schema_version' not in item.content:
-            yield ('INFO - Item has no states_schema_version', item.id)
             item.content['states_schema_version'] = 0
 
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
@@ -845,7 +846,8 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('INFO - Exploration does not exist', item.id)
             return
 
-        if (latest_exploration.states_schema_version !=
+        exploration_model = exp_models.ExplorationModel.get(exp_id)
+        if (exploration_model.states_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             yield (
                 'FAILURE - Exploration is not at latest schema version', exp_id)
@@ -858,8 +860,8 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'INFO - Exploration %s failed non-strict validation' % item.id,
                 e)
 
+        # Some old explorations do not have a states schema version.
         if 'states_schema_version' not in item.content:
-            yield ('INFO - Item has no states_schema_version', item.id)
             item.content['states_schema_version'] = 0
 
         # If the snapshot being stored in the datastore does not have the most
