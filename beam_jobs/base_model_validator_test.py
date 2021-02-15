@@ -22,8 +22,9 @@ import unittest
 
 import apache_beam as beam
 from apache_beam.runners.direct.direct_runner import DirectRunner
-from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing import util as beam_testing_util
+from apache_beam.testing.test_pipeline import TestPipeline
+
 
 from beam_jobs import base_model_validator
 from core.platform import models
@@ -40,10 +41,10 @@ class BaseModelValidatorTests(unittest.TestCase):
 
     def setUp(self):
         self.now = datetime.datetime.utcnow()
-        self.year_ago = (datetime.datetime.utcnow() 
-            - datetime.timedelta(weeks=52))
-        self.year_later = (datetime.datetime.utcnow() 
-            + datetime.timedelta(weeks=52))
+        self.year_ago = (
+            datetime.datetime.utcnow() - datetime.timedelta(weeks=52))
+        self.year_later = (
+            datetime.datetime.utcnow() + datetime.timedelta(weeks=52))
 
     def test_validate_deleted_reports_error_for_old_deleted_model(self):
 
@@ -63,10 +64,10 @@ class BaseModelValidatorTests(unittest.TestCase):
             beam_testing_util.assert_that(
                 errors.error_category_stale_check,
                 beam_testing_util.equal_to([(
-                        'entity stale check',
-                        'Entity id 123:'
-                        ' model marked as deleted is older than 8 weeks'
-                    )])
+                    'entity stale check',
+                    'Entity id 123:'
+                    ' model marked as deleted is older than 8 weeks'
+                )])
             )
 
     def test_validate_model_time_field_check(self):
@@ -138,10 +139,10 @@ class BaseModelValidatorTests(unittest.TestCase):
             beam_testing_util.assert_that(
                 errors.error_category_id_check,
                 beam_testing_util.equal_to([(
-                        'model id check',
-                        'Entity id 123@?!*:'
-                        ' Entity id does not match regex pattern'
-                    )])
+                    'model id check',
+                    'Entity id 123@?!*:'
+                    ' Entity id does not match regex pattern'
+                )])
             )
 
     def test_base_model_validator_ptransform(self):

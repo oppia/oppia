@@ -38,7 +38,7 @@ ERROR_CATEGORY_ID_CHECK = 'id check'
 ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_STALE_CHECK = 'stale check'
 
-MAX_CLOCK_SKEW_SECS = 1
+MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
 class ValidateModelIdWithRegex(beam.DoFn):
@@ -126,9 +126,7 @@ class ValidateModelTimeFields(beam.DoFn):
         """
 
         element = model.clone()
-        if element.created_on > (element.last_updated
-                                 + datetime.timedelta(
-                                     seconds=MAX_CLOCK_SKEW_SECS)):
+        if element.created_on > (element.last_updated+ MAX_CLOCK_SKEW_SECS):
             yield beam.pvalue.TaggedOutput(
                 'error_category_time_field_check', (
                     ERROR_CATEGORY_TIME_FIELD_CHECK,
