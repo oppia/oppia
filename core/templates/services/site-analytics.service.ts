@@ -43,20 +43,11 @@ export class SiteAnalyticsService {
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
-    if (this.windowRef.nativeWindow.ga && this.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.ga(
-        'send', 'event', eventCategory, eventAction, eventLabel);
-    }
-  }
-
-  // For definitions of the various arguments, please see:
-  // developers.google.com/analytics/devguides/collection/analyticsjs/
-  // social-interactions.
-  __sendSocialEventToGoogleAnalytics(
-      network: string, action: string, targetUrl: string): void {
-    if (this.windowRef.nativeWindow.ga && this.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.ga(
-        'send', 'social', network, action, targetUrl);
+    if (this.windowRef.nativeWindow.gtag && this.CAN_SEND_ANALYTICS_EVENTS) {
+      this.windowRef.nativeWindow.gtag('event', eventAction, {
+        event_category: eventCategory,
+        event_label: eventLabel
+      });
     }
   }
 
@@ -93,6 +84,16 @@ export class SiteAnalyticsService {
   registerClickStartLearningButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
       'StartLearningButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartContributingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartContributingButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartTeachingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartTeachingButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerClickVisitClassroomButtonEvent(): void {
@@ -132,11 +133,11 @@ export class SiteAnalyticsService {
       'CommitToPrivateExploration', 'click', explorationId);
   }
   registerShareExplorationEvent(network: string): void {
-    this.__sendSocialEventToGoogleAnalytics(
+    this._sendEventToGoogleAnalytics(
       network, 'share', this.windowRef.nativeWindow.location.pathname);
   }
   registerShareCollectionEvent(network: string): void {
-    this.__sendSocialEventToGoogleAnalytics(
+    this._sendEventToGoogleAnalytics(
       network, 'share', this.windowRef.nativeWindow.location.pathname);
   }
   registerOpenEmbedInfoEvent(explorationId: string): void {

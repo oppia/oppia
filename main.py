@@ -222,17 +222,17 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionreviewerhandler',
-        admin.AddContributionReviewerHandler),
+        r'/addcontributionrightshandler',
+        admin.AddContributionRightsHandler),
     get_redirect_route(
-        r'/removecontributionreviewerhandler',
-        admin.RemoveContributionReviewerHandler),
+        r'/removecontributionrightshandler',
+        admin.RemoveContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributionreviewershandler',
-        admin.ContributionReviewersListHandler),
+        r'/getcontributorusershandler',
+        admin.ContributorUsersListHandler),
     get_redirect_route(
-        r'/contributionreviewerrightsdatahandler',
-        admin.ContributionReviewerRightsDataHandler),
+        r'/contributionrightsdatahandler',
+        admin.ContributionRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
