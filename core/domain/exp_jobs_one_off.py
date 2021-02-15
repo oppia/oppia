@@ -751,12 +751,15 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('FAILURE - Snapshot %s is deleted', item.id)
             return
 
+        if not any([item.id.startswith(prefix) for prefix in allowed_prefixes]):
+            return
+
         exp_id = item.get_unversioned_instance_id()
 
         latest_exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False)
         if latest_exploration is None:
-            yield ('SUCCESS - Exploration does not exist', 1)
+            yield ('INFO - Exploration does not exist', item.id)
             return
 
         if (latest_exploration.states_schema_version !=
@@ -852,7 +855,7 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         latest_exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False)
         if latest_exploration is None:
-            yield ('SUCCESS - Exploration does not exist', 1)
+            yield ('INFO - Exploration does not exist', item.id)
             return
 
         if (latest_exploration.states_schema_version !=

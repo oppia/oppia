@@ -871,7 +871,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     filepath = 'image/%s' % old_filename
     try:
-        content = fs.get(filepath.encode('utf-8'))
+        content = fs.get(filepath)
         height, width = image_services.get_image_dimensions(content)
     except IOError:
         height = 120
@@ -1116,6 +1116,11 @@ def add_math_content_to_math_rte_components(html_string):
         html_string.encode(encoding='utf-8'), 'html.parser')
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('raw_latex-with-value'):
+            # There have been cases where the attr value is empty.
+            if not math_tag['raw_latex-with-value']:
+                math_tag.decompose()
+                continue
+
             try:
                 # The raw_latex attribute value should be enclosed in
                 # double quotes(&amp;quot;) and should be a valid unicode
@@ -1148,8 +1153,9 @@ def add_math_content_to_math_rte_components(html_string):
         elif math_tag.has_attr('math_content-with-value'):
             pass
         else:
-            raise Exception(
-                'Invalid math tag with no proper attribute found.')
+            # Invalid math tag with no proper attribute found.
+            math_tag.decompose()
+
     # We need to replace the <br/> tags (if any) with  <br> because for passing
     # the textangular migration tests we need to have only <br> tags.
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')

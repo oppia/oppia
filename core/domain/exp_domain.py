@@ -2534,7 +2534,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, states_dict):
         """Converts from version 33 to 34. Version 34 adds a new
-        attribute math components. The new attribute has an additional field to
+        attribute math components. The new attribute has an additional field
         for storing SVG filenames.
 
         Args:
@@ -2788,9 +2788,10 @@ class Exploration(python_utils.OBJECT):
             ]
 
             all_valid_ca_keys = [ca_spec.name for ca_spec in ca_specs]
-            for key in ca_dict:
-                if key not in all_valid_ca_keys:
-                    del ca_dict[key]
+            keys_to_remove = [
+                key for key in ca_dict if key not in all_valid_ca_keys]
+            for key in keys_to_remove:
+                del ca_dict[key]
 
             for ca_spec in ca_specs:
                 schema = ca_spec.schema

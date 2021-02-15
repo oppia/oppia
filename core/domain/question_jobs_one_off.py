@@ -146,7 +146,7 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         latest_question = question_services.get_question_by_id(
             question_id, strict=False)
         if latest_question is None:
-            yield ('SUCCESS - Question does not exist', 1)
+            yield ('INFO - Question does not exist', item.id)
             return
 
         if (latest_question.question_state_data_schema_version !=
@@ -235,7 +235,7 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         latest_question = question_services.get_question_by_id(
             question_id, strict=False)
         if latest_question is None:
-            yield ('SUCCESS - Question does not exist', 1)
+            yield ('INFO - Question does not exist', item.id)
             return
 
         if (latest_question.question_state_data_schema_version !=
