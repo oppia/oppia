@@ -29,17 +29,13 @@ import { BrowserModule } from '@angular/platform-browser';
     BrowserModule
   ],
 
-  providers: [
-  ],
+  providers: [],
 
-  declarations: [
-  ],
+  declarations: [],
 
-  entryComponents: [
-  ],
+  entryComponents: [],
 
-  exports: [
-  ],
+  exports: [],
 })
 
 export class ExtensionsModule { }
