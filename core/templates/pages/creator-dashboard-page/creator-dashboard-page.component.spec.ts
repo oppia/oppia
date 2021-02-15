@@ -596,12 +596,14 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(feedbackThread))),
           createdSuggestionsList: (
             dashboardData.created_suggestions_list.map(
-              suggestionDict => Suggestion
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           suggestionsToReviewList: (
             dashboardData.suggestions_to_review_list.map(
-              suggestionDict => Suggestion
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           createdSuggestionThreadsList: _getSuggestionThreads(
             dashboardData.threads_for_created_suggestions_list,
             dashboardData.created_suggestions_list,
