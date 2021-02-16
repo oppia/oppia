@@ -23,8 +23,8 @@ import constants from 'assets/constants';
     // Reference doc:
     // https://developers.google.com/analytics/devguides/collection/gtagjs
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
+    const gtag = function(): typeof gtag {
+      window.dataLayer.push(arguments);
     }
     gtag('set', 'linker', {
       'domains': [constants.SITE_NAME_FOR_ANALYTICS]
