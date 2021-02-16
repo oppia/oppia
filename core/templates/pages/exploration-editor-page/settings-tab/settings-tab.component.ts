@@ -117,8 +117,7 @@ angular.module('oppia').component('settingsTab', {
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        RouterService, UrlInterpolationService,
-        UserEmailPreferencesService,
+        RouterService, UrlInterpolationService, UserEmailPreferencesService,
         UserExplorationPermissionsService, WindowDimensionsService,
         WindowRef, ALL_CATEGORIES,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
