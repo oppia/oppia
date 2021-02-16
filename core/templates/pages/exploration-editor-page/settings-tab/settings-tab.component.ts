@@ -264,27 +264,23 @@ angular.module('oppia').component('settingsTab', {
 
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
-        UserEmailPreferencesService
-          .setFeedbackNotificationPreferences(
-            true);
+        UserEmailPreferencesService.setFeedbackNotificationPreferences(
+          true);
       };
       ctrl.muteSuggestionNotifications = function() {
-        UserEmailPreferencesService
-          .setSuggestionNotificationPreferences(
-            true
-          );
+        UserEmailPreferencesService.setSuggestionNotificationPreferences(
+          true
+        );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
-        UserEmailPreferencesService
-          .setFeedbackNotificationPreferences(
-            false
-          );
+        UserEmailPreferencesService.setFeedbackNotificationPreferences(
+          false
+        );
       };
       ctrl.unmuteSuggestionNotifications = function() {
-        UserEmailPreferencesService
-          .setSuggestionNotificationPreferences(
-            false);
+        UserEmailPreferencesService.setSuggestionNotificationPreferences(
+          false);
       };
 
       // Methods relating to control buttons.
@@ -448,8 +444,7 @@ angular.module('oppia').component('settingsTab', {
         ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
         ctrl.explorationParamChangesService = (
           ExplorationParamChangesService);
-        ctrl.UserEmailPreferencesService =
-        UserEmailPreferencesService;
+        ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
 
         ctrl.refreshSettingsTab();
 
