@@ -624,7 +624,7 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     user_id = auth_services.get_user_id_from_auth_id(auth_id)
     user_settings_model = (
         None if user_id is None else
-        user_models.UserSettingsModel.get(user_id, strict=False))
+        user_models.UserSettingsModel.get_by_id(user_id))
     if user_settings_model is not None:
         return _get_user_settings_from_model(user_settings_model)
     elif strict:
@@ -965,8 +965,8 @@ def _save_user_settings(user_settings):
 
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
-    user_model = user_models.UserSettingsModel.get(
-        user_settings.user_id, strict=False)
+    user_model = user_models.UserSettingsModel.get_by_id(
+        user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
         user_model.update_timestamps()
