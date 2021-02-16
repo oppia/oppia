@@ -114,11 +114,28 @@ describe('Auth service', () => {
       .toBeObservable(expectedObservations);
   }));
 
-  it('should be in emulator mode during unit tests', () => {
+  it('should not use firebase auth in unit tests', () => {
+    expect(AuthService.firebaseAuthIsEnabled).toBeFalse();
+  });
+
+  it('should be in emulator mode by default', () => {
+    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
+      .and.returnValue(true);
+
     expect(AuthService.firebaseEmulatorIsEnabled).toBeTrue();
   });
 
+  it('should not provide firebase config if auth is disabled', () => {
+    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
+      .and.returnValue(false);
+
+    expect(AuthService.firebaseConfig).toBeUndefined();
+  });
+
   it('should use firebase constants for the config', () => {
+    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
+      .and.returnValue(true);
+
     expect(AuthService.firebaseConfig).toEqual({
       apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
       authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
