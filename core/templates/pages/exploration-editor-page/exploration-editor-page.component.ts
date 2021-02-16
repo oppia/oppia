@@ -128,8 +128,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
 require(
-  'pages/exploration-editor-page/services/' +
-  'user-email-preferences.service.ts');
+  'pages/exploration-editor-page/services/user-email-preferences.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
@@ -179,8 +178,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateEditorRefreshService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService', 'UrlInterpolationService',
-    'UserEmailPreferencesService',
-    'UserExplorationPermissionsService',
+    'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $uibModal,
@@ -201,8 +199,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataBackendApiService, UrlInterpolationService,
-        UserEmailPreferencesService,
-        UserExplorationPermissionsService,
+        UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
