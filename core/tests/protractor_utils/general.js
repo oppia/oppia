@@ -128,7 +128,11 @@ var moveToEditor = async function() {
 };
 
 var expect404Error = async function() {
-  expect(await element(by.css('.protractor-test-error-container')).getText()).
+  var protractorTestErrorContainer = 
+    element(by.css('.protractor-test-error-container'));
+  await waitFor.visibilityOf(protractorTestErrorContainer,
+    'Protractor test error container taking too long to appear')
+  expect(await protractorTestErrorContainer.getText()).
     toMatch('Error 404');
 };
 
@@ -193,7 +197,7 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
 
 var goToHomePage = async function() {
   var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
-  await oppiaMainLogo.click();
+  await action.click('Oppia Main Logo', oppiaMainLogo);
   return await waitFor.pageToFullyLoad();
 };
 
