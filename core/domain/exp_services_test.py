@@ -562,7 +562,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # But the model still exists in the backend.
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get(self.EXP_0_ID, strict=False))
+            exp_models.ExplorationModel.get_by_id(self.EXP_0_ID))
 
         # The exploration summary is deleted, however.
         self.assertIsNone(exp_models.ExpSummaryModel.get(
@@ -625,9 +625,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # But the models still exist in the backend.
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get(self.EXP_0_ID, strict=False))
+            exp_models.ExplorationModel.get_by_id(self.EXP_0_ID))
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get(self.EXP_1_ID, strict=False))
+            exp_models.ExplorationModel.get_by_id(self.EXP_1_ID))
 
         # The exploration summaries are deleted, however.
         self.assertIsNone(exp_models.ExpSummaryModel.get(
@@ -4692,27 +4692,27 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_draft_cleared_after_change_list_applied(self):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID1, self.draft_change_list, '')
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=False)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
     def test_draft_version_valid_returns_true(self):
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=False)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertTrue(exp_services.is_version_of_draft_valid(
             self.EXP_ID1, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_returns_false(self):
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            '%s.%s' % (self.USER_ID, self.EXP_ID2), strict=False)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID2))
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID2, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_when_no_draft_exists(self):
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            '%s.%s' % (self.USER_ID, self.EXP_ID3), strict=False)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID3))
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
@@ -4787,8 +4787,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_draft_discarded(self):
         exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=False)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)

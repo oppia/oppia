@@ -231,13 +231,13 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
 
     def test_delete_feedback_threads_deletes_message(self):
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackMessageModel.get(
-                '%s.%s' % (self.thread_1_id, 0), strict=False))
+            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+                '%s.%s' % (self.thread_1_id, 0)))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
         self.assertIsNone(
-            feedback_models.GeneralFeedbackMessageModel.get(
-                '%s.%s' % (self.thread_1_id, 0), strict=False))
+            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+                '%s.%s' % (self.thread_1_id, 0)))
 
     def test_delete_feedback_threads_deletes_feedback_analytics(self):
         self.assertIsNotNone(
