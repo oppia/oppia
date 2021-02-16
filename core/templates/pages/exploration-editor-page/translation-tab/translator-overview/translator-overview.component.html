@@ -14,13 +14,13 @@
     <div ng-if="canShowTabModeSwitcher()" class="oppia-mode-change-section">
       <label class="oppia-mode-change-label">Mode: </label>
       <button class="oppia-translation-tab-mode-changer oppia-translation-mode protractor-test-translation-mode"
-              uib-tooltip="Translation mode" tooltip-placement="bottom"
+              uib-tooltip="Translation mode" tooltip-placement="auto bottom"
               ng-class="{'oppia-active-mode' : inTranslationMode}"
               ng-click="changeActiveMode(TRANSLATION_MODE)">
         <i class="material-icons md-18">translate</i>
       </button>
       <button class="oppia-translation-tab-mode-changer oppia-voiceover-mode protractor-test-voiceover-mode"
-              uib-tooltip="Voiceover mode" tooltip-placement="bottom"
+              uib-tooltip="Voiceover mode" tooltip-placement="auto bottom"
               ng-class="{'oppia-active-mode' : inVoiceoverMode}"
               ng-click="changeActiveMode(VOICEOVER_MODE)">
         <i class="material-icons md-18">record_voice_over</i>

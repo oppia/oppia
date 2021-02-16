@@ -10,7 +10,7 @@
         </a>
         <a ng-click="onPlayButtonClicked()"
            uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
-           tooltip-append-to-body="true" tooltip-placement="right">
+           tooltip-append-to-body="true" tooltip-placement="auto right">
           <i class="fas oppia-audio-controls-button-icon" tabindex="0"
              ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
           </i>

@@ -43,8 +43,8 @@
            class="item-flex-container">
         <md-card class="subtopic item-container protractor-test-subtopic-column">
           <div class="subtopic-header" ng-click="$ctrl.editNameOfSubtopicWithId(subtopic.getId())">
-            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
-            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
+            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="auto bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
+            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="auto bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
             <div class="number-skills-container">
               <span ng-if="subtopic.getSkillSummaries().length === 1" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skill</span>
               <span ng-if="!(subtopic.getSkillSummaries().length === 1)" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skills</span>

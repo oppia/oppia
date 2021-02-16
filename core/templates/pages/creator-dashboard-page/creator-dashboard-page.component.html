@@ -243,7 +243,7 @@
               <span>
                 <span class="fa fa-star oppia-dashboard-card-statistic-icon"
                       uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
-                      tooltip-placement="top">
+                      tooltip-placement="auto top">
                 </span>
                 <span class="oppia-dashboard-card-statistic-value">
                   <[($ctrl.getAverageRating(exploration.ratings) | number:1) || 'N/A']>
@@ -254,7 +254,7 @@
             <li flex="50" class="protractor-test-exp-summary-tile-open-feedback">
               <span class="fa fa-comments oppia-dashboard-card-statistic-icon"
                     uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
-                    tooltip-placement="top">
+                    tooltip-placement="auto top">
               </span>
               <a ng-if="exploration.numOpenThreads != 0" ng-href="/create/<[exploration.id]>#/feedback"
                  class="oppia-dashboard-card-statistic-value">
@@ -269,7 +269,7 @@
             <li flex="50" class="protractor-test-exp-summary-tile-num-views">
               <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                     uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                    tooltip-placement="top">
+                    tooltip-placement="auto top">
               </span>
               <span class="oppia-dashboard-card-statistic-value">
                 <[exploration.numViews]>
@@ -279,7 +279,7 @@
             <li flex="50" class="protractor-test-exp-summary-tile-last-updated">
               <span class="far fa-clock oppia-dashboard-card-statistic-icon"
                     uib-tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
-                    tooltip-placement="top">
+                    tooltip-placement="auto top">
               </span>
               <span class="oppia-dashboard-card-statistic-value">
                 <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)]>

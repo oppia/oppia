@@ -35,7 +35,7 @@
             <div>
               <span class="topic-classroom protractor-test-topic-classroom">
                 <span ng-if="topic.classroom"><[topic.classroom]></span>
-                <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="bottom" ng-if="!topic.classroom">No classroom assigned.</span>
+                <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="auto bottom" ng-if="!topic.classroom">No classroom assigned.</span>
               </span>
             </div>
             <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
@@ -57,7 +57,7 @@
           <span> <[topic.totalSkillCount]> </span>
           <div ng-show="$ctrl.topic.uncategorized_skill_count"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-               uib-tooltip="This topic has <[topic.uncategorizedSkillCount]> uncategorized skill<[topic.uncategorizedSkillCount > 1 ? 's' : '']>." tooltip-placement="bottom">
+               uib-tooltip="This topic has <[topic.uncategorizedSkillCount]> uncategorized skill<[topic.uncategorizedSkillCount > 1 ? 's' : '']>." tooltip-placement="auto bottom">
             <span class="oppia-editor-warnings-count">
               &nbsp;!
             </span>

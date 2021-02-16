@@ -4,7 +4,7 @@
   <li class="nav-item d-none d-sm-block" ng-if="showPublishButton()">
     <div class="btn-group oppia-publish-button-container"
          uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
-         tooltip-placement="bottom"
+         tooltip-placement="auto bottom"
          ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
       <button type="button" class="btn btn-light oppia-editor-publish-button protractor-test-publish-exploration"
               ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"

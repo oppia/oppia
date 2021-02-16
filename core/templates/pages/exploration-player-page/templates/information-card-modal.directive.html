@@ -13,7 +13,7 @@
 
     <ul ng-if="!explorationIsPrivate" layout="row" class="card-metrics" layout-align="space-between center">
       <li class="protractor-test-info-card-rating">
-        <span class="fas fa-star fa-lg" uib-tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+        <span class="fas fa-star fa-lg" uib-tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="auto top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_RATINGS_TOOLTIP' | translate]></span>
         </span>
         <span ng-if="!averageRating" translate="I18N_PLAYER_UNRATED">Unrated</span>
@@ -21,35 +21,35 @@
       </li>
 
       <li class="mr-0">
-        <span class="far fa-eye" uib-tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+        <span class="far fa-eye" uib-tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="auto top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_VIEWS_TOOLTIP' | translate]></span>
         </span>
         <[numViews | summarizeNonnegativeNumber]>
       </li>
 
       <li class="mr-0">
-        <span class="far fa-clock" uib-tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top">
+        <span class="far fa-clock" uib-tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="auto top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]></span>
         </span>
         <[lastUpdatedString]>
       </li>
 
       <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-        <i class="material-icons oppia-contributors-icon" uib-tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top">&#xE7EF;</i>
+        <i class="material-icons oppia-contributors-icon" uib-tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="auto top">&#xE7EF;</i>
         <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]></span>
         <li ng-repeat="name in contributorNames| limitTo: 2"
-            tooltip="<[name]>" tooltip-placement="top">
+            tooltip="<[name]>" tooltip-placement="auto top">
           <profile-link-image [username]="name">
           </profile-link-image>
         </li>
 
         <li ng-if="contributorNames.length > 2" class="oppia-contributors-more-circle"
             tooltip-append-to-body="true" uib-tooltip="<[contributorNames.slice(2).join(', ')]>"
-            tooltip-placement="top">+<[contributorNames.length - 2]>
+            tooltip-placement="auto top">+<[contributorNames.length - 2]>
         </li>
         <li ng-if="contributorNames.length === 0"
             tooltip="<['I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate]>"
-            tooltip-placement="top">
+            tooltip-placement="auto top">
           <span class="far fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
         </li>
       </ul>
@@ -61,14 +61,14 @@
           <div class="oppia-info-card-tag-icon">
             <span class="fas fa-tags oppia-info-card-modal-tooltip" tooltip-append-to-body="true"
                   uib-tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
-                  tooltip-placement="top">
+                  tooltip-placement="auto top">
               <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>
             </span>
           </div>
           <div layout-align="center center">
             <md-chip ng-if="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
                      tooltip-append-to-body="true" uib-tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
-                     tooltip-placement="right"
+                     tooltip-placement="auto right"
                      translate="I18N_PLAYER_PLUS_TAGS"
                      translate-values="{additionalTagNumber: explorationTags.tagsInTooltip.length}">
             </md-chip>

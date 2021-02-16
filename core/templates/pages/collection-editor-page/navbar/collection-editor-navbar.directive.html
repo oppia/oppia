@@ -23,14 +23,14 @@
 
   <!-- Settings -->
   <li ng-class="{'active': $ctrl.getActiveTabName() === 'settings'}" class="nav-item">
-    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="$ctrl.selectSettingsTab()" class="nav-link protractor-test-settings-tab">
+    <a href="#" uib-tooltip="Settings" tooltip-placement="auto bottom" ng-click="$ctrl.selectSettingsTab()" class="nav-link protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
   </li>
 
   <!-- Player -->
   <li class="nav-item">
-    <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom" class="nav-link">
+    <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="auto bottom" class="nav-link">
       <i class="material-icons">&#xE037;</i>
     </a>
   </li>
