@@ -1281,8 +1281,8 @@ def _save_user_auth_details(user_auth_details):
 
     # If user auth details entry with the given user_id does not exist, create
     # a new one.
-    user_auth_details_model = auth_models.UserAuthDetailsModel.get(
-        user_auth_details.user_id, strict=False)
+    user_auth_details_model = auth_models.UserAuthDetailsModel.get_by_id(
+        user_auth_details.user_id)
     user_auth_details_dict = user_auth_details.to_dict()
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
@@ -2544,7 +2544,7 @@ def remove_contribution_reviewer(user_id):
         user_id: str. The unique ID of the user.
     """
     user_contribution_rights_model = (
-        user_models.UserContributionRightsModel.get(user_id, strict=False))
+        user_models.UserContributionRightsModel.get_by_id(user_id))
     if user_contribution_rights_model is not None:
         user_contribution_rights = _create_user_contribution_rights_from_model(
             user_contribution_rights_model)
