@@ -25,6 +25,7 @@ import { InteractionCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { InteractionId } from './rule-input-defs';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -38,7 +39,7 @@ export class InteractionAttributesExtractorService {
   ) {}
 
   getValuesFromAttributes(
-      interactionId: string, attributes: Object
+      interactionId: InteractionId, attributes: Object
   ) : InteractionCustomizationArgs {
     const caBackendDict = {};
     const caSpecs = (

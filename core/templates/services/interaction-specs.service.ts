@@ -20,12 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionId } from 'interactions/rule-input-defs';
 
 @Injectable({providedIn: 'root'})
 export class InteractionSpecsService {
-  isInteractionTrainable(
-      interactionId:
-        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS): boolean {
+  isInteractionTrainable(interactionId: InteractionId): boolean {
     const interactionSpecs =
       InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
     if (!interactionSpecs) {

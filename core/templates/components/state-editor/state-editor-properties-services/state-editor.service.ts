@@ -41,7 +41,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionId } from 'interactions/rule-input-defs';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;
@@ -162,9 +162,7 @@ export class StateEditorService {
     this.interaction = newInteraction;
   }
 
-  setInteractionId(
-      newId:
-        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS): void {
+  setInteractionId(newId: InteractionId): void {
     this.interaction.setId(newId);
   }
 
@@ -194,7 +192,7 @@ export class StateEditorService {
   }
 
   getAnswerChoices(
-      interactionId: string,
+      interactionId: InteractionId,
       customizationArgs: InteractionCustomizationArgs): AnswerChoice[] {
     if (!interactionId) {
       return null;

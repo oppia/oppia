@@ -70,7 +70,7 @@ import {
 import {
   SubtitledHtmlObjectFactory, SubtitledHtml
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionId } from 'interactions/rule-input-defs';
 
 
 export interface InteractionBackendDict {
@@ -79,7 +79,7 @@ export interface InteractionBackendDict {
   'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': readonly HintBackendDict[];
-  'id': keyof typeof InteractionSpecsConstants.INTERACTION_SPECS;
+  'id': InteractionId;
   'solution': SolutionBackendDict;
 }
 
@@ -89,14 +89,14 @@ export class Interaction {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
-  id: keyof typeof InteractionSpecsConstants.INTERACTION_SPECS;
+  id: InteractionId;
   solution: Solution;
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[],
-      id: keyof typeof InteractionSpecsConstants.INTERACTION_SPECS,
+      id: InteractionId,
       solution: Solution) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
@@ -107,9 +107,7 @@ export class Interaction {
     this.solution = solution;
   }
 
-  setId(
-      newValue:
-        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS): void {
+  setId(newValue: InteractionId): void {
     this.id = newValue;
   }
 
@@ -375,7 +373,7 @@ export class InteractionObjectFactory {
   }
 
   convertFromCustomizationArgsBackendDict(
-      interactionId: string,
+      interactionId: InteractionId,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ) : InteractionCustomizationArgs {
     if (interactionId === null) {
@@ -460,7 +458,7 @@ export class InteractionObjectFactory {
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string
+      interactionId: InteractionId
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {

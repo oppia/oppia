@@ -28,11 +28,11 @@ import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
+import { InteractionId } from 'interactions/rule-input-defs';
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
@@ -104,8 +104,7 @@ describe('Content translation manager service', () => {
       }
     };
 
-    let interactionId:
-        keyof typeof InteractionSpecsConstants.INTERACTION_SPECS = 'TextInput';
+    let interactionId: InteractionId = 'TextInput';
     let interactionDict = {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
