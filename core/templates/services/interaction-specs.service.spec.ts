@@ -33,8 +33,8 @@ describe('InteractionSpecsService', () => {
       // of type '"ImageClickInput" | "NumberWithUnits" |
       // "NumericExpressionInput" | "NumericInput" | "DragAndDropSortInput" |
       // "ItemSelectionInput" | "Continue" | "GraphInput" | "EndExploration" |
-      // ... 11 more ... | "RatioExpressionInput"'." We need to suppress this 
-      // error because we need to change the value of 'interaction.id' for 
+      // ... 11 more ... | "RatioExpressionInput"'." We need to suppress this
+      // error because we need to change the value of 'interaction.id' for
       // testing purposes.
       // @ts-expect-error
       expect(() => interactionSpecsService.isInteractionTrainable('Fake'))
