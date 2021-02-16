@@ -138,8 +138,8 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
             self.save_new_question_suggestion_with_state_data_schema_v27(
                 self.albert_id, self.skill_id))
         old_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(
-                suggestion_id, strict=False))
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                suggestion_id))
         self.assertEqual(
             old_suggestion_model.change_cmd['question_dict'][
                 'question_state_data_schema_version'], 27)
@@ -148,8 +148,8 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
         self._run_job_and_verify_output(expected_output)
 
         updated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(
-                suggestion_id, strict=False))
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                suggestion_id))
         self.assertEqual(
             updated_suggestion_model.change_cmd['question_dict'][
                 'question_state_data_schema_version'],
@@ -161,8 +161,8 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
                 self.albert_id, self.skill_id, suggestion_id='suggestion456'))
 
         suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(
-                suggestion_id, strict=False))
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                suggestion_id))
 
         # Adding some invalid values in suggestion.
         suggestion_model.language_code = None
@@ -1207,8 +1207,8 @@ class PopulateContributionStatsOneOffJobTests(
             'skill_1')
         expected_output = []
 
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            question_suggestion.suggestion_id, strict=False
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            question_suggestion.suggestion_id
         )
         suggestion_model.deleted = True
         suggestion_model.update_timestamps()
@@ -1221,8 +1221,8 @@ class PopulateContributionStatsOneOffJobTests(
             'skill_1')
         expected_output = []
 
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            question_suggestion.suggestion_id, strict=False
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            question_suggestion.suggestion_id
         )
         suggestion_model.delete()
 
@@ -1236,8 +1236,8 @@ class PopulateContributionStatsOneOffJobTests(
         expected_output = []
 
         user_contribution_rights_model = (
-            user_models.UserContributionRightsModel.get(
-                self.reviewer_1_id, strict=False)
+            user_models.UserContributionRightsModel.get_by_id(
+                self.reviewer_1_id)
         )
         user_contribution_rights_model.deleted = True
         user_contribution_rights_model.update_timestamps()
@@ -1563,8 +1563,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             score_category='score_category'
         ).put()
 
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            self.EXPLORATION_THREAD_ID, strict=False)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
         suggestion_model.deleted = True
         suggestion_model.update_timestamps()
         suggestion_model.put()
@@ -1572,8 +1572,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [u'[u\'DELETED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
 
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            self.EXPLORATION_THREAD_ID, strict=False)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, None)
 
     def test_job_does_not_changes_valid_models(self):
@@ -1593,8 +1593,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [u'[u\'UNCHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            self.EXPLORATION_THREAD_ID, strict=False)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
 
     def test_accepted_suggestion_with_none_final_reviewer_id_gets_updated(self):
@@ -1622,8 +1622,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            self.EXPLORATION_THREAD_ID, strict=False)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_IDget_by_id)
         self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
 
     def test_rejected_suggestion_with_none_final_reviewer_id_gets_updated(self):
@@ -1651,8 +1651,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            self.EXPLORATION_THREAD_ID, strict=False)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
 
     def test_job_with_no_message_model_yields_without_update(self):
@@ -1674,8 +1674,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             u'[u\'FAILED_NONE_MESSAGE_MODEL\', '
             '[u"(\'exploration.exp1.thread_1\', u\'accepted\')"]]']
         self._run_job_and_verify_output(expected_output)
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            self.EXPLORATION_THREAD_ID, strict=False)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, None)
 
     def test_job_with_multi_message_models_yields_without_update(self):
@@ -1712,6 +1712,6 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             u'[u\'FAILED_MULTIPLE_MESSAGE_MODEL\', '
             '[u"(\'exploration.exp1.thread_1\', u\'accepted\')"]]']
         self._run_job_and_verify_output(expected_output)
-        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
-            self.EXPLORATION_THREAD_ID, strict=False)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, None)
