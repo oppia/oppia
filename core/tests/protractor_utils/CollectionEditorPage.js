@@ -153,13 +153,9 @@ var CollectionEditorPage = function() {
 
   // Set collection category.
   this.setCategory = async function(category) {
-    await action.click(
-      'Editor Category Drop Down', editorCategoryDropdown.first());
-    // TODO(#11289): sendKeys statement cannot be
-    // converted to action.sendKeys(..)
-    // because doing so causes the e2e test to fail with the error
-    // "Failed: Cannot read property 'bind' of undefined".
-    await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
+    await action.select2(
+      'Editor Category Drop Down', editorCategoryDropdown.first(),
+      category);
   };
 
   // Saves changes and publishes collection.
