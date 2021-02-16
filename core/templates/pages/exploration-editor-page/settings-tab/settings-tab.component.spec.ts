@@ -172,7 +172,7 @@ describe('Settings Tab Component', function() {
       explorationTitleService = $injector.get('ExplorationTitleService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
-        'UserEmailPreferencesBackendApiService');
+        'UserEmailPreferencesService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
@@ -623,7 +623,7 @@ describe('Settings Tab Component', function() {
       explorationTitleService = $injector.get('ExplorationTitleService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
-        'UserEmailPreferencesBackendApiService');
+        'UserEmailPreferencesService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));

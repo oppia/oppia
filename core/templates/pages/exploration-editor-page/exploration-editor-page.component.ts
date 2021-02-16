@@ -179,7 +179,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateEditorRefreshService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService', 'UrlInterpolationService',
-    'UserEmailPreferencesBackendApiService',
+    'UserEmailPreferencesService',
     'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
@@ -201,7 +201,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataBackendApiService, UrlInterpolationService,
-        UserEmailPreferencesBackendApiService,
+        UserEmailPreferencesService,
         UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
@@ -293,7 +293,7 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.rights.cloned_from,
             explorationData.rights.community_owned,
             explorationData.rights.viewable_if_private);
-          UserEmailPreferencesBackendApiService.init(
+          UserEmailPreferencesService.init(
             explorationData.email_preferences.mute_feedback_notifications,
             explorationData.email_preferences
               .mute_suggestion_notifications);

@@ -30,7 +30,7 @@ interface ResponseData {
 @Injectable({
   providedIn: 'root'
 })
-export class UserEmailPreferencesBackendApiService {
+export class UserEmailPreferencesService {
   MESSAGE_TYPE_SUGGESTION = 'suggestion';
   MESSAGE_TYPE_FEEDBACK = 'feedback';
   feedbackNotificationsMuted: boolean;
@@ -99,5 +99,5 @@ export class UserEmailPreferencesBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'UserEmailPreferencesBackendApiService',
-  downgradeInjectable(UserEmailPreferencesBackendApiService));
+  'UserEmailPreferencesService',
+  downgradeInjectable(UserEmailPreferencesService));

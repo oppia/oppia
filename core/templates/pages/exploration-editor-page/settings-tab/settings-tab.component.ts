@@ -104,7 +104,7 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
     'RouterService', 'UrlInterpolationService',
-    'UserEmailPreferencesBackendApiService',
+    'UserEmailPreferencesService',
     'UserExplorationPermissionsService', 'WindowDimensionsService',
     'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
@@ -120,7 +120,7 @@ angular.module('oppia').component('settingsTab', {
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
         RouterService, UrlInterpolationService,
-        UserEmailPreferencesBackendApiService,
+        UserEmailPreferencesService,
         UserExplorationPermissionsService, WindowDimensionsService,
         WindowRef, ALL_CATEGORIES,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
@@ -267,25 +267,25 @@ angular.module('oppia').component('settingsTab', {
 
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
-        UserEmailPreferencesBackendApiService
+        UserEmailPreferencesService
           .setFeedbackNotificationPreferences(
             true);
       };
       ctrl.muteSuggestionNotifications = function() {
-        UserEmailPreferencesBackendApiService
+        UserEmailPreferencesService
           .setSuggestionNotificationPreferences(
             true
           );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
-        UserEmailPreferencesBackendApiService
+        UserEmailPreferencesService
           .setFeedbackNotificationPreferences(
             false
           );
       };
       ctrl.unmuteSuggestionNotifications = function() {
-        UserEmailPreferencesBackendApiService
+        UserEmailPreferencesService
           .setSuggestionNotificationPreferences(
             false);
       };
@@ -452,7 +452,7 @@ angular.module('oppia').component('settingsTab', {
         ctrl.explorationParamChangesService = (
           ExplorationParamChangesService);
         ctrl.UserEmailPreferencesService =
-        UserEmailPreferencesBackendApiService;
+        UserEmailPreferencesService;
 
         ctrl.refreshSettingsTab();
 
