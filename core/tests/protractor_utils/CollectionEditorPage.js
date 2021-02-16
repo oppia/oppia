@@ -155,13 +155,9 @@ var CollectionEditorPage = function() {
   this.setCategory = async function(category) {
     await action.click(
       'Editor Category Drop Down', editorCategoryDropdown.first());
-    // TODO(#11289): sendKeys statement cannot be
-    // converted to action.sendKeys(..)
-    // because doing so causes the e2e test to fail with the error
-    // "Failed: Cannot read property 'bind' of undefined".
-    let active = await browser.driver.switchTo().activeElement();
-    let keys = category + '\n';
-    await active.sendKeys(keys); // eslint-disable-line oppia/e2e-action
+    await action.select2(
+      'Editor Category Drop Down', editorCategoryDropdown.first(),
+      category);
   };
 
   // Saves changes and publishes collection.
