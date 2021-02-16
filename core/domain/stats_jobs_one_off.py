@@ -1383,9 +1383,9 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                 latest_exp_model if version == latest_exp_model.version else
                 exp_models.ExplorationModel.get_version(
                     exp_id, version, strict=False))
-            exp_stats_model = stats_models.ExplorationStatsModel.get(
+            exp_stats_model = stats_models.ExplorationStatsModel.get_by_id(
                 stats_models.ExplorationStatsModel.get_entity_id(
-                    exp_id, version), strict=False)
+                    exp_id, version))
 
             for state_name in exp_model.states:
                 exp_versions_with_states[state_name].add(version)
