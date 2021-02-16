@@ -4,7 +4,7 @@
       <div class="oppia-opportunities-subheading">{{ subheading }}</div>
       <div class="oppia-opportunities-heading">{{ heading }}</div>
     </div>
-    <button type="button" class="close oppia-close-button-position" (click)="confirm()" aria-label="Close">
+    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -44,7 +44,7 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-default" (click)="cancel()">Cancel</button>
+  <button class="btn btn-default" (click)="activeModal.close()">Cancel</button>
   <button class="btn btn-success oppia-upload-translated-text-button"
           [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
           (click)="suggestTranslatedText()">
