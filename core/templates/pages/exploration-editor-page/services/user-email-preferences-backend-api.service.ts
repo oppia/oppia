@@ -17,6 +17,11 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { RequestParams } from './user-email-preferences.service';
 
+/**
+ * @fileoverview User exploration emails backend api service
+ * for the exploration settings.
+ */
+
 @Injectable({
   providedIn: 'root'
 })
