@@ -558,9 +558,8 @@ class InteractionInstance(python_utils.OBJECT):
                 interaction instance.
             default_outcome: Outcome. The default outcome of the interaction
                 instance.
-            confirmed_unclassified_answers: list(AnswerGroup). List of answers
-                which have been confirmed to be associated with the default
-                outcome.
+            confirmed_unclassified_answers: list(*). List of answers which have
+                been confirmed to be associated with the default outcome.
             hints: list(Hint). List of hints for this interaction.
             solution: Solution. A possible solution for the question asked in
                 this interaction.
