@@ -24,6 +24,7 @@ interface ImageUploaderCustomScope extends ng.IScope {
   onFileChanged?: (file: File, fileName?: string) => void;
   fileInputClassName?: string;
   getAllowedImageFormats?: () => string[];
+  backgroundWhileUploading?:boolean;
 }
 
 angular.module('oppia').directive('imageUploader', [
@@ -36,7 +37,8 @@ angular.module('oppia').directive('imageUploader', [
         onFileChanged: '=',
         errorMessage: '@',
         width: '@',
-        getAllowedImageFormats: '&allowedImageFormats'
+        getAllowedImageFormats: '&allowedImageFormats',
+        backgroundWhileUploading: '<'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -44,8 +46,12 @@ angular.module('oppia').directive('imageUploader', [
       link: function(scope: ImageUploaderCustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
-          $('.image-uploader-drop-area').removeClass(
-            'image-uploader-is-active');
+          scope.backgroundWhileUploading = false;
+          // JQlite is used for event handling
+          // in this case and it runs outside angular.
+          // Due to this, scope.$apply() has to be triggered manually
+          // for the changes to be detected.
+          scope.$apply();
         };
 
         var validateUploadedFile = function(file, filename) {
@@ -120,7 +126,12 @@ angular.module('oppia').directive('imageUploader', [
 
         $(elt).bind('dragover', function(e) {
           e.preventDefault();
-          $('.image-uploader-drop-area').addClass('image-uploader-is-active');
+          scope.backgroundWhileUploading = true;
+          // JQlite is used for event handling
+          // in this case and it runs outside angular.
+          // Due to this, scope.$apply() has to be triggered manually
+          // for the changes to be detected.
+          scope.$apply();
         });
 
         $(elt).bind('dragleave', onDragEnd);
