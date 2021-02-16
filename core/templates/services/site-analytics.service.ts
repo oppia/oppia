@@ -71,6 +71,16 @@ export class SiteAnalyticsService {
       'GuideParentsButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
+  registerClickStartContributingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartContributingButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartTeachingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'StartTeachingButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
   registerClickExploreLessonsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
       'ExploreLessonsButton', 'click',
