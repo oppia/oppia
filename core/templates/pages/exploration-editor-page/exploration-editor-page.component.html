@@ -93,7 +93,7 @@
   </div>
 </div>
 <div class="exploration-editor-content" ng-cloak>
-  <div class="container-fluid oppia-editor-page-container" ng-joy-ride="$ctrl.tutorialInProgress" config="$ctrl.EDITOR_TUTORIAL_OPTIONS" on-finish="$ctrl.onFinishTutorial()" on-skip="$ctrl.onSkipTutorial()">
+  <div class="container-fluid oppia-editor-page-container">
     <div class="row" ng-if="$ctrl.ExplorationRightsService.isCloned()">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="oppia-align-center uib-alert alert-warning oppia-alert-warning">
@@ -190,6 +190,7 @@
     font-size: 12px;
   }
   exploration-editor-page .oppia-editor-warnings-box {
+    cursor: default;
     max-width: none;
   }
   exploration-editor-page .navbar-tab-active {
@@ -251,7 +252,7 @@
     justify-content: center;
     width: 90px;
   }
-  exploration-editor-page .navbar-icons li:hover {
+  exploration-editor-page .navbar-icons .nav-list-item:hover {
     background-color: #4eb0c0;
   }
   exploration-editor-page .oppia-alert-warning {

@@ -1764,7 +1764,7 @@ pre.oppia-pre-wrapped-text {
   font-weight: 500;
   letter-spacing: 0.7px;
   margin-left: 5px;
-  margin-right: 5px;
+  margin-right: 0px;
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
@@ -4414,4 +4414,8 @@ div.oppia-issues-learner-action {
 
 .fx-cross-end {
   align-items: end;
+}
+
+.practice-tab-mat-checkbox .mat-checkbox-label {
+  font-weight: normal;
 }
