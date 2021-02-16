@@ -89,7 +89,8 @@ class GeneralFeedbackThreadModelValidator(
             item: datastore_services.Model. GeneralFeedbackThreadModel to
                 validate.
         """
-        if item.entity_type not in feedback_services.TARGET_TYPE_TO_TARGET_MODEL:
+        if item.entity_type not in (
+                feedback_services.TARGET_TYPE_TO_TARGET_MODEL):
             cls._add_error(
                 'entity %s' % base_model_validators.ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Entity type %s is not allowed' % (

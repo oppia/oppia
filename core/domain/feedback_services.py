@@ -34,7 +34,7 @@ import feconf
 import python_utils
 
 (
-    email_models, exp_models, feedback_models,
+    email_models, expl_models, feedback_models,
     question_models, skill_models, suggestion_models,
     topic_models
 ) = models.Registry.import_models([
@@ -50,13 +50,13 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 TARGET_TYPE_TO_TARGET_MODEL = {
-    ENTITY_TYPE_EXPLORATION: (
-        exp_models.ExplorationModel),
-    ENTITY_TYPE_QUESTION: (
+    feconf.ENTITY_TYPE_EXPLORATION: (
+        expl_models.ExplorationModel),
+    feconf.ENTITY_TYPE_QUESTION: (
         question_models.QuestionModel),
-    ENTITY_TYPE_SKILL: (
+    feconf.ENTITY_TYPE_SKILL: (
         skill_models.SkillModel),
-    ENTITY_TYPE_TOPIC: (
+    feconf.ENTITY_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
 
