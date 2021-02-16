@@ -70,8 +70,7 @@ require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require(
-  'pages/exploration-editor-page/services/' +
-  'user-email-preferences-backend-api.service.ts');
+  'pages/exploration-editor-page/services/user-email-preferences.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
@@ -103,8 +102,7 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'RouterService', 'UrlInterpolationService',
-    'UserEmailPreferencesService',
+    'RouterService', 'UrlInterpolationService', 'UserEmailPreferencesService',
     'UserExplorationPermissionsService', 'WindowDimensionsService',
     'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',

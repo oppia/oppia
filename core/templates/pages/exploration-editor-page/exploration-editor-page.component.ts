@@ -129,7 +129,7 @@ require(
   'state-tutorial-first-time.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
-  'user-email-preferences-backend-api.service.ts');
+  'user-email-preferences.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
