@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClient } from '@angular/common/http';
 import { AlertsService } from 'services/alerts.service';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { UserEmailPreferencesBackendApiService } from './user-email-preferences-backend-api.service';
 /**
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
-interface ResponseData {
+export interface EmailPreferencesData {
   'email_preferences': {
     'mute_feedback_notifications': boolean,
     'mute_suggestion_notifications': boolean
   }
+}
+
+export interface RequestParams {
+  'message_type' : string,
+  mute: boolean
 }
 
 @Injectable({
@@ -36,8 +41,8 @@ export class UserEmailPreferencesService {
   feedbackNotificationsMuted: boolean;
   suggestionNotificationsMuted: boolean;
   constructor(
-    private http: HttpClient,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private backendApiService: UserEmailPreferencesBackendApiService
   ) { }
 
   init(
@@ -78,20 +83,17 @@ export class UserEmailPreferencesService {
       mute: mute
     });
   }
+
   /**
    * Save the change of message_type and mute to backend.
-   * @param {object} requestParams - Info about message_type and mute.
+   * @param {RequestParam} requestParams - Info about message_type and mute.
    */
-  saveChangeToBackend(
-      requestParams: object
-  ): Promise<void | object> {
-    var that = this;
-    var emailPreferencesUrl = '/createhandler/notificationpreferences/12345';
-    return this.http.put(emailPreferencesUrl, requestParams).toPromise().then(
-      function(response: ResponseData) {
+  saveChangeToBackend(requestParams: RequestParams) : Promise<void | object> {
+    return this.backendApiService.saveChangeToBackend(requestParams).then(
+      (response: EmailPreferencesData) => {
         var data = response;
-        that.alertsService.clearWarnings(),
-        that.init(
+        this.alertsService.clearWarnings(),
+        this.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
       });
