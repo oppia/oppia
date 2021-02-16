@@ -260,21 +260,12 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             'state': item.content['question_state_data']
         }
         while current_state_schema_version < target_state_schema_version:
-            try:
-                assert (
-                    versioned_question_state['states_schema_version'] ==
-                    current_state_schema_version)
-                question_domain.Question.update_state_from_model(
-                    versioned_question_state, current_state_schema_version)
-                current_state_schema_version += 1
-            except Exception as e:
-                error_message = (
-                    'Question snapshot %s failed migration to state '
-                    'v%s: %s' % (
-                        item.id, current_state_schema_version + 1, e))
-                logging.exception(error_message)
-                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
-                break
+            assert (
+                versioned_question_state['states_schema_version'] ==
+                current_state_schema_version)
+            question_domain.Question.update_state_from_model(
+                versioned_question_state, current_state_schema_version)
+            current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:
                 yield ('SUCCESS - Model upgraded', 1)

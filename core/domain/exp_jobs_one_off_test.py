@@ -620,8 +620,8 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             )
 
         expected_output = [
-            u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
-            'n to states v37: u\'property_that_dne\'"]]'
+            u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed '
+            'migration to states v37: u\'property_that_dne\'"]]'
         ]
         self.assertEqual(actual_output, expected_output)
 
