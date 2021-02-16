@@ -153,8 +153,6 @@ var CollectionEditorPage = function() {
 
   // Set collection category.
   this.setCategory = async function(category) {
-    await action.click(
-      'Editor Category Drop Down', editorCategoryDropdown.first());
     await action.select2(
       'Editor Category Drop Down', editorCategoryDropdown.first(),
       category);
