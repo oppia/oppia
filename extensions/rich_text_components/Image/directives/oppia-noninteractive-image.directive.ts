@@ -69,7 +69,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
           // preloader service beforehand.
           if (
             ImagePreloaderService.inExplorationPlayer() &&
-            !ContextService.getEntityType() === ENTITY_TYPE.SKILL) {
+            ContextService.getEntityType() !== ENTITY_TYPE.SKILL) {
             ctrl.isLoadingIndicatorShown = true;
             // For aligning the gif to the center of it's container.
             var loadingIndicatorSize = (
