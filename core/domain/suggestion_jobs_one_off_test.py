@@ -1623,7 +1623,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
-            self.EXPLORATION_THREAD_IDget_by_id)
+            self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
 
     def test_rejected_suggestion_with_none_final_reviewer_id_gets_updated(self):
