@@ -328,7 +328,9 @@ describe('Content translation manager service', () => {
       // '"ImageClickInput" | "NumberWithUnits" | "NumericExpressionInput" |
       // "NumericInput" | "DragAndDropSortInput" | "ItemSelectionInput" |
       // "Continue" | "GraphInput" | "EndExploration" | ... 11 more ... |
-      // "RatioExpressionInput"'.""
+      // "RatioExpressionInput"'." We need to suppress this error because
+      // we need to change the value of 'interaction.id' for testing
+      // purposes.
       // @ts-expect-error
       interaction.id = 'DummyInteraction';
       interaction.customizationArgs = {
