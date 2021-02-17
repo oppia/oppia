@@ -152,8 +152,8 @@ angular.module('oppia').directive('versionDiffVisualization', [
               },
               headers: function() {
                 return {
-                  leftPane: ctrl.getLaterVersionHeader(),
-                  rightPane: ctrl.getEarlierVersionHeader()
+                  leftPane: ctrl.getEarlierVersionHeader(),
+                  rightPane: ctrl.getLaterVersionHeader()
                 };
               }
             },

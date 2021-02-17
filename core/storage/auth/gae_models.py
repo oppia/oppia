@@ -200,6 +200,19 @@ class UserIdentifiersModel(base_models.BaseModel):
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @classmethod
+    def get_by_gae_id(cls, gae_id):
+        """Fetch an entry by user ID.
+
+        Args:
+            gae_id: str. The GAE ID.
+
+        Returns:
+            UserIdentifiersModel. The model with user_id field equal to user_id
+            argument.
+        """
+        return cls.get_by_id(gae_id)
+
+    @classmethod
     def get_by_user_id(cls, user_id):
         """Fetch an entry by user ID.
 
