@@ -26,6 +26,8 @@ import python_utils
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
+
+from .. import build
 from .. import common
 from .. import concurrent_task_utils
 
@@ -714,6 +716,39 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        build.JS_FILEPATHS_NOT_TO_BUILD.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
+        """
+        name = 'Extra JS files'
+        error_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+
+        for filepath in files_to_lint:
+            if (filepath.endswith(('.js')) and
+                    filepath.startswith(('core/templates', 'extensions')) and
+                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD and
+                    not filepath.endswith('protractor.js')):
+                error_message = (
+                    '%s  --> Found extra .js file' % filepath)
+                error_messages.append(error_message)
+                failed = True
+
+        if failed:
+            err_msg = (
+                'If you want the above files to be present as js files, '
+                'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                'build.py. Otherwise, rename them to .ts')
+            error_messages.append(err_msg)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -729,7 +764,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     ['There are no files to be checked.'])]
         task_results = [
             self.check_mandatory_patterns(), self.check_bad_patterns(),
-            self.check_newline_at_eof()]
+            self.check_newline_at_eof(), self.check_extra_js_files()]
         return task_results
 
 

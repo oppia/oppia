@@ -29,7 +29,6 @@ import sys
 
 import python_utils
 
-from .. import build
 from .. import common
 from .. import concurrent_task_utils
 
@@ -381,38 +380,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     or (
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
-    def _check_extra_js_files(self):
-        """Checks if the changes made include extra js files in core
-        or extensions folder which are not specified in
-        build.JS_FILEPATHS_NOT_TO_BUILD.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Extra JS files'
-        error_messages = []
-        failed = False
-        js_files_to_check = self.js_filepaths
-
-        for filepath in js_files_to_check:
-            if filepath.startswith(('core/templates', 'extensions')) and (
-                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
-                        not filepath.endswith('protractor.js')):
-                error_message = (
-                    '%s  --> Found extra .js file\n' % filepath)
-                error_messages.append(error_message)
-                failed = True
-
-        if failed:
-            err_msg = (
-                'If you want the above files to be present as js files, '
-                'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
-                'build.py. Otherwise, rename them to .ts\n')
-            error_messages.append(err_msg)
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
@@ -1054,7 +1021,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         linter_stdout = []
 
-        linter_stdout.append(self._check_extra_js_files())
         linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
         linter_stdout.append(self._check_sorted_dependencies())
