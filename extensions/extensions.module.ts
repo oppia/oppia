@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for Continue interaction.
+ * @fileoverview Module for the extension components.
  */
+import 'core-js/es7/reflect';
+import 'zone.js';
 
-require('interactions/Continue/directives/continue-rules.service.ts');
-require('interactions/Continue/directives/continue-validation.service.ts');
-require(
-  'interactions/Continue/directives/oppia-interactive-continue.component.ts');
-require(
-  'interactions/Continue/directives/' +
-  'oppia-response-continue.component.ts');
-require(
-  'interactions/Continue/directives/' +
-  'oppia-short-response-continue.component.ts');
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+
+@NgModule({
+  imports: [
+    CommonModule,
+    BrowserModule
+  ],
+  providers: [],
+  declarations: [],
+  entryComponents: [],
+  exports: [],
+})
+
+export class ExtensionsModule { }
