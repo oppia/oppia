@@ -17,49 +17,75 @@
  * fields.
  */
 
-export class TranslateTextContainer {
-  stateName: string;
-  contentID: string;
-  contentText: string;
+export class StateAndContentContainer {
+  private stateName: string;
+  private contentID: string;
+  private contentText: string;
+
+  public getStateName(): string {
+      return this.stateName;
+  }
+
+  public setStateName(stateName: string): void {
+      this.stateName = stateName;
+  }
+
+  public getContentID(): string {
+      return this.contentID;
+  }
+
+  public setContentID(contentID: string): void {
+      this.contentID = contentID;
+  }
+
+  public getContentText(): string {
+      return this.contentText;
+  }
+
+  public setContentText(contentText: string): void {
+      this.contentText = contentText;
+  }
+
   constructor(stateName: string, contentID: string, contentText: string) {
-    this.stateName = stateName;
-    this.contentID = contentID;
-    this.contentText = contentText;
+    this.setStateName(stateName);
+    this.setContentID(contentID);
+    this.setContentText(contentText);
   }
 }
 
 angular.module('oppia').factory('TranslateTextService', [
   '$http', function($http) {
+    const STARTING_INDEX = -1;
     var stateWiseContents = null;
     var stateWiseContentIds = {};
-    var translateTextContainers = [];
+    var stateAndContentContainers = [];
     var stateNamesList = [];
     var activeExpId = null;
     var activeExpVersion = null;
-    var activeIndex = -1;
+    var activeIndex = STARTING_INDEX;
     var activeStateName = null;
     var activeContentId = null;
     var activeContentText = null;
 
     const getNextText = function() {
-      if (translateTextContainers.length === 0) {
+      if (stateAndContentContainers.length === 0) {
         return null;
       }
       activeIndex += 1;
-      activeStateName = translateTextContainers[activeIndex].stateName;
-      activeContentId = translateTextContainers[activeIndex].contentID;
-      activeContentText = translateTextContainers[activeIndex].contentText;
+      activeStateName = stateAndContentContainers[activeIndex].getStateName();
+      activeContentId = stateAndContentContainers[activeIndex].getContentID();
+      activeContentText = stateAndContentContainers[activeIndex].getContentText();
       return activeContentText;
     };
 
     const getPreviousText = function() {
-      if (translateTextContainers.length === 0 || activeIndex <= 0) {
+      if (stateAndContentContainers.length === 0 || activeIndex <= 0) {
         return null;
       }
       activeIndex -= 1;
-      activeStateName = translateTextContainers[activeIndex].stateName;
-      activeContentId = translateTextContainers[activeIndex].contentID;
-      activeContentText = translateTextContainers[activeIndex].contentText;
+      activeStateName = stateAndContentContainers[activeIndex].getStateName();
+      activeContentId = stateAndContentContainers[activeIndex].getContentID();
+      activeContentText = stateAndContentContainers[activeIndex].getContentText();
       return activeContentText;
     };
 
@@ -68,10 +94,10 @@ angular.module('oppia').factory('TranslateTextService', [
     };
 
     const isMoreTextAvailableForTranslation = function() {
-      if (translateTextContainers.length === 0) {
+      if (stateAndContentContainers.length === 0) {
         return false;
       }
-      return (activeIndex + 1 < translateTextContainers.length);
+      return (activeIndex + 1 < stateAndContentContainers.length);
     };
 
     return {
@@ -79,8 +105,8 @@ angular.module('oppia').factory('TranslateTextService', [
         stateWiseContents = null;
         stateWiseContentIds = {};
         stateNamesList = [];
-        translateTextContainers = [];
-        activeIndex = -1;
+        stateAndContentContainers = [];
+        activeIndex = STARTING_INDEX;
 
         activeExpId = expId;
         activeExpVersion = null;
@@ -100,8 +126,8 @@ angular.module('oppia').factory('TranslateTextService', [
               stateWiseContents[stateName])) {
               if (text !== '') {
                 contentIds.push(contentId);
-                translateTextContainers.push(
-                  new TranslateTextContainer(
+                stateAndContentContainers.push(
+                  new StateAndContentContainer(
                     stateName, contentId, text as string));
                 stateHasText = true;
               }
