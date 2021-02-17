@@ -690,8 +690,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
             self.user_id, '0', 'Introduction', 1)
 
         self.model_instance = (
-            user_models.ExpUserLastPlaythroughModel.get(
-                '%s.0' % self.user_id, strict=False))
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                '%s.0' % self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off
             .ExpUserLastPlaythroughModelAuditOneOffJob)
@@ -2055,8 +2055,8 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, '3')
 
-        self.model_instance = user_models.CollectionProgressModel.get(
-            '%s.col' % self.user_id, strict=False)
+        self.model_instance = user_models.CollectionProgressModel.get_by_id(
+            '%s.col' % self.user_id)
         self.job_class = (
             prod_validation_jobs_one_off.CollectionProgressModelAuditOneOffJob)
 
@@ -2263,8 +2263,8 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, '0')
 
-        self.model_instance = user_models.StoryProgressModel.get(
-            '%s.story' % self.user_id, strict=False)
+        self.model_instance = user_models.StoryProgressModel.get_by_id(
+            '%s.story' % self.user_id)
         self.job_class = (
             prod_validation_jobs_one_off.StoryProgressModelAuditOneOffJob)
 
@@ -2720,8 +2720,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, 'skill', 0.8)
 
-        self.model_instance = user_models.UserSkillMasteryModel.get(
-            id='%s.skill' % self.user_id, strict=False)
+        self.model_instance = user_models.UserSkillMasteryModel.get_by_id(
+            id='%s.skill' % self.user_id)
         self.job_class = (
             prod_validation_jobs_one_off.UserSkillMasteryModelAuditOneOffJob)
 
