@@ -10,9 +10,9 @@
           <label for="audioTranslationFileField" class="col-lg-2 col-md-2 col-sm-2 float-left">Audio File</label>
           <div class="col-lg-10 col-md-10 col-sm-10">
             <audio-file-uploader id="audioTranslationFileField"
-                                 dropped-file="droppedFile"
-                                 on-file-changed="updateUploadedFile"
-                                 on-file-cleared="clearUploadedFile">
+                                 [dropped-file]="droppedFile"
+                                 (on-file-changed)="updateUploadedFile($event)"
+                                 (on-file-cleared)="clearUploadedFile()">
             </audio-file-uploader>
             <div ng-if="isAudioAvailable"
                  class="oppia-updated-audio-file-upload-message">
