@@ -1803,7 +1803,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
             exp_id, exp_versions)
     except:
         raise Exception(
-            'Failed to fetch Exploration(exp_id=%r) versions:' % exp_id)
+            'Failed to fetch Exploration(exp_id=%r) versions' % exp_id)
 
     if all(exp_stats is None for exp_stats in exp_stats_list):
         for index, version in enumerate(exp_versions):
@@ -1920,9 +1920,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
             else:
                 prev_state_name = state_name
 
-            if (
-                    prev_state_name in prev_exp.states and
-                    prev_state_name in prev_exp_stats.state_stats_mapping):
+            try:
                 prev_interaction_id = (
                     prev_exp.states[prev_state_name].interaction.id)
                 current_interaction_id = (
@@ -1935,7 +1933,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
                 missing_state_stats.append(
                     'StateStats(exp_id=%r, exp_version=%r, '
                     'state_name=%r)' % (exp_id, exp.version, state_name))
-            else:
+            except:
                 raise Exception(
                     'Exploration(id=%r, exp_version=%r) has no '
                     'State(name=%r): %r' % (
@@ -1949,8 +1947,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
                             'old_to_new_state_names': (
                                 exp_versions_diff.old_to_new_state_names),
                             'prev_exp.states': prev_exp.states.keys(),
-                            'prev_exp_stats.state_stats_mapping': (
-                                prev_exp_stats.state_stats_mapping.keys())
+                            'prev_exp_stats': prev_exp_stats
                         }))
 
     for index, exp_stats in enumerate(exp_stats_list):

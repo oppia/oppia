@@ -4983,6 +4983,147 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID'), (
                 [], [], 1, 1))
 
+    def test_fails_to_fetch_explorations_by_versions(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+
+        def _mock_get_multiple_explorations_by_version(
+                unused_exp_id, unused_exp_versions):
+            """Mocks get_multiple_explorations_by_version() to raise an
+            Exception.
+            """
+            raise Exception('something')
+
+        error_message = 'Failed to fetch Exploration'
+        with self.swap(
+            exp_fetchers, 'get_multiple_explorations_by_version',
+            _mock_get_multiple_explorations_by_version):
+            with self.assertRaisesRegexp(Exception, error_message):
+                exp_services.regenerate_missing_stats_for_exploration('ID')
+
+    def test_fail_to_fetch_exploration_snapshots(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        exp_snapshot_id = exp_models.ExplorationModel.get_snapshot_id('ID', 1)
+        exp_snapshot = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+            exp_snapshot_id)
+        exp_snapshot.commit_cmds[0] = {}
+        exp_snapshot.update_timestamps()
+        exp_models.ExplorationSnapshotMetadataModel.put(exp_snapshot)
+        error_message = 'snapshots contain invalid commit_cmds'
+        with self.assertRaisesRegexp(Exception, error_message):
+            exp_services.regenerate_missing_stats_for_exploration('ID')
+
+    def test_handle_state_name_is_not_found_in_state_stats_mapping(self):
+        exp_id = 'ID1'
+        owner_id = 'owner_id'
+        self.save_new_default_exploration(exp_id, 'owner_id')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 1'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Changed title.')
+        exp_stats_list = (
+            stats_services.get_multiple_exploration_stats_by_version(
+                exp_id, [1, 2, 3]))
+        exp_stats_list[0].state_stats_mapping['new'] = (
+            exp_stats_list[0].state_stats_mapping['Introduction'])
+        del exp_stats_list[0].state_stats_mapping['Introduction']
+        stats_services.save_stats_model(exp_stats_list[0])
+        stats_models.ExplorationStatsModel.get_model(exp_id, 3).delete()
+        error_message = (
+            r'Exploration\(id=.*, exp_version=1\) has no State\(name=.*\)')
+        with self.assertRaisesRegexp(Exception, error_message):
+            exp_services.regenerate_missing_stats_for_exploration(exp_id)
+
+    def test_handle_missing_exp_stats_for_reverted_exp_version(self):
+        exp_id = 'ID1'
+        owner_id = 'owner_id'
+        self.save_new_default_exploration(exp_id, 'owner_id')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 1'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 3'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 4'
+            })], 'Changed title.')
+        exp_services.revert_exploration(owner_id, exp_id, 5, 4)
+        stats_models.ExplorationStatsModel.get_model(exp_id, 6).delete()
+
+        self.assertItemsEqual(
+            exp_services.regenerate_missing_stats_for_exploration('ID1'),
+            (
+                [
+                    'ExplorationStats(exp_id=u\'ID1\', exp_version=6)',
+                ], [], 5, 6
+            )
+        )
+
+    def test_handle_missing_state_stats_for_reverted_exp_version(self):
+        exp_id = 'ID1'
+        owner_id = 'owner_id'
+        self.save_new_default_exploration(exp_id, 'owner_id')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 1'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 3'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 4'
+            })], 'Changed title.')
+        exp_services.revert_exploration(owner_id, exp_id, 5, 4)
+        exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 6)
+        exp_stats.state_stats_mapping = {}
+        stats_services.save_stats_model(exp_stats)
+
+        self.assertItemsEqual(
+            exp_services.regenerate_missing_stats_for_exploration('ID1'),
+            (
+                [], [
+                    'StateStats(exp_id=u\'ID1\', exp_version=6, '
+                    'state_name=u\'Introduction\')'
+                ], 5, 6
+            )
+        )
+
     def test_when_few_exp_stats_models_are_missing(self):
         exp_id = 'ID1'
         owner_id = 'owner_id'
