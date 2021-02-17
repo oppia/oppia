@@ -16,20 +16,20 @@
  * @fileoverview Tests for CamelCaseToHyphens pipe for Oppia.
  */
 
-import { FilterForMatchingTextPipe } from
-  'filters/string-utility-filters/filter-for-matching-text.pipe';
+import { FilterForMatchingStringPipe } from
+  'filters/string-utility-filters/filter-for-matching-string.pipe';
 
-describe('Testing FilterForMatchingTextPipe', () => {
-  let pipe: FilterForMatchingTextPipe;
+describe('Testing FilterForMatchingStringipe', () => {
+  let pipe: FilterForMatchingStringPipe;
   beforeEach(() => {
-    pipe = new FilterForMatchingTextPipe();
+    pipe = new FilterForMatchingStringPipe();
   });
 
   it('should have all expected pipes', () => {
     expect(pipe).not.toEqual(null);
   });
 
-  it('should get items that include search text', () => {
+  it('should get items that contain search text', () => {
     let list = ["cat", "dog", "caterpillar"]
     expect(pipe.transform(list, "cat")).toEqual(["cat", "caterpillar"]);
     expect(pipe.transform(list, "dog")).toEqual(["dog"]);

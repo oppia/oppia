@@ -161,7 +161,7 @@ import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe.ts';
 import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FilterForMatchingTextPipe } from 'filters/string-utility-filters/filter-for-matching-text.pipe';
+import { FilterForMatchingStringPipe } from 'filters/string-utility-filters/filter-for-matching-string.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -449,7 +449,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['FatigueDetectionService',
     FatigueDetectionService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
-  ['FilterForMatchingTextPipe', FilterForMatchingTextPipe],
+  ['FilterForMatchingStringPipe', FilterForMatchingStringPipe],
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FormatRtePreviewPipe', FormatRtePreviewPipe],

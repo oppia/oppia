@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview FilterForMatchingText pipe for Oppia, filters for matching strings.
+ * @fileoverview FilterForMatchingString pipe for Oppia, filters for matching strings.
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'filterForMatchingText'
+  name: 'filterForMatchingString'
 })
-export class FilterForMatchingTextPipe implements PipeTransform {
+export class FilterForMatchingStringPipe implements PipeTransform {
 
   transform(value: string[], input: string): any {
     if (input) {
