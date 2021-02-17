@@ -28,18 +28,10 @@ import { BrowserModule } from '@angular/platform-browser';
     CommonModule,
     BrowserModule
   ],
-
-  providers: [
-  ],
-
-  declarations: [
-  ],
-
-  entryComponents: [
-  ],
-
-  exports: [
-  ],
+  providers: [],
+  declarations: [],
+  entryComponents: [],
+  exports: [],
 })
 
 export class ExtensionsModule { }

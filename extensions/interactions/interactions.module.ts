@@ -32,10 +32,8 @@ import { ContinueExtensionsModule } from './Continue/continue-extensions.module'
     AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule
   ],
-  declarations: [
-  ],
-  entryComponents: [
-  ],
+  declarations: [],
+  entryComponents: [],
   exports: [
     ContinueExtensionsModule,
     AlgebraicExpressionInputExtensionsModule

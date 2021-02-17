@@ -31,12 +31,13 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class OppiaShortResponseContinueComponent implements OnInit {
   @Input() answer: string;
-  escapedAnswer: Object = new String('');
+  escapedAnswer: string = '';
 
   constructor(private readonly htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
+    this.escapedAnswer = (
+      this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
   }
 }
 
