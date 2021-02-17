@@ -15,9 +15,9 @@
 /**
  * @fileoverview Unit tests for the UserEmailPreferencesBackendApiService.
  */
+
 import { UserEmailPreferencesBackendApiService } from './user-email-preferences-backend-api.service';
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, flushMicrotasks } from '@angular/core/testing';
 import { EmailPreferencesData } from './user-email-preferences.service';
 
@@ -30,14 +30,16 @@ describe('User Email Preferences Backend Api Service', () => {
     }
   };
 
-  var serviceInstance: UserEmailPreferencesBackendApiService = null;
-  var httpTestingController: HttpTestingController = null;
+  let userEmailPreferencesBackendApiService:
+  UserEmailPreferencesBackendApiService;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    serviceInstance = TestBed.get(UserEmailPreferencesBackendApiService);
+    userEmailPreferencesBackendApiService =
+    TestBed.get(UserEmailPreferencesBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -48,7 +50,8 @@ describe('User Email Preferences Backend Api Service', () => {
 
   it('should successfully send http request and get a valid response',
     fakeAsync((done) => {
-      let result : Promise <void | object > = serviceInstance
+      let result : Promise <void | object > =
+      userEmailPreferencesBackendApiService
         .saveChangeToBackend({
           message_type: 'feedback',
           mute: false

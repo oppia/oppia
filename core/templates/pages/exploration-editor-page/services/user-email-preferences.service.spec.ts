@@ -26,27 +26,28 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 // ^^^ This block is to be removed.
 
 describe('User Email Preferences Service', () => {
-  var expId = '12345';
-  var sampleResponse = {
+  let expId = '12345';
+  let sampleResponse = {
     email_preferences: {
       mute_feedback_notifications: false,
       mute_suggestion_notifications: false
     }
   };
 
-  var serviceInstance: UserEmailPreferencesService = null;
-  var httpTestingController: HttpTestingController = null;
-  var csrfService: CsrfTokenService = null;
+  let userEmailPreferencesService :
+  UserEmailPreferencesService;
+  let httpTestingController: HttpTestingController;
+  let csrfTokenService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    serviceInstance = TestBed.get(UserEmailPreferencesService);
+    userEmailPreferencesService = TestBed.get(UserEmailPreferencesService);
     httpTestingController = TestBed.get(HttpTestingController);
-    csrfService = TestBed.get(CsrfTokenService);
+    csrfTokenService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
@@ -57,48 +58,47 @@ describe('User Email Preferences Service', () => {
     httpTestingController.verify();
   });
 
-
   it('should successfully intialise the service', () => {
-    expect(serviceInstance.feedbackNotificationsMuted)
+    expect(userEmailPreferencesService.feedbackNotificationsMuted)
       .toBeUndefined();
-    expect(serviceInstance.suggestionNotificationsMuted)
+    expect(userEmailPreferencesService.suggestionNotificationsMuted)
       .toBeUndefined();
 
-    serviceInstance.init(true, true);
+    userEmailPreferencesService.init(true, true);
 
-    expect(serviceInstance.feedbackNotificationsMuted).toBe(true);
-    expect(serviceInstance.suggestionNotificationsMuted).toBe(true);
+    expect(userEmailPreferencesService.feedbackNotificationsMuted).toBe(true);
+    expect(userEmailPreferencesService.suggestionNotificationsMuted).toBe(true);
   });
 
   it('should successfully return the feedbackNotificationsMuted value',
     () => {
-      serviceInstance.init(true, true);
-      expect(serviceInstance.areFeedbackNotificationsMuted())
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully return the suggestionNotificationsMuted value',
     () => {
-      serviceInstance.init(true, true);
-      expect(serviceInstance.areSuggestionNotificationsMuted())
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully set the feedback notification preferences',
     fakeAsync(() => {
-      serviceInstance.setFeedbackNotificationPreferences(false);
+      userEmailPreferencesService.setFeedbackNotificationPreferences(false);
       var req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId);
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleResponse);
       flushMicrotasks();
-      expect(serviceInstance.areFeedbackNotificationsMuted())
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
         .toBe(false);
     }));
 
   it('should successfully set the suggestion notification preferences',
     fakeAsync(() => {
-      serviceInstance.setSuggestionNotificationPreferences(false);
+      userEmailPreferencesService.setSuggestionNotificationPreferences(false);
 
       var req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId
@@ -106,7 +106,7 @@ describe('User Email Preferences Service', () => {
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleResponse);
       flushMicrotasks();
-      expect(serviceInstance.areSuggestionNotificationsMuted())
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
         .toBe(false);
     }));
 });
