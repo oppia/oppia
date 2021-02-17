@@ -16,13 +16,13 @@
  * @fileoverview Tests for CamelCaseToHyphens pipe for Oppia.
  */
 
-import { FilterForMatchingStringPipe } from
-  'filters/string-utility-filters/filter-for-matching-string.pipe';
+import { FilterForMatchingSubstringPipe } from
+  'filters/string-utility-filters/filter-for-matching-substring.pipe';
 
-describe('Testing FilterForMatchingStringPipe', () => {
-  let pipe: FilterForMatchingStringPipe;
+fdescribe('Testing FilterForMatchingSubstringPipe', () => {
+  let pipe: FilterForMatchingSubstringPipe;
   beforeEach(() => {
-    pipe = new FilterForMatchingStringPipe();
+    pipe = new FilterForMatchingSubstringPipe();
   });
 
   it('should have all expected pipes', () => {
@@ -33,5 +33,10 @@ describe('Testing FilterForMatchingStringPipe', () => {
     let list = ["cat", "dog", "caterpillar"]
     expect(pipe.transform(list, "cat")).toEqual(["cat", "caterpillar"]);
     expect(pipe.transform(list, "dog")).toEqual(["dog"]);
+  });
+
+  it('should not get items that do not contain search text', () => {
+    let list = ["cat", "dog", "caterpillar"]
+    expect(pipe.transform(list, "puppy")).toEqual([]);
   });
 });

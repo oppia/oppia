@@ -13,21 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview FilterForMatchingString pipe for Oppia, filters for matching strings.
+ * @fileoverview FilterForMatchingSubstring pipe for Oppia, filters for matching strings.
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'filterForMatchingString'
+  name: 'filterForMatchingSubtring'
 })
-export class FilterForMatchingStringPipe implements PipeTransform {
+export class FilterForMatchingSubstringPipe implements PipeTransform {
 
-  transform(value: string[], input: string): any {
-    if (input) {
-      return value.filter(val => val.indexOf(input) >= 0);
-    } else {
-      return value;
+  transform(input: string[], matcher: string): string[] {
+    if (!input.filter) {
+      throw new Error(
+        'Bad input for filterForMatchingSubstring: ' + JSON.stringify(input));
     }
+    return input.filter(val => { 
+      return val.toLowerCase().includes(matcher.toLowerCase())
+    })
   }
 }

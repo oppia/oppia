@@ -21,6 +21,8 @@ import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and
 import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import { ShortSkillSummary } from 'core/templates/domain/skill/ShortSkillSummaryObjectFactory';
 
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -47,6 +49,9 @@ export class SkillSelectorComponent implements OnInit {
   subTopicFilterDict: { [topicName: string]:
      { subTopicName: string; checked: boolean }[] } = {};
   intialSubTopicFilterDict = {};
+  private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe = (
+    new FilterForMatchingSubstringPipe()
+  );
 
   constructor() {}
 
@@ -74,7 +79,7 @@ export class SkillSelectorComponent implements OnInit {
     return skills.length === 0;
   }
 
-  checkIfTopicIsEmpty(topicName: string): boolean {
+  checkTopicIsNotEmpty(topicName: string): boolean {
     for (let key in this.categorizedSkills[topicName]) {
       if (Object.keys(this.categorizedSkills[topicName][key]).length) {
         return true;
@@ -157,6 +162,26 @@ export class SkillSelectorComponent implements OnInit {
     // After we update the subtopic filter list, we need to update
     // the main skills list.
     this.updateSkillsListOnSubtopicFilterChange();
+  }
+
+  searchInSubtopicSkills(input: ShortSkillSummary[], searchText: string): ShortSkillSummary[] {
+    let skills: string[] = input.map(val => {
+      return val.getDescription()
+    })
+    let filteredSkills = this.filterForMatchingSubtringPipe.transform(skills, searchText)
+    return input.filter(val => {
+      return filteredSkills.includes(val.description)
+    })
+  }
+
+  searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
+    let skills: string[] = this.untriagedSkillSummaries.map(val => {
+      return val.description
+    })
+    let filteredSkills = this.filterForMatchingSubtringPipe.transform(skills, searchText)
+    return this.untriagedSkillSummaries.filter(val => {
+      return filteredSkills.includes(val.description)
+    })
   }
 
   clearAllFilters(): void {
