@@ -227,6 +227,7 @@ import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/se
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
+import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
 import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
@@ -433,6 +434,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
+  ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
