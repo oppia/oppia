@@ -320,13 +320,9 @@ var ExplorationPlayerPage = function() {
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
-    if (interactionId === 'Continue') {
-      await waitFor.presenceOf(
-        conversationInput, 'Conversation input takes too long to appear.');
-    } else {
-      await waitFor.visibilityOf(
-        conversationInput, 'Conversation input takes too long to appear.');
-    }
+    // TODO(#11969): Move this wait to interactions submitAnswer function.
+    await waitFor.presenceOf(
+      conversationInput, 'Conversation input takes too long to appear.');
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     await interactions.getInteraction(interactionId).submitAnswer(
