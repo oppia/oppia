@@ -160,8 +160,7 @@ export class ExplorationEngineService {
         if ('parse_with_jinja' in pc.customizationArgs) {
           if (!pc.customizationArgs.parse_with_jinja) {
             newParams[pc.name] = pc.customizationArgs.value;
-          }
-          else {
+          } else {
             if ('value' in pc.customizationArgs) {
               let paramValue =
                 this.expressionInterpolationService.processUnicode(
