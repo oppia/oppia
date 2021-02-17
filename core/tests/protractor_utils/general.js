@@ -24,6 +24,9 @@ var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {
+  waitFor.presenceOf(
+    dragAndDropScript,
+    'Drag and drop script taking too long to load');
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
 };
 
@@ -141,8 +144,12 @@ var expect404Error = async function() {
 var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  var promiseValue = await element(by.css(
-    '.oppia-base-container')).getAttribute('innerHTML');
+  var oppiaBaseContainer = element(by.css(
+    '.oppia-base-container'));
+  waitFor.visibilityOf(
+    oppiaBaseContainer,
+    'Oppia base container taking too long to appear.');
+  var promiseValue = await oppiaBaseContainer.getAttribute('innerHTML');
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
