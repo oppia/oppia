@@ -298,6 +298,8 @@ var AdminPage = function() {
   };
 
   this._stopOneOffJob = async function(jobName, i) {
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       unfinishedOneOffJobRows.get(i),
       'Could not get Unfinished Off Job');
