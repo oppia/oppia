@@ -20,10 +20,8 @@ import { Suggestion } from
   'domain/suggestion/suggestion.model';
 
 describe('Suggestion data model', () => {
-
   beforeEach(() => {
   });
-
   it('should create a new suggestion from a backend dict.', () => {
     let suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
