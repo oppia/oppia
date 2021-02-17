@@ -3283,8 +3283,8 @@ class ConcatenationCheckerTests(unittest.TestCase):
             pylint_extensions.ConcatenationChecker)
         self.checker_test_object.setup_method()
 
-    def test_string_concatenation(self):
-        node_string_concatenation = astroid.scoped_nodes.Module(
+    def test_string_concatenation_present_error(self):
+        node_string_concatenation_present_error = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -3293,27 +3293,77 @@ class ConcatenationCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 """
-                a = 'hello' + 'mello'
+                a = 'string1' + 'string2'
 
-                b = a + 'mello'
+                b = a + 'string1'
 
-                c = 'hello' + b
+                c = 'string2' + b
+
                 """)
-        node_string_concatenation.file = filename
-        node_string_concatenation.path = filename
+        node_string_concatenation_present_error.file = filename
+        node_string_concatenation_present_error.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_string_concatenation))
+            utils.tokenize_module(node_string_concatenation_present_error))
 
         double_message1 = testutils.Message(
-            msg_id='string-concatenation', args=('\'hello\''), line=2)
+            msg_id='string-concatenation', args=('\'string1\''), line=2)
         double_message2 = testutils.Message(
-            msg_id='string-concatenation', args=('\'mello\''), line=2)
+            msg_id='string-concatenation', args=('\'string2\''), line=2)
         right_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'mello\''), line=4)
+            msg_id='string-concatenation', args=('\'string1\''), line=4)
         left_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'hello\''), line=6)
+            msg_id='string-concatenation', args=('\'string2\''), line=6)
 
         with self.checker_test_object.assertAddsMessages(
             double_message1, double_message2, right_message, left_message):
+            temp_file.close()
+
+    def test_string_concatenation_not_present(self):
+        node_string_concatenation_not_present = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                """
+                d = 'string1%s' % (string2)
+
+                e = '%sstring2' % d
+                """)
+        node_string_concatenation_not_present.file = filename
+        node_string_concatenation_not_present.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_string_concatenation_not_present))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_string_concatenation_present_inside_a_string_no_error(self):
+        node_string_concatenation_present_inside_a_string_no_error = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                """
+                a = '\'string1\' + \'string2\''
+
+                """)
+        node_string_concatenation_present_inside_a_string_no_error.file = (
+            filename)
+        node_string_concatenation_present_inside_a_string_no_error.path = (
+            filename)
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(
+                node_string_concatenation_present_inside_a_string_no_error))
+
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()

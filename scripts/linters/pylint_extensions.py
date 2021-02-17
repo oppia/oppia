@@ -2121,11 +2121,11 @@ class ConcatenationChecker(checkers.BaseChecker):
     name = 'string-concatenation'
     priority = -1
     msgs = {
-        'C0032': (
-            'At string %s, please prefer string interpolation over '
-            'concatenation',
+        'C0034': (
+            'at string %s, use string interpolation (\'string1%%s\' %% string2)'
+            ' rather than string concatenation (\'string1\' + \'string2\').',
             'string-concatenation',
-            'Prefer: "My string %s" % varname to "My string " + varname.',
+            'Enforce use of string interpolation over string concatenation.',
         ),
     }
 
@@ -2136,20 +2136,29 @@ class ConcatenationChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        for (token_type, token, (line_num, _), _, line) in tokens:
-            if token_type == tokenize.STRING:
-                if token.startswith('"""') or token.startswith('u"""'):
-                    continue
-                line = line.strip()
-                # Regex evaluates to True if the line is of the form
-                # ('text' +) or (+ 'text')
-                if re.search(
-                        r'(\'[^\']*\'(\s*)\+(\s*))|((\s*)\+(\s*)\'[^\']*\')',
-                        line):
-                    self.add_message(
-                        'string-concatenation',
-                        args=(token),
-                        line=line_num)
+        prev_token = None
+        prev_token_type = None
+        for (token_type, token, (line_num, _), _, _) in tokens:
+            if (prev_token and
+                    prev_token_type == tokenize.STRING and token == '+'):
+                # The condition checks for
+                # ('text' +)
+                self.add_message(
+                    'string-concatenation',
+                    args=(prev_token),
+                    line=line_num)
+
+            if (prev_token and
+                    prev_token == '+' and token_type == tokenize.STRING):
+                # The condition checks for
+                # (+ 'text')
+                self.add_message(
+                    'string-concatenation',
+                    args=(token),
+                    line=line_num)
+
+            prev_token_type = token_type
+            prev_token = token
 
 
 def register(linter):
