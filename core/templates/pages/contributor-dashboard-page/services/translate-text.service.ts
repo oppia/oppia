@@ -23,27 +23,27 @@ export class StateAndContentContainer {
   private contentText: string;
 
   public getStateName(): string {
-      return this.stateName;
+    return this.stateName;
   }
 
   public setStateName(stateName: string): void {
-      this.stateName = stateName;
+    this.stateName = stateName;
   }
 
   public getContentID(): string {
-      return this.contentID;
+    return this.contentID;
   }
 
   public setContentID(contentID: string): void {
-      this.contentID = contentID;
+    this.contentID = contentID;
   }
 
   public getContentText(): string {
-      return this.contentText;
+    return this.contentText;
   }
 
   public setContentText(contentText: string): void {
-      this.contentText = contentText;
+    this.contentText = contentText;
   }
 
   constructor(stateName: string, contentID: string, contentText: string) {
@@ -74,7 +74,8 @@ angular.module('oppia').factory('TranslateTextService', [
       activeIndex += 1;
       activeStateName = stateAndContentContainers[activeIndex].getStateName();
       activeContentId = stateAndContentContainers[activeIndex].getContentID();
-      activeContentText = stateAndContentContainers[activeIndex].getContentText();
+      activeContentText
+        = stateAndContentContainers[activeIndex].getContentText();
       return activeContentText;
     };
 
@@ -85,7 +86,8 @@ angular.module('oppia').factory('TranslateTextService', [
       activeIndex -= 1;
       activeStateName = stateAndContentContainers[activeIndex].getStateName();
       activeContentId = stateAndContentContainers[activeIndex].getContentID();
-      activeContentText = stateAndContentContainers[activeIndex].getContentText();
+      activeContentText
+        = stateAndContentContainers[activeIndex].getContentText();
       return activeContentText;
     };
 
