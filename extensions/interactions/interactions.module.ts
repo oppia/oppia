@@ -30,10 +30,8 @@ import { ContinueExtensionsModule } from './Continue/continue-extensions.module'
     BrowserModule,
     ContinueExtensionsModule
   ],
-  declarations: [
-  ],
-  entryComponents: [
-  ],
+  declarations: [],
+  entryComponents: [],
   exports: [
     ContinueExtensionsModule
   ],
