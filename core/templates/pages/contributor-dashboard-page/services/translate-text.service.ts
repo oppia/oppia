@@ -74,8 +74,8 @@ angular.module('oppia').factory('TranslateTextService', [
       activeIndex += 1;
       activeStateName = stateAndContentContainers[activeIndex].getStateName();
       activeContentId = stateAndContentContainers[activeIndex].getContentID();
-      activeContentText
-        = stateAndContentContainers[activeIndex].getContentText();
+      activeContentText =
+       stateAndContentContainers[activeIndex].getContentText();
       return activeContentText;
     };
 
@@ -86,8 +86,8 @@ angular.module('oppia').factory('TranslateTextService', [
       activeIndex -= 1;
       activeStateName = stateAndContentContainers[activeIndex].getStateName();
       activeContentId = stateAndContentContainers[activeIndex].getContentID();
-      activeContentText
-        = stateAndContentContainers[activeIndex].getContentText();
+      activeContentText =
+        stateAndContentContainers[activeIndex].getContentText();
       return activeContentText;
     };
 
