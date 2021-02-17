@@ -1,5 +1,3 @@
-/* eslint-disable oppia/no-multiline-disable */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,7 +109,7 @@ export class ExplorationRightsService {
     });
   }
 
-  setViewability(viewableIfPrivate): Promise<void> {
+  setViewability(viewableIfPrivate: boolean): Promise<void> {
     let that = this;
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
@@ -129,7 +127,8 @@ export class ExplorationRightsService {
         data.rights.community_owned, data.rights.viewable_if_private);
     });
   }
-  saveRoleChanges(newMemberUsername, newMemberRole): Promise<void> {
+  saveRoleChanges(
+      newMemberUsername: string, newMemberRole: string): Promise<void> {
     let that = this;
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
@@ -165,7 +164,7 @@ export class ExplorationRightsService {
         data.rights.community_owned, data.rights.viewable_if_private);
     });
   }
-  saveModeratorChangeToBackend(emailBody): void {
+  saveModeratorChangeToBackend(emailBody: string): void {
     let that = this;
     let explorationModeratorRightsUrl = (
       '/createhandler/moderatorrights/' +
