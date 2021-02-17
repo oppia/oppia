@@ -22,7 +22,7 @@ import { IdGenerationService } from 'services/id-generation.service';
 
 @Component({
   selector: 'audio-file-uploader',
-  templateUrl: './audio-file-uploader.directive.html',
+  templateUrl: './audio-file-uploader.component.html',
   styleUrls: []
 })
 export class AudioFileUploaderComponent implements OnInit {
