@@ -23,7 +23,8 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { ExplorationRightsService } from
-  'pages/exploration-editor-page/services/exploration-rights.service';
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationDataService } from
   'pages/exploration-editor-page/services/exploration-data.service';
 
