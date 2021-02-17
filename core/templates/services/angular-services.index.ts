@@ -559,7 +559,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],
-  ['QuestionValidationService', QuestionValidationService],
   ['RatingComputationService', RatingComputationService],
   ['RatioExpressionInputRulesService', RatioExpressionInputRulesService],
   ['RatioExpressionInputValidationService',
@@ -689,5 +688,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['baseInteractionValidationService', baseInteractionValidationService],
-  ['UndoRedoService', UndoRedoService]
+  ['UndoRedoService', UndoRedoService],
+  ['QuestionValidationService', QuestionValidationService]
 ];
