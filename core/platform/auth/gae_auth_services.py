@@ -150,7 +150,7 @@ def get_user_id_from_auth_id(auth_id):
         association exists.
     """
     assoc_by_auth_id_model = (
-        auth_models.UserIdentifiersModel.get(auth_id, strict=False))
+        auth_models.UserIdentifiersModel.get_by_gae_id(auth_id))
     return (
         None if assoc_by_auth_id_model is None else
         assoc_by_auth_id_model.user_id)
