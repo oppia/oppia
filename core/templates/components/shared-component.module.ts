@@ -61,7 +61,7 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
-import { AngularHtmlBindDirective } from '../directives/angular-html-bind.directive';
+import { MockAngularHtmlBindDirective } from '../directives/angular-html-bind.directive';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -92,7 +92,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   ],
 
   declarations: [
-    AngularHtmlBindDirective,
+    MockAngularHtmlBindDirective,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
@@ -133,7 +133,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     // Components, directives, and pipes.
-    AngularHtmlBindDirective,
+    MockAngularHtmlBindDirective,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,

@@ -78,14 +78,14 @@ import { Schema } from 'services/schema-default-value.service';
   selector: 'schema-based-editor'
 })
 export class SchemaBasedEditorDirective extends UpgradeComponent {
-  @Input() schema: Schema;
-  @Input() isDisabled: boolean;
-  @Input() localValue: string;
-  @Input() labelForFocusTarget: string;
-  @Input() onInputBlur: string;
-  @Input() onInputFocus: string;
+  @Input() schema: ()=>Schema;
+  @Input() isDisabled: ()=>boolean;
+  @Input() localValue;
+  @Input() labelForFocusTarget: ()=>string;
+  @Input() onInputBlur: ()=>void;
+  @Input() onInputFocus: ()=>void;
 
   constructor(elementRef: ElementRef, injector: Injector) {
-    super('schemaBasedEditorDirective', elementRef, injector);
+    super('schemaBasedEditor', elementRef, injector);
   }
 }

@@ -30,19 +30,21 @@ import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-ed
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 import { TranslationModalContent } from './modal-templates/translation-modal.component';
-import { TranslationOpportunities } from './translation-opportunities/translation-opportunities.component';
+import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
 import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
 import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    NgbModalModule,
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -53,7 +55,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OpportunitiesListItemComponent,
     TranslationLanguageSelectorComponent,
     TranslationModalContent,
-    TranslationOpportunities,
+    TranslationOpportunitiesComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -64,7 +66,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OpportunitiesListItemComponent,
     TranslationLanguageSelectorComponent,
     TranslationModalContent,
-    TranslationOpportunities,
+    TranslationOpportunitiesComponent,
   ],
   providers: [
     {

@@ -39,7 +39,7 @@ export class TranslationOpportunityDict {
   selector: 'translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
 })
-export class TranslationOpportunities {
+export class TranslationOpportunitiesComponent {
   allOpportunities: {[id: string]: TranslationOpportunityDict} = {};
   userIsLoggedIn = false;
   constructor(
@@ -51,6 +51,7 @@ export class TranslationOpportunities {
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
+    private readonly injector: Injector
   ) {}
 
   getOpportunitySummary(expId: string): TranslationOpportunityDict {
@@ -96,6 +97,13 @@ export class TranslationOpportunities {
       TranslationModalContent, {
         size: 'lg',
         backdrop: 'static',
+        injector: Injector.create({
+          providers: [
+            {provide: TranslationOpportunityDict, useValue: opportunity
+            }
+          ],
+          parent: this.injector
+        })
       });
     modalRef.componentInstance.opportunity = opportunity;
   }
@@ -129,5 +137,5 @@ export class TranslationOpportunities {
 
 angular.module('oppia').directive(
   'translationOpportunities', downgradeComponent(
-    {component: TranslationOpportunities}));
+    {component: TranslationOpportunitiesComponent}));
 
