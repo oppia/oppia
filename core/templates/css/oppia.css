@@ -2653,6 +2653,7 @@ div#ng-curtain {
 }
 
 .oppia-navbar {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
   height: 56px;
   left: -2%;
@@ -2716,7 +2717,7 @@ div#ng-curtain {
 .nav-link.oppia-navbar-tab,
 .nav-item > div.oppia-navbar-tab {
   font-family: "Roboto", Arial, sans-serif;
-  font-size: medium;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.7px;
   padding: 17px 12px 10px 12px;
