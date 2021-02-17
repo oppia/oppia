@@ -165,8 +165,11 @@ describe('Full exploration editor', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
     var backButton = element(by.css('.protractor-test-back-button'));
+    var nextCardButton = element(by.css('.protractor-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('LogicProof');
+    await waitFor.visibilityOf(
+      nextCardButton, 'Next Card button taking too long to show up.');
     await waitFor.invisibilityOf(
       backButton, 'Back button takes too long to disappear.');
 
