@@ -6,12 +6,12 @@
 </div>
 <div class="modal-body">
   <skill-selector [sorted-skill-summaries]="skillSummaries"
-                [selected-skill-id]="selectedSkillId"
-                [count-of-skills-to-prioritize]="countOfSkillsToPrioritize"
-                [categorized-skills]="categorizedSkills"
-                [untriaged-skill-summaries]="untriagedSkillSummaries"
-                [allow-skills-from-other-topics]="allowSkillsFromOtherTopics"
-                (selected-skill-id-changed)="setSelectedSkillId($event)">
+                  [selected-skill-id]="selectedSkillId"
+                  [count-of-skills-to-prioritize]="countOfSkillsToPrioritize"
+                  [categorized-skills]="categorizedSkills"
+                  [untriaged-skill-summaries]="untriagedSkillSummaries"
+                  [allow-skills-from-other-topics]="allowSkillsFromOtherTopics"
+                  (selected-skill-id-changed)="setSelectedSkillId($event)">
   </skill-selector>
 </div>
 <div class="modal-footer">

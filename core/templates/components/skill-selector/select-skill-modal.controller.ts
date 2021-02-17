@@ -56,7 +56,7 @@ angular.module('oppia').controller('SelectSkillModalController', [
         summary => summary.id === $scope.selectedSkillId));
     };
     $scope.setSelectedSkillId = function(skillId: string) {
-      $scope.selectedSkillId = skillId
+      $scope.selectedSkillId = skillId;
     };
   }
 ]);

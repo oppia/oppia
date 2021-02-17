@@ -42,7 +42,7 @@ export class SkillSelectorComponent implements OnInit {
   @Output() selectedSkillIdChanged: EventEmitter<string> = new EventEmitter();
   selectedSkill = null;
   skillFilterText = '';
-  
+
   topicFilterList = [];
   subTopicFilterDict: { [topicName: string]:
      { subTopicName: string; checked: boolean }[] } = {};
@@ -51,7 +51,6 @@ export class SkillSelectorComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("untriagedSkillSummaries = " + this.untriagedSkillSummaries)
     for (let topicName in this.categorizedSkills) {
       var topicNameDict = {
         topicName: topicName,
@@ -87,7 +86,7 @@ export class SkillSelectorComponent implements OnInit {
   setSelectedSkillId(): void {
     this.selectedSkillIdChanged.emit(this.selectedSkill);
   }
-  
+
   // The folowing function is called when the subtopic filter changes.
   // This updates the list of Skills displayed in the selector.
   updateSkillsListOnSubtopicFilterChange(): void {
@@ -122,11 +121,6 @@ export class SkillSelectorComponent implements OnInit {
       }
       if (isAnyTopicChecked) {
         this.categorizedSkills = angular.copy(updatedSkillsDict);
-      } else {
-        // If no filter is applied on both subtopics and topics, we
-        // need to display all the skills (the original list).
-        // This might not be needed below...
-        this.categorizedSkills = this.categorizedSkills
       }
     } else {
       this.categorizedSkills = angular.copy(updatedSkillsDict);
@@ -163,9 +157,9 @@ export class SkillSelectorComponent implements OnInit {
     // After we update the subtopic filter list, we need to update
     // the main skills list.
     this.updateSkillsListOnSubtopicFilterChange();
-  };
+  }
 
-  clearAllFilters() {
+  clearAllFilters(): void {
     for (var i = 0; i < this.topicFilterList.length; i++) {
       this.topicFilterList[i].checked = false;
     }

@@ -19,7 +19,7 @@
 import { FilterForMatchingTextPipe } from
   'filters/string-utility-filters/filter-for-matching-text.pipe';
 
-describe('Testing FilterForMatchingTextPipe', () => {
+fdescribe('Testing FilterForMatchingTextPipe', () => {
   let pipe: FilterForMatchingTextPipe;
   beforeEach(() => {
     pipe = new FilterForMatchingTextPipe();
