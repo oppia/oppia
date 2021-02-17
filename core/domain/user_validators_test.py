@@ -3022,7 +3022,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for deleted '
@@ -3033,8 +3033,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_user_settings_model_not_marked_deleted_failure(self):
-        user_model = user_models.UserSettingsModel.get(
-            self.user_id, strict=False)
+        user_model = user_models.UserSettingsModel.get_by_id(
+            self.user_id)
         user_model.deleted = False
         user_model.update_timestamps()
         user_model.put()
@@ -3082,7 +3082,7 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
             wipeout_service.get_pending_deletion_request(self.user_id))
 
         self.model_instance = (
-            user_models.DeletedUserModel.get(self.user_id, strict=False))
+            user_models.DeletedUserModel.get_by_id(self.user_id))
 
         self.job_class = (
             prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob)
