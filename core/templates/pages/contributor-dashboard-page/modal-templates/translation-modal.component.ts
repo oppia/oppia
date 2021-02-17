@@ -136,7 +136,7 @@ export class TranslationModalContent {
       this.translateTextService.suggestTranslatedText(
         this.activeWrittenTranslation.html,
         this.translationLanguageService.getActiveLanguageCode(),
-        imagesData, function() {
+        imagesData, () => {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.');
           if (this.moreAvailable) {
