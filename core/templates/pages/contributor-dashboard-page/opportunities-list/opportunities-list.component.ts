@@ -75,6 +75,9 @@ angular.module('oppia').component('opportunitiesList', {
 
         ctrl.loadOpportunities().then(function({opportunitiesDicts, more}) {
           opportunities = opportunitiesDicts;
+          // More returned from GAE storage is not always reliable if true.
+          // See https://github.com/oppia/oppia/issues/11900.
+          more = more && opportunitiesDicts.length === OPPORTUNITIES_PAGE_SIZE;
           ctrl.visibleOpportunities = opportunities.slice(
             0, OPPORTUNITIES_PAGE_SIZE);
           ctrl.lastPageNumber = more ? ctrl.lastPageNumber : Math.ceil(
@@ -95,6 +98,10 @@ angular.module('oppia').component('opportunitiesList', {
           ctrl.loadMoreOpportunities().then(
             function({opportunitiesDicts, more}) {
               opportunities = opportunities.concat(opportunitiesDicts);
+              // More returned from GAE storage is not always reliable if true.
+              // See https://github.com/oppia/oppia/issues/11900.
+              more = (more &&
+                opportunitiesDicts.length === OPPORTUNITIES_PAGE_SIZE);
               ctrl.visibleOpportunities = opportunities.slice(
                 startIndex, endIndex);
               ctrl.lastPageNumber = more ? ctrl.lastPageNumber : Math.ceil(
