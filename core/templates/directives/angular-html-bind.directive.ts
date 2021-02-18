@@ -56,7 +56,7 @@ angular.module('oppia').directive('angularHtmlBind', [
       }
     };
   }]);
-angular.module('oppia').directive('mockAngularHtmlBind', [
+angular.module('oppia').directive('angularHtmlBindWrapper', [
   function() {
     return {
       restrict: 'E',
@@ -68,9 +68,11 @@ angular.module('oppia').directive('mockAngularHtmlBind', [
       '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
       controllerAs: '$ctrl',
       controller: [
-        function() {
+        '$rootScope',
+        function($rootScope) {
           var ctrl = this;
           ctrl.$onInit = function() {
+            $rootScope.$applyAsync();
           };
         }
       ]
@@ -82,9 +84,9 @@ import { UpgradeComponent } from '@angular/upgrade/static';
   @Directive({
     selector: 'mock-angular-html-bind'
   })
-export class MockAngularHtmlBindDirective extends UpgradeComponent {
+export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
   constructor(elementRef: ElementRef, injector: Injector) {
-    super('mockAngularHtmlBind', elementRef, injector);
+    super('angularHtmlBindWrapper', elementRef, injector);
   }
 }

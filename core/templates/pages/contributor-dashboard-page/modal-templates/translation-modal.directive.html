@@ -28,11 +28,11 @@
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <!-- textToTranslate contains the html content of an exploration state -->
-      <mock-angular-html-bind [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+      <angular-html-bind-wrapper [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
                          (click)="onContentClick($event)"
                         [htmlData]="textToTranslate"
                          class="oppia-rte-editor">
-      </mock-angular-html-bind>
+      </angular-html-bind-wrapper>
     </div>
     <div class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
