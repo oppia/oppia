@@ -16,57 +16,79 @@
  * @fileoverview Unit tests for translationOpportunities.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ContributionOpportunitiesBackendApiService } from
-  // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
-import { UserService } from 'services/user.service.ts';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
+import { OpportunitiesListComponent } from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
+import { OpportunitiesListItemComponent } from 'pages/contributor-dashboard-page/opportunities-list-item/opportunities-list-item.component';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { TranslationModalContent } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import { TranslationOpportunitiesComponent } from './translation-opportunities.component';
+import { UserInfo } from 'domain/user/user-info.model';
+import { UserService } from 'services/user.service';
+import { LoginRequiredMessageComponent } from 'pages/contributor-dashboard-page/login-required-message/login-required-message.component';
+import { NO_ERRORS_SCHEMA } from '@angular/compiler';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
-describe('Translation opportunities component', function() {
-  var ctrl = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $uibModal = null;
-  var contributionOpportunitiesService = null;
-  var siteAnalyticsService = null;
-  var translationLanguageService = null;
-  var userService = null;
+fdescribe('Translation opportunities component', () => {
+  let contributionOpportunitiesService: ContributionOpportunitiesService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let translationLanguageService: TranslationLanguageService;
+  let userService: UserService;
+  let modalService: NgbModal;
+  let component: TranslationOpportunitiesComponent;
+  let fixture: ComponentFixture<TranslationOpportunitiesComponent>;
+  let httpTestingController;
+  let loggedInUserInfo = new UserInfo(
+    false, false, false, false, false,
+    'en', 'username', 'test@example.com', true
+  );
+  let notLoggedInUserInfo = new UserInfo(
+    false, false, false, false, false,
+    'en', null, null, false
+  );
 
-  var opportunitiesArray = [];
+  let opportunitiesArray = [];
 
-  importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+      imports: [
+        HttpClientTestingModule,
+        SharedComponentsModule,
+        NgbModalModule
+      ],
+      declarations: [
+        OpportunitiesListComponent,
+        OpportunitiesListItemComponent,
+        TranslationModalContent,
+        TranslationOpportunitiesComponent,
+      ],
+      // Prevent errors for rendering upgraded directives
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    httpTestingController = TestBed.inject(HttpTestingController);
+    contributionOpportunitiesService = TestBed.inject(
+      ContributionOpportunitiesService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
+    userService = TestBed.inject(UserService);
+    modalService = TestBed.inject(NgbModal);
+    spyOn(modalService, 'open').and.stub();
+    spyOn(contributionOpportunitiesService, 'showRequiresLoginModal').and
+      .callFake(() => {});
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'ContributionOpportunitiesBackendApiService',
-      TestBed.get(ContributionOpportunitiesBackendApiService));
-    $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
-    $provide.value(
-      'UserService', TestBed.get(UserService));
-  }));
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
-    contributionOpportunitiesService = $injector.get(
-      'ContributionOpportunitiesService');
-    translationLanguageService = $injector.get('TranslationLanguageService');
-    userService = $injector.get('UserService');
-
+  beforeEach(() => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
 
@@ -93,162 +115,100 @@ describe('Translation opportunities component', function() {
       })
     ];
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('translationOpportunities', {
-      $scope: $scope,
-      $uibModal: $uibModal,
-    });
-  }));
+    fixture = TestBed.createComponent(
+      TranslationOpportunitiesComponent);
+    component = fixture.componentInstance;
+  });
 
-  it('should load translation opportunities', function() {
+  it('should load translation opportunities', () => {
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
-      .returnValue(Promise.resolve({
+      .resolveTo({
         opportunities: opportunitiesArray,
         more: false
-      }));
+      });
 
-    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBe(false);
+      expect(more).toBeFalse();
     });
   });
 
-  it('should load more translation opportunities', function() {
+  it('should load more translation opportunities', () => {
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
-      .returnValue(Promise.resolve({
+      .resolveTo({
         opportunities: opportunitiesArray,
         more: true
-      }));
-    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      });
+    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBe(true);
+      expect(more).toBeTrue();
     });
 
     spyOn(
       contributionOpportunitiesService,
-      'getMoreTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
+      'getMoreTranslationOpportunitiesAsync').and.resolveTo({
       opportunities: opportunitiesArray,
       more: false
-    }));
+    });
 
-    ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBe(false);
+      expect(more).toBeFalse();
     });
   });
 
-  it('should open translation modal when clicking button', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve({
-        isLoggedIn: () => true
-      }));
+  it('should open translation modal when clicking button', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
-      .returnValue(Promise.resolve({
+      .resolveTo({
         opportunities: opportunitiesArray,
         more: false
-      }));
-    ctrl.$onInit();
-    $scope.$apply();
-
-    spyOn($uibModal, 'open').and.callThrough();
-    ctrl.onClickButton('2');
-
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+      });
+    component.ngOnInit();
+    tick();
+    component.onClickButton('2');
+    tick();
+    expect(modalService.open).toHaveBeenCalled();
+  }));
 
   it('should register Contributor Dashboard suggest event when clicking button',
-    function() {
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+    fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
       spyOn(
         contributionOpportunitiesService,
-        'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
+        'getTranslationOpportunitiesAsync').and.resolveTo({
         opportunities: opportunitiesArray,
         more: false
-      }));
+      });
 
       spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
-      ctrl.$onInit();
-      $scope.$apply();
-
-      spyOn($uibModal, 'open').and.callThrough();
-      ctrl.onClickButton('2');
+      component.ngOnInit();
+      tick();
+      component.onClickButton('2');
+      tick();
 
       expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
         .toHaveBeenCalledWith('Translation');
-    });
+    })
+  );
 
-  it('should close translation modal when clicking save', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve({
-        isLoggedIn: () => true
-      }));
-    spyOn(
-      contributionOpportunitiesService,
-      'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
-      opportunities: opportunitiesArray,
-      more: false
+  it('should not open translation modal when user is not logged', fakeAsync(
+    () => {
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
+      spyOn(
+        contributionOpportunitiesService,
+        'getTranslationOpportunitiesAsync').and.resolveTo({
+        opportunities: opportunitiesArray,
+        more: true
+      });
+      component.ngOnInit();
+
+      component.onClickButton('2');
+      tick();
+
+      expect(modalService.open).not.toHaveBeenCalled();
     }));
-    ctrl.$onInit();
-    $scope.$apply();
-
-    var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
-    ctrl.onClickButton('2');
-    $scope.$apply();
-
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should dismiss translation modal when clicking cancel', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve({
-        isLoggedIn: () => true
-      }));
-    spyOn(
-      contributionOpportunitiesService,
-      'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
-      opportunities: opportunitiesArray,
-      more: true
-    }));
-    ctrl.$onInit();
-    $scope.$apply();
-
-    var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    ctrl.onClickButton('2');
-    $scope.$apply();
-
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should not open translation modal when user is not logged', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve({
-        isLoggedIn: () => false
-      }));
-    spyOn(
-      contributionOpportunitiesService,
-      'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
-      opportunities: opportunitiesArray,
-      more: true
-    }));
-    ctrl.$onInit();
-    $scope.$apply();
-
-    spyOn($uibModal, 'open');
-    // The callFake is to avoid conflicts when testing modal calls.
-    spyOn(contributionOpportunitiesService, 'showRequiresLoginModal').and
-      .callFake(() => {});
-    ctrl.onClickButton('2');
-    $scope.$apply();
-
-    expect($uibModal.open).not.toHaveBeenCalled();
-  });
 });
