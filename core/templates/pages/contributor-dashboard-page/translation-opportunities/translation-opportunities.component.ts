@@ -24,16 +24,8 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
-import { TranslationModalContent } from '../modal-templates/translation-modal.component';
+import { TranslationModalContent, TranslationOpportunityDict } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
-
-export class TranslationOpportunityDict {
-  id: string;
-  heading: string;
-  subheading: string;
-  progressPercentage: string;
-  actionButtonTitle: string;
-}
 
 @Component({
   selector: 'translation-opportunities',
@@ -93,7 +85,7 @@ export class TranslationOpportunitiesComponent {
     this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
       'Translation');
     const opportunity = this.getOpportunitySummary(expId);
-    const modalRef = this.modalService.open(
+    this.modalService.open(
       TranslationModalContent, {
         size: 'lg',
         backdrop: 'static',
@@ -105,7 +97,6 @@ export class TranslationOpportunitiesComponent {
           parent: this.injector
         })
       });
-    modalRef.componentInstance.opportunity = opportunity;
   }
 
   ngOnInit(): void {

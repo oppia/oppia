@@ -28,7 +28,6 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { AppConstants } from 'app.constants';
-import { TranslationOpportunityDict } from '../translation-opportunities/translation-opportunities.component';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -36,12 +35,21 @@ class UiConfig {
   'language'?: string;
   'languageDirection'?: string;
 }
+export class TranslationOpportunityDict {
+  id: string;
+  heading: string;
+  subheading: string;
+  progressPercentage: string;
+  actionButtonTitle: string;
+}
 
 @Component({
   selector: 'translation-modal',
   templateUrl: './translation-modal.directive.html',
   styleUrls: [],
-  providers: []
+  providers: [
+    {provide: TranslationOpportunityDict, useValue: null}
+  ]
 })
 export class TranslationModalContent {
   activeWrittenTranslation: {html: string} = {html: ''};

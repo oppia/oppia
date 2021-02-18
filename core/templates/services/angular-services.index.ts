@@ -146,7 +146,9 @@ import { TopicUpdateService } from 'domain/topic/topic-update.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service.ts';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PopulateRuleContentIdsService } from
   'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
@@ -218,7 +220,6 @@ import { AdminRouterService } from 'pages/admin-page/services/admin-router.servi
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { EmailDashboardDataService } from 'pages/email-dashboard-pages/email-dashboard-data.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -394,7 +395,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
-  ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
   ['CountVectorizerService', CountVectorizerService],
   ['CreatorDashboardBackendApiService', CreatorDashboardBackendApiService],
@@ -473,7 +473,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['IdGenerationService', IdGenerationService],
   ['ImageClickInputRulesService', ImageClickInputRulesService],
   ['ImageClickInputValidationService', ImageClickInputValidationService],
+  ['ImageLocalStorageService', ImageLocalStorageService],
   ['ImagePreloaderService', ImagePreloaderService],
+  ['ImageUploadHelperService', ImageUploadHelperService],
   ['ImprovementsService', ImprovementsService],
   ['InteractionAttributesExtractorService',
     InteractionAttributesExtractorService],
