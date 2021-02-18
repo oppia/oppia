@@ -22,7 +22,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 angular.module('oppia').directive('oppiaRoot', [
-  '$translate', function($translate) {
+  '$rootScope', '$translate', function($rootScope, $translate) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
@@ -31,7 +31,11 @@ angular.module('oppia').directive('oppiaRoot', [
       controller: ['$scope',
         function($scope) {
           $scope.initialized = false;
-
+          OppiaAngularRootComponent.angularChangeDetectionComplete.subscribe(
+            () => {
+              $rootScope.$applyAsync();
+            }
+          );
           $scope.onInit = function() {
             const translateService = (
               OppiaAngularRootComponent.translateService);

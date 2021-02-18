@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, NgZone, OnInit } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -487,15 +487,16 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'oppia-angular-root',
   template: ''
 })
-export class OppiaAngularRootComponent implements AfterViewInit {
+export class OppiaAngularRootComponent implements AfterViewInit, OnInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
-
+  static angularChangeDetectionComplete: Subject<void> = new Subject();
   static adminBackendApiService: AdminBackendApiService;
   static adminDataService: AdminDataService;
   static adminRouterService: AdminRouterService;
@@ -789,6 +790,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
 
   constructor(
+    private ngZone: NgZone,
     private adminBackendApiService: AdminBackendApiService,
 private adminDataService: AdminDataService,
 private adminRouterService: AdminRouterService,
@@ -1560,5 +1562,11 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();
+  }
+
+  ngOnInit(): void {
+    this.ngZone.onMicrotaskEmpty.subscribe(
+      () => OppiaAngularRootComponent.angularChangeDetectionComplete.next()
+    );
   }
 }
