@@ -33,7 +33,7 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class SubtopicViewerNavbarPreLogoAction implements OnInit {
   topicUrlFragment: string;
-  topicUrl: string
+  topicUrl: string;
   constructor(
     private urlService: UrlService,
     private urlInterpolationService: UrlInterpolationService
@@ -46,7 +46,7 @@ export class SubtopicViewerNavbarPreLogoAction implements OnInit {
         topic_url_fragment: this.topicUrlFragment,
         classroom_url_fragment: (
           this.urlService.getClassroomUrlFragmentFromLearnerUrl())
-    });
+      });
   }
 }
 
