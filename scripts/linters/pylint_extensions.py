@@ -2133,8 +2133,7 @@ class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access function.
         """
         file_content = read_from_node(node)
-        # line_num==2 depicts the line below the function definition.
-        # function returns the message if line_num==2 is an empty string.
+        
         for (line_num, line) in enumerate(file_content):
             if line.strip().startswith('def'):
                 next_line = dict(enumerate(file_content))[line_num + 1]
