@@ -3257,3 +3257,41 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
+
+
+class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
+
+    def test_no_blank_lines_below_function_definition(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.NoBlankLineBelowFunctionDefinition)
+
+        checker_test_object.setup_method()
+        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def Sum(a,b):
+
+                    \"\"\"Returns the sum of a and b.
+                    return a+b
+                    """
+                )
+
+        node.file = filename
+        node.path = filename
+
+        checker_test_object.checker.check_blank_lines_below_function_definition(
+            node)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='newline-below-function-definition',
+                line=1
+            ),
+
+        ):
+            temp_file.close()

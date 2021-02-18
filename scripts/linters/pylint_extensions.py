@@ -2107,6 +2107,38 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                         'replace-disallowed-function-calls',
                         node=node, args=(func, replacement))
                     break
+class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
+    """Checks if there are no blank lines available below function
+    definition.
+    """
+
+    _implements_ = interfaces.IAstroidChecker
+    name = 'newline-below-function-definition'
+    priority = -1
+    msgs = {
+        'W0033': (
+            'A blank line found below the function definition.',
+            'newline-below-function-definition',
+            'All functions must have no spaces below function definition.'
+        )
+    }
+
+    def check_blank_lines_below_function_definition(self, node):
+        """Visit a function to ensure that there are no  blank lines below
+        function definition.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access function.
+        """
+        file_content = read_from_node(node)
+        # line_num==2 depicts the line below the function definition.
+        # function returns the message if line_num==2 is an empty string.
+        for (line_num, line) in enumerate(file_content):
+            if line.strip().startswith('def'):
+                next_line = dict(enumerate(file_content))[line_num + 1]
+                if len(next_line.strip()) == 0:
+                    self.add_message(
+                        'newline-below-function-definition', line=1)
 
 
 def register(linter):
@@ -2131,3 +2163,4 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
+    linter.register_checker(NoBlankLineBelowFunctionDefinition(linter))
