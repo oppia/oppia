@@ -2133,7 +2133,7 @@ class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access function.
         """
         file_content = read_from_node(node)
-        
+
         for (line_num, line) in enumerate(file_content):
             if line.strip().startswith('def'):
                 next_line = dict(enumerate(file_content))[line_num + 1]
