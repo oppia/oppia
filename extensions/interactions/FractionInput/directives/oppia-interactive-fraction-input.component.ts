@@ -121,7 +121,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.allowNonzeroIntegerPart = allowNonzeroIntegerPart.value;
     this.customPlaceholder = customPlaceholder.value.unicode;
     const submitAnswerFn = () => this.submitAnswer();
-    const isAnswerValid = () => this.isValid;
+    const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswerFn, isAnswerValid);
   }
@@ -162,7 +162,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
         this.isValid = false;
       } else {
         this.currentInteractionService.onSubmit(
-          fraction.toString(),
+          fraction as unknown as string,
           this.fractionInputRulesService as unknown as InteractionRulesService);
       }
     } catch (parsingError) {
@@ -176,7 +176,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   }
 
   answerValueChanged(): void {
-    console.log(this.answer);
     this.answerChanged.next(this.answer);
   }
 
