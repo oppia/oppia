@@ -2107,6 +2107,8 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                         'replace-disallowed-function-calls',
                         node=node, args=(func, replacement))
                     break
+
+
 class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
     """Checks if there are no blank lines available below function
     definition.
