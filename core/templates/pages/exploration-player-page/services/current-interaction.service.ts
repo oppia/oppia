@@ -30,7 +30,7 @@ import { PlayerTranscriptService } from
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
-interface InteractionRulesService {
+export interface InteractionRulesService {
   [ruleName: string]: (
     answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
 }

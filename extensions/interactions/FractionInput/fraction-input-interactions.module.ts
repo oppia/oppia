@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the interaction extension components.
+ * @fileoverview Module for the continue extension components.
  */
 import 'core-js/es7/reflect';
 import 'zone.js';
@@ -21,22 +21,27 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { InteractiveFractionInputComponent } from './directives/oppia-interactive-fraction-input.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
-import { ContinueExtensionsModule } from './Continue/continue-extensions.module';
-import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    ContinueExtensionsModule,
-    FractionInputInteractionModule
+    FormsModule,
+    SharedComponentsModule
   ],
-  declarations: [],
-  entryComponents: [],
+  declarations: [
+    InteractiveFractionInputComponent
+  ],
+  entryComponents: [
+    InteractiveFractionInputComponent
+  ],
   exports: [
-    ContinueExtensionsModule,
-    FractionInputInteractionModule
+    InteractiveFractionInputComponent
   ],
 })
-export class InteractionExtensionsModule { }
+
+export class FractionInputInteractionModule { }
