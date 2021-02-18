@@ -4812,6 +4812,10 @@ export default {
     "description": "हिन्दी (Hindi)",
     "direction": "ltr"
   }, {
+    "code": "hi-en",
+    "description": "Hinglish",
+    "direction": "ltr"
+  }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
     "direction": "ltr"
