@@ -256,12 +256,16 @@ angular.module('oppia').component('settingsTab', {
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
         ctrl.closeRolesForm();
         ExplorationRightsService.saveRoleChanges(
-          newMemberUsername, newMemberRole);
+          newMemberUsername, newMemberRole).then(() => {
+          $rootScope.$applyAsync();
+        });
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
         ExplorationRightsService.setViewability(
-          !ExplorationRightsService.viewableIfPrivate());
+          !ExplorationRightsService.viewableIfPrivate()).then(() => {
+          $rootScope.$applyAsync();
+        });
       };
 
       // Methods for muting notifications.
@@ -308,7 +312,9 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          ExplorationRightsService.makeCommunityOwned();
+          ExplorationRightsService.makeCommunityOwned().then(() => {
+            $rootScope.$applyAsync();
+          });
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -354,7 +360,9 @@ angular.module('oppia').component('settingsTab', {
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
             ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody);
+              emailBody).then(() => {
+              $rootScope.$applyAsync();
+            });
           }, function() {
             AlertsService.clearWarnings();
           });

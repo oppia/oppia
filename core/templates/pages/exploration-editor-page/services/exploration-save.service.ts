@@ -161,6 +161,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             SiteAnalyticsService.registerPublishExplorationEvent(
               ExplorationDataService.explorationId);
             whenModalClosed.resolve();
+            $rootScope.$applyAsync();
           });
       }, function() {
         AlertsService.clearWarnings();
