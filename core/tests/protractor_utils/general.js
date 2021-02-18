@@ -24,10 +24,10 @@ var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {
-  waitFor.presenceOf(
+  waitFor.visibilityOf(
     fromElement,
     'fromElement taking too long to load');
-  waitFor.presenceOf(
+  waitFor.visibilityOf(
     toElement,
     'toElement taking too long to load');
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
