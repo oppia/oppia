@@ -15,10 +15,11 @@
 /**
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
-import { HttpTestingController } from '@angular/common/http/testing';
-import { async, ComponentFixture, flushMicrotasks, TestBed } from
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ComponentFixture, flushMicrotasks, TestBed } from
   '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { async } from 'q';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 
@@ -33,7 +34,7 @@ class MockActiveModal {
   }
 }
 
-describe('Learner Playlist Modal Component', function() {
+fdescribe('Learner Playlist Modal Component', function() {
   let component: LearnerPlaylistModalComponent;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -42,14 +43,12 @@ describe('Learner Playlist Modal Component', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [LearnerPlaylistModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
-        },
-        {
-          csrfService: CsrfTokenService
         }
       ]
     }).compileComponents();
@@ -58,20 +57,19 @@ describe('Learner Playlist Modal Component', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(LearnerPlaylistModalComponent);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.get(NgbActiveModal);
-    csrfService = TestBed.get(CsrfTokenService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    spyOn(csrfService, 'getTokenAsync').and.callFake(
+      (): Promise<string> => {
+        var deferred = new Promise<string>((resolve) => {
+          resolve('sample-csrf-token');
+        });
+        return deferred;
+      });
   });
 
-  spyOn(csrfService, 'getTokenAsync').and.callFake(
-    (): Promise<string> => {
-      var deferred = new Promise<string>((resolve) => {
-        resolve('sample-csrf-token');
-      });
-      return deferred;
-    });
-
-  it('should call http for deleting from learner playlist when clicking on' +
+  fit('should call http for deleting from learner playlist when clicking on' +
   ' remove button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     var req = httpTestingController.expectOne(
@@ -83,7 +81,7 @@ describe('Learner Playlist Modal Component', function() {
     expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should not call http delete when clicking on cancel button', () => {
+  fit('should not call http delete when clicking on cancel button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     httpTestingController.verify();

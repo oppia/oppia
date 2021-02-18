@@ -148,7 +148,7 @@ angular.module('oppia').directive('learnerDashboardIcons', [
               }
               $scope.disablePlaylistTooltip();
             }
-            $rootScope.$apply();
+            $rootScope.apply();
           };
         }
       ]
