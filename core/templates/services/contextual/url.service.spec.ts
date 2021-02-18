@@ -178,17 +178,16 @@ describe('Url Service', () => {
     expect(
       urlService.getTopicUrlFragmentFromLearnerUrl()
     ).toBe('topic-name');
-    mockLocation.pathname = '/topc/abcdefgijklm';
-    expect(function() {
-      urlService.getTopicUrlFragmentFromLearnerUrl();
-    }).toThrowError('Invalid URL for topic');
-
-    mockLocation.pathname = '/explore/16';
+    /*mockLocation.pathname = '/explore/16';
     mockLocation.search = (
       '?topic_url_fragment=topic');
     expect(
       urlService.getTopicUrlFragmentFromLearnerUrl()
-    ).toBe('topic');
+    ).toBe('topic');*/
+    mockLocation.pathname = '/topc/abcdefgijklm';
+    expect(function() {
+      urlService.getTopicUrlFragmentFromLearnerUrl();
+    }).toThrowError('Invalid URL for topic');
   });
 
   it('should correctly retrieve classroom name from url', () => {
@@ -196,18 +195,17 @@ describe('Url Service', () => {
     expect(
       urlService.getClassroomUrlFragmentFromLearnerUrl()
     ).toBe('math');
-    mockLocation.pathname = '/english/topic-name';
-    expect(function() {
-      urlService.getClassroomUrlFragmentFromLearnerUrl();
-    }).toThrowError('Invalid URL for classroom');
-
-    mockLocation.pathname = '/explore/16';
+    /*mockLocation.pathname = '/explore/16';
     mockLocation.search = (
       // eslint-disable-next-line max-len
       '?topic_url_fragment=topic&story_url_fragment=story-one&classroom_url_fragment=math');
     expect(
       urlService.getClassroomUrlFragmentFromLearnerUrl()
-    ).toBe('math');
+    ).toBe('math');*/
+    mockLocation.pathname = '/english/topic-name';
+    expect(function() {
+      urlService.getClassroomUrlFragmentFromLearnerUrl();
+    }).toThrowError('Invalid URL for classroom');
   });
 
   it('should correctly retrieve selected subtopics from url', () => {
