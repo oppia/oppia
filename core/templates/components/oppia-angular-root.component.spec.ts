@@ -16,21 +16,24 @@
  * @fileoverview Unit tests for the OppiaAngularRootComponent.
  */
 
-import { ComponentFixture, TestBed, async} from
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync} from
   '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
+import { NgZone } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
 
 describe('OppiaAngularRootComponent', function() {
   let emitSpy: jasmine.Spy;
+  let ngZone: NgZone;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [OppiaAngularRootComponent],
@@ -38,11 +41,22 @@ describe('OppiaAngularRootComponent', function() {
         {provide: AngularFireAuth, useValue: new MockAngularFireAuth()},
       ],
     }).compileComponents();
-
+    ngZone = TestBed.inject(NgZone);
     fixture = TestBed.createComponent(OppiaAngularRootComponent);
     component = fixture.componentInstance;
 
     emitSpy = spyOn(component.initialized, 'emit');
+  }));
+
+  it ('should emit changeDetectionCompleteEvent', fakeAsync(() => {
+    const successSpy = jasmine.createSpy('Success');
+    const sub: Subscription = (
+      OppiaAngularRootComponent.angularChangeDetectionComplete.subscribe(
+        successSpy));
+    component.ngOnInit();
+    ngZone.onMicrotaskEmpty.next();
+    expect(successSpy).toHaveBeenCalled();
+    sub.unsubscribe();
   }));
 
   describe('.initialized', () => {
