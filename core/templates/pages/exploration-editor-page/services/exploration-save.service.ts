@@ -160,8 +160,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
             showCongratulatorySharingModal();
             SiteAnalyticsService.registerPublishExplorationEvent(
               ExplorationDataService.explorationId);
-            whenModalClosed.resolve();
             $rootScope.$applyAsync();
+            whenModalClosed.resolve();
           });
       }, function() {
         AlertsService.clearWarnings();
