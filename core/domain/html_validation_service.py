@@ -1116,7 +1116,12 @@ def add_math_content_to_math_rte_components(html_string):
         html_string.encode(encoding='utf-8'), 'html.parser')
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('raw_latex-with-value'):
-            # There have been cases where the attr value is empty.
+            # There was a case in prod where the attr value was empty. This was
+            # dealt with manually in an earlier migration (states schema v34),
+            # but we are not sure how it arose. We can't migrate those snapshots
+            # manually, hence the addition of the logic here. After all
+            # snapshots are migrated to states schema v42 (or above), this
+            # 'if' branch will no longer be needed.
             if not math_tag['raw_latex-with-value']:
                 math_tag.decompose()
                 continue

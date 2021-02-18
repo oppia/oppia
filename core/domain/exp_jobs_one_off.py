@@ -769,7 +769,11 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 'INFO - Exploration %s failed non-strict validation' % item.id,
                 e)
 
-        # Some old explorations do not have a states schema version.
+        # Some (very) old explorations do not have a states schema version.
+        # These explorations have snapshots that were created before the
+        # states_schema_version system was introduced. We therefore set their
+        # states schema version to 0, since we now expect all snapshots to
+        # explicitly include this field.
         if 'states_schema_version' not in item.content:
             item.content['states_schema_version'] = 0
 
