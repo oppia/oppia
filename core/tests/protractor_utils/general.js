@@ -25,8 +25,11 @@ var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {
   waitFor.presenceOf(
-    dragAndDropScript,
-    'Drag and drop script taking too long to load');
+    fromElement,
+    'fromElement taking too long to load');
+  waitFor.presenceOf(
+    toElement,
+    'toElement taking too long to load');
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
 };
 
