@@ -84,7 +84,12 @@ ID_LENGTH = 12
 
 
 class BaseModel(datastore_services.Model):
-    """Base model for all persistent object storage classes."""
+    """Base model for all persistent object storage classes.
+
+    IMPORTANT: If humans can interface with the model directly, then inherit
+    from BaseHumanMaintainedModel instead and use the put_for_human family of
+    methods when appropriate.
+    """
 
     # Specifies whether the model's id is used as a key in Takeout. By default,
     # the model's id is not used as the key for the Takeout dict.
@@ -92,10 +97,10 @@ class BaseModel(datastore_services.Model):
 
     # When this entity was first created. This value should not be modified.
     created_on = (
-        datastore_services.DateTimeProperty(auto_now_add=True, indexed=True))
+        datastore_services.DateTimeProperty(indexed=True))
     # When this entity was last updated. This value should not be modified.
     last_updated = (
-        datastore_services.DateTimeProperty(auto_now=True, indexed=True))
+        datastore_services.DateTimeProperty(indexed=True))
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
@@ -257,6 +262,7 @@ class BaseModel(datastore_services.Model):
             entities: list(datastore_services.Model). List of model instances to
                 be stored.
         """
+
         datastore_services.put_multi(entities)
 
     @classmethod

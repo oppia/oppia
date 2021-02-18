@@ -969,7 +969,6 @@ def _save_user_settings(user_settings):
         user_model.populate(**user_settings_dict)
     else:
         user_settings_dict['id'] = user_settings.user_id
-        del user_settings_dict['created_on']
         user_model = user_models.UserSettingsModel(**user_settings_dict)
     user_model.put()
 
