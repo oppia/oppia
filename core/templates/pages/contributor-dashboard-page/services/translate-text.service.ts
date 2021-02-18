@@ -31,7 +31,7 @@ import { ImagesData } from 'services/image-local-storage.service';
 })
 export class TranslateTextService {
   constructor(
-    private _translatableTextBackedApiService:
+    private translatableTextBackedApiService:
     TranslateTextBackendApiService) {}
 
   stateWiseContents: StateNamesToContentIdMappingBackendDict = null;
@@ -84,7 +84,7 @@ export class TranslateTextService {
     this.stateNamesList = [];
     this.activeExpId = expId;
     this.activeExpVersion = null;
-    this._translatableTextBackedApiService.getTranslatableTextsAsync(
+    this.translatableTextBackedApiService.getTranslatableTextsAsync(
       expId, languageCode).then((response) => {
       this.stateWiseContents = response.state_names_to_content_id_mapping;
       this.activeExpVersion = response.version;
@@ -120,7 +120,7 @@ export class TranslateTextService {
   suggestTranslatedText(
       translationHtml: string, languageCode: string, imagesData:ImagesData[],
       successCallback: ()=>void): void {
-    this._translatableTextBackedApiService.suggestTranslatedTextAsync(
+    this.translatableTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,
       this.activeContentId,
