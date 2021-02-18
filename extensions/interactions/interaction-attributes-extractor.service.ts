@@ -25,7 +25,7 @@ import { InteractionCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { InteractionId } from './rule-input-defs';
+import { InteractionId } from 'interactions/rule-input-defs';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
