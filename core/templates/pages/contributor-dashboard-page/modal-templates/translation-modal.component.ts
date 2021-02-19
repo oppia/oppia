@@ -16,7 +16,7 @@
  * @fileoverview Component for the translation modal.
 */
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -52,6 +52,7 @@ export class TranslationOpportunityDict {
   ]
 })
 export class TranslationModalContent {
+  @Input() opportunity: TranslationOpportunityDict;
   activeWrittenTranslation: {html: string} = {html: ''};
   uploadingTranslation = false;
   subheading: string;
@@ -73,8 +74,7 @@ export class TranslationModalContent {
     private readonly imageLocalStorageService: ImageLocalStorageService,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
-    private readonly translationLanguageService: TranslationLanguageService,
-    private readonly opportunity: TranslationOpportunityDict) {}
+    private readonly translationLanguageService: TranslationLanguageService) {}
 
   ngOnInit(): void {
     // We need to set the context here so that the rte fetches
@@ -105,6 +105,10 @@ export class TranslationModalContent {
           this.translationLanguageService.getActiveLanguageDirection())
       }
     };
+  }
+
+  close(): void {
+    this.activeModal.close();
   }
 
   getHtmlSchema(): {
@@ -158,7 +162,7 @@ export class TranslationModalContent {
         });
     }
     if (!this.moreAvailable) {
-      this.activeModal.close();
+      this.close();
     }
   }
 }
