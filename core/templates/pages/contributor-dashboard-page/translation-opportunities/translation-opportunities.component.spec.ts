@@ -39,6 +39,7 @@ describe('Translation opportunities component', () => {
   let modalService: NgbModal;
   let component: TranslationOpportunitiesComponent;
   let fixture: ComponentFixture<TranslationOpportunitiesComponent>;
+  let translationModal: NgbModalRef;
   let httpTestingController;
   let loggedInUserInfo = new UserInfo(
     false, false, false, false, false,
@@ -74,16 +75,14 @@ describe('Translation opportunities component', () => {
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     userService = TestBed.inject(UserService);
     modalService = TestBed.inject(NgbModal);
-    spyOn(modalService, 'open').and.callFake(content => {
-      // This only needs to have the property componentInstance
-      return TestBed.createComponent(content) as unknown as NgbModalRef;
-    });
-    spyOn(contributionOpportunitiesService, 'showRequiresLoginModal')
-      .and.stub();
+    translationModal = TestBed.createComponent(
+      TranslationModalContent) as unknown as NgbModalRef;
+    spyOn(modalService, 'open').and.returnValue(translationModal);
   });
 
   afterEach(() => {
     httpTestingController.verify();
+    fixture.destroy();
   });
 
   beforeEach(() => {
@@ -181,6 +180,8 @@ describe('Translation opportunities component', () => {
         opportunities: opportunitiesArray,
         more: true
       });
+      spyOn(contributionOpportunitiesService, 'showRequiresLoginModal')
+        .and.stub();
 
       component.ngOnInit();
 
