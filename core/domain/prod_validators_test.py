@@ -485,6 +485,21 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         for error in actual_error_list:
             assert (error in full_error_list), ('Extra error: %s' % error)
 
+    def test_model_with_invalid_commit_message_length(self):
+        self.model_instance_0.commit_message = 'a' * (
+            constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit message check '
+                'of ExplorationSnapshotMetadataModel\', '
+                '[u\'Entity id 0-1: Commit message larger than '
+                'accepted length\']]'
+            ), u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
 
 class ExplorationSnapshotContentModelValidatorTests(
         test_utils.AuditJobsTestBase):
@@ -1405,6 +1420,21 @@ class ExplorationCommitLogEntryModelValidatorTests(
                 'validation for command: {u\'cmd\': u\'add_state\'} '
                 'failed with error: The following required attributes '
                 'are missing: state_name"]]'
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_invalid_commit_message_length(self):
+        self.model_instance_0.commit_message = 'a' * (
+            constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit message check '
+                'of ExplorationCommitLogEntryModel\', '
+                '[u\'Entity id exploration-0-1: Commit message larger than '
+                'accepted length\']]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)

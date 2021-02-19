@@ -4415,3 +4415,7 @@ div.oppia-issues-learner-action {
 .fx-cross-end {
   align-items: end;
 }
+
+.practice-tab-mat-checkbox .mat-checkbox-label {
+  font-weight: normal;
+}
