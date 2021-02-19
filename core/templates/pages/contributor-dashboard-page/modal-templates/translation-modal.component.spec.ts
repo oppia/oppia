@@ -27,6 +27,8 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { TranslationModalContent, TranslationOpportunityDict } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from '../services/translate-text.service';
 
 describe('Login Required Modal Content', () => {
@@ -34,6 +36,8 @@ describe('Login Required Modal Content', () => {
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let imageLocalStorageService: ImageLocalStorageService;
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalContent>;
   let component: TranslationModalContent;
@@ -66,6 +70,8 @@ describe('Login Required Modal Content', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     contextService = TestBed.inject(ContextService);
     translateTextService = TestBed.inject(TranslateTextService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
   });
@@ -195,8 +201,6 @@ describe('Login Required Modal Content', () => {
   describe('when skipping the active translation', () => {
     describe('when there is available text', () => {
       beforeEach(fakeAsync(() => {
-        spyOn(translateTextService, 'init').and.callThrough();
-        spyOn(translateTextService, 'getTextToTranslate').and.callThrough();
         component.ngOnInit();
 
         const sampleStateWiseContentMapping = {
@@ -223,23 +227,171 @@ describe('Login Required Modal Content', () => {
     });
   });
 
-  describe('clicking save', () => {
-    describe('when alreadhy uploading a translation', () => {
-      it('should not submit the translation', () => {
-        // TODO
+  fdescribe('when suggesting translated text', () => {
+    let expectedPayload, imagesData;
+    beforeEach(fakeAsync(() => {
+      expectedPayload = {
+        suggestion_type: 'translate_content',
+        target_type: 'exploration',
+        description: 'Adds translation',
+        target_id: '1',
+        target_version_at_submission: 1,
+        change: {
+          cmd: 'add_translation',
+          content_id: 'contentId1',
+          state_name: 'stateName1',
+          language_code: 'es',
+          content_html: 'text1',
+          translation_html: 'texto1'
+        }
+      };
+      component.ngOnInit();
+
+      const sampleStateWiseContentMapping = {
+        stateName1: {contentId1: 'text1'},
+        stateName2: {contentId2: 'text2'}
+      };
+
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=es');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1
       });
+      flushMicrotasks();
+      component.activeWrittenTranslation.html = 'texto1';
+    }));
+
+    it('should correctly submit a translation suggestion', fakeAsync(() => {
+      component.suggestTranslatedText();
+
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.getAll('payload')[0]).toEqual(
+        JSON.stringify(expectedPayload));
+      req.flush({});
+      flushMicrotasks();
+    }));
+
+    describe('when already uploading a translation', () => {
+      it('should not submit the translation', fakeAsync(() => {
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+        component.suggestTranslatedText();
+
+        const req = httpTestingController.expectOne(
+          '/suggestionhandler/');
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.body.getAll('payload')[0]).toEqual(
+          JSON.stringify(expectedPayload));
+        req.flush({});
+        flushMicrotasks();
+        // Prevention of concurrent suggestions is also confirmed by "expectOne"
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(1);
+      }));
     });
 
     describe('when currently loading data', () => {
       it('should not submit the translation', () => {
-        // TODO
+        component.loadingData = true;
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
       });
     });
-  });
 
-  describe('when clicking cancel', () => {
-    it('should close the modal', () => {
+    describe('when suggesting the last available text', () => {
+      beforeEach(() => {
+        expectedPayload = {
+          suggestion_type: 'translate_content',
+          target_type: 'exploration',
+          description: 'Adds translation',
+          target_id: '1',
+          target_version_at_submission: 1,
+          change: {
+            cmd: 'add_translation',
+            content_id: 'contentId2',
+            state_name: 'stateName2',
+            language_code: 'es',
+            content_html: 'text2',
+            translation_html: 'texto2'
+          }
+        };
+        component.skipActiveTranslation();
+        component.activeWrittenTranslation.html = 'texto2';
+      });
 
+      it('should close the modal', fakeAsync(() => {
+        spyOn(component, 'close');
+        component.suggestTranslatedText();
+
+        const req = httpTestingController.expectOne(
+          '/suggestionhandler/');
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.body.getAll('payload')[0]).toEqual(
+          JSON.stringify(expectedPayload));
+        req.flush({});
+        flushMicrotasks();
+        expect(component.close).toHaveBeenCalled();
+      }));
+    });
+
+    it('should register a contributor dashboard submit suggestion event',
+      () => {
+        spyOn(
+          siteAnalyticsService,
+          'registerContributorDashboardSubmitSuggestionEvent'
+        );
+        spyOn(translateTextService, 'suggestTranslatedText').and.stub();
+        component.suggestTranslatedText();
+      });
+
+    it('should flush stored image data',
+      fakeAsync(() => {
+        imagesData = [{
+          filename: 'imageFilename1',
+          imageBlob: 'imageBlob1'
+        }, {
+          filename: 'imageFilename1',
+          imageBlob: 'imageBlob2'
+        }, {
+          filename: 'imageFilename2',
+          imageBlob: 'imageBlob1'
+        }, {
+          filename: 'imageFilename2',
+          imageBlob: 'imageBlob2'
+        }];
+        spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
+          imagesData
+        );
+        component.suggestTranslatedText();
+        const req = httpTestingController.expectOne(
+          '/suggestionhandler/');
+        expect(req.request.method).toEqual('POST');
+        const filename1Blobs = req.request.body.getAll('imageFilename1');
+        const filename2Blobs = req.request.body.getAll('imageFilename2');
+        expect(filename1Blobs).toContain('imageBlob1');
+        expect(filename1Blobs).toContain('imageBlob2');
+        expect(filename2Blobs).toContain('imageBlob1');
+        expect(filename2Blobs).toContain('imageBlob2');
+        req.flush({});
+        flushMicrotasks();
+      }));
+
+    it('should reset the image save destination', () => {
+      spyOn(translateTextService, 'suggestTranslatedText').and.stub();
+      expect(contextService.imageSaveDestination).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      component.suggestTranslatedText();
+      expect(contextService.imageSaveDestination).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     });
   });
 });
