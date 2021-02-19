@@ -18,26 +18,22 @@
 
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
-import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
 import { OpportunitiesListComponent } from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
 import { OpportunitiesListItemComponent } from 'pages/contributor-dashboard-page/opportunities-list-item/opportunities-list-item.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationModalContent } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationOpportunitiesComponent } from './translation-opportunities.component';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { LoginRequiredMessageComponent } from 'pages/contributor-dashboard-page/login-required-message/login-required-message.component';
 import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
-fdescribe('Translation opportunities component', () => {
+describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
-  let siteAnalyticsService: SiteAnalyticsService;
   let translationLanguageService: TranslationLanguageService;
   let userService: UserService;
   let modalService: NgbModal;
@@ -60,28 +56,30 @@ fdescribe('Translation opportunities component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        SharedComponentsModule,
-        NgbModalModule
+        SharedComponentsModule
       ],
       declarations: [
         OpportunitiesListComponent,
         OpportunitiesListItemComponent,
         TranslationModalContent,
-        TranslationOpportunitiesComponent,
+        TranslationOpportunitiesComponent
       ],
+      providers: [NgbModal, NgbActiveModal],
       // Prevent errors for rendering upgraded directives
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     httpTestingController = TestBed.inject(HttpTestingController);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     userService = TestBed.inject(UserService);
     modalService = TestBed.inject(NgbModal);
-    spyOn(modalService, 'open').and.stub();
-    spyOn(contributionOpportunitiesService, 'showRequiresLoginModal').and
-      .callFake(() => {});
+    spyOn(modalService, 'open').and.callFake(content => {
+      // This only needs to have the property componentInstance
+      return TestBed.createComponent(content) as unknown as NgbModalRef;
+    });
+    spyOn(contributionOpportunitiesService, 'showRequiresLoginModal')
+      .and.stub();
   });
 
   afterEach(() => {
@@ -174,27 +172,6 @@ fdescribe('Translation opportunities component', () => {
     expect(modalService.open).toHaveBeenCalled();
   }));
 
-  it('should register Contributor Dashboard suggest event when clicking button',
-    fakeAsync(() => {
-      spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
-      spyOn(
-        contributionOpportunitiesService,
-        'getTranslationOpportunitiesAsync').and.resolveTo({
-        opportunities: opportunitiesArray,
-        more: false
-      });
-
-      spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
-      component.ngOnInit();
-      tick();
-      component.onClickButton('2');
-      tick();
-
-      expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
-        .toHaveBeenCalledWith('Translation');
-    })
-  );
-
   it('should not open translation modal when user is not logged', fakeAsync(
     () => {
       spyOn(userService, 'getUserInfoAsync').and.resolveTo(notLoggedInUserInfo);
@@ -204,6 +181,7 @@ fdescribe('Translation opportunities component', () => {
         opportunities: opportunitiesArray,
         more: true
       });
+
       component.ngOnInit();
 
       component.onClickButton('2');
