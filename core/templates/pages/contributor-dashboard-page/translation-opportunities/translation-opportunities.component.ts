@@ -24,7 +24,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
-import { TranslationModalContent, TranslationOpportunityDict } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import { TranslationModalContent, TranslationOpportunityDict } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 
 @Component({
@@ -124,4 +124,3 @@ export class TranslationOpportunitiesComponent {
 angular.module('oppia').directive(
   'translationOpportunities', downgradeComponent(
     {component: TranslationOpportunitiesComponent}));
-

@@ -78,6 +78,7 @@ describe('Login Required Modal Content', () => {
 
   afterEach(() => {
     httpTestingController.verify();
+    fixture.destroy();
   });
 
   describe('when initialized', () => {
@@ -289,7 +290,7 @@ describe('Login Required Modal Content', () => {
           JSON.stringify(expectedPayload));
         req.flush({});
         flushMicrotasks();
-        // Prevention of concurrent suggestions is also confirmed by "expectOne"
+        // Prevention of concurrent suggestions also confirmed by "expectOne".
         expect(translateTextService.suggestTranslatedText)
           .toHaveBeenCalledTimes(1);
       }));
