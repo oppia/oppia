@@ -20,7 +20,7 @@ import { AudioFileUploaderComponent } from './audio-file-uploader.component';
  * @fileoverview Tests for Component for uploading audio
  */
 
-fdescribe('Audio File Uploader Component', () => {
+describe('Audio File Uploader Component', () => {
   let component: AudioFileUploaderComponent;
   let fixture:
     ComponentFixture<AudioFileUploaderComponent>;
