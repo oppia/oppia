@@ -1745,15 +1745,27 @@ class WrittenTranslations(python_utils.OBJECT):
                 written_translations_dict['translations_mapping'].items()):
             for language_code in (
                     language_code_to_written_translation.keys()):
-                if (written_translations_dict['translations_mapping'][
-                        content_id][language_code]['data_format'] ==
-                        WrittenTranslation.DATA_FORMAT_HTML):
+                translation_dict = written_translations_dict[
+                    'translations_mapping'][content_id][language_code]
+                if 'data_format' in translation_dict:
+                    if (translation_dict['data_format'] ==
+                            WrittenTranslation.DATA_FORMAT_HTML):
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code]['translation'] = (
+                                conversion_fn(written_translations_dict[
+                                    'translations_mapping'][content_id][
+                                        language_code]['translation'])
+                            )
+                elif 'html' in translation_dict:
+                    # TODO(#11950): Delete this once old schema migration
+                    # functions are deleted.
+                    # This "elif" branch is needed because, in states schema
+                    # v33, this function is called but the dict is still in the
+                    # old format (that doesn't have a "data_format" key).
                     written_translations_dict['translations_mapping'][
-                        content_id][language_code]['translation'] = (
-                            conversion_fn(written_translations_dict[
-                                'translations_mapping'][content_id][
-                                    language_code]['translation'])
-                        )
+                        content_id][language_code]['html'] = (
+                            conversion_fn(translation_dict['html']))
+
         return written_translations_dict
 
 
@@ -3135,6 +3147,18 @@ class State(python_utils.OBJECT):
 
         interaction_id = state_dict['interaction']['id']
         if interaction_id is None:
+            return state_dict
+
+        # TODO(#11950): Drop the following 'if' clause once all snapshots have
+        # been migrated. This is currently causing issues in migrating old
+        # snapshots to schema v34 because MathExpressionInput was still around
+        # at the time. It is conceptually OK to ignore customization args here
+        # because the MathExpressionInput has no customization arg fields.
+        if interaction_id == 'MathExpressionInput':
+            if state_dict['interaction']['solution']:
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    conversion_fn(state_dict['interaction']['solution'][
+                        'explanation']['html']))
             return state_dict
 
         if state_dict['interaction']['solution']:

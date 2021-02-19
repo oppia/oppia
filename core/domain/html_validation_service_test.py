@@ -1631,6 +1631,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
                 ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
             )
+        }, {
+            # The empty math tag here just gets deleted.
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math></oppia-nonintera'
+                'ctive-math>'),
+            'expected_output': '<p>Feedback</p>'
+        }, {
+            # If the raw_latex field is empty, the entire math tag gets
+            # deleted.
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value="">'
+                '</oppia-noninteractive-math>blahblah'
+            ),
+            'expected_output': 'blahblah'
         }]
 
         for test_case in test_cases:
@@ -1638,27 +1652,18 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.add_math_content_to_math_rte_components(
                     test_case['html_content']),
                 test_case['expected_output'])
+
         invalid_cases = [{
-            'html_content': (
-                '<p>Feedback</p><oppia-noninteractive-math></oppia-nonintera'
-                'ctive-math>')
-        }, {
             'html_content': (
                 '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
                 'e="++--"></oppia-noninteractive-math>'
             )
         }]
         with self.assertRaisesRegexp(
-            Exception, 'Invalid math tag with no proper attribute found'
-        ):
-            html_validation_service.add_math_content_to_math_rte_components(
-                invalid_cases[0]['html_content'])
-
-        with self.assertRaisesRegexp(
             Exception, 'No JSON object could be decoded'
         ):
             html_validation_service.add_math_content_to_math_rte_components(
-                invalid_cases[1]['html_content'])
+                invalid_cases[0]['html_content'])
 
     def test_validate_math_tags_in_html(self):
         """Test that the validate_math_tags_in_html method validates an
