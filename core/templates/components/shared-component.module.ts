@@ -59,6 +59,7 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { LearnerPlaylistModalComponent } from 'domain/learner_dashboard/learner-playlist-modal.component';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -95,6 +96,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    LearnerPlaylistModalComponent,
     LoadingDotsComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -114,6 +116,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    LearnerPlaylistModalComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -129,6 +132,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    LearnerPlaylistModalComponent,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,

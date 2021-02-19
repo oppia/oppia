@@ -18,7 +18,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, flushMicrotasks, TestBed } from
   '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { async } from 'q';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
@@ -43,7 +43,7 @@ fdescribe('Learner Playlist Modal Component', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, NgbModule],
       declarations: [LearnerPlaylistModalComponent],
       providers: [
         {
