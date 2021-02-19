@@ -32,11 +32,11 @@ export class ShortResponseAlgebraicExpressionInputComponent implements OnInit {
   @Input() answer: string = '';
   escapedAnswer: string = '';
 
-  constructor(private htmlEsacperService: HtmlEscaperService) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     this.escapedAnswer = (
-      this.htmlEsacperService.escapedJsonToObj(this.answer) as string);
+      this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
   }
 }
 
