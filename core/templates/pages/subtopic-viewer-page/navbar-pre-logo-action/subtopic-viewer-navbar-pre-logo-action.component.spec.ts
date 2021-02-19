@@ -21,7 +21,7 @@ import { SubtopicViewerNavbarPreLogoActionComponent } from
   './subtopic-viewer-navbar-pre-logo-action.component';
 import { UrlService } from 'services/contextual/url.service';
 
-fdescribe('subtopic viewer pre logo action component', () => {
+describe('subtopic viewer pre logo action component', () => {
   let component: SubtopicViewerNavbarPreLogoActionComponent;
   let fixture: ComponentFixture<SubtopicViewerNavbarPreLogoActionComponent>;
   let urlService = null;
