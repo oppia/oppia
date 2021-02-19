@@ -192,21 +192,33 @@ describe('Login Required Modal Content', () => {
     });
   });
 
-  describe('clicking the skip button', () => {
+  describe('when skipping the active translation', () => {
     describe('when there is available text', () => {
-      it('should retrieve remaining text availability', () => {
-        // TODO
-      });
+      beforeEach(fakeAsync(() => {
+        spyOn(translateTextService, 'init').and.callThrough();
+        spyOn(translateTextService, 'getTextToTranslate').and.callThrough();
+        component.ngOnInit();
 
-      it('should set the active text to translate to the next available text',
-        () => {
-          // TODO
+        const sampleStateWiseContentMapping = {
+          stateName1: {contentId1: 'text1'},
+          stateName2: {contentId2: 'text2'}
+        };
+
+        const req = httpTestingController.expectOne(
+          '/gettranslatabletexthandler?exp_id=1&language_code=es');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+          version: 1
         });
-    });
+        flushMicrotasks();
+        component.skipActiveTranslation();
+      }));
 
-    describe('when there is no more available text', () => {
-      it('should close the modal', () => {
 
+      it('should retrieve remaining text and availability', () => {
+        expect(component.textToTranslate).toBe('text2');
+        expect(component.moreAvailable).toBeFalse();
       });
     });
   });
