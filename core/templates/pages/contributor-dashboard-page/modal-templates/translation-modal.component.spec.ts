@@ -22,6 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TranslationModalContent, TranslationOpportunityDict } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -32,6 +33,7 @@ describe('Login Required Modal Content', () => {
   let contextService: ContextService;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
+  let ckEditorCopyContentService: CkEditorCopyContentService;
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalContent>;
   let component: TranslationModalContent;
@@ -61,6 +63,7 @@ describe('Login Required Modal Content', () => {
     component = fixture.componentInstance;
     component.opportunity = opportunity;
     httpTestingController = TestBed.inject(HttpTestingController);
+    ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     contextService = TestBed.inject(ContextService);
     translateTextService = TestBed.inject(TranslateTextService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -150,31 +153,62 @@ describe('Login Required Modal Content', () => {
   });
 
   describe('when clicking on the translatable content', () => {
+    let target: HTMLElement;
+    let broadcastSpy: jasmine.Spy<(target: HTMLElement) => void>;
+    let propagationSpy: jasmine.Spy<() => void>;
+    beforeEach(fakeAsync(() => {
+      spyOn(translateTextService, 'init').and.callFake(
+        (expId, languageCode, successCallback) => successCallback());
+      broadcastSpy = spyOn(
+        ckEditorCopyContentService, 'broadcastCopy').and.stub();
+
+      component.ngOnInit();
+      target = document.createElement('div');
+      target.onclick = function(this, ev) {
+        propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
+        component.onContentClick(ev);
+      };
+    }));
+
     it('should broadcast the clicked element', () => {
-      // TODO
+      target.click();
+      expect(broadcastSpy).toHaveBeenCalledWith(target);
     });
     describe('when copy mode is active', () => {
+      beforeEach(() => {
+        ckEditorCopyContentService.toggleCopyMode();
+      });
       it('should prevent default behavior', () => {
-        // TODO
+        target.click();
+        expect(propagationSpy).toHaveBeenCalled();
       });
     });
 
     describe('when copy mode is inactive', () => {
       it('should not prevent default behavior', () => {
-        // TODO
+        target.click();
+        expect(propagationSpy).not.toHaveBeenCalled();
       });
     });
   });
 
   describe('clicking the skip button', () => {
-    it('should retrieve remaining text availability', () => {
-      // TODO
-    });
-
-    it('should set the active text to translate to the next available text',
-      () => {
+    describe('when there is available text', () => {
+      it('should retrieve remaining text availability', () => {
         // TODO
       });
+
+      it('should set the active text to translate to the next available text',
+        () => {
+          // TODO
+        });
+    });
+
+    describe('when there is no more available text', () => {
+      it('should close the modal', () => {
+
+      });
+    });
   });
 
   describe('clicking save', () => {
@@ -189,16 +223,10 @@ describe('Login Required Modal Content', () => {
         // TODO
       });
     });
-
-    describe('when there is no more available text', () => {
-      it('should close', () => {
-
-      });
-    });
   });
 
   describe('when clicking cancel', () => {
-    it('should close when clicking cancel', () => {
+    it('should close the modal', () => {
 
     });
   });
