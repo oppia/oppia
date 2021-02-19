@@ -29,8 +29,11 @@ import { TranslationModalContent } from 'pages/contributor-dashboard-page/modal-
 import { TranslationOpportunitiesComponent } from './translation-opportunities.component';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { NO_ERRORS_SCHEMA } from '@angular/compiler';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
+import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
+import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind.directive';
+import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -57,26 +60,33 @@ describe('Translation opportunities component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        SharedComponentsModule
       ],
       declarations: [
+        AngularHtmlBindWrapperDirective,
+        CkEditorCopyToolbarComponent,
+        LazyLoadingComponent,
         OpportunitiesListComponent,
         OpportunitiesListItemComponent,
+        SchemaBasedEditorDirective,
         TranslationModalContent,
-        TranslationOpportunitiesComponent
+        TranslationOpportunitiesComponent,
+        WrapTextWithEllipsisPipe,
       ],
-      providers: [NgbModal, NgbActiveModal],
+      providers: [
+        NgbModal,
+        NgbActiveModal
+      ],
       // Prevent errors for rendering upgraded directives
-      schemas: [NO_ERRORS_SCHEMA]
+      // schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+    translationModal = TestBed.createComponent(
+      TranslationModalContent) as unknown as NgbModalRef;
     httpTestingController = TestBed.inject(HttpTestingController);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     userService = TestBed.inject(UserService);
     modalService = TestBed.inject(NgbModal);
-    translationModal = TestBed.createComponent(
-      TranslationModalContent) as unknown as NgbModalRef;
     spyOn(modalService, 'open').and.returnValue(translationModal);
   });
 

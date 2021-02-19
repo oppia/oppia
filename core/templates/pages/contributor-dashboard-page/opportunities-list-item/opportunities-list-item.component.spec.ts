@@ -15,8 +15,9 @@
 /**
  * @fileoverview Unit tests for opportunitiesListItem.
  */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 import { OpportunitiesListItemComponent } from './opportunities-list-item.component';
 
@@ -24,17 +25,20 @@ describe('Opportunities List Item Component', () => {
   let component: OpportunitiesListItemComponent;
   let fixture: ComponentFixture<OpportunitiesListItemComponent>;
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SharedComponentsModule],
+      imports: [],
       declarations: [
-        OpportunitiesListItemComponent
+        OpportunitiesListItemComponent,
+        LazyLoadingComponent,
+        WrapTextWithEllipsisPipe
       ]
-    }).compileComponents();
-    fixture = TestBed.createComponent(
-      OpportunitiesListItemComponent);
-    component = fixture.componentInstance;
-  });
+    }).compileComponents().then(() => {
+      fixture = TestBed.createComponent(
+        OpportunitiesListItemComponent);
+      component = fixture.componentInstance;
+    });
+  }));
 
   afterEach(() => {
     fixture.destroy();

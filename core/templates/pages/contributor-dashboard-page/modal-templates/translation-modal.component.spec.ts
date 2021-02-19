@@ -23,7 +23,6 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { TranslationModalContent, TranslationOpportunityDict } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
@@ -49,11 +48,10 @@ describe('Login Required Modal Content', () => {
     actionButtonTitle: 'Action Button'
   };
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule,
-        SharedComponentsModule
+        HttpClientTestingModule
       ],
       declarations: [
         TranslationModalContent
@@ -62,10 +60,11 @@ describe('Login Required Modal Content', () => {
         NgbActiveModal
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-    fixture = TestBed.createComponent(TranslationModalContent);
-    component = fixture.componentInstance;
-    component.opportunity = opportunity;
+    }).compileComponents().then(() => {
+      fixture = TestBed.createComponent(TranslationModalContent);
+      component = fixture.componentInstance;
+      component.opportunity = opportunity;
+    });
     httpTestingController = TestBed.inject(HttpTestingController);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     contextService = TestBed.inject(ContextService);
@@ -74,7 +73,7 @@ describe('Login Required Modal Content', () => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
-  });
+  }));
 
   afterEach(() => {
     httpTestingController.verify();
