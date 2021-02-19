@@ -47,9 +47,7 @@ export class TranslationOpportunityDict {
   selector: 'translation-modal',
   templateUrl: './translation-modal.directive.html',
   styleUrls: [],
-  providers: [
-    {provide: TranslationOpportunityDict, useValue: null}
-  ]
+  providers: []
 })
 export class TranslationModalContent {
   @Input() opportunity: TranslationOpportunityDict;

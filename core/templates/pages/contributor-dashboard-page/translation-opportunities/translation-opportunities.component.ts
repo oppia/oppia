@@ -85,18 +85,13 @@ export class TranslationOpportunitiesComponent {
     this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
       'Translation');
     const opportunity = this.getOpportunitySummary(expId);
-    this.modalService.open(
+    const modalRef = this.modalService.open(
       TranslationModalContent, {
         size: 'lg',
         backdrop: 'static',
-        injector: Injector.create({
-          providers: [
-            {provide: TranslationOpportunityDict, useValue: opportunity
-            }
-          ],
-          parent: this.injector
-        })
+        injector: this.injector
       });
+    modalRef.componentInstance.opportunity = opportunity;
   }
 
   ngOnInit(): void {
