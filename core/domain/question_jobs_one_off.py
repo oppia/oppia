@@ -175,9 +175,6 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         }
         while current_state_schema_version < target_state_schema_version:
             try:
-                assert (
-                    versioned_question_state['states_schema_version'] ==
-                    current_state_schema_version)
                 question_domain.Question.update_state_from_model(
                     versioned_question_state, current_state_schema_version)
                 current_state_schema_version += 1
@@ -260,9 +257,6 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             'state': item.content['question_state_data']
         }
         while current_state_schema_version < target_state_schema_version:
-            assert (
-                versioned_question_state['states_schema_version'] ==
-                current_state_schema_version)
             question_domain.Question.update_state_from_model(
                 versioned_question_state, current_state_schema_version)
             current_state_schema_version += 1
