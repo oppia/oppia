@@ -227,7 +227,7 @@ describe('Login Required Modal Content', () => {
     });
   });
 
-  fdescribe('when suggesting translated text', () => {
+  describe('when suggesting translated text', () => {
     let expectedPayload, imagesData;
     beforeEach(fakeAsync(() => {
       expectedPayload = {
