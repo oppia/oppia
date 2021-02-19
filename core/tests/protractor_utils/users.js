@@ -25,10 +25,10 @@ var adminPage = new AdminPage.AdminPage();
 
 var login = async function(
     email, isSuperAdmin = false, manualNavigation = true) {
-  // Use of element is not possible because the login page is non-angular.
+  // Use of element and action is not possible because the login page
+  // is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;
-  await browser.waitForAngularEnabled(false);
   // The manualNavigation argument is used to determine whether to navigate to
   // the login URL using driver.get() or not. If false, the calling method
   // should handle navigation to the login page.
@@ -47,18 +47,15 @@ var login = async function(
       }
       return true;
     }, waitFor.DEFAULT_WAIT_TIME_MSECS, 'Login takes too long.');
-  var emailInput = element(protractor.By.name('email'));
-  await action.clear('Email input', emailInput);
-  await action.sendKeys('Email input', emailInput, email);
+  await (await driver.findElement(protractor.By.name('email'))).clear();
+  await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
   if (isSuperAdmin) {
-    var adminCheckbox = element(protractor.By.name('admin'));
-    await action.click('Test admin checkbox', adminCheckbox);
-    let adminCheckboxStatus = await adminCheckbox.getAttribute('checked');
+    await (await driver.findElement(protractor.By.name('admin'))).click();
+    let adminCheckboxStatus = await driver.findElement(
+      protractor.By.name('admin')).getAttribute('checked');
     expect(adminCheckboxStatus).toBeTruthy();
   }
-  await action.click(
-    'submit-logout button',
-    element(protractor.By.id('submit-login')));
+  await (await driver.findElement(protractor.By.id('submit-login'))).click();
   if (manualNavigation) {
     // The statement below uses a browser.wait() to determine if the user has
     // logged in. Use of waitFor is not possible because the active page is
@@ -74,11 +71,10 @@ var login = async function(
 };
 
 var logout = async function() {
+  // Use of action is not possible because logout page is non-angular.
   var driver = browser.driver;
-  browser.waitForAngularEnabled(false);
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
-  var logoutButton = element(protractor.By.id('submit-logout'));
-  await action.click('Test Submit button', logoutButton);
+  await (await driver.findElement(protractor.By.id('submit-logout'))).click();
 };
 
 // The user needs to log in immediately before this method is called. Note
@@ -92,9 +88,7 @@ var _completeSignup = async function(username, manualNavigation = true) {
     // as a client side navigation and the tests fail since Angular is
     // not found due to the navigation interfering with protractor's
     // bootstrapping.
-    await browser.waitForAngularEnabled(false);
     await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
-    await browser.waitForAngularEnabled(true);
   }
   await waitFor.pageToFullyLoad();
   var usernameInput = element(by.css('.protractor-test-username-input'));
