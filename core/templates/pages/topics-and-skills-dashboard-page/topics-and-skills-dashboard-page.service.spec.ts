@@ -16,9 +16,6 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
 import { ETopicPublishedOptions, ETopicSortOptions } from
 // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
@@ -32,7 +29,6 @@ import { TopicSummary } from
   'domain/topic/topic-summary.model';
 
 describe('Topic and Skill dashboard page service', () => {
-  importAllAngularServices();
   let tsds: TopicsAndSkillsDashboardPageService = null;
 
   beforeEach(() => {
