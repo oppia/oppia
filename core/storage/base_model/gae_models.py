@@ -255,6 +255,19 @@ class BaseModel(datastore_services.Model):
         return entities
 
     @classmethod
+    @transaction_services.run_in_transaction_wrapper
+    def put_multi_transactional(cls, entities):
+        """Stores the given datastore_services.Model instances and runs it
+        through a transaction. Either all models are stored, or none of them
+        in the case when the transaction fails.
+
+        Args:
+            entities: list(datastore_services.Model). List of model instances to
+                be stored.
+        """
+        datastore_services.put_multi(entities)
+
+    @classmethod
     def put_multi(cls, entities):
         """Stores the given datastore_services.Model instances.
 
@@ -798,7 +811,7 @@ class VersionedModel(BaseHumanMaintainedModel):
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self]
-        transaction_services.run_in_transaction(BaseModel.put_multi, entities)
+        BaseModel.put_multi_transactional(entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -899,8 +912,7 @@ class VersionedModel(BaseHumanMaintainedModel):
                     0,
                     len(all_models_keys),
                     feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-                transaction_services.run_in_transaction(
-                    datastore_services.delete_multi,
+                datastore_services.delete_multi_transactional(
                     all_models_keys[
                         i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
         else:
@@ -926,12 +938,10 @@ class VersionedModel(BaseHumanMaintainedModel):
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
             entities = (
-                snapshot_metadata_models +
-                snapshot_content_models +
+                snapshot_metadata_models + snapshot_content_models +
                 versioned_models
             )
-            transaction_services.run_in_transaction(
-                BaseModel.put_multi, entities)
+            BaseModel.put_multi_transactional(entities)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""

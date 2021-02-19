@@ -640,7 +640,9 @@ def _pseudonymize_config_models(pending_deletion_request):
         )
     )
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -672,8 +674,7 @@ def _pseudonymize_config_models(pending_deletion_request):
                 0,
                 len(config_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 config_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -722,7 +723,9 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         )
     )
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -763,8 +766,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
                 0,
                 len(activity_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 activity_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
@@ -820,7 +822,9 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         )
     )
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -946,8 +950,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
                 0,
                 len(activity_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 activity_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -968,7 +971,8 @@ def _remove_user_id_from_contributors_in_summary_models(
         summary_model_class.contributor_ids == user_id
     ).fetch()
 
-    def _remove_user_id_from_models(summary_models):
+    @transaction_services.run_in_transaction_wrapper
+    def _remove_user_id_from_models_transactional(summary_models):
         """Remove the user ID from contributor_ids and contributor_summary
         fields.
 
@@ -993,8 +997,7 @@ def _remove_user_id_from_contributors_in_summary_models(
             0,
             len(related_summary_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        transaction_services.run_in_transaction(
-            _remove_user_id_from_models,
+        _remove_user_id_from_models_transactional(
             related_summary_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
 
@@ -1040,7 +1043,9 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     _save_pseudonymizable_entity_mappings(
         pending_deletion_request, models.NAMES.feedback, feedback_ids)
 
-    def _pseudonymize_models(feedback_related_models, pseudonymized_id):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            feedback_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1100,8 +1105,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
                 0,
                 len(feedback_related_models),
                 feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+            _pseudonymize_models_transactional(
                 feedback_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
@@ -1128,7 +1132,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     _save_pseudonymizable_entity_mappings(
         pending_deletion_request, models.NAMES.suggestion, suggestion_ids)
 
-    def _pseudonymize_models(voiceover_application_models):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(voiceover_application_models):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1157,8 +1162,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             0,
             len(voiceover_application_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        transaction_services.run_in_transaction(
-            _pseudonymize_models,
+        _pseudonymize_models_transactional(
             voiceover_application_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
