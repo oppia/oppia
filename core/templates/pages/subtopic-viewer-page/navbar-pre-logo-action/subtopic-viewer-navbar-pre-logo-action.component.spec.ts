@@ -40,10 +40,11 @@ describe('subtopic viewer pre logo action component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SubtopicViewerNavbarPreLogoActionComponent)
+    fixture = TestBed.createComponent(
+      SubtopicViewerNavbarPreLogoActionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  })
+  });
 
   it('should set topic url fragment from the URL correctly', () => {
     component.ngOnInit();
