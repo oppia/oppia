@@ -357,9 +357,8 @@ angular.module('oppia').component('settingsTab', {
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
             ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody).then(() => {
-              $rootScope.$applyAsync();
-            });
+              emailBody);
+            $rootScope.$applyAsync();
           }, function() {
             AlertsService.clearWarnings();
           });
