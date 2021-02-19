@@ -41,7 +41,30 @@ ERROR_CATEGORY_STALE_CHECK = 'stale check'
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
-class ValidateModelIdWithRegex(beam.DoFn):
+class BaseValidatorDoFn(beam.DoFn):
+    def clone(self, model, **new_values):
+          """Clones the entity, adding or overriding constructor attributes.
+
+          The cloned entity will have exactly the same property values as the
+          original entity, except where overridden. By default, it will have no
+          parent entity or key name, unless supplied.
+
+          Args:
+              model: datastore_services.Model. Model to clone.
+              **new_values: dict(str: *). Keyword arguments to override when
+                  invoking the cloned entity's constructor.
+
+          Returns:
+              *. A cloned, and possibly modified, copy of self. Subclasses of
+              BaseModel will return a clone with the same type.
+          """
+          # Reference implementation: https://stackoverflow.com/a/2712401/4859885.
+          cls = model.__class__
+          props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
+          props.update(new_values)
+          return cls(id=model.id, **props)
+
+class ValidateModelIdWithRegex(BaseValidatorDoFn):
     """DoFn to validate model ids against a given regex string."""
 
     def __init__(self, regex_string):
@@ -64,7 +87,7 @@ class ValidateModelIdWithRegex(beam.DoFn):
             beam.pvalue.TaggedOutput. An element of the output PCollection for
             the doFn which represents an error as a key value pair.
         """
-        element = model.clone()
+        element = self.clone(model)
         regex_string = self.regex_string
 
         if not re.compile(regex_string).match(element.id):
@@ -75,7 +98,7 @@ class ValidateModelIdWithRegex(beam.DoFn):
             ))
 
 
-class ValidateDeleted(beam.DoFn):
+class ValidateDeleted(BaseValidatorDoFn):
     """DoFn to check whether models marked for deletion are stale."""
 
     def process(self, model):
@@ -89,7 +112,7 @@ class ValidateDeleted(beam.DoFn):
             beam.pvalue.TaggedOutput. An element of the output PCollection for
             the doFn which represents an error as a key value pair.
         """
-        element = model.clone()
+        element = self.clone(model)
         date_now = datetime.datetime.utcnow()
 
         date_before_which_models_should_be_deleted = (
@@ -109,7 +132,7 @@ class ValidateDeleted(beam.DoFn):
             ))
 
 
-class ValidateModelTimeFields(beam.DoFn):
+class ValidateModelTimeFields(BaseValidatorDoFn):
     """DoFn to check whether created_on and last_updated timestamps are
     valid."""
 
@@ -125,7 +148,7 @@ class ValidateModelTimeFields(beam.DoFn):
             the doFn which represents an error as a key value pair.
         """
 
-        element = model.clone()
+        element = self.clone(model)
         if element.created_on > (element.last_updated+ MAX_CLOCK_SKEW_SECS):
             yield beam.pvalue.TaggedOutput(
                 'error_category_time_field_check', (

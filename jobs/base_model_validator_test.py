@@ -26,16 +26,69 @@ from apache_beam.testing import util as beam_testing_util
 from apache_beam.testing.test_pipeline import TestPipeline
 
 
-from beam_jobs import base_model_validator
+from jobs import base_model_validator
 from core.platform import models
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 
+datastore_services = models.Registry.import_datastore_services()
+
 
 class MockModel(base_models.BaseModel):
     pass
 
+class BaseValidatorDoFnTests(unittest.TestCase):
+    def setUp(self):
+        self.base_validator_fn = base_model_validator.BaseValidatorDoFn()
+    def test_clone(self):
+        model = base_models.BaseModel(id='123', deleted=True)
+        clone = self.base_validator_fn.clone(model)
+
+        self.assertEqual(model.id, clone.id)
+        self.assertEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, base_models.BaseModel)
+
+    def test_clone_with_changes(self):
+        model = base_models.BaseModel(id='123', deleted=True)
+        clone = self.base_validator_fn.clone(model, deleted=False)
+
+        self.assertNotEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, base_models.BaseModel)
+        self.assertTrue(model.deleted)
+        self.assertFalse(clone.deleted)
+
+    def test_clone_sub_class(self):
+        class DerivedModel(base_models.BaseModel):
+            """Simple model with an extra 'field' string property."""
+
+            field = datastore_services.StringProperty()
+
+        model = DerivedModel(id='123', field='original')
+        clone = self.base_validator_fn.clone(model)
+
+        self.assertEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, DerivedModel)
+        self.assertEqual(model.field, 'original')
+        self.assertEqual(clone.field, 'original')
+
+    def test_clone_sub_class_with_changes(self):
+        class DerivedModel(base_models.BaseModel):
+            """Simple model with an extra 'field' string property."""
+
+            field = datastore_services.StringProperty()
+
+        model = DerivedModel(id='123', field='original')
+        clone = self.base_validator_fn.clone(model, field='updated')
+
+        self.assertNotEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, DerivedModel)
+        self.assertEqual(model.field, 'original')
+        self.assertEqual(clone.field, 'updated')
 
 class BaseModelValidatorTests(unittest.TestCase):
 
