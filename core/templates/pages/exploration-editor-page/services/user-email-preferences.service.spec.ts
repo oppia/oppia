@@ -23,6 +23,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { ExplorationDataService } from './exploration-data.service';
 // ^^^ This block is to be removed.
 
 describe('User Email Preferences Service', () => {
@@ -33,6 +34,9 @@ describe('User Email Preferences Service', () => {
       mute_suggestion_notifications: false
     }
   };
+  class MockExplorationDataService {
+    explorationId: string = expId;
+  }
 
   let userEmailPreferencesService :
   UserEmailPreferencesService;
@@ -41,11 +45,13 @@ describe('User Email Preferences Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: ExplorationDataService,
+        useClass: MockExplorationDataService }]
     });
-    userEmailPreferencesService = TestBed.get(UserEmailPreferencesService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    csrfTokenService = TestBed.get(CsrfTokenService);
+    userEmailPreferencesService = TestBed.inject(UserEmailPreferencesService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
       return new Promise((resolve) => {

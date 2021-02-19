@@ -15,6 +15,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationDataService } from './exploration-data.service';
 import { RequestParams } from './user-email-preferences.service';
 
 /**
@@ -28,12 +30,18 @@ import { RequestParams } from './user-email-preferences.service';
 export class UserEmailPreferencesBackendApiService {
   constructor(
     private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService,
+    private explorationDataService: ExplorationDataService
   ) { }
 
   saveChangeToBackend(
       requestParams: RequestParams
   ): Promise<void | object> {
-    var emailPreferencesUrl = '/createhandler/notificationpreferences/12345';
+    let emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/notificationpreferences/<exploration_id>', {
+        exploration_id: this.explorationDataService.explorationId
+      }
+    );
     return this.http.put(emailPreferencesUrl, requestParams).toPromise();
   }
 }

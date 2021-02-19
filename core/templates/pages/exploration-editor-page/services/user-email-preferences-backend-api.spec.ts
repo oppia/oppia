@@ -20,6 +20,7 @@ import { UserEmailPreferencesBackendApiService } from './user-email-preferences-
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, flushMicrotasks } from '@angular/core/testing';
 import { EmailPreferencesData } from './user-email-preferences.service';
+import { ExplorationDataService } from './exploration-data.service';
 
 describe('User Email Preferences Backend Api Service', () => {
   var expId = '12345';
@@ -30,23 +31,28 @@ describe('User Email Preferences Backend Api Service', () => {
     }
   };
 
+  class MockExplorationDataService {
+    explorationId: string = expId;
+  }
+
   let userEmailPreferencesBackendApiService:
   UserEmailPreferencesBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: ExplorationDataService,
+        useClass: MockExplorationDataService }]
     });
     userEmailPreferencesBackendApiService =
-    TestBed.get(UserEmailPreferencesBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    TestBed.inject(UserEmailPreferencesBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
-
 
   it('should successfully send http request and get a valid response',
     fakeAsync((done) => {
