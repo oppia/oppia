@@ -49,7 +49,7 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$rootScope', '$scope', '$translate', '$uibModal',
+    '$http', '$q', '$rootScope', '$scope', '$uibModal',
     'AlertsService', 'DateTimeFormatService', 'DeviceInfoService',
     'LearnerDashboardBackendApiService', 'LoaderService',
     'SuggestionModalForLearnerDashboardService',
@@ -61,7 +61,7 @@ angular.module('oppia').component('learnerDashboardPage', {
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $rootScope, $scope, $translate, $uibModal,
+        $http, $q, $rootScope, $scope, $uibModal,
         AlertsService, DateTimeFormatService, DeviceInfoService,
         LearnerDashboardBackendApiService, LoaderService,
         SuggestionModalForLearnerDashboardService,
@@ -233,21 +233,9 @@ angular.module('oppia').component('learnerDashboardPage', {
       };
 
       var changeDelay = function() {
-        if (ctrl.checkMobileView()) {
-          return 1000;
-        }
-        return 0;
-      };
-
-      ctrl.getPlaceholder = function() {
-        if (ctrl.checkMobileView()) {
-          return $translate.instant(
-            'I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER' +
-            '_PLAYLIST_MESSAGE_MOBILE');
-        }
-        return $translate.instant(
-          'I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER' +
-          '_PLAYLIST_MESSAGE');
+        const delaydrag = 1000;
+        const instantdrag = 0;
+        return ctrl.checkMobileView() ? delaydrag : instantdrag;
       };
 
       var getPlaylistSortableOptions = function(activityType) {
