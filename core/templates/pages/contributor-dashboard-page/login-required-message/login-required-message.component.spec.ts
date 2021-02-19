@@ -54,6 +54,7 @@ describe('Login required message component', () => {
 
   afterEach(() => {
     httpTestingController.verify();
+    fixture.destroy();
   });
 
   it('should initialize controller properties after its initialization',

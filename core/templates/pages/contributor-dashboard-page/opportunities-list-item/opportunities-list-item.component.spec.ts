@@ -36,6 +36,10 @@ describe('Opportunities List Item Component', () => {
     component = fixture.componentInstance;
   });
 
+  afterEach(() => {
+    fixture.destroy();
+  });
+
   describe('when opportunity is provided', () => {
     beforeEach(() => {
       component.opportunity = {
