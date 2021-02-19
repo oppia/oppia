@@ -44,7 +44,7 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-default" (click)="activeModal.close()">Cancel</button>
+  <button class="btn btn-default" (click)="close()">Cancel</button>
   <button class="btn btn-success oppia-upload-translated-text-button"
           [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
           (click)="suggestTranslatedText()">
