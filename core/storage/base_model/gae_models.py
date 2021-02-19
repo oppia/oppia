@@ -97,12 +97,19 @@ class BaseModel(datastore_services.Model):
 
     # When this entity was first created. This value should not be modified.
     created_on = (
-        datastore_services.DateTimeProperty(indexed=True))
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # When this entity was last updated. This value should not be modified.
     last_updated = (
-        datastore_services.DateTimeProperty(indexed=True))
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
+
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage."""
+        super(BaseModel, self)._pre_put_hook()
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+        self.last_updated = datetime.datetime.utcnow()
 
     @property
     def id(self):

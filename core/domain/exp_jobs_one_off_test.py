@@ -3025,9 +3025,7 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
                 exp_models.ExplorationSnapshotContentModel.get(
                     '%s-1' % self.VALID_EXP_ID))
             del snapshot_content_model.content['states_schema_version']
-            snapshot_content_model.update_timestamps(
-                update_last_updated_time=False)
-            snapshot_content_model.put()
+            snapshot_content_model.put_for_bot()
 
             # There is no failure due to a missing states schema version.
             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
@@ -3258,9 +3256,7 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
                 exp_models.ExplorationSnapshotContentModel.get(
                     '%s-1' % self.VALID_EXP_ID))
             del snapshot_content_model.content['states_schema_version']
-            snapshot_content_model.update_timestamps(
-                update_last_updated_time=False)
-            snapshot_content_model.put()
+            snapshot_content_model.put_for_bot()
 
             # There is no failure due to a missing states schema version.
             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
