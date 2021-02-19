@@ -164,8 +164,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
           ctrl.generatePathIconParameters = function() {
             var collectionNodes = ctrl.collection.getCollectionNodes();
             var iconParametersArray = [];
-            if (collectionNodes.length !== 0) {
-              ctrl.explorationAdded = true;
               iconParametersArray.push({
                 thumbnailIconUrl:
                   collectionNodes[0].getExplorationSummaryObject(
@@ -211,7 +209,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
                 });
               }
               return iconParametersArray;
-            }
           };
 
           ctrl.getExplorationUrl = function(explorationId) {
@@ -244,7 +241,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.collection', function(newValue) {
-              if (newValue !== null) {
+              if (newValue !== null && ctrl.collection.getCollectionNodeCount()) {
                 ctrl.generatePathParameters();
               }
             }, true);
@@ -253,7 +250,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
             ctrl.collectionPlaythrough = null;
             ctrl.collectionId = UrlService.getCollectionIdFromUrl();
             ctrl.explorationCardIsShown = false;
-            ctrl.explorationAdded = false;
             // The pathIconParameters is an array containing the co-ordinates,
             // background color and icon url for the icons generated on the
             // path.

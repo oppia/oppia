@@ -1,11 +1,11 @@
 <div>
   <background-banner></background-banner>
-  <div ng-if="!$ctrl.explorationAdded" class="no-exploration-created">
+  <div ng-if="!$ctrl.collection.getCollectionNodeCount()" class="no-exploration-created">
     <div class="oppia-collection-path-section">
       No exploration has been created yet.
     </div>
   </div>
-  <div ng-if="$ctrl.collection && $ctrl.explorationAdded" class="oppia-collection-player-tiles-container">
+  <div ng-if="$ctrl.collection && $ctrl.collection.getCollectionNodeCount()" class="oppia-collection-player-tiles-container">
     <h2 ng-if="!$ctrl.collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading" align="center">
       <span ng-if="!$ctrl.collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Begin <[$ctrl.collection.getTitle()]>:</span>
       <span ng-if="$ctrl.collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Continue <[$ctrl.collection.getTitle()]>:</span>
