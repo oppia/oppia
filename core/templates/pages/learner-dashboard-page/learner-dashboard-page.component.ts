@@ -75,8 +75,8 @@ angular.module('oppia').component('learnerDashboardPage', {
       var ctrl = this;
       var threadIndex = null;
 
-      const TIME_DELAY_DRAG = 1000;
-      const TIME_INSTANT_DRAG = 0;
+      const DRAG_DELAY_MOBILE_MSEC = 1000;
+      const DRAG_DELAY_DESKTOP_MSEC = 0;
 
       ctrl.setActiveSection = function(newActiveSectionName) {
         ctrl.activeSection = newActiveSectionName;
@@ -238,7 +238,8 @@ angular.module('oppia').component('learnerDashboardPage', {
       var getPlaylistSortableOptions = function(activityType) {
         return {
           'ui-floating': 'auto',
-          delay: ctrl.checkMobileView() ? TIME_DELAY_DRAG : TIME_INSTANT_DRAG,
+          delay: ctrl.checkMobileView() ?
+            DRAG_DELAY_MOBILE_MSEC : DRAG_DELAY_DESKTOP_MSEC,
           start: function(e, ui) {
             ui.placeholder.height(ui.item.height());
             $scope.$apply();
