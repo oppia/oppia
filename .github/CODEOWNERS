@@ -232,7 +232,7 @@
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @srijanreddy98
@@ -477,6 +477,7 @@
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
+/extensions/extensions.module.ts @vojtechjelinek
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
@@ -631,6 +632,7 @@
 /extensions/rich_text_components/*/protractor.js @U8NWXD @kevintab95
 /extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
 /extensions/objects/protractor.js @U8NWXD @kevintab95
+/scripts/backend_test_shards.json @U8NWXD
 
 
 # Python 3 Migration project.
