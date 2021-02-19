@@ -17,11 +17,12 @@
  */
 
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Injectable } from '@angular/core';
+import { Injectable, SecurityContext } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,8 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 export class ImageUploadHelperService {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private sanitizer: DomSanitizer) {}
+    private sanitizer: DomSanitizer,
+    private windowRef: WindowRef) {}
 
   private _generateDateTimeStringForFilename() {
     const date = new Date();
@@ -96,8 +98,10 @@ export class ImageUploadHelperService {
   getTrustedResourceUrlForThumbnailFilename(
       imageFileName: string, entityType: string, entityId: string):
         SafeResourceUrl {
-    const encodedFilepath = window.encodeURIComponent(imageFileName);
-    return this.sanitizer.bypassSecurityTrustResourceUrl(
+    const encodedFilepath = this.windowRef.nativeWindow.encodeURIComponent(
+      imageFileName);
+    return this.sanitizer.sanitize(
+      SecurityContext.RESOURCE_URL,
       this.assetsBackendApiService.getThumbnailUrlForPreview(
         entityType, entityId, encodedFilepath));
   }
