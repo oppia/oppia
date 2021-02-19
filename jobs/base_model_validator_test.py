@@ -26,8 +26,9 @@ from apache_beam.testing import util as beam_testing_util
 from apache_beam.testing.test_pipeline import TestPipeline
 
 
-from jobs import base_model_validator
 from core.platform import models
+from jobs import base_model_validator
+from jobs import base_model_validator_errors as errors
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -38,9 +39,11 @@ datastore_services = models.Registry.import_datastore_services()
 class MockModel(base_models.BaseModel):
     pass
 
+
 class BaseValidatorDoFnTests(unittest.TestCase):
     def setUp(self):
         self.base_validator_fn = base_model_validator.BaseValidatorDoFn()
+
     def test_clone(self):
         model = base_models.BaseModel(id='123', deleted=True)
         clone = self.base_validator_fn.clone(model)
@@ -90,6 +93,7 @@ class BaseValidatorDoFnTests(unittest.TestCase):
         self.assertEqual(model.field, 'original')
         self.assertEqual(clone.field, 'updated')
 
+
 class BaseModelValidatorTests(unittest.TestCase):
 
     def setUp(self):
@@ -102,129 +106,110 @@ class BaseModelValidatorTests(unittest.TestCase):
     def test_validate_deleted_reports_error_for_old_deleted_model(self):
 
         with TestPipeline(runner=DirectRunner()) as p:
-            pcoll = p | beam.Create([
-                MockModel(
-                    id='123',
-                    deleted=True,
-                    created_on=self.year_ago,
-                    last_updated=self.year_ago
-                )
-            ])
+            test_model = MockModel(
+                id='123',
+                deleted=True,
+                created_on=self.year_ago,
+                last_updated=self.year_ago
+            )
+            pcoll = p | beam.Create([test_model])
 
-            errors = (pcoll | beam.ParDo(
-                base_model_validator.ValidateDeleted()).with_outputs())
+            output = (pcoll | beam.ParDo(
+                base_model_validator.ValidateDeleted()))
 
             beam_testing_util.assert_that(
-                errors.error_category_stale_check,
-                beam_testing_util.equal_to([(
-                    'entity stale check',
-                    'Entity id 123:'
-                    ' model marked as deleted is older than 8 weeks'
-                )])
+                output,
+                beam_testing_util.equal_to([
+                    errors.StaleDeletedModelValidationError(test_model)
+                ])
             )
 
     def test_validate_model_time_field_check(self):
         with TestPipeline(runner=DirectRunner()) as p:
-            pcoll = p | beam.Create([
-                MockModel(
-                    id='123',
-                    created_on=self.now,
-                    last_updated=self.year_ago
-                ),
-            ])
+            test_model = MockModel(
+                id='123',
+                created_on=self.now,
+                last_updated=self.year_ago
+            )
+            pcoll = p | beam.Create([test_model])
 
-            errors = (pcoll | beam.ParDo(
-                base_model_validator.ValidateModelTimeFields()).with_outputs())
+            output = (pcoll | beam.ParDo(
+                base_model_validator.ValidateModelTimeFields()))
 
             beam_testing_util.assert_that(
-                errors.error_category_time_field_check,
+                output,
                 beam_testing_util.equal_to([
-                    (
-                        'time field relation check',
-                        'Entity id 123: The created_on field has a value %s which '
-                        'is greater than the value %s of last_updated field' %
-                        (self.now, self.year_ago)
-                    ),
+                    errors.TimeFieldModelValidationError(test_model)
                 ])
             )
 
     def test_validate_model_current_time_check(self):
         with TestPipeline(runner=DirectRunner()) as p:
-            pcoll = p | beam.Create([
-                MockModel(
-                    id='124',
-                    created_on=self.now,
-                    last_updated=self.year_later
-                )
-            ])
+            test_model = MockModel(
+                id='124',
+                created_on=self.now,
+                last_updated=self.year_later
+            )
+            pcoll = p | beam.Create([test_model])
 
-            errors = (pcoll | beam.ParDo(
-                base_model_validator.ValidateModelTimeFields()).with_outputs())
+            output = (pcoll | beam.ParDo(
+                base_model_validator.ValidateModelTimeFields()))
 
             beam_testing_util.assert_that(
-                errors.error_category_current_time_check,
+                output,
                 beam_testing_util.equal_to([
-                    (
-                        'current time check',
-                        'Entity id 124:'
-                        ' The last_updated field has a value %s which '
-                        'is greater than the time when the job was run'
-                        % (self.year_later)
-                    )
+                    errors.CurrentTimeModelValidationError(test_model)
                 ])
             )
 
     def test_validate_model_id(self):
         with TestPipeline(runner=DirectRunner()) as p:
-            pcoll = p | beam.Create([
-                MockModel(
-                    id='123@?!*',
-                    created_on=self.year_ago,
-                    last_updated=self.now
-                )
-            ])
+            test_model = MockModel(
+                id='123@?!*',
+                created_on=self.year_ago,
+                last_updated=self.now
+            )
+            pcoll = p | beam.Create([test_model])
 
-            errors = (pcoll | beam.ParDo(
+            output = (pcoll | beam.ParDo(
                 base_model_validator.ValidateModelIdWithRegex(
-                    '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH))
-                      .with_outputs())
+                    '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH)))
 
             beam_testing_util.assert_that(
-                errors.error_category_id_check,
-                beam_testing_util.equal_to([(
-                    'model id check',
-                    'Entity id 123@?!*:'
-                    ' Entity id does not match regex pattern'
-                )])
+                output,
+                beam_testing_util.equal_to([
+                    errors.IdModelValidationError(test_model)
+                ])
             )
 
     def test_base_model_validator_ptransform(self):
         with TestPipeline(runner=DirectRunner()) as p:
+            invalid_id = MockModel(
+                id='123@?!*',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now
+            )
+            invalid_time_check = MockModel(
+                id='124',
+                deleted=False,
+                created_on=self.now,
+                last_updated=self.year_later
+            )
+            stale_deletion = MockModel(
+                id='123',
+                deleted=True,
+                created_on=self.year_ago,
+                last_updated=self.year_ago
+            )
+            valid_model = MockModel(
+                id='123',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now
+            )
             pcoll = p | beam.Create([
-                MockModel(
-                    id='123@?!*',
-                    deleted=False,
-                    created_on=self.year_ago,
-                    last_updated=self.now
-                ),
-                MockModel(
-                    id='124',
-                    deleted=False,
-                    created_on=self.now,
-                    last_updated=self.year_later
-                ),
-                MockModel(
-                    id='123',
-                    deleted=True,
-                    created_on=self.year_ago,
-                    last_updated=self.year_ago
-                ),
-                MockModel(
-                    id='123',
-                    deleted=False,
-                    created_on=self.year_ago,
-                    last_updated=self.now
-                ),
+                invalid_id, invalid_time_check, stale_deletion, valid_model
             ])
 
             output = pcoll | base_model_validator.BaseModelValidator()
@@ -232,23 +217,9 @@ class BaseModelValidatorTests(unittest.TestCase):
             beam_testing_util.assert_that(
                 output,
                 beam_testing_util.equal_to([
-                    (
-                        'model id check',
-                        'Entity id 123@?!*:'
-                        ' Entity id does not match regex pattern'
-                    ),
-                    (
-                        'current time check',
-                        'Entity id 124:'
-                        ' The last_updated field has a value %s which '
-                        'is greater than the time when the job was run'
-                        % (self.year_later)
-                    ),
-                    (
-                        'entity stale check',
-                        'Entity id 123:'
-                        ' model marked as deleted is older than 8 weeks'
-                    )
+                    errors.IdModelValidationError(invalid_id),
+                    errors.CurrentTimeModelValidationError(invalid_time_check),
+                    errors.StaleDeletedModelValidationError(stale_deletion)
                 ]),
                 label='CheckOutput'
             )

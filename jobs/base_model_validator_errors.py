@@ -19,6 +19,7 @@ from core.domain import cron_services
 period_to_hard_delete_models_in_days = (
     cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
 
+
 class ModelValidationError(object):
 
     @property
@@ -44,8 +45,7 @@ class ModelValidationError(object):
         return hash((self.__class__, self.key, self.message))
 
 
-class TimeFieldModelValidationError(ValidationError):
-
+class TimeFieldModelValidationError(ModelValidationError):
     def __init__(self, model):
         self._message = (
             'Entity ID %s: The created_on field has a value %s which '
@@ -56,20 +56,20 @@ class TimeFieldModelValidationError(ValidationError):
     def message(self):
         return self._message
 
-class CurrentTimeModelValidationError(ValidationError):
 
+class CurrentTimeModelValidationError(ModelValidationError):
     def __init__(self, model):
         self._message = (
             'Entity id %s: The last_updated field has a value %s which '
-                'is greater than the time when the job was run'
-                % (element.id, element.last_updated))
+            'is greater than the time when the job was run'
+            % (model.id, model.last_updated))
 
     @property
     def message(self):
         return self._message
 
-class IdModelValidationError(ValidationError):
 
+class IdModelValidationError(ModelValidationError):
     def __init__(self, model):
         self._message = (
             'Entity id %s: Entity id does not match regex pattern' % (
@@ -79,12 +79,12 @@ class IdModelValidationError(ValidationError):
     def message(self):
         return self._message
 
-class StaleDeletedModelValidationError(ValidationError):
 
+class StaleDeletedModelValidationError(ModelValidationError):
     def __init__(self, model):
         self._message = (
             'Entity id %s: model marked as deleted is older than %s days'
-                % (model.id, period_to_hard_delete_models_in_days))
+            % (model.id, period_to_hard_delete_models_in_days))
 
     @property
     def message(self):
