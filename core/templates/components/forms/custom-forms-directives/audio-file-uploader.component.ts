@@ -45,18 +45,6 @@ export class AudioFileUploaderComponent implements OnInit {
       'audio-file-uploader-input' + this.idGenerationService.generateNewId());
     this.inputFieldFormId = (
       'audio-file-uploader-form' + this.idGenerationService.generateNewId());
-
-    if (this.droppedFile) {
-      if (this.droppedFile.length === 1) {
-        angular.element(document).ready(function() {
-          (
-            <HTMLInputElement>$('.' + this.inputFieldClassName)[0]
-          ).files = this.droppedFile;
-        });
-      } else {
-        this.errorMessage = 'Please drop one file at a time.';
-      }
-    }
   }
 
   validateUploadedFile(file: File): string {
