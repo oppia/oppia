@@ -100,8 +100,8 @@ angular.module('oppia').component('opportunitiesList', {
               opportunities = opportunities.concat(opportunitiesDicts);
               // More returned from GAE storage is not always reliable if true.
               // See https://github.com/oppia/oppia/issues/11900.
-              more = (more &&
-                opportunitiesDicts.length === OPPORTUNITIES_PAGE_SIZE);
+              more = (
+                more && opportunitiesDicts.length === OPPORTUNITIES_PAGE_SIZE);
               ctrl.visibleOpportunities = opportunities.slice(
                 startIndex, endIndex);
               ctrl.lastPageNumber = more ? ctrl.lastPageNumber : Math.ceil(
