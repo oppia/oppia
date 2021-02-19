@@ -81,9 +81,9 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
 ]);
 import { Directive, ElementRef, Injector, Input } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
-  @Directive({
-    selector: 'mock-angular-html-bind'
-  })
+@Directive({
+  selector: 'angular-html-bind-wrapper'
+})
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
   constructor(elementRef: ElementRef, injector: Injector) {
