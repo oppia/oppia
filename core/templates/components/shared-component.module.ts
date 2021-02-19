@@ -61,7 +61,7 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
-import { AngularHtmlBindWrapperDirective } from '../directives/angular-html-bind.directive';
+import { AngularHtmlBindWrapperDirective } from '../directives/angular-html-bind-wrapper.directive';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
