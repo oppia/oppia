@@ -925,18 +925,5 @@ describe('Learner dashboard page', function() {
       }).start();
       expect(elementSlideDownSpy).toHaveBeenCalled();
     });
-
-    it('should test the playlist message placeholder for mobiles', function() {
-      spyOn(ctrl, 'checkMobileView').and.returnValue(true);
-      expect(ctrl.getPlaceholder()).toBe(
-        'I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE_MOBILE');
-    });
-
-    it('should test the playlist message placeholder for desktops', function() {
-      expect(ctrl.checkMobileView()).toBe(false);
-
-      expect(ctrl.getPlaceholder()).toBe(
-        'I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE');
-    });
   });
 });
