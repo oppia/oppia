@@ -31,7 +31,7 @@ import { UrlService } from 'services/contextual/url.service';
   templateUrl: './subtopic-viewer-navbar-pre-logo-action.component.html',
   styleUrls: []
 })
-export class SubtopicViewerNavbarPreLogoAction implements OnInit {
+export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
   topicUrlFragment: string;
   topicUrl: string;
   constructor(
@@ -51,5 +51,5 @@ export class SubtopicViewerNavbarPreLogoAction implements OnInit {
 }
 
 angular.module('oppia').component(
-  'subtopicViewerNavbarPreLogoAction', downgradeComponent(
-    { component: SubtopicViewerNavbarPreLogoAction }));
+  'subtopicViewerNavbarPreLogoActionComponent', downgradeComponent(
+    { component: SubtopicViewerNavbarPreLogoActionComponent }));
