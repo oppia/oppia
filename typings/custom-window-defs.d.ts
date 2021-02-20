@@ -26,4 +26,5 @@ interface Window {
     $: JQueryStatic;
     Base64Binary: Base64Binary;
     jQuery: JQueryStatic;
+    dataLayer: object[];
 }
