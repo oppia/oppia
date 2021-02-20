@@ -364,13 +364,15 @@ describe('Assets Backend API Service', () => {
     }));
   });
 
-  describe('on production mode', () => {
+  describe('on emulator mode', () => {
     let assetsBackendApiService: AssetsBackendApiService = null;
     let httpTestingController: HttpTestingController = null;
     let urlInterpolationService: UrlInterpolationService;
     const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
 
     beforeEach(() => {
+      spyOnProperty(AssetsBackendApiService, 'EMULATOR_MODE', 'get')
+        .and.returnValue(false);
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]

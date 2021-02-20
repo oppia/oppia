@@ -5621,5 +5621,6 @@ export default {
 
   "PROFILE_PICTURE_FILEPATH": "image/profile_image.png",
 
-  "DEV_MODE": true
+  "DEV_MODE": true,
+  "EMULATOR_MODE": true
 } as const;
