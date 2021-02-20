@@ -197,7 +197,8 @@ angular.module('oppia').directive('collectionPlayerPage', [
               iconParametersArray.push({
                 thumbnailIconUrl:
                   collectionNodes[i].getExplorationSummaryObject(
-                  ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+                  ).thumbnail_icon_url.replace(
+                    'subjects', 'inverted_subjects'),
                 left: x + 'px',
                 top: y + 'px',
                 thumbnailBgColor:
@@ -238,7 +239,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.collection', function(newValue) {
-              if (newValue !== null) {
+              if (
+                newValue !== null &&
+                ctrl.collection.getCollectionNodeCount()) {
                 ctrl.generatePathParameters();
               }
             }, true);
