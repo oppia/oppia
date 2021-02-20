@@ -58,7 +58,7 @@ describe('Interaction attributes extractor service', () => {
     'attributes', () => {
     const buttonTextWithValue = hes.objToEscapedJson({
       content_id: 'ca_placeholder_0',
-      unicode_Str: 'Enter Here'
+      unicode_str: 'Enter Here'
     });
     const attributes = { buttonTextWithValue };
 
