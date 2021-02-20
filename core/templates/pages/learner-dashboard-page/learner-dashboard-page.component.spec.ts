@@ -324,6 +324,14 @@ describe('Learner dashboard page', function() {
         expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
       });
 
+    it('should test playlist delay for mobiles', function() {
+      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+      ctrl.$onInit();
+      expect(ctrl.checkMobileView()).toBe(true);
+      ctrl.collectionPlaylistSortableOptions;
+      expect(ctrl.collectionPlaylistSortableOptions.delay).toBe(1000);
+    });
+
     it('should sort collection playlist by index', function() {
       var mockedUi = {
         item: {

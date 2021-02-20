@@ -371,8 +371,6 @@ describe('Assets Backend API Service', () => {
     const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
 
     beforeEach(() => {
-      spyOnProperty(urlInterpolationService, 'EMULATOR_MODE', 'get')
-        .and.returnValue(false);
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
@@ -380,6 +378,9 @@ describe('Assets Backend API Service', () => {
       urlInterpolationService = TestBed.inject(UrlInterpolationService);
       spyOnProperty(
         urlInterpolationService, 'DEV_MODE', 'get'
+      ).and.returnValue(false);
+      spyOnProperty(
+        urlInterpolationService, 'EMULATOR_MODE', 'get'
       ).and.returnValue(false);
       httpTestingController = TestBed.inject(HttpTestingController);
       assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
