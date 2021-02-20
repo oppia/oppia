@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from "rxjs";
 
 /**
  * @fileoverview Directive for the test interaction panel in the state editor.
@@ -25,6 +24,8 @@ require(
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('testInteractionPanel', {
   bindings: {
