@@ -240,7 +240,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.collection', function(newValue) {
               if (
-                newValue !== null && 
+                newValue !== null &&
                 ctrl.collection.getCollectionNodeCount()) {
                 ctrl.generatePathParameters();
               }
