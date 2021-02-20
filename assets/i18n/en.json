@@ -268,6 +268,7 @@
     "I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION": "It looks like you haven't started any explanations yet. Head over to the library to start an exciting new exploration!",
     "I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION": "Play Later",
     "I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE": "Drag and rearrange the activities in the order in which you want to play them!",
+    "I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE_MOBILE": "Press and hold to rearrange the activities in the order in which you want to play them!",
     "I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY": "Are you sure you want to remove '<[entityTitle]>' from your '<[sectionNameI18nId | translate]>' list?",
     "I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER": "Remove from '<[sectionNameI18nId | translate]>' list?",
     "I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "Remove",
