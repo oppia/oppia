@@ -23,8 +23,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { InteractiveFractionInputComponent } from './directives/oppia-interactive-fraction-input.component';
+import { ResponseFractionInput } from './directives/oppia-response-fraction-input.component';
+import { ShortResponseFractionInput } from './directives/oppia-short-response-fraction-input.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-
 
 @NgModule({
   imports: [
@@ -34,13 +35,20 @@ import { SharedComponentsModule } from 'components/shared-component.module';
     SharedComponentsModule
   ],
   declarations: [
-    InteractiveFractionInputComponent
+    InteractiveFractionInputComponent,
+    ResponseFractionInput,
+    ShortResponseFractionInput
+
   ],
   entryComponents: [
-    InteractiveFractionInputComponent
+    InteractiveFractionInputComponent,
+    ResponseFractionInput,
+    ShortResponseFractionInput
   ],
   exports: [
-    InteractiveFractionInputComponent
+    InteractiveFractionInputComponent,
+    ResponseFractionInput,
+    ShortResponseFractionInput
   ],
 })
 

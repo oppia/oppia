@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from "rxjs";
 
 /**
  * @fileoverview Controller for add or update solution modal.
@@ -36,6 +35,7 @@ require(
   'state-solution.service.ts');
 require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance', 'ContextService',
