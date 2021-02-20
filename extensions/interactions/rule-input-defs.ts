@@ -22,7 +22,6 @@ import {
   MusicNotesAnswer,
   GraphAnswer } from
   'interactions/answer-defs';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 // AlgebraicExpressionInput interaction has multiple types of inputs based on
 // rule type.
@@ -266,6 +265,3 @@ export type InteractionRuleInputs = (
   RatioInputRuleInputs|
   SetInputRuleInputs |
   TextInputRuleInputs);
-
-export type InteractionId = (
-  keyof typeof InteractionSpecsConstants.INTERACTION_SPECS);

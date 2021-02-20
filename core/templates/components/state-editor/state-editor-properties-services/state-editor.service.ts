@@ -41,7 +41,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { InteractionId } from 'interactions/rule-input-defs';
+import { InteractionId } from 'interactions/interaction-defs';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;

@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { InteractionId } from 'interactions/rule-input-defs';
+import { InteractionId } from 'interactions/interaction-defs';
 
 @Injectable({providedIn: 'root'})
 export class InteractionSpecsService {

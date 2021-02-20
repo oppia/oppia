@@ -70,7 +70,7 @@ import {
 import {
   SubtitledHtmlObjectFactory, SubtitledHtml
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { InteractionId } from 'interactions/rule-input-defs';
+import { InteractionId } from 'interactions/interaction-defs';
 
 
 export interface InteractionBackendDict {
