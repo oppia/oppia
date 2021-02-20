@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+""" Unit tests for BaseModelValidator"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -22,8 +23,8 @@ import unittest
 
 import apache_beam as beam
 from apache_beam.runners.direct import direct_runner
+from apache_beam.testing import test_pipeline as pipeline
 from apache_beam.testing import util as beam_testing_util
-from apache_beam.testing import test_pipeline
 
 
 from core.platform import models
@@ -169,7 +170,7 @@ class BaseModelValidatorTests(unittest.TestCase):
 
     def test_validate_deleted_reports_error_for_old_deleted_model(self):
 
-        with test_pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             test_model = MockModel(
                 id='123',
                 deleted=True,
@@ -191,7 +192,7 @@ class BaseModelValidatorTests(unittest.TestCase):
             )
 
     def test_validate_model_time_field_check(self):
-        with test_pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             test_model = MockModel(
                 id='123',
                 created_on=self.now,
@@ -212,7 +213,7 @@ class BaseModelValidatorTests(unittest.TestCase):
             )
 
     def test_validate_model_current_time_check(self):
-        with test_pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             test_model = MockModel(
                 id='124',
                 created_on=self.now,
@@ -233,7 +234,7 @@ class BaseModelValidatorTests(unittest.TestCase):
             )
 
     def test_validate_model_id(self):
-        with test_pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             test_model = MockModel(
                 id='123@?!*',
                 created_on=self.year_ago,
@@ -255,7 +256,7 @@ class BaseModelValidatorTests(unittest.TestCase):
             )
 
     def test_base_model_validator_ptransform(self):
-        with test_pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             invalid_id = MockModel(
                 id='123@?!*',
                 deleted=False,
