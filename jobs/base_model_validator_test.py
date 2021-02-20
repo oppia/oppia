@@ -43,7 +43,7 @@ class MockModel(base_models.BaseModel):
 
 class BaseValidatorFnTests(unittest.TestCase):
     def setUp(self):
-        self.base_validator_fn = base_model_validator.BaseValidatorDoFn()
+        self.base_validator_fn = base_model_validator.BaseValidator()
 
     def test_clone_model(self):
         model = base_models.BaseModel(id='123', deleted=True)
