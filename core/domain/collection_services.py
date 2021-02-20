@@ -479,7 +479,7 @@ def record_played_exploration_in_collection_context(
 
     if exploration_id not in progress_model.completed_explorations:
         progress_model.completed_explorations.append(exploration_id)
-        progress_model.put_for_human()
+        progress_model.put()
 
 
 def get_collection_summary_dicts_from_models(collection_summary_models):
