@@ -24,23 +24,27 @@ describe('Admin Navbar component', () => {
   var $scope = null;
   var $q = null;
   var UserService = null;
+  var AdminRouterService = null;
   var userProfileImage = 'profile-data-url';
   var userInfo = {
     isModerator: () => true,
     getUsername: () => 'username1',
     isSuperAdmin: () => true
   };
+  var imagePath = '/path/to/image.png';
+  var profileUrl = '/profile/username1';
 
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     UserService = $injector.get('UserService');
+    AdminRouterService = $injector.get('AdminRouterService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $q = $injector.get('$q');
     ctrl = $componentController('adminNavbar', {
-      scope: $scope
+      $scope: $scope
     });
   }));
 
@@ -53,19 +57,28 @@ describe('Admin Navbar component', () => {
     $rootScope.$apply();
   });
 
-  it('should get data from backend', () => {
-    var imagePath = '/path/to/image.png';
-
-    expect(ctrl.isModerator).toBe(true);
+  it('should initialize ctrl properties after directive is initialized', () => {
+    expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     expect(ctrl.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
     expect(ctrl.username).toBe('username1');
-    expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
+    expect(ctrl.isModerator).toBe(true);
+    expect(ctrl.isSuperAdmin).toBe(true);
+    expect(ctrl.profileUrl).toEqual(profileUrl);
+    expect(ctrl.logoutUrl).toEqual('/logout');
+    expect(ctrl.profileDropdownIsActive).toBe(false);
+    expect(ctrl.dropdownMenuisActive).toBe(false);
   });
 
-  it('should be routed to the activities tab', () => {
+  it('should be call showtab in AdminRouterService', () => {
+    spyOn(AdminRouterService, 'showTab');
+
     ctrl.showTab();
 
+    expect(AdminRouterService.showTab).toHaveBeenCalled();
+  });
+
+  it('should be routed to the activities tab by default', () => {
     expect(ctrl.isActivitiesTabOpen()).toBe(true);
     expect(ctrl.isConfigTabOpen()).toBe(false);
     expect(ctrl.isFeaturesTabOpen()).toBe(false);
@@ -74,25 +87,127 @@ describe('Admin Navbar component', () => {
     expect(ctrl.isMiscTabOpen()).toBe(false);
   });
 
+  it('should be routed to the config tab', () => {
+    expect(ctrl.isActivitiesTabOpen()).toBe(true);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+
+    AdminRouterService.showTab('#config');
+
+    expect(ctrl.isActivitiesTabOpen()).toBe(false);
+    expect(ctrl.isConfigTabOpen()).toBe(true);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+  });
+
+  it('should be routed to the features tab', () => {
+    expect(ctrl.isActivitiesTabOpen()).toBe(true);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+
+    AdminRouterService.showTab('#features');
+
+    expect(ctrl.isActivitiesTabOpen()).toBe(false);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(true);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+  });
+
+  it('should be routed to the roles tab', () => {
+    expect(ctrl.isActivitiesTabOpen()).toBe(true);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+
+    AdminRouterService.showTab('#roles');
+
+    expect(ctrl.isActivitiesTabOpen()).toBe(false);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(true);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+  });
+
+  it('should be routed to the jobs tab', () => {
+    expect(ctrl.isActivitiesTabOpen()).toBe(true);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+
+    AdminRouterService.showTab('#jobs');
+
+    expect(ctrl.isActivitiesTabOpen()).toBe(false);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(true);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+  });
+
+  it('should be routed to the misc tab', () => {
+    expect(ctrl.isActivitiesTabOpen()).toBe(true);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(false);
+
+    AdminRouterService.showTab('#misc');
+
+    expect(ctrl.isActivitiesTabOpen()).toBe(false);
+    expect(ctrl.isConfigTabOpen()).toBe(false);
+    expect(ctrl.isFeaturesTabOpen()).toBe(false);
+    expect(ctrl.isRolesTabOpen()).toBe(false);
+    expect(ctrl.isJobsTabOpen()).toBe(false);
+    expect(ctrl.isMiscTabOpen()).toBe(true);
+  });
+
   it('should set profileDropdownIsActive to true', () => {
+    expect(ctrl.profileDropdownIsActive).toBe(false);
+
     ctrl.activateProfileDropdown();
 
     expect(ctrl.profileDropdownIsActive).toBe(true);
   });
 
   it('should set profileDropdownIsActive to false', () => {
+    ctrl.profileDropdownIsActive = true;
+
+    expect(ctrl.profileDropdownIsActive).toBe(true);
+
     ctrl.deactivateProfileDropdown();
 
     expect(ctrl.profileDropdownIsActive).toBe(false);
   });
 
   it('should set dropdownMenuisActive to true', () => {
+    expect(ctrl.dropdownMenuisActive).toBe(false);
+
     ctrl.activateDropdownMenu();
 
     expect(ctrl.dropdownMenuisActive).toBe(true);
   });
 
   it('should set dropdownMenuisActive to false', () => {
+    ctrl.dropdownMenuisActive = true;
+
+    expect(ctrl.dropdownMenuisActive).toBe(true);
+
     ctrl.deactivateDropdownMenu();
 
     expect(ctrl.dropdownMenuisActive).toBe(false);
