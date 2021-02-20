@@ -201,7 +201,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @classmethod
     def get_by_gae_id(cls, gae_id):
-        """Fetch an entry by user ID.
+        """Fetch an entry by GAE ID.
 
         Args:
             gae_id: str. The GAE ID.

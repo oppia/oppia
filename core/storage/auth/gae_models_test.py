@@ -199,6 +199,23 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
                 self.NONEXISTENT_USER_ID)
         )
 
+    def test_get_by_gae_id_for_correct_user_id(self):
+        self.assertEqual(
+            auth_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
+            auth_models.UserIdentifiersModel.get_by_gae_id(self.USER_GAE_ID)
+        )
+
+    def test_get_by_gae_id_for_correct_user_id_marked_as_deleted(self):
+        user_identifiers_model = (
+            auth_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID))
+        user_identifiers_model.deleted = True
+        user_identifiers_model.update_timestamps()
+        user_identifiers_model.put()
+        self.assertEqual(
+            user_identifiers_model,
+            auth_models.UserIdentifiersModel.get_by_gae_id(self.USER_GAE_ID)
+        )
+
     def test_get_by_user_id_for_correct_user_id(self):
         self.assertEqual(
             auth_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
