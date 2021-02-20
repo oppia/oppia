@@ -62,8 +62,8 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       InteractionAttributesExtractorService
   ) {
     this.componentSubscriptions.add(this.answerChanged.pipe(
-      // Wait 300ms after the last event before emitting last event.
-      debounceTime(300),
+      // Wait 150ms after the last event before emitting last event.
+      debounceTime(150),
       // Only emit if value is different from previous value.
       distinctUntilChanged()
     ).subscribe(newValue => {
@@ -93,6 +93,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
         this.errorMessage = '';
         this.isValid = true;
       }
+      this.currentInteractionService.updateViewWithNewAnswer();
     }));
   }
 

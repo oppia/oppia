@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Subscription } from "rxjs";
+
 /**
  * @fileoverview Directive for the test interaction panel in the state editor.
  */
@@ -31,12 +33,15 @@ angular.module('oppia').component('testInteractionPanel', {
   },
   template: require('./test-interaction-panel.component.html'),
   controller: [
-    '$scope', 'CurrentInteractionService', 'ExplorationStatesService',
-    'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
+    '$rootScope', '$scope', 'CurrentInteractionService',
+    'ExplorationStatesService', 'INTERACTION_DISPLAY_MODE_INLINE',
+    'INTERACTION_SPECS',
     function(
-        $scope, CurrentInteractionService, ExplorationStatesService,
-        INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
+        $rootScope, $scope, CurrentInteractionService,
+        ExplorationStatesService, INTERACTION_DISPLAY_MODE_INLINE,
+        INTERACTION_SPECS) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       $scope.onSubmitAnswerFromButton = function() {
         CurrentInteractionService.submitAnswer();
       };
@@ -44,11 +49,22 @@ angular.module('oppia').component('testInteractionPanel', {
       $scope.isSubmitButtonDisabled = (
         CurrentInteractionService.isSubmitButtonDisabled);
       ctrl.$onInit = function() {
+        ctrl.directiveSubscriptions.add(
+          CurrentInteractionService.onAnswerChanged.subscribe(() => {
+            // Remove this when migrating to angular or use
+            // changeDetector.detectChanges instead.
+            $rootScope.$applyAsync();
+          })
+        );
         var _stateName = ctrl.getStateName();
         var _state = ExplorationStatesService.getState(_stateName);
         $scope.interactionIsInline = (
           INTERACTION_SPECS[_state.interaction.id].display_mode ===
           INTERACTION_DISPLAY_MODE_INLINE);
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
