@@ -239,8 +239,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.collection', function(newValue) {
-              // eslint-disable-next-line max-len
-              if (newValue !== null && ctrl.collection.getCollectionNodeCount()) {
+              if (
+                newValue !== null && 
+                ctrl.collection.getCollectionNodeCount()) {
                 ctrl.generatePathParameters();
               }
             }, true);
