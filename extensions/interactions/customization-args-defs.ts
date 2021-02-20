@@ -126,13 +126,13 @@ export interface EndExplorationCustomizationArgs {
 
 export interface FractionInputCustomizationArgsBackendDict {
   requireSimplestForm: {
-    value: string;
+    value: boolean;
   };
   allowImproperFraction: {
-    value: string;
+    value: boolean;
   };
   allowNonzeroIntegerPart: {
-    value: string;
+    value: boolean;
   };
   customPlaceholder: {
     value: SubtitledUnicodeBackendDict;
