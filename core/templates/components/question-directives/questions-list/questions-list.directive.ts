@@ -410,40 +410,45 @@ angular.module('oppia').directive('questionsList', [
             }
             $location.hash(ctrl.questionId);
           };
-
           ctrl.deleteQuestionFromSkill = function(
               questionId, skillDescription) {
-            if (!ctrl.canEditQuestion()) {
-              AlertsService.addWarning(
-                'User does not have enough rights to delete the question');
-              return;
-            }
-            _reInitializeSelectedSkillIds();
-            // For the case when, it is in the skill editor.
-            if (ctrl.getAllSkillSummaries().length === 0) {
-              EditableQuestionBackendApiService.editQuestionSkillLinks(
-                questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
-              ).then(function() {
-                QuestionsListService.resetPageNumber();
-                QuestionsListService.getQuestionSummariesAsync(
-                  ctrl.selectedSkillId, true, true
-                );
-                AlertsService.addSuccessMessage('Deleted Question');
-              });
-            } else {
-              ctrl.getAllSkillSummaries().forEach(function(summary) {
-                if (summary.getDescription() === skillDescription) {
-                  EditableQuestionBackendApiService.editQuestionSkillLinks(
-                    questionId, [{id: summary.getId(), task: 'remove'}]
-                  ).then(function() {
-                    QuestionsListService.resetPageNumber();
-                    QuestionsListService.getQuestionSummariesAsync(
-                      ctrl.selectedSkillId, true, true
-                    );
-                    AlertsService.addSuccessMessage('Deleted Question');
-                  });
-                }
-              });
+            //To ensure that the function is not evoked multiple times 
+            // if the user clicks the link off button multiple times.
+            if( questionId !== ctrl.questionIdDeleted){
+              ctrl.questionIdDeleted = questionId
+              if (!ctrl.canEditQuestion()) {
+                AlertsService.addWarning(
+                  'User does not have enough rights to delete the question');
+                  ctrl.questionIdDeleted='xyz';
+                return;
+              }
+              _reInitializeSelectedSkillIds();
+              // For the case when, it is in the skill editor.
+              if (ctrl.getAllSkillSummaries().length === 0) {
+                EditableQuestionBackendApiService.editQuestionSkillLinks(
+                  questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
+                ).then(function() {
+                  QuestionsListService.resetPageNumber();
+                  QuestionsListService.getQuestionSummariesAsync(
+                    ctrl.selectedSkillId, true, true
+                  );
+                  AlertsService.addSuccessMessage('Deleted Question');
+                });
+              } else {
+                ctrl.getAllSkillSummaries().forEach(function(summary) {
+                  if (summary.getDescription() === skillDescription) {
+                    EditableQuestionBackendApiService.editQuestionSkillLinks(
+                      questionId, [{id: summary.getId(), task: 'remove'}]
+                    ).then(function() {
+                      QuestionsListService.resetPageNumber();
+                      QuestionsListService.getQuestionSummariesAsync(
+                        ctrl.selectedSkillId, true, true
+                      );
+                      AlertsService.addSuccessMessage('Deleted Question');
+                    });
+                  }
+                });
+              }
             }
           };
 
@@ -607,6 +612,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;
+            ctrl.questionIdDeleted= 'yyyy';
             // The _initTab function is written separately since it is also
             // called in subscription when some external events are triggered.
             _initTab(true);
