@@ -50,6 +50,7 @@ import webtest
 ])
 datastore_services = models.Registry.import_datastore_services()
 
+
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
     """Test job that maps over the general suggestion model."""
 
@@ -350,9 +351,9 @@ class CronJobTests(test_utils.GenericTestBase):
             deleted=True
         )
         with self.swap(
-                user_models.CompletedActivitiesModel,
-                '_pre_put_hook',
-                self.mock_pre_put_hook
+            user_models.CompletedActivitiesModel,
+            '_pre_put_hook',
+            self.mock_pre_put_hook
         ):
             completed_activities_model.put()
 
@@ -390,9 +391,9 @@ class CronJobTests(test_utils.GenericTestBase):
             last_updated=datetime.datetime.utcnow() - self.FIVE_WEEKS
         )
         with self.swap(
-                user_models.UserQueryModel,
-                '_pre_put_hook',
-                self.mock_pre_put_hook
+            user_models.UserQueryModel,
+            '_pre_put_hook',
+            self.mock_pre_put_hook
         ):
             user_query_model.put()
         with self.testapp_swap:
