@@ -23,14 +23,17 @@ PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS = (
     cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
 
 
-class ModelValidationError(Lpython_utils.OBJECT.):
+class ModelValidationError(python_utils.OBJECT):
     """Base error class for model validations."""
+
     @property
     def key(self):
+        """Property that returns the error class name."""
         return self.__class__.__name__
 
     @property
     def message(self):
+        """Message property to override in subclasses."""
         return None
 
     def __repr__(self):
@@ -48,21 +51,23 @@ class ModelValidationError(Lpython_utils.OBJECT.):
         return hash((self.__class__, self.key, self.message))
 
 
-class TimeFieldModelValidationError(ModelValidationError):
+class ModelTimestampRelationshipError(ModelValidationError):
     """Error class for time field model validation errors."""
+
     def __init__(self, model):
         self._message = (
             'Entity ID %s: The created_on field has a value %s which '
-            'is greater than the value %s of last_updated field' % (
-                model.id, model.created_on, model.last_updated))
+            'is greater than the value %s of last_updated field'
+            % (model.id, model.created_on, model.last_updated))
 
     @property
     def message(self):
         return self._message
 
 
-class CurrentTimeModelValidationError(ModelValidationError):
+class ModelMutatedDuringJobError(ModelValidationError):
     """Error class for current time model validation errors."""
+
     def __init__(self, model):
         self._message = (
             'Entity id %s: The last_updated field has a value %s which '
@@ -74,20 +79,22 @@ class CurrentTimeModelValidationError(ModelValidationError):
         return self._message
 
 
-class IdModelValidationError(ModelValidationError):
+class ModelInvalidIdError(ModelValidationError):
     """Error class for id model validation errors."""
+
     def __init__(self, model):
         self._message = (
-            'Entity id %s: Entity id does not match regex pattern' % (
-                model.id))
+            'Entity id %s: Entity id does not match regex pattern'
+            % (model.id))
 
     @property
     def message(self):
         return self._message
 
 
-class StaleDeletedModelValidationError(ModelValidationError):
+class ModelExpiredError(ModelValidationError):
     """Error class for stale deletion validation errors."""
+
     def __init__(self, model):
         self._message = (
             'Entity id %s: model marked as deleted is older than %s days'

@@ -36,7 +36,8 @@ MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 class BaseValidatorDoFn(beam.DoFn):
     """"Base DoFn for model validations."""
-    def clone(self, model, **new_values):
+
+    def clone_model(self, model, **new_values):
         """Clones the entity, adding or overriding constructor attributes.
 
         The cloned entity will have exactly the same property values as the
@@ -69,7 +70,7 @@ class ValidateModelIdWithRegex(BaseValidatorDoFn):
             regex_string: str. A regex pattern for valid ids.
         """
         super(ValidateModelIdWithRegex, self).__init__()
-        self.regex_string = regex_string
+        self.regex = re.compile(regex_string)
 
     def process(self, model):
         """Function that defines how to process each element in a pipeline of
@@ -82,11 +83,10 @@ class ValidateModelIdWithRegex(BaseValidatorDoFn):
             beam.pvalue.TaggedOutput. An element of the output PCollection for
             the doFn which represents an error as a key value pair.
         """
-        element = self.clone(model)
-        regex_string = self.regex_string
+        element = self.clone_model(model)
 
-        if not re.compile(regex_string).match(element.id):
-            yield errors.IdModelValidationError(element)
+        if not self.regex.match(element.id):
+            yield errors.ModelInvalidIdError(element)
 
 
 class ValidateDeleted(BaseValidatorDoFn):
@@ -103,7 +103,7 @@ class ValidateDeleted(BaseValidatorDoFn):
             beam.pvalue.TaggedOutput. An element of the output PCollection for
             the doFn which represents an error as a key value pair.
         """
-        element = self.clone(model)
+        element = self.clone_model(model)
         date_now = datetime.datetime.utcnow()
 
         date_before_which_models_should_be_deleted = (
@@ -112,7 +112,7 @@ class ValidateDeleted(BaseValidatorDoFn):
         )
 
         if element.last_updated < date_before_which_models_should_be_deleted:
-            yield errors.StaleDeletedModelValidationError(element)
+            yield errors.ModelExpiredError(element)
 
 
 class ValidateModelTimeFields(BaseValidatorDoFn):
@@ -131,13 +131,13 @@ class ValidateModelTimeFields(BaseValidatorDoFn):
             the doFn which represents an error as a key value pair.
         """
 
-        element = self.clone(model)
+        element = self.clone_model(model)
         if element.created_on > (element.last_updated + MAX_CLOCK_SKEW_SECS):
-            yield errors.TimeFieldModelValidationError(element)
+            yield errors.ModelTimestampRelationshipError(element)
 
         current_datetime = datetime.datetime.utcnow()
-        if element.last_updated > current_datetime:
-            yield errors.CurrentTimeModelValidationError(element)
+        if (element.last_updated + MAX_CLOCK_SKEW_SECS) > current_datetime:
+            yield errors.ModelMutatedDuringJobError(element)
 
 
 class BaseModelValidator(beam.PTransform):
@@ -155,17 +155,24 @@ class BaseModelValidator(beam.PTransform):
             beam.PCollection. A collection of errors represented as
             key-value pairs.
         """
-        not_deleted, deleted = (model_pipe | beam.Map(
-            self._check_deletion_status)
-                                .with_outputs('not_deleted', 'deleted'))
+        not_deleted, deleted = (
+            model_pipe
+            | beam.Map(
+                lambda m: beam.pvalue.TaggedOutput(
+                    'deleted' if m.deleted else 'not_deleted', m))
+            .with_outputs('not_deleted', 'deleted'))
 
         deletion_errors = deleted | beam.ParDo(ValidateDeleted())
 
-        time_field_validation_errors = (not_deleted | beam.ParDo(
-            ValidateModelTimeFields()))
+        time_field_validation_errors = (
+            not_deleted
+            | beam.ParDo(
+                ValidateModelTimeFields()))
 
-        model_id_validation_errors = (not_deleted | beam.ParDo(
-            ValidateModelIdWithRegex(self._get_model_id_regex())))
+        model_id_validation_errors = (
+            not_deleted
+            | beam.ParDo(
+                ValidateModelIdWithRegex(self._get_model_id_regex())))
 
         merged = ((
             deletion_errors,
@@ -182,17 +189,3 @@ class BaseModelValidator(beam.PTransform):
             str. A regex pattern to be followed by the model id.
         """
         return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
-
-    def _check_deletion_status(self, model):
-        """Function that splits model PCollection based on deletion status.
-
-        Args:
-            model: datastore_services.Model. Entity to validate.
-
-        Returns:
-            beam.pvalue.TaggedOutput: An element of the output PCollection.
-
-        if not model.deleted:
-            return beam.pvalue.TaggedOutput('not_deleted', model)
-        else:
-            return beam.pvalue.TaggedOutput('deleted', model)
