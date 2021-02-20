@@ -34,6 +34,7 @@ class MockModel(base_models.BaseModel):
 
 class ValidatorErrorTestBase(unittest.TestCase):
     """Base class for valiator error tests"""
+
     def setUp(self):
         self.now = datetime.datetime.utcnow()
         self.year_ago = self.now - datetime.timedelta(weeks=52)
@@ -45,15 +46,14 @@ class ModelTimestampRelationshipErrorTests(ValidatorErrorTestBase):
         model = MockModel(
             id='123',
             created_on=self.now,
-            last_updated=self.year_ago
-        )
+            last_updated=self.year_ago)
         error = errors.ModelTimestampRelationshipError(model)
 
         msg = (
             'Entity ID %s: The created_on field has a value %s which '
             'is greater than the value %s of last_updated field'
             % (model.id, model.created_on, model.last_updated))
-        assert error.message == msg
+        self.assert_equal(error.message, msg)
 
 
 class ModelMutatedDuringJobErrorTests(ValidatorErrorTestBase):
@@ -61,8 +61,7 @@ class ModelMutatedDuringJobErrorTests(ValidatorErrorTestBase):
         model = MockModel(
             id='124',
             created_on=self.now,
-            last_updated=self.year_later
-        )
+            last_updated=self.year_later)
         error = errors.ModelMutatedDuringJobError(model)
 
         msg = (
@@ -70,7 +69,7 @@ class ModelMutatedDuringJobErrorTests(ValidatorErrorTestBase):
             'is greater than the time when the job was run'
             % (model.id, model.last_updated))
 
-        assert error.message == msg
+        self.assert_equal(error.message, msg)
 
 
 class ModelInvalidIdErrorTests(ValidatorErrorTestBase):
@@ -78,15 +77,14 @@ class ModelInvalidIdErrorTests(ValidatorErrorTestBase):
         model = MockModel(
             id='123@?!*',
             created_on=self.year_ago,
-            last_updated=self.now
-        )
+            last_updated=self.now)
         error = errors.ModelInvalidIdError(model)
 
         msg = (
             'Entity id %s: Entity id does not match regex pattern'
             % (model.id))
 
-        assert error.message == msg
+        self.assert_equal(error.message, msg)
 
 
 class ModelExpiredErrorTests(ValidatorErrorTestBase):
@@ -95,8 +93,7 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
             id='123',
             deleted=True,
             created_on=self.year_ago,
-            last_updated=self.year_ago
-        )
+            last_updated=self.year_ago)
 
         error = errors.ModelExpiredError(model)
 
@@ -104,4 +101,4 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
             'Entity id %s: model marked as deleted is older than %s days'
             % (model.id, errors.PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
 
-        assert error.message == msg
+        self.assert_equal(error.message, msg)

@@ -30,8 +30,6 @@ import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-datastore_services = models.Registry.import_datastore_services()
-
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""

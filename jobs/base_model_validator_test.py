@@ -41,60 +41,6 @@ class MockModel(base_models.BaseModel):
     pass
 
 
-class BaseValidatorFnTests(unittest.TestCase):
-    def setUp(self):
-        self.base_validator_fn = base_model_validator.BaseValidator()
-
-    def test_clone_model(self):
-        model = base_models.BaseModel(id='123', deleted=True)
-        clone = self.base_validator_fn.clone_model(model)
-
-        self.assertEqual(model.id, clone.id)
-        self.assertEqual(model, clone)
-        self.assertIsNot(model, clone)
-        self.assertIsInstance(clone, base_models.BaseModel)
-
-    def test_clone_with_changes(self):
-        model = base_models.BaseModel(id='123', deleted=True)
-        clone = self.base_validator_fn.clone_model(model, deleted=False)
-
-        self.assertNotEqual(model, clone)
-        self.assertIsNot(model, clone)
-        self.assertIsInstance(clone, base_models.BaseModel)
-        self.assertTrue(model.deleted)
-        self.assertFalse(clone.deleted)
-
-    def test_clone_sub_class(self):
-        class DerivedModel(base_models.BaseModel):
-            """Simple model with an extra 'field' string property."""
-
-            field = datastore_services.StringProperty()
-
-        model = DerivedModel(id='123', field='original')
-        clone = self.base_validator_fn.clone_model(model)
-
-        self.assertEqual(model, clone)
-        self.assertIsNot(model, clone)
-        self.assertIsInstance(clone, DerivedModel)
-        self.assertEqual(model.field, 'original')
-        self.assertEqual(clone.field, 'original')
-
-    def test_clone_sub_class_with_changes(self):
-        class DerivedModel(base_models.BaseModel):
-            """Simple model with an extra 'field' string property."""
-
-            field = datastore_services.StringProperty()
-
-        model = DerivedModel(id='123', field='original')
-        clone = self.base_validator_fn.clone_model(model, field='updated')
-
-        self.assertNotEqual(model, clone)
-        self.assertIsNot(model, clone)
-        self.assertIsInstance(clone, DerivedModel)
-        self.assertEqual(model.field, 'original')
-        self.assertEqual(clone.field, 'updated')
-
-
 class BaseModelValidatorTests(unittest.TestCase):
 
     def setUp(self):
@@ -108,26 +54,22 @@ class BaseModelValidatorTests(unittest.TestCase):
                 id='123@?!*',
                 deleted=False,
                 created_on=self.year_ago,
-                last_updated=self.now
-            )
+                last_updated=self.now)
             invalid_timestamp = MockModel(
                 id='124',
                 deleted=False,
                 created_on=self.now,
-                last_updated=self.year_later
-            )
+                last_updated=self.year_later)
             expired_model = MockModel(
                 id='123',
                 deleted=True,
                 created_on=self.year_ago,
-                last_updated=self.year_ago
-            )
+                last_updated=self.year_ago)
             valid_model = MockModel(
                 id='123',
                 deleted=False,
                 created_on=self.year_ago,
-                last_updated=self.now
-            )
+                last_updated=self.now)
             pcoll = (
                 p
                 | beam.Create([
@@ -143,8 +85,7 @@ class BaseModelValidatorTests(unittest.TestCase):
                     errors.ModelInvalidIdError(invalid_id),
                     errors.ModelMutatedDuringJobError(invalid_timestamp),
                     errors.ModelExpiredError(expired_model)
-                ]),
-            )
+            ]))
 
 
 class ValidateDeletedTests(BaseModelValidatorTests):
@@ -154,8 +95,7 @@ class ValidateDeletedTests(BaseModelValidatorTests):
                 id='123',
                 deleted=True,
                 created_on=self.year_ago,
-                last_updated=self.year_ago
-            )
+                last_updated=self.year_ago)
             pcoll = p | beam.Create([expired_model])
 
             output = (
@@ -167,8 +107,7 @@ class ValidateDeletedTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelExpiredError(expired_model)
-                ])
-            )
+            ]))
 
 
 class ValidateModelTimeFieldTests(BaseModelValidatorTests):
@@ -177,8 +116,7 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTests):
             invalid_timestamp = MockModel(
                 id='123',
                 created_on=self.now,
-                last_updated=self.year_ago
-            )
+                last_updated=self.year_ago)
             pcoll = p | beam.Create([invalid_timestamp])
 
             output = (
@@ -190,16 +128,14 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelTimestampRelationshipError(invalid_timestamp)
-                ])
-            )
+            ]))
 
     def test_process_reports_model_mutated_during_job_error(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             invalid_timestamp = MockModel(
                 id='124',
                 created_on=self.now,
-                last_updated=self.year_later
-            )
+                last_updated=self.year_later)
             pcoll = p | beam.Create([invalid_timestamp])
 
             output = (
@@ -211,8 +147,7 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelMutatedDuringJobError(invalid_timestamp)
-                ])
-            )
+            ]))
 
 
 class ValidateModelIdTests(BaseModelValidatorTests):
@@ -221,8 +156,7 @@ class ValidateModelIdTests(BaseModelValidatorTests):
             invalid_id_model = MockModel(
                 id='123@?!*',
                 created_on=self.year_ago,
-                last_updated=self.now
-            )
+                last_updated=self.now)
             pcoll = p | beam.Create([invalid_id_model])
 
             output = (
@@ -235,5 +169,4 @@ class ValidateModelIdTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelInvalidIdError(invalid_id_model)
-                ])
-            )
+            ]))

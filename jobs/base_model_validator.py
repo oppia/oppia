@@ -26,42 +26,16 @@ import apache_beam as beam
 from core.domain import cron_services
 from core.platform import models
 from jobs import base_model_validator_errors as errors
-
+from jobs import utils as beam_utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
-datastore_services = models.Registry.import_datastore_services()
+
 
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
-class BaseValidator(beam.DoFn):
-    """"Base DoFn for model validations."""
-
-    def clone_model(self, model, **new_values):
-        """Clones the entity, adding or overriding constructor attributes.
-
-        The cloned entity will have exactly the same property values as the
-        original entity, except where overridden. By default, it will have no
-        parent entity or key name, unless supplied.
-
-        Args:
-            model: datastore_services.Model. Model to clone.
-            **new_values: dict(str: *). Keyword arguments to override when
-                invoking the cloned entity's constructor.
-
-        Returns:
-            *. A cloned, and possibly modified, copy of self. Subclasses of
-            BaseModel will return a clone with the same type.
-        """
-        # Reference implementation: https://stackoverflow.com/a/2712401/4859885.
-        cls = model.__class__
-        props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
-        props.update(new_values)
-        return cls(id=model.id, **props)
-
-
-class ValidateModelIdWithRegex(BaseValidator):
+class ValidateModelIdWithRegex(beam.DoFn):
     """DoFn to validate model ids against a given regex string."""
 
     def __init__(self, regex_string):
@@ -83,13 +57,13 @@ class ValidateModelIdWithRegex(BaseValidator):
         Yields:
             ModelInvalidIdError. An error class for models with invalid IDs.
         """
-        model = self.clone_model(input_model)
+        model = beam_utils.clone_model(input_model)
 
         if not self.regex.match(model.id):
             yield errors.ModelInvalidIdError(model)
 
 
-class ValidateDeleted(BaseValidator):
+class ValidateDeleted(beam.DoFn):
     """DoFn to check whether models marked for deletion are stale."""
 
     def process(self, input_model):
@@ -102,7 +76,7 @@ class ValidateDeleted(BaseValidator):
         Yields:
             ModelExpiredError. An error class for expired models.
         """
-        model = self.clone_model(input_model)
+        model = beam_utils.clone_model(input_model)
         date_now = datetime.datetime.utcnow()
 
         expiration_date = (
@@ -113,7 +87,7 @@ class ValidateDeleted(BaseValidator):
             yield errors.ModelExpiredError(model)
 
 
-class ValidateModelTimeFields(BaseValidator):
+class ValidateModelTimeFields(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are
     valid."""
 
@@ -129,7 +103,7 @@ class ValidateModelTimeFields(BaseValidator):
             ModelTimestampRelationshipError. Error for timestamp validation.
         """
 
-        model = self.clone_model(input_model)
+        model = beam_utils.clone_model(input_model)
         if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
             yield errors.ModelTimestampRelationshipError(model)
 
@@ -139,7 +113,7 @@ class ValidateModelTimeFields(BaseValidator):
 
 
 class BaseModelValidator(beam.PTransform):
-    """Composite Beam Transform which returns a pipeline of validation
+    """Composite beam Transform which returns a pipeline of validation
     errors."""
 
     def expand(self, model_pipe):
