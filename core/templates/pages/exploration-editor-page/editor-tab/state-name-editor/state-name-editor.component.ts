@@ -38,11 +38,11 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('stateNameEditor', {
   template: require('./state-name-editor.component.html'),
   controller: [
-    '$filter', 'EditabilityService', 'ExplorationStatesService',
+    '$filter', '$window', 'EditabilityService', 'ExplorationStatesService',
     'ExternalSaveService', 'FocusManagerService', 'RouterService',
     'StateEditorService', 'StateNameService', 'MAX_STATE_NAME_LENGTH',
     function(
-        $filter, EditabilityService, ExplorationStatesService,
+        $filter, $window, EditabilityService, ExplorationStatesService,
         ExternalSaveService, FocusManagerService, RouterService,
         StateEditorService, StateNameService, MAX_STATE_NAME_LENGTH) {
       var ctrl = this;
@@ -117,6 +117,9 @@ angular.module('oppia').component('stateNameEditor', {
         ctrl.StateEditorService = StateEditorService;
         ctrl.StateNameService = StateNameService;
         ctrl.stateNameEditorIsShown = false;
+        $window.onload = function () { 
+          FocusManagerService.setFocus('oppiaEditableSection');
+        }
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
