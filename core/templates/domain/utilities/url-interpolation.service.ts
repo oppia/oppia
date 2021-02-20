@@ -20,7 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
@@ -45,6 +44,9 @@ export class UrlInterpolationService {
 
   get DEV_MODE(): boolean {
     return AppConstants.DEV_MODE;
+  }
+  get EMULATOR_MODE(): boolean {
+    return AppConstants.EMULATOR_MODE;
   }
 
   validateResourcePath(resourcePath: string): void {
@@ -245,15 +247,14 @@ export class UrlInterpolationService {
   }
 
   getGcsUrl(): string {
-    if (!AppConstants.DEV_MODE &&
-        !AppConstants.GCS_RESOURCE_BUCKET_NAME) {
-      throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+    let urlPrefix = '/assetsdevhandler';
+    if (!this.EMULATOR_MODE) {
+      urlPrefix = (
+        'https://storage.googleapis.com/' +
+        AppConstants.GCS_RESOURCE_BUCKET_NAME
+      );
     }
-    const prodGcsUrl = (
-      'https://storage.googleapis.com/' +
-      AppConstants.GCS_RESOURCE_BUCKET_NAME
-    );
-    return this.DEV_MODE ? '/assetsdevhandler' : prodGcsUrl;
+    return urlPrefix;
   }
 
   getProfilePictureUrl(username: string): string {
