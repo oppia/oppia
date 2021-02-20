@@ -432,6 +432,7 @@
 /jobs/base_model_validator.py @brianrodri
 /jobs/base_model_validator_test.py @brianrodri
 /jobs/base_model_validator_errors.py @brianrodri
+/jobs/base_model_validator_errors_test.py @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21

@@ -41,73 +41,7 @@ class MockModel(base_models.BaseModel):
     pass
 
 
-class BaseValidatorErrorTests(unittest.TestCase):
-    def setUp(self):
-        self.now = datetime.datetime.utcnow()
-        self.year_ago = self.now - datetime.timedelta(weeks=52)
-        self.year_later = self.now + datetime.timedelta(weeks=52)
-
-    def test_model_timestamp_relationship_error(self):
-        model = MockModel(
-            id='123',
-            created_on=self.now,
-            last_updated=self.year_ago
-        )
-        error = errors.ModelTimestampRelationshipError(model)
-
-        msg = (
-            'Entity ID %s: The created_on field has a value %s which '
-            'is greater than the value %s of last_updated field'
-            % (model.id, model.created_on, model.last_updated))
-        assert error.message == msg
-
-    def test_model_mutated_during_job_error(self):
-        model = MockModel(
-            id='124',
-            created_on=self.now,
-            last_updated=self.year_later
-        )
-        error = errors.ModelMutatedDuringJobError(model)
-
-        msg = (
-            'Entity id %s: The last_updated field has a value %s which '
-            'is greater than the time when the job was run'
-            % (model.id, model.last_updated))
-
-        assert error.message == msg
-
-    def test_model_invalid_id_error(self):
-        model = MockModel(
-            id='123@?!*',
-            created_on=self.year_ago,
-            last_updated=self.now
-        )
-        error = errors.ModelInvalidIdError(model)
-
-        msg = (
-            'Entity id %s: Entity id does not match regex pattern'
-            % (model.id))
-
-        assert error.message == msg
-
-    def test_model_expired_error(self):
-        model = MockModel(
-            id='123',
-            deleted=True,
-            created_on=self.year_ago,
-            last_updated=self.year_ago
-        )
-
-        error = errors.ModelExpiredError(model)
-
-        msg = (
-            'Entity id %s: model marked as deleted is older than %s days'
-            % (model.id, errors.PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
-
-        assert error.message == msg
-
-
-class BaseValidatorDoFnTests(unittest.TestCase):
+class BaseValidatorFnTests(unittest.TestCase):
     def setUp(self):
         self.base_validator_fn = base_model_validator.BaseValidatorDoFn()
 
@@ -168,93 +102,6 @@ class BaseModelValidatorTests(unittest.TestCase):
         self.year_ago = self.now - datetime.timedelta(weeks=52)
         self.year_later = self.now + datetime.timedelta(weeks=52)
 
-    def test_validate_deleted_reports_error_for_old_deleted_model(self):
-
-        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            test_model = MockModel(
-                id='123',
-                deleted=True,
-                created_on=self.year_ago,
-                last_updated=self.year_ago
-            )
-            pcoll = p | beam.Create([test_model])
-
-            output = (
-                pcoll
-                | beam.ParDo(
-                    base_model_validator.ValidateDeleted()))
-
-            beam_testing_util.assert_that(
-                output,
-                beam_testing_util.equal_to([
-                    errors.ModelExpiredError(test_model)
-                ])
-            )
-
-    def test_validate_model_time_field_check(self):
-        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            test_model = MockModel(
-                id='123',
-                created_on=self.now,
-                last_updated=self.year_ago
-            )
-            pcoll = p | beam.Create([test_model])
-
-            output = (
-                pcoll
-                | beam.ParDo(
-                    base_model_validator.ValidateModelTimeFields()))
-
-            beam_testing_util.assert_that(
-                output,
-                beam_testing_util.equal_to([
-                    errors.ModelTimestampRelationshipError(test_model)
-                ])
-            )
-
-    def test_validate_model_current_time_check(self):
-        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            test_model = MockModel(
-                id='124',
-                created_on=self.now,
-                last_updated=self.year_later
-            )
-            pcoll = p | beam.Create([test_model])
-
-            output = (
-                pcoll
-                | beam.ParDo(
-                    base_model_validator.ValidateModelTimeFields()))
-
-            beam_testing_util.assert_that(
-                output,
-                beam_testing_util.equal_to([
-                    errors.ModelMutatedDuringJobError(test_model)
-                ])
-            )
-
-    def test_validate_model_id(self):
-        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            test_model = MockModel(
-                id='123@?!*',
-                created_on=self.year_ago,
-                last_updated=self.now
-            )
-            pcoll = p | beam.Create([test_model])
-
-            output = (
-                pcoll
-                | beam.ParDo(
-                    base_model_validator.ValidateModelIdWithRegex(
-                        '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH)))
-
-            beam_testing_util.assert_that(
-                output,
-                beam_testing_util.equal_to([
-                    errors.ModelInvalidIdError(test_model)
-                ])
-            )
-
     def test_base_model_validator_ptransform(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             invalid_id = MockModel(
@@ -263,13 +110,13 @@ class BaseModelValidatorTests(unittest.TestCase):
                 created_on=self.year_ago,
                 last_updated=self.now
             )
-            invalid_time_check = MockModel(
+            invalid_timestamp = MockModel(
                 id='124',
                 deleted=False,
                 created_on=self.now,
                 last_updated=self.year_later
             )
-            stale_deletion = MockModel(
+            expired_model = MockModel(
                 id='123',
                 deleted=True,
                 created_on=self.year_ago,
@@ -284,7 +131,7 @@ class BaseModelValidatorTests(unittest.TestCase):
             pcoll = (
                 p
                 | beam.Create([
-                    invalid_id, invalid_time_check, stale_deletion, valid_model
+                    invalid_id, invalid_timestamp, expired_model, valid_model
                 ])
             )
 
@@ -294,7 +141,99 @@ class BaseModelValidatorTests(unittest.TestCase):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelInvalidIdError(invalid_id),
-                    errors.ModelMutatedDuringJobError(invalid_time_check),
-                    errors.ModelExpiredError(stale_deletion)
+                    errors.ModelMutatedDuringJobError(invalid_timestamp),
+                    errors.ModelExpiredError(expired_model)
                 ]),
+            )
+
+
+class ValidateDeletedTests(BaseModelValidatorTests):
+    def test_process_reports_error_for_old_deleted_model(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            expired_model = MockModel(
+                id='123',
+                deleted=True,
+                created_on=self.year_ago,
+                last_updated=self.year_ago
+            )
+            pcoll = p | beam.Create([expired_model])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateDeleted()))
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelExpiredError(expired_model)
+                ])
+            )
+
+
+class ValidateModelTimeFieldTests(BaseModelValidatorTests):
+    def test_process_reports_model_timestamp_relationship_error(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_timestamp = MockModel(
+                id='123',
+                created_on=self.now,
+                last_updated=self.year_ago
+            )
+            pcoll = p | beam.Create([invalid_timestamp])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateModelTimeFields()))
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelTimestampRelationshipError(invalid_timestamp)
+                ])
+            )
+
+    def test_process_reports_model_mutated_during_job_error(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_timestamp = MockModel(
+                id='124',
+                created_on=self.now,
+                last_updated=self.year_later
+            )
+            pcoll = p | beam.Create([invalid_timestamp])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateModelTimeFields()))
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelMutatedDuringJobError(invalid_timestamp)
+                ])
+            )
+
+
+class ValidateModelIdTests(BaseModelValidatorTests):
+    def test_validate_model_id(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_id_model = MockModel(
+                id='123@?!*',
+                created_on=self.year_ago,
+                last_updated=self.now
+            )
+            pcoll = p | beam.Create([invalid_id_model])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateModelIdWithRegex(
+                        '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH)))
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelInvalidIdError(invalid_id_model)
+                ])
             )

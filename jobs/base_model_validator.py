@@ -35,7 +35,7 @@ datastore_services = models.Registry.import_datastore_services()
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
-class BaseValidatorDoFn(beam.DoFn):
+class BaseValidator(beam.DoFn):
     """"Base DoFn for model validations."""
 
     def clone_model(self, model, **new_values):
@@ -61,7 +61,7 @@ class BaseValidatorDoFn(beam.DoFn):
         return cls(id=model.id, **props)
 
 
-class ValidateModelIdWithRegex(BaseValidatorDoFn):
+class ValidateModelIdWithRegex(BaseValidator):
     """DoFn to validate model ids against a given regex string."""
 
     def __init__(self, regex_string):
@@ -73,72 +73,69 @@ class ValidateModelIdWithRegex(BaseValidatorDoFn):
         super(ValidateModelIdWithRegex, self).__init__()
         self.regex = re.compile(regex_string)
 
-    def process(self, model):
+    def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
         models.
 
         Args:
-            model: datastore_services.Model. Entity to validate.
+            input_model: datastore_services.Model. Entity to validate.
 
         Yields:
-            beam.pvalue.TaggedOutput. An element of the output PCollection for
-            the doFn which represents an error as a key value pair.
+            ModelInvalidIdError. An error class for models with invalid IDs.
         """
-        element = self.clone_model(model)
+        model = self.clone_model(input_model)
 
-        if not self.regex.match(element.id):
-            yield errors.ModelInvalidIdError(element)
+        if not self.regex.match(model.id):
+            yield errors.ModelInvalidIdError(model)
 
 
-class ValidateDeleted(BaseValidatorDoFn):
+class ValidateDeleted(BaseValidator):
     """DoFn to check whether models marked for deletion are stale."""
 
-    def process(self, model):
+    def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
         models.
 
         Args:
-            model: datastore_services.Model. Entity to validate.
+            input_model: datastore_services.Model. Entity to validate.
 
         Yields:
-            beam.pvalue.TaggedOutput. An element of the output PCollection for
-            the doFn which represents an error as a key value pair.
+            ModelExpiredError. An error class for expired models.
         """
-        element = self.clone_model(model)
+        model = self.clone_model(input_model)
         date_now = datetime.datetime.utcnow()
 
-        date_before_which_models_should_be_deleted = (
+        expiration_date = (
             date_now -
-            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
-        )
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
-        if element.last_updated < date_before_which_models_should_be_deleted:
-            yield errors.ModelExpiredError(element)
+        if model.last_updated < expiration_date:
+            yield errors.ModelExpiredError(model)
 
 
-class ValidateModelTimeFields(BaseValidatorDoFn):
+class ValidateModelTimeFields(BaseValidator):
     """DoFn to check whether created_on and last_updated timestamps are
     valid."""
 
-    def process(self, model):
+    def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
         models.
 
         Args:
-            model: datastore_services.Model. Entity to validate.
+            input_model: datastore_services.Model. Entity to validate.
 
         Yields:
-            beam.pvalue.TaggedOutput. An element of the output PCollection for
-            the doFn which represents an error as a key value pair.
+            ModelMutatedDuringJobError. Error for timestamp validation.
+            ModelTimestampRelationshipError. Error for timestamp validation.
         """
 
-        element = self.clone_model(model)
-        if element.created_on > (element.last_updated + MAX_CLOCK_SKEW_SECS):
-            yield errors.ModelTimestampRelationshipError(element)
+        model = self.clone_model(input_model)
+        if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
+            yield errors.ModelTimestampRelationshipError(model)
 
         current_datetime = datetime.datetime.utcnow()
-        if (element.last_updated + MAX_CLOCK_SKEW_SECS) > current_datetime:
-            yield errors.ModelMutatedDuringJobError(element)
+        if (model.last_updated - MAX_CLOCK_SKEW_SECS) > current_datetime:
+            yield errors.ModelMutatedDuringJobError(model)
 
 
 class BaseModelValidator(beam.PTransform):
@@ -156,32 +153,29 @@ class BaseModelValidator(beam.PTransform):
             beam.PCollection. A collection of errors represented as
             key-value pairs.
         """
-        not_deleted, deleted = (
+        deleted, not_deleted = (
             model_pipe
             | beam.Map(
                 lambda m: beam.pvalue.TaggedOutput(
                     'deleted' if m.deleted else 'not_deleted', m))
-            .with_outputs('not_deleted', 'deleted'))
+            .with_outputs('deleted', 'not_deleted'))
 
         deletion_errors = deleted | beam.ParDo(ValidateDeleted())
 
         time_field_validation_errors = (
-            not_deleted
-            | beam.ParDo(
-                ValidateModelTimeFields()))
+            not_deleted | beam.ParDo(ValidateModelTimeFields()))
 
         model_id_validation_errors = (
             not_deleted
             | beam.ParDo(
                 ValidateModelIdWithRegex(self._get_model_id_regex())))
 
-        merged = ((
-            deletion_errors,
-            time_field_validation_errors,
-            model_id_validation_errors)
-                  | beam.Flatten())
-
-        return merged
+        return (
+            (
+                deletion_errors,
+                time_field_validation_errors,
+                model_id_validation_errors)
+            | beam.Flatten())
 
     def _get_model_id_regex(self):
         """Returns a regex for model id.
