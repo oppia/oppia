@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-extensions.module';
 import { ContinueExtensionsModule } from './Continue/continue-extensions.module';
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 
@@ -29,12 +30,14 @@ import { FractionInputInteractionModule } from './FractionInput/fraction-input-i
   imports: [
     CommonModule,
     BrowserModule,
+    AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
   exports: [
+    AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule
   ],
