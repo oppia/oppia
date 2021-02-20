@@ -412,14 +412,14 @@ angular.module('oppia').directive('questionsList', [
           };
           ctrl.deleteQuestionFromSkill = function(
               questionId, skillDescription) {
-            //To ensure that the function is not evoked multiple times 
+            // To ensure that the function is not evoked multiple times,
             // if the user clicks the link off button multiple times.
-            if( questionId !== ctrl.questionIdDeleted){
-              ctrl.questionIdDeleted = questionId
+            if (questionId !== ctrl.questionIdDeleted) {
+              ctrl.questionIdDeleted = questionId;
               if (!ctrl.canEditQuestion()) {
                 AlertsService.addWarning(
                   'User does not have enough rights to delete the question');
-                  ctrl.questionIdDeleted='xyz';
+                ctrl.questionIdDeleted = 'xyz';
                 return;
               }
               _reInitializeSelectedSkillIds();
@@ -612,7 +612,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;
-            ctrl.questionIdDeleted= 'yyyy';
+            ctrl.questionIdDeleted = 'yyyy';
             // The _initTab function is written separately since it is also
             // called in subscription when some external events are triggered.
             _initTab(true);
