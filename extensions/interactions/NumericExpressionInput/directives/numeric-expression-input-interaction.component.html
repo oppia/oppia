@@ -4,15 +4,17 @@
   <[$ctrl.warningText]>
 </div>
 <!--
-  Guppy enforces the 'white-space', 'height' and 'width' styles causing the
-  non-responsive behaviour. The changes listed below present a plausible
-  solution for the problem, even though it may not agree with the principles
-  of design for this project. !important overrides the properties of
-  'white-space','height' and 'width' which are given by Guppy, thus making the
-  text contained within the box. The overridden 'height' property prevents
-  text overflowing out of the textbox vertically. The overriden 'white-space'
-  and 'width' property prevent text overflowing out of the textbox
-  horizontally. Again, specificity overrides are done with !important.
+  Guppy enforces the 'white-space', 'height' and 'width' styles through their
+  predefined styles causing the non-responsive behaviour. This is being
+  supposedly done in the default Guppy CSS file that Guppy uses.
+  The changes done to the main Guppy template overwrites the default CSS that
+  Guppy provides. The customized styles are necessary to override what Guppy
+  assigns to the classes with the help of !important. Testing shows that
+  application of styles without !important doesn't work as the Guppy assigned
+  styles seem to override those. Only the application of !important to the
+  new styles defined in the main Guppy document seems to work here. It only
+  makes sense to go against the design principles for this change as there 
+  does not seem to be another more intuitive way of doing this.
 -->
 <style>
   .guppy-div-learner {
@@ -20,14 +22,4 @@
     width: 100%;
   }
 
-  .base {
-    white-space: pre-wrap !important;
-    width: 100% !important;
-  }
-
-  .mord {
-    display: inline-block;
-    hyphens: auto;
-    white-space: pre-wrap !important;
-  }
 </style>
