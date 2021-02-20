@@ -4812,6 +4812,10 @@ export default {
     "description": "हिन्दी (Hindi)",
     "direction": "ltr"
   }, {
+    "code": "hi-en",
+    "description": "Hinglish",
+    "direction": "ltr"
+  }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
     "direction": "ltr"
@@ -5279,12 +5283,13 @@ export default {
     ]
   }],
 
-  "REVIEW_CATEGORY_TRANSLATION": "translation",
-  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
-  "REVIEW_CATEGORY_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION": "submit_question",
 
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
-  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
   "USER_FILTER_CRITERION_USERNAME": "username",
   "USER_FILTER_CRITERION_ROLE": "role",
 
@@ -5433,6 +5438,8 @@ export default {
   // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
+
+  "FIREBASE_AUTH_ENABLED": false,
 
   // Data required for Firebase authentication.
   //

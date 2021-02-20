@@ -1912,13 +1912,7 @@ class UserQueryModel(base_models.BaseModel):
         datastore_services.StringProperty(default=None, indexed=True))
     # Current status of the query.
     query_status = datastore_services.StringProperty(
-        indexed=True,
-        choices=[
-            feconf.USER_QUERY_STATUS_PROCESSING,
-            feconf.USER_QUERY_STATUS_COMPLETED,
-            feconf.USER_QUERY_STATUS_ARCHIVED,
-            feconf.USER_QUERY_STATUS_FAILED
-        ])
+        indexed=True, choices=feconf.ALLOWED_USER_QUERY_STATUSES)
 
     @staticmethod
     def get_deletion_policy():
@@ -2366,6 +2360,8 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_review_voiceover_for_language_codes = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     can_review_questions = datastore_services.BooleanProperty(indexed=True)
+    can_submit_questions = datastore_services.BooleanProperty(
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -2414,7 +2410,8 @@ class UserContributionRightsModel(base_models.BaseModel):
                 rights_model.can_review_translation_for_language_codes),
             'can_review_voiceover_for_language_codes': (
                 rights_model.can_review_voiceover_for_language_codes),
-            'can_review_questions': rights_model.can_review_questions
+            'can_review_questions': rights_model.can_review_questions,
+            'can_submit_questions': rights_model.can_submit_questions
         }
 
     @staticmethod
@@ -2430,7 +2427,8 @@ class UserContributionRightsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'can_review_voiceover_for_language_codes':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'can_review_questions': base_models.EXPORT_POLICY.EXPORTED
+            'can_review_questions': base_models.EXPORT_POLICY.EXPORTED,
+            'can_submit_questions': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -2480,6 +2478,18 @@ class UserContributionRightsModel(base_models.BaseModel):
         reviewer_keys = cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
             keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+    @classmethod
+    def get_question_submitter_user_ids(cls):
+        """Returns the IDs of the users who have rights to submit questions.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to submit
+            questions.
+        """
+        contributor_keys = cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
+            keys_only=True)
+        return [contributor_key.id() for contributor_key in contributor_keys]
 
 
 class PendingDeletionRequestModel(base_models.BaseModel):

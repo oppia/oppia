@@ -274,7 +274,26 @@
           width: 100vw;
           z-index: -1;
         }
-    }
+      }
+      @media (max-width: 768px) {
+        .navbar-brand {
+          display: none;
+        }
+
+        .oppia-navbar-brand-name.d-none {
+          /* !important is necessary otherwise d-none class of base components is not overwritten(!important
+          is being used there). */
+          display: flex !important;
+        }
+        .float-left {
+          margin-left: 40%;
+        }
+      }
+      @media (max-width: 500px) {
+        .float-left {
+        margin-left: 30%;
+        }
+      }
     </style>
   </head>
   <body>
