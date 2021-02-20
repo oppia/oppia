@@ -39,7 +39,13 @@ class MockModel(base_models.BaseModel):
 
 
 class MockNonAutoLastUpdatedModel(base_models.BaseModel):
-    last_updated = datastore_services.DateTimeProperty(indexed=True)
+    created_on = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
+
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage."""
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
 
 
 class MockSnapshotModel(base_models.BaseModel):
