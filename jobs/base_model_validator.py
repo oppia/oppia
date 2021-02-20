@@ -25,7 +25,6 @@ import apache_beam as beam
 from core.domain import cron_services
 from core.platform import models
 from jobs import base_model_validator_errors as errors
-import python_utils
 
 
 (base_models, user_models) = models.Registry.import_models(
@@ -36,6 +35,7 @@ MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
 class BaseValidatorDoFn(beam.DoFn):
+    """"Base DoFn for model validations."""
     def clone(self, model, **new_values):
         """Clones the entity, adding or overriding constructor attributes.
 
@@ -111,9 +111,6 @@ class ValidateDeleted(BaseValidatorDoFn):
             cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
         )
 
-        period_to_hard_delete_models_in_days = (
-            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
-
         if element.last_updated < date_before_which_models_should_be_deleted:
             yield errors.StaleDeletedModelValidationError(element)
 
@@ -160,7 +157,7 @@ class BaseModelValidator(beam.PTransform):
         """
         not_deleted, deleted = (model_pipe | beam.Map(
             self._check_deletion_status)
-            .with_outputs('not_deleted', 'deleted'))
+                                .with_outputs('not_deleted', 'deleted'))
 
         deletion_errors = deleted | beam.ParDo(ValidateDeleted())
 
@@ -174,7 +171,7 @@ class BaseModelValidator(beam.PTransform):
             deletion_errors,
             time_field_validation_errors,
             model_id_validation_errors)
-            | beam.Flatten())
+                  | beam.Flatten())
 
         return merged
 
@@ -190,12 +187,10 @@ class BaseModelValidator(beam.PTransform):
         """Function that splits model PCollection based on deletion status.
 
         Args:
-          model: datastore_services.Model. Entity to validate.
+            model: datastore_services.Model. Entity to validate.
 
         Returns:
-            beam.pvalue.TaggedOutput: A model which element of the output
-            PCollection for the doFn.
-        """
+            beam.pvalue.TaggedOutput: An element of the output PCollection.
 
         if not model.deleted:
             return beam.pvalue.TaggedOutput('not_deleted', model)

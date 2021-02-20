@@ -13,15 +13,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import cron_services
+import python_utils
 
-period_to_hard_delete_models_in_days = (
+PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS = (
     cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
 
 
-class ModelValidationError(object):
-
+class ModelValidationError(Lpython_utils.OBJECT.):
+    """Base error class for model validations."""
     @property
     def key(self):
         return self.__class__.__name__
@@ -46,6 +49,7 @@ class ModelValidationError(object):
 
 
 class TimeFieldModelValidationError(ModelValidationError):
+    """Error class for time field model validation errors."""
     def __init__(self, model):
         self._message = (
             'Entity ID %s: The created_on field has a value %s which '
@@ -58,6 +62,7 @@ class TimeFieldModelValidationError(ModelValidationError):
 
 
 class CurrentTimeModelValidationError(ModelValidationError):
+    """Error class for current time model validation errors."""
     def __init__(self, model):
         self._message = (
             'Entity id %s: The last_updated field has a value %s which '
@@ -70,6 +75,7 @@ class CurrentTimeModelValidationError(ModelValidationError):
 
 
 class IdModelValidationError(ModelValidationError):
+    """Error class for id model validation errors."""
     def __init__(self, model):
         self._message = (
             'Entity id %s: Entity id does not match regex pattern' % (
@@ -81,10 +87,11 @@ class IdModelValidationError(ModelValidationError):
 
 
 class StaleDeletedModelValidationError(ModelValidationError):
+    """Error class for stale deletion validation errors."""
     def __init__(self, model):
         self._message = (
             'Entity id %s: model marked as deleted is older than %s days'
-            % (model.id, period_to_hard_delete_models_in_days))
+            % (model.id, PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
 
     @property
     def message(self):
