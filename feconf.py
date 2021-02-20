@@ -829,6 +829,7 @@ SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -936,6 +937,13 @@ USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
 USER_QUERY_STATUS_FAILED = 'failed'
+
+ALLOWED_USER_QUERY_STATUSES = (
+    USER_QUERY_STATUS_PROCESSING,
+    USER_QUERY_STATUS_COMPLETED,
+    USER_QUERY_STATUS_ARCHIVED,
+    USER_QUERY_STATUS_FAILED
+)
 
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
@@ -1264,6 +1272,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
 USER_ID_REGEX = r'uid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
+PSEUDONYMOUS_ID_REGEX = r'pid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
 
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5

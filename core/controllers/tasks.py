@@ -47,7 +47,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             # Model may not exist if user has already attended to the feedback.
             return
 
-        feedback_services.update_feedback_email_retries(user_id)
+        feedback_services.update_feedback_email_retries_transactional(user_id)
 
         messages = {}
         for reference in references:
@@ -70,7 +70,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
                 }
 
         email_manager.send_feedback_message_email(user_id, messages)
-        feedback_services.pop_feedback_message_references(
+        feedback_services.pop_feedback_message_references_transactional(
             user_id, len(references))
         self.render_json({})
 

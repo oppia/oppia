@@ -222,17 +222,17 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionreviewerhandler',
-        admin.AddContributionReviewerHandler),
+        r'/addcontributionrightshandler',
+        admin.AddContributionRightsHandler),
     get_redirect_route(
-        r'/removecontributionreviewerhandler',
-        admin.RemoveContributionReviewerHandler),
+        r'/removecontributionrightshandler',
+        admin.RemoveContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributionreviewershandler',
-        admin.ContributionReviewersListHandler),
+        r'/getcontributorusershandler',
+        admin.ContributorUsersListHandler),
     get_redirect_route(
-        r'/contributionreviewerrightsdatahandler',
-        admin.ContributionReviewerRightsDataHandler),
+        r'/contributionrightsdatahandler',
+        admin.ContributionRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
@@ -323,6 +323,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
+        skill_editor.SkillDescriptionHandler),
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),

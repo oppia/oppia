@@ -32,6 +32,8 @@
     }
   },
   "files": [
+    "core/templates/domain/admin/computation-data.model.ts",
+    "core/templates/domain/admin/computation-data.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
@@ -56,6 +58,8 @@
     "core/templates/domain/opportunity/featured-translation-language.model.spec.ts",
     "core/templates/domain/skill/assigned-skill.model.ts",
     "core/templates/domain/skill/assigned-skill.model.spec.ts",
+    "core/templates/domain/skill/augmented-skill-summary.model.ts",
+    "core/templates/domain/skill/augmented-skill-summary.model.spec.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.spec.ts",
     "core/templates/domain/utilities/audio-file.model.ts",

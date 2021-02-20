@@ -26,6 +26,8 @@ import python_utils
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
+
+from .. import build
 from .. import common
 from .. import concurrent_task_utils
 
@@ -368,13 +370,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'datetime.datetime.now\(\)'),
-        'message': 'Please use datetime.datetime.utcnow() instead of '
-                   'datetime.datetime.now().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'ndb\.'),
         'message': (
             'Please use datastore_services instead of ndb, for example:\n'
@@ -395,39 +390,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
-        'regexp': re.compile(r'\sprint\('),
-        'message': 'Please use python_utils.PRINT().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'# pylint:\s*disable=[A-Z][0-9]{4}'),
         'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
                    'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'self.assertEquals\('),
-        'message': 'Please do not use self.assertEquals method. ' +
-                   'This method has been deprecated. Instead use ' +
-                   'self.assertEqual method.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'with open\(|= open\('),
-        'message': 'Please use python_utils.open_file() instead of open().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'StringIO'),
-        'message': 'Please use python_utils.string_io() instead of ' +
-                   'import StringIO.',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
@@ -461,63 +429,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'urlsplit'),
-        'message': 'Please use python_utils.url_split().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urlparse'),
-        'message': 'Please use python_utils.url_parse().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urlunsplit'),
-        'message': 'Please use python_utils.url_unsplit().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'parse_qs'),
-        'message': 'Please use python_utils.parse_query_string().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wunquote\('),
-        'message': 'Please use python_utils.urllib_unquote().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urljoin'),
-        'message': 'Please use python_utils.url_join().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w]input\('),
-        'message': 'Please use python_utils.INPUT.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w|\s]map\('),
-        'message': 'Please use python_utils.MAP.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wnext\('),
-        'message': 'Please use python_utils.NEXT.',
-        'excluded_files': (),
         'excluded_dirs': ()
     },
     {
@@ -527,77 +441,11 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\Wrange\('),
-        'message': 'Please use python_utils.RANGE.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wround\('),
-        'message': 'Please use python_utils.ROUND.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wstr\('),
-        'message': (
-            'Please try to use python_utils.convert_to_bytes() for the strings '
-            'used in webapp2\'s built-in methods or for strings used directly '
-            'in NDB datastore models. If you need to cast ints/floats to '
-            'strings, please use python_utils.UNICODE() instead.'),
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wzip\('),
-        'message': 'Please use python_utils.ZIP.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'basestring'),
-        'message': 'Please use python_utils.BASESTRING.',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'__metaclass__'),
         'message': 'Please use python_utils.with_metaclass().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
-    {
-        'regexp': re.compile(r'iteritems'),
-        'message': 'Please use items() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'itervalues'),
-        'message': 'Please use values() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'iterkeys'),
-        'message': 'Please use keys() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\.put_async\('),
-        'message': (
-            'Please use put() instead.'),
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\.put_multi_async\('),
-        'message': (
-            'Please use put_multi() instead.'),
-        'excluded_files': (),
-        'excluded_dirs': ()
-    }
 ]
 
 BAD_PATTERNS_MAP = {
@@ -868,6 +716,39 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        build.JS_FILEPATHS_NOT_TO_BUILD.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
+        """
+        name = 'Extra JS files'
+        error_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+
+        for filepath in files_to_lint:
+            if (filepath.endswith(('.js')) and
+                    filepath.startswith(('core/templates', 'extensions')) and
+                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD and
+                    not filepath.endswith('protractor.js')):
+                error_message = (
+                    '%s  --> Found extra .js file' % filepath)
+                error_messages.append(error_message)
+                failed = True
+
+        if failed:
+            err_msg = (
+                'If you want the above files to be present as js files, '
+                'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                'build.py. Otherwise, rename them to .ts')
+            error_messages.append(err_msg)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -883,7 +764,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     ['There are no files to be checked.'])]
         task_results = [
             self.check_mandatory_patterns(), self.check_bad_patterns(),
-            self.check_newline_at_eof()]
+            self.check_newline_at_eof(), self.check_extra_js_files()]
         return task_results
 
 

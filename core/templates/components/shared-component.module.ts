@@ -49,7 +49,7 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfilePictureComponent } from 'components/common-layout-directives/common-elements/profile-picture.component';
@@ -62,20 +62,31 @@ import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates
 import { AuthService } from 'services/auth.service';
 
 
+// TODO(#11462): Delete these conditional values once firebase auth is launched.
+const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireModule.initializeApp(AuthService.firebaseConfig),
+  AngularFireAuthModule,
+] : [];
+
+const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireAuth,
+  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+] : [
+  {provide: AngularFireAuth, useValue: null},
+];
+
+
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
-    NgbModalModule,
     BrowserModule,
+    NgbTooltipModule,
     FormsModule,
-    AngularFireModule.initializeApp(AuthService.firebaseConfig),
-    AngularFireAuthModule,
+    ...firebaseAuthModules,
   ],
 
   providers: [
-    AngularFireAuth,
-    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+    ...firebaseAuthProviders,
   ],
 
   declarations: [
@@ -123,6 +134,7 @@ import { AuthService } from 'services/auth.service';
     // Modules.
     FormsModule,
     MaterialModule,
+    NgbTooltipModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,

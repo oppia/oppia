@@ -337,6 +337,10 @@ class NewSkillHandler(base.BaseHandler):
 
         skill_domain.Skill.require_valid_description(description)
 
+        if skill_services.does_skill_with_description_exist(description):
+            raise self.InvalidInputException(
+                'Skill description should not be a duplicate.')
+
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 
@@ -397,6 +401,8 @@ class MergeSkillHandler(base.BaseHandler):
                 Exception('The old skill with the given id doesn\'t exist.'))
         question_services.replace_skill_id_for_all_questions(
             old_skill_id, old_skill.description, new_skill_id)
+        skill_services.replace_skill_id_in_all_topics(
+            self.user_id, old_skill_id, new_skill_id)
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,

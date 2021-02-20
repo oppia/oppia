@@ -158,6 +158,25 @@ COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
 # will be identical.
 REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 
+DIRS_TO_ADD_TO_SYS_PATH = [
+    GOOGLE_APP_ENGINE_SDK_HOME,
+    PYLINT_PATH,
+
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
+    PSUTIL_DIR,
+    os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
+    CURR_DIR,
+    THIRD_PARTY_PYTHON_LIBS_DIR
+]
+
 
 def is_windows_os():
     """Check if the running system is Windows."""
@@ -830,8 +849,8 @@ def managed_process(
         for proc in procs_to_kill:
             if proc.is_running():
                 procs_still_alive.append(proc)
-                proc.terminate()
                 logging.info('Terminating %s...' % get_debug_info(proc))
+                proc.terminate()
             else:
                 logging.info('%s has ended.' % get_debug_info(proc))
 
@@ -840,8 +859,8 @@ def managed_process(
         for proc in procs_gone:
             logging.info('%s has ended.' % get_debug_info(proc))
         for proc in procs_still_alive:
-            proc.kill()
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
+            proc.kill()
 
         if proc_name_to_kill is not None:
             python_utils.PRINT(
@@ -851,8 +870,8 @@ def managed_process(
                     proc_name_to_kill in cmd_part
                     for cmd_part in proc.cmdline())
                 if proc_should_be_killed:
-                    proc.kill()
                     logging.warn('Forced to kill %s!' % get_debug_info(proc))
+                    proc.kill()
 
 
 @contextlib.contextmanager
