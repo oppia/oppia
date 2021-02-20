@@ -28,9 +28,10 @@ describe('AlgebraicExpressionInputInteractive', () => {
   let component: AlgebraicExpressionInputInteractionComponent;
   let fixture: ComponentFixture<AlgebraicExpressionInputInteractionComponent>;
   let windowRef: WindowRef;
-  let guppyInitializationService = null;
-  let deviceInfoService = null;
+  let guppyInitializationService: GuppyInitializationService;
+  let deviceInfoService: DeviceInfoService;
   let mockGuppyObject = {
+    divId: '1',
     guppyInstance: {
       asciimath: function() {
         return 'Dummy value';
