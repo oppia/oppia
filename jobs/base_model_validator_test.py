@@ -74,8 +74,7 @@ class BaseModelValidatorTests(unittest.TestCase):
                 p
                 | beam.Create([
                     invalid_id, invalid_timestamp, expired_model, valid_model
-                ])
-            )
+                ]))
 
             output = pcoll | base_model_validator.BaseModelValidator()
 
@@ -85,7 +84,7 @@ class BaseModelValidatorTests(unittest.TestCase):
                     errors.ModelInvalidIdError(invalid_id),
                     errors.ModelMutatedDuringJobError(invalid_timestamp),
                     errors.ModelExpiredError(expired_model)
-            ]))
+                ]))
 
 
 class ValidateDeletedTests(BaseModelValidatorTests):
@@ -107,7 +106,7 @@ class ValidateDeletedTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelExpiredError(expired_model)
-            ]))
+                ]))
 
 
 class ValidateModelTimeFieldTests(BaseModelValidatorTests):
@@ -128,7 +127,7 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelTimestampRelationshipError(invalid_timestamp)
-            ]))
+                ]))
 
     def test_process_reports_model_mutated_during_job_error(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
@@ -147,7 +146,7 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelMutatedDuringJobError(invalid_timestamp)
-            ]))
+                ]))
 
 
 class ValidateModelIdTests(BaseModelValidatorTests):
@@ -169,4 +168,4 @@ class ValidateModelIdTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelInvalidIdError(invalid_id_model)
-            ]))
+                ]))
