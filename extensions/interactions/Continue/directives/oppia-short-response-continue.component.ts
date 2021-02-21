@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,26 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the AlgebraicExpressionInput short response.
+ * @fileoverview Directive for the Continue button short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Component({
-  selector: 'oppia-short-response-algebraic-expression-input',
-  templateUrl: './algebraic-expression-input-response.component.html',
+  selector: 'oppia-short-response-continue',
+  templateUrl: './continue-short-response.component.html',
   styleUrls: []
 })
-export class ShortResponseAlgebraicExpressionInputComponent implements OnInit {
-  @Input() answer: string = '';
+export class OppiaShortResponseContinueComponent implements OnInit {
+  @Input() answer: string;
   escapedAnswer: string = '';
 
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor(private readonly htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     this.escapedAnswer = (
@@ -41,6 +42,8 @@ export class ShortResponseAlgebraicExpressionInputComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseAlgebraicExpressionInput', downgradeComponent({
-    component: ShortResponseAlgebraicExpressionInputComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaShortResponseContinue',
+  downgradeComponent(
+    {
+      component: OppiaShortResponseContinueComponent
+    }) as angular.IDirectiveFactory);
