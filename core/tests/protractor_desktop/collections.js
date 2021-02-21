@@ -58,48 +58,59 @@ describe('Collections', function() {
 
     await users.login('creator@explorations.com');
     // Create four test explorations.
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       'First Exploration',
       'Languages',
-      'First Test Exploration.'
+      'First Test Exploration.',
+      true
     );
     firstExplorationId = await general.getExplorationIdFromEditor();
-
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Second Exploration',
       'Languages',
-      'Second Test Exploration.'
+      'Second Test Exploration.',
+      false
     );
     secondExplorationId = await general.getExplorationIdFromEditor();
-
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Third Exploration',
       'Languages',
-      'Third Test Exploration.'
+      'Third Test Exploration.',
+      false
     );
     thirdExplorationId = await general.getExplorationIdFromEditor();
-
+    //expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Fourth Exploration',
       'Languages',
-      'Fourth Test Exploration.'
+      'Fourth Test Exploration.',
+      false
     );
     fourthExplorationId = await general.getExplorationIdFromEditor();
     // Create searchable explorations.
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'The Lazy Magician for CollectionSuiteTest',
       'Algorithms',
-      'discover the binary search algorithm'
+      'discover the binary search algorithm',
+      false
     );
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
-      'discover the Root Linear Coefficient Theorem'
+      'discover the Root Linear Coefficient Theorem',
+      false
     );
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Test Exploration for CollectionSuiteTest',
       'Languages',
-      'discover the Protractor Testing'
+      'discover the Protractor Testing',
+      false
     );
     await users.logout();
     await users.login('player@collections.com');

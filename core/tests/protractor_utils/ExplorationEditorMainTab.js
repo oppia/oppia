@@ -152,14 +152,9 @@ var ExplorationEditorMainTab = function() {
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
-    // If the editor welcome modal shows up, exit it.
-    var isVisible = await editorWelcomeModal.isPresent();
-
-    if (isVisible) {
-      await action.click(
-        'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
-    }
-
+    // Exit the welcome modal
+    await action.click(
+      'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
     await waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 

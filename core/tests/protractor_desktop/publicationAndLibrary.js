@@ -76,16 +76,25 @@ describe('Library index page', function() {
       'earendil@publicationAndLibrary.com', 'earendilPublicationAndLibrary');
 
     await users.login('feanor@publicationAndLibrary.com');
-
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
-      EXPLORATION_SILMARILS, CATEGORY_ARCHITECTURE,
-      'hold the light of the two trees', LANGUAGE_DEUTSCH);
+      EXPLORATION_SILMARILS,
+      CATEGORY_ARCHITECTURE,
+      'hold the light of the two trees',
+      LANGUAGE_DEUTSCH,
+      true
+      );
 
     await users.logout();
-
+    // expectWelcomeModal: true
     await users.login('earendil@publicationAndLibrary.com');
     await workflow.createAndPublishExploration(
-      EXPLORATION_VINGILOT, CATEGORY_BUSINESS, 'seek the aid of the Valar');
+      EXPLORATION_VINGILOT,
+      CATEGORY_BUSINESS,
+      'seek the aid of the Valar',
+      LANGUAGE_DEUTSCH,
+      true
+      );
     await users.logout();
 
     await users.login('varda@publicationAndLibrary.com');
@@ -100,7 +109,8 @@ describe('Library index page', function() {
     await users.logout();
 
     await users.login('celebrimor@publicationAndLibrary.com');
-    await workflow.createExploration();
+    // expectWelcomeModal: true
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Celebrimbor wrote this'));
     await explorationEditorMainTab.setInteraction('EndExploration');
@@ -196,11 +206,22 @@ describe('Library index page', function() {
     await users.createUser('aule@example.com', 'Aule');
 
     await users.login('aule@example.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
-      EXPLORATION_SILMARILS, CATEGORY_BUSINESS,
-      'hold the light of the two trees', LANGUAGE_FRANCAIS);
+      EXPLORATION_SILMARILS,
+      CATEGORY_BUSINESS,
+      'hold the light of the two trees',
+      LANGUAGE_FRANCAIS,
+      true
+      );
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
-      EXPLORATION_VINGILOT, CATEGORY_ENVIRONMENT, 'seek the aid of the Valar');
+      EXPLORATION_VINGILOT,
+      CATEGORY_ENVIRONMENT,
+      'seek the aid of the Valar',
+      LANGUAGE_FRANCAIS,
+      false
+      );
     await users.logout();
 
     await libraryPage.get();
@@ -234,7 +255,8 @@ describe('Permissions for private explorations', function() {
     async function() {
       await users.createUser('checkFor@title.com', 'Thanos');
       await users.login('checkFor@title.com');
-      await workflow.createExploration();
+      // expectWelcomeModal: true
+      await workflow.createExploration(true);
       await explorationEditorPage.navigateToSettingsTab();
 
       await workflow.openEditRolesForm();
@@ -253,7 +275,8 @@ describe('Permissions for private explorations', function() {
     await users.createUser('eve@privileges.com', 'evePrivileges');
 
     await users.login('alice@privileges.com');
-    await workflow.createExploration();
+    // expectWelcomeModal: true
+    await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('CollaboratorPermissions');
     await workflow.addExplorationCollaborator('bobPrivileges');
@@ -285,7 +308,8 @@ describe('Permissions for private explorations', function() {
     await users.createUser('guestUser@oppia.tests', 'guestUser');
 
     await users.login('expOwner@oppia.tests');
-    await workflow.createExploration();
+    // expectWelcomeModal: true
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 1'));
     await explorationEditorPage.saveChanges('Added content to first card.');

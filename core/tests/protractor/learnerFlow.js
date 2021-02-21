@@ -118,11 +118,13 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadExploration('exploration_player_test.yaml');
       } else {
+        // expectWelcomeModal: true
         await workflow.createAndPublishExploration(
           'Exploration Player Test',
           'Astronomy',
           'To test the exploration player',
-          'English'
+          'English',
+          true
         );
       }
       await users.logout();
@@ -145,11 +147,13 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadCollection(0);
       } else {
+        // expectWelcomeModal: true
         await workflow.createAndPublishExploration(
           'Demo Exploration',
           'Algebra',
           'To test collection player',
-          'English'
+          'English',
+          true
         );
         // Update the role of the user to admin since only admin users
         // can create a collection.
@@ -190,11 +194,13 @@ describe('Learner dashboard functionality', function() {
       // Create exploration 'Dummy Exploration'.
       await createDummyExplorationOnDesktop();
       // Create a second exploration named 'Test Exploration'.
+      // expectWelcomeModal: true
       await workflow.createAndPublishExploration(
         'Test Exploration',
         'Astronomy',
         'To expand the horizon of the minds!',
-        'English'
+        'English',
+        true
       );
     }
     await users.logout();
@@ -299,11 +305,13 @@ describe('Learner dashboard functionality', function() {
       // Create first exploration named 'Dummy Exploration'.
       await createDummyExplorationOnDesktop();
       // Create a second exploration named 'Collection Exploration'.
+      // expectWelcomeModal: true
       await workflow.createAndPublishExploration(
         'Collection Exploration',
         'Architect',
         'To be a part of a collection!',
-        'English'
+        'English',
+        true
       );
       // Update the role of the user to admin since only admin users
       // can create a collection.

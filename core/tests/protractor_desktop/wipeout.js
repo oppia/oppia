@@ -51,7 +51,8 @@ describe('When account is deleted it', function() {
   it('should delete private exploration', async function() {
     await users.createUser('voiceArtist@oppia.com', 'voiceArtist');
     await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
-    await workflow.createExploration();
+    // expectWelcomeModal: true
+    await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voice artists');
@@ -71,10 +72,13 @@ describe('When account is deleted it', function() {
   it('should set published exploration as community owned', async function() {
     await users.createUser('user@check.com', 'userForChecking');
     await users.createAndLoginUser('user3@delete.com', 'userToDelete3');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
-      EXPLORATION_OBJECTIVE
+      EXPLORATION_OBJECTIVE,
+      'English',
+      true
     );
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
@@ -90,7 +94,8 @@ describe('When account is deleted it', function() {
   it('should keep published exploration with other owner', async function() {
     await users.createUser('secondOwner@check.com', 'secondOwner');
     await users.createAndLoginUser('user4@delete.com', 'userToDelete4');
-    await workflow.createExploration();
+    // expectWelcomeModal: true
+    await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('second owner');

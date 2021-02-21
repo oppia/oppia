@@ -51,7 +51,8 @@ describe('Exploration translation and voiceover tab', function() {
     await users.createAndLoginAdminUser(
       'superUser@translationTab.com', 'superUser');
     await users.login('user@editorTab.com');
-    await workflow.createExploration();
+    //expectWelcomeModal:true
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(await forms.toRichText(

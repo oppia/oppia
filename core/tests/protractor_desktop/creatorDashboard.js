@@ -62,18 +62,23 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user4@creatorDashboard.com', 'learner4');
 
     await users.login('user1@creatorDashboard.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+      );
     await creatorDashboardPage.get();
-
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      false
+      );
 
     await users.login('user2@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
@@ -129,18 +134,23 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user7@creatorDashboard.com', 'learner7');
 
     await users.login('user5@creatorDashboard.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+      );
     await creatorDashboardPage.get();
-
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_4,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      false
+      );
     await users.logout();
     await users.login('user6@creatorDashboard.com');
     await libraryPage.get();
@@ -191,18 +201,23 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user10@creatorDashboard.com', 'learner10');
 
     await users.login('user8@creatorDashboard.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_5,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+      );
     await creatorDashboardPage.get();
-
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_6,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      false
+      );
     await users.logout();
     await users.login('user9@creatorDashboard.com');
     await libraryPage.get();

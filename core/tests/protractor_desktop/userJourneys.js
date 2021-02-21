@@ -118,7 +118,8 @@ describe('Site language', function() {
     await users.logout();
 
     await users.login('langCreator@explorations.com');
-    await workflow.createExploration();
+    // expectWelcomeModal: true
+    await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Language Test'));

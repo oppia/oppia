@@ -78,12 +78,15 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration.
+    // expectWelcomeModal: true
     await users.login('user1@ExplorationFeedback.com');
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+      );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -123,11 +126,14 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user3@ExplorationFeedback.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+      );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -176,11 +182,14 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user5@ExplorationFeedback.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+      );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -266,11 +275,14 @@ describe('Suggestions on Explorations', function() {
   it('should accept and reject a suggestion on a published exploration',
     async function() {
       await users.login('user1@ExplorationSuggestions.com');
+      // expectWelcomeModal: true
       await workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
-        EXPLORATION_LANGUAGE);
+        EXPLORATION_LANGUAGE,
+        true
+        );
       await users.logout();
 
       // Suggester plays the exploration and suggests a change.

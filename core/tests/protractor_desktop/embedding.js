@@ -151,7 +151,8 @@ describe('Embedding', function() {
 
     // Create exploration.
     // Version 1 is creation of the exploration.
-    await workflow.createExploration();
+    //expectWelcomeModal: true
+    await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     // Create Version 2 of the exploration.
     await createCountingExploration();
@@ -280,7 +281,8 @@ describe('Embedding', function() {
       await users.login('embedder2@example.com', true);
 
       // Create an exploration.
-      await workflow.createExploration();
+      //expectWelcomeModal: true
+      await workflow.createExploration(true);
       explorationId = await general.getExplorationIdFromEditor();
 
       await explorationEditorMainTab.setContent(

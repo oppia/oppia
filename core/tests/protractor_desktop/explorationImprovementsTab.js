@@ -53,7 +53,8 @@ describe('Improvements tab', function() {
     await users.createUser(
       'drafter@improvementsTab.com', 'improvementsTabDrafter');
     await users.login('drafter@improvementsTab.com');
-    await workflow.createExploration();
+    //expectWelcomeModal: true
+    await workflow.createExploration(true);
 
     await explorationEditorImprovementsTab.expectToBeHidden();
   });
@@ -62,8 +63,14 @@ describe('Improvements tab', function() {
     await users.createUser(
       'publisher@improvementsTab.com', 'improvementsTabPublisher');
     await users.login('publisher@improvementsTab.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
-      'Demo Exploration', 'Algebra', 'Learn how to demo', 'English');
+      'Demo Exploration',
+      'Algebra',
+      'Learn how to demo',
+      'English',
+      true
+      );
 
     // Freshly-published explorations should not show the improvements tab yet.
     await explorationEditorImprovementsTab.expectToBeHidden();

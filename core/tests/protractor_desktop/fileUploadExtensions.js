@@ -42,8 +42,8 @@ describe('rich-text components', function() {
       'richTextuser@fileUploadExtensions.com',
       'fileUploadRichTextuser');
     await users.login('richTextuser@fileUploadExtensions.com');
-
-    await workflow.createExploration();
+    //expectWelcomeModal : true
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');

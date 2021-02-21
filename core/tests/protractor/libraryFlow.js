@@ -54,11 +54,13 @@ describe('Library pages tour', function() {
       await adminPage.reloadExploration(
         'protractor_mobile_test_exploration.yaml');
     } else {
+      // expectWelcomeModal: true
       await workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
-        EXPLORATION_LANGUAGE
+        EXPLORATION_LANGUAGE,
+        true
       );
     }
     await libraryPage.get();
@@ -144,9 +146,14 @@ describe('Rating', function() {
       await adminPage.reloadExploration('rating_test.yaml');
     } else {
       // For a desktop browser, create and publish an exploration.
+      // expectWelcomeModal: true
       await workflow.createAndPublishExploration(
-        EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
-        'this is an objective', LANGUAGE_ENGLISH);
+        EXPLORATION_RATINGTEST,
+        CATEGORY_BUSINESS,
+        'this is an objective',
+        LANGUAGE_ENGLISH,
+        true
+        );
     }
     await users.logout();
 

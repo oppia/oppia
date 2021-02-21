@@ -78,7 +78,8 @@ describe('Enable correctness feedback and set correctness', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    await workflow.createExploration();
+    //expectWelcomeModal: true
+    await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
     await explorationEditorSettingsTab.setCategory('Algorithm');
@@ -279,7 +280,8 @@ describe('Core exploration functionality', function() {
     await users.createUser(
       `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
     await users.login(`user${userNumber}@stateEditor.com`);
-    await workflow.createExploration();
+    //expectWelcomeModal: true
+    await workflow.createExploration(true);
 
     userNumber++;
   });

@@ -51,11 +51,13 @@ describe('Learner dashboard functionality', function() {
     await users.createUser(
       creator2Id + '@learnerDashboard.com', creator2Id);
     await users.login(creator1Id + '@learnerDashboard.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       'Activations',
       'Chemistry',
       'Learn about different types of chemistry activations.',
-      'English'
+      'English',
+      true
     );
     await users.logout();
 
@@ -92,11 +94,13 @@ describe('Learner dashboard functionality', function() {
     await users.createUser(
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
     await users.login('feedbackAdm@learnerDashboard.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       'BUS101',
       'Business',
       'Learn about different business regulations around the world.',
-      'English'
+      'English',
+      true
     );
     await users.logout();
 
@@ -128,12 +132,22 @@ describe('Learner dashboard functionality', function() {
     await users.createUser(
       'creator@learnerDashboard.com', 'creatorLearnerDashboard');
     await users.login('creator@learnerDashboard.com');
+    // expectWelcomeModal: true
     await workflow.createAndPublishExploration(
-      EXPLORATION_FRACTION, CATEGORY_MATHEMATICS,
-      EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
+      EXPLORATION_FRACTION,
+      CATEGORY_MATHEMATICS,
+      EXPLORATION_OBJECTIVE,
+      LANGUAGE_ENGLISH,
+      true
+      );
+    // expectWelcomeModal: false
     await workflow.createAndPublishExploration(
-      EXPLORATION_SINGING, CATEGORY_MUSIC,
-      EXPLORATION_OBJECTIVE2, LANGUAGE_ENGLISH);
+      EXPLORATION_SINGING,
+      CATEGORY_MUSIC,
+      EXPLORATION_OBJECTIVE2,
+      LANGUAGE_ENGLISH,
+      false
+      );
     await users.logout();
 
     await users.createUser(

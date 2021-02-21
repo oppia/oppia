@@ -68,11 +68,13 @@ var openEditRolesForm = async function() {
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
-var createExploration = async function() {
+var createExploration = async function(expectWelcomeModal) {
   await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  await explorationEditorMainTab.exitTutorial();
+  if(expectWelcomeModal) {
+    await explorationEditorMainTab.exitTutorial();
+  }
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
@@ -158,8 +160,8 @@ var publishExploration = async function() {
 
 // Creates and publishes a minimal exploration.
 var createAndPublishExploration = async function(
-    title, category, objective, language) {
-  await createExploration();
+    title, category, objective, language, expectWelcomeModal) {
+  await createExploration(expectWelcomeModal);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
@@ -179,8 +181,8 @@ var createAndPublishExploration = async function(
 };
 
 var createAddExpDetailsAndPublishExp = async function(
-    title, category, objective, language, tags) {
-  await createExploration();
+    title, category, objective, language, tags, expectWelcomeModal) {
+  await createExploration(expectWelcomeModal);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
