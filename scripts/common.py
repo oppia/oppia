@@ -792,7 +792,7 @@ def swap_env(key, value):
 @contextlib.contextmanager
 def managed_process(
         command_args, shell=False, timeout_secs=60,
-        proc_name_to_kill=None, log_path=None, **kwargs):
+        proc_name_to_kill=None, log_path=None, drop_logs=False, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -814,7 +814,10 @@ def managed_process(
             given process is terminated. (This is needed for, e.g.,
             elasticsearch.)
         log_path: str|None. Path to log file to write process stdout and
-            stderr to. If None, no log file will be created.
+            stderr to. If None, no log file will be created, and output
+            will go to stdout.
+        drop_logs: bool. If True, discards stdout and stderr. This
+            overrides log_path.
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -830,7 +833,9 @@ def managed_process(
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
     logging.info('Starting new process: %s' % command)
-    if log_path:
+    if drop_logs:
+        log_file = subprocess.PIPE
+    elif log_path:
         log_file = python_utils.open_file(log_path, 'w')
     else:
         log_file = None
@@ -894,7 +899,7 @@ def managed_process(
                 if proc_should_be_killed:
                     logging.warn('Forced to kill %s!' % get_debug_info(proc))
                     proc.kill()
-        if log_path:
+        if log_path and not drop_logs:
             log_file.close()
 
 
@@ -1005,6 +1010,6 @@ def managed_elasticsearch_dev_server(log_path=None):
     es_args = ['%s/bin/elasticsearch' % ES_PATH]
     with managed_process(
         es_args, shell=True, proc_name_to_kill='elasticsearch',
-        log_path=log_path,
+        log_path=log_path, drop_logs=log_path is None
     ) as proc:
         yield proc
