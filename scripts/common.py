@@ -390,6 +390,20 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
+def is_port_in_use(port):
+    """Checks if a port is in use or not.
+
+    Args:
+        port: int. The port number.
+
+    Returns:
+        bool. True if port is in use else False.
+    """
+    with contextlib.closing(
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        return bool(s.connect_ex(('localhost', port)))
+
+
 def is_port_open(port):
     """Checks if a process is listening to the port.
 
@@ -639,7 +653,7 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         raise
 
 
-def wait_for_port_to_be_open(port_number):
+def wait_for_port_to_be_in_use(port_number):
     """Wait until the port is open and exit if port isn't open after
     MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
@@ -647,7 +661,7 @@ def wait_for_port_to_be_open(port_number):
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (is_port_open(port_number)
+    while (not is_port_in_use(port_number)
            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
