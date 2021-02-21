@@ -32,6 +32,7 @@ import { WrittenTranslationsObjectFactory } from
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
 
 describe('Exploration Player Suggestion Modal Controller', function() {
   importAllAngularServices();
@@ -40,7 +41,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
-  var ExplorationEngineService = null;
+  var explorationEngineService = null;
   var interactionObjectFactory = null;
   var playerPositionService = null;
   var playerTranscriptService = null;
@@ -63,6 +64,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     suggestionModalService = TestBed.get(SuggestionModalService);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
+    explorationEngineService = TestBed.get(ExplorationEngineService);
+
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -71,8 +74,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     ContextService = $injector.get('ContextService');
     spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
 
-    ExplorationEngineService = $injector.get('ExplorationEngineService');
-
+   
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
@@ -130,8 +132,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   });
 
   it('should submit a suggestion when closing the modal', function() {
-    spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(ExplorationEngineService, 'getExplorationVersion').and.returnValue(
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(explorationEngineService, 'getExplorationVersion').and.returnValue(
       '1');
 
     $scope.submitSuggestion();

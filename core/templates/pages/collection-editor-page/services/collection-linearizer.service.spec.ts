@@ -25,6 +25,7 @@ import { Collection } from
   'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ContextService } from 'services/context.service';
 // ^^^ This block is to be removed.
 
 require(
@@ -36,6 +37,7 @@ describe('Collection linearizer service', function() {
   var firstCollectionNode = null;
   var secondCollectionNode = null;
   var thirdCollectionNode = null;
+  var contextService: ContextService;
 
   importAllAngularServices();
 
@@ -52,7 +54,7 @@ describe('Collection linearizer service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionLinearizerService = $injector.get('CollectionLinearizerService');
-
+    contextService = $injector.get('ContextService');
     var firstCollectionNodeBackendObject = {
       exploration_id: 'exp_id0',
       exploration_summary: {
@@ -215,6 +217,9 @@ describe('Collection linearizer service', function() {
     });
 
     it('should correctly append a node to a non-empty collection', function() {
+      spyOn(
+        contextService, 'getExplorationId').and.returnValue('exp_id3');
+    
       var collection = createLinearCollection();
       var newCollectionNodeBackendObject = {
         exploration_id: 'exp_id3',

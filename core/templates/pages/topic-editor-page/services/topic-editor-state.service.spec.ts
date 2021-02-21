@@ -42,6 +42,7 @@ import { TopicUpdateService } from 'domain/topic/topic-update.service';
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 import { Subscription } from 'rxjs';
+import { ContextService } from 'services/context.service';
 
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
@@ -59,6 +60,7 @@ describe('Topic editor state service', function() {
   var secondTopicRightsObject = null;
   var $rootScope = null;
   var $q = null;
+  let contextService : ContextService =  null;
 
   var testSubscriptions = null;
   var subtopicPageLoadedSpy = null;
@@ -197,6 +199,8 @@ describe('Topic editor state service', function() {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     topicUpdateService = TestBed.get(TopicUpdateService);
+    contextService = TestBed.get(ContextService);
+  
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
 
@@ -336,6 +340,8 @@ describe('Topic editor state service', function() {
 
   beforeEach(() => {
     subtopicPageLoadedSpy = jasmine.createSpy('subtopicPageLoaded');
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+
     testSubscriptions = new Subscription();
     testSubscriptions.add(
       TopicEditorStateService.onSubtopicPageLoaded.subscribe(
