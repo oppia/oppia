@@ -17,7 +17,7 @@
   </thead>
   <tr *ngFor="let thread of this.threads" (click)="onClickRow(thread.threadId)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row">
     <td width="15%">
-      <span ngClass="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status)}}</span>
+      <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status)}}</span>
     </td>
     <td width="45%">
       <div class="protractor-test-exploration-feedback-subject">{{thread.subject | truncate:40 }}</div>

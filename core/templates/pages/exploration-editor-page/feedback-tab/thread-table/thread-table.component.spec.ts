@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,50 +12,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
+import { ThreadTableComponent } from './thread-table.component';
+
 /**
  * @fileoverview Unit tests for threadTable.
  */
 
-describe('Thread table directive', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var DateTimeFormatService = null;
+export class MockDateTimeFormatService {
+  getLocaleAbbreviatedDatetimeString(): string {
+    return '11/21/2014';
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
-    DateTimeFormatService = $injector.get('DateTimeFormatService');
+describe('Thread table component', () => {
+  let component : ThreadTableComponent;
+  let fixture: ComponentFixture<ThreadTableComponent>;
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    $scope = $rootScope.$new();
-    $componentController('threadTable', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ThreadTableComponent, TruncatePipe],
+      providers: [{ provide: DateTimeFormatService,
+        useClass: MockDateTimeFormatService }, ThreadStatusDisplayService]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture =
+      TestBed.createComponent(ThreadTableComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeDefined();
+  });
+
   it('should get css classes based on status', function() {
-    expect($scope.getLabelClass('open')).toBe('badge badge-info');
-    expect($scope.getLabelClass('compliment')).toBe('badge badge-success');
-    expect($scope.getLabelClass('other')).toBe('badge badge-secondary');
+    expect(component.getLabelClass('open')).toBe('badge badge-info');
+    expect(component.getLabelClass('compliment')).toBe('badge badge-success');
+    expect(component.getLabelClass('other')).toBe('badge badge-secondary');
   });
 
   it('should get human readable status from provided status', function() {
-    expect($scope.getHumanReadableStatus('open')).toBe('Open');
-    expect($scope.getHumanReadableStatus('compliment')).toBe('Compliment');
-    expect($scope.getHumanReadableStatus('not_actionable')).toBe(
+    expect(component.getHumanReadableStatus('open')).toBe('Open');
+    expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
+    expect(component.getHumanReadableStatus('not_actionable')).toBe(
       'Not Actionable');
   });
 
   it('should get formatted date string from the timestamp in milliseconds',
     function() {
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       var NOW_MILLIS = 1416563100000;
-      spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-        .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
-      expect($scope.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
+      expect(component.getLocaleAbbreviatedDateTimeString(NOW_MILLIS)).toBe(
         '11/21/2014');
     });
 });
