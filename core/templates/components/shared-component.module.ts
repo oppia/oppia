@@ -59,6 +59,8 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -104,7 +106,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
     TranslatePipe,
-    TakeBreakModalComponent
+    TakeBreakModalComponent,
+    TruncatePipe,
+    ThreadTableComponent
   ],
 
   entryComponents: [
@@ -118,7 +122,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    ThreadTableComponent
   ],
 
   exports: [

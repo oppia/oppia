@@ -379,16 +379,16 @@
       <div ng-if="!$ctrl.activeThread">
         <div ng-if="$ctrl.mySuggestionsList.length > 0">
           <h2>Suggestions created</h2>
-          <thread-table threads="$ctrl.mySuggestionsList"
-                        on-click-row="$ctrl.setActiveThread">
+          <thread-table ng-if="$ctrl.mySuggestionsList" [threads]="$ctrl.mySuggestionsList"
+                       [on-click-row]="$ctrl.setActiveThread">
           </thread-table>
           <br>
         </div>
 
         <div ng-if="$ctrl.suggestionsToReviewList.length > 0">
           <h2>Suggestions to review</h2>
-          <thread-table threads="$ctrl.suggestionsToReviewList"
-                        on-click-row="$ctrl.setActiveThread">
+          <thread-table ng-if="$ctrl.suggestionsToReviewList" [threads]="$ctrl.suggestionsToReviewList"
+                        [on-click-row]="$ctrl.setActiveThread">
           </thread-table>
           <br>
         </div>
