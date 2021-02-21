@@ -477,6 +477,7 @@
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
+/extensions/extensions.module.ts @vojtechjelinek
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
