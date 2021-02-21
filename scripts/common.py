@@ -715,7 +715,7 @@ def start_redis_server():
         REDIS_SERVER_PATH, REDIS_CONF_PATH,
         '--daemonize', 'yes'
     ])
-    wait_for_port_to_be_open(feconf.REDISPORT)
+    wait_for_port_to_be_in_use(feconf.REDISPORT)
 
 
 def stop_redis_server():
