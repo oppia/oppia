@@ -218,6 +218,28 @@ class ReportPassTests(test_utils.GenericTestBase):
                 Exception, 'Unknown build environment.'):
                 flake_checker.report_pass('suiteName')
 
+    def test_missing_environment_variable(self):
+
+        def mock_getenv(variable):
+            environment_vars = {
+                'CIRCLECI': 1,
+                'CIRCLE_USERNAME': 'user',
+                'CIRCLE_BRANCH': 'develop',
+            }
+            return environment_vars.get(variable)
+
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
+            raise AssertionError('requests.post called.')
+
+        getenv_swap = self.swap(os, 'getenv', mock_getenv)
+        post_swap = self.swap(requests, 'post', mock_post)
+
+        with getenv_swap, post_swap:
+            with self.assertRaisesRegexp(
+                RuntimeError,
+                'Expected environment variable CIRCLE_BUILD_URL missing'):
+                flake_checker.report_pass('suiteName')
+
 
 class MockResponse(python_utils.OBJECT):
 
