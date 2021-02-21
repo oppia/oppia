@@ -37,6 +37,7 @@ CI_INFO = {
         'env': {
             'identifier': 'CIRCLECI',
             'user_info': 'CIRCLE_USERNAME',
+            'branch': 'CIRCLE_BRANCH',
             'template_vars': ['CIRCLE_BUILD_URL']
         },
         'build_url_template': '%s',
@@ -45,7 +46,8 @@ CI_INFO = {
         'env': {
             'identifier': 'GITHUB_ACTIONS',
             'user_info': 'GITHUB_ACTOR',
-            'template_vars': ['GITHUB_REPOSITORY', 'GITHUB_RUN_ID']
+            'branch': 'GITHUB_REF',
+            'template_vars': ['GITHUB_REPOSITORY', 'GITHUB_RUN_ID'],
         },
         'build_url_template': 'https://github.com/%s/actions/runs/%s',
     }
@@ -102,6 +104,7 @@ def _get_build_info():
         build_info['username'] = os.getenv(ci_env['user_info'])
         build_info['build_url'] = build_url
         build_info['timestamp'] = timestamp
+        build_info['branch'] = os.getenv(ci_env['branch'])
 
         return build_info
 
