@@ -487,12 +487,12 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion_to_accept['suggestion_id']), {
                 'action': u'accept',
                 'commit_message':
-                    u'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                    u'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
                 'review_message': u'Accepted'
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Commit messages must be at most 1000 characters long.'
+            'Commit messages must be at most 375 characters long.'
         )
 
     def test_accept_suggestion(self):

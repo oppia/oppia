@@ -195,15 +195,29 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
         # Checks whether every pattern in the CODEOWNERS file matches at
         # least one dir/file.
         critical_file_section_found = False
+        inside_blanket_codeowners_section = False
         important_rules_in_critical_section = []
         file_patterns = []
-        dir_patterns = []
+        ignored_dir_patterns = []
         for line_num, line in enumerate(self.file_cache.readlines(
                 CODEOWNER_FILEPATH)):
             stripped_line = line.strip()
             if '# Critical files' in line:
                 critical_file_section_found = True
+            if '# Blanket codeowners' in line:
+                inside_blanket_codeowners_section = True
+            # An empty line after the Blanket codeowners section marks its end.
+            if inside_blanket_codeowners_section is True and not stripped_line:
+                inside_blanket_codeowners_section = False
+                continue
             if stripped_line and stripped_line[0] != '#':
+                if '#' in line:
+                    error_message = (
+                        '%s --> Please remove inline comment from line %s' % (
+                            CODEOWNER_FILEPATH, line_num + 1))
+                    self.error_messages.append(error_message)
+                    self.failed = True
+
                 if '@' not in line:
                     error_message = (
                         '%s --> Pattern on line %s doesn\'t have '
@@ -271,14 +285,20 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
                     # leading '/' to aid in the glob pattern matching in
                     # the next part of the check wherein the valid patterns
                     # are used to check if they cover the entire codebase.
-                    if os.path.isdir(line_in_concern):
-                        dir_patterns.append(line_in_concern)
-                    else:
-                        file_patterns.append(line_in_concern)
+                    # Also we do not populate the lists if we are currently in
+                    # the blanket codeowners section, because that would allow
+                    # even those files and directories to pass the check whose
+                    # ownership is defined by blanket codeowners only and is not
+                    # overridden by a specific codeowner.
+                    if not inside_blanket_codeowners_section:
+                        if os.path.isdir(line_in_concern):
+                            ignored_dir_patterns.append(line_in_concern)
+                        else:
+                            file_patterns.append(line_in_concern)
 
         # Checks that every file (except those under the dir represented by
-        # the dir_patterns) is covered under CODEOWNERS.
-        for file_paths in self._walk_with_gitignore('.', dir_patterns):
+        # the ignored_dir_patterns) is covered under CODEOWNERS.
+        for file_paths in self._walk_with_gitignore('.', ignored_dir_patterns):
             for file_path in file_paths:
                 match = False
                 for file_pattern in file_patterns:

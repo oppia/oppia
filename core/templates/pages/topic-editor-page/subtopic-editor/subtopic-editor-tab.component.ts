@@ -187,7 +187,7 @@ angular.module('oppia').component('subtopicEditorTab', {
                 ctrl.subtopicPage.getPageContents().getHtml()) {
           var subtitledHtml = angular.copy(
             ctrl.subtopicPage.getPageContents().getSubtitledHtml());
-          subtitledHtml.setHtml(ctrl.htmlData);
+          subtitledHtml.html = ctrl.htmlData;
           TopicUpdateService.setSubtopicPageContentsHtml(
             ctrl.subtopicPage, ctrl.subtopic.getId(), subtitledHtml);
           TopicEditorStateService.setSubtopicPage(ctrl.subtopicPage);

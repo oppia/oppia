@@ -29,12 +29,9 @@ from . import python_linter
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
-VALID_TEST_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid_test_file_test.py')
 PYTHON_UTILS_FILEPATH = os.path.join(os.getcwd(), 'python_utils.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
-INVALID_TEST_ONLY_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_test_only.py')
 INVALID_PYCODESTYLE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pycodestyle_error.py')
 INVALID_PYTHON3_FILEPATH = os.path.join(
@@ -114,24 +111,6 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             ], lint_task_report.trimmed_messages)
         self.assertEqual('Job registry', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
-
-    def test_custom_linter_with_test_only_in_non_test_file(self):
-        lint_task_report = python_linter.PythonLintChecksManager(
-            [INVALID_TEST_ONLY_FILEPATH], FILE_CACHE).check_non_test_files()
-        self.assert_same_list_elements([
-            'Line 35: Please do not use \'test_only\' in the non-test '
-            'file.'], lint_task_report.trimmed_messages)
-        self.assertEqual('Function definition', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_custom_linter_with_test_function_in_test_file(self):
-        lint_task_report = python_linter.PythonLintChecksManager(
-            [VALID_TEST_FILEPATH], FILE_CACHE).check_non_test_files()
-        self.assertEqual(
-            ['SUCCESS  Function definition check passed'],
-            lint_task_report.get_report())
-        self.assertEqual('Function definition', lint_task_report.name)
-        self.assertFalse(lint_task_report.failed)
 
     def test_valid_file_with_pylint(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(

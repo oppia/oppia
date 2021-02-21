@@ -58,7 +58,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('previewTab', {
   template: require('./preview-tab.component.html'),
   controller: [
-    '$q', '$timeout', '$uibModal', 'ContextService',
+    '$q', '$rootScope', '$timeout', '$uibModal', 'ContextService',
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
@@ -68,7 +68,7 @@ angular.module('oppia').component('previewTab', {
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
     'StateEditorService', 'UrlInterpolationService',
     function(
-        $q, $timeout, $uibModal, ContextService,
+        $q, $rootScope, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
@@ -147,13 +147,14 @@ angular.module('oppia').component('previewTab', {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
             explorationId).then(function(returnDict) {
             ExplorationEngineService.init(
-              returnDict, null, null, null,
+              returnDict, null, null, null, null,
               function() {
                 ctrl.loadPreviewState(initStateNameForPreview, []);
               });
             PlayerCorrectnessFeedbackEnabledService.init(
               returnDict.correctness_feedback_enabled);
             NumberAttemptsService.reset();
+            $rootScope.$applyAsync();
           });
         }, 200);
       };
@@ -196,7 +197,9 @@ angular.module('oppia').component('previewTab', {
               ctrl.loadPreviewState(
                 initStateNameForPreview, manualParamChanges);
             });
+          $rootScope.$applyAsync();
         });
+        $rootScope.$applyAsync();
         ctrl.allParams = {};
       };
       ctrl.$onDestroy = function() {

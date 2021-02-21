@@ -159,6 +159,12 @@ describe('Customize Interaction Modal Controller', function() {
         '/extensions/interactions/i1/static/i1.png');
     });
 
+    it('should return the hyphenated category name as expected', function() {
+      var categoryName = 'Camel Case CATEGORY Name With Spaces';
+      expect($scope.getHyphenatedLowercaseCategoryName(categoryName)).toBe(
+        'camel-case-category-name-with-spaces');
+    });
+
     it('should get a customization args warning message when' +
       ' customization args warning message button has no value', function() {
       stateCustomizationArgsService.displayed = {

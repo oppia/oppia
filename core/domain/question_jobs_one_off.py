@@ -59,7 +59,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             question.validate()
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Question %s failed validation: %s' % (item.id, e))
             yield (
                 QuestionMigrationOneOffJob._ERROR_KEY,
@@ -118,3 +118,163 @@ class MissingQuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-off job for testing the migration of all question
+    versions to the latest schema version. This job runs the state migration,
+    but does not commit the new question to the datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionSnapshotContentModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(QuestionSnapshotsMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        question_id = item.get_unversioned_instance_id()
+
+        latest_question = question_services.get_question_by_id(
+            question_id, strict=False)
+        if latest_question is None:
+            yield ('INFO - Question does not exist', item.id)
+            return
+
+        question_model = question_models.QuestionModel.get(question_id)
+        if (question_model.question_state_data_schema_version !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            yield (
+                'FAILURE - Question is not at latest schema version',
+                question_id)
+            return
+
+        try:
+            latest_question.validate()
+        except Exception as e:
+            yield (
+                'INFO - Question %s failed validation' % item.id,
+                e)
+
+        target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        current_state_schema_version = item.content[
+            'question_state_data_schema_version']
+        if current_state_schema_version == target_state_schema_version:
+            yield (
+                'SUCCESS - Snapshot is already at latest schema version',
+                item.id)
+            return
+
+        versioned_question_state = {
+            'states_schema_version': current_state_schema_version,
+            'state': item.content['question_state_data']
+        }
+        while current_state_schema_version < target_state_schema_version:
+            try:
+                question_domain.Question.update_state_from_model(
+                    versioned_question_state, current_state_schema_version)
+                current_state_schema_version += 1
+            except Exception as e:
+                error_message = (
+                    'Question snapshot %s failed migration to state '
+                    'v%s: %s' % (
+                        item.id, current_state_schema_version + 1, e))
+                logging.exception(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                break
+
+            if target_state_schema_version == current_state_schema_version:
+                yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that may be used to migrate question schema
+    versions. This job will load all snapshots of all existing questions
+    from the datastore and immediately store them back into the datastore.
+    The loading process of a question automatically performs schema updating
+    on the fly. This job persists that conversion work, keeping questions
+    up-to-date.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionSnapshotContentModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(QuestionSnapshotsMigrationJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        question_id = item.get_unversioned_instance_id()
+
+        latest_question = question_services.get_question_by_id(
+            question_id, strict=False)
+        if latest_question is None:
+            yield ('INFO - Question does not exist', item.id)
+            return
+
+        question_model = question_models.QuestionModel.get(question_id)
+        if (question_model.question_state_data_schema_version !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            yield (
+                'FAILURE - Question is not at latest schema version',
+                question_id)
+            return
+
+        try:
+            latest_question.validate()
+        except Exception as e:
+            yield (
+                'INFO - Question %s failed validation' % item.id,
+                e)
+
+        # If the snapshot being stored in the datastore does not have the most
+        # up-to-date states schema version, then update it.
+        target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        current_state_schema_version = item.content[
+            'question_state_data_schema_version']
+        if current_state_schema_version == target_state_schema_version:
+            yield (
+                'SUCCESS - Snapshot is already at latest schema version',
+                item.id)
+            return
+
+        versioned_question_state = {
+            'states_schema_version': current_state_schema_version,
+            'state': item.content['question_state_data']
+        }
+        while current_state_schema_version < target_state_schema_version:
+            question_domain.Question.update_state_from_model(
+                versioned_question_state, current_state_schema_version)
+            current_state_schema_version += 1
+
+            if target_state_schema_version == current_state_schema_version:
+                yield ('SUCCESS - Model upgraded', 1)
+
+        item.content['question_state_data'] = versioned_question_state['state']
+        item.content['question_state_data_schema_version'] = (
+            current_state_schema_version)
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+
+        yield ('SUCCESS - Model saved', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)

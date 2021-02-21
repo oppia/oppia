@@ -13,7 +13,7 @@
         </div>
         <strong>Explanation:</strong>
         <span>
-          <angular-html-bind class="oppia-rte-editor" html-data="$ctrl.StateSolutionService.savedMemento.explanation.getHtml()">
+          <angular-html-bind class="oppia-rte-editor" html-data="$ctrl.StateSolutionService.savedMemento.explanation.html">
           </angular-html-bind>
         </span>
       </div>
@@ -38,7 +38,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!$ctrl.StateSolutionService.displayed.explanation.getHtml()"
+                ng-disabled="!$ctrl.StateSolutionService.displayed.explanation.html"
                 ng-click="$ctrl.saveThisExplanation()">
           Save
         </button>

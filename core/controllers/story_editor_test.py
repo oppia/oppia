@@ -354,7 +354,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters long.')
+            'Commit messages must be at most 375 characters long.')
 
         self.logout()
 

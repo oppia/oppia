@@ -226,7 +226,8 @@ export class ContextService {
       let pathnameArray = this.urlService.getPathname().split('/');
       for (let i = 0; i < pathnameArray.length; i++) {
         if (pathnameArray[i] === 'explore' ||
-            pathnameArray[i] === 'create') {
+            pathnameArray[i] === 'create' ||
+            pathnameArray[i] === 'skill_editor') {
           this.explorationId = pathnameArray[i + 1];
           return pathnameArray[i + 1];
         }

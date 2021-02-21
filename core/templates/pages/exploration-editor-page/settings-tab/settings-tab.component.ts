@@ -92,7 +92,7 @@ angular.module('oppia').component('settingsTab', {
   },
   template: require('./settings-tab.component.html'),
   controller: [
-    '$http', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'EditabilityService', 'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
@@ -107,7 +107,7 @@ angular.module('oppia').component('settingsTab', {
     'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
-        $http, $uibModal, AlertsService, ChangeListService,
+        $http, $rootScope, $uibModal, AlertsService, ChangeListService,
         EditabilityService, EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
@@ -163,7 +163,9 @@ angular.module('oppia').component('settingsTab', {
             ctrl.stateNames = ExplorationStatesService.getStateNames();
           }
           ctrl.hasPageLoaded = true;
+          $rootScope.$applyAsync();
         });
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveExplorationTitle = function() {
@@ -209,6 +211,13 @@ angular.module('oppia').component('settingsTab', {
       ctrl.areParametersEnabled = function() {
         return ExplorationFeaturesService.areParametersEnabled();
       };
+
+      ctrl.areParametersUsed = function() {
+        if (ctrl.hasPageLoaded) {
+          return (ExplorationDataService.data.param_changes.length > 0);
+        }
+      };
+
       ctrl.enableParameters = function() {
         ExplorationFeaturesService.enableParameters();
       };

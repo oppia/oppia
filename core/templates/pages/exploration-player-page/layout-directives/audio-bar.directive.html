@@ -1,4 +1,4 @@
-<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}">
+<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
@@ -43,8 +43,8 @@
         </select>
       </div>
     </div>
-    <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse"><i class="fas fa-sort-up"></i></div>
   </div>
+  <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse"><i class="fas fa-sort-up"></i></div>
   <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()" aria-label="Audio menu expand">
     <div class="container protractor-test-audio-bar">
       <div class="row">
@@ -134,6 +134,7 @@
     display: block;
     font-size: 12px;
     margin: 0 auto;
+    position: sticky;
     text-align: center;
   }
 
@@ -251,6 +252,16 @@
     top: 3.5em;
   }
 
+  @media(max-width: 768px) {
+    .audio-header {
+      top: 3.5em;
+    }
+
+    .audio-header.headroom--unpinned {
+      margin-top: 32px;
+      top: 0;
+      }
+  }
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;
@@ -303,8 +314,8 @@
 
   @media screen and (max-width: 550px) {
     .audio-controls {
-      height: 98px;
-      padding: 0;
+      height: auto;
+      padding: 20px 0;
     }
     audio-bar .slider-section {
       transform: translateY(4px);

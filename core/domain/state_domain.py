@@ -558,9 +558,8 @@ class InteractionInstance(python_utils.OBJECT):
                 interaction instance.
             default_outcome: Outcome. The default outcome of the interaction
                 instance.
-            confirmed_unclassified_answers: list(AnswerGroup). List of answers
-                which have been confirmed to be associated with the default
-                outcome.
+            confirmed_unclassified_answers: list(*). List of answers which have
+                been confirmed to be associated with the default outcome.
             hints: list(Hint). List of hints for this interaction.
             solution: Solution. A possible solution for the question asked in
                 this interaction.
@@ -1449,9 +1448,6 @@ class WrittenTranslation(python_utils.OBJECT):
         self.translation = translation
         self.needs_update = needs_update
 
-        if data_format == self.DATA_FORMAT_HTML:
-            self.translation = html_cleaner.clean(self.translation)
-
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
 
@@ -1749,15 +1745,27 @@ class WrittenTranslations(python_utils.OBJECT):
                 written_translations_dict['translations_mapping'].items()):
             for language_code in (
                     language_code_to_written_translation.keys()):
-                if (written_translations_dict['translations_mapping'][
-                        content_id][language_code]['data_format'] ==
-                        WrittenTranslation.DATA_FORMAT_HTML):
+                translation_dict = written_translations_dict[
+                    'translations_mapping'][content_id][language_code]
+                if 'data_format' in translation_dict:
+                    if (translation_dict['data_format'] ==
+                            WrittenTranslation.DATA_FORMAT_HTML):
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code]['translation'] = (
+                                conversion_fn(written_translations_dict[
+                                    'translations_mapping'][content_id][
+                                        language_code]['translation'])
+                            )
+                elif 'html' in translation_dict:
+                    # TODO(#11950): Delete this once old schema migration
+                    # functions are deleted.
+                    # This "elif" branch is needed because, in states schema
+                    # v33, this function is called but the dict is still in the
+                    # old format (that doesn't have a "data_format" key).
                     written_translations_dict['translations_mapping'][
-                        content_id][language_code]['translation'] = (
-                            conversion_fn(written_translations_dict[
-                                'translations_mapping'][content_id][
-                                    language_code]['translation'])
-                        )
+                        content_id][language_code]['html'] = (
+                            conversion_fn(translation_dict['html']))
+
         return written_translations_dict
 
 
@@ -2542,9 +2550,9 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info(
+            logging.exception(
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
-            raise Exception('Could not convert state dict to YAML.')
+            python_utils.reraise_exception()
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
@@ -3139,6 +3147,18 @@ class State(python_utils.OBJECT):
 
         interaction_id = state_dict['interaction']['id']
         if interaction_id is None:
+            return state_dict
+
+        # TODO(#11950): Drop the following 'if' clause once all snapshots have
+        # been migrated. This is currently causing issues in migrating old
+        # snapshots to schema v34 because MathExpressionInput was still around
+        # at the time. It is conceptually OK to ignore customization args here
+        # because the MathExpressionInput has no customization arg fields.
+        if interaction_id == 'MathExpressionInput':
+            if state_dict['interaction']['solution']:
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    conversion_fn(state_dict['interaction']['solution'][
+                        'explanation']['html']))
             return state_dict
 
         if state_dict['interaction']['solution']:

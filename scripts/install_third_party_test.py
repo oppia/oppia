@@ -438,3 +438,180 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_third_party.install_redis_cli()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_install_elasticsearch_dev_server_windows(self):
+        check_function_calls = {
+            'subprocess_call_is_called': False,
+            'download_and_untar_files_is_called': False,
+            'download_and_unzip_files_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True,
+            'download_and_untar_files_is_called': False,
+            'download_and_unzip_files_is_called': True
+        }
+        def mock_is_mac_os():
+            return False
+        def mock_is_linux_os():
+            return False
+        def mock_is_windows_os():
+            return True
+        def mock_download_and_unzip_files(
+                unused_source_url, unused_target_parent_dir,
+                unused_tar_root_name, unused_target_root_name):
+            check_function_calls['download_and_unzip_files_is_called'] = True
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+
+            # The first subprocess.call() needs to throw an
+            # exception so that the script can execute the installation pathway.
+            if unused_cmd_tokens == [
+                    '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
+                raise OSError('elasticsearch: command not found')
+            else:
+                return Ret()
+
+        swap_call = self.swap(
+            subprocess, 'call', mock_call)
+        unzip_files_swap = self.swap(
+            install_third_party, 'download_and_unzip_files',
+            mock_download_and_unzip_files)
+
+        mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
+        linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
+        windows_swap = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        with swap_call, unzip_files_swap, mac_swap, linux_swap, windows_swap:
+            install_third_party.install_elasticsearch_dev_server()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_install_elasticsearch_dev_server_unix(self):
+        check_function_calls = {
+            'subprocess_call_is_called': False,
+            'download_and_untar_files_is_called': False,
+            'download_and_unzip_files_is_called': False
+        }
+        def mock_is_linux_os():
+            return False
+        def mock_is_mac_os():
+            return True
+        def mock_download_and_untar_files(
+                unused_source_url, unused_target_parent_dir,
+                unused_tar_root_name, unused_target_root_name):
+            check_function_calls['download_and_untar_files_is_called'] = True
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+
+            # The first subprocess.call() needs to throw an
+            # exception so that the script can execute the installation pathway.
+            if unused_cmd_tokens == [
+                    '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
+                raise OSError('elasticsearch: command not found')
+            else:
+                return Ret()
+
+        swap_call = self.swap(
+            subprocess, 'call', mock_call)
+        untar_files_swap = self.swap(
+            install_third_party, 'download_and_untar_files',
+            mock_download_and_untar_files)
+
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True,
+            'download_and_untar_files_is_called': True,
+            'download_and_unzip_files_is_called': False
+        }
+
+        mac_os_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
+        linux_os_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
+        with swap_call, untar_files_swap, mac_os_swap, linux_os_swap:
+            install_third_party.install_elasticsearch_dev_server()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_install_elasticsearch_unrecognized_os(self):
+
+        def mock_is_mac_os():
+            return False
+        def mock_is_linux_os():
+            return False
+        def mock_is_windows_os():
+            return False
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+
+            # The first subprocess.call() needs to throw an
+            # exception so that the script can execute the installation pathway.
+            if unused_cmd_tokens == [
+                    '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
+                raise OSError('elasticsearch: command not found')
+            else:
+                return Ret()
+
+        swap_call = self.swap(
+            subprocess, 'call', mock_call)
+
+        os_not_supported_exception = self.assertRaisesRegexp(
+            Exception, 'Unrecognized or unsupported operating system.')
+        mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
+        linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
+        windows_swap = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        with mac_swap, linux_swap, windows_swap, swap_call, (
+            os_not_supported_exception):
+            install_third_party.install_elasticsearch_dev_server()
+
+    def test_elasticsearch_already_installed(self):
+        check_function_calls = {
+            'subprocess_call_is_called': False,
+            'download_and_untar_files_is_called': False,
+            'download_and_unzip_files_is_called': False
+        }
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+
+            return Ret()
+
+        swap_call = self.swap(
+            subprocess, 'call', mock_call)
+
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True,
+            'download_and_untar_files_is_called': False,
+            'download_and_unzip_files_is_called': False
+        }
+
+        with swap_call:
+            install_third_party.install_elasticsearch_dev_server()
+        self.assertEqual(check_function_calls, expected_check_function_calls)

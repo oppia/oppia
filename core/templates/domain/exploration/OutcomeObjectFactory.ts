@@ -72,7 +72,7 @@ export class Outcome {
   }
 
   hasNonemptyFeedback(): boolean {
-    return this.feedback.getHtml().trim() !== '';
+    return this.feedback.html.trim() !== '';
   }
 
   /**
