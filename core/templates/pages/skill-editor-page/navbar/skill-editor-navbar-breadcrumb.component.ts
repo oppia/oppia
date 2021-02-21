@@ -29,7 +29,7 @@ export class SkillEditorNavbarBreadcrumbComponent {
   constructor(
     private skillEditorStateService: SkillEditorStateService) {}
 
-  getTruncatedDescription() {
+  getTruncatedDescription(): string {
     var skill = this.skillEditorStateService.getSkill();
     var truncatedDescription = skill.getDescription().substr(0, 35);
     if (skill.getDescription().length > 35) {
