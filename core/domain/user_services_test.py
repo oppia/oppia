@@ -96,24 +96,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    def test_is_user_or_pseudonymous_id(self):
-        self.assertTrue(
-            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id(
-                'uid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
-        self.assertTrue(
-            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id(
-                'pid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(
-            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
-
     def test_set_and_get_username(self):
         auth_id = 'someUser'
         username = 'username'
@@ -2529,6 +2511,15 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_question_suggestions(self.voice_artist_id))
 
+    def test_assign_user_submit_question_suggestion(self):
+        self.assertFalse(
+            user_services.can_submit_question_suggestions(self.voice_artist_id))
+
+        user_services.allow_user_to_submit_question(self.voice_artist_id)
+
+        self.assertTrue(
+            user_services.can_submit_question_suggestions(self.voice_artist_id))
+
     def test_get_users_contribution_rights_with_multiple_reviewer_user_ids(
             self):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
@@ -2744,12 +2735,13 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self):
         with self.assertRaisesRegexp(
             Exception, 'Expected language_code to be None'):
-            user_services.get_contribution_reviewer_usernames(
-                constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
+            user_services.get_contributor_usernames(
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                language_code='hi')
 
-    def test_get_contribution_reviewer_usernames_with_invalid_category_raises(
+    def test_get_contributor_usernames_with_invalid_category_raises(
             self):
         with self.assertRaisesRegexp(
-            Exception, 'Invalid review category: invalid_category'):
-            user_services.get_contribution_reviewer_usernames(
+            Exception, 'Invalid category: invalid_category'):
+            user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')

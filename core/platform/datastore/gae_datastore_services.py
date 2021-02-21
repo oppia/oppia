@@ -23,6 +23,7 @@ import contextlib
 import datetime
 import functools
 
+from core.platform import models
 import python_utils
 
 from google.appengine.api import datastore_types
@@ -30,6 +31,7 @@ from google.appengine.datastore import datastore_query
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
+transaction_services = models.Registry.import_transaction_services()
 Model = ndb.Model
 Key = ndb.Key
 
@@ -84,16 +86,31 @@ def update_timestamps_multi(entities, update_last_updated_time=True):
             update_last_updated_time=update_last_updated_time)
 
 
-def put_multi(models):
+def put_multi(entities):
     """Stores a sequence of Model instances.
 
     Args:
-        models: list(datastore_services.Model). A list of Model instances.
+        entities: list(datastore_services.Model). A list of Model instances.
 
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(models)
+    return ndb.put_multi(entities)
+
+
+@transaction_services.run_in_transaction_wrapper
+def delete_multi_transactional(keys):
+    """Deletes models corresponding to a sequence of keys and runs it through
+    a transaction. Either all models are deleted, or none of them in the case
+    when the transaction fails.
+
+    Args:
+        keys: list(str). A list of keys.
+
+    Returns:
+        list(None). A list of Nones, one per deleted model.
+    """
+    return ndb.delete_multi(keys)
 
 
 def delete_multi(keys):
