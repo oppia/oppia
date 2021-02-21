@@ -26,7 +26,7 @@ import apache_beam as beam
 from core.domain import cron_services
 from core.platform import models
 from jobs import base_model_validator_errors as errors
-from jobs import utils as beam_utils
+from jobs import utils as jobs_utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -57,7 +57,7 @@ class ValidateModelIdWithRegex(beam.DoFn):
         Yields:
             ModelInvalidIdError. An error class for models with invalid IDs.
         """
-        model = beam_utils.clone_model(input_model)
+        model = jobs_utils.clone_model(input_model)
 
         if not self.regex.match(model.id):
             yield errors.ModelInvalidIdError(model)
@@ -76,7 +76,7 @@ class ValidateDeleted(beam.DoFn):
         Yields:
             ModelExpiredError. An error class for expired models.
         """
-        model = beam_utils.clone_model(input_model)
+        model = jobs_utils.clone_model(input_model)
         date_now = datetime.datetime.utcnow()
 
         expiration_date = (
@@ -102,8 +102,7 @@ class ValidateModelTimeFields(beam.DoFn):
             ModelMutatedDuringJobError. Error for timestamp validation.
             ModelTimestampRelationshipError. Error for timestamp validation.
         """
-
-        model = beam_utils.clone_model(input_model)
+        model = jobs_utils.clone_model(input_model)
         if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
             yield errors.ModelTimestampRelationshipError(model)
 

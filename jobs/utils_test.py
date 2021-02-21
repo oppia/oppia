@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import unittest
 
 from core.platform import models
-from jobs import utils as beam_utils
+from jobs import utils as jobs_utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -33,7 +33,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_model(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = beam_utils.clone_model(model)
+        clone = jobs_utils.clone_model(model)
 
         self.assertEqual(model.id, clone.id)
         self.assertEqual(model, clone)
@@ -42,7 +42,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_with_changes(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = beam_utils.clone_model(model, deleted=False)
+        clone = jobs_utils.clone_model(model, deleted=False)
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -57,7 +57,7 @@ class CloneTests(unittest.TestCase):
             field = datastore_services.StringProperty()
 
         model = DerivedModel(id='123', field='original')
-        clone = beam_utils.clone_model(model)
+        clone = jobs_utils.clone_model(model)
 
         self.assertEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -72,7 +72,7 @@ class CloneTests(unittest.TestCase):
             field = datastore_services.StringProperty()
 
         model = DerivedModel(id='123', field='original')
-        clone = beam_utils.clone_model(model, field='updated')
+        clone = jobs_utils.clone_model(model, field='updated')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)

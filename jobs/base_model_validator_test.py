@@ -61,12 +61,12 @@ class BaseModelValidatorTests(unittest.TestCase):
                 created_on=self.now,
                 last_updated=self.year_later)
             expired_model = MockModel(
-                id='123',
+                id='125',
                 deleted=True,
                 created_on=self.year_ago,
                 last_updated=self.year_ago)
             valid_model = MockModel(
-                id='123',
+                id='126',
                 deleted=False,
                 created_on=self.year_ago,
                 last_updated=self.now)
