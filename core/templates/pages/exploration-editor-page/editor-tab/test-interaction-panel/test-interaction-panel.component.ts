@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Directive for the test interaction panel in the state editor.
  */
@@ -51,9 +50,8 @@ angular.module('oppia').component('testInteractionPanel', {
         CurrentInteractionService.isSubmitButtonDisabled);
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
-          CurrentInteractionService.onAnswerChanged.subscribe(() => {
-            // Remove this when migrating to angular or use
-            // changeDetector.detectChanges instead.
+          // TODO(#11996): Remove when migrating to Angular2+.
+          CurrentInteractionService.onAnswerChanged$.subscribe(() => {
             $rootScope.$applyAsync();
           })
         );

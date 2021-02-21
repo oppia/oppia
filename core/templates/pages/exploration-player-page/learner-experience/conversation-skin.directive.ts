@@ -1299,9 +1299,8 @@ angular.module('oppia').directive('conversationSkin', [
 
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              CurrentInteractionService.onAnswerChanged.subscribe(() => {
-                // Remove this when migrating to angular or use
-                // changeDetector.detectChanges instead.
+              // TODO(#11996): Remove when migrating to Angular2+.
+              CurrentInteractionService.onAnswerChanged$.subscribe(() => {
                 $rootScope.$applyAsync();
               })
             );

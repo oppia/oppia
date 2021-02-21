@@ -866,18 +866,12 @@ def managed_process(
             python_utils.PRINT(
                 'Killing remaining %s processes' % proc_name_to_kill)
             for proc in psutil.process_iter():
-                try:
-                    proc_should_be_killed = any(
-                        proc_name_to_kill in cmd_part
-                        for cmd_part in proc.cmdline())
-                    if proc_should_be_killed:
-                        proc.kill()
-                        logging.warn(
-                            'Forced to kill %s!' % get_debug_info(proc))
-                except psutil.AccessDenied:
-                    pass
-                except psutil.ZombieProcess:
-                    pass
+                proc_should_be_killed = any(
+                    proc_name_to_kill in cmd_part
+                    for cmd_part in proc.cmdline())
+                if proc_should_be_killed:
+                    logging.warn('Forced to kill %s!' % get_debug_info(proc))
+                    proc.kill()
 
 
 @contextlib.contextmanager

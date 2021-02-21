@@ -57,7 +57,7 @@ export class CurrentInteractionService {
   private static onSubmitFn: OnSubmitFn = null;
   private static validityCheckFn: ValidityCheckFn = null;
   private static presubmitHooks: PresubmitHookFn[] = [];
-  private static answerChanged: Subject<void> = new Subject<void>();
+  private static answerChangedSubject: Subject<void> = new Subject<void>();
 
   setOnSubmitFn(onSubmit: OnSubmitFn): void {
     /**
@@ -156,11 +156,11 @@ export class CurrentInteractionService {
   }
 
   updateViewWithNewAnswer(): void {
-    CurrentInteractionService.answerChanged.next();
+    CurrentInteractionService.answerChangedSubject.next();
   }
 
-  get onAnswerChanged(): Observable<void> {
-    return CurrentInteractionService.answerChanged.asObservable();
+  get onAnswerChanged$(): Observable<void> {
+    return CurrentInteractionService.answerChangedSubject.asObservable();
   }
 }
 angular.module('oppia').factory('CurrentInteractionService',

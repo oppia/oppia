@@ -46,8 +46,13 @@ INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
 INTERACTIONS_THAT_USE_COMPONENTS = [
-    'AlgebraicExpressionInput', 'Continue', 'MathEquationInput',
-    'NumericExpressionInput', 'RatioExpressionInput']
+    'AlgebraicExpressionInput',
+    'Continue',
+    'FractionInput',
+    'MathEquationInput',
+    'NumericExpressionInput',
+    'RatioExpressionInput'
+]
 
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', python_utils.BASESTRING),

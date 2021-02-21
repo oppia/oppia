@@ -124,9 +124,8 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
 
     $scope.$onInit = function() {
       $scope.directiveSubscriptions.add(
-        CurrentInteractionService.onAnswerChanged.subscribe(() => {
-          // Remove this when migrating to angular or use changeDetector.detect
-          // Changes instead.
+        // TODO(#11996): Remove when migrating to Angular2+.
+        CurrentInteractionService.onAnswerChanged$.subscribe(() => {
           $rootScope.$applyAsync();
         })
       );
