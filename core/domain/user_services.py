@@ -196,7 +196,11 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not utils.is_user_id_valid(self.user_id):
+        if not utils.is_user_id_valid(
+                self.user_id,
+                allow_system_user_id=True,
+                allow_pseudonymous_id=True
+        ):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not isinstance(self.role, python_utils.BASESTRING):
@@ -407,22 +411,6 @@ class UserSettings(python_utils.OBJECT):
                 if reserved_username in username.lower().strip():
                     raise utils.ValidationError(
                         'This username is not available.')
-
-
-def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
-    """Verify that the user ID is in a correct format or it is in correct
-    pseudonymous ID format.
-
-    Args:
-        user_or_pseudonymous_id: str. The user or pseudonymous ID to be checked.
-
-    Returns:
-        bool. True when the ID is in a correct user ID or pseudonymous ID
-        format, False otherwise.
-    """
-    return (
-        utils.is_user_id_valid(user_or_pseudonymous_id) or
-        utils.is_pseudonymous_id(user_or_pseudonymous_id))
 
 
 def is_username_taken(username):
@@ -685,9 +673,10 @@ def _create_user_contribution_rights_from_model(user_contribution_rights_model):
                 user_contribution_rights_model
                 .can_review_voiceover_for_language_codes
             ),
-            user_contribution_rights_model.can_review_questions)
+            user_contribution_rights_model.can_review_questions,
+            user_contribution_rights_model.can_submit_questions)
     else:
-        return user_domain.UserContributionRights('', [], [], False)
+        return user_domain.UserContributionRights('', [], [], False, False)
 
 
 def get_user_contribution_rights(user_id):
@@ -793,7 +782,9 @@ def _save_user_contribution_rights(user_contribution_rights):
         can_review_voiceover_for_language_codes=(
             user_contribution_rights.can_review_voiceover_for_language_codes),
         can_review_questions=(
-            user_contribution_rights.can_review_questions)).put()
+            user_contribution_rights.can_review_questions),
+        can_submit_questions=(
+            user_contribution_rights.can_submit_questions)).put()
 
 
 def _update_user_contribution_rights(user_contribution_rights):
@@ -810,6 +801,7 @@ def _update_user_contribution_rights(user_contribution_rights):
         remove_contribution_reviewer(user_contribution_rights.id)
 
 
+@transaction_services.run_in_transaction_wrapper
 def _update_reviewer_counts_in_community_contribution_stats_transactional(
         future_user_contribution_rights):
     """Updates the reviewer counts in the community contribution stats based
@@ -879,8 +871,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
         user_contribution_rights: UserContributionRights. The user contribution
             rights.
     """
-    transaction_services.run_in_transaction(
-        _update_reviewer_counts_in_community_contribution_stats_transactional,
+    _update_reviewer_counts_in_community_contribution_stats_transactional(
         user_contribution_rights)
 
 
@@ -2413,6 +2404,19 @@ def can_review_question_suggestions(user_id):
     return user_contribution_rights.can_review_questions
 
 
+def can_submit_question_suggestions(user_id):
+    """Checks whether the user can submit question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. Whether the user can submit question suggestions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    return user_contribution_rights.can_submit_questions
+
+
 def allow_user_to_review_translation_in_language(user_id, language_code):
     """Allows the user with the given user id to review translation in the given
     language_code.
@@ -2507,6 +2511,30 @@ def remove_question_review_rights(user_id):
     _update_user_contribution_rights(user_contribution_rights)
 
 
+def allow_user_to_submit_question(user_id):
+    """Allows the user with the given user id to submit question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user does not have rights to submit questions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_submit_questions = True
+    _save_user_contribution_rights(user_contribution_rights)
+
+
+def remove_question_submit_rights(user_id):
+    """Removes the user's submit rights to question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user already has rights to submit questions.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_submit_questions = False
+    _update_user_contribution_rights(user_contribution_rights)
+
+
 def remove_contribution_reviewer(user_id):
     """Deletes the UserContributionRightsModel corresponding to the given
     user_id.
@@ -2528,12 +2556,12 @@ def remove_contribution_reviewer(user_id):
         user_contribution_rights_model.delete()
 
 
-def get_contribution_reviewer_usernames(review_category, language_code=None):
-    """Returns a list of usernames of users who has rights to review item of
-    given review category.
+def get_contributor_usernames(category, language_code=None):
+    """Returns a list of usernames of users who has contribution rights of given
+    category.
 
     Args:
-        review_category: str. The review category to find the list of reviewers
+        category: str. The review category to find the list of reviewers
             for.
         language_code: None|str. The language code for translation or voiceover
             review category.
@@ -2541,26 +2569,30 @@ def get_contribution_reviewer_usernames(review_category, language_code=None):
     Returns:
         list(str). A list of usernames.
     """
-    reviewer_ids = []
-    if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
-        reviewer_ids = (
+    user_ids = []
+    if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
-    elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
-        reviewer_ids = (
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
-    elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (
                 language_code))
-        reviewer_ids = (
+        user_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
+    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
+        user_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_submitter_user_ids())
     else:
-        raise Exception('Invalid review category: %s' % review_category)
+        raise Exception('Invalid category: %s' % category)
 
-    return get_usernames(reviewer_ids)
+    return get_usernames(user_ids)
 
 
 def log_username_change(committer_id, old_username, new_username):

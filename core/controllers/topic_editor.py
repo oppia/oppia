@@ -76,13 +76,13 @@ class TopicEditorStoryHandler(base.BaseHandler):
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
-            summary['pending_node_dicts'] = []
+            summary['all_node_dicts'] = []
 
         for summary in additional_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
-            summary['pending_node_dicts'] = []
+            summary['all_node_dicts'] = []
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -437,7 +437,7 @@ class TopicUrlFragmentHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_create_topic
     def get(self, topic_url_fragment):
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
@@ -455,7 +455,7 @@ class TopicNameHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_create_topic
     def get(self, topic_name):
         """Handler that receives a topic name and checks whether
         a topic with the same name exists.

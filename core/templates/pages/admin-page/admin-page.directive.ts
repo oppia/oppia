@@ -24,7 +24,7 @@ require(
   'pages/admin-page/activities-tab/admin-dev-mode-activities-tab.directive.ts');
 require(
   'pages/admin-page/activities-tab/' +
-  'admin-prod-mode-activities-tab.directive.ts');
+  'admin-prod-mode-activities-tab.component.ts');
 require('pages/admin-page/config-tab/admin-config-tab.directive.ts');
 require('pages/admin-page/jobs-tab/admin-jobs-tab.directive.ts');
 require('pages/admin-page/misc-tab/admin-misc-tab.directive.ts');
@@ -34,7 +34,6 @@ require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
 require('services/csrf-token.service.ts');
 require('services/utils.service.ts');
@@ -49,11 +48,11 @@ angular.module('oppia').directive('adminPage', [
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$rootScope', '$scope', 'AdminDataService',
+        '$location', '$rootScope', '$scope',
         'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
         'DEV_MODE',
         function(
-            $location, $rootScope, $scope, AdminDataService,
+            $location, $rootScope, $scope,
             AdminRouterService, CsrfTokenService, PlatformFeatureService,
             DEV_MODE) {
           var ctrl = this;
@@ -89,13 +88,6 @@ angular.module('oppia').directive('adminPage', [
           ctrl.$onInit = function() {
             $scope.$on('$locationChangeSuccess', function() {
               AdminRouterService.showTab($location.path().replace('/', '#'));
-            });
-            ctrl.userEmail = '';
-            AdminDataService.getDataAsync().then(function(response) {
-              ctrl.userEmail = response.user_email;
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
             });
             ctrl.inDevMode = DEV_MODE;
             ctrl.statusMessage = '';
