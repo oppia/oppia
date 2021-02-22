@@ -37,6 +37,7 @@ describe('Login Required Modal Content', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalContent>;
   let component: TranslationModalContent;
@@ -68,6 +69,7 @@ describe('Login Required Modal Content', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     contextService = TestBed.inject(ContextService);
+    activeModal = TestBed.inject(NgbActiveModal);
     translateTextService = TestBed.inject(TranslateTextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
@@ -77,6 +79,11 @@ describe('Login Required Modal Content', () => {
 
   afterEach(() => {
     httpTestingController.verify();
+  });
+  it('should close', () => {
+    spyOn(activeModal, 'close');
+    component.close();
+    expect(activeModal.close).toHaveBeenCalled();
   });
 
   describe('when initialized', () => {
