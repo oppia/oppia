@@ -88,7 +88,9 @@ var _completeSignup = async function(username, manualNavigation = true) {
     // as a client side navigation and the tests fail since Angular is
     // not found due to the navigation interfering with protractor's
     // bootstrapping.
+    await browser.waitForAngularEnabled(false);
     await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
+    await browser.waitForAngularEnabled(true);
   }
   await waitFor.pageToFullyLoad();
   var usernameInput = element(by.css('.protractor-test-username-input'));
@@ -102,8 +104,8 @@ var _completeSignup = async function(username, manualNavigation = true) {
 };
 
 var completeLoginFlowFromStoryViewerPage = async function(email, username) {
-  await login(email, false);
-  await _completeSignup(username);
+  await login(email, false, false);
+  await _completeSignup(username, false);
 };
 
 var createUser = async function(email, username) {
