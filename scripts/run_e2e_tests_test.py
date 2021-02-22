@@ -423,7 +423,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         mock_sleep.sleep_time = 0
 
-        is_port_open_swap = self.swap(common, 'is_port_in_use', mock_is_port_open)
+        is_port_open_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_open)
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
