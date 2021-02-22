@@ -21,10 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  StateNamesToContentIdMappingBackendDict,
   TranslateTextBackendApiService
 } from 'services/translate-text-backend-api.service';
 import { ImagesData } from 'services/image-local-storage.service';
+import { StateNamesToContentIdMapping, TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +34,7 @@ export class TranslateTextService {
     private translatableTextBackedApiService:
     TranslateTextBackendApiService) {}
 
-  stateWiseContents: StateNamesToContentIdMappingBackendDict = null;
+  stateWiseContents: StateNamesToContentIdMapping = null;
   stateWiseContentIds: {[key: string]: string[]} = {};
   activeStateName: string = null;
   activeContentId: string = null;
@@ -85,9 +85,10 @@ export class TranslateTextService {
     this.activeExpId = expId;
     this.activeExpVersion = null;
     this.translatableTextBackedApiService.getTranslatableTextsAsync(
-      expId, languageCode).then((response) => {
-      this.stateWiseContents = response.state_names_to_content_id_mapping;
-      this.activeExpVersion = response.version;
+      expId, languageCode).then((translatableTexts: TranslatableTexts) => {
+      this.stateWiseContents = translatableTexts.getStateWiseContents();
+      this.activeExpVersion = translatableTexts.getExplorationVersion();
+      console.log(translatableTexts);
       for (const stateName in this.stateWiseContents) {
         let stateHasText = false;
         const contentIds = [];

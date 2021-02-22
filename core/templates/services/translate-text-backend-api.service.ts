@@ -18,17 +18,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from './image-local-storage.service';
 
 
-export class StateNamesToContentIdMappingBackendDict {
-  [state: string]: {[contentId:string]: string}
-}
-
-export class TranslatableTextHandlerResponseBackendDict {
-  'state_names_to_content_id_mapping': StateNamesToContentIdMappingBackendDict;
-  'version': string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -37,14 +30,16 @@ export class TranslateTextBackendApiService {
   constructor(private http: HttpClient) {}
 
   async getTranslatableTextsAsync(expId: string, languageCode: string):
-    Promise<TranslatableTextHandlerResponseBackendDict> {
-    return this.http.get<TranslatableTextHandlerResponseBackendDict>(
+    Promise<TranslatableTexts> {
+    return this.http.get<TranslatableTextsBackendDict>(
       '/gettranslatabletexthandler', {
         params: {
           exp_id: expId,
           language_code: languageCode
         }
-      }).toPromise();
+      }).toPromise().then((backendDict: TranslatableTextsBackendDict) => {
+      return TranslatableTexts.createFromBackendDict(backendDict);
+    });
   }
 
   async suggestTranslatedTextAsync(
