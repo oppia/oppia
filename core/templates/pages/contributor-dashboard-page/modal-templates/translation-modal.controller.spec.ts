@@ -179,7 +179,7 @@ describe('Translation Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should close modal when suggestion could not be submitted',
+  it('should close modal when suggestion could not be submitted',
     function() {
       $httpBackend.flush();
 

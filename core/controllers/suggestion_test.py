@@ -1030,8 +1030,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             raw_image = f.read()
 
         def mock_copy_images(
-            unused_target_type, unused_target_id_1, unused_image_context,
-            unused_target_id_2, unused_target_image_filenames):
+                unused_target_type, unused_target_id_1, unused_image_context,
+                unused_target_id_2, unused_target_image_filenames):
             raise Exception('Failed to copy images')
 
         with self.swap(fs_services, 'copy_images', mock_copy_images):
