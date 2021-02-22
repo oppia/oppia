@@ -218,7 +218,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     r'\033\[1mfile.ts\033\[0m seems to be fully covered!'
                     ' Before removing it manually from the blacklist'
                     ' in the file'
-                    ' scripts/check_frontend_test_coverage.py, please'
+                    ' scripts/check_frontend_coverage.py, please'
                     ' make sure you\'ve followed the unit tests rules'
                     ' correctly on:'
                     ' https://github.com/oppia/oppia/wiki/Frontend-unit'
