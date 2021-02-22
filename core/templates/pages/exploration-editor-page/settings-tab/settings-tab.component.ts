@@ -264,35 +264,37 @@ angular.module('oppia').component('settingsTab', {
 
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
-        UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          true);
-        setTimeout(() => {
+        let successCallback = () => {
           $rootScope.$applyAsync();
-        }, 150);
+        };
+        UserEmailPreferencesService.setFeedbackNotificationPreferences(
+          true, successCallback);
       };
       ctrl.muteSuggestionNotifications = function() {
-        UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          true
-        );
-        setTimeout(() => {
+        let successCallback = () => {
           $rootScope.$applyAsync();
-        }, 150);
+        };
+        UserEmailPreferencesService.setSuggestionNotificationPreferences(
+          true,
+          successCallback
+        );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
-        UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          false
-        );
-        setTimeout(() => {
+        let successCallback = () => {
           $rootScope.$applyAsync();
-        }, 150);
+        };
+        UserEmailPreferencesService.setFeedbackNotificationPreferences(
+          false,
+          successCallback
+        );
       };
       ctrl.unmuteSuggestionNotifications = function() {
-        UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          false);
-        setTimeout(() => {
+        let successCallback = () => {
           $rootScope.$applyAsync();
-        }, 150);
+        };
+        UserEmailPreferencesService.setSuggestionNotificationPreferences(
+          false, successCallback);
       };
 
       // Methods relating to control buttons.

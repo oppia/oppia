@@ -67,20 +67,26 @@ export class UserEmailPreferencesService {
    * Set the message type to feedback and mute to true or false.
    * @param {boolean} mute - Whether the feedback notification is muted.
    */
-  setFeedbackNotificationPreferences(mute: boolean): void {
+  setFeedbackNotificationPreferences(
+      mute: boolean, successCallback: () => void): void {
     this.saveChangeToBackend({
       message_type: this.MESSAGE_TYPE_FEEDBACK,
       mute: mute
+    }).then(() => {
+      successCallback();
     });
   }
   /**
    * Set the message type to suggestion and mute to true or false.
    * @param {boolean} mute - Whether the suggestion notification is muted.
    */
-  setSuggestionNotificationPreferences(mute: boolean): void {
+  setSuggestionNotificationPreferences(
+      mute: boolean, successCallback: () => void): void {
     this.saveChangeToBackend({
       message_type: this.MESSAGE_TYPE_SUGGESTION,
       mute: mute
+    }).then(()=> {
+      successCallback();
     });
   }
 

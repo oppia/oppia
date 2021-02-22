@@ -92,7 +92,8 @@ describe('User Email Preferences Service', () => {
 
   it('should successfully set the feedback notification preferences',
     fakeAsync(() => {
-      userEmailPreferencesService.setFeedbackNotificationPreferences(false);
+      userEmailPreferencesService
+        .setFeedbackNotificationPreferences(false, () => {});
       var req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId);
       expect(req.request.method).toEqual('PUT');
@@ -104,7 +105,8 @@ describe('User Email Preferences Service', () => {
 
   it('should successfully set the suggestion notification preferences',
     fakeAsync(() => {
-      userEmailPreferencesService.setSuggestionNotificationPreferences(false);
+      userEmailPreferencesService
+        .setSuggestionNotificationPreferences(false, () => {});
 
       var req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId
