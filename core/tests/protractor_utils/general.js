@@ -134,12 +134,12 @@ var moveToEditor = async function() {
 };
 
 var expect404Error = async function() {
-  var protractorTestErrorContainer =
+  var errorContainer =
     element(by.css('.protractor-test-error-container'));
   await waitFor.visibilityOf(
-    protractorTestErrorContainer,
+    errorContainer,
     'Protractor test error container taking too long to appear');
-  expect(await protractorTestErrorContainer.getText()).
+  expect(await errorContainer.getText()).
     toMatch('Error 404');
 };
 
