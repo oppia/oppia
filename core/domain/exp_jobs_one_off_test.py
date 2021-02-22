@@ -168,11 +168,8 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
 
             self.assertIsNotNone(exp_model1.skill_tags)
 
-
             self.assertIn('skill_tags', exp_model1._values) # pylint: disable=protected-access
             self.assertIn('skill_tags', exp_model1._properties) # pylint: disable=protected-access
-
-
 
             output = self._run_one_off_job()
             self.assertItemsEqual(
@@ -181,13 +178,10 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
             migrated_exp_model1 = (
                 exp_models.ExplorationModel.get_by_id('exp_id1'))
 
-
             self.assertNotIn(
                 'skill_tags', migrated_exp_model1._values)  # pylint: disable=protected-access
             self.assertNotIn(
                 'skill_tags', migrated_exp_model1._properties)  # pylint: disable=protected-access
-
-
 
             # Run job twice.
             output = self._run_one_off_job()
