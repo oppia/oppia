@@ -70,16 +70,6 @@ describe('Admin Navbar component', () => {
     expect(ctrl.dropdownMenuisActive).toBe(false);
   });
 
-  it('should call showTab in AdminRouterService and the page should be ' +
-      'routed to the activities tab by default', () => {
-    spyOn(AdminRouterService, 'showTab');
-
-    ctrl.showTab();
-
-    expect(AdminRouterService.showTab).toHaveBeenCalled();
-    expect(ctrl.isActivitiesTabOpen()).toBe(true);
-  });
-
   it('should be routed to the activities tab by default', () => {
     expect(ctrl.isActivitiesTabOpen()).toBe(true);
     expect(ctrl.isConfigTabOpen()).toBe(false);
