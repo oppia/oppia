@@ -57,7 +57,7 @@ describe('Admin Navbar component', () => {
     $rootScope.$apply();
   });
 
-  it('should initialize ctrl properties after directive is initialized', () => {
+  it('should initialize component properties correctly', () => {
     expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     expect(ctrl.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
