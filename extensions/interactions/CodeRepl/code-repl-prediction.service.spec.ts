@@ -30,7 +30,7 @@ import { WinnowingPreprocessingService } from
 describe('CodeRepl prediction service', () => {
   describe('CodeRepl prediction service test', () => {
     let service: CodeReplPredictionService, tokenizer: PythonProgramTokenizer;
-    beforeEach(angular.mock.inject(() => {
+    beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
           CodeReplPredictionService, CountVectorizerService,
@@ -40,7 +40,7 @@ describe('CodeRepl prediction service', () => {
       });
       tokenizer = TestBed.get(PythonProgramTokenizer);
       service = TestBed.get(CodeReplPredictionService);
-    }));
+    });
 
     it('should calculate correct jaccard index', () => {
       let multisetA = [1, 2];
