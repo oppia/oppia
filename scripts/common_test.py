@@ -820,7 +820,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         swap_call = self.swap(subprocess, 'call', mock_call)
         swap_wait_for_port_to_be_open = self.swap(
-            common, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_in_use',
             mock_wait_for_port_to_be_open)
         with swap_call, swap_wait_for_port_to_be_open:
             common.start_redis_server()
