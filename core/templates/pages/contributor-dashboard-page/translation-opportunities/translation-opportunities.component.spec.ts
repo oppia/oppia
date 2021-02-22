@@ -76,8 +76,6 @@ describe('Translation opportunities component', () => {
         NgbModal,
         NgbActiveModal
       ],
-      // Prevent errors for rendering upgraded directives
-      // schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     translationModal = TestBed.createComponent(
       TranslationModalContent) as unknown as NgbModalRef;
