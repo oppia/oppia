@@ -40,7 +40,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'admin-navbar.directive.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
-    'ajs-services-provided-in-angular.index.ts', # Please don't cover this file.
     'alert-message.directive.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
