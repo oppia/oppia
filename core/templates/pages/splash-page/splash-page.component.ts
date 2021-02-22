@@ -55,7 +55,7 @@ export class SplashPageComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
     private userService: UserService,
-    private loaderService: LoaderService,
+    private loaderService: LoaderService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {

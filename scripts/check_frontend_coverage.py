@@ -31,7 +31,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # manually.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
-# @marianazangrossi first.
+# @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
@@ -40,6 +40,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'admin-navbar.directive.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
+    'ajs-services-provided-in-angular.index.ts', # Please don't cover this file.
     'alert-message.directive.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',

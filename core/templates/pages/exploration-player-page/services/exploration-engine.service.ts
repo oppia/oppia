@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { $Injector } from 'components/ajs-services-provided-in-angular.index';
 
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
@@ -32,6 +33,9 @@ require('pages/exploration-player-page/services/audio-preloader.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
+require(
+  'pages/exploration-player-page/services/' +
+  'content-translation-language.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('pages/exploration-player-page/services/learner-params.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
@@ -478,3 +482,15 @@ angular.module('oppia').factory('ExplorationEngineService', [
     };
   }
 ]);
+
+export class ExplorationEngineService {}
+
+const explorationEngineServiceFactoryFunction = (i: $Injector): unknown => {
+  return i.get('ExplorationEngineService');
+};
+
+export const explorationEngineServiceProvider = {
+  provide: ExplorationEngineService,
+  useFactory: explorationEngineServiceFactoryFunction,
+  deps: ['$injector']
+};

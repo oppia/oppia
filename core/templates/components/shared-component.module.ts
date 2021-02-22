@@ -59,6 +59,7 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { ajsFactoryFunctions } from './ajs-services-provided-in-angular.index';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -85,6 +86,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   ],
 
   providers: [
+    ...ajsFactoryFunctions,
     ...firebaseAuthProviders,
   ],
 

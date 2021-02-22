@@ -49,6 +49,7 @@
 
 # Angular Migration team
 /core/templates/components/shared-component.module.ts @srijanreddy98
+/core/templates/components/ajs-services-provided-in-angular.index.ts @srijanreddy98
 /core/templates/services/loader.service*.ts @srijanreddy98
 /core/templates/components/material.module.ts @srijanreddy98
 /core/templates/components/oppia-angular-root.component.ts @srijanreddy98

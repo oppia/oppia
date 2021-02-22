@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the OppiaAngularRootComponent.
  */
 
-import { ComponentFixture, TestBed, async} from
+import { ComponentFixture, TestBed, waitForAsync} from
   '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -30,7 +30,7 @@ let fixture: ComponentFixture<OppiaAngularRootComponent>;
 describe('OppiaAngularRootComponent', function() {
   let emitSpy: jasmine.Spy;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [OppiaAngularRootComponent],
