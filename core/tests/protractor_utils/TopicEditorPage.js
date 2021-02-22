@@ -36,8 +36,7 @@ var TopicEditorPage = function() {
   var storyListItems = element.all(
     by.css('.protractor-test-story-list-item'));
   var storyListTable = element(by.css('.protractor-test-story-list-table'));
-  var skillDescriptionButton = element(
-    by.css('option[label="' + skillDescription + '"]'));
+
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
   var topicNameHeading = element(
@@ -155,6 +154,8 @@ var TopicEditorPage = function() {
       count, skillDescription) {
     await action.select(
       'Select skill dropdown', selectSkillDropdown, skillDescription);
+    var skillDescriptionButton = element(
+      by.css('option[label="' + skillDescription + '"]'));
     await action.click('Skill description button', skillDescriptionButton);
     await waitFor.visibilityOf(
       questionItems.first(), 'Question takes too long to appear');
@@ -171,6 +172,8 @@ var TopicEditorPage = function() {
   this.createQuestionForSkillWithName = async function(skillDescription) {
     await action.select(
       'Select skill dropdown', selectSkillDropdown, skillDescription);
+    var skillDescriptionButton = element(
+      by.css('option[label="' + skillDescription + '"]'));
     await action.click('Skill description button', skillDescriptionButton);
     await action.click('Create question button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
