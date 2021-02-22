@@ -24,6 +24,8 @@ var TopicViewerPage = function() {
   var topicDescription = element(by.css('.protractor-test-topic-description'));
   var storySummaryTitleList =
     element.all(by.css('.protractor-test-story-summary-title'));
+  var startPracticeButton =
+    element(by.css('.protractor-test-practice-start-button'));
 
   this.get = async function(classroomUrlFragment, topicName) {
     await browser.get(`/learn/${classroomUrlFragment}`);
@@ -57,6 +59,35 @@ var TopicViewerPage = function() {
         'Story summary tiles take too long to be visible.');
       expect(await storySummaryTitleList.count()).toEqual(count);
     }
+  };
+
+  this.moveToRevisionTab = async function() {
+    var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
+    await action.click('Revision Tab', revisionTabLink);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.moveToPracticeTab = async function() {
+    var practiceTabLink = element(by.css('.protractor-test-practice-tab-link'));
+    await action.click('Practice Tab', practiceTabLink);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.selectSkillForPractice = async function(subtopicTitle) {
+    var skillCheckbox = element(by.cssContainingText(
+      '.protractor-test-skill-checkbox', subtopicTitle));
+    await action.click('Select skill to practice', skillCheckbox);
+  };
+
+  this.startPractice = async function() {
+    await action.click('Start practice', startPracticeButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.expectedMessageAfterCompletion = async function(message) {
+    var messageOnCompletion = element(
+      by.css('.protractor-test-practice-complete-message'));
+    expect(await messageOnCompletion.getText()).toEqual(message);
   };
 };
 

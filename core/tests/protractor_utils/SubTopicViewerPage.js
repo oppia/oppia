@@ -22,12 +22,24 @@ var action = require('./action.js');
 
 var SubTopicViewerPage = function() {
   var subTopicTileList = element.all(by.css('.protractor-test-subtopic-tile'));
+  var conceptCardList = element.all(
+    by.css('.protractor-test-concept-card-link'));
+  var conceptCardExplanation = element(
+    by.css('.protractor-test-concept-card-explanation'));
 
-  this.get = async function() {
-    var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
-    await action.click('Revision Tab', revisionTabLink);
+  this.get = async function(subTopicName) {
     await waitFor.pageToFullyLoad();
-  };
+    var subTopicTile = element(by.cssContainingText(
+      '.protractor-test-subtopic-tile', subTopicName));
+    if (await subTopicTile.isPresent()) {
+      await action.click(subTopicName, subTopicTile);
+      await waitFor.pageToFullyLoad();
+    } else {
+      throw new Error (
+        'Sub topic ' + subTopicName + ' card is not present,'
+      );
+    }
+  }
 
   this.expectedRevisionCardCountToBe = async function(count) {
     if (count === 0) {
@@ -39,6 +51,32 @@ var SubTopicViewerPage = function() {
       expect(await subTopicTileList.count()).toEqual(count);
     }
   };
+
+  this.expectedConceptCardCountToBe = async function(count) {
+    if (count === 0) {
+      expect(await conceptCardList.count()).toEqual(0);
+    } else {
+      await waitFor.visibilityOf(
+        conceptCardList.first(),
+        'Concept card take too long to be visible.');
+      expect(await conceptCardList.count()).toEqual(count);
+    }
+  };
+
+  this.getConceptCard = async function() {
+    var conceptCardElement = conceptCardList.first();
+    await action.click('Concept card link', conceptCardElement);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.expectedConceptCardInformationToBe = async function(description) {
+    await waitFor.visibilityOf(
+      conceptCardExplanation,
+      'Concept card explanation takes too long to be visible.');
+    var text = await conceptCardExplanation.getText();
+    expect(text).toEqual(description);
+  };
+
 };
 
 exports.SubTopicViewerPage = SubTopicViewerPage;

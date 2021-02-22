@@ -119,6 +119,12 @@ var TopicEditorPage = function() {
   };
   var saveRearrangedSkillsButton = element(
     by.css('.protractor-save-rearrange-skills'));
+  var practiceTabCheckbox = element(
+    by.css('.protractor-test-toggle-practice-tab'));
+
+  this.togglePracticeTab = async function() {
+    await action.click('Practice tab checkbox', practiceTabCheckbox);
+  };
 
   this.get = async function(topicId) {
     await browser.get(EDITOR_URL_PREFIX + topicId);
@@ -264,6 +270,14 @@ var TopicEditorPage = function() {
     var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
     await pageEditorInput.click();
     await pageEditorInput.sendKeys(htmlContent);
+    var conceptCardButton = pageEditor.element(by.css('#cke_24'));
+    await conceptCardButton.click();
+    var skillForConceptCard = element.all(
+      by.css('.protractor-test-rte-skill-selector-item')).first();
+    await skillForConceptCard.click();
+    var closeRTEButton = element(
+      by.css('.protractor-test-close-rich-text-component-editor'));
+    await closeRTEButton.click();
 
     await waitFor.elementToBeClickable(
       confirmSubtopicCreationButton,
