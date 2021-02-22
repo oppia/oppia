@@ -35,9 +35,13 @@ describe('Thread table component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ThreadTableComponent, TruncatePipe],
-      providers: [{ provide: DateTimeFormatService,
-        useClass: MockDateTimeFormatService }, ThreadStatusDisplayService]
-    }).compileComponents();
+      providers: [
+        {
+          provide: DateTimeFormatService,
+          useClass: MockDateTimeFormatService
+        },
+        ThreadStatusDisplayService
+      ]}).compileComponents();
   }));
 
   beforeEach(() => {
@@ -51,13 +55,13 @@ describe('Thread table component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should get css classes based on status', function() {
+  it('should get css classes based on status', () => {
     expect(component.getLabelClass('open')).toBe('badge badge-info');
     expect(component.getLabelClass('compliment')).toBe('badge badge-success');
     expect(component.getLabelClass('other')).toBe('badge badge-secondary');
   });
 
-  it('should get human readable status from provided status', function() {
+  it('should get human readable status from provided status', () => {
     expect(component.getHumanReadableStatus('open')).toBe('Open');
     expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
     expect(component.getHumanReadableStatus('not_actionable')).toBe(
@@ -65,7 +69,7 @@ describe('Thread table component', () => {
   });
 
   it('should get formatted date string from the timestamp in milliseconds',
-    function() {
+    () => {
       var NOW_MILLIS = 1416563100000;
       expect(component.getLocaleAbbreviatedDateTimeString(NOW_MILLIS)).toBe(
         '11/21/2014');
