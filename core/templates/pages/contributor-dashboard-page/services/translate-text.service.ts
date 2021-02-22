@@ -88,7 +88,6 @@ export class TranslateTextService {
       expId, languageCode).then((translatableTexts: TranslatableTexts) => {
       this.stateWiseContents = translatableTexts.getStateWiseContents();
       this.activeExpVersion = translatableTexts.getExplorationVersion();
-      console.log(translatableTexts);
       for (const stateName in this.stateWiseContents) {
         let stateHasText = false;
         const contentIds = [];

@@ -22,7 +22,7 @@ import {
 } from
   'domain/opportunity/translatable-texts.model';
 
-fdescribe('Translatable Texts model', () => {
+describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
 
   beforeEach(() => {
