@@ -15,7 +15,8 @@
 /**
  * @fileoverview Component for the exploration title field in forms.
  */
-
+require('pages/exploration-editor-page/services/router.service.ts');
+require('services/stateful/focus-manager.service.ts');
 angular.module('oppia').component('explorationTitleEditor', {
   bindings: {
     // The text for the label of the field.
@@ -29,9 +30,18 @@ angular.module('oppia').component('explorationTitleEditor', {
   },
   template: require('./exploration-title-editor.component.html'),
   controller: [
-    '$scope', 'ExplorationTitleService',
-    function($scope, ExplorationTitleService) {
+    '$scope', '$rootScope', 'ExplorationTitleService', 'FocusManagerService',
+    'RouterService',
+    function($scope, $rootScope, ExplorationTitleService, FocusManagerService,
+      RouterService) {
       $scope.explorationTitleService = ExplorationTitleService;
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        $rootScope.$watch(() => RouterService.getActiveTabName(), function(newValue){
+        if (newValue === 'settings') {
+          FocusManagerService.setFocus(ctrl.focusLabel);
+        }
+      })
     }
-  ]
+  }]
 });
