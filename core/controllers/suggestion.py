@@ -112,48 +112,39 @@ class SuggestionHandler(base.BaseHandler):
             self.render_json(self.values)
             return
 
-        try:
-            new_image_filenames = (
-                suggestion.get_new_image_filenames_added_in_suggestion())
-            for filename in new_image_filenames:
-                image = self.request.get(filename)
-                if not image:
-                    logging.error(
-                        'Image not provided for file with name %s when the '
-                        ' suggestion with target id %s was created.' % (
-                            filename, suggestion.target_id))
-                    raise self.InvalidInputException(
-                        'No image data provided for file with name %s.'
-                        % (filename))
-                try:
-                    file_format = (
-                        image_validation_services.validate_image_and_filename(
-                            image, filename))
-                except utils.ValidationError as e:
-                    raise self.InvalidInputException('%s' % (e))
-                image_is_compressible = (
-                    file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-                fs_services.save_original_and_compressed_versions_of_image(
-                    filename, suggestion_image_context, suggestion.target_id,
-                    image, 'image', image_is_compressible)
+        new_image_filenames = (
+            suggestion.get_new_image_filenames_added_in_suggestion())
+        for filename in new_image_filenames:
+            image = self.request.get(filename)
+            if not image:
+                logging.error(
+                    'Image not provided for file with name %s when the '
+                    ' suggestion with target id %s was created.' % (
+                        filename, suggestion.target_id))
+                raise self.InvalidInputException(
+                    'No image data provided for file with name %s.'
+                    % (filename))
+            try:
+                file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        image, filename))
+            except utils.ValidationError as e:
+                raise self.InvalidInputException('%s' % (e))
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, suggestion_image_context, suggestion.target_id,
+                image, 'image', image_is_compressible)
 
-            target_entity_html_list = (
-                suggestion.get_target_entity_html_strings())
-            target_image_filenames = (
-                html_cleaner.get_image_filenames_from_html_strings(
-                    target_entity_html_list))
+        target_entity_html_list = suggestion.get_target_entity_html_strings()
+        target_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                target_entity_html_list))
 
-            fs_services.copy_images(
-                suggestion.target_type, suggestion.target_id,
-                suggestion_image_context, suggestion.target_id,
-                target_image_filenames)
-        except Exception as e:
-            suggestion_services.reject_suggestion(
-                suggestion.suggestion_id, feconf.SUGGESTION_BOT_USER_ID,
-                'The images in the suggestion could not be saved.')
-            logging.error('Failed to submit suggestion: %s' % e)
-            raise self.InvalidInputException(
-                'Failed to submit suggestion: %s' % e)
+        fs_services.copy_images(
+            suggestion.target_type, suggestion.target_id,
+            suggestion_image_context, suggestion.target_id,
+            target_image_filenames)
 
         self.render_json(self.values)
 

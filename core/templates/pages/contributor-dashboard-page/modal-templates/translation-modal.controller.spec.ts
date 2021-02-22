@@ -183,7 +183,7 @@ describe('Translation Modal Controller', function() {
     function() {
       $httpBackend.flush();
 
-      let errorResponseObject = {
+      const errorResponseObject = {
         status_code: 401,
         error: 'Error!'
       };

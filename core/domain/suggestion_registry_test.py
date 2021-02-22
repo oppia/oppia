@@ -1350,7 +1350,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.change.content_html = 'invalid content_html'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The Exploration content has changed since this translation'
+            'The Exploration content has changed since this translation '
             'was submitted.'
         ):
             suggestion.pre_accept_validate()
