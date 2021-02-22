@@ -20,6 +20,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
 
 import { TranslateTextBackendApiService } from
   'services/translate-text-backend-api.service';
@@ -51,7 +52,7 @@ describe('TranslateTextBackendApiService', () => {
           stateName1: {contentId1: 'text1', contentId2: 'text2'},
           stateName2: {contentId3: 'text3'}
         },
-        version: 1
+        version: '1'
       };
       translateTextBackendApiService.getTranslatableTextsAsync('1', 'en').then(
         successHandler, failHandler
@@ -62,7 +63,8 @@ describe('TranslateTextBackendApiService', () => {
       req.flush(sampleDataResults);
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(
+        TranslatableTexts.createFromBackendDict(sampleDataResults));
     }));
 
     it('should call the failHandler on error response', fakeAsync(() => {
