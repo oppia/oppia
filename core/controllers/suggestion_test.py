@@ -27,6 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -998,6 +999,65 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, upload_files=(
                 ('file.svg', 'file.svg', raw_image), ))
         self.logout()
+
+    def test_suggestion_creation_fails_if_copy_images_fails(self):
+        self.save_new_skill(
+            'skill_id2', self.admin_id, description='description')
+        question_state_data_dict = self._create_valid_question_data(
+            'default_state').to_dict()
+        valid_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data_dict['content']['html'] = valid_html
+        self.question_dict = {
+            'question_state_data': question_state_data_dict,
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_id2'],
+            'inapplicable_skill_misconception_ids': []
+        }
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+
+        def mock_copy_images(
+            unused_target_type, unused_target_id_1, unused_image_context,
+            unused_target_id_2, unused_target_image_filenames):
+            raise Exception('Failed to copy images')
+
+        with self.swap(fs_services, 'copy_images', mock_copy_images):
+            response_dict = self.post_json(
+                '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                    'suggestion_type': (
+                        feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                    'target_type': feconf.ENTITY_TYPE_SKILL,
+                    'target_id': self.SKILL_ID,
+                    'target_version_at_submission': 1,
+                    'change': {
+                        'cmd': (
+                            question_domain
+                            .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                        'question_dict': self.question_dict,
+                        'skill_id': self.SKILL_ID,
+                        'skill_difficulty': 0.3
+                    },
+                    'description': 'Add new question to skill'
+                }, csrf_token=csrf_token, upload_files=(
+                    ('file.svg', 'file.svg', raw_image), ),
+                expected_status_int=400)
+            self.assertIn(
+                'Failed to submit suggestion: Failed to copy images',
+                response_dict['error'])
+            self.logout()
 
     def test_suggestion_creation_when_images_are_not_provided(self):
         self.save_new_skill(

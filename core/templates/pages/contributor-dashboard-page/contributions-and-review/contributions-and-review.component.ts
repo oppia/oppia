@@ -60,6 +60,7 @@ angular.module('oppia').component('contributionsAndReview', {
         UrlInterpolationService, UserService, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
+      var submissionIsInProgress = false;
 
       var SUGGESTION_LABELS = {
         review: {
@@ -161,6 +162,7 @@ angular.module('oppia').component('contributionsAndReview', {
         AlertsService.addSuccessMessage('Submitted suggestion review.');
         ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
           [suggestionId]);
+        submissionIsInProgress = false;
       };
 
       var _showQuestionSuggestionModal = function(
@@ -178,6 +180,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
         var skillDifficulty = suggestion.change.skill_difficulty;
+        submissionIsInProgress = true;
 
         $uibModal.open({
           templateUrl: _templateUrl,
@@ -213,7 +216,10 @@ angular.module('oppia').component('contributionsAndReview', {
         }).result.then(function(result) {
           ContributionAndReviewService.resolveSuggestiontoSkill(
             targetId, suggestionId, result.action, result.reviewMessage,
-            result.skillDifficulty, resolveSuggestionSuccess);
+            result.skillDifficulty, resolveSuggestionSuccess, () => {
+              submissionIsInProgress = false;
+              AlertsService.addInfoMessage('Failed to submit suggestion.');
+            });
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -263,6 +269,12 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       ctrl.onClickViewSuggestion = function(suggestionId) {
+        if (submissionIsInProgress) {
+          AlertsService.addInfoMessage(
+            'Previous suggestion is being submitted. ' +
+            'Please try again once the suggestion has been submitted.');
+          return;
+        }
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
         if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
