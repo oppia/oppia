@@ -69,10 +69,6 @@ BUF_VERSION = '0.29.0'
 # the version of protobuf library being used.
 PROTOC_VERSION = PROTOBUF_VERSION
 
-# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
-# there is a `make test` bug in redis 6.0.6 where the solution has not been
-# released. This is explained in this issue:
-# https://github.com/redis/redis/issues/7540.
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
 # 2. Extract the cli in the folder that it was downloaded, most likely
@@ -88,7 +84,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-REDIS_CLI_VERSION = '6.0.5'
+REDIS_CLI_VERSION = '6.0.10'
 ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
