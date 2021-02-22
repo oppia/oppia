@@ -84,6 +84,7 @@ class ReportPassTests(test_utils.GenericTestBase):
                 'CIRCLECI': 1,
                 'CIRCLE_USERNAME': 'user',
                 'CIRCLE_BUILD_URL': 'https://example.com',
+                'CIRCLE_BRANCH': 'develop',
             }
             return environment_vars.get(variable)
 
@@ -96,6 +97,7 @@ class ReportPassTests(test_utils.GenericTestBase):
                 'username': 'user',
                 'build_url': 'https://example.com',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             }
         }
 
@@ -123,6 +125,8 @@ class ReportPassTests(test_utils.GenericTestBase):
                 'GITHUB_ACTIONS': 1,
                 'GITHUB_ACTOR': 'user',
                 'GITHUB_RUN_ID': 1234,
+                'GITHUB_REF': 'develop',
+                'GITHUB_REPOSITORY': 'foo/oppia',
             }
             return environment_vars.get(variable)
 
@@ -133,8 +137,9 @@ class ReportPassTests(test_utils.GenericTestBase):
             'suite': 'suiteName',
             'metadata': {
                 'username': 'user',
-                'build_url': 'https://github.com/oppia/oppia/actions/runs/1234',
+                'build_url': 'https://github.com/foo/oppia/actions/runs/1234',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             }
         }
 
@@ -162,6 +167,7 @@ class ReportPassTests(test_utils.GenericTestBase):
                 'CIRCLECI': 1,
                 'CIRCLE_USERNAME': 'user',
                 'CIRCLE_BUILD_URL': 'https://example.com',
+                'CIRCLE_BRANCH': 'develop',
             }
             return environment_vars.get(variable)
 
@@ -174,6 +180,7 @@ class ReportPassTests(test_utils.GenericTestBase):
                 'username': 'user',
                 'build_url': 'https://example.com',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             },
         }
 
@@ -211,6 +218,28 @@ class ReportPassTests(test_utils.GenericTestBase):
                 Exception, 'Unknown build environment.'):
                 flake_checker.report_pass('suiteName')
 
+    def test_missing_environment_variable(self):
+
+        def mock_getenv(variable):
+            environment_vars = {
+                'CIRCLECI': 1,
+                'CIRCLE_USERNAME': 'user',
+                'CIRCLE_BRANCH': 'develop',
+            }
+            return environment_vars.get(variable)
+
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
+            raise AssertionError('requests.post called.')
+
+        getenv_swap = self.swap(os, 'getenv', mock_getenv)
+        post_swap = self.swap(requests, 'post', mock_post)
+
+        with getenv_swap, post_swap:
+            with self.assertRaisesRegexp(
+                RuntimeError,
+                'Expected environment variable CIRCLE_BUILD_URL missing'):
+                flake_checker.report_pass('suiteName')
+
 
 class MockResponse(python_utils.OBJECT):
 
@@ -243,6 +272,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'CIRCLECI': 1,
                 'CIRCLE_USERNAME': 'user',
                 'CIRCLE_BUILD_URL': 'https://example.com',
+                'CIRCLE_BRANCH': 'develop',
             }
             return environment_vars.get(variable)
 
@@ -265,6 +295,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'username': 'user',
                 'build_url': 'https://example.com',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             }
         }
 
@@ -294,6 +325,8 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'GITHUB_ACTIONS': 1,
                 'GITHUB_ACTOR': 'user',
                 'GITHUB_RUN_ID': 1234,
+                'GITHUB_REF': 'develop',
+                'GITHUB_REPOSITORY': 'foo/oppia'
             }
             return environment_vars.get(variable)
 
@@ -314,8 +347,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             'output_lines': ['line1', 'line2'],
             'metadata': {
                 'username': 'user',
-                'build_url': 'https://github.com/oppia/oppia/actions/runs/1234',
+                'build_url': 'https://github.com/foo/oppia/actions/runs/1234',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             }
         }
 
@@ -345,6 +379,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'CIRCLECI': 1,
                 'CIRCLE_USERNAME': 'user',
                 'CIRCLE_BUILD_URL': 'https://example.com',
+                'CIRCLE_BRANCH': 'develop',
             }
             return environment_vars.get(variable)
 
@@ -358,6 +393,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'username': 'user',
                 'build_url': 'https://example.com',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             },
         }
 
@@ -387,6 +423,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'CIRCLECI': 1,
                 'CIRCLE_USERNAME': 'user',
                 'CIRCLE_BUILD_URL': 'https://example.com',
+                'CIRCLE_BRANCH': 'develop',
             }
             return environment_vars.get(variable)
 
@@ -400,6 +437,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'username': 'user',
                 'build_url': 'https://example.com',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             },
         }
 
@@ -429,6 +467,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'CIRCLECI': 1,
                 'CIRCLE_USERNAME': 'user',
                 'CIRCLE_BUILD_URL': 'https://example.com',
+                'CIRCLE_BRANCH': 'develop',
             }
             return environment_vars.get(variable)
 
@@ -442,6 +481,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                 'username': 'user',
                 'build_url': 'https://example.com',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
             },
         }
 
