@@ -39,7 +39,7 @@ var SubTopicViewerPage = function() {
         'Sub topic ' + subTopicName + ' card is not present,'
       );
     }
-  }
+  };
 
   this.expectedRevisionCardCountToBe = async function(count) {
     if (count === 0) {
@@ -76,7 +76,6 @@ var SubTopicViewerPage = function() {
     var text = await conceptCardExplanation.getText();
     expect(text).toEqual(description);
   };
-
 };
 
 exports.SubTopicViewerPage = SubTopicViewerPage;

@@ -367,7 +367,7 @@ var createQuestion = async function() {
     explanation: 'It is correct'
   });
   await skillEditorPage.saveQuestion();
-}
+};
 
 exports.getImageSource = getImageSource;
 exports.submitImage = submitImage;

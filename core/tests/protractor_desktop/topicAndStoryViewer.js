@@ -110,7 +110,7 @@ describe('Topic and Story viewer functionality', function() {
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill TASV1', 'Concept card explanation', false);
+      'Skill TASV1', 'Concept card explanation', false);
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
@@ -167,7 +167,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
   });
 
-  fit(
+  it(
     'should check for topic description, stories and revision cards',
     async function() {
       await topicViewerPage.get('math', 'Topic TASV1');
