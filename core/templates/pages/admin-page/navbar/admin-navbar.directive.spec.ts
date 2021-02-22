@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Admin Navbar component', () => {
+fdescribe('Admin Navbar component', () => {
   var $rootScope = null;
   var ctrl = null;
   var $scope = null;
@@ -70,13 +70,14 @@ describe('Admin Navbar component', () => {
     expect(ctrl.dropdownMenuisActive).toBe(false);
   });
 
-  it('should call showTab function in AdminRouterService' +
-      'when showTab in AdminNavbar is called', () => {
+  it('should call showTab in AdminRouterService and should be ' +
+      'routed to the activities tab by default', () => {
     spyOn(AdminRouterService, 'showTab');
 
     ctrl.showTab();
 
     expect(AdminRouterService.showTab).toHaveBeenCalled();
+    expect(AdminRouterService.currentTabHash).toEqual('#activities');
   });
 
   it('should be routed to the activities tab by default', () => {
