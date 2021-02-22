@@ -38,7 +38,7 @@ CI_INFO = {
             'identifier': 'CIRCLECI',
             'user_info': 'CIRCLE_USERNAME',
             'branch': 'CIRCLE_BRANCH',
-            'template_vars': ['CIRCLE_BUILD_URL']
+            'build_url_template_vars': ['CIRCLE_BUILD_URL']
         },
         'build_url_template': '%s',
     },
@@ -47,7 +47,7 @@ CI_INFO = {
             'identifier': 'GITHUB_ACTIONS',
             'user_info': 'GITHUB_ACTOR',
             'branch': 'GITHUB_REF',
-            'template_vars': ['GITHUB_REPOSITORY', 'GITHUB_RUN_ID'],
+            'build_url_template_vars': ['GITHUB_REPOSITORY', 'GITHUB_RUN_ID'],
         },
         'build_url_template': 'https://github.com/%s/actions/runs/%s',
     }
@@ -91,7 +91,7 @@ def _get_build_info():
             continue
 
         template_values = []
-        for template_var in ci_env['template_vars']:
+        for template_var in ci_env['build_url_template_vars']:
             value = os.getenv(template_var)
             if value is None:
                 raise RuntimeError(
