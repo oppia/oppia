@@ -70,7 +70,8 @@ describe('Admin Navbar component', () => {
     expect(ctrl.dropdownMenuisActive).toBe(false);
   });
 
-  it('should be call showtab in AdminRouterService', () => {
+  it('should call showTab function in AdminRouterService' +
+      'when showTab in AdminNavbar is called', () => {
     spyOn(AdminRouterService, 'showTab');
 
     ctrl.showTab();
