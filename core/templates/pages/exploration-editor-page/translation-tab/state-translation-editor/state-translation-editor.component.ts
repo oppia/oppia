@@ -61,7 +61,7 @@ angular.module('oppia').component('stateTranslationEditor', {
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/components/forms/forms-templates/' +
               'mark-audio-as-needing-update-modal.directive.html'),
-            backdrop: true,
+            backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
             recordedVoiceovers.toggleNeedsUpdateAttribute(

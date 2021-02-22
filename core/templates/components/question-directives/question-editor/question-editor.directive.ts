@@ -200,7 +200,7 @@ angular.module('oppia').directive('questionEditor', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/components/forms/forms-templates/mark-all-audio-and-' +
                   'translations-as-needing-update-modal.directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 updateQuestion(function() {
