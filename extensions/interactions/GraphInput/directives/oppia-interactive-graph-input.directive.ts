@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('interactions/GraphInput/directives/graph-viz.directive.ts');
+require('interactions/GraphInput/directives/graph-viz.component.ts');
 
 require('interactions/GraphInput/directives/graph-input-rules.service.ts');
 require(

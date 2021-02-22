@@ -25,6 +25,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 // See: https://stackoverflow.com/a/11381730
 export class DeviceInfoService {
+  static isMobileDevice() {
+    throw new Error('Method not implemented.');
+  }
   constructor(private window: WindowRef) {}
 
   isMobileDevice(): boolean {
