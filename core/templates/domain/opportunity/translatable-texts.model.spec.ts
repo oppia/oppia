@@ -17,6 +17,7 @@
  */
 
 import {
+  StateNamesToContentIdMapping,
   TranslatableTexts,
   TranslatableTextsBackendDict
 } from
@@ -43,7 +44,7 @@ describe('Translatable Texts model', () => {
   });
 
   it('should get state name to content id mapping', () => {
-    let expectedStatewiseContents = {
+    let expectedStatewiseContents: StateNamesToContentIdMapping = {
       state1: {
         1: 'text1',
         2: 'text2'
