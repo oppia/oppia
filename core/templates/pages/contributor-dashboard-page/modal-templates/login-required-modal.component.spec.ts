@@ -40,10 +40,6 @@ describe('Login Required Modal Content', () => {
     });
   }));
 
-  afterEach(() => {
-    fixture.destroy();
-  });
-
   it('should have a publicly accessible activeModal', () => {
     expect(component.activeModal).toBeInstanceOf(NgbActiveModal);
   });

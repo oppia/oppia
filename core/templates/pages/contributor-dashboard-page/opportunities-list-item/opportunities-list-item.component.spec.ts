@@ -40,9 +40,6 @@ describe('Opportunities List Item Component', () => {
     });
   }));
 
-  afterEach(() => {
-    fixture.destroy();
-  });
 
   describe('when opportunity is provided', () => {
     beforeEach(() => {

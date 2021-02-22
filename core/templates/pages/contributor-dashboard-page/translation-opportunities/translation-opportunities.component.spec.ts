@@ -92,7 +92,6 @@ describe('Translation opportunities component', () => {
 
   afterEach(() => {
     httpTestingController.verify();
-    fixture.destroy();
   });
 
   beforeEach(() => {

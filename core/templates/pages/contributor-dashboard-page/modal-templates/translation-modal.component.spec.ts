@@ -77,7 +77,6 @@ describe('Login Required Modal Content', () => {
 
   afterEach(() => {
     httpTestingController.verify();
-    fixture.destroy();
   });
 
   describe('when initialized', () => {
