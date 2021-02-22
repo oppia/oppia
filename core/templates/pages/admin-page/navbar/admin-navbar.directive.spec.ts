@@ -77,7 +77,7 @@ describe('Admin Navbar component', () => {
     ctrl.showTab();
 
     expect(AdminRouterService.showTab).toHaveBeenCalled();
-    expect(AdminRouterService.currentTabHash).toEqual('#activities');
+    expect(ctrl.isActivitiesTabOpen()).toBe(true);
   });
 
   it('should be routed to the activities tab by default', () => {
