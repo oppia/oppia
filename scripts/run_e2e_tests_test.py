@@ -407,7 +407,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
 
         with is_port_open_swap, sleep_swap:
-            common.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_in_use(1)
         self.assertEqual(mock_is_port_open.wait_time, 11)
         self.assertEqual(mock_sleep.called_times, 10)
 
@@ -427,7 +427,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
-            common.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_in_use(1)
         self.assertEqual(
             mock_sleep.sleep_time,
             common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
@@ -931,7 +931,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
+                common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
@@ -1050,7 +1050,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
+                common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
@@ -1398,7 +1398,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
+                common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
@@ -1572,7 +1572,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
+                common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
@@ -1697,7 +1697,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
+                common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
