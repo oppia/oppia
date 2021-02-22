@@ -127,11 +127,12 @@ class BaseModelValidator(beam.PTransform):
             key-value pairs.
         """
         deleted, not_deleted = (
-            model_pipe
-            | beam.Map(
+            model_pipe | 
+            beam.Map(
                 lambda m: beam.pvalue.TaggedOutput(
-                    'deleted' if m.deleted else 'not_deleted', m))
-            .with_outputs('deleted', 'not_deleted'))
+                    'deleted' if m.deleted else 'not_deleted', m)
+            ).with_outputs('deleted', 'not_deleted')
+        )
 
         deletion_errors = deleted | beam.ParDo(ValidateDeleted())
 
