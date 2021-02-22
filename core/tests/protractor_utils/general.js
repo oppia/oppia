@@ -24,10 +24,10 @@ var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     fromElement,
     'fromElement taking too long to load');
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     toElement,
     'toElement taking too long to load');
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -149,7 +149,7 @@ var ensurePageHasNoTranslationIds = async function() {
   // individual component that contains text.
   var oppiaBaseContainer = element(by.css(
     '.oppia-base-container'));
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
   var promiseValue = await oppiaBaseContainer.getAttribute('innerHTML');
