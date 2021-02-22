@@ -37,7 +37,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'admin-dev-mode-activities-tab.directive.ts',
     'admin-jobs-tab.directive.ts',
     'admin-misc-tab.directive.ts',
-    'admin-navbar.directive.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
     'alert-message.directive.ts',

@@ -37,9 +37,6 @@ angular.module('oppia').directive('adminNavbar', [
       controller: ['$rootScope', 'UserService',
         function($rootScope, UserService) {
           var ctrl = this;
-          ctrl.showTab = function() {
-            return AdminRouterService.showTab();
-          };
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
           };
