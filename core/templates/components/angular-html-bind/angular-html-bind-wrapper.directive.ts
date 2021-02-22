@@ -18,6 +18,30 @@
  * should not be used in migrated files unless strictly necessary.
  */
 
+angular.module('oppia').directive('angularHtmlBindWrapper', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        htmlData: '<'
+      },
+      template:
+      '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
+      controllerAs: '$ctrl',
+      controller: [
+        '$rootScope',
+        function($rootScope) {
+          var ctrl = this;
+          ctrl.$onInit = function() {
+            $rootScope.$applyAsync();
+          };
+        }
+      ]
+    };
+  }
+]);
+
 import { Directive, ElementRef, Injector, Input } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 @Directive({

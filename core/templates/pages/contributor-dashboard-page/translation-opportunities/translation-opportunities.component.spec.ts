@@ -32,7 +32,7 @@ import { UserService } from 'services/user.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind.directive';
+import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 
 describe('Translation opportunities component', () => {
