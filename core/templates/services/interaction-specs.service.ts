@@ -27,9 +27,6 @@ export class InteractionSpecsService {
   isInteractionTrainable(interactionId: InteractionId): boolean {
     const interactionSpecs =
       InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
-    if (!interactionSpecs) {
-      throw new Error(interactionId + ' is not a valid interaction id');
-    }
     return interactionSpecs.is_trainable;
   }
 }
