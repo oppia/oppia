@@ -20,10 +20,8 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ClassroomDomainConstants } from
-  'domain/classroom/classroom-domain.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 
 @Component({

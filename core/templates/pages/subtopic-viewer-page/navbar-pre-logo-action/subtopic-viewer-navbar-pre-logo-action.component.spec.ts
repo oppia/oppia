@@ -17,14 +17,13 @@
  */
 
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { SubtopicViewerNavbarPreLogoActionComponent } from
-  './subtopic-viewer-navbar-pre-logo-action.component';
+import { SubtopicViewerNavbarPreLogoActionComponent } from './subtopic-viewer-navbar-pre-logo-action.component';
 import { UrlService } from 'services/contextual/url.service';
 
 describe('subtopic viewer pre logo action component', () => {
   let component: SubtopicViewerNavbarPreLogoActionComponent;
   let fixture: ComponentFixture<SubtopicViewerNavbarPreLogoActionComponent>;
-  let urlService = null;
+  let urlService: UrlService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

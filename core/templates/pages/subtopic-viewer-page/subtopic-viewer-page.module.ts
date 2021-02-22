@@ -28,9 +28,6 @@ import { OppiaAngularRootComponent } from
 import { SubtopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
-import { SubtopicViewerNavbarPreLogoActionComponent } from
-  // eslint-disable-next-line max-len
-  'pages/subtopic-viewer-page/navbar-pre-logo-action/subtopic-viewer-navbar-pre-logo-action.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -42,13 +39,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ],
   declarations: [
     OppiaAngularRootComponent,
-    SubtopicViewerNavbarBreadcrumbComponent,
-    SubtopicViewerNavbarPreLogoActionComponent
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    SubtopicViewerNavbarBreadcrumbComponent,
-    SubtopicViewerNavbarPreLogoActionComponent
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
     {
