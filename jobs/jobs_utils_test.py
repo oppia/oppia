@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import unittest
 
 from core.platform import models
-from jobs import utils as jobs_utils
+from jobs import jobs_utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])

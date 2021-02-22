@@ -13,7 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Helper functions for beam validators and one-off jobs"""
+"""Helper functions for beam validators and one-off jobs. The clone function
+should be used in every beam function since beam functions require all input
+to be immutable."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules

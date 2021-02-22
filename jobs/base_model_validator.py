@@ -26,7 +26,7 @@ import apache_beam as beam
 from core.domain import cron_services
 from core.platform import models
 from jobs import base_model_validator_errors as errors
-from jobs import utils as jobs_utils
+from jobs import jobs_utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
