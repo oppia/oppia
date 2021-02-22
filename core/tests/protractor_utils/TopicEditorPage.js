@@ -36,7 +36,8 @@ var TopicEditorPage = function() {
   var storyListItems = element.all(
     by.css('.protractor-test-story-list-item'));
   var storyListTable = element(by.css('.protractor-test-story-list-table'));
-
+  var skillDescriptionButton = element(
+    by.css('option[label="' + skillDescription + '"]'));
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
   var topicNameHeading = element(
@@ -152,9 +153,8 @@ var TopicEditorPage = function() {
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    await action.click('Select skill dropdown', selectSkillDropdown);
-    var skillDescriptionButton = element(
-      by.css('option[label="' + skillDescription + '"]'));
+    await action.select(
+      'Select skill dropdown', selectSkillDropdown, skillDescription);
     await action.click('Skill description button', skillDescriptionButton);
     await waitFor.visibilityOf(
       questionItems.first(), 'Question takes too long to appear');
@@ -164,12 +164,13 @@ var TopicEditorPage = function() {
   this.saveQuestion = async function() {
     await general.scrollToTop();
     await action.click('Save question button', saveQuestionButton);
+    await waitFor.invisibilityOf(
+      saveQuestionButton, 'Question modal takes too long to disappear');
   };
 
   this.createQuestionForSkillWithName = async function(skillDescription) {
-    await action.click('Select skill dropdown', selectSkillDropdown);
-    var skillDescriptionButton = element(
-      by.css('option[label="' + skillDescription + '"]'));
+    await action.select(
+      'Select skill dropdown', selectSkillDropdown, skillDescription);
     await action.click('Skill description button', skillDescriptionButton);
     await action.click('Create question button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
@@ -376,14 +377,16 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
-    await waitFor.visibilityOf(
-      storyListItems, 'Story list items element taking too long to appear');
+    if (count) {
+      await waitFor.visibilityOf(
+        storyListTable, 'Story list table takes too long to appear.');
+    }
     expect(await storyListItems.count()).toEqual(count);
   };
 
   this.expectStoryTitleToBe = async function(title, index) {
     await waitFor.visibilityOf(
-      storyListItems, 'Story list items element taking too long to appear');
+      storyListTable, 'Story list table takes too long to appear.');
     expect(
       await storyListItems.get(index).all(
         by.css('.protractor-test-story-title')).first().getText()
@@ -392,7 +395,7 @@ var TopicEditorPage = function() {
 
   this.expectStoryPublicationStatusToBe = async function(status, index) {
     await waitFor.visibilityOf(
-      storyListItems, 'Story list items element taking too long to appear');
+      storyListTable, 'Story list table takes too long to appear.');
     expect(
       await storyListItems.get(index).all(
         by.css('.protractor-test-story-publication-status')).first().getText()
@@ -469,6 +472,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeTopicDescription = async function(newDescription) {
+    await general.scrollToTop();
     await action.clear(
       'Topic description field', topicDescriptionField);
     await action.sendKeys(
