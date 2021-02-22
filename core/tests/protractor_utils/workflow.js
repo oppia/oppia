@@ -195,8 +195,8 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language, correctnessFeedbackIsEnabled) {
-  await createExploration();
+    title, category, objective, language, expectWelcomeModal, correctnessFeedbackIsEnabled) {
+  await createExploration(expectWelcomeModal);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));

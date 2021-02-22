@@ -63,7 +63,8 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('voiceArtist@oppia.com');
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: true
+    await general.openEditor(explorationId, true);
     await general.expect404Error();
     expectedConsoleErrors = [
       'Failed to load resource: the server responded with a status of 404'];
@@ -87,7 +88,8 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('user@check.com');
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: true
+    await general.openEditor(explorationId, true);
     await workflow.isExplorationCommunityOwned();
   });
 
@@ -106,7 +108,8 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('secondOwner@check.com');
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: true
+    await general.openEditor(explorationId, true);
     await explorationEditorPage.navigateToSettingsTab();
     expect(await workflow.getExplorationManagers()).toEqual(['secondOwner']);
   });

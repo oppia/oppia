@@ -156,8 +156,8 @@ describe('Embedding', function() {
     var explorationId = await general.getExplorationIdFromEditor();
     // Create Version 2 of the exploration.
     await createCountingExploration();
-
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: false
+    await general.openEditor(explorationId, false);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Version 3'));
     await explorationEditorPage.saveChanges('demonstration edit');
@@ -316,7 +316,8 @@ describe('Embedding', function() {
       await workflow.publishExploration();
 
       // Change language to Thai, which is not a supported site language.
-      await general.openEditor(explorationId);
+      // expectWelcomeModal: false
+      await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
       await explorationEditorPage.saveChanges(
@@ -325,7 +326,8 @@ describe('Embedding', function() {
       await checkPlaceholder('Type a number');
 
       // Change language to Spanish, which is a supported site language.
-      await general.openEditor(explorationId);
+      // expectWelcomeModal: false
+      await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('español');
       await explorationEditorPage.saveChanges(

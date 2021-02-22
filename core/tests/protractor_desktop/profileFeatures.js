@@ -144,12 +144,13 @@ describe('Visiting user profile page', function() {
 
     await users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
     await users.login(ANOTHER_EMAIL);
-
+    // expectWelcomeModal: true
     await workflow.createAndPublishTwoCardExploration(
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
-      EXPLORATION.language
+      EXPLORATION.language,
+      true
     );
 
     await creatorDashboardPage.get();
@@ -201,12 +202,13 @@ describe('Playing the exploration', function() {
     await users.login(TEST_EMAIL);
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-
+    // expectWelcomeModal: true
     await workflow.createAndPublishTwoCardExploration(
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
-      EXPLORATION.language
+      EXPLORATION.language,
+      true
     );
   });
 

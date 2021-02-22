@@ -542,11 +542,13 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should move focus to skip to main content button in exploration player',
     async function() {
       // Should create and play a dummy exploration.
+      // expectWelcomeModal: true
       await workflow.createAndPublishTwoCardExploration(
         EXPLORATION.title,
         EXPLORATION.category,
         EXPLORATION.objective,
-        EXPLORATION.language
+        EXPLORATION.language,
+        true
       );
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');

@@ -277,7 +277,8 @@ describe('Learner dashboard functionality', function() {
       // Wait for player page to completely load.
       await waitFor.pageToFullyLoad();
       var explorationId = await general.getExplorationIdFromPlayer();
-      await general.openEditor(explorationId);
+      // expectWelcomeModal: true
+      await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();
       await users.logout();

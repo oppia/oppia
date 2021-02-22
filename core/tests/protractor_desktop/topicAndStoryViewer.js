@@ -52,13 +52,27 @@ describe('Topic and Story viewer functionality', function() {
       language: 'English'
     };
     for (var i = 1; i <= 3; i++) {
-      await workflow.createAndPublishTwoCardExploration(
-        `Exploration TASV1 - ${i}`,
-        EXPLORATION.category,
-        EXPLORATION.objective,
-        EXPLORATION.language,
-        true
-      );
+      if(i===1){
+        // expectWelcomeModal: true
+        await workflow.createAndPublishTwoCardExploration(
+          `Exploration TASV1 - ${i}`,
+          EXPLORATION.category,
+          EXPLORATION.objective,
+          EXPLORATION.language,
+          true,
+          true
+        );
+      } else {
+        // expectWelcomeModal: false
+        await workflow.createAndPublishTwoCardExploration(
+          `Exploration TASV1 - ${i}`,
+          EXPLORATION.category,
+          EXPLORATION.objective,
+          EXPLORATION.language,
+          false,
+          true
+        );
+      }
       dummyExplorationIds.push(await general.getExplorationIdFromEditor());
     }
   };

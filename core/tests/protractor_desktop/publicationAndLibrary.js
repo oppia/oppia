@@ -101,7 +101,8 @@ describe('Library index page', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
-    await general.moveToEditor();
+    // expectWelcomeModal: true
+    await general.moveToEditor(true);
     // Moderators can edit explorations.
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
@@ -289,7 +290,8 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('bob@privileges.com');
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: true
+    await general.openEditor(explorationId, true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('I love you'));
     await explorationEditorMainTab.setInteraction('TextInput');
@@ -297,7 +299,8 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('eve@privileges.com');
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: true
+    await general.openEditor(explorationId, true);
     await general.expect404Error();
     await users.logout();
   });
@@ -325,7 +328,8 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('voiceArtist@oppia.tests');
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: true
+    await general.openEditor(explorationId, true);
     await explorationEditorMainTab.expectContentToMatch(
       await forms.toRichText('this is card 1'));
     expect(await element(by.css(
@@ -333,7 +337,8 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('guestUser@oppia.tests');
-    await general.openEditor(explorationId);
+    // expectWelcomeModal: true
+    await general.openEditor(explorationId, true);
     await general.expect404Error();
     await users.logout();
   });
