@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-fdescribe('Admin Navbar component', () => {
+describe('Admin Navbar component', () => {
   var $rootScope = null;
   var ctrl = null;
   var $scope = null;
@@ -70,7 +70,7 @@ fdescribe('Admin Navbar component', () => {
     expect(ctrl.dropdownMenuisActive).toBe(false);
   });
 
-  it('should call showTab in AdminRouterService and should be ' +
+  it('should call showTab in AdminRouterService and the page should be ' +
       'routed to the activities tab by default', () => {
     spyOn(AdminRouterService, 'showTab');
 
