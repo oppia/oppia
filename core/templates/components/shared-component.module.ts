@@ -58,8 +58,8 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind/angular-html-bind-wrapper.directive';
 
@@ -109,6 +109,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TranslatePipe,
     TakeBreakModalComponent,
     WrapTextWithEllipsisPipe,
@@ -125,7 +126,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    ThumbnailDisplayComponent
   ],
 
   exports: [
@@ -142,6 +144,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TakeBreakModalComponent,
     TranslatePipe,
     WrapTextWithEllipsisPipe,

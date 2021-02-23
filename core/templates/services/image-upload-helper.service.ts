@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,21 @@
  * @fileoverview Image upload helper service.
  */
 
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Injectable, SecurityContext } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { WindowRef } from './contextual/window-ref.service';
+
+import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageUploadHelperService {
-  constructor(
-    private assetsBackendApiService: AssetsBackendApiService,
-    private sanitizer: DomSanitizer,
-    private windowRef: WindowRef) {}
+  constructor(private assetsBackendApiService: AssetsBackendApiService) {}
 
-  private _generateDateTimeStringForFilename() {
-    const date = new Date();
+  private _generateDateTimeStringForFilename(): string {
+    let date = new Date();
     return date.getFullYear() +
       ('0' + (date.getMonth() + 1)).slice(-2) +
       ('0' + date.getDate()).slice(-2) + '_' +
@@ -96,14 +92,10 @@ export class ImageUploadHelperService {
   }
 
   getTrustedResourceUrlForThumbnailFilename(
-      imageFileName: string, entityType: string, entityId: string):
-        SafeResourceUrl {
-    const encodedFilepath = this.windowRef.nativeWindow.encodeURIComponent(
-      imageFileName);
-    return this.sanitizer.sanitize(
-      SecurityContext.RESOURCE_URL,
-      this.assetsBackendApiService.getThumbnailUrlForPreview(
-        entityType, entityId, encodedFilepath));
+      imageFileName: string, entityType: string, entityId: string): string {
+    let encodedFilepath = window.encodeURIComponent(imageFileName);
+    return this.assetsBackendApiService.getThumbnailUrlForPreview(
+      entityType, entityId, encodedFilepath);
   }
 
   generateImageFilename(

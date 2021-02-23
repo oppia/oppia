@@ -39,6 +39,8 @@ describe('Edit Thumbnail Modal Controller', function() {
   const uploadedImageMimeType = 'image/svg+xml';
   importAllAngularServices();
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $q = $injector.get('$q');
