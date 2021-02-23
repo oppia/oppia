@@ -94,6 +94,7 @@ var createExplorationAndStartTutorial = async function() {
     await action.click('Create Exploration Button', createExplorationButton);
   }
 
+  await waitFor.pageToFullyLoad();
   await waitFor.visibilityOf(
     stateNameText, 'State name text takes too long to appear.');
 };
