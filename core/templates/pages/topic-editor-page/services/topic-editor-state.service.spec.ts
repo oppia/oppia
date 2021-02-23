@@ -507,7 +507,11 @@ describe('Topic editor state service', () => {
       spyOn(
         mockTopicRightsBackendApiService, 'fetchTopicRights')
         .and.callThrough();
-      topicEditorStateService.loadTopic('5');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      topicEditorStateService.loadTopic('5').then(
+        successHandler, failHandler
+      );
       expect(topicEditorStateService.isLoadingTopic()).toBe(true);
 
       tick(1000);

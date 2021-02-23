@@ -29,10 +29,10 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('subtopicPreviewTab', {
   template: require('./subtopic-preview-tab.component.html'),
   controller: [
-    '$scope', 'TopicEditorRoutingService', 'TopicEditorStateService',
-    'WindowDimensionsService',
+    '$rootScope', '$scope', 'TopicEditorRoutingService',
+    'TopicEditorStateService', 'WindowDimensionsService',
     function(
-        $scope, TopicEditorRoutingService, TopicEditorStateService,
+        $rootScope, $scope, TopicEditorRoutingService, TopicEditorStateService,
         WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -45,7 +45,10 @@ angular.module('oppia').component('subtopicPreviewTab', {
 
         if ($scope.topic.getId() && $scope.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
-            $scope.topic.getId(), $scope.subtopicId);
+            $scope.topic.getId(), $scope.subtopicId).then(
+            () => {
+              $rootScope.$applyAsync();
+            });
           $scope.editableTitle = $scope.subtopic.getTitle();
           $scope.editableThumbnailFilename = (
             $scope.subtopic.getThumbnailFilename());

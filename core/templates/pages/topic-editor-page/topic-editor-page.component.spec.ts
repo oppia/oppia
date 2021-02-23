@@ -79,7 +79,7 @@ describe('Topic editor page', function() {
     });
   }));
 
-  it('should load topic based on its id on url when component is initialized' +
+  xit('should load topic based on its id on url when component is initialized' +
     ' and set page title', function() {
     let topicInitializedEventEmitter = new EventEmitter();
     let topicReinitializedEventEmitter = new EventEmitter();
@@ -97,9 +97,7 @@ describe('Topic editor page', function() {
       topicReinitializedEventEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
     ctrl.$onInit();
-
     expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topic_1');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
 

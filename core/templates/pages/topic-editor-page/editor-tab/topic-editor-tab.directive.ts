@@ -159,7 +159,10 @@ angular.module('oppia').directive('topicEditorTab', [
           // editor, it gets assigned to that topic, and to reflect that
           // change, we need to fetch the topic again from the backend.
           $scope.refreshTopic = function() {
-            TopicEditorStateService.loadTopic($scope.topic.getId());
+            TopicEditorStateService.loadTopic($scope.topic.getId()).then(
+              () => {
+                $rootScope.$applyAsync();
+              });
           };
 
           $scope.getStaticImageUrl = function(imagePath) {
@@ -245,7 +248,8 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             if (newName) {
               TopicEditorStateService.updateExistenceOfTopicName(
-                newName, function() {
+                newName).then(
+                () => {
                   $scope.topicNameExists = (
                     TopicEditorStateService.getTopicWithNameExists());
                   TopicUpdateService.setTopicName($scope.topic, newName);
@@ -254,6 +258,7 @@ angular.module('oppia').directive('topicEditorTab', [
                 });
             } else {
               TopicUpdateService.setTopicName($scope.topic, newName);
+              $rootScope.$applyAsync();
               $scope.topicNameEditorIsShown = false;
             }
           };
@@ -265,7 +270,8 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             if (newTopicUrlFragment) {
               TopicEditorStateService.updateExistenceOfTopicUrlFragment(
-                newTopicUrlFragment, function() {
+                newTopicUrlFragment).then(
+                () => {
                   $scope.topicUrlFragmentExists = (
                     TopicEditorStateService.getTopicWithUrlFragmentExists());
                   TopicUpdateService.setTopicUrlFragment(
@@ -275,6 +281,7 @@ angular.module('oppia').directive('topicEditorTab', [
             } else {
               TopicUpdateService.setTopicUrlFragment(
                 $scope.topic, newTopicUrlFragment);
+              $rootScope.$applyAsync();
             }
           };
 

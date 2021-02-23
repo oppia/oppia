@@ -57,13 +57,13 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        'BottomNavbarStatusService', 'ContextService', 'LoaderService',
-        'PageTitleService',
+        '$rootScope', 'BottomNavbarStatusService', 'ContextService',
+        'LoaderService', 'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService', 'WindowRef',
         function(
-            BottomNavbarStatusService, ContextService, LoaderService,
-            PageTitleService,
+            $rootScope, BottomNavbarStatusService, ContextService,
+            LoaderService, PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService, WindowRef) {
           var ctrl = this;
@@ -205,7 +205,11 @@ angular.module('oppia').directive('topicEditorPage', [
               TopicEditorStateService.onTopicReinitialized.subscribe(
                 () => setPageTitle()
               ));
-            TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+            TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl())
+              .then(
+                () => {
+                  $rootScope.$applyAsync();
+                });
             PageTitleService.setPageTitleForMobileView('Topic Editor');
             ctrl.setUpBeforeUnload();
             ctrl.validationIssues = [];

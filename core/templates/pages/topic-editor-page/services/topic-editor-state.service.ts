@@ -195,46 +195,51 @@ export class TopicEditorStateService {
    * specified topic ID. See setTopic() for more information on
    * additional behavior of this function.
    */
-  loadTopic(topicId: string): void {
-    this._topicIsLoading = true;
-    this.editableTopicBackendApiService.fetchTopic(
-      topicId).then(
-      (newBackendTopicObject) => {
-        this._skillCreationIsAllowed = (
-          newBackendTopicObject.skillCreationIsAllowed);
-        this._skillQuestionCountDict = (
-          newBackendTopicObject.skillQuestionCountDict);
-        this._updateGroupedSkillSummaries(
-          newBackendTopicObject.groupedSkillSummaries);
-        this._updateTopic(
-          newBackendTopicObject.topicDict,
-          newBackendTopicObject.skillIdToDescriptionDict
-        );
-        this._updateGroupedSkillSummaries(
-          newBackendTopicObject.groupedSkillSummaries);
-        this._updateSkillIdToRubricsObject(
-          newBackendTopicObject.skillIdToRubricsDict);
-        this._updateClassroomUrlFragment(
-          newBackendTopicObject.classroomUrlFragment);
-        this.editableTopicBackendApiService.fetchStories(topicId).then(
-          (canonicalStorySummaries) => {
-            this._setCanonicalStorySummaries(canonicalStorySummaries);
-          });
-      },
-      (error) => {
-        this.alertService.addWarning(
-          error || 'There was an error when loading the topic.');
+  loadTopic(topicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._topicIsLoading = true;
+      this.editableTopicBackendApiService.fetchTopic(
+        topicId).then(
+        (newBackendTopicObject) => {
+          this._skillCreationIsAllowed = (
+            newBackendTopicObject.skillCreationIsAllowed);
+          this._skillQuestionCountDict = (
+            newBackendTopicObject.skillQuestionCountDict);
+          this._updateGroupedSkillSummaries(
+            newBackendTopicObject.groupedSkillSummaries);
+          this._updateTopic(
+            newBackendTopicObject.topicDict,
+            newBackendTopicObject.skillIdToDescriptionDict
+          );
+          this._updateGroupedSkillSummaries(
+            newBackendTopicObject.groupedSkillSummaries);
+          this._updateSkillIdToRubricsObject(
+            newBackendTopicObject.skillIdToRubricsDict);
+          this._updateClassroomUrlFragment(
+            newBackendTopicObject.classroomUrlFragment);
+          this.editableTopicBackendApiService.fetchStories(topicId).then(
+            (canonicalStorySummaries) => {
+              this._setCanonicalStorySummaries(canonicalStorySummaries);
+            });
+        },
+        (error) => {
+          this.alertService.addWarning(
+            error || 'There was an error when loading the topic.');
+          this._topicIsLoading = false;
+          reject();
+        });
+      this.topicRightsBackendApiService.fetchTopicRights(
+        topicId).then((newBackendTopicRightsObject) => {
+        this._updateTopicRights(newBackendTopicRightsObject);
         this._topicIsLoading = false;
-      });
-    this.topicRightsBackendApiService.fetchTopicRights(
-      topicId).then((newBackendTopicRightsObject) => {
-      this._updateTopicRights(newBackendTopicRightsObject);
-      this._topicIsLoading = false;
-    }, (error) => {
-      this.alertService.addWarning(
-        error ||
+        resolve();
+      }, (error) => {
+        this.alertService.addWarning(
+          error ||
             'There was an error when loading the topic rights.');
-      this._topicIsLoading = false;
+        this._topicIsLoading = false;
+        reject();
+      });
     });
   }
 
@@ -264,23 +269,28 @@ export class TopicEditorStateService {
    * Loads, or reloads, the subtopic page stored by this service given a
    * specified topic ID and subtopic ID.
    */
-  loadSubtopicPage(topicId: string, subtopicId: number): void {
-    let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
-    if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
-      this._subtopicPage = cloneDeep(
-        this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPageId)]);
-      this._subtopicPageLoadedEventEmitter.emit();
-      return;
-    }
-    this.editableTopicBackendApiService.fetchSubtopicPage(
-      topicId, subtopicId).then(
-      (newBackendSubtopicPageObject) => {
-        this._updateSubtopicPage(newBackendSubtopicPageObject);
-      },
-      (error) => {
-        this.alertService.addWarning(
-          error || 'There was an error when loading the topic.');
-      });
+  loadSubtopicPage(topicId: string, subtopicId: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
+      if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
+        this._subtopicPage = cloneDeep(
+          this._cachedSubtopicPages[
+            this._getSubtopicPageIndex(subtopicPageId)]);
+        this._subtopicPageLoadedEventEmitter.emit();
+        return;
+      }
+      this.editableTopicBackendApiService.fetchSubtopicPage(
+        topicId, subtopicId).then(
+        (newBackendSubtopicPageObject) => {
+          this._updateSubtopicPage(newBackendSubtopicPageObject);
+          resolve();
+        },
+        (error) => {
+          this.alertService.addWarning(
+            error || 'There was an error when loading the topic.');
+          reject();
+        });
+    });
   }
 
   /**
@@ -512,52 +522,48 @@ export class TopicEditorStateService {
   /**
    * Attempts to set the boolean variable _topicWithNameExists based
    * on the value returned by doesTopicWithNameExistAsync and
-   * executes the success callback provided. No arguments are passed to the
-   * success callback. Execution of the success callback indicates that the
-   * async backend call was successful and that _topicWithNameExists
-   * has been successfully updated.
+   * resolves it.
    */
   updateExistenceOfTopicName(
-      topicName: string,
-      successCallback: Function): void {
-    this.editableTopicBackendApiService.doesTopicWithNameExistAsync(
-      topicName).then(
-      (topicNameExists) => {
-        this._setTopicWithNameExists(topicNameExists);
-        if (successCallback) {
-          successCallback();
-        }
-      }, (error) => {
-        this.alertService.addWarning(
-          error ||
+      topicName: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.editableTopicBackendApiService.doesTopicWithNameExistAsync(
+        topicName).then(
+        (topicNameExists) => {
+          this._setTopicWithNameExists(topicNameExists);
+          resolve();
+        }, (error) => {
+          this.alertService.addWarning(
+            error ||
               'There was an error when checking if the topic name ' +
               'exists for another topic.');
-      });
+          reject();
+        });
+    });
   }
 
   /**
    * Attempts to set the boolean variable _topicWithUrlFragmentExists based
    * on the value returned by doesTopicWithUrlFragmentExistAsync and
-   * executes the success callback provided. No arguments are passed to the
-   * success callback. Execution of the success callback indicates that the
-   * async backend call was successful and that _topicWithUrlFragmentExists
-   * has been successfully updated.
+   * resolves it.
    */
   updateExistenceOfTopicUrlFragment(
-      topicUrlFragment: string, successCallback: Function): void {
-    this.editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
-      topicUrlFragment).then(
-      (topicUrlFragmentExists) => {
-        this._setTopicWithUrlFragmentExists(topicUrlFragmentExists);
-        if (successCallback) {
-          successCallback();
-        }
-      }, (error) => {
-        this.alertService.addWarning(
-          error ||
+      topicUrlFragment: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.editableTopicBackendApiService.
+        doesTopicWithUrlFragmentExistAsync(
+          topicUrlFragment).then(
+          (topicUrlFragmentExists) => {
+            this._setTopicWithUrlFragmentExists(topicUrlFragmentExists);
+            resolve();
+          }, (error) => {
+            this.alertService.addWarning(
+              error ||
               'There was an error when checking if the topic url fragment ' +
               'exists for another topic.');
-      });
+            reject();
+          });
+    });
   }
 
   get onStorySummariesInitialized(): EventEmitter<void> {

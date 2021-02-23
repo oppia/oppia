@@ -38,14 +38,14 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
-    '$scope', 'QuestionBackendApiService',
+    '$rootScope', '$scope', 'QuestionBackendApiService',
     'SubtopicValidationService', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'TopicUpdateService',
     'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
-        $scope, QuestionBackendApiService,
+        $rootScope, $scope, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorRoutingService,
         TopicEditorStateService, TopicUpdateService,
         UrlInterpolationService, WindowDimensionsService, WindowRef,
@@ -72,7 +72,10 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.subtopicUrlFragmentIsValid = false;
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
-            ctrl.topic.getId(), ctrl.subtopicId);
+            ctrl.topic.getId(), ctrl.subtopicId).then(
+            () => {
+              $rootScope.$applyAsync();
+            });
           ctrl.skillIds = ctrl.subtopic.getSkillIds();
           ctrl.questionCount = 0;
           if (ctrl.skillIds.length) {

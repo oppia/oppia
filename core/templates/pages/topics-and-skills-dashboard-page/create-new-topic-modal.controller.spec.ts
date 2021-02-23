@@ -83,10 +83,13 @@ describe('Create new topic modal', function() {
   });
 
   it('should check if url fragment already exists', function() {
-    spyOn(
-      TopicEditorStateService,
-      'updateExistenceOfTopicUrlFragment').and.callFake(
-      (urlFragment, callback) => callback());
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    TopicEditorStateService.updateExistenceOfTopicUrlFragment.then(
+      successHandler, failHandler
+    );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
     spyOn(
       TopicEditorStateService,
       'getTopicWithUrlFragmentExists').and.returnValue(true);
@@ -107,10 +110,14 @@ describe('Create new topic modal', function() {
     });
 
   it('should check if topic name already exists', function() {
-    spyOn(
-      TopicEditorStateService,
-      'updateExistenceOfTopicName').and.callFake(
-      (urlFragment, callback) => callback());
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    TopicEditorStateService.updateExistenceOfTopicName.then(
+      successHandler, failHandler
+    );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
     spyOn(
       TopicEditorStateService,
       'getTopicWithNameExists').and.returnValue(true);

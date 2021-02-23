@@ -69,7 +69,8 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
         return;
       }
       TopicEditorStateService.updateExistenceOfTopicUrlFragment(
-        $scope.newlyCreatedTopic.urlFragment, function() {
+        $scope.newlyCreatedTopic.urlFragment).then(
+        () => {
           $scope.topicUrlFragmentExists = (
             TopicEditorStateService.getTopicWithUrlFragmentExists());
           $rootScope.$applyAsync();
@@ -81,7 +82,8 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
         return;
       }
       TopicEditorStateService.updateExistenceOfTopicName(
-        $scope.newlyCreatedTopic.name, function() {
+        $scope.newlyCreatedTopic.name).then(
+        () => {
           $scope.topicNameExists = (
             TopicEditorStateService.getTopicWithNameExists());
           $rootScope.$applyAsync();

@@ -154,7 +154,10 @@ angular.module('oppia').directive('topicEditorNavbar', [
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
             $scope.discardChangesButtonIsShown = false;
-            TopicEditorStateService.loadTopic($scope.topicId);
+            TopicEditorStateService.loadTopic($scope.topicId).then(
+              () => {
+                $rootScope.$applyAsync();
+              });
           };
 
           $scope.getChangeListLength = function() {

@@ -249,10 +249,16 @@ describe('Topic editor tab directive', function() {
     expect($scope.topicDescriptionChanged).toEqual(true);
   });
 
-  it('should call the TopicUpdateService if name is updated', function() {
+  fit('should call the TopicUpdateService if name is updated', function() {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
+
     spyOn(TopicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
-      (newName, successCallback) => successCallback());
+      function() {
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      });
+
     $scope.updateTopicName('Different Name');
     expect(topicNameSpy).toHaveBeenCalled();
   });
@@ -282,14 +288,18 @@ describe('Topic editor tab directive', function() {
       expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
     });
 
-  it('should call the TopicUpdateService if url fragment is updated',
+  it(
+    'should call the TopicUpdateService if url fragment is updated',
     function() {
       var topicUrlFragmentSpy = spyOn(
         TopicUpdateService, 'setTopicUrlFragment');
-      spyOn(
-        TopicEditorStateService,
-        'updateExistenceOfTopicUrlFragment').and.callFake(
-        (newUrlFragment, successCallback) => successCallback());
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      TopicEditorStateService.updateExistenceOfTopicUrlFragment.then(
+        successHandler, failHandler
+      );
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
       $scope.updateTopicUrlFragment('topic');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
     });
