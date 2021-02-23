@@ -417,7 +417,7 @@ angular.module('oppia').directive('questionsList', [
                 'User does not have enough rights to delete the question');
               return;
             }
-            ctrl.questionIdsDeletedArray.push(questionId);
+            ctrl.deletedQuestionIds.push(questionId);
             _reInitializeSelectedSkillIds();
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
@@ -428,8 +428,7 @@ angular.module('oppia').directive('questionsList', [
                 QuestionsListService.getQuestionSummariesAsync(
                   ctrl.selectedSkillId, true, true);
                 AlertsService.addSuccessMessage('Deleted Question');
-                ctrl.removeArrayElement(
-                  ctrl.questionIdsDeletedArray, questionId);
+                _removeArrayElement(questionId);
               });
             } else {
               ctrl.getAllSkillSummaries().forEach(function(summary) {
@@ -441,20 +440,18 @@ angular.module('oppia').directive('questionsList', [
                     QuestionsListService.getQuestionSummariesAsync(
                       ctrl.selectedSkillId, true, true);
                     AlertsService.addSuccessMessage('Deleted Question');
-                    ctrl.removeArrayElement(
-                      ctrl.questionIdsDeletedArray, questionId);
+                    _removeArrayElement(questionId);
                   });
                 }
               });
             }
           };
 
-          ctrl.removeArrayElement = function(array, n) {
-            var index = array.indexOf(n);
+          var _removeArrayElement = function(questionId) {
+            var index = ctrl.deletedQuestionIds.indexOf(questionId);
             if (index > -1) {
-              array.splice(index, 1);
+              ctrl.deletedQuestionIds.splice(index, 1);
             }
-            return array;
           };
 
           ctrl.removeSkill = function(skillId) {
@@ -617,7 +614,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;
-            ctrl.questionIdsDeletedArray = [];
+            ctrl.deletedQuestionIds = [];
             // The _initTab function is written separately since it is also
             // called in subscription when some external events are triggered.
             _initTab(true);
