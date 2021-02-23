@@ -87,7 +87,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       },
       resolveSuggestionToExploration: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
-          onSuccess) {
+          onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
             exp_id: targetId,
@@ -102,11 +102,11 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           )
         }).then(function() {
           onSuccess(suggestionId);
-        });
+        }, (error) => onFailure && onFailure(error));
       },
       resolveSuggestiontoSkill: function(
           targetId, suggestionId, action, reviewMessage, skillDifficulty,
-          onSuccess) {
+          onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
             skill_id: targetId,
@@ -118,7 +118,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           skill_difficulty: skillDifficulty
         }).then(function() {
           onSuccess(suggestionId);
-        });
+        }, () => onFailure && onFailure(suggestionId));
       }
     };
   }

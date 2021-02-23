@@ -108,7 +108,8 @@ angular.module('oppia').factory('TranslateTextService', [
         };
       },
       suggestTranslatedText: function(
-          translationHtml, languageCode, imagesData, successCallback) {
+          translationHtml, languageCode, imagesData,
+          successCallback, errorCallback) {
         const url = '/suggestionhandler/';
         const postData = {
           suggestion_type: 'translate_content',
@@ -146,7 +147,7 @@ angular.module('oppia').factory('TranslateTextService', [
           headers: {
             'Content-Type': undefined
           }
-        }).then(successCallback);
+        }).then(successCallback, errorCallback);
       }
     };
   }]);

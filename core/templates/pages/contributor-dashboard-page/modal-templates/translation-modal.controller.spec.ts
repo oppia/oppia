@@ -178,4 +178,20 @@ describe('Translation Modal Controller', function() {
       $scope.suggestTranslatedText();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
+
+  it('should close modal when suggestion could not be submitted',
+    function() {
+      $httpBackend.flush();
+
+      const errorResponseObject = {
+        status_code: 401,
+        error: 'Error!'
+      };
+      $httpBackend.expectPOST('/suggestionhandler/').respond(
+        401, errorResponseObject);
+
+      $scope.suggestTranslatedText();
+      $httpBackend.flush();
+      expect($uibModalInstance.close).toHaveBeenCalled();
+    });
 });

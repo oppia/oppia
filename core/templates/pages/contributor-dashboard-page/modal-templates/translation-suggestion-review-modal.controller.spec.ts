@@ -26,6 +26,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let $uibModalInstance = null;
   let SiteAnalyticsService = null;
   let contributionAndReviewService = null;
+  let AlertsService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
@@ -38,6 +39,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     contributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
+    AlertsService = $injector.get('AlertsService');
     spyOn(
       SiteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview');
@@ -116,8 +118,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
-            callback) => {
-          callback();
+            successCallback, errorCallback) => {
+          successCallback();
         });
 
       $scope.reviewMessage = 'Review message example';
@@ -133,7 +135,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect(contributionAndReviewService.resolveSuggestionToExploration)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'accept', 'Review message example',
-          'hint section of "StateName" card', $scope.showNextItemToReview);
+          'hint section of "StateName" card', $scope.showNextItemToReview,
+          jasmine.any(Function));
 
       $scope.reviewMessage = 'Review message example 2';
       $scope.acceptAndReviewNext();
@@ -144,7 +147,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect(contributionAndReviewService.resolveSuggestionToExploration)
         .toHaveBeenCalledWith(
           '2', 'suggestion_2', 'accept', 'Review message example 2',
-          'hint section of "StateName" card', $scope.showNextItemToReview);
+          'hint section of "StateName" card', $scope.showNextItemToReview,
+          jasmine.any(Function));
       expect($uibModalInstance.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
@@ -193,6 +197,43 @@ describe('Translation Suggestion Review Modal Controller', function() {
           'hint section of "StateName" card', $scope.showNextItemToReview);
       expect($uibModalInstance.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
+    });
+
+    it('should reject a suggestion if the backend pre accept validation ' +
+    'failed', function() {
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardAcceptSuggestion');
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            successCallback, errorCallback) => {
+          let dummyErrorResponse = {
+            data: { error: 'Error!' }
+          };
+          if (errorCallback) {
+            errorCallback(dummyErrorResponse);
+          }
+        });
+      spyOn(AlertsService, 'addWarning');
+
+      $scope.reviewMessage = 'Review message example';
+      $scope.acceptAndReviewNext();
+
+      expect(
+        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'accept', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview,
+          jasmine.any(Function));
+      expect(AlertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error!');
     });
 
     it('should cancel suggestion in suggestion modal service when clicking on' +
