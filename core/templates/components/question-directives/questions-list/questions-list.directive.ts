@@ -412,34 +412,34 @@ angular.module('oppia').directive('questionsList', [
           };
           ctrl.deleteQuestionFromSkill = function(
               questionId, skillDescription) {
-          if (!ctrl.canEditQuestion()) {
-            AlertsService.addWarning(
-              'User does not have enough rights to delete the question');
-            return;
-          }
-          ctrl.questionIdsDeletedArray.push(questionId);
-          _reInitializeSelectedSkillIds();
-          // For the case when, it is in the skill editor.
-          if (ctrl.getAllSkillSummaries().length === 0) {
-            EditableQuestionBackendApiService.editQuestionSkillLinks(
-              questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
-            ).then(function() {
-              QuestionsListService.resetPageNumber();
-              QuestionsListService.getQuestionSummariesAsync(
-                ctrl.selectedSkillId, true, true);
-                AlertsService.addSuccessMessage('Deleted Question');
-                ctrl.removeArrayElement(
-                  ctrl.questionIdsDeletedArray, questionId);
-                });
-          } else {
-            ctrl.getAllSkillSummaries().forEach(function(summary) {
-              if (summary.getDescription() === skillDescription) {
-                EditableQuestionBackendApiService.editQuestionSkillLinks(
-                  questionId, [{id: summary.getId(), task: 'remove'}]
-                ).then(function() {
-                  QuestionsListService.resetPageNumber();
-                  QuestionsListService.getQuestionSummariesAsync(
-                    ctrl.selectedSkillId, true, true);
+            if (!ctrl.canEditQuestion()) {
+              AlertsService.addWarning(
+                'User does not have enough rights to delete the question');
+              return;
+            }
+            ctrl.questionIdsDeletedArray.push(questionId);
+            _reInitializeSelectedSkillIds();
+            // For the case when, it is in the skill editor.
+            if (ctrl.getAllSkillSummaries().length === 0) {
+              EditableQuestionBackendApiService.editQuestionSkillLinks(
+                questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
+              ).then(function() {
+                QuestionsListService.resetPageNumber();
+                QuestionsListService.getQuestionSummariesAsync(
+                  ctrl.selectedSkillId, true, true);
+                  AlertsService.addSuccessMessage('Deleted Question');
+                  ctrl.removeArrayElement(
+                    ctrl.questionIdsDeletedArray, questionId);
+                  });
+            } else {
+              ctrl.getAllSkillSummaries().forEach(function(summary) {
+                if (summary.getDescription() === skillDescription) {
+                  EditableQuestionBackendApiService.editQuestionSkillLinks(
+                    questionId, [{id: summary.getId(), task: 'remove'}]
+                  ).then(function() {
+                    QuestionsListService.resetPageNumber();
+                    QuestionsListService.getQuestionSummariesAsync(
+                      ctrl.selectedSkillId, true, true);
                     AlertsService.addSuccessMessage('Deleted Question');
                     ctrl.removeArrayElement(
                       ctrl.questionIdsDeletedArray, questionId);
