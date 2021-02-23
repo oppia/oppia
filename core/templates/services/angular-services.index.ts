@@ -148,7 +148,6 @@ import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-b
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service.ts';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PopulateRuleContentIdsService } from
   'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';

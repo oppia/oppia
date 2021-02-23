@@ -21,7 +21,6 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Rte Helper Modal Controller', function() {
   var $scope = null;
