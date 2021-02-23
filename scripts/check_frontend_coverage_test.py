@@ -249,7 +249,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     ' blacklist but it doesn\'t exist anymore. If you have'
                     ' renamed it, please make sure to remove the old file name'
                     ' and add the new file name in the blacklist in the file'
-                    ' scripts/check_frontend_test_coverage.py.\n'):
+                    ' scripts/check_frontend_coverage.py.\n'):
                     check_frontend_coverage.check_coverage_changes()
 
     def test_fully_covered_filenames_is_sorted(self):
