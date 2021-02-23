@@ -126,7 +126,7 @@ describe('Learner dashboard functionality', function() {
         );
       }
       await users.logout();
-      var PLAYER_USERNAME = 'expPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'expPlayerDM';
       await users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
@@ -169,7 +169,7 @@ describe('Learner dashboard functionality', function() {
         await collectionEditorPage.saveChanges();
       }
       await users.logout();
-      var PLAYER_USERNAME = 'collectionPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'collectionPlayerDM';
       await users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
