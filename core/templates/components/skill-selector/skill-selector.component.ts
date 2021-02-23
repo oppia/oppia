@@ -40,7 +40,7 @@ export class SkillSelectorComponent implements OnInit {
   @Input() countOfSkillsToPrioritize: number;
   @Input() categorizedSkills: CategorizedSkills;
   @Input() untriagedSkillSummaries: SkillSummary[];
-  @Input() canAllowSkillsFromOtherTopics: boolean;
+  @Input() allowSkillsFromOtherTopics: boolean;
   @Output() selectedSkillIdChanged: EventEmitter<string> = new EventEmitter();
   selectedSkill = null;
   skillFilterText = '';
