@@ -62,7 +62,6 @@ describe('Exploration save and publish buttons component', function() {
   var explorationWarningsService = null;
   var editabilityService = null;
   var userExplorationPermissionsService = null;
-  var PreventPageUnloadEventService = null;
 
   var mockExternalSaveEventEmitter = null;
 
@@ -122,8 +121,7 @@ describe('Exploration save and publish buttons component', function() {
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
-    PreventPageUnloadEventService = $injector.get(
-      'PreventPageUnloadEventService');
+
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue($q.resolve({
         canPublish: true
