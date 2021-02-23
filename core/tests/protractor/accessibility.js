@@ -17,6 +17,7 @@
  * and check for any console errors
  */
 
+var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var users = require('../protractor_utils/users.js');
@@ -102,8 +103,7 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should skip to the main content element', async function() {
     await libraryPage.get();
     await browser.actions().sendKeys(protractor.Key.TAB).perform();
-    await waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
-    await skipLink.click();
+    await action.click('Skip link', skipLink);
     expect(await mainContent.getAttribute('class')).toEqual(
       await (await browser.driver.switchTo().activeElement())
         .getAttribute('class'));
@@ -581,7 +581,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
 
       // Should safely exit out of the exploration.
-      await oppiaLogo.click();
+      await action.click('Oppia Logo', oppiaLogo);
     });
 
   afterEach(async function() {
