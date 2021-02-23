@@ -105,7 +105,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
 
           $scope.hasLoadedSkill = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            FocusManagerService.setFocus('newQuestionBtn')
+            FocusManagerService.setFocus('newQuestionBtn');
             return SkillEditorStateService.hasLoadedSkill();
           };
 

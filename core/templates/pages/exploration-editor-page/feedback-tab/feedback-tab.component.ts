@@ -48,16 +48,17 @@ require('services/stateful/focus-manager.service.ts');
 angular.module('oppia').component('feedbackTab', {
   template: require('./feedback-tab.component.html'),
   controller: [
-    '$q', '$rootScope', '$window', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
-    'FocusManagerService',
-    'LoaderService', 'RouterService','SuggestionModalForExplorationEditorService',
+    'FocusManagerService', 'LoaderService', 'RouterService',
+    'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     function(
-        $q, $rootScope, $window, $uibModal, AlertsService, ChangeListService,
-        DateTimeFormatService, EditabilityService, ExplorationStatesService, FocusManagerService,
-        LoaderService, RouterService, SuggestionModalForExplorationEditorService,
+        $q, $rootScope, $uibModal, AlertsService, ChangeListService,
+        DateTimeFormatService, EditabilityService, ExplorationStatesService,
+        FocusManagerService, LoaderService, RouterService,
+        SuggestionModalForExplorationEditorService,
         ThreadDataBackendApiService, ThreadStatusDisplayService,
         UrlInterpolationService, UserService) {
       var ctrl = this;
@@ -221,12 +222,13 @@ angular.module('oppia').component('feedbackTab', {
       };
 
       ctrl.$onInit = function() {
-        $rootScope.$watch(() => RouterService.getActiveTabName(), function(newValue){
+        $rootScope.$watch(() => {
+          RouterService.getActiveTabName()}, function(newValue) {
           if (newValue === 'feedback') {
-            if(!ctrl.activeThread) {
+            if (!ctrl.activeThread) {
               FocusManagerService.setFocus('newThreadButton');
-            };
-            if(ctrl.activeThread) {
+            }
+            if (ctrl.activeThread) {
               FocusManagerService.setFocus('tmpMessageText');
             }
           }

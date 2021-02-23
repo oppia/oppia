@@ -41,15 +41,16 @@ import cloneDeep from 'lodash/cloneDeep';
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$http', '$log', '$rootScope','$window', '$uibModal', 'CompareVersionsService',
+    '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'FocusManagerService', 'LoaderService', 'RouterService',
     'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
-        $http, $log, $rootScope,$window, $uibModal, CompareVersionsService,
+        $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        FocusManagerService, LoaderService, RouterService, UrlInterpolationService,
+        FocusManagerService, LoaderService, RouterService,
+        UrlInterpolationService,
         VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -282,7 +283,8 @@ angular.module('oppia').component('historyTab', {
       };
 
       ctrl.$onInit = function() {
-        $rootScope.$watch(() => RouterService.getActiveTabName(), function(newValue){
+        $rootScope.$watch(() => {
+          RouterService.getActiveTabName()}, function(newValue) {
           if (newValue === 'history') {
             FocusManagerService.setFocus('usernameInputField');
           }

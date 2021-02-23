@@ -175,10 +175,10 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.filterObject.reset();
         if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
           ctrl.goToPageNumber(ctrl.topicPageNumber);
-          FocusManagerService.setFocus('createTopicBtn')
+          FocusManagerService.setFocus('createTopicBtn');
         } else if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
           ctrl.initSkillDashboard();
-          FocusManagerService.setFocus('createSkillBtn')
+          FocusManagerService.setFocus('createSkillBtn');
         }
       };
 
@@ -382,18 +382,16 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         );
         $window.onload = function() {
           if (ctrl.activeTab === 'topics') {
-            console.log(ctrl.activeTab)
             FocusManagerService.setFocus('createTopicBtn');
           } else {
-            console.log(ctrl.activeTab)
             FocusManagerService.setFocus('createSkillBtn');
-         }
+          };
+        };
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are
         // triggered.
         ctrl._initDashboard(false);
       };
-    }
 
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

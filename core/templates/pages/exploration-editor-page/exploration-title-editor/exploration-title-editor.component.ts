@@ -30,18 +30,19 @@ angular.module('oppia').component('explorationTitleEditor', {
   },
   template: require('./exploration-title-editor.component.html'),
   controller: [
-    '$scope', '$rootScope', 'ExplorationTitleService', 'FocusManagerService',
+    '$rootScope', '$scope', 'ExplorationTitleService', 'FocusManagerService',
     'RouterService',
-    function($scope, $rootScope, ExplorationTitleService, FocusManagerService,
+    function(
+      $rootScope, $scope, ExplorationTitleService, FocusManagerService,
       RouterService) {
-      $scope.explorationTitleService = ExplorationTitleService;
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        $rootScope.$watch(() => RouterService.getActiveTabName(), function(newValue){
-        if (newValue === 'settings') {
-          FocusManagerService.setFocus(ctrl.focusLabel);
-        }
-      })
-    }
-  }]
+        $scope.explorationTitleService = ExplorationTitleService;
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          $rootScope.$watch(() => RouterService.getActiveTabName(), function(newValue) {
+          if (newValue === 'settings') {
+            FocusManagerService.setFocus(ctrl.focusLabel);
+          }
+        });
+      };
+    }]
 });

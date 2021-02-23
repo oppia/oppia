@@ -38,11 +38,11 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/topic-editor-page/questions-tab/' +
         'topic-questions-tab.directive.html'),
       controller: [
-        '$scope', '$window', 'QuestionsListService', 'FocusManagerService', 
-        'TopicEditorStateService', 
+        '$scope', '$window', 'FocusManagerService', 'QuestionsListService',
+        'TopicEditorStateService',
         'TopicsAndSkillsDashboardBackendApiService',
         function(
-            $scope, $window, QuestionsListService, FocusManagerService,
+            $scope, $window, FocusManagerService, QuestionsListService,
             TopicEditorStateService,
             TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;
@@ -87,14 +87,13 @@ angular.module('oppia').directive('questionsTab', [
             );
           };
           ctrl.$onInit = function() {
-            //To set autofocus when screen loads 
-            $window.onload =function ()      
-            {
-              FocusManagerService.setFocus('selectSkillField')
-            }
-            //To-set sutofocus when user navigates to editor using question-editor
-            //-tab.
-            FocusManagerService.setFocus('selectSkillField')
+            // To set autofocus when screen loads 
+            $window.onload = function () {
+              FocusManagerService.setFocus('selectSkillField');
+            };
+            // To-set sutofocus when user navigates to editor using 
+            // question-editor-tab.
+            FocusManagerService.setFocus('selectSkillField');
             $scope.selectedSkillId = null;
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(

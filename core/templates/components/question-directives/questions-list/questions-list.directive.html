@@ -1,7 +1,6 @@
 <div class="question-editor-container">
   <div ng-if="$ctrl.editorIsOpen" class="question-editor-parent">
-    <div focus-on="difficultySelectionDiv" class="oppia-autofocus">
-    <md-card class="oppia-page-card oppia-mobile-collapsible-card oppia-autofocus">
+    <md-card class="oppia-page-card oppia-mobile-collapsible-card">
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleDifficultyCard()">
         <h3>Difficulty</h3>
         <i class="fa fa-caret-down"
@@ -25,7 +24,6 @@
         </div>
       </div>
     </md-card>
-    </div>
     <div ng-if="!$ctrl.newQuestionIsBeingCreated" class="linked-skills-container">
       <h4> <strong> Linked Skills </strong> </h4>
       <md-card class="question-skill-id" ng-repeat="skill in $ctrl.associatedSkillSummaries">
