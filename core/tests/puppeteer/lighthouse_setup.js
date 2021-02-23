@@ -192,10 +192,10 @@ const getTopicEditorUrl = async function(browser, page) {
     await page.click(topicPhotoSubmit);
 
     await page.waitForSelector(confirmTopicCreationButton, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.click(confirmTopicCreationButton);
-    // Doing waitFor(10000) to handle new tab being opened.
-    await page.waitFor(10000);
+    // Doing waitForTimeout(10000) to handle new tab being opened.
+    await page.waitForTimeout(10000);
     await browser.pages();
 
     // Refresh page and click on topic link.
@@ -234,9 +234,9 @@ const getStoryEditorUrl = async function(browser, page) {
     await page.click(storyPhotoSubmit);
 
     await page.waitForSelector(confirmStoryCreationButton, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.click(confirmStoryCreationButton);
-    await page.waitFor(15000);
+    await page.waitForTimeout(15000);
     storyEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -255,14 +255,14 @@ const getSkillEditorUrl = async function(browser, page) {
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.keyboard.type('Skill Overview here');
 
     await page.waitForSelector(confirmSkillCreationButton, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.click(confirmSkillCreationButton);
-    // Doing waitFor(15000) to handle new tab being opened.
-    await page.waitFor(15000);
+    // Doing waitForTimeout(15000) to handle new tab being opened.
+    await page.waitForTimeout(15000);
     let pages = await browser.pages();
     skillEditorUrl = await pages[2].url();
     if (await skillEditorUrl.includes('topic_editor')) {
