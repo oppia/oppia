@@ -195,13 +195,13 @@ describe('Url Service', () => {
     expect(
       urlService.getClassroomUrlFragmentFromLearnerUrl()
     ).toBe('math');
-    /*mockLocation.pathname = '/explore/16';
+    mockLocation.pathname = '/explore/16';
     mockLocation.search = (
       // eslint-disable-next-line max-len
       '?topic_url_fragment=topic&story_url_fragment=story-one&classroom_url_fragment=math');
     expect(
       urlService.getClassroomUrlFragmentFromLearnerUrl()
-    ).toBe('math');*/
+    ).toBe('math');
     mockLocation.pathname = '/english/topic-name';
     expect(function() {
       urlService.getClassroomUrlFragmentFromLearnerUrl();

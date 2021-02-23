@@ -37,7 +37,8 @@ require('services/date-time-format.service.ts');
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { Subscription } from 'rxjs';
+//import { null } from 'mathjs';
+import { Subscription, VirtualTimeScheduler } from 'rxjs';
 
 angular.module('oppia').directive('learnerViewInfo', [
   function() {
@@ -60,6 +61,8 @@ angular.module('oppia').directive('learnerViewInfo', [
           var ctrl = this;
           var explorationId = ContextService.getExplorationId();
           var expInfo = null;
+          var url=null;
+          //var isLinkedToTopic = null;
           ctrl.directiveSubscriptions = new Subscription();
 
           ctrl.showInformationCard = function() {
@@ -104,14 +107,72 @@ angular.module('oppia').directive('learnerViewInfo', [
           };
 
           ctrl.getTopicUrl = function() {
-            return UrlInterpolationService.interpolateUrl(
-              TOPIC_VIEWER_STORY_URL_TEMPLATE, {
-                topic_url_fragment: (
-                  UrlService.getTopicUrlFragmentFromLearnerUrl()),
-                classroom_url_fragment: (
-                  UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-              });
+            /*var topic_url_fragment = (
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
+            var classroom_url_fragment = (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl());
+            if( typeof topic_url_fragment === 'undefined' &&
+              typeof classroom_url_fragment === 'undefined')
+            {
+              topic_url_fragment= 'ab';
+              classroom_url_fragment= 'cd';
+              return;
+            }
+            else {*/
+              return UrlInterpolationService.interpolateUrl(
+                TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+                  /*topic_url_fragment: topic_url_fragment,
+                  classroom_url_fragment: classroom_url_fragment,*/
+                  topic_url_fragment: (
+                    UrlService.getTopicUrlFragmentFromLearnerUrl()),
+                  classroom_url_fragment: (
+                    UrlService.getClassroomUrlFragmentFromLearnerUrl()),
+                });
+                //return url;
+            //}
+            
+               //else
+              //console.log(url+'testurlhere');
+            //return url;
+            /*if(url!==undefined) {
+              return '';
+            } else {
+              return url;
+            }*/
+              
           };
+          ctrl.testTopic = function() {
+            ctrl.topic_url_fragment = (
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
+            ctrl.classroom_url_fragment = (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl());
+            ctrl.storyUrlFragment = (
+              UrlService.getStoryUrlFragmentFromLearnerUrl());
+              if(ctrl.storyUrlFragment === undefined)
+              {
+                ctrl.storyUrlFragment='er';
+              }
+            if( ctrl.topic_url_fragment === undefined &&
+              ctrl.classroom_url_fragment === undefined)
+            {
+              ctrl.topic_url_fragment= '';
+              ctrl.classroom_url_fragment= '';
+              ctrl.storyUrlFragment= '';
+              return;
+            }
+            else {
+              //return ctrl.getTopicUrl();
+              return UrlInterpolationService.interpolateUrl(
+                TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+                  topic_url_fragment: ctrl.topic_url_fragment,
+                  classroom_url_fragment: ctrl.classroom_url_fragment,
+                  /*topic_url_fragment: (
+                    UrlService.getTopicUrlFragmentFromLearnerUrl()),
+                  classroom_url_fragment: (
+                    UrlService.getClassroomUrlFragmentFromLearnerUrl()),*/
+                });
+            }
+          }
           ctrl.$onInit = function() {
             ctrl.explorationTitle = 'Loading...';
             ReadOnlyExplorationBackendApiService.fetchExploration(
@@ -120,23 +181,45 @@ angular.module('oppia').directive('learnerViewInfo', [
                 ctrl.explorationTitle = response.exploration.title;
                 $rootScope.$applyAsync();
               });
+            ctrl.topic_url_fragment = (
+                UrlService.getTopicUrlFragmentFromLearnerUrl());
+            ctrl.classroom_url_fragment = (
+                UrlService.getClassroomUrlFragmentFromLearnerUrl());
+            //ctrl.isLinkedToTopic = (ctrl.getTopicUrl()!==undefined)?true:false;
+            ctrl.isLinkedToTopic = (ctrl.testTopic()!==undefined)?true:false;/* ||
+            ((ctrl.topic_url_fragment === undefined)?false:true ||
+            (ctrl.classroom_url_fragment === undefined)?false:true));*/
+
+            ctrl.directiveSubscriptions.add(
+              ctrl.storyViewerBackendApiService.onSendStoryData.subscribe((data) => {
+                ctrl.topicName = data.topicName;
+              })
+            );
+
+            //ctrl.topicName = ctrl.getTopicName();
             ctrl.storyViewerBackendApiService = (
               OppiaAngularRootComponent.storyViewerBackendApiService);
             var topicUrlFragment = (
               UrlService.getTopicUrlFragmentFromLearnerUrl());
             var classroomUrlFragment = (
               UrlService.getClassroomUrlFragmentFromLearnerUrl());
-            var storyUrlFragment = (
+            /*ctrl.storyUrlFragment = (
               UrlService.getStoryUrlFragmentFromLearnerUrl());
-            ctrl.storyViewerBackendApiService.fetchStoryData(
-              topicUrlFragment,
-              classroomUrlFragment,
-              storyUrlFragment).then(
+              if(ctrl.storyUrlFragment === undefined)
+              {
+                ctrl.storyUrlFragment='er';
+              }*/
+            /*ctrl.storyViewerBackendApiService.fetchStoryData(
+              /*topicUrlFragment,
+              classroomUrlFragment,*
+              ctrl.topic_url_fragment,
+              ctrl.classroom_url_fragment,
+              ctrl.storyUrlFragment).then(
               function(storyDataDict) {
                 ctrl.storyPlaythroughObject = storyDataDict;
                 var topicName = ctrl.storyPlaythroughObject.topicName;
                 ctrl.topicName = topicName;
-              });
+              });*/
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();

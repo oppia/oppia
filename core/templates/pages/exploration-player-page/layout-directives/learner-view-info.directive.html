@@ -1,12 +1,18 @@
 <ul class="nav navbar-nav oppia-navbar-breadcrumb">
   <li>
-    <div class="oppia-learner-navbar-container">
+    <span class="oppia-navbar-breadcrumb-separator"></span>
+    <div>
+      <a class="oppia-topic-title" ng-if="$ctrl.isLinkedToTopic==true" ng-href="<[$ctrl.getTopicUrl()]>" ><[$ctrl.topicName]></a>
+      <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description"><[$ctrl.explorationTitle]></span></h1>
+    </div>
+    
+    <!--<div ng-if="ctrl.isLinkedToTopic" class="oppia-learner-navbar-container">
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <div class="oppia-navbar-title-container">
         <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description"><[$ctrl.explorationTitle]></span></h1>
         <a class="oppia-topic-title" ng-href="<[$ctrl.getTopicUrl()]>" ><[$ctrl.topicName]></a>
       </div>
-    </div>
+    </div>-->
   </li>
   <li ng-click="$ctrl.showInformationCard()" uib-tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
     <i class="material-icons oppia-navbar-breadcrumb-icon oppia-navbar-info-icon">&#xE88E;</i>
