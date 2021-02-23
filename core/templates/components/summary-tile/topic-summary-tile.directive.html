@@ -4,7 +4,7 @@
   <a ng-href="<[$ctrl.getTopicPageUrl()]>" class="protractor-test-topic-link">
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
-      <picture class="fx-row" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
+      <picture class="fx-row fx-main-center" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
         <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
       </picture>
     </div>
@@ -18,18 +18,15 @@
   </a>
 </div>
 <style>
-  .faded-topic-card {
-    background: rgb(93, 109, 108)!important;
-    /*important is to overeide the default background color
-      for the unpublished card*/
-    pointer-events: none;
-  }
-
   .topic-card .margin-top-offset {
     margin-top: -1.5em;
   }
 
   .topic-card .grayscale-effect {
+    backdrop-filter: brightness(0.5);
+  }
+
+  .grayscale-effect .img-thumbnail {
     filter: brightness(0.5);
   }
 
@@ -60,11 +57,6 @@
     position: relative;
     text-transform: uppercase;
     z-index: 100;
-  }
-
-  .fx-row {
-    display: flex;
-    justify-content: center;
   }
 
   .topic-card a:hover {
