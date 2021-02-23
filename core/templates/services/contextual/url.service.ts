@@ -111,22 +111,18 @@ export class UrlService {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[3]);
-    }
-    // The following section is for getting the URL fragment from the
-    // exploration player.
-    else if (pathname.startsWith('/explore')) {
+    } else if (pathname.startsWith('/explore')) {
+      // The following section is for getting the URL fragment from the
+      // exploration player.
       if (
         this.getUrlParams().hasOwnProperty('topic_url_fragment') &&
         this.getUrlParams().topic_url_fragment.match(
           constants.VALID_URL_FRAGMENT_REGEX)) {
-            console.log(this.getUrlParams().topic_url_fragment);
         return this.getUrlParams().topic_url_fragment;
       }
-    }
-    else {
+    } else {
       throw new Error('Invalid URL for topic');
     }
-    //throw new Error('Invalid URL for topic');
   }
 
   getStoryUrlFragmentFromLearnerUrl(): string {
@@ -165,21 +161,18 @@ export class UrlService {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[2]);
-    }
-    // The following section is for getting the URL fragment from the
-    // exploration player.
-    else if (pathname.startsWith('/explore')) {
+    } else if (pathname.startsWith('/explore')) {
+      // The following section is for getting the URL fragment from the
+      // exploration player.
       if (
         this.getUrlParams().hasOwnProperty('classroom_url_fragment') &&
         this.getUrlParams().classroom_url_fragment.match(
           constants.VALID_URL_FRAGMENT_REGEX)) {
         return this.getUrlParams().classroom_url_fragment;
       }
-    }
-    else {
+    } else {
       throw new Error('Invalid URL for classroom');
     }
-    //throw new Error('Invalid URL for classroom');
   }
 
   /**
