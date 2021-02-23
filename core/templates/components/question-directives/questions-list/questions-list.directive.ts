@@ -415,12 +415,12 @@ angular.module('oppia').directive('questionsList', [
             // To ensure that the function is not evoked multiple times,
             // if the user clicks the link off button multiple times.
             if (!ctrl.questionIdsDeletedArray.includes(questionId)) {
-              console.log("true")
-              ctrl.questionIdsDeletedArray.push(questionId)
+              ctrl.questionIdsDeletedArray.push(questionId);
               if (!ctrl.canEditQuestion()) {
                 AlertsService.addWarning(
                   'User does not have enough rights to delete the question');
-                  ctrl.removeArrayElement(ctrl.questionIdsDeletedArray,questionId);
+                ctrl.removeArrayElement(
+                  ctrl.questionIdsDeletedArray, questionId);
                 return;
               }
               _reInitializeSelectedSkillIds();
@@ -434,7 +434,9 @@ angular.module('oppia').directive('questionsList', [
                     ctrl.selectedSkillId, true, true
                   ).then(function() {
                     AlertsService.addSuccessMessage('Deleted Question');
-                    ctrl.removeArrayElement(ctrl.questionIdsDeletedArray,questionId)});
+                    ctrl.removeArrayElement(
+                      ctrl.questionIdsDeletedArray, questionId)
+                    });
                 });
               } else {
                 ctrl.getAllSkillSummaries().forEach(function(summary) {
