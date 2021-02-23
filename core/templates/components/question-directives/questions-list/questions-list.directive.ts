@@ -412,17 +412,12 @@ angular.module('oppia').directive('questionsList', [
           };
           ctrl.deleteQuestionFromSkill = function(
               questionId, skillDescription) {
-            // To ensure that the function is not evoked multiple times,
-            // if the user clicks the link off button multiple times.
-            if (!ctrl.questionIdsDeletedArray.includes(questionId)) {
-              ctrl.questionIdsDeletedArray.push(questionId);
               if (!ctrl.canEditQuestion()) {
                 AlertsService.addWarning(
                   'User does not have enough rights to delete the question');
-                ctrl.removeArrayElement(
-                  ctrl.questionIdsDeletedArray, questionId);
                 return;
               }
+              ctrl.questionIdsDeletedArray.push(questionId);
               _reInitializeSelectedSkillIds();
               // For the case when, it is in the skill editor.
               if (ctrl.getAllSkillSummaries().length === 0) {
@@ -431,13 +426,11 @@ angular.module('oppia').directive('questionsList', [
                 ).then(function() {
                   QuestionsListService.resetPageNumber();
                   QuestionsListService.getQuestionSummariesAsync(
-                    ctrl.selectedSkillId, true, true
-                  ).then(function() {
+                    ctrl.selectedSkillId, true, true);
                     AlertsService.addSuccessMessage('Deleted Question');
                     ctrl.removeArrayElement(
                       ctrl.questionIdsDeletedArray, questionId);
-                  });
-                });
+                    });
               } else {
                 ctrl.getAllSkillSummaries().forEach(function(summary) {
                   if (summary.getDescription() === skillDescription) {
@@ -446,18 +439,16 @@ angular.module('oppia').directive('questionsList', [
                     ).then(function() {
                       QuestionsListService.resetPageNumber();
                       QuestionsListService.getQuestionSummariesAsync(
-                        ctrl.selectedSkillId, true, true
-                      ).then(function() {
+                        ctrl.selectedSkillId, true, true);
                         AlertsService.addSuccessMessage('Deleted Question');
                         ctrl.removeArrayElement(
                           ctrl.questionIdsDeletedArray, questionId);
                       });
-                    });
-                  }
-                });
-              }
-            }
-          };
+                    }
+                  });
+                }
+              
+            };
 
           ctrl.removeArrayElement = function(array, n) {
             var index = array.indexOf(n);
