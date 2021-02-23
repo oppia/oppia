@@ -50,6 +50,7 @@ require(
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 import { Subscription } from 'rxjs';
 import debounce from 'lodash/debounce';
@@ -61,13 +62,15 @@ import { TopicsAndSkillsDashboardFilter } from
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$scope', '$timeout', 'AlertsService', 'SkillCreationService',
+    '$rootScope', '$scope', '$timeout', '$window', 'AlertsService',
+    'FocusManagerService', 'SkillCreationService',
     'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
     'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
     'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
-        $rootScope, $scope, $timeout, AlertsService, SkillCreationService,
+        $rootScope, $scope, $timeout, $window, AlertsService,
+        FocusManagerService, SkillCreationService,
         TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, WindowDimensionsService,
         FATAL_ERROR_CODES, SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
@@ -172,8 +175,10 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.filterObject.reset();
         if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
           ctrl.goToPageNumber(ctrl.topicPageNumber);
+          FocusManagerService.setFocus('createTopicBtn')
         } else if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
           ctrl.initSkillDashboard();
+          FocusManagerService.setFocus('createSkillBtn')
         }
       };
 
@@ -375,6 +380,9 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
               }
             )
         );
+        $window.onload = function() {
+          FocusManagerService.setFocus('createTopicBtn')
+         }
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are
         // triggered.

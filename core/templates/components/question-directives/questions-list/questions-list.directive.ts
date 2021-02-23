@@ -60,6 +60,7 @@ require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
@@ -87,7 +88,7 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
-        'ContextService', 'EditableQuestionBackendApiService',
+        'ContextService', 'EditableQuestionBackendApiService', 'FocusManagerService',
         'ImageLocalStorageService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
@@ -98,7 +99,8 @@ angular.module('oppia').directive('questionsList', [
         function(
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
-            ImageLocalStorageService, MisconceptionObjectFactory,
+            FocusManagerService, ImageLocalStorageService,
+            MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionUndoRedoService,
             QuestionValidationService, QuestionsListService,
             ShortSkillSummaryObjectFactory, SkillBackendApiService,
@@ -323,6 +325,8 @@ angular.module('oppia').directive('questionsList', [
                   ctrl.newQuestionSkillDifficulties.push(
                     linkedSkillWithDifficulty.getDifficulty());
                 }
+                FocusManagerService.setFocus('difficultySelectionDiv')
+                console.log("henlo")
               });
             ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
             if (AlertsService.warnings.length === 0) {
@@ -598,6 +602,7 @@ angular.module('oppia').directive('questionsList', [
               QuestionsListService.onQuestionSummariesInitialized.subscribe(
                 () => {
                   _initTab(false);
+                  FocusManagerService.setFocus('newQuestionBtn')
                   $rootScope.$apply();
                 }));
             ctrl.showDifficultyChoices = false;
