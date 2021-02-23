@@ -58,10 +58,10 @@ export class Suggestion {
       stateName: string, newValue: SuggestionChangeValue,
       oldValue: SuggestionChangeValue, lastUpdatedMsecs: number) {
     this.suggestionType = suggestionType;
+    this.suggestionId = suggestionId;
     this.threadId = threadId;
     this.targetType = targetType;
     this.targetId = targetId;
-    this.suggestionId = suggestionId;
     this.status = status;
     this.authorName = authorName;
     this.stateName = stateName;
