@@ -80,7 +80,7 @@ describe('About Page', () => {
           }
         },
         { provide: TranslateService, useClass: MockTranslateService },
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
         UrlInterpolationService,
         {
           provide: WindowRef,
