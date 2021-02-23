@@ -435,8 +435,8 @@ angular.module('oppia').directive('questionsList', [
                   ).then(function() {
                     AlertsService.addSuccessMessage('Deleted Question');
                     ctrl.removeArrayElement(
-                      ctrl.questionIdsDeletedArray, questionId)
-                    });
+                      ctrl.questionIdsDeletedArray, questionId);
+                  });
                 });
               } else {
                 ctrl.getAllSkillSummaries().forEach(function(summary) {
@@ -449,7 +449,9 @@ angular.module('oppia').directive('questionsList', [
                         ctrl.selectedSkillId, true, true
                       ).then(function() {
                         AlertsService.addSuccessMessage('Deleted Question');
-                        ctrl.removeArrayElement(ctrl.questionIdsDeletedArray,questionId)});
+                        ctrl.removeArrayElement(
+                          ctrl.questionIdsDeletedArray, questionId);
+                      });
                     });
                   }
                 });
@@ -457,13 +459,13 @@ angular.module('oppia').directive('questionsList', [
             }
           };
 
-          ctrl.removeArrayElement = function(array,n) {
+          ctrl.removeArrayElement = function(array, n) {
             var index = array.indexOf(n);
             if (index > -1) {
               array.splice(index, 1);
             }
-            return array;      
-          }
+            return array;
+          };
 
           ctrl.removeSkill = function(skillId) {
             if (ctrl.associatedSkillSummaries.length === 1) {
