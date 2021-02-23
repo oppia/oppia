@@ -1294,9 +1294,10 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change.content_html = 'invalid content_html'
         with self.assertRaisesRegexp(
-            Exception,
-            'The given content_html does not match the content of the'
-            ' exploration.'):
+            utils.ValidationError,
+            'The Exploration content has changed since this translation '
+            'was submitted.'
+        ):
             suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self):

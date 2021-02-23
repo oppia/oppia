@@ -597,9 +597,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         content_html = exploration.get_content_html(
             self.change.state_name, self.change.content_id)
         if content_html != self.change.content_html:
-            raise Exception(
-                'The given content_html does not match the content of the '
-                'exploration.')
+            raise utils.ValidationError(
+                'The Exploration content has changed since this translation '
+                'was submitted.')
 
     def accept(self, commit_message):
         """Accepts the suggestion.
