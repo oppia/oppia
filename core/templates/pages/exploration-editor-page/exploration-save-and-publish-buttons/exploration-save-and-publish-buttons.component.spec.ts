@@ -277,15 +277,6 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.explorationCanBePublished).toBe(true);
   });
 
-  it('should add PreventPageUnloadEventService when changelist' +
-    ' is greater than 50', function() {
-    spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
-    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-    $scope.getChangeListLength();
-    $scope.$apply();
-    expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
-  });
-
   it('should fetch userExplorationPermissions when ' +
     'showPublishExplorationModal is called', function() {
     var userPermissions = {
