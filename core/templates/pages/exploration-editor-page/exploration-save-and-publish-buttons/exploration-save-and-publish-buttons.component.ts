@@ -32,20 +32,17 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/editability.service.ts');
-require('services/prevent-page-unload-event.service.ts');
 
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
     '$rootScope', '$scope', 'ChangeListService', 'EditabilityService',
     'ExplorationRightsService', 'ExplorationSaveService',
-    'ExplorationWarningsService', 'PreventPageUnloadEventService',
-    'UserExplorationPermissionsService',
+    'ExplorationWarningsService', 'UserExplorationPermissionsService',
     function(
         $rootScope, $scope, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
-        ExplorationWarningsService, PreventPageUnloadEventService,
-        UserExplorationPermissionsService) {
+        ExplorationWarningsService, UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
 
@@ -71,13 +68,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
       };
 
       $scope.getChangeListLength = function() {
-        var changeListLength = ChangeListService.getChangeList().length;
-        if (changeListLength > 50) {
-          PreventPageUnloadEventService.addListener();
-        } else {
-          PreventPageUnloadEventService.removeListener();
-        }
-        return changeListLength;
+        return ChangeListService.getChangeList().length;
       };
 
       $scope.isExplorationSaveable = function() {
