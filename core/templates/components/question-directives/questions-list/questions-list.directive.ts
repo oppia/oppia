@@ -430,7 +430,7 @@ angular.module('oppia').directive('questionsList', [
                 AlertsService.addSuccessMessage('Deleted Question');
                 ctrl.removeArrayElement(
                   ctrl.questionIdsDeletedArray, questionId);
-                });
+              });
             } else {
               ctrl.getAllSkillSummaries().forEach(function(summary) {
                 if (summary.getDescription() === skillDescription) {
