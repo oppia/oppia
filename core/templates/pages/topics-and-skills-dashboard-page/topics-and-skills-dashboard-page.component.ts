@@ -381,13 +381,19 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
             )
         );
         $window.onload = function() {
-          FocusManagerService.setFocus('createTopicBtn')
+          if (ctrl.activeTab === 'topics') {
+            console.log(ctrl.activeTab)
+            FocusManagerService.setFocus('createTopicBtn');
+          } else {
+            console.log(ctrl.activeTab)
+            FocusManagerService.setFocus('createSkillBtn');
          }
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are
         // triggered.
         ctrl._initDashboard(false);
       };
+    }
 
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
