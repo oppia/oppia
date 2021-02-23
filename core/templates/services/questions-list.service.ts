@@ -69,7 +69,7 @@ export class QuestionsListService {
   }
 
   getQuestionSummariesAsync(
-      skillId: string, fetchMore: boolean, resetHistory: boolean): void {
+      skillId: string, fetchMore: boolean, resetHistory: boolean): Promise<void> {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
       this._nextCursorForQuestions = '';
@@ -96,7 +96,8 @@ export class QuestionsListService {
         this._setNextQuestionsCursor(response.nextCursor);
         this._setQuestionSummariesForOneSkill(
           questionSummaries, resetHistory);
-      });
+      })
+      return Promise.resolve();
     }
   }
 
