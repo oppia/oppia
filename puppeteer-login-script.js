@@ -107,7 +107,7 @@ const createCollections = async function(context, page) {
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin');
-    await page.waitFor(2000);
+    await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
     // eslint-disable-next-line no-console
@@ -125,7 +125,7 @@ const createExplorations = async function(context, page) {
     // Load in Exploration
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin', { waitUntil: 'networkidle0' });
-    await page.waitFor(2000);
+    await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click(
       '.protractor-test-reload-exploration-button');
