@@ -24,7 +24,7 @@
   <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given content in {{ languageDescription }}:</strong>
-      <a class="oppia-skip-button" href="" *ngIf="moreAvailable" (click)="skipActiveTranslation()">skip</a>
+      <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">skip</a>
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <!-- textToTranslate contains the html content of an exploration state -->
