@@ -251,6 +251,8 @@ describe('Settings Tab Component', function() {
     it('should refresh permissions when onExplorationPublished flag is ' +
         'broadcasted', function() {
       ctrl.canUnpublish = false;
+      expect(ctrl.canUnpublish).toBe(false);
+
       explorationSaveService.onExplorationPublished.emit();
       $scope.$apply();
 

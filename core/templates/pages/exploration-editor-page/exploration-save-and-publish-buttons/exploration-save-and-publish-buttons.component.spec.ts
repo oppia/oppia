@@ -283,8 +283,8 @@ describe('Exploration save and publish buttons component', function() {
     $scope.explorationCanBePublished = false;
     spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
       .returnValue($q.resolve(userPermissions));
-    $scope.showPublishExplorationModal();
 
+    $scope.showPublishExplorationModal();
     $scope.$apply();
 
     expect($scope.publishIsInProcess).toBe(false);
