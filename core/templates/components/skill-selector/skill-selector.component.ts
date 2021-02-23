@@ -164,24 +164,27 @@ export class SkillSelectorComponent implements OnInit {
     this.updateSkillsListOnSubtopicFilterChange();
   }
 
-  searchInSubtopicSkills(input: ShortSkillSummary[], searchText: string): ShortSkillSummary[] {
+  searchInSubtopicSkills(input: ShortSkillSummary[], searchText: string):
+  ShortSkillSummary[] {
     let skills: string[] = input.map(val => {
-      return val.getDescription()
-    })
-    let filteredSkills = this.filterForMatchingSubtringPipe.transform(skills, searchText)
+      return val.getDescription();
+    });
+    let filteredSkills = this.filterForMatchingSubtringPipe
+      .transform(skills, searchText);
     return input.filter(val => {
-      return filteredSkills.includes(val.description)
-    })
+      return filteredSkills.includes(val.description);
+    });
   }
 
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
     let skills: string[] = this.untriagedSkillSummaries.map(val => {
-      return val.description
-    })
-    let filteredSkills = this.filterForMatchingSubtringPipe.transform(skills, searchText)
+      return val.description;
+    });
+    let filteredSkills = this.filterForMatchingSubtringPipe
+      .transform(skills, searchText);
     return this.untriagedSkillSummaries.filter(val => {
-      return filteredSkills.includes(val.description)
-    })
+      return filteredSkills.includes(val.description);
+    });
   }
 
   clearAllFilters(): void {

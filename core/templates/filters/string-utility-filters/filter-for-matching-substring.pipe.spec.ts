@@ -19,7 +19,7 @@
 import { FilterForMatchingSubstringPipe } from
   'filters/string-utility-filters/filter-for-matching-substring.pipe';
 
-fdescribe('Testing FilterForMatchingSubstringPipe', () => {
+describe('Testing FilterForMatchingSubstringPipe', () => {
   let pipe: FilterForMatchingSubstringPipe;
   beforeEach(() => {
     pipe = new FilterForMatchingSubstringPipe();
@@ -30,13 +30,13 @@ fdescribe('Testing FilterForMatchingSubstringPipe', () => {
   });
 
   it('should get items that contain search text', () => {
-    let list = ["cat", "dog", "caterpillar"]
-    expect(pipe.transform(list, "cat")).toEqual(["cat", "caterpillar"]);
-    expect(pipe.transform(list, "dog")).toEqual(["dog"]);
+    let list = ['cat', 'dog', 'caterpillar'];
+    expect(pipe.transform(list, 'cat')).toEqual(['cat', 'caterpillar']);
+    expect(pipe.transform(list, 'dog')).toEqual(['dog']);
   });
 
   it('should not get items that do not contain search text', () => {
-    let list = ["cat", "dog", "caterpillar"]
-    expect(pipe.transform(list, "puppy")).toEqual([]);
+    let list = ['cat', 'dog', 'caterpillar'];
+    expect(pipe.transform(list, 'puppy')).toEqual([]);
   });
 });

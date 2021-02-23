@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview FilterForMatchingSubstring pipe for Oppia, filters for matching strings.
+ * @fileoverview FilterForMatchingSubstring pipe for Oppia, filters for
+ * matching strings.
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
@@ -22,14 +23,13 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'filterForMatchingSubtring'
 })
 export class FilterForMatchingSubstringPipe implements PipeTransform {
-
   transform(input: string[], matcher: string): string[] {
     if (!input.filter) {
       throw new Error(
         'Bad input for filterForMatchingSubstring: ' + JSON.stringify(input));
     }
-    return input.filter(val => { 
-      return val.toLowerCase().includes(matcher.toLowerCase())
-    })
+    return input.filter(val => {
+      return val.toLowerCase().includes(matcher.toLowerCase());
+    });
   }
 }
