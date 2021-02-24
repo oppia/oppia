@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Helper functions for beam validators and one-off jobs. The clone function
 should be used in every beam function since beam functions require all input
 to be immutable."""
@@ -34,7 +35,7 @@ def clone_model(model, **new_values):
             invoking the cloned entity's constructor.
 
     Returns:
-        *. A cloned, and possibly modified, copy of self. Subclasses of
+        datastore_services.Model. A cloned, and possibly modified, copy of self. Subclasses of
         BaseModel will return a clone with the same type.
     """
     # Reference implementation: https://stackoverflow.com/a/2712401/4859885.

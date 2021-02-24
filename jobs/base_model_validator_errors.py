@@ -29,6 +29,9 @@ PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS = (
 class ModelValidationError(python_utils.OBJECT):
     """Base error class for model validations."""
 
+    def __init__(self, model):
+        self._message = "Entity id %s: " % (model.id)
+
     @property
     def key(self):
         """Property that returns the error class name."""
@@ -37,7 +40,7 @@ class ModelValidationError(python_utils.OBJECT):
     @property
     def message(self):
         """Message property to override in subclasses."""
-        return None
+        return self._message
 
     def __repr__(self):
         return '%s: %s' % (self.key, self.message) if self.message else self.key
@@ -45,7 +48,7 @@ class ModelValidationError(python_utils.OBJECT):
     def __eq__(self, other):
         if self.__class__ is other.__class__:
             return (self.key, self.message) == (other.key, other.message)
-        return NotImplemented
+        return NotImplementedError
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -59,9 +62,10 @@ class ModelTimestampRelationshipError(ModelValidationError):
 
     def __init__(self, model):
         self._message = (
-            'Entity ID %s: The created_on field has a value %s which '
+            super(ModelTimestampRelationshipError, self).__init__(model)
+            ('The created_on field has a value %s which '
             'is greater than the value %s of last_updated field'
-            % (model.id, model.created_on, model.last_updated))
+            % (model.created_on, model.last_updated)))
 
     @property
     def message(self):
@@ -73,9 +77,10 @@ class ModelMutatedDuringJobError(ModelValidationError):
 
     def __init__(self, model):
         self._message = (
-            'Entity id %s: The last_updated field has a value %s which '
-            'is greater than the time when the job was run'
-            % (model.id, model.last_updated))
+            super(ModelMutatedDuringJobError, self).__init__(model)
+            ("The last_updated field has a value %s which '
+            'is greater than the time when the job was run' 
+            % (model.last_updated)))
 
     @property
     def message(self):
@@ -87,8 +92,8 @@ class ModelInvalidIdError(ModelValidationError):
 
     def __init__(self, model):
         self._message = (
-            'Entity id %s: Entity id does not match regex pattern'
-            % (model.id))
+            super(ModelInvalidIdError, self).__init__(model)
+            'Entity id does not match regex pattern')
 
     @property
     def message(self):
@@ -100,8 +105,9 @@ class ModelExpiredError(ModelValidationError):
 
     def __init__(self, model):
         self._message = (
-            'Entity id %s: model marked as deleted is older than %s days'
-            % (model.id, PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
+            super(ModelExpiredError, self).__init__(model)
+            'model marked as deleted is older than %s days'
+            % (PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
 
     @property
     def message(self):
