@@ -25,50 +25,35 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class PreventPageUnloadEventService {
   private listenerActive: boolean;
-  validation: Function;
-  _preventPageUnloadEventHandlerBind = undefined;
-
   constructor(private windowRef: WindowRef) {
     this.listenerActive = false;
-    this.validation = undefined;
   }
 
-  addListener(callback: Function = () => {
-    return true;
-  }): void {
+  addListener(): void {
     if (this.listenerActive) {
       return;
     }
-    this.validation = callback;
-    this._preventPageUnloadEventHandlerBind =
-      this._preventPageUnloadEventHandler.bind(null, this.validation);
     this.windowRef.nativeWindow.addEventListener(
-      'beforeunload', this._preventPageUnloadEventHandlerBind, true);
+      'beforeunload', this._preventPageUnloadEventHandler);
     this.listenerActive = true;
   }
 
   removeListener(): void {
-    if (!this.listenerActive) {
-      return;
-    }
     this.windowRef.nativeWindow.removeEventListener(
-      'beforeunload', this._preventPageUnloadEventHandlerBind, true);
+      'beforeunload', this._preventPageUnloadEventHandler);
     this.listenerActive = false;
   }
 
   private _preventPageUnloadEventHandler(
-      validation: Function, e: BeforeUnloadEvent): void {
-    if (validation()) {
-      // The preventDefault call is used to trigger a confirmation
-      // before leaving.
-      e.preventDefault();
-      // According to the specification, to show the confirmation dialog an
-      // event handler should call preventDefault() on the event. However note
-      // that not all browsers support this method. So returnValue is also used.
-      // The exact value in returnValue is not relevant, but it needs to be set
-      // in order to trigger a confirmation before leaving.
-      e.returnValue = '';
-    }
+      e: BeforeUnloadEvent): void {
+    // The preventDefault call is used to trigger a confirmation before leaving.
+    e.preventDefault();
+    // According to the specification, to show the confirmation dialog an
+    // event handler should call preventDefault() on the event. However note
+    // that not all browsers support this method. So returnValue is also used.
+    // The exact value in returnValue is not relevant, but it needs to be set
+    // in order to trigger a confirmation before leaving.
+    e.returnValue = '';
   }
 
   isListenerActive(): boolean {

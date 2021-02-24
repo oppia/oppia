@@ -82,7 +82,7 @@ describe ('Prevent page unload event service', function() {
     expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 
-  it('should prevent adding multiple listeners', () => {
+  it('should prevent multiple listeners', () => {
     spyOn(windowRef.nativeWindow, 'addEventListener');
 
     expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(0);
@@ -93,20 +93,6 @@ describe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.addListener();
 
     expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(1);
-  });
-
-  it('should prevent removeListener called multiple times', () => {
-    spyOn(windowRef.nativeWindow, 'removeEventListener');
-    preventPageUnloadEventService.addListener();
-
-    expect(windowRef.nativeWindow.removeEventListener).toHaveBeenCalledTimes(0);
-    preventPageUnloadEventService.removeListener();
-    expect(windowRef.nativeWindow.removeEventListener).toHaveBeenCalledTimes(1);
-    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
-
-    preventPageUnloadEventService.removeListener();
-
-    expect(windowRef.nativeWindow.removeEventListener).toHaveBeenCalledTimes(1);
   });
 
   it('should remove listener on ngondestroy', () => {
