@@ -41,5 +41,5 @@ export class SummaryListHeaderComponent {
 angular.module('oppia').directive(
   'summaryListHeader', downgradeComponent(
     {component: SummaryListHeaderComponent
-}
-));
+    }
+  ));
