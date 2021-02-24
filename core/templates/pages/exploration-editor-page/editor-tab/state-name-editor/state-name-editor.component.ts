@@ -38,11 +38,13 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('stateNameEditor', {
   template: require('./state-name-editor.component.html'),
   controller: [
-    '$filter', '$window', '$rootScope', 'EditabilityService', 'ExplorationStatesService',
+    '$filter', '$rootScope', '$window', 'EditabilityService',
+    'ExplorationStatesService',
     'ExternalSaveService', 'FocusManagerService', 'RouterService',
     'StateEditorService', 'StateNameService', 'MAX_STATE_NAME_LENGTH',
     function(
-        $filter, $window, $rootScope, EditabilityService, ExplorationStatesService,
+        $filter, $rootScope, $window, EditabilityService,
+        ExplorationStatesService,
         ExternalSaveService, FocusManagerService, RouterService,
         StateEditorService, StateNameService, MAX_STATE_NAME_LENGTH) {
       var ctrl = this;
@@ -103,20 +105,22 @@ angular.module('oppia').component('stateNameEditor', {
         }
       };
       ctrl.$onInit = function() {
-        //If-user refreshes the tab.
-        $window.onload = function () {
-          if(RouterService.getActiveTabName() === 'main') {
+        // If-user refreshes the tab.
+        $window.onload = function() {
+          if (RouterService.getActiveTabName() === 'main') {
             FocusManagerService.setFocus('oppiaEditableSection');
-          };
-          if(RouterService.getActiveTabName() === 'feedback') {
+          }
+          if (RouterService.getActiveTabName() === 'feedback') {
             FocusManagerService.setFocus('newThreadButton');
-          };
-          if(RouterService.getActiveTabName() === 'history') {
+          }
+          if (RouterService.getActiveTabName() === 'history') {
             FocusManagerService.setFocus('usernameInputField');
-          };
+          }
         };
-        $rootScope.$watch(() => RouterService.getActiveTabName(), function(newValue){
-          if (newValue === 'main' ) {
+        $rootScope.$watch(() => {
+          RouterService.getActiveTabName()
+        }, function(newValue) {
+          if (newValue === 'main') {
             FocusManagerService.setFocus('oppiaEditableSection');
           }
         });

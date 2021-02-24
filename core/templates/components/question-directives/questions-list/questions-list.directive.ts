@@ -325,8 +325,8 @@ angular.module('oppia').directive('questionsList', [
                 if (linkedSkillWithDifficulty.getDifficulty()) {
                   ctrl.newQuestionSkillDifficulties.push(
                     linkedSkillWithDifficulty.getDifficulty());
-                };
-                FocusManagerService.setFocus('difficultySelectionDiv')
+                }
+                FocusManagerService.setFocus('difficultySelectionDiv');
               });
             ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
             if (AlertsService.warnings.length === 0) {

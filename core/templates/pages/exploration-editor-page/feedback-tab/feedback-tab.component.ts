@@ -223,7 +223,8 @@ angular.module('oppia').component('feedbackTab', {
 
       ctrl.$onInit = function() {
         $rootScope.$watch(() => {
-          RouterService.getActiveTabName()}, function(newValue) {
+          RouterService.getActiveTabName();
+        }, function(newValue) {
           if (newValue === 'feedback') {
             if (!ctrl.activeThread) {
               FocusManagerService.setFocus('newThreadButton');

@@ -31,7 +31,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
 describe('State Name Editor component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -42,7 +41,6 @@ describe('State Name Editor component', function() {
   var routerService = null;
   var stateEditorService = null;
   var stateNameService = null;
-  var focusManagerService = null;
   var mockExternalSaveEventEmitter = null;
 
   var mockExplorationData = {
@@ -67,7 +65,6 @@ describe('State Name Editor component', function() {
     editabilityService = TestBed.get(EditabilityService);
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -304,5 +301,4 @@ describe('State Name Editor component', function() {
     mockExternalSaveEventEmitter.emit();
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
-
 });
