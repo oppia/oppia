@@ -281,18 +281,18 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     var pageEditorInput = element(by.css('.protractor-test-edit-html-content'));
-    await action.click("RTE input", pageEditorInput);
+    await action.click('RTE input', pageEditorInput);
     var conceptCardButton = element(
       by.cssContainingText('.cke_button', 'Insert Concept Card Link'));
-    await action.click("Concept card button", conceptCardButton);
+    await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard =
      element(
-      by.cssContainingText(
-        '.protractor-test-rte-skill-selector-item', skillName));
+       by.cssContainingText(
+         '.protractor-test-rte-skill-selector-item', skillName));
     await skillForConceptCard.click();
     var closeRTEButton = element(
       by.css('.protractor-test-close-rich-text-component-editor'));
-    await action.click("Close RTE button", closeRTEButton);
+    await action.click('Close RTE button', closeRTEButton);
   };
 
   this.saveSubtopicExplanation = async function() {
@@ -302,7 +302,7 @@ var TopicEditorPage = function() {
       saveSubtopicExplanationButton,
       'Save Subtopic Explanation button taking too long to be clickable');
     await saveSubtopicExplanationButton.click();
-  }
+  };
 
   this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
     await waitFor.visibilityOf(
