@@ -61,8 +61,9 @@ class ModelTimestampRelationshipError(ModelValidationError):
     """Error class for time field model validation errors."""
 
     def __init__(self, model):
+        super(ModelTimestampRelationshipError, self).__init__(model)
         self._message = (
-            super(ModelTimestampRelationshipError, self).__init__(model)
+            super(ModelTimestampRelationshipError, self).message +
             ('The created_on field has a value %s which '
             'is greater than the value %s of last_updated field'
             % (model.created_on, model.last_updated)))
@@ -76,9 +77,10 @@ class ModelMutatedDuringJobError(ModelValidationError):
     """Error class for current time model validation errors."""
 
     def __init__(self, model):
+        super(ModelMutatedDuringJobError, self).__init__(model)
         self._message = (
-            super(ModelMutatedDuringJobError, self).__init__(model)
-            ("The last_updated field has a value %s which '
+            super(ModelMutatedDuringJobError, self).message +
+            ('The last_updated field has a value %s which '
             'is greater than the time when the job was run' 
             % (model.last_updated)))
 
@@ -91,8 +93,9 @@ class ModelInvalidIdError(ModelValidationError):
     """Error class for id model validation errors."""
 
     def __init__(self, model):
+        super(ModelInvalidIdError, self).__init__(model)
         self._message = (
-            super(ModelInvalidIdError, self).__init__(model)
+            super(ModelInvalidIdError, self).message +
             'Entity id does not match regex pattern')
 
     @property
@@ -104,8 +107,9 @@ class ModelExpiredError(ModelValidationError):
     """Error class for stale deletion validation errors."""
 
     def __init__(self, model):
+        super(ModelExpiredError, self).__init__(model)
         self._message = (
-            super(ModelExpiredError, self).__init__(model)
+            super(ModelExpiredError, self).message +
             'model marked as deleted is older than %s days'
             % (PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
 

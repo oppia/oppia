@@ -51,7 +51,7 @@ class ModelTimestampRelationshipErrorTests(ValidatorErrorTestBase):
         error = errors.ModelTimestampRelationshipError(model)
 
         msg = (
-            'Entity ID %s: The created_on field has a value %s which '
+            'Entity id %s: The created_on field has a value %s which '
             'is greater than the value %s of last_updated field'
             % (model.id, model.created_on, model.last_updated))
         self.assertEqual(error.message, msg)
