@@ -29,7 +29,7 @@ describe('Test Interaction Panel directive', function() {
   var $uibModalInstance = null;
   var CurrentInteractionService = null;
   var ExplorationStatesService = null;
-
+  var ctrl = null;
   var stateName = 'Introduction';
   var state = {
     interaction: {
@@ -68,13 +68,14 @@ describe('Test Interaction Panel directive', function() {
       .returnValue(false);
 
     $scope = $rootScope.$new();
-    var ctrl = $componentController('testInteractionPanel', {
+    ctrl = $componentController('testInteractionPanel', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
     }, {
       getStateName: () => stateName
     });
     ctrl.$onInit();
+    CurrentInteractionService.updateViewWithNewAnswer();
   }));
 
   it('should initialize controller properties after its initialization',
@@ -86,7 +87,7 @@ describe('Test Interaction Panel directive', function() {
   it('should submit answer when clicking on button', function() {
     spyOn(CurrentInteractionService, 'submitAnswer');
     $scope.onSubmitAnswerFromButton();
-
+    ctrl.$onDestroy();
     expect(CurrentInteractionService.submitAnswer).toHaveBeenCalled();
   });
 });
