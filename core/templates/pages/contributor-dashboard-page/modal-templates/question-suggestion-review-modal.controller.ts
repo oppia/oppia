@@ -16,23 +16,20 @@
  * @fileoverview Controller for question suggestion review modal.
  */
 
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-opportunities.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
-  '$scope', '$uibModalInstance', 'ContributionOpportunitiesService',
-  'SiteAnalyticsService', 'SuggestionModalService', 'authorName', 'contentHtml',
+  '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+  'SuggestionModalService', 'authorName', 'contentHtml',
   'misconceptionsBySkill', 'question', 'questionHeader', 'reviewable',
-  'skillDifficulty', 'skillRubrics', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
+  'skillDifficulty', 'skillRubrics', 'ACTION_ACCEPT_SUGGESTION',
   'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $scope, $uibModalInstance, ContributionOpportunitiesService,
-      SiteAnalyticsService, SuggestionModalService, authorName, contentHtml,
+      $scope, $uibModalInstance, SiteAnalyticsService,
+      SuggestionModalService, authorName, contentHtml,
       misconceptionsBySkill, question, questionHeader, reviewable,
-      skillDifficulty, skillRubrics, suggestionId, ACTION_ACCEPT_SUGGESTION,
+      skillDifficulty, skillRubrics, ACTION_ACCEPT_SUGGESTION,
       ACTION_REJECT_SUGGESTION, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
@@ -83,8 +80,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.accept = function() {
-      ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-        [suggestionId]);
       SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
         'Question');
       SuggestionModalService.acceptSuggestion(
@@ -97,8 +92,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.reject = function() {
-      ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-        [suggestionId]);
       SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
         'Question');
       SuggestionModalService.rejectSuggestion(

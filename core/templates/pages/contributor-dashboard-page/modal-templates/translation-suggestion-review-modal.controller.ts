@@ -18,23 +18,22 @@
 
 require('domain/feedback_message/ThreadMessageObjectFactory.ts');
 
-require('services/alerts.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$http', '$scope', '$uibModalInstance', 'AlertsService',
-    'ContributionAndReviewService', 'SiteAnalyticsService',
-    'ThreadMessageObjectFactory', 'UrlInterpolationService',
-    'initialSuggestionId', 'reviewable', 'suggestionIdToSuggestion',
-    'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+    '$http', '$scope', '$uibModalInstance', 'ContributionAndReviewService',
+    'SiteAnalyticsService', 'ThreadMessageObjectFactory',
+    'UrlInterpolationService', 'initialSuggestionId', 'reviewable',
+    'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION',
     function(
-        $http, $scope, $uibModalInstance, AlertsService,
-        ContributionAndReviewService, SiteAnalyticsService,
-        ThreadMessageObjectFactory, UrlInterpolationService,
-        initialSuggestionId, reviewable, suggestionIdToSuggestion,
-        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+        $http, $scope, $uibModalInstance, ContributionAndReviewService,
+        SiteAnalyticsService, ThreadMessageObjectFactory,
+        UrlInterpolationService, initialSuggestionId, reviewable,
+        suggestionIdToSuggestion, ACTION_ACCEPT_SUGGESTION,
+        ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
@@ -116,21 +115,17 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           ACTION_ACCEPT_SUGGESTION,
           $scope.reviewMessage, generateCommitMessage(),
-          $scope.showNextItemToReview, (error) => {
-            $scope.rejectAndReviewNext('Invalid Suggestion');
-            AlertsService.clearWarnings();
-            AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
-          });
+          $scope.showNextItemToReview);
       };
 
-      $scope.rejectAndReviewNext = function(reviewMessage) {
+      $scope.rejectAndReviewNext = function() {
         $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
           'Translation');
 
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
+          ACTION_REJECT_SUGGESTION, $scope.reviewMessage,
           generateCommitMessage(), $scope.showNextItemToReview);
       };
 

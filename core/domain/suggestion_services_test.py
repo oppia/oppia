@@ -229,8 +229,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegexp(
             Exception,
-            'The Exploration content has changed since this translation '
-            'was submitted.'):
+            'The given content_html does not match the content of the '
+            'exploration.'):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,

@@ -121,8 +121,6 @@ angular.module('oppia').controller('TranslationModalController', [
             }
             $scope.activeWrittenTranslation.html = '';
             $scope.uploadingTranslation = false;
-          }, () => {
-            $uibModalInstance.close();
           });
       }
       if (!$scope.moreAvailable) {
