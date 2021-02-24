@@ -133,6 +133,8 @@ describe('Full exploration editor', function() {
       ['final card', 'card1', 'card2']);
     await explorationEditorMainTab.setInteraction('EndExploration');
 
+    expect(false).toBeTruthy();
+
     // Check discarding of changes.
     await explorationEditorPage.discardChanges();
     await explorationEditorMainTab.expectCurrentStateToBe(
