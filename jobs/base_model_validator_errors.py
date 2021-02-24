@@ -79,7 +79,7 @@ class ModelMutatedDuringJobError(ModelValidationError):
     def __init__(self, model):
         super(ModelMutatedDuringJobError, self).__init__(model)
         self._message = (
-            super(ModelMutatedDuringJobError, self).message +(
+            super(ModelMutatedDuringJobError, self).message + (
                 'The last_updated field has a value %s which '
                 'is greater than the time when the job was run'
                 % (model.last_updated)))
