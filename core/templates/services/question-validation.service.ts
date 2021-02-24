@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { Question } from 'domain/question/QuestionObjectFactory';
@@ -31,37 +31,17 @@ export class QuestionValidationService {
     private stateEditorService: StateEditorService
   ) { }
 
-  isQuestionValid = (
+  isQuestionValid(
       question: Question,
-      misconceptionsBySkill: Misconception[]): boolean => {
+      misconceptionsBySkill: Misconception[]): boolean {
     return !(
       question.getValidationErrorMessage() ||
       question.getUnaddressedMisconceptionNames(
         misconceptionsBySkill
       ).length > 0 ||
       !this.stateEditorService.isCurrentSolutionValid());
-  };
+  }
 }
 
 angular.module('oppia').factory(
   'QuestionValidationService', downgradeInjectable(QuestionValidationService));
-
-
-// require(
-//   'components/state-editor/state-editor-properties-services/' +
-//   'state-editor.service.ts');
-
-// angular.module('oppia').factory('QuestionValidationService', [
-//   'StateEditorService',
-//   function(StateEditorService) {
-//     return {
-//       isQuestionValid: function(question, misconceptionsBySkill) {
-//         return !(
-//           question.getValidationErrorMessage() ||
-//           question.getUnaddressedMisconceptionNames(
-//             misconceptionsBySkill).length > 0 ||
-//           !StateEditorService.isCurrentSolutionValid());
-//       }
-//     };
-//   }
-// ]);
