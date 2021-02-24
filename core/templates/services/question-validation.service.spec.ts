@@ -22,7 +22,7 @@ import { QuestionValidationService } from './question-validation.service';
  * @fileoverview Unit tests for QuestionValidationService.
  */
 
-fdescribe('Question Validation Service', () => {
+describe('Question Validation Service', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject;
   let mockQuestionDict;
