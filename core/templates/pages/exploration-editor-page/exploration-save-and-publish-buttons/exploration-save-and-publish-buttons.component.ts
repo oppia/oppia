@@ -36,11 +36,11 @@ require('services/editability.service.ts');
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
-    '$rootScope', '$scope', 'ChangeListService', 'EditabilityService',
+    '$scope', 'ChangeListService', 'EditabilityService',
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationWarningsService', 'UserExplorationPermissionsService',
     function(
-        $rootScope, $scope, ChangeListService, EditabilityService,
+        $scope, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
         ExplorationWarningsService, UserExplorationPermissionsService) {
       var ctrl = this;
@@ -104,9 +104,6 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         UserExplorationPermissionsService.fetchPermissionsAsync()
           .then(function(permissions) {
             $scope.explorationCanBePublished = permissions.canPublish;
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
           });
       };
 
@@ -141,6 +138,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
         $scope.explorationCanBePublished = false;
+
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
             $scope.explorationCanBePublished = permissions.canPublish;
@@ -151,13 +149,14 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
               UserExplorationPermissionsService.getPermissionsAsync()
                 .then(function(permissions) {
                   $scope.explorationCanBePublished = permissions.canPublish;
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the controller is migrated to angular.
-                  $rootScope.$applyAsync();
                 });
             }
           )
         );
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

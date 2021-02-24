@@ -283,8 +283,8 @@ describe('Exploration rights service', function() {
     function() {
       $httpBackend.expectPUT('/createhandler/moderatorrights/12345').respond(
         200, sampleDataResults);
-      const onUnpublishingcallbackFunc =
-        jasmine.createSpy('onUnpublishingcallback');
+      const onUnpublishingcallbackFunc = jasmine.createSpy(
+        'onUnpublishingcallback');
 
       ers.saveModeratorChangeToBackend(
         'Email body', onUnpublishingcallbackFunc);

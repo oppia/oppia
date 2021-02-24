@@ -149,6 +149,10 @@ describe('Exploration save and publish buttons component', function() {
     $scope.$apply();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should initialize $scope properties after controller initialization',
     function() {
       expect($scope.saveIsInProcess).toBe(false);
@@ -264,16 +268,17 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.isEditableOutsideTutorialMode()).toBe(false);
   });
 
-  it('should display publish button', function() {
-    $scope.explorationCanBePublished = false;
+  it('should display publish button when the exploration is unpublished',
+    function() {
+      $scope.explorationCanBePublished = false;
 
-    explorationRightsService.onExplorationUnpublished.emit();
-    $scope.$apply();
+      explorationRightsService.onExplorationUnpublished.emit();
+      $scope.$apply();
 
-    expect(userExplorationPermissionsService.getPermissionsAsync)
-      .toHaveBeenCalled();
-    expect($scope.explorationCanBePublished).toBe(true);
-  });
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect($scope.explorationCanBePublished).toBe(true);
+    });
 
   it('should fetch userExplorationPermissions when ' +
     'showPublishExplorationModal is called', function() {
@@ -292,5 +297,13 @@ describe('Exploration save and publish buttons component', function() {
     expect(userExplorationPermissionsService.fetchPermissionsAsync)
       .toHaveBeenCalled();
     expect($scope.explorationCanBePublished).toBe(true);
+  });
+
+  it('should unsubscribe when onDestroy runs', function() {
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
+    ctrl.$onDestroy();
+
+    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });

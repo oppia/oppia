@@ -342,9 +342,6 @@ angular.module('oppia').component('settingsTab', {
             .then(function(permissions) {
               ctrl.canUnpublish = permissions.canUnpublish;
               ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$applyAsync();
             });
         };
 
@@ -417,9 +414,6 @@ angular.module('oppia').component('settingsTab', {
                 .then(function(permissions) {
                   ctrl.canUnpublish = permissions.canUnpublish;
                   ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the controller is migrated to angular.
-                  $rootScope.$applyAsync();
                 });
             }
           )
