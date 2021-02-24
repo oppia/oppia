@@ -53,7 +53,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() canAddEdge: boolean;
   @Input() canDeleteEdge: boolean;
   @Input() canEditEdgeWeight: boolean;
-  @Input() isInteractionActive: boolean;
+  @Input() interactionIsActive: boolean;
   isMobile: boolean = false;
   helpText: string = '';
   _MODES = {
@@ -158,13 +158,13 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         ' ' + (viewBoxHeight));
     // Initial value of SVG view box.
 
-    if (this.isInteractionActive) {
+    if (this.interactionIsActive) {
       this.init();
     }
   }
 
   getEdgeColor(index: number): string {
-    if (!this.isInteractionActive) {
+    if (!this.interactionIsActive) {
       return this.DEFAULT_COLOR;
     }
     if (this.state.currentMode === this._MODES.DELETE &&
@@ -181,7 +181,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   getVertexColor(index: number): string {
-    if (!this.isInteractionActive) {
+    if (!this.interactionIsActive) {
       return this.DEFAULT_COLOR;
     }
     if (this.state.currentMode === this._MODES.DELETE &&
@@ -209,7 +209,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   mousemoveGraphSVG(event: MouseEvent): void {
-    if (!this.isInteractionActive) {
+    if (!this.interactionIsActive) {
       return;
     }
     // Note: Transform client (X, Y) to SVG (X, Y). This has to be
@@ -240,7 +240,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onClickGraphSVG(): void {
-    if (!this.isInteractionActive) {
+    if (!this.interactionIsActive) {
       return;
     }
     if (this.state.currentMode === this._MODES.ADD_VERTEX &&
@@ -342,7 +342,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   onClickModeButton(mode: number, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    if (this.isInteractionActive) {
+    if (this.interactionIsActive) {
       this.setMode(mode);
     }
   }

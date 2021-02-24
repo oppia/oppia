@@ -38,15 +38,14 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 
 require('services/stateful/focus-manager.service.ts');
-
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.
 angular.module('oppia').directive('focusOn', [
   'FocusManagerService', 'LABEL_FOR_CLEARING_FOCUS',
-  (FocusManagerService, LABEL_FOR_CLEARING_FOCUS) => {
+  function(FocusManagerService, LABEL_FOR_CLEARING_FOCUS) {
     return (scope, elt, attrs) => {
-      scope.directiveSubscriptions = new Subscription();
-      scope.directiveSubscriptions.add(
+      const directiveSubscriptions = new Subscription();
+      directiveSubscriptions.add(
         FocusManagerService.onFocus.subscribe(
           (name) => {
             if (name === attrs.focusOn) {
@@ -62,11 +61,12 @@ angular.module('oppia').directive('focusOn', [
         )
       );
       scope.$on('$destroy', function() {
-        scope.directiveSubscriptions.unsubscribe();
+        directiveSubscriptions.unsubscribe();
       });
     };
   }
 ]);
+
 @Directive({
   selector: '[oppiaFocusOn]'
 })
