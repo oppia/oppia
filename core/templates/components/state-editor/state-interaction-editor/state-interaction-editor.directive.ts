@@ -130,11 +130,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
             if (!StateInteractionIdService.savedMemento) {
               return '';
             }
-            const inter = ExplorationHtmlFormatterService.getInteractionHtml(
+            return ExplorationHtmlFormatterService.getInteractionHtml(
               StateInteractionIdService.savedMemento,
               interactionCustomizationArgs, false);
-            debugger;
-            return inter;
           };
 
           var _updateInteractionPreview = function() {
