@@ -20,18 +20,18 @@ import { downgradeComponent } from '@angular/upgrade/static';
  */
 
 @Component({
-  selector: 'summary-list-header',
+  selector: 'oppia-summary-list-header',
   templateUrl: './summary-list-header.component.html'
 })
 export class SummaryListHeaderComponent {
  @Input() disableSorting: boolean;
- @Input() index;
- @Input() summary;
- @Input() shortSummary;
+ @Input() index: number;
+ @Input() summary: string;
+ @Input() shortSummary: string;
  @Input() isActive: boolean;
- @Input() onDeleteFn;
+ @Input() onDeleteFn: (index: number, event: Event) => void ;
  @Input() isDeleteAvailable: boolean;
- @Input() numItems;
+ @Input() numItems: number;
 
  deleteItem(evt: Event): void {
    this.onDeleteFn(this.index, evt);
@@ -39,7 +39,7 @@ export class SummaryListHeaderComponent {
 }
 
 angular.module('oppia').directive(
-  'summaryListHeader', downgradeComponent(
-    {component: SummaryListHeaderComponent
-    }
+  'oppiaSummaryListHeader', downgradeComponent({
+    component: SummaryListHeaderComponent
+  }
   ));
