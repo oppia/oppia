@@ -23,7 +23,6 @@ export const AboutPageConstants = {
   // updated in update_changelog_and_credits.py file. If the patterns do
   // not match, update_changelog_and_credits_test will fail.
   CREDITS_CONSTANTS: [
-    '',
     'Aadya Mishra',
     'Aaron Zuspan',
     'Aashish Gaba',
