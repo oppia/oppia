@@ -63,6 +63,15 @@ describe('Site Analytics Service', () => {
     });
   });
 
+  it('should register click start learning button event', () => {
+    sas.registerClickStartLearningButtonEvent();
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+      event_category: 'StartLearningButton',
+      event_label: '/context.html'
+    });
+  });
+
   it('should register go to donation site event', () => {
     const donationSite = 'https://donation.com';
     sas.registerGoToDonationSiteEvent(donationSite);
@@ -518,6 +527,43 @@ describe('Site Analytics Service', () => {
     expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
       event_category: 'ContributorDashboardRejectSuggestion',
       event_label: contributionType
+    });
+  });
+
+  it('should register active lesson usage', () => {
+    sas.registerLessonActiveUse();
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+      event_category: 'ActiveUserStartAndSawCards',
+      event_label: ''
+    });
+  });
+
+  it('should register exploration start', () => {
+    const explorationId = 'abc1';
+    sas.registerStartExploration(explorationId);
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+      event_category: 'PlayerStartExploration',
+      event_label: explorationId
+    });
+  });
+
+  it('should register active classroom lesson usage', () => {
+    sas.registerClassroomLessonActiveUse();
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+      event_category: 'ClassroomActiveUserStartAndSawCards',
+      event_label: ''
+    });
+  });
+
+  it('should register classroom header click event', () => {
+    sas.registerClassoomHeaderClickEvent();
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+      event_category: 'ClassroomEngagement',
+      event_label: 'ClickOnClassroom'
     });
   });
 });
