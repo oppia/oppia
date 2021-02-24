@@ -138,7 +138,7 @@ class BaseModelValidator(beam.PTransform):
         """
         deleted, not_deleted = (
             model_pipe
-            | beam.Map(
+            | 'SplitByDeleted' >> beam.Map(
                 lambda m: beam.pvalue.TaggedOutput(
                     'deleted' if m.deleted else 'not_deleted', m)
             ).with_outputs('deleted', 'not_deleted')
