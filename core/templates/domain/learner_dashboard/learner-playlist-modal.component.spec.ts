@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ComponentFixture, flushMicrotasks, TestBed } from
+import { async, ComponentFixture, flushMicrotasks, TestBed } from
   '@angular/core/testing';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { async } from 'q';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 

@@ -25,22 +25,18 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 @Component({
   selector: 'learner-playlist-modal',
-  templateUrl: (
-    '/template/pages/learner-dashboard-page/modal-templates/' +
-    'remove-activity-from-learner-dashboard-modal.template.html'),
+  templateUrl: './learner-playlist-modal.component.html',
   styleUrls: []
 })
 export class LearnerPlaylistModalComponent {
   constructor(
     private activeModal: NgbActiveModal,
     private http: HttpClient,
-    private activityType = activityType,
-    private activityId = activityId,
-    private activityTitle = activityTitle,
-    private urlInterpolationService: UrlInterpolationService
-    = urlInterpolationService,
+    private activityType: string,
+    private activityId: string,
+    private activityTitle: string,
+    private urlInterpolationService: UrlInterpolationService,
   ) {}
-
   sectionNameI18nId = (
       'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
   removeFromLearnerPlaylistUrl = (

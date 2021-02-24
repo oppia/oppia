@@ -23,13 +23,13 @@ import { TranslatorProviderForTests } from 'tests/test.extras';
 import { LearnerPlaylistService } from './learner-playlist.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import constants from 'assets/constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { ApplicationRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
 
 export class MockChangeDetectorRef {
   detectChanges: () => void;
@@ -80,7 +80,7 @@ fdescribe('Learner playlist service factory', () => {
     instance = TestBed.inject(LearnerPlaylistService);
     ref = TestBed.inject(ChangeDetectorRef);
     appRef = TestBed.inject(ApplicationRef);
-    activityType = TestBed.get(constants.ACTIVITY_TYPE_EXPLORATION);
+    activityType = TestBed.get(AppConstants.ACTIVITY_TYPE_EXPLORATION);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     alertsService = TestBed.inject(AlertsService);
     csrfService = TestBed.inject(CsrfTokenService);
