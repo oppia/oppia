@@ -97,6 +97,7 @@ export class Fraction {
 
   isEqualTo(fractionToCompare: Fraction): boolean {
     const fraction = this.convertToSimplestForm();
+    fractionToCompare = fractionToCompare.convertToSimplestForm();
     return (
       fraction.denominator === fractionToCompare.denominator &&
       fraction.numerator === fractionToCompare.numerator &&

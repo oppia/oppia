@@ -16,6 +16,7 @@
  * @fileoverview Controller for add or update solution modal.
  */
 
+import { Subscription } from 'rxjs';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -34,7 +35,6 @@ require(
   'state-solution.service.ts');
 require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance', 'ContextService',

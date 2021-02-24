@@ -49,9 +49,35 @@ describe('Fraction Object Factory', () => {
       numerator: 0,
       denominator: 1
     };
-    const createdFraction = fraction.fromDict(fractionObject);
-    const createdFraction2 = fraction.fromDict(fractionObject);
+    let createdFraction = fraction.fromDict(fractionObject);
+    let createdFraction2 = fraction.fromDict(fractionObject);
     expect(createdFraction.isEqualTo(createdFraction2)).toBe(true);
+    createdFraction = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 1,
+      denominator: 2
+    });
+    createdFraction2 = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 2,
+      denominator: 4
+    });
+    expect(createdFraction.isEqualTo(createdFraction2)).toBe(true);
+    createdFraction = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 1,
+      denominator: 3
+    });
+    createdFraction2 = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 2,
+      denominator: 4
+    });
+    expect(createdFraction.isEqualTo(createdFraction2)).toBe(false);
   });
 
   it('should convert itself to a string in fraction format', () => {
