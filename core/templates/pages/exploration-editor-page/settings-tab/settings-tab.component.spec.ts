@@ -457,16 +457,20 @@ describe('Settings Tab Component', function() {
         userEmailPreferencesService, 'setSuggestionNotificationPreferences');
 
       ctrl.muteFeedbackNotifications();
-      expect(feedbackNotificationsSpy).toHaveBeenCalledWith(true);
+      expect(feedbackNotificationsSpy)
+        .toHaveBeenCalledWith(true, jasmine.any(Function));
 
       ctrl.unmuteFeedbackNotifications();
-      expect(feedbackNotificationsSpy).toHaveBeenCalledWith(false);
+      expect(feedbackNotificationsSpy)
+        .toHaveBeenCalledWith(false, jasmine.any(Function));
 
       ctrl.muteSuggestionNotifications();
-      expect(suggestionNotificationsSpy).toHaveBeenCalledWith(true);
+      expect(suggestionNotificationsSpy)
+        .toHaveBeenCalledWith(true, jasmine.any(Function));
 
       ctrl.unmuteSuggestionNotifications();
-      expect(suggestionNotificationsSpy).toHaveBeenCalledWith(false);
+      expect(suggestionNotificationsSpy)
+        .toHaveBeenCalledWith(false, jasmine.any(Function));
     });
 
     it('should open edit roles form and edit username and role', function() {
