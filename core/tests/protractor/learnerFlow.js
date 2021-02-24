@@ -54,11 +54,13 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktop = async function() {
+  var createDummyExplorationOnDesktop = async function(expectWelcomeModal) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await waitFor.pageToFullyLoad();
-    await explorationEditorMainTab.exitTutorial();
+    if(expectWelcomeModal) {
+      await explorationEditorMainTab.exitTutorial();
+    }
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
@@ -192,15 +194,16 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-      await createDummyExplorationOnDesktop();
-      // Create a second exploration named 'Test Exploration'.
       // expectWelcomeModal: true
+      await createDummyExplorationOnDesktop(true);
+      // Create a second exploration named 'Test Exploration'.
+      // expectWelcomeModal: false
       await workflow.createAndPublishExploration(
         'Test Exploration',
         'Astronomy',
         'To expand the horizon of the minds!',
         'English',
-        true
+        false
       );
     }
     await users.logout();
@@ -304,7 +307,8 @@ describe('Learner dashboard functionality', function() {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-      await createDummyExplorationOnDesktop();
+      // expectWelcomeModal: true
+      await createDummyExplorationOnDesktop(true);
       // Create a second exploration named 'Collection Exploration'.
       // expectWelcomeModal: true
       await workflow.createAndPublishExploration(
@@ -312,7 +316,7 @@ describe('Learner dashboard functionality', function() {
         'Architect',
         'To be a part of a collection!',
         'English',
-        true
+        false
       );
       // Update the role of the user to admin since only admin users
       // can create a collection.

@@ -331,6 +331,7 @@ describe('Chapter editor functionality', function() {
     'linked to story', async function() {
       await browser.get('/create/' + dummyExplorationIds[0]);
       await waitFor.pageToFullyLoad();
+      await explorationEditorMainTab.exitTutorial();
       await explorationEditorMainTab.setContent(
         async function(richTextEditor) {
           await richTextEditor.addRteComponent(
