@@ -79,22 +79,10 @@
   side-navigation-bar .oppia-sidebar-menu-icon.fa {
     font-size: 24px;
   }
-  #classroom-submenu {
-    display: none;
+  side-navigation-bar .classroom-submenu {
     padding: 0 0 1em 18px;
   }
 </style>
-
-<script>
-  function toggleClassroomSubmenu() {
-    var x = document.getElementById("classroom-submenu");
-    if (x.style.display === "none") {
-      x.style.display = "block";
-    } else {
-      x.style.display = "none";
-    }
-  }
-</script>
 
 <nav class="oppia-sidebar-menu oppia-sidebar-menu-transition">
   <div class="oppia-sidebar-header">
@@ -168,11 +156,11 @@
     </li>
 
     <li ng-class="{'active': $ctrl.currentUrl === '/learn/math'}">
-      <a onclick="toggleClassroomSubmenu()" class="protractor-mobile-test-classroom">
+      <a ng-init="showSubmenu = false" ng-click="showSubmenu = !showSubmenu" class="protractor-mobile-test-classroom">
         <i class="material-icons oppia-sidebar-menu-icon">school</i>
         <span translate="I18N_SIDEBAR_CLASSROOM"></span>
       </a>
-      <div id="classroom-submenu">
+      <div ng-show="showSubmenu" class="classroom-submenu">
         <a href="/learn/math" class="protractor-mobile-test-mathematics-link">
           <span translate="I18N_SIDEBAR_CLASSROOM_BASIC_MATHS"></span>
         </a>
