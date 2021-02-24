@@ -48,9 +48,9 @@ describe('Site Analytics Service', () => {
   it('should register new signup event', () => {
     sas.registerNewSignupEvent();
 
-    expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-      event_category: 'SignupButton',
-      event_label: ''
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'signup', {
+      event_category: 'OnboardingEngagement',
+      event_label: 'AccountSignUp'
     });
   });
 
@@ -402,11 +402,20 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register finish exploration event', () => {
-    sas.registerFinishExploration();
+    sas.registerFinishExploration('123');
 
-    expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
       event_category: 'PlayerFinishExploration',
-      event_label: ''
+      event_label: '123'
+    });
+  });
+
+  it('should register finish curated lesson event', () => {
+    sas.registerCuratedLessonCompleted('123');
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+      event_category: 'CuratedLessonCompleted',
+      event_label: '123'
     });
   });
 
