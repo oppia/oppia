@@ -40,7 +40,7 @@ angular.module('oppia').component('explorationTitleEditor', {
       ctrl.$onInit = function() {
         $rootScope.$watch(() => {
           RouterService.getActiveTabName();
-      }, function(newValue) {
+        }, function(newValue) {
           if (newValue === 'settings') {
             FocusManagerService.setFocus(ctrl.focusLabel);
           }

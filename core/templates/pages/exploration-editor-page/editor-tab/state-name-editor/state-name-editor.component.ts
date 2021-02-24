@@ -118,7 +118,7 @@ angular.module('oppia').component('stateNameEditor', {
           }
         };
         $rootScope.$watch(() => {
-          RouterService.getActiveTabName()
+          RouterService.getActiveTabName();
         }, function(newValue) {
           if (newValue === 'main') {
             FocusManagerService.setFocus('oppiaEditableSection');
