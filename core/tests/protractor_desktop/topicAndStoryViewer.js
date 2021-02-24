@@ -125,6 +125,8 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.addSubtopic(
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
+    await topicEditorPage.addConceptCardToSubtopicExplanation('Skill TASV1');
+    await topicEditorPage.saveSubtopicExplanation();
     await topicEditorPage.saveTopic('Added subtopic.');
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
@@ -171,14 +173,14 @@ describe('Topic and Story viewer functionality', function() {
     'should check for topic description, stories and revision cards',
     async function() {
       await topicViewerPage.get('math', 'Topic TASV1');
-      await topicViewerPage.expectedTopicInformationToBe('Description');
-      await topicViewerPage.expectedStoryCountToBe(1);
+      await topicViewerPage.expectTopicInformationToBe('Description');
+      await topicViewerPage.expectStoryCountToBe(1);
       await topicViewerPage.moveToRevisionTab();
-      await subTopicViewerPage.expectedRevisionCardCountToBe(1);
+      await subTopicViewerPage.expectRevisionCardCountToBe(1);
       await subTopicViewerPage.get('Subtopic TASV1');
-      await subTopicViewerPage.expectedConceptCardCountToBe(1);
+      await subTopicViewerPage.expectConceptCardCountToBe(1);
       await subTopicViewerPage.getConceptCard();
-      await subTopicViewerPage.expectedConceptCardInformationToBe(
+      await subTopicViewerPage.expectConceptCardInformationToBe(
         'Concept card explanation');
       await skillEditorPage.get(skillId);
       await workflow.createQuestion();
@@ -190,7 +192,7 @@ describe('Topic and Story viewer functionality', function() {
       await topicViewerPage.startPractice();
       await explorationPlayerPage.submitAnswer('TextInput', 'correct');
       await explorationPlayerPage.clickThroughToNextCard();
-      await topicViewerPage.expectedMessageAfterCompletion(
+      await topicViewerPage.expectMessageAfterCompletion(
         'Test complete. Well done!'
       );
     });

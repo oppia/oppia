@@ -31,17 +31,13 @@ var SubTopicViewerPage = function() {
     await waitFor.pageToFullyLoad();
     var subTopicTile = element(by.cssContainingText(
       '.protractor-test-subtopic-tile', subTopicName));
-    if (await subTopicTile.isPresent()) {
-      await action.click(subTopicName, subTopicTile);
-      await waitFor.pageToFullyLoad();
-    } else {
-      throw new Error (
-        'Sub topic ' + subTopicName + ' card is not present,'
-      );
-    }
+    await waitFor.presenceOf(
+      subTopicTile, 'Sub topic ' + subTopicName + ' card is not present,');
+    await action.click(subTopicName, subTopicTile);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectedRevisionCardCountToBe = async function(count) {
+  this.expectRevisionCardCountToBe = async function(count) {
     if (count === 0) {
       expect(await subTopicTileList.count()).toEqual(0);
     } else {
@@ -52,13 +48,13 @@ var SubTopicViewerPage = function() {
     }
   };
 
-  this.expectedConceptCardCountToBe = async function(count) {
+  this.expectConceptCardCountToBe = async function(count) {
     if (count === 0) {
       expect(await conceptCardList.count()).toEqual(0);
     } else {
       await waitFor.visibilityOf(
         conceptCardList.first(),
-        'Concept card take too long to be visible.');
+        'Concept cards take too long to be visible.');
       expect(await conceptCardList.count()).toEqual(count);
     }
   };
@@ -69,7 +65,7 @@ var SubTopicViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectedConceptCardInformationToBe = async function(description) {
+  this.expectConceptCardInformationToBe = async function(description) {
     await waitFor.visibilityOf(
       conceptCardExplanation,
       'Concept card explanation takes too long to be visible.');

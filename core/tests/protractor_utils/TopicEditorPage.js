@@ -270,15 +270,6 @@ var TopicEditorPage = function() {
     var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
     await pageEditorInput.click();
     await pageEditorInput.sendKeys(htmlContent);
-    var conceptCardButton = pageEditor.element(by.css('#cke_24'));
-    await conceptCardButton.click();
-    var skillForConceptCard = element.all(
-      by.css('.protractor-test-rte-skill-selector-item')).first();
-    await skillForConceptCard.click();
-    var closeRTEButton = element(
-      by.css('.protractor-test-close-rich-text-component-editor'));
-    await closeRTEButton.click();
-
     await waitFor.elementToBeClickable(
       confirmSubtopicCreationButton,
       'Confirm subtopic creation button takes too long to be clickable');
@@ -287,6 +278,31 @@ var TopicEditorPage = function() {
       element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
   };
+
+  this.addConceptCardToSubtopicExplanation = async function(skillName) {
+    var pageEditorInput = element(by.css('.protractor-test-edit-html-content'));
+    await action.click("RTE input", pageEditorInput);
+    var conceptCardButton = element(
+      by.cssContainingText('.cke_button', 'Insert Concept Card Link'));
+    await action.click("Concept card button", conceptCardButton);
+    var skillForConceptCard =
+     element(
+      by.cssContainingText(
+        '.protractor-test-rte-skill-selector-item', skillName));
+    await skillForConceptCard.click();
+    var closeRTEButton = element(
+      by.css('.protractor-test-close-rich-text-component-editor'));
+    await action.click("Close RTE button", closeRTEButton);
+  };
+
+  this.saveSubtopicExplanation = async function() {
+    var saveSubtopicExplanationButton = element(by.css(
+      '.protractor-test-save-subtopic-content-button'));
+    await waitFor.elementToBeClickable(
+      saveSubtopicExplanationButton,
+      'Save Subtopic Explanation button taking too long to be clickable');
+    await saveSubtopicExplanationButton.click();
+  }
 
   this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
     await waitFor.visibilityOf(

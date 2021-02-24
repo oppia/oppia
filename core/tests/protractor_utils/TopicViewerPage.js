@@ -32,25 +32,21 @@ var TopicViewerPage = function() {
     await waitFor.pageToFullyLoad();
     var topicLink = element(by.cssContainingText(
       '.protractor-test-topic-link', topicName));
-    if (await topicLink.isPresent()) {
-      await action.click(topicName, topicLink);
-      await waitFor.pageToFullyLoad();
-    } else {
-      throw new Error (
-        'Topic ' +
-        topicName + ' card is not present on /' + classroomUrlFragment
-      );
-    }
+    await waitFor.presenceOf(
+      topicLink, 'Topic ' +
+      topicName + ' card is not present on /' + classroomUrlFragment);
+    await action.click(topicName, topicLink);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectedTopicInformationToBe = async function(description) {
+  this.expectTopicInformationToBe = async function(description) {
     await waitFor.visibilityOf(
       topicDescription, 'Topic description takes too long to be visible.');
     var text = await topicDescription.getText();
     expect(text).toEqual(description);
   };
 
-  this.expectedStoryCountToBe = async function(count) {
+  this.expectStoryCountToBe = async function(count) {
     if (count === 0) {
       expect(await storySummaryTitleList.count()).toEqual(0);
     } else {
@@ -64,13 +60,11 @@ var TopicViewerPage = function() {
   this.moveToRevisionTab = async function() {
     var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
     await action.click('Revision Tab', revisionTabLink);
-    await waitFor.pageToFullyLoad();
   };
 
   this.moveToPracticeTab = async function() {
     var practiceTabLink = element(by.css('.protractor-test-practice-tab-link'));
     await action.click('Practice Tab', practiceTabLink);
-    await waitFor.pageToFullyLoad();
   };
 
   this.selectSkillForPractice = async function(subtopicTitle) {
@@ -84,10 +78,13 @@ var TopicViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectedMessageAfterCompletion = async function(message) {
+  this.expectMessageAfterCompletion = async function(message) {
     var messageOnCompletion = element(
       by.css('.protractor-test-practice-complete-message'));
-    expect(await messageOnCompletion.getText()).toEqual(message);
+    await waitFor.visibilityOf(
+      messageOnCompletion, 'Completion message takes too long to be visible.');
+    var text = await messageOnCompletion.getText();
+    expect(text).toEqual(message);
   };
 };
 
