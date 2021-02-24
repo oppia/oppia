@@ -16,7 +16,7 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 /**
- * @fileoverview Directive for the header of items in a list.
+ * @fileoverview Component for the header of items in a list.
  */
 
 @Component({
