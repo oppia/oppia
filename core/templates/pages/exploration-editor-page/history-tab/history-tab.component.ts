@@ -284,7 +284,8 @@ angular.module('oppia').component('historyTab', {
 
       ctrl.$onInit = function() {
         $rootScope.$watch(() => {
-          RouterService.getActiveTabName()}, function(newValue) {
+          RouterService.getActiveTabName()
+        }, function(newValue) {
           if (newValue === 'history') {
             FocusManagerService.setFocus('usernameInputField');
           }

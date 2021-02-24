@@ -87,11 +87,11 @@ angular.module('oppia').directive('questionsTab', [
             );
           };
           ctrl.$onInit = function() {
-            // To set autofocus when screen loads 
-            $window.onload = function () {
+            // To set autofocus when screen loads.
+            $window.onload = function() {
               FocusManagerService.setFocus('selectSkillField');
             };
-            // To-set sutofocus when user navigates to editor using 
+            // To-set sutofocus when user navigates to editor using
             // question-editor-tab.
             FocusManagerService.setFocus('selectSkillField');
             $scope.selectedSkillId = null;

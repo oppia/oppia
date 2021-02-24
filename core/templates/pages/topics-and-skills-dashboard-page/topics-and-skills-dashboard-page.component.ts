@@ -385,7 +385,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
             FocusManagerService.setFocus('createTopicBtn');
           } else {
             FocusManagerService.setFocus('createSkillBtn');
-          };
+          }
         };
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are

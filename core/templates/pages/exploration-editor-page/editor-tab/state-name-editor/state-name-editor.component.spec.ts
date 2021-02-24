@@ -305,9 +305,4 @@ describe('State Name Editor component', function() {
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
 
-  it('should autofocus on editor icon beside Introduction', function() {
-    spyOn(focusManagerService, 'setFocus').and.callThrough();
-    ctrl.$onInit();
-    expect(focusManagerService.setFocus()).toHaveBeenCalledWith('oppiaEditableSection');
-  })
 });

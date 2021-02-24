@@ -103,7 +103,7 @@ angular.module('oppia').component('stateNameEditor', {
         }
       };
       ctrl.$onInit = function() {
-        //If-user refreshes the tab
+        //If-user refreshes the tab.
         $window.onload = function () {
           if(RouterService.getActiveTabName() === 'main') {
             FocusManagerService.setFocus('oppiaEditableSection');

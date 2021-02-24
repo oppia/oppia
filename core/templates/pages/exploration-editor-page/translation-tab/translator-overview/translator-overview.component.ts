@@ -45,8 +45,8 @@ angular.module('oppia').component('translatorOverview', {
     'DEFAULT_AUDIO_LANGUAGE',
     function(
         $scope, $window, ExplorationLanguageCodeService,
-        FocusManagerService, LanguageUtilService, RouterService,
-        StateEditorService, TranslationLanguageService,
+        FocusManagerService, LanguageUtilService,
+        RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
         DEFAULT_AUDIO_LANGUAGE) {
       var ctrl = this;

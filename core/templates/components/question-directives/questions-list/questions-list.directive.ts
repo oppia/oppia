@@ -88,8 +88,9 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
-        'ContextService', 'EditableQuestionBackendApiService', 'FocusManagerService',
-        'ImageLocalStorageService', 'MisconceptionObjectFactory',
+        'ContextService', 'EditableQuestionBackendApiService',
+        'FocusManagerService', 'ImageLocalStorageService',
+        'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
         'ShortSkillSummaryObjectFactory', 'SkillBackendApiService',
@@ -324,9 +325,8 @@ angular.module('oppia').directive('questionsList', [
                 if (linkedSkillWithDifficulty.getDifficulty()) {
                   ctrl.newQuestionSkillDifficulties.push(
                     linkedSkillWithDifficulty.getDifficulty());
-                }
+                };
                 FocusManagerService.setFocus('difficultySelectionDiv')
-                console.log("henlo")
               });
             ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
             if (AlertsService.warnings.length === 0) {
@@ -602,7 +602,7 @@ angular.module('oppia').directive('questionsList', [
               QuestionsListService.onQuestionSummariesInitialized.subscribe(
                 () => {
                   _initTab(false);
-                  FocusManagerService.setFocus('newQuestionBtn')
+                  FocusManagerService.setFocus('newQuestionBtn');
                   $rootScope.$apply();
                 }));
             ctrl.showDifficultyChoices = false;
