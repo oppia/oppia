@@ -22,15 +22,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import unittest
 
+from core.platform import models
+from jobs import base_model_validator
+from jobs import base_model_validator_errors as errors
+
 import apache_beam as beam
 from apache_beam.runners.direct import direct_runner
 from apache_beam.testing import test_pipeline as pipeline
 from apache_beam.testing import util as beam_testing_util
-
-
-from core.platform import models
-from jobs import base_model_validator
-from jobs import base_model_validator_errors as errors
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])

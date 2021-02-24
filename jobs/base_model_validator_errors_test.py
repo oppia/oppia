@@ -99,7 +99,7 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
         error = errors.ModelExpiredError(model)
 
         msg = (
-            'Entity id %s: model marked as deleted is older than %s days'
+            'Entity id %s: Model marked as deleted is older than %s days'
             % (model.id, errors.PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
 
         self.assertEqual(error.message, msg)
