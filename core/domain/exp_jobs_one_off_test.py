@@ -164,7 +164,6 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'category': 'category',
             }])
 
-
             # exp_model1 = (
             #     exp_models.ExplorationModel.get_by_id('exp_id1'))
 
@@ -184,8 +183,6 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'skill_tags', migrated_exp_model1._values)  # pylint: disable=protected-access
             self.assertNotIn(
                 'skill_tags', migrated_exp_model1._properties)  # pylint: disable=protected-access
-
-
 
             # Run job twice.
             output = self._run_one_off_job()
