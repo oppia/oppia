@@ -84,8 +84,8 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJob(
                     del exp_model._values[deprecated_field]  # pylint: disable=protected-access
                 removed_deprecated_field = True
         if removed_deprecated_field:
-            exp_models.ExplorationModel.put_multi(
-                [exp_model], update_last_updated_time=False)
+            exp_model.update_timestamps()
+            exp_models.ExplorationModel.put_multi([exp_model])
             yield ('SUCCESS_REMOVED - ExplorationModel', exp_model.id)
         else:
             yield ('SUCCESS_ALREADY_REMOVED - ExplorationModel', exp_model.id)

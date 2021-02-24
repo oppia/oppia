@@ -155,7 +155,6 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 param_changes=[],
                 skill_tags=['tag1', 'tag2'],
             )
-            exp_model1.update_timestamps()
             rights_manager.create_new_exploration_rights('exp_id1', 'uid_1')
             commit_message = 'New exploration created with title \'title\'.'
             exp_model1.commit('uid_1', commit_message, [{
@@ -165,8 +164,8 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
             }])
 
 
-            # exp_model1 = (
-            #     exp_models.ExplorationModel.get_by_id('exp_id1'))
+            exp_model1 = (
+                exp_models.ExplorationModel.get_by_id('exp_id1'))
 
             self.assertIsNotNone(exp_model1.skill_tags)
 
@@ -185,117 +184,117 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
             self.assertNotIn(
                 'skill_tags', migrated_exp_model1._properties)  # pylint: disable=protected-access
 
-            self.assertEqual(exp_model1, migrated_exp_model1)
+
 
             # Run job twice.
             output = self._run_one_off_job()
             self.assertItemsEqual(
                 [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)
 
-    # def test_one_exp_models_with_deprecated_field_default_skin(self):
-    #     with self.swap(
-    #         exp_models,
-    #         'ExplorationModel',
-    #         MockExplorationModelWithDeprecatedFields
-    #     ):
-    #         exp_model2 = exp_models.ExplorationModel(
-    #             id='exp_id2',
-    #             category='category',
-    #             title='title',
-    #             objective='objective',
-    #             language_code='en',
-    #             tags=[],
-    #             blurb='',
-    #             author_notes='',
-    #             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-    #             param_specs={},
-    #             param_changes=[],
-    #             default_skin='conversation_v1',
-    #         )
-    #         # rights_manager.create_new_exploration_rights('exp_id2', 'uid_2')
-    #         # commit_message = 'New exploration created with title \'title\'.'
-    #         # exp_model2.commit('uid_2', commit_message, [{
-    #         #     'cmd': 'create_new',
-    #         #     'title': 'title',
-    #         #     'category': 'category',
-    #         # }])
+    def test_one_exp_models_with_deprecated_field_default_skin(self):
+        with self.swap(
+            exp_models,
+            'ExplorationModel',
+            MockExplorationModelWithDeprecatedFields
+        ):
+            exp_model2 = exp_models.ExplorationModel(
+                id='exp_id2',
+                category='category',
+                title='title',
+                objective='objective',
+                language_code='en',
+                tags=[],
+                blurb='',
+                author_notes='',
+                init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+                param_specs={},
+                param_changes=[],
+                default_skin='conversation_v1',
+            )
+            rights_manager.create_new_exploration_rights('exp_id2', 'uid_2')
+            commit_message = 'New exploration created with title \'title\'.'
+            exp_model2.commit('uid_2', commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
 
-    #         exp_model2 = (
-    #             exp_models.ExplorationModel.get_by_id('exp_id2'))
+            exp_model2 = (
+                exp_models.ExplorationModel.get_by_id('exp_id2'))
 
-    #         self.assertIsNotNone(exp_model2.default_skin)
+            self.assertIsNotNone(exp_model2.default_skin)
 
-    #         self.assertIn('default_skin', exp_model2._values) # pylint: disable=protected-access
-    #         self.assertIn('default_skin', exp_model2._properties) # pylint: disable=protected-access
+            self.assertIn('default_skin', exp_model2._values) # pylint: disable=protected-access
+            self.assertIn('default_skin', exp_model2._properties) # pylint: disable=protected-access
 
-    #         output = self._run_one_off_job()
-    #         self.assertItemsEqual(
-    #             [['SUCCESS_REMOVED - ExplorationModel', 1]], output)
-    #         migrated_exp_model2 = (
-    #             exp_models.ExplorationModel.get_by_id('exp_id2'))
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - ExplorationModel', 1]], output)
+            migrated_exp_model2 = (
+                exp_models.ExplorationModel.get_by_id('exp_id2'))
 
-    #         self.assertNotIn(
-    #             'default_skin', migrated_exp_model2._values)  # pylint: disable=protected-access
-    #         self.assertNotIn(
-    #             'default_skin', migrated_exp_model2._properties)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'default_skin', migrated_exp_model2._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'default_skin', migrated_exp_model2._properties)  # pylint: disable=protected-access
 
-    #         # Run job twice.
-    #         output = self._run_one_off_job()
-    #         self.assertItemsEqual(
-    #             [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)
+            # Run job twice.
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)
 
-    # def test_one_exp_models_with_deprecated_field_skin_customizations(self):
-    #     with self.swap(
-    #         exp_models,
-    #         'ExplorationModel',
-    #         MockExplorationModelWithDeprecatedFields
-    #     ):
-    #         exp_model3 = exp_models.ExplorationModel(
-    #             id='exp_id3',
-    #             category='category',
-    #             title='title',
-    #             objective='objective',
-    #             language_code='en',
-    #             tags=[],
-    #             blurb='',
-    #             author_notes='',
-    #             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-    #             param_specs={},
-    #             param_changes=[],
-    #             skin_customizations={'one': 'two'},
-    #         )
-    #         # rights_manager.create_new_exploration_rights('exp_id3', 'uid_3')
-    #         # commit_message = 'New exploration created with title \'title\'.'
-    #         # exp_model3.commit('uid_3', commit_message, [{
-    #         #     'cmd': 'create_new',
-    #         #     'title': 'title',
-    #         #     'category': 'category',
-    #         # }])
+    def test_one_exp_models_with_deprecated_field_skin_customizations(self):
+        with self.swap(
+            exp_models,
+            'ExplorationModel',
+            MockExplorationModelWithDeprecatedFields
+        ):
+            exp_model3 = exp_models.ExplorationModel(
+                id='exp_id3',
+                category='category',
+                title='title',
+                objective='objective',
+                language_code='en',
+                tags=[],
+                blurb='',
+                author_notes='',
+                init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+                param_specs={},
+                param_changes=[],
+                skin_customizations={},
+            )
+            rights_manager.create_new_exploration_rights('exp_id3', 'uid_3')
+            commit_message = 'New exploration created with title \'title\'.'
+            exp_model3.commit('uid_3', commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
 
-    #         exp_model3 = (
-    #             exp_models.ExplorationModel.get_by_id('exp_id3'))
+            exp_model3 = (
+                exp_models.ExplorationModel.get_by_id('exp_id3'))
 
-    #         self.assertIsNotNone(exp_model3.skin_customizations)
+            self.assertIsNotNone(exp_model3.skin_customizations)
 
-    #         self.assertIn('skin_customizations', exp_model3._values) # pylint: disable=protected-access
-    #         self.assertIn('skin_customizations', exp_model3._properties) # pylint: disable=protected-access
+            self.assertIn('skin_customizations', exp_model3._values) # pylint: disable=protected-access
+            self.assertIn('skin_customizations', exp_model3._properties) # pylint: disable=protected-access
 
-    #         output = self._run_one_off_job()
-    #         self.assertItemsEqual(
-    #             [['SUCCESS_REMOVED - ExplorationModel', 1]], output)
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - ExplorationModel', 1]], output)
 
-    #         migrated_exp_model3 = (
-    #             exp_models.ExplorationModel.get_by_id('exp_id3'))
+            migrated_exp_model3 = (
+                exp_models.ExplorationModel.get_by_id('exp_id3'))
 
-    #         self.assertNotIn(
-    #             'skin_customizations', migrated_exp_model3._values)  # pylint: disable=protected-access
-    #         self.assertNotIn(
-    #             'skin_customizations', migrated_exp_model3._properties)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'skin_customizations', migrated_exp_model3._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'skin_customizations', migrated_exp_model3._properties)  # pylint: disable=protected-access
 
-    #         # Run job twice.
-    #         output = self._run_one_off_job()
-    #         self.assertItemsEqual(
-    #             [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)
+            # Run job twice.
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)
 
     def test_one_exploration_model_without_deprecated_fields(self):
         original_exploration_model = exp_models.ExplorationModel(
