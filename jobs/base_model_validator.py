@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Beam functions and transforms to provide validation for models. The
 BaseModelValidator is intended to be a class that other validators can inherit
 from. It takes in a Beam PCollection of models and returns a PCollection of the
