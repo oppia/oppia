@@ -162,8 +162,8 @@ describe('Question Validation Service', () => {
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return false if misconceptions are not addressed', function() {
-    var interaction = mockQuestionDict.question_state_data.interaction;
+  it('should return false if misconceptions are not addressed', () => {
+    let interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[1].tagged_skill_misconception_id = null;
     expect(
       qvs.isQuestionValid(
@@ -171,7 +171,7 @@ describe('Question Validation Service', () => {
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return false if solution is invalid', function() {
+  it('should return false if solution is invalid', () => {
     ses.isCurrentSolutionValid.and.returnValue(false);
     expect(
       qvs.isQuestionValid(
@@ -179,8 +179,8 @@ describe('Question Validation Service', () => {
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return true if validation is successful', function() {
-    var question = questionObjectFactory.createFromBackendDict(
+  it('should return true if validation is successful', () => {
+    let question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
   });
