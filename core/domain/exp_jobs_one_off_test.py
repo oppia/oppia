@@ -115,6 +115,7 @@ class MockExplorationModelWithDeprecatedFields(exp_models.ExplorationModel):
 
 class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
         test_utils.GenericTestBase):
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
@@ -164,8 +165,8 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
             }])
 
 
-            exp_model1 = (
-                exp_models.ExplorationModel.get_by_id('exp_id1'))
+            # exp_model1 = (
+            #     exp_models.ExplorationModel.get_by_id('exp_id1'))
 
             self.assertIsNotNone(exp_model1.skill_tags)
 
@@ -219,8 +220,8 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'category': 'category',
             }])
 
-            exp_model2 = (
-                exp_models.ExplorationModel.get_by_id('exp_id2'))
+            # exp_model2 = (
+            #     exp_models.ExplorationModel.get_by_id('exp_id2'))
 
             self.assertIsNotNone(exp_model2.default_skin)
 
@@ -271,8 +272,8 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'category': 'category',
             }])
 
-            exp_model3 = (
-                exp_models.ExplorationModel.get_by_id('exp_id3'))
+            # exp_model3 = (
+            #     exp_models.ExplorationModel.get_by_id('exp_id3'))
 
             self.assertIsNotNone(exp_model3.skin_customizations)
 
