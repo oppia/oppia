@@ -184,7 +184,7 @@ describe('State Interaction Stats Service', () => {
         statsCaptured.push(stats);
       };
 
-      stateInteractionStatsService.computeStats(expId, mockState)
+      stateInteractionStatsService.computeStatsAsync(expId, mockState)
         .then(captureStats);
       const req = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -200,7 +200,7 @@ describe('State Interaction Stats Service', () => {
       });
       flushMicrotasks();
 
-      stateInteractionStatsService.computeStats(expId, mockState)
+      stateInteractionStatsService.computeStatsAsync(expId, mockState)
         .then(captureStats);
       httpTestingController.expectNone(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -218,7 +218,7 @@ describe('State Interaction Stats Service', () => {
         statsCaptured.push(stats);
       };
 
-      stateInteractionStatsService.computeStats(expId, mockState)
+      stateInteractionStatsService.computeStatsAsync(expId, mockState)
         .then(captureStats);
       const holaReq = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -235,7 +235,7 @@ describe('State Interaction Stats Service', () => {
       flushMicrotasks();
 
       mockState.name = 'Adios';
-      stateInteractionStatsService.computeStats(expId, mockState)
+      stateInteractionStatsService.computeStatsAsync(expId, mockState)
         .then(captureStats);
       const adiosReq = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Adios');
@@ -260,7 +260,7 @@ describe('State Interaction Stats Service', () => {
       const onSuccess = jasmine.createSpy('success');
       const onFailure = jasmine.createSpy('failure');
 
-      stateInteractionStatsService.computeStats(expId, mockState)
+      stateInteractionStatsService.computeStatsAsync(expId, mockState)
         .then(onSuccess, onFailure);
 
       const req = httpTestingController.expectOne(
@@ -295,7 +295,7 @@ describe('State Interaction Stats Service', () => {
         const onSuccess = jasmine.createSpy('success');
         const onFailure = jasmine.createSpy('failure');
 
-        stateInteractionStatsService.computeStats(expId, mockState).then(
+        stateInteractionStatsService.computeStatsAsync(expId, mockState).then(
           onSuccess, onFailure);
 
         const req = httpTestingController.expectOne(
@@ -335,7 +335,7 @@ describe('State Interaction Stats Service', () => {
           ]
         }
       };
-      stateInteractionStatsService.computeStats(expId, mockState).then(
+      stateInteractionStatsService.computeStatsAsync(expId, mockState).then(
         onSuccess, onFailure);
 
       const req = httpTestingController.expectOne(
@@ -375,7 +375,7 @@ describe('State Interaction Stats Service', () => {
           }
         };
 
-        stateInteractionStatsService.computeStats(expId, mockState).then(
+        stateInteractionStatsService.computeStatsAsync(expId, mockState).then(
           onSuccess, onFailure);
 
         const req = httpTestingController.expectOne(
