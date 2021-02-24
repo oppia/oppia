@@ -149,8 +149,8 @@ class BaseModelValidator(beam.PTransform):
             not_deleted | beam.ParDo(ValidateModelTimeFields()))
 
         model_id_validation_errors = (
-            not_deleted |
-            beam.ParDo(
+            not_deleted
+            | beam.ParDo(
                 ValidateModelIdWithRegex(self._get_model_id_regex()))
         )
 
