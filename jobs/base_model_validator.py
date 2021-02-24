@@ -13,15 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Beam functions and transforms to provide validation for models.
-The BaseModelValidator is intended to be a class that other validators can
-inherit from. It takes in a Beam PCollection of models and returns a 
-PCollection of the validation errors found in the input. The Beam.DoFn classes
-are functions that are called in the BaseModelValidator to perform validations.
+"""Beam functions and transforms to provide validation for models. The
+BaseModelValidator is intended to be a class that other validators can inherit
+from. It takes in a Beam PCollection of models and returns a PCollection of the
+validation errors found in the input. The Beam.DoFn classes are functions that
+are called in the BaseModelValidator to perform validations.
 
-When writing subclasses to BaseModelValidator, call the new added validation functions in
-the expand function, and then flatten the output with the result of the super
-function.
+When writing subclasses to BaseModelValidator, call the new added
+validation functions in the expand function, and then flatten the output
+with the result of the super function.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -98,8 +98,7 @@ class ValidateDeleted(beam.DoFn):
 
 class ValidateModelTimeFields(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are
-    valid.
-    """
+    valid."""
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
@@ -137,7 +136,7 @@ class BaseModelValidator(beam.PTransform):
             key-value pairs.
         """
         deleted, not_deleted = (
-            model_pipe | 
+            model_pipe |
             beam.Map(
                 lambda m: beam.pvalue.TaggedOutput(
                     'deleted' if m.deleted else 'not_deleted', m)
@@ -150,7 +149,7 @@ class BaseModelValidator(beam.PTransform):
             not_deleted | beam.ParDo(ValidateModelTimeFields()))
 
         model_id_validation_errors = (
-            not_deleted | 
+            not_deleted |
             beam.ParDo(
                 ValidateModelIdWithRegex(self._get_model_id_regex()))
         )

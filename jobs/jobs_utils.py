@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helper functions for beam validators and one-off jobs. The clone function
-should be used in every beam function since beam functions require all input
-to be immutable."""
+"""Helper functions for beam validators and one-off jobs.
+
+The clone function should be used in every beam function since beam
+functions require all input to be immutable.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -35,8 +37,8 @@ def clone_model(model, **new_values):
             invoking the cloned entity's constructor.
 
     Returns:
-        datastore_services.Model. A cloned, and possibly modified, copy of self. Subclasses of
-        BaseModel will return a clone with the same type.
+        datastore_services.Model. A cloned, and possibly modified, copy of self.
+        Subclasses of BaseModel will return a clone with the same type.
     """
     # Reference implementation: https://stackoverflow.com/a/2712401/4859885.
     cls = model.__class__

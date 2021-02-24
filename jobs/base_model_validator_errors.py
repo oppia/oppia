@@ -30,7 +30,7 @@ class ModelValidationError(python_utils.OBJECT):
     """Base error class for model validations."""
 
     def __init__(self, model):
-        self._message = "Entity id %s: " % (model.id)
+        self._message = 'Entity id %s: ' % (model.id)
 
     @property
     def key(self):
@@ -63,10 +63,10 @@ class ModelTimestampRelationshipError(ModelValidationError):
     def __init__(self, model):
         super(ModelTimestampRelationshipError, self).__init__(model)
         self._message = (
-            super(ModelTimestampRelationshipError, self).message +
-            ('The created_on field has a value %s which '
-            'is greater than the value %s of last_updated field'
-            % (model.created_on, model.last_updated)))
+            super(ModelTimestampRelationshipError, self).message + (
+                'The created_on field has a value %s which '
+                'is greater than the value %s of last_updated field'
+                % (model.created_on, model.last_updated)))
 
     @property
     def message(self):
@@ -79,10 +79,10 @@ class ModelMutatedDuringJobError(ModelValidationError):
     def __init__(self, model):
         super(ModelMutatedDuringJobError, self).__init__(model)
         self._message = (
-            super(ModelMutatedDuringJobError, self).message +
-            ('The last_updated field has a value %s which '
-            'is greater than the time when the job was run' 
-            % (model.last_updated)))
+            super(ModelMutatedDuringJobError, self).message +(
+                'The last_updated field has a value %s which '
+                'is greater than the time when the job was run'
+                % (model.last_updated)))
 
     @property
     def message(self):
