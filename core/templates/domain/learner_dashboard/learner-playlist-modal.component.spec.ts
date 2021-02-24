@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Pipe } from '@angular/core';
 import { async, ComponentFixture, flushMicrotasks, TestBed } from
   '@angular/core/testing';
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 
@@ -33,6 +34,13 @@ class MockActiveModal {
   }
 }
 
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
+
 fdescribe('Learner Playlist Modal Component', function() {
   let component: LearnerPlaylistModalComponent;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
@@ -42,8 +50,8 @@ fdescribe('Learner Playlist Modal Component', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbModule],
-      declarations: [LearnerPlaylistModalComponent],
+      imports: [HttpClientTestingModule],
+      declarations: [LearnerPlaylistModalComponent, MockTranslatePipe],
       providers: [
         {
           provide: NgbActiveModal,
