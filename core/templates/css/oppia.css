@@ -1881,6 +1881,20 @@ pre.oppia-pre-wrapped-text {
 .popover-content {
   padding: 10px;
 }
+.popover-content:after{
+  position: absolute;
+                width: 15px;
+                height: 15px;
+                border-left: 1px solid rgba(0, 0, 0, 0.2);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+                content: '';
+                left: 0%;
+                top: 0%;
+                margin-left: -8px;
+                margin-top: 8px;
+                transform: rotate(45deg);
+                background-color: rgb(255, 255, 255);
+}
 .popover.ng-joyride {
   padding: 1px;
   width: 245px;
