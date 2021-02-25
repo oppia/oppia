@@ -1,5 +1,112 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.0.8 (25 Feb 2021)
+------------------------
+Contributor Pages
+* Contributor dashboard bug fixes (#12008)
+* Fix part of #11900: Disable opportunities list next button if there are no more results to display (#11982)
+* Fix #11901: aligns bullets points properly. (#11976)
+* Fix #11840 and #11899: Allow admin to view, add, and remove users to use submit question tab on contributor dashboard + misc admin roles fixes (#11862)
+
+Bug fixes
+* Fix part of #11462: Avoid initializing AngularFire by default (#11845)
+
+Angular Migration
+* Fix part of #11920: Add `RatioExpressionInputRulesService` to `UpgradedServices.ts` (#12009)
+* Fix part of #8472: Migrate translation-tab-active-content-id.service (#11760)
+* Fixes Part of #8472: Migrate Exploration data service (#11564)
+
+Translations
+* Add hi-en to SUPPORTED_CONTENT_LANGUAGES and fixes revision card not showing content (#11917)
+
+Developer UX
+* Fix #9887: Adds inline comment checker for codeowner (#11835)
+* Fix part of #10474: Enable strict check on audio language model (#11813)
+* Fix #11477: Update codeowners in preparation for vacation. (#11810)
+* Upgrade libraries (#11754)
+* Fix #11727: Update the CODEOWNERS file and lint check to ensure new files don’t fall under blanket code owners (#11745)
+* Fix part of #11431: Replace run_in_transaction call with decorator (#11741)
+* Fix #9726 Relocated sidebar-status.service.ts file from domain to services directory. (#11729)
+* Fix part of #11572: Tighten some try/excepts and use `exception` instead of `error` in some places (#11728)
+* Fix part of #10306: Added async keyword to functions that return a promise (#11710)
+* Fix css linter chekcs never stops because of re.sub() call (#11672)
+* Clean up ElasticSearch server after e2e run. (#11662)
+* Fix part of #10728: Move python regex lint check to pylint (#11579)
+* Fix part of #10474: Cover more files with strict checks (#11574)
+* Fix part of #7450: Modify private methods in SuggestionIntegrationTests (#11797)
+* Fix of #10306 added async keyword before functions that return a promise (#11755)
+* Fix part of #10306 adding async in ansynchronous functions of Translations-backend-api.service (#11740)
+* Fix part of #10306: Added async keyword to asynchronous functions that return a promise (#11739)
+
+Data handling
+* Fix signup process for user marked as deleted (#11946)
+* Add notification email when Wipeout fails (#11775)
+* Refactor controllers to not user storage models directly (#11673)
+* Fix #11469, #11623: Fix audit jobs, adding ID validation and reducing shards for audit jobs (#11646)
+* Fix part of #5914: Truncate commit_message lengths to enable projection queries for Takeout (#11465)
+* Fix part of #10049: Remove deprecated fields from `CollectionModel` and `CollectionRightsModel` (#11350)
+* Fix part of #10049: Remove deprecated field from `UserSubscriptionsModel` (#11597)
+
+Miscellaneous
+* Fix installation issues with gtag (#11908)
+* Pin webdriver-manager package to ^12.1.8 (#11794)
+* Add code snippet for Google Optimize (#11773)
+* Fix #8174: Remove duplicate DIRS_TO_ADD_TO_SYS_PATH from the code base (#11860)
+* Upgrade GA version to use gtag. (#11882)
+* Change Version to Browser-version in the bug report issue template (#11689)
+* Replace logging mocks with TestBase.capture_logging (#11688)
+
+Release team
+* Add correct release constants for migration job names list (#11648)
+
+QA Team
+* fix preferencePages as part of #10798 (#11669)
+* Use waitFor.invisibilityOf immediately after waitFor.visibilityOf for toast messages in ExplorationEditorPage.saveChanges (#11846)
+* fix "confirm delete skill button is not clickable" flake in topicsAndSkillsDashboard (#11801)
+* Fix part of #10798: Fix end to end tests for ExplorationEditorImprovementsTab.js (#11619)
+
+Python Migration
+* Fix part of #11462: Initialize AngularFire with Firebase constants (#11796)
+* Fix part of #11314: Switch over to elasticsearch in dev and prod. (#11774)
+* Fix part of #11462: Lift GAE-specific auth services to the platform layer (#11588)
+
+Learner/Creator Pages
+* Fix images not loading when offline (#11964)
+* Fix #11912: Implements delay before cards can be rearranged. (#11931)
+* Fix #11898: The social media icons are missaligned and different sizes (#11913)
+* Fix Skill editor console error (#11989)
+* Fix #11887: fixes audio player position in tablet,mobile view (#11948)
+* Fix #11918: Added text to that conveys the interaction used (#11941)
+* Fix #11919 : Refactor CSS styles to prevent errors from looking clickable (#11940)
+* Fix #11892:Added a specific height to the cards. (#11911)
+* Fix #11885: added media query to change to mobile view (#11894)
+* Fix #11886 : Added padding at the bottom of the search bar container to make it visible (#11893)
+* Fix #10201 and #11682: Editor and translation tutorials fully working (#11857)
+* Remove deleted skills from skillIdToRubricsObject in the topic editor (#11855)
+* Fix #11679: Success alert on merging two skills (#11766)
+* Fix minor syntax issues in the correctness footer (#11719)
+* Add End-to-end test for topic and story viewer page (#11701)
+* Fix part of #11464 task 12 highlighting interaction selection modal (#11674)
+* Hide create topic/skill buttons for users with insufficient access rights; Update page title guidelines; (#11670)
+* Fix #11181: Changed button CSS (#11667)
+* Fix #11519: Removes "Uncategorized Skills" from topic editor if all skills have been categorized (#11656)
+* Fix #11536: Fix overflowing map container in exploration editor (#11651)
+* Fix part of #11464:Changes question editor flow in skill editor tab and Fixes task 7 (#11625)
+* Fix question editor issues (#11573)
+* Fix part of #10306: Adds async keyword in read-only-collection-backend-api.service (#11568)
+* Deprecate parameters in exploration editor settings (#11513)
+* Fix part of #10667: Prevent duplicate skill creation (#11375)
+* Increase duration that success toast stays on the screen (save exp) (#11842)
+* Make categories visible (#11832)
+* Fix #11105: Adds correct styling in the audio player to maintain its height (#11819)
+* Add metrics for 'curated lesson completed' (#11799)
+* Introduce an Audit job to list all interaction ids in a topic (#11712)
+* Add few methods for site analytics (#11668)
+* Fix #11247: Duplicated Number Input interaction into General tab (#11664)
+* Fix #10261: Displays "Reload Site?" modal/alert (#11654)
+* Fix part of #8038: Changes translation-file-hash-loader.service.ts name to  translation-file-hash-loader-backend-api.service.ts (#11650)
+* Fix part of #11464 task 20 and 21 fixing border-bottom (#11567)
+
 v3.0.7 (04 Feb 2021)
 ------------------------
 Contributor Pages
