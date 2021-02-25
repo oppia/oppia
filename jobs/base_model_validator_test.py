@@ -161,8 +161,8 @@ class ValidateModelIdTests(BaseModelValidatorTests):
             output = (
                 pcoll
                 | beam.ParDo(
-                    base_model_validator.ValidateModelIdWithRegex(
-                        '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH)))
+                    base_model_validator.ValidateModelIdWithRegex(),
+                    '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH))
 
             beam_testing_util.assert_that(
                 output,

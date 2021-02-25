@@ -45,7 +45,7 @@ class ModelValidationError(python_utils.OBJECT):
     @property
     def message(self):
         """Message property to override in subclasses."""
-        return None
+        raise NotImplementedError
 
     def __repr__(self):
         return '%s: %s' % (self.key, self.message) if self.message else self.key
@@ -70,9 +70,7 @@ class ModelTimestampRelationshipError(ModelValidationError):
         self._message = (
             '%s The created_on field has a value %s which '
             'is greater than the value %s of last_updated field'
-            % (
-                super(ModelTimestampRelationshipError, self).base_message,
-                model.created_on, model.last_updated))
+            % (self.base_message, model.created_on, model.last_updated))
 
     @property
     def message(self):
@@ -87,9 +85,7 @@ class ModelMutatedDuringJobError(ModelValidationError):
         self._message = (
             '%s The last_updated field has a value %s which '
             'is greater than the time when the job was run'
-            % (
-                super(ModelMutatedDuringJobError, self).base_message,
-                model.last_updated))
+            % (self.base_message, model.last_updated))
 
     @property
     def message(self):
@@ -103,7 +99,7 @@ class ModelInvalidIdError(ModelValidationError):
         super(ModelInvalidIdError, self).__init__(model)
         self._message = (
             '%s Entity id does not match regex pattern'
-            % (super(ModelInvalidIdError, self).base_message))
+            % (self.base_message))
 
     @property
     def message(self):
@@ -117,9 +113,7 @@ class ModelExpiredError(ModelValidationError):
         super(ModelExpiredError, self).__init__(model)
         self._message = (
             '%s Model marked as deleted is older than %s days'
-            % (
-                super(ModelExpiredError, self).base_message,
-                PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
+            % (self.base_message, PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
 
     @property
     def message(self):

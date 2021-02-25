@@ -48,7 +48,7 @@ MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 class ValidateModelIdWithRegex(beam.DoFn):
     """DoFn to validate model ids against a given regex string."""
 
-    def __init__(self, regex_string):
+    def __init__(self):
         """Initializes the ValidateModelIdWithRegex DoFn.
 
         Args:
@@ -57,7 +57,7 @@ class ValidateModelIdWithRegex(beam.DoFn):
         super(ValidateModelIdWithRegex, self).__init__()
         self.regex = re.compile(regex_string)
 
-    def process(self, input_model):
+    def process(self, input_model, regex_string):
         """Function that defines how to process each element in a pipeline of
         models.
 
@@ -152,7 +152,7 @@ class BaseModelValidator(beam.PTransform):
         model_id_validation_errors = (
             not_deleted
             | beam.ParDo(
-                ValidateModelIdWithRegex(self._get_model_id_regex()))
+                ValidateModelIdWithRegex(), self._get_model_id_regex())
         )
 
         return (
