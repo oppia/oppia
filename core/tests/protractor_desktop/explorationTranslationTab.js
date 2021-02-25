@@ -227,7 +227,6 @@ describe('Exploration translation and voiceover tab', function() {
     await creatorDashboardPage.editExploration('Test Exploration');
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.changeLanguage('Hindi');
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
 

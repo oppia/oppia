@@ -272,7 +272,6 @@ describe('Full exploration editor', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(
       'Parent Exploration in collection');
@@ -300,7 +299,6 @@ describe('Full exploration editor', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Refresher Exploration');
     await explorationEditorSettingsTab.setCategory('Algebra');
