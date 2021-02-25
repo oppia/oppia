@@ -55,7 +55,7 @@ class ValidateModelIdWithRegex(beam.DoFn):
             regex_string: str. A regex pattern for valid ids.
         """
         super(ValidateModelIdWithRegex, self).__init__()
-        self.regex = re.compile(regex_string)
+        
 
     def process(self, input_model, regex_string):
         """Function that defines how to process each element in a pipeline of
@@ -67,9 +67,10 @@ class ValidateModelIdWithRegex(beam.DoFn):
         Yields:
             ModelInvalidIdError. An error class for models with invalid IDs.
         """
+        regex = re.compile(regex_string)
         model = jobs_utils.clone_model(input_model)
 
-        if not self.regex.match(model.id):
+        if not regex.match(model.id):
             yield errors.ModelInvalidIdError(model)
 
 
