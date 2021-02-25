@@ -38,7 +38,7 @@ export class UserExplorationPermissionsService {
   async getPermissionsAsync(): Promise<ExplorationPermissions> {
     if (!UserExplorationPermissionsService.permissionsPromise) {
       UserExplorationPermissionsService.permissionsPromise = (
-        this.explorationPermissionsBackendApiService.getPermissions());
+        this.explorationPermissionsBackendApiService.getPermissionsAsync());
     }
     return UserExplorationPermissionsService.permissionsPromise;
   }
