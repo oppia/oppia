@@ -16,15 +16,12 @@
  * @fileoverview Unit tests for the UserEmailPreferencesService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
 import { UserEmailPreferencesService } from './user-email-preferences.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ExplorationDataService } from './exploration-data.service';
-// ^^^ This block is to be removed.
 
 describe('User Email Preferences Service', () => {
   let expId = '12345';
@@ -94,7 +91,7 @@ describe('User Email Preferences Service', () => {
     fakeAsync(() => {
       userEmailPreferencesService
         .setFeedbackNotificationPreferences(false, () => {});
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId);
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleResponse);
@@ -108,7 +105,7 @@ describe('User Email Preferences Service', () => {
       userEmailPreferencesService
         .setSuggestionNotificationPreferences(false, () => {});
 
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId
       );
       expect(req.request.method).toEqual('PUT');

@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview User exploration emails service for the exploration settings.
+ */
+
 import { AlertsService } from 'services/alerts.service';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { UserEmailPreferencesBackendApiService } from './user-email-preferences-backend-api.service';
-/**
- * @fileoverview User exploration emails service for the exploration settings.
- */
 
 export interface EmailPreferencesData {
   'email_preferences': {
@@ -94,10 +95,11 @@ export class UserEmailPreferencesService {
    * Save the change of message_type and mute to backend.
    * @param {RequestParam} requestParams - Info about message_type and mute.
    */
-  saveChangeToBackend(requestParams: RequestParams) : Promise<void | object> {
+  saveChangeToBackend(requestParams: RequestParams) :
+  Promise<void | EmailPreferencesData> {
     return this.backendApiService.saveChangeToBackend(requestParams).then(
       (response: EmailPreferencesData) => {
-        var data = response;
+        let data = response;
         this.alertsService.clearWarnings(),
         this.init(
           data.email_preferences.mute_feedback_notifications,

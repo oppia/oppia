@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview User exploration emails backend api service
+ * for the exploration settings.
+ */
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationDataService } from './exploration-data.service';
-import { RequestParams } from './user-email-preferences.service';
-
-/**
- * @fileoverview User exploration emails backend api service
- * for the exploration settings.
- */
+import { EmailPreferencesData, RequestParams } from './user-email-preferences.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +36,7 @@ export class UserEmailPreferencesBackendApiService {
 
   saveChangeToBackend(
       requestParams: RequestParams
-  ): Promise<void | object> {
+  ): Promise<void | EmailPreferencesData> {
     let emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
       '/createhandler/notificationpreferences/<exploration_id>', {
         exploration_id: this.explorationDataService.explorationId

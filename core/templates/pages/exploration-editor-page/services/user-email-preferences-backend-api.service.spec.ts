@@ -23,8 +23,8 @@ import { EmailPreferencesData } from './user-email-preferences.service';
 import { ExplorationDataService } from './exploration-data.service';
 
 describe('User Email Preferences Backend Api Service', () => {
-  var expId = '12345';
-  var sampleResponse = {
+  const expId = '12345';
+  let sampleResponse = {
     email_preferences: {
       mute_feedback_notifications: false,
       mute_suggestion_notifications: false
@@ -56,13 +56,13 @@ describe('User Email Preferences Backend Api Service', () => {
 
   it('should successfully send http request and get a valid response',
     fakeAsync((done) => {
-      let result : Promise <void | object > =
+      let result : Promise <void | EmailPreferencesData> =
       userEmailPreferencesBackendApiService
         .saveChangeToBackend({
           message_type: 'feedback',
           mute: false
         });
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/createhandler/notificationpreferences/' + expId
       );
       expect(req.request.method).toEqual('PUT');
