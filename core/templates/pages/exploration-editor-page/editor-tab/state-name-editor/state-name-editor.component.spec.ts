@@ -17,7 +17,8 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, flush, flushMicrotasks, tick } from '@angular/core/testing';
+import { Subscription } from 'rxjs';
 import { EditabilityService } from 'services/editability.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -31,7 +32,8 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-describe('State Name Editor component', function() {
+import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
+fdescribe('State Name Editor component', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $rootScope = null;
@@ -41,8 +43,10 @@ describe('State Name Editor component', function() {
   var routerService = null;
   var stateEditorService = null;
   var stateNameService = null;
+  var focusManagerService = null;
   var mockExternalSaveEventEmitter = null;
-
+  let focusOnSpy: jasmine.Spy;
+  let testSubscriptions: Subscription;
   var mockExplorationData = {
     explorationId: 0,
     autosaveChangeList: function() {}
@@ -65,6 +69,13 @@ describe('State Name Editor component', function() {
     editabilityService = TestBed.get(EditabilityService);
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
+  });
+
+  beforeEach(() => {
+    focusManagerService = TestBed.get(FocusManagerService);
+    focusOnSpy = jasmine.createSpy('focusOn');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(focusManagerService.onFocus.subscribe(focusOnSpy));
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -210,7 +221,6 @@ describe('State Name Editor component', function() {
     });
     ctrl.$onInit();
   }));
-
   afterEach(() => {
     ctrl.$onDestroy();
   });
@@ -301,4 +311,13 @@ describe('State Name Editor component', function() {
     mockExternalSaveEventEmitter.emit();
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
+  
+  
+  it('should apply autofocus to  main tab elements', fakeAsync(() => {
+      spyOn(routerService, 'getActiveTabName').and.returnValue('main');
+      ctrl.$onInit();
+      flush();
+      expect(focusOnSpy).toHaveBeenCalledWith('oppiaEditableSection');
+    })
+  );
 });
