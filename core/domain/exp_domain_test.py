@@ -8359,8 +8359,9 @@ title: Title
     def test_load_from_v40_special_cases(self):
         """Test to cover some special cases that occurs in the migration from
         v40 to v41 exploration schema. This includes modifying existing written
-        translations, converting html to SubtitledHtml, and filling in empty
-        SubtitledHtml list customization arguments with a default value.
+        translations, converting html to SubtitledHtml, deleting unused
+        customization arguments, and filling in empty SubtitledHtml list
+        customization arguments with a default value.
         """
         sample_yaml_content = (
             """author_notes: ''
@@ -8458,6 +8459,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        columns:
+          value: 40
         placeholder:
           value: ''
         rows:
