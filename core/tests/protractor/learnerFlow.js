@@ -58,7 +58,7 @@ describe('Learner dashboard functionality', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await waitFor.pageToFullyLoad();
-    if(expectWelcomeModal) {
+    if (expectWelcomeModal) {
       await explorationEditorMainTab.exitTutorial();
     }
     await explorationEditorMainTab.setStateName('First');
@@ -120,7 +120,7 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadExploration('exploration_player_test.yaml');
       } else {
-        // expectWelcomeModal: true
+        // Set expectWelcomeModal: true
         await workflow.createAndPublishExploration(
           'Exploration Player Test',
           'Astronomy',
@@ -149,7 +149,7 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadCollection(0);
       } else {
-        // expectWelcomeModal: true
+        // Set expectWelcomeModal: true
         await workflow.createAndPublishExploration(
           'Demo Exploration',
           'Algebra',
@@ -280,7 +280,7 @@ describe('Learner dashboard functionality', function() {
       // Wait for player page to completely load.
       await waitFor.pageToFullyLoad();
       var explorationId = await general.getExplorationIdFromPlayer();
-      // expectWelcomeModal: true
+      // Set expectWelcomeModal: true
       await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();

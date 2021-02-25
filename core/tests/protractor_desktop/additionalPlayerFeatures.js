@@ -80,7 +80,7 @@ describe('Full exploration editor', function() {
       const EXPLORATION_CATEGORY = 'Mathematics';
       const EXPLORATION_LANGUAGE = 'Deutsch';
       const EXPLORATION_TAGS = ['maths', 'english', 'fractions', 'addition'];
-      // expectWelcomeModal: true
+      // Set expectWelcomeModal: true
       await workflow.createAddExpDetailsAndPublishExp(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
@@ -88,7 +88,7 @@ describe('Full exploration editor', function() {
         EXPLORATION_LANGUAGE,
         EXPLORATION_TAGS,
         true
-        );
+      );
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorPage.verifyExplorationSettingFields(
         EXPLORATION_TITLE,
@@ -105,14 +105,14 @@ describe('Full exploration editor', function() {
     await users.createUser(
       'creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
     await users.login('creator@editorAndPlayer.com');
-    // expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       'Fractions',
       'Mathematics',
       EXPLORATION_OBJECTIVE,
       'English',
       true
-      );
+    );
     await users.logout();
     await users.createUser('learner@editorAndPlayer.com', 'learner');
     await users.login('learner@editorAndPlayer.com');
@@ -125,7 +125,7 @@ describe('Full exploration editor', function() {
     await users.createUser(
       'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
     await users.login('creator2@editorAndPlayer.com');
-    // expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       'Adding Fractions', 'Mathematics', 'Let us learn how to add fractions',
       'English', true);
@@ -146,7 +146,7 @@ describe('Full exploration editor', function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
 
-    //expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
@@ -191,30 +191,30 @@ describe('Full exploration editor', function() {
       ' given as query parameter', async function() {
     await users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
     await users.login('user1@editorAndPlayer.com');
-    // expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       'Parent Exploration 1',
       'Algebra',
       'This is the topmost parent exploration.',
       true
-      );
+    );
     var parentId1 = await general.getExplorationIdFromEditor();
-    // expectWelcomeModal: false
+    // Set expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Parent Exploration 2',
       'Algebra',
       'This is the second parent exploration to which refresher ' +
       'exploration redirects.',
       false
-      );
+    );
     var parentId2 = await general.getExplorationIdFromEditor();
-    // expectWelcomeModal: false
+    // Set expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Refresher Exploration',
       'Algebra',
       'This is the most basic refresher exploration',
       false
-      );
+    );
 
     var refresherExplorationId = await general.getExplorationIdFromEditor();
 
@@ -381,8 +381,8 @@ describe('Full exploration editor', function() {
       await users.createUser(
         'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
       await users.login('user4@editorAndPlayer.com');
-      
-      //expectWelcomeModal: true
+
+      // Set expectWelcomeModal: true
       await workflow.createExploration(true);
       await explorationEditorMainTab.setStateName('card 1');
       await explorationEditorMainTab.setContent(
@@ -443,8 +443,8 @@ describe('Full exploration editor', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user1@hintsAndSolutions.com');
-    
-    //expectWelcomeModal: true
+
+    // Set expectWelcomeModal: true
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Introduction');
     await explorationEditorMainTab.setContent(
@@ -486,7 +486,7 @@ describe('Full exploration editor', function() {
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
 
-    //expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('You should recommend this exploration'));
@@ -508,7 +508,7 @@ describe('Full exploration editor', function() {
     // Using the Id from Player and create a new exploration
     // and add the Id as suggestion.
     var recommendedExplorationId = await general.getExplorationIdFromPlayer();
-    //expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('I want to recommend an exploration at the end'));

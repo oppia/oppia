@@ -64,8 +64,8 @@ describe('Full exploration editor', function() {
     async function() {
       await users.createUser('user@heightWarning.com', 'userHeightWarning');
       await users.login('user@heightWarning.com');
-      
-      //expectWelcomeModal: true
+
+      // Set expectWelcomeModal: true
       await workflow.createExploration(true);
 
       var postTutorialPopover = element(by.css('.popover-content'));
@@ -113,8 +113,8 @@ describe('Full exploration editor', function() {
       'switching to preview mode', async function() {
     await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
     await users.login('user5@editorAndPlayer.com');
-    
-    // expectWelcomeModal: true
+
+    // Set expectWelcomeModal: true
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('card1');
     await explorationEditorMainTab.expectCurrentStateToBe('card1');
@@ -252,8 +252,8 @@ describe('Full exploration editor', function() {
       await users.createUser(
         'user7@editorAndPlayer.com', 'user7EditorAndPlayer');
       await users.login('user6@editorAndPlayer.com');
-      
-      //expectWelcomeModal: true
+
+      // Set expectWelcomeModal: true
       await workflow.createExploration(true);
 
       // Create an exploration with multiple groups.
@@ -366,7 +366,7 @@ describe('Full exploration editor', function() {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
 
-    //expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'How are you feeling?'));

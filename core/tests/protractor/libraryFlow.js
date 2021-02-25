@@ -54,7 +54,7 @@ describe('Library pages tour', function() {
       await adminPage.reloadExploration(
         'protractor_mobile_test_exploration.yaml');
     } else {
-      // expectWelcomeModal: true
+      // Set expectWelcomeModal: true
       await workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
@@ -153,7 +153,7 @@ describe('Rating', function() {
         'this is an objective',
         LANGUAGE_ENGLISH,
         true
-        );
+      );
     }
     await users.logout();
 
