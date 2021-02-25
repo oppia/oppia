@@ -136,12 +136,9 @@ class BaseModelValidator(beam.PTransform):
             beam.PCollection. A collection of errors represented as
             key-value pairs.
         """
-        deleted, not_deleted = (
+        not_deleted, deleted = (
             model_pipe
-            | 'SplitByDeleted' >> beam.Map(
-                lambda m: beam.pvalue.TaggedOutput(
-                    'deleted' if m.deleted else 'not_deleted', m)
-            ).with_outputs('deleted', 'not_deleted')
+            | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
         )
 
         deletion_errors = deleted | beam.ParDo(ValidateDeleted())
