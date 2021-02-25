@@ -37,7 +37,8 @@ export class CollectionEditorStateService {
   private _collectionIsInitialized: boolean = false;
   private _collectionIsLoading: boolean = false;
   private _collectionIsBeingSaved: boolean = false;
-  private _collectionInitializedEventEmitter: EventEmitter<void>
+  private _collectionInitializedEventEmitter: EventEmitter<void> = (
+  new EventEmitter());
    = new EventEmitter();
 
   constructor(
