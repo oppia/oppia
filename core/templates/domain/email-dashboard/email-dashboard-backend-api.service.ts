@@ -31,7 +31,7 @@ import {
 
 interface QueryDatum {
   attribute: string,
-  value: String
+  value: string | number
 }
 
 export interface QueryData extends Array<QueryDatum> {}
@@ -91,9 +91,9 @@ export class EmailDashboardBackendApiService {
   }
 
   async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery> {
-    let postData = {}
+    let postData = {};
     data.forEach(datum => {
-      postData[datum.attribute] = datum.value
+      postData[datum.attribute] = datum.value;
     });
 
     return new Promise((resolve, reject) => {

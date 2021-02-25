@@ -39,12 +39,15 @@ describe('Email Dashboard Page', function() {
     {id: 3, status: 'processing'},
     {id: 4, status: 'processing'}
   ];
+  var EMAIL_DASHBOARD_PREDICATE_DEFINITION = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     EmailDashboardDataService = $injector.get('EmailDashboardDataService');
     UserService = $injector.get('UserService');
+    EMAIL_DASHBOARD_PREDICATE_DEFINITION = $injector.get(
+      'EMAIL_DASHBOARD_PREDICATE_DEFINITION');
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
@@ -81,32 +84,35 @@ describe('Email Dashboard Page', function() {
   });
 
   it('should clear form when form is reset', function() {
+    // Initialize ctrl.data.
+    ctrl.resetForm();
     // Mock some values.
-    ctrl.hasNotLoggedInForNDays = true;
-    ctrl.inactiveInLastNDays = true;
-    ctrl.createdAtLeastNExps = true;
-    ctrl.createdFewerThanNExps = false;
-    ctrl.editedAtLeastNExps = true;
-    ctrl.editedFewerThanNExps = false;
+    EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
+      ctrl.data.push({
+        attribute: predicate.backend_attr,
+        value: 1,
+        default_value: predicate.default_value
+      });
+    });
 
     ctrl.resetForm();
 
-    expect(ctrl.hasNotLoggedInForNDays).toBe(null);
-    expect(ctrl.inactiveInLastNDays).toBe(null);
-    expect(ctrl.createdAtLeastNExps).toBe(null);
-    expect(ctrl.createdFewerThanNExps).toBe(null);
-    expect(ctrl.editedAtLeastNExps).toBe(null);
-    expect(ctrl.editedFewerThanNExps).toBe(null);
+    ctrl.data.forEach(element => {
+      expect(element.value).toBe(element.default_value);
+    });
   });
 
   it('should submit query when submitting form', function() {
+    // Initialize ctrl.data.
+    ctrl.resetForm();
     // Mock some values.
-    ctrl.hasNotLoggedInForNDays = true;
-    ctrl.inactiveInLastNDays = true;
-    ctrl.createdAtLeastNExps = true;
-    ctrl.createdFewerThanNExps = false;
-    ctrl.editedAtLeastNExps = true;
-    ctrl.editedFewerThanNExps = false;
+    EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
+      ctrl.data.push({
+        attribute: predicate.backend_attr,
+        value: 1,
+        default_value: predicate.default_value
+      });
+    });
 
     spyOn(EmailDashboardDataService, 'submitQueryAsync').and.callFake(
       function() {
@@ -121,12 +127,9 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
     expect(ctrl.showSuccessMessage).toBe(true);
 
-    expect(ctrl.hasNotLoggedInForNDays).toBe(null);
-    expect(ctrl.inactiveInLastNDays).toBe(null);
-    expect(ctrl.createdAtLeastNExps).toBe(null);
-    expect(ctrl.createdFewerThanNExps).toBe(null);
-    expect(ctrl.editedAtLeastNExps).toBe(null);
-    expect(ctrl.editedFewerThanNExps).toBe(null);
+    ctrl.data.forEach(element => {
+      expect(element.value).toBe(element.default_value);
+    });
   });
 
   it('should get next page of queries', function() {

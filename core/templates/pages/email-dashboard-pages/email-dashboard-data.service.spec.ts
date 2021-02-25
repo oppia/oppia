@@ -32,6 +32,32 @@ describe('Email Dashboard Services', () => {
     let csrfService: CsrfTokenService = null;
     let emailDashboardDataService: EmailDashboardDataService = null;
     let httpTestingController: HttpTestingController;
+    let defaultData = [
+      {
+        attribute: 'inactive_in_last_n_days',
+        value: 10
+      },
+      {
+        attribute: 'has_not_logged_in_for_n_days',
+        value: -1
+      },
+      {
+        attribute: 'created_at_least_n_exps',
+        value: -1
+      },
+      {
+        attribute: 'created_fewer_than_n_exps',
+        value: -1
+      },
+      {
+        attribute: 'edited_at_least_n_exps',
+        value: -1
+      },
+      {
+        attribute: 'edited_fewer_than_n_exps',
+        value: -1
+      }
+    ];
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -91,14 +117,8 @@ describe('Email Dashboard Services', () => {
 
     it('should post correct data to backend',
       fakeAsync(() => {
-        var data = {
-          hasNotLoggedInForNDays: 'value1',
-          inactiveInLastNDays: null,
-          createdAtLeastNExps: null,
-          createdFewerThanNExps: null,
-          editedAtLeastNExps: null,
-          editedFewerThanNExps: null
-        };
+        var data = defaultData;
+        data[0].value = 10;
         var queryDataDict = {
           id: 'qnew',
           status: 'processing',
@@ -230,14 +250,8 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getQueries()).toEqual([]);
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(0);
 
-        var data = {
-          hasNotLoggedInForNDays: 'value1',
-          inactiveInLastNDays: null,
-          createdAtLeastNExps: null,
-          createdFewerThanNExps: null,
-          editedAtLeastNExps: null,
-          editedFewerThanNExps: null
-        };
+        var data = defaultData;
+        data[0].value = 10;
         // Maintain list of all submitted queries for cross checking.
         var totalQueries = [];
         // Submit 25 new queries.
