@@ -1882,18 +1882,18 @@ pre.oppia-pre-wrapped-text {
   padding: 10px;
 }
 .popover-content:after {
+  background-color: rgb(255, 255, 255);
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   content: '';
-  background-color: rgb(255, 255, 255);
-  position: absolute;
-  margin-left: -8px;
   height: 15px;
-  margin-top: 8px;
   left: 0%;
+  margin-left: -8px;
+  margin-top: 8px;
+  position: absolute;
   top: 0%;
-  width: 15px;
   transform: rotate(45deg);
+  width: 15px;
 }
 .popover.ng-joyride {
   padding: 1px;
