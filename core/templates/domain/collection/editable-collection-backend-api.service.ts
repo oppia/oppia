@@ -28,6 +28,7 @@ import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 
 interface EditableCollectionBackendResponse {
   collection: CollectionBackendDict;
@@ -57,6 +58,7 @@ interface EditCollectionPropertyChange {
   'old_value': Object;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type CollectionChange = (
   AddNodeCollectionChange |
   SwapNodesCollectionChange |
@@ -108,7 +110,7 @@ export class EditableCollectionBackendApiService {
 
   private _updateCollection(
       collectionId: string, collectionVersion: number,
-      commitMessage: string, changeList: CollectionChange[],
+      commitMessage: string, changeList: BackendChangeObject[],
       successCallback: (value: Collection) => void,
       errorCallback: (reason: string) => void): void {
     var editableCollectionDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -164,7 +166,7 @@ export class EditableCollectionBackendApiService {
   async updateCollectionAsync(
       collectionId: string, collectionVersion: number,
       commitMessage: string,
-      changeList: CollectionChange[]): Promise<Collection> {
+      changeList: BackendChangeObject[]): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this._updateCollection(
         collectionId, collectionVersion, commitMessage, changeList,
