@@ -1883,13 +1883,13 @@ pre.oppia-pre-wrapped-text {
 }
 .popover-content:after {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-  position: absolute;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
-  height: 15px;
+  position: absolute;
   content: '';
-  width: 15px;
-  left: 0%;
+  height: 15px;
   background-color: rgb(255, 255, 255);
+  left: 0%;
+  width: 15px;
   margin-left: -8px;
   margin-top: 8px;
   top: 0%;
