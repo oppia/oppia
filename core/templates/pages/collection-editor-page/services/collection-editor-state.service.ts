@@ -39,7 +39,6 @@ export class CollectionEditorStateService {
   private _collectionIsBeingSaved: boolean = false;
   private _collectionInitializedEventEmitter: EventEmitter<void> = (
   new EventEmitter());
-   = new EventEmitter();
 
   constructor(
     private alertsService: AlertsService,
@@ -79,12 +78,7 @@ export class CollectionEditorStateService {
       collectionId).then(
       (newCollectionObject) => {
         this._updateCollection(newCollectionObject);
-        // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-        // once the controller is migrated to angular.
-        // $rootScope.$applyAsync();
-        if (successCallback) {
-          successCallback();
-        }
+        successCallback();
       },
       (error) => {
         this.alertsService.addWarning(
