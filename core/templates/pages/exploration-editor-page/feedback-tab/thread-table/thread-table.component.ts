@@ -12,23 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SuggestionThread } from 'domain/suggestion/SuggestionThreadObjectFactory';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
-
 /**
  * @fileoverview Directive for displaying the list of threads in the feedback
  * tab of the exploration editor.
  */
 
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { SuggestionThread } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
+
 @Component({
-  selector: 'thread-table',
+  selector: 'oppia-thread-table',
   templateUrl: './thread-table.component.html'
 })
 export class ThreadTableComponent {
-  @Input() onClickRow: {(threadId: string): void;};
+  @Output('onClickRow') clickRowEventEmitter: EventEmitter<string> =
+  new EventEmitter();
   @Input() threads?: SuggestionThread[] = [];
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -51,5 +52,4 @@ export class ThreadTableComponent {
 
 angular.module('oppia').directive(
   'threadTable', downgradeComponent(
-    {component: ThreadTableComponent,
-      inputs: ['threads', 'onClickRow']}));
+    {component: ThreadTableComponent}));

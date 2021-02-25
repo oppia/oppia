@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for threadTable.
+ */
+
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
 import { ThreadTableComponent } from './thread-table.component';
-
-/**
- * @fileoverview Unit tests for threadTable.
- */
 
 export class MockDateTimeFormatService {
   getLocaleAbbreviatedDatetimeString(): string {
