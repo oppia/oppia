@@ -57,9 +57,6 @@ export class TeachPageComponent implements OnInit {
     private userService: UserService,
     private loaderService: LoaderService,
   ) {    
-    this.windowDimensionService.getResizeEvent().subscribe(() => {
-      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
-      });
   }
 
   ngOnInit(): void {
@@ -75,6 +72,9 @@ export class TeachPageComponent implements OnInit {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
+    });
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     });
   }
   // TODO(#11657): Extract the testimonials code into a separate component.

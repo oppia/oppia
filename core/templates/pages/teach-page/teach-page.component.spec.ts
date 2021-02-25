@@ -121,7 +121,6 @@ describe('Teach Page', () => {
     expect(component.displayedTestimonialId).toBe(0);
     expect(component.testimonialCount).toBe(3);
     expect(component.classroomUrl).toBe('/learn/math');
-    expect(component.isWindowNarrow).toBe(true);
   });
 
   it('should check if loader screen is working', () =>
@@ -228,4 +227,8 @@ describe('Teach Page', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
+
+  it ('should check if screen is narrow or not', function () {
+    expect(component.isWindowNarrow).toBe(true);
+  })
 });

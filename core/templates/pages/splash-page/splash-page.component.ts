@@ -56,11 +56,7 @@ export class SplashPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
-  ) {
-    this.windowDimensionService.getResizeEvent().subscribe(() => {
-      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
-      });
-  }
+  ) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -142,6 +138,9 @@ export class SplashPageComponent implements OnInit {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
+    });
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     });
   }
 }
