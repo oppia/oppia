@@ -33,6 +33,10 @@ angular.module('oppia').directive('sideNavigationBar', [
         };
         ctrl.$onInit = function() {
           ctrl.currentUrl = $window.location.pathname;
+          ctrl.showMe = false;
+        };
+        ctrl.myFunc = function() {
+          ctrl.showMe = !ctrl.showMe;
         };
       }]
     };
