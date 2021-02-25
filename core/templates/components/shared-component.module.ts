@@ -136,7 +136,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    SummaryListHeaderComponent
   ],
 })
 

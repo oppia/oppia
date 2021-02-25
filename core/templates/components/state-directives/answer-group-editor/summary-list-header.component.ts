@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 /**
  * @fileoverview Component for the header of items in a list.
  */
+
+interface EventData {
+  index: number,
+  event: Event
+}
 
 @Component({
   selector: 'oppia-summary-list-header',
@@ -29,12 +34,17 @@ export class SummaryListHeaderComponent {
  @Input() summary: string;
  @Input() shortSummary: string;
  @Input() isActive: boolean;
- @Input() onDeleteFn: (index: number, event: Event) => void ;
+ @Output('onDeleteFn') deleteEventEmitter: EventEmitter<EventData> =
+  new EventEmitter();
  @Input() isDeleteAvailable: boolean;
  @Input() numItems: number;
 
  deleteItem(evt: Event): void {
-   this.onDeleteFn(this.index, evt);
+   let eventData = {
+     index: this.index,
+     event: evt
+   };
+   this.deleteEventEmitter.emit(eventData);
  }
 }
 
