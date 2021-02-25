@@ -9,8 +9,8 @@
       </picture>
     </div>
     <div class="oppia-about-page-section-one-left">
-      <h2 class="oppia-about-title" [innerHTML]="'I18N_ABOUT_PAGE_TITLE_SEC_ONE' | translate"></h2>
-      <p class="oppia-about-content" [innerHTML]="'I18N_ABOUT_PAGE_SEC_ONE_CONTENT' | translate"></p>
+      <h2 class="oppia-about-title" [innerHTML]="'I18N_ABOUT_PAGE_TITLE_SECTION_ONE' | translate"></h2>
+      <p class="oppia-about-content" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT' | translate"></p>
       <div class="oppia-about-button-container">
         <form action="<[$ctrl.classroomUrl]>">
           <button type="submit" (click)="onClickVisitClassroomButton()"
@@ -142,8 +142,10 @@
     </div>
   </div>
   <div class="oppia-about-page-section-seven">
-    <h2 class="get-started-title" [innerHTML]="'I18N_ABOUT_PAGE_SEC_SEVEN_TITLE' | translate"></h2>
-    <div class="oppia-about-classroom-button-container-one">
+    <h2 class="get-started-title" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_SEVEN_TITLE' | translate"></h2>
+    <!--The pages "Guide For Teachers" and "Tips For Parents And Guardians" targeting these buttons are not yet created.
+      Pages can be linked here when created-->
+    <!--<div class="oppia-about-classroom-button-container-one">
       <form action="<[$ctrl.classroomUrl]>">
         <button type="submit" (click)="onClickGuideForTeacherButton()"
                 class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
@@ -158,7 +160,7 @@
                 [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
         </button>
       </form>
-    </div>
+    </div>-->
     <div class="oppia-about-classroom-button-container-three">
       <form action="<[$ctrl.classroomUrl]>">
         <button type="submit" (click)="onClickVisitClassroomButton()"
@@ -171,9 +173,6 @@
 </div>
 
 <style>
-  * {
-    margin: 0;
-  }
   .oppia-about-page-section-one {
     background-image: url(/assets/images/about/background1.png);
     clear: both;
@@ -200,6 +199,7 @@
     color: #094142;
     font-family: "Capriola", Arial, sans-serif;
     font-size: 45px;
+    margin: 0;
     padding-top: 15vh;
     width: 30vw;
   }
@@ -209,6 +209,7 @@
     font-size: 23px;
     font-weight: 400;
     line-height: 1.5;
+    margin: 0;
     padding-right: 4vw;
     padding-top: 4vh;
   }
@@ -244,6 +245,7 @@
     font-family: "Capriola", Arial, sans-serif;
     font-size: 40px;
     font-weight: normal;
+    margin: 0;
     padding-top: 6.5vh;
     text-align: center;
   }
@@ -330,6 +332,7 @@
     color: #ffffff;
     font-family: "Capriola", Arial, sans-serif;
     font-size: 40px;
+    margin: 0;
     width: 30vw;
   }
   .oppia-about-page-section-three .oppia-about-outcome-title-mobile {
@@ -382,6 +385,7 @@
     font-family: "Capriola", Arial, sans-serif;
     font-size: 40px;
     font-weight: normal;
+    margin: 0;
     width: 30vw;
   }
   .oppia-about-page-section-four .oppia-about-learn-title-mobile {
@@ -395,6 +399,7 @@
     font-family: "Roboto", Arial, sans-serif;
     font-size: 20px;
     line-height: 1.5;
+    margin: 0;
     padding-bottom: 5vh;
     padding-top: 4vh;
     width: 35vw;
@@ -441,6 +446,7 @@
     font-family: "Capriola", Arial, sans-serif;
     font-size: 40px;
     font-weight: normal;
+    margin: 0;
     width: 30vw;
   }
   .oppia-about-page-section-five .oppia-about-explore-lesson-content {
@@ -448,6 +454,7 @@
     font-family: "Roboto", Arial, sans-serif;
     font-size: 20px;
     line-height: 1.5;
+    margin: 0;
     padding-bottom: 5vh;
     padding-top: 4vh;
     width: 35vw;
@@ -489,12 +496,14 @@
     font-family: "Capriola", Arial, sans-serif;
     font-size: 40px;
     font-weight: normal;
+    margin: 0;
   }
   .oppia-about-page-section-six .oppia-about-outcome-content {
     color: #333333;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 20px;
     line-height: 1.5;
+    margin: 0;
     padding-top: 4vh;
   }
   .oppia-about-page-section-six .oppia-about-outcome-title-mobile {
@@ -517,7 +526,7 @@
   .about-page .oppia-about-page-section-seven {
     background-color: white;
     clear: both;
-    height: 40vh;
+    height: auto;
     margin: 0 auto;
     max-width: 100%;
     padding-top: 5vh;
@@ -528,12 +537,13 @@
     font-family: "Capriola", Arial, sans-serif;
     font-size: 40px;
     font-weight: 400;
+    margin: 0;
     padding-bottom: 5vh;
   }
   .oppia-about-page-section-seven .oppia-about-classroom-button-container-one,
   .oppia-about-page-section-seven .oppia-about-classroom-button-container-two,
   .oppia-about-page-section-seven .oppia-about-classroom-button-container-three {
-    padding-bottom: 5vh;
+    padding-bottom: 4vh;
   }
   .oppia-about-page-section-four .oppia-about-button,
   .oppia-about-page-section-five .oppia-about-button,
@@ -547,6 +557,7 @@
     font-family: "Roboto", Arial, sans-serif;
     font-size: 16px;
     font-weight: 500;
+    margin-left: 0;
     margin-top: -20px;
     min-width: 250px;
     padding: 10px;
@@ -562,11 +573,6 @@
   .about-page .oppia-about-bottom-button:active {
     background-color: #05beb2;
     color: #ffffff;
-  }
-  .oppia-about-classroom-button-container-three .oppia-about-button {
-    background-color: rgb(255, 255, 255);
-    border-color: teal;
-    color: teal;
   }
   .oppia-about-page-section-seven .oppia-about-button {
     width: 510px;
@@ -868,7 +874,7 @@
     }
     .about-page .oppia-about-page-section-seven {
       display: inherit;
-      height: 50vh;
+      height: auto;
       max-height: fit-content;
     }
     .about-page .oppia-about-page-section-five {
@@ -1029,6 +1035,7 @@
       display: block;
       font-family: "Capriola", Arial, sans-serif;
       font-size: 25px;
+      margin: 0;
       margin-left: auto;
       padding-bottom: 3vh;
       text-align: left;
@@ -1111,6 +1118,7 @@
       display: block;
       font-family: "Capriola", Arial, sans-serif;
       font-size: 25px;
+      margin: 0;
       margin-right: 2vw;
       padding-bottom: 3vh;
       text-align: left;
@@ -1125,6 +1133,7 @@
       display: block;
       font-family: "Capriola", Arial, sans-serif;
       font-size: 25px;
+      margin: 0;
       padding-bottom: 3vh;
       text-align: left;
       width: 100%;
@@ -1157,6 +1166,7 @@
       display: block;
       font-family: "Capriola", Arial, sans-serif;
       font-size: 25px;
+      margin: 0;
       margin-left: 0;
       padding-bottom: 3vh;
       text-align: left;
@@ -1184,6 +1194,7 @@
     }
     .oppia-about-page-section-seven .get-started-title {
       font-size: 25px;
+      margin: 0;
       margin-left: 0;
       padding-bottom: 5vh;
       padding-left: 10vw;
@@ -1195,7 +1206,6 @@
     .oppia-about-page-section-seven .oppia-about-classroom-button-container-one,
     .oppia-about-page-section-seven .oppia-about-classroom-button-container-two,
     .oppia-about-page-section-seven .oppia-about-classroom-button-container-three {
-      padding-bottom: 6vh;
       padding-left: 5vw;
       padding-right: 5vw;
     }

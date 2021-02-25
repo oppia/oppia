@@ -36,7 +36,7 @@ export class AboutPageComponent implements OnInit {
   classroomUrlFragment: string;
   classroomUrl :string;
   loginUrl: string;
-  userIsLoggedIn: boolean | null;
+  userIsLoggedIn: boolean;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
