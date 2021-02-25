@@ -253,7 +253,6 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
-
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service.ts';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
