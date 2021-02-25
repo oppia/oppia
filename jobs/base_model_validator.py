@@ -48,15 +48,6 @@ MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 class ValidateModelIdWithRegex(beam.DoFn):
     """DoFn to validate model ids against a given regex string."""
 
-    def __init__(self):
-        """Initializes the ValidateModelIdWithRegex DoFn.
-
-        Args:
-            regex_string: str. A regex pattern for valid ids.
-        """
-        super(ValidateModelIdWithRegex, self).__init__()
-        
-
     def process(self, input_model, regex_string):
         """Function that defines how to process each element in a pipeline of
         models.
