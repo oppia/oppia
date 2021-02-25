@@ -56,8 +56,7 @@ export class TeachPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
-  ) {    
-  }
+  ) {}
 
   ngOnInit(): void {
     this.displayedTestimonialId = 0;

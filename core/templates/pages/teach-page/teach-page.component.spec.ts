@@ -228,7 +228,7 @@ describe('Teach Page', () => {
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 
-  it ('should check if screen is narrow or not', function () {
+  it('should check if screen is narrow or not', function () {
     expect(component.isWindowNarrow).toBe(true);
-  })
+  });
 });
