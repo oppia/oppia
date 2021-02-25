@@ -639,8 +639,8 @@
 /core/domain/auth*.py @brianrodri
 /core/domain/caching*.py @brianrodri
 /core/domain/taskqueue*.py @brianrodri
-/core/templates/services/auth-interceptor.service*.ts @brianrodri
 /core/templates/services/auth.service*.ts @brianrodri
+/core/templates/services/auth-backend-api.service*.ts @brianrodri
 
 
 # Critical files.
