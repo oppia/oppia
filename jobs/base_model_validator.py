@@ -54,6 +54,7 @@ class ValidateModelIdWithRegex(beam.DoFn):
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
+            regex_string: str. Regex pattern for valid ids to match.
 
         Yields:
             ModelInvalidIdError. An error class for models with invalid IDs.
