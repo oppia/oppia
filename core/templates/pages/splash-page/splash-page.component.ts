@@ -56,7 +56,11 @@ export class SplashPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
-  ) {}
+  ) {
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+      });
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -126,7 +130,6 @@ export class SplashPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.userIsLoggedIn = null;
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;

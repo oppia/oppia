@@ -56,10 +56,13 @@ export class TeachPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
-  ) {}
+  ) {    
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+      });
+  }
 
   ngOnInit(): void {
-    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.displayedTestimonialId = 0;
     // Change count after all testimonials are available.
     this.testimonialCount = 3;
