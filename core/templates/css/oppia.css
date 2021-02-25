@@ -1885,14 +1885,14 @@ pre.oppia-pre-wrapped-text {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   content: '';
-  position: absolute;
   background-color: rgb(255, 255, 255);
+  position: absolute;
   margin-left: -8px;
-  margin-top: 8px;
   height: 15px;
+  margin-top: 8px;
   left: 0%;
-  width: 15px;
   top: 0%;
+  width: 15px;
   transform: rotate(45deg);
 }
 .popover.ng-joyride {
