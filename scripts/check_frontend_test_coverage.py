@@ -484,7 +484,7 @@ def check_coverage_changes():
                     '\033[1m{}\033[0m seems to be fully covered!'
                     ' Before removing it manually from the blacklist'
                     ' in the file'
-                    ' scripts/check_frontend_coverage.py, please'
+                    ' scripts/check_frontend_test_coverage.py, please'
                     ' make sure you\'ve followed the unit tests rules'
                     ' correctly on:'
                     ' https://github.com/oppia/oppia/wiki/Frontend'
@@ -499,7 +499,7 @@ def check_coverage_changes():
                 ' blacklist but it doesn\'t exist anymore. If you have'
                 ' renamed it, please make sure to remove the old file'
                 ' name and add the new file name in the blacklist in'
-                ' the file scripts/check_frontend_coverage.py.\n'
+                ' the file scripts/check_frontend_test_coverage.py.\n'
                 .format(test_name))
 
     if errors:
@@ -523,6 +523,6 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when check_frontend_coverage.py is used as a script.
+# it will only be called when check_frontend_test_coverage.py is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()
