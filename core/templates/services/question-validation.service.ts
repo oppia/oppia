@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Service to validate a question.
+ *
+ */
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
-
-/**
- * @fileoverview Service to validate a question.
- *
- */
 
 @Injectable({
   providedIn: 'root'
