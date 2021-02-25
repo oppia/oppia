@@ -156,11 +156,11 @@
     </li>
 
     <li ng-class="{'active': $ctrl.currentUrl === '/learn/math'}">
-      <a ng-click="$ctrl.myFunc()" class="protractor-mobile-test-classroom">
+      <a ng-click="$ctrl.toggleClassroomSubmenu()" class="protractor-mobile-test-classroom">
         <i class="material-icons oppia-sidebar-menu-icon">school</i>
         <span translate="I18N_SIDEBAR_CLASSROOM"></span>
       </a>
-      <div ng-show="$ctrl.showMe" class="classroom-submenu">
+      <div ng-show="$ctrl.showSubmenu" class="classroom-submenu">
         <a href="/learn/math" class="protractor-mobile-test-mathematics-link">
           <span translate="I18N_SIDEBAR_CLASSROOM_BASIC_MATHS"></span>
         </a>
