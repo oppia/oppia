@@ -29,14 +29,12 @@ import {
   EmailDashboardQueryBackendDict,
 } from 'domain/email-dashboard/email-dashboard-query.model';
 
-export interface QueryData {
-  hasNotLoggedInForNDays: string;
-  inactiveInLastNDays: string;
-  createdAtLeastNExps: string;
-  createdFewerThanNExps: string;
-  editedAtLeastNExps: string;
-  editedFewerThanNExps: string;
+interface QueryDatum {
+  attribute: string,
+  value: String
 }
+
+export interface QueryData extends Array<QueryDatum> {}
 
 @Injectable({
   providedIn: 'root'
@@ -93,14 +91,10 @@ export class EmailDashboardBackendApiService {
   }
 
   async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery> {
-    const postData = {
-      has_not_logged_in_for_n_days: data.hasNotLoggedInForNDays,
-      inactive_in_last_n_days: data.inactiveInLastNDays,
-      created_at_least_n_exps: data.createdAtLeastNExps,
-      created_fewer_than_n_exps: data.createdFewerThanNExps,
-      edited_at_least_n_exps: data.editedAtLeastNExps,
-      edited_fewer_than_n_exps: data.editedFewerThanNExps
-    };
+    let postData = {}
+    data.forEach(datum => {
+      postData[datum.attribute] = datum.value
+    });
 
     return new Promise((resolve, reject) => {
       this.http.post<EmailDashboardQueryBackendDict>(

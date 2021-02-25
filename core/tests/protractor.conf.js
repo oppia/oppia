@@ -9,159 +9,163 @@ var suites = {
     // them. Therefore, we mention the complete directory
     // in 'full'.
     full: [
-      'protractor/*.js',
-      'protractor_desktop/*.js'
+      // 'protractor/*.js',
+      'protractor_desktop/emailDashboard.js'
     ],
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
+    // accessibility: [
+    //   'protractor/accessibility.js'
+    // ],
+
+    // additionalEditorFeatures: [
+    //   'protractor_desktop/additionalEditorFeatures.js'
+    // ],
+
+    // additionalPlayerFeatures: [
+    //   'protractor_desktop/additionalPlayerFeatures.js'
+    // ],
+
+    // adminPage: [
+    //   'protractor_desktop/adminTabFeatures.js'
+    // ],
+
+    // classroomPage: [
+    //   'protractor_desktop/classroomPage.js'
+    // ],
+
+    // classroomPageFileUploadFeatures: [
+    //   'protractor_desktop/classroomPageFileUploadFeatures.js'
+    // ],
+
+    // collections: [
+    //   'protractor_desktop/collections.js'
+    // ],
+
+    // contributorDashboard: [
+    //   'protractor_desktop/contributorDashboard.js'
+    // ],
+
+    // coreEditorAndPlayerFeatures: [
+    //   'protractor_desktop/coreEditorAndPlayerFeatures.js'
+    // ],
+
+    // creatorDashboard: [
+    //   'protractor_desktop/creatorDashboard.js'
+    // ],
+
+    emailDashboard: [
+      'protractor_desktop/emailDashboard.js'
     ],
 
-    additionalEditorFeatures: [
-      'protractor_desktop/additionalEditorFeatures.js'
-    ],
+    // embedding: [
+    //   'protractor_desktop/embedding.js'
+    // ],
 
-    additionalPlayerFeatures: [
-      'protractor_desktop/additionalPlayerFeatures.js'
-    ],
+    // explorationImprovementsTab: [
+    //   'protractor_desktop/explorationImprovementsTab.js'
+    // ],
 
-    adminPage: [
-      'protractor_desktop/adminTabFeatures.js'
-    ],
+    // explorationFeedbackTab: [
+    //   'protractor_desktop/explorationFeedbackTab.js'
+    // ],
 
-    classroomPage: [
-      'protractor_desktop/classroomPage.js'
-    ],
+    // explorationHistoryTab: [
+    //   'protractor_desktop/explorationHistoryTab.js'
+    // ],
 
-    classroomPageFileUploadFeatures: [
-      'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
+    // explorationStatisticsTab: [
+    //   'protractor_desktop/explorationStatisticsTab.js'
+    // ],
 
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
+    // explorationTranslationTab: [
+    //   'protractor_desktop/explorationTranslationTab.js'
+    // ],
 
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
+    // extensions: [
+    //   'protractor_desktop/extensions.js'
+    // ],
 
-    coreEditorAndPlayerFeatures: [
-      'protractor_desktop/coreEditorAndPlayerFeatures.js'
-    ],
+    // featureGating: [
+    //   'protractor/featureGatingFlow.js'
+    // ],
 
-    creatorDashboard: [
-      'protractor_desktop/creatorDashboard.js'
-    ],
+    // fileUploadFeatures: [
+    //   'protractor_desktop/voiceoverUploadFeatures.js'
+    // ],
 
-    embedding: [
-      'protractor_desktop/embedding.js'
-    ],
+    // fileUploadExtensions: [
+    //   'protractor_desktop/fileUploadExtensions.js'
+    // ],
 
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
-    ],
+    // learnerDashboard: [
+    //   'protractor_desktop/learnerDashboard.js'
+    // ],
 
-    explorationFeedbackTab: [
-      'protractor_desktop/explorationFeedbackTab.js'
-    ],
+    // learner: [
+    //   'protractor/learnerFlow.js'
+    // ],
 
-    explorationHistoryTab: [
-      'protractor_desktop/explorationHistoryTab.js'
-    ],
+    // library: [
+    //   'protractor/libraryFlow.js'
+    // ],
 
-    explorationStatisticsTab: [
-      'protractor_desktop/explorationStatisticsTab.js'
-    ],
+    // navigation: [
+    //   'protractor_desktop/navigation.js'
+    // ],
 
-    explorationTranslationTab: [
-      'protractor_desktop/explorationTranslationTab.js'
-    ],
+    // playVoiceovers: [
+    //   'protractor_desktop/playVoiceovers.js'
+    // ],
 
-    extensions: [
-      'protractor_desktop/extensions.js'
-    ],
+    // preferences: [
+    //   'protractor_desktop/preferences.js'
+    // ],
 
-    featureGating: [
-      'protractor/featureGatingFlow.js'
-    ],
+    // profileFeatures: [
+    //   'protractor_desktop/profileFeatures.js'
+    // ],
 
-    fileUploadFeatures: [
-      'protractor_desktop/voiceoverUploadFeatures.js'
-    ],
+    // profileMenu: [
+    //   'protractor/profileMenuFlow.js'
+    // ],
 
-    fileUploadExtensions: [
-      'protractor_desktop/fileUploadExtensions.js'
-    ],
+    // publication: [
+    //   'protractor_desktop/publicationAndLibrary.js'
+    // ],
 
-    learnerDashboard: [
-      'protractor_desktop/learnerDashboard.js'
-    ],
+    // subscriptions: [
+    //   'protractor/subscriptionsFlow.js'
+    // ],
 
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
+    // topicAndStoryEditor: [
+    //   'protractor_desktop/topicAndStoryEditor.js'
+    // ],
 
-    library: [
-      'protractor/libraryFlow.js'
-    ],
+    // topicAndStoryEditorFileUploadFeatures: [
+    //   'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
+    // ],
 
-    navigation: [
-      'protractor_desktop/navigation.js'
-    ],
+    // topicsAndSkillsDashboard: [
+    //   'protractor_desktop/topicsAndSkillsDashboard.js'
+    // ],
 
-    playVoiceovers: [
-      'protractor_desktop/playVoiceovers.js'
-    ],
+    // skillEditor: [
+    //   'protractor_desktop/skillEditor.js'
+    // ],
 
-    preferences: [
-      'protractor_desktop/preferences.js'
-    ],
+    // topicAndStoryViewer: [
+    //   'protractor_desktop/topicAndStoryViewer.js'
+    // ],
 
-    profileFeatures: [
-      'protractor_desktop/profileFeatures.js'
-    ],
+    // users: [
+    //   'protractor_desktop/userJourneys.js',
+    // ],
 
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
-
-    publication: [
-      'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
-    ],
-
-    topicAndStoryEditor: [
-      'protractor_desktop/topicAndStoryEditor.js'
-    ],
-
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
-    ],
-
-    topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
-    ],
-
-    skillEditor: [
-      'protractor_desktop/skillEditor.js'
-    ],
-
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
-    users: [
-      'protractor_desktop/userJourneys.js',
-    ],
-
-    wipeout: [
-      'protractor_desktop/wipeout.js',
-    ]
+    // wipeout: [
+    //   'protractor_desktop/wipeout.js',
+    // ]
   };
 
 // A reference configuration file.
