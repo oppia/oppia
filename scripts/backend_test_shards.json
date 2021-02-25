@@ -192,7 +192,10 @@
     ],
     "9": [
         "core.domain.user_jobs_one_off_test",
-        "core.domain.topic_validators_test"
+        "core.domain.topic_validators_test",
+        "jobs.jobs_utils_test.py",
+        "jobs.base_model_validator_test.py",
+        "jobs.base_model_validator_errors_test.py"
     ],
     "10": [
         "core.domain.question_jobs_one_off_test",
