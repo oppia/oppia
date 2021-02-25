@@ -41,6 +41,7 @@ describe('Question Suggestion Review Modal Controller', function() {
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
+  const suggestionId = '123';
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -152,7 +153,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         questionHeader: questionHeader,
         reviewable: reviewable,
         skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics
+        skillRubrics: skillRubrics,
+        suggestionId: suggestionId
       });
     }));
 
@@ -322,7 +324,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         questionHeader: questionHeader,
         reviewable: reviewable,
         skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics
+        skillRubrics: skillRubrics,
+        suggestionId: suggestionId
       });
     }));
 

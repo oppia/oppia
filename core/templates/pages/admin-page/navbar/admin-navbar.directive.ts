@@ -31,18 +31,12 @@ angular.module('oppia').directive('adminNavbar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        getUserEmail: '&userEmail'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', 'UserService',
         function($rootScope, UserService) {
           var ctrl = this;
-          ctrl.showTab = function() {
-            return AdminRouterService.showTab();
-          };
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
           };
