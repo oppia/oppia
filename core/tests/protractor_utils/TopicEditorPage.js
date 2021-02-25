@@ -284,11 +284,11 @@ var TopicEditorPage = function() {
     await action.click('RTE input', pageEditorInput);
     var conceptCardButton = element(
       by.css('.protractor-test-ck-editor')).element(
-        by.cssContainingText('.cke_button', 'Insert Concept Card Link'));
+      by.cssContainingText('.cke_button', 'Insert Concept Card Link'));
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = element(
-       by.cssContainingText(
-         '.protractor-test-rte-skill-selector-item', skillName));
+      by.cssContainingText(
+        '.protractor-test-rte-skill-selector-item', skillName));
     await action.click('Skill for concept card', skillForConceptCard);
     var closeRTEButton = element(
       by.css('.protractor-test-close-rich-text-component-editor'));
