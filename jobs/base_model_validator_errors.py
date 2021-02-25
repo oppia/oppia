@@ -22,8 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import cron_services
 import python_utils
 
-PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS = (
-    cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+DELETE_DAYS = cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days
 
 
 class ModelValidationError(python_utils.OBJECT):
@@ -113,7 +112,7 @@ class ModelExpiredError(ModelValidationError):
         super(ModelExpiredError, self).__init__(model)
         self._message = (
             '%s Model marked as deleted is older than %s days'
-            % (self.base_message, PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
+            % (self.base_message, DELETE_DAYS))
 
     @property
     def message(self):
