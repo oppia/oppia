@@ -258,7 +258,8 @@ describe('Exploration editor page component', function() {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue($q.resolve({}));
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -459,7 +460,8 @@ describe('Exploration editor page component', function() {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue($q.resolve({}));
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
@@ -687,7 +689,8 @@ describe('Exploration editor page component', function() {
       registerDeclineTutorialModalEventSpy = (
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue($q.resolve({}));
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
