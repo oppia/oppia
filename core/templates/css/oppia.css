@@ -1881,19 +1881,19 @@ pre.oppia-pre-wrapped-text {
 .popover-content {
   padding: 10px;
 }
-.popover-content:after{
+.popover-content:after {
   position: absolute;
-                width: 15px;
-                height: 15px;
-                border-left: 1px solid rgba(0, 0, 0, 0.2);
-                border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-                content: '';
-                left: 0%;
-                top: 0%;
-                margin-left: -8px;
-                margin-top: 8px;
-                transform: rotate(45deg);
-                background-color: rgb(255, 255, 255);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+  height: 15px;
+  width: 15px;
+  content: '';
+  left: 0%;
+  margin-left: -8px;
+  top: 0%;
+  margin-top: 8px;
+  background-color: rgb(255, 255, 255);
+  transform: rotate(45deg);
 }
 .popover.ng-joyride {
   padding: 1px;
