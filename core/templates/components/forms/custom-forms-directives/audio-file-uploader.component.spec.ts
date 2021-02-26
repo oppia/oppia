@@ -17,7 +17,7 @@ import { IdGenerationService } from 'services/id-generation.service';
 import { AudioFileUploaderComponent } from './audio-file-uploader.component';
 
 /**
- * @fileoverview Tests for Component for uploading audio
+ * @fileoverview Tests for audio-file-uploader component.
  */
 
 describe('Audio File Uploader Component', () => {
