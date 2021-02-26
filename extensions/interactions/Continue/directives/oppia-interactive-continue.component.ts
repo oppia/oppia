@@ -22,7 +22,6 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { ContinueCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
@@ -57,7 +56,7 @@ export class OppiaInteractiveContinue implements OnInit {
         {
           buttonTextWithValue: this.buttonTextWithValue
         }) as ContinueCustomizationArgs);
-    this.buttonText = (buttonText as unknown as SubtitledUnicode).unicode;
+    this.buttonText = buttonText.value.unicode;
     const submitAnswer = () => {
       // We used to show "(Continue)" to indicate a 'continue' action when
       // the learner browses through the history of the exploration, but

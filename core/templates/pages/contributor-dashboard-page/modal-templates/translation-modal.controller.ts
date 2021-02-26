@@ -130,6 +130,8 @@ angular.module('oppia').controller('TranslationModalController', [
             $scope.previousTranslationAvailable = true;
             $scope.activeWrittenTranslation.html = '';
             $scope.uploadingTranslation = false;
+          }, () => {
+            $uibModalInstance.close();
           });
       }
       if (!$scope.moreAvailable) {
