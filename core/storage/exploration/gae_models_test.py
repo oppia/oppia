@@ -74,7 +74,8 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         snapshot_dict['skill_tags'] = ['tag1', 'tag2']
         snapshot_dict['default_skin'] = 'conversation_v1'
         snapshot_dict['skin_customizations'] = {}
-        snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(snapshot_dict)
+        snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(
+            snapshot_dict)
         exp_model = exp_models.ExplorationModel(**snapshot_dict)
         for field in ['skill_tags', 'default_skin', 'skin_customization']:
             self.assertNotIn(field, exp_model._properties) # pylint: disable=protected-access
