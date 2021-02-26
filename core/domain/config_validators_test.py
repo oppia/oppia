@@ -319,7 +319,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put_for_human()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for time field relation check '
@@ -374,7 +374,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             config_models.ConfigPropertySnapshotContentModel(
                 id='config_model-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for config property model '
@@ -679,7 +679,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put_for_human()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for time field relation check '
@@ -731,7 +731,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             config_models.PlatformParameterSnapshotContentModel(
                 id='%s-3' % (self.parameter_model.id)))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for platform parameter model '
