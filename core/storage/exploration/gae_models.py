@@ -211,6 +211,34 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
+    @staticmethod
+    def convert_to_valid_dict(snapshot_dict):
+        """Replace invalid fields and values in the ExplorationModel dict.
+        Some old ExplorationModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationModel from
+        them. We need to remove or replace these fields and values.
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the ExplorationModel
+                schema.
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+
+        # The nodes field is moved to collection_contents dict. We
+        # need to move the values from nodes field to collection_contents dict
+        # and delete nodes.
+        if 'skill_tags' in snapshot_dict:
+            del snapshot_dict['skill_tags']
+        if 'default_skin' in snapshot_dict:
+            del snapshot_dict['default_skin']
+        if 'skin_customizations' in snapshot_dict:
+            del snapshot_dict['skin_customizations']
+
+        return snapshot_dict
+
     def _reconstitute(self, snapshot_dict):
         """Populates the model instance with the snapshot.
         Some old ExplorationSnapshotContentModels can contain fields
@@ -227,14 +255,8 @@ class ExplorationModel(base_models.VersionedModel):
             with the snapshot.
         """
 
-        if 'skill_tags' in snapshot_dict:
-            del snapshot_dict['skill_tags']
-        if 'default_skin' in snapshot_dict:
-            del snapshot_dict['default_skin']
-        if 'skin_customizations' in snapshot_dict:
-            del snapshot_dict['skin_customizations']
-
-        self.populate(**snapshot_dict)
+        self.populate(
+            **ExplorationModel.convert_to_valid_dict(snapshot_dict))
         return self
 
 
