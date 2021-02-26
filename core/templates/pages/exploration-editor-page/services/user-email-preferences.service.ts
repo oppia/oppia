@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ export class UserEmailPreferencesService {
    * @param {RequestParam} requestParams - Info about message_type and mute.
    */
   saveChangeToBackend(requestParams: RequestParams) :
-  Promise<void | EmailPreferencesData> {
+  Promise<EmailPreferencesData> {
     return this.backendApiService.saveChangeToBackend(requestParams).then(
       (response: EmailPreferencesData) => {
         let data = response;

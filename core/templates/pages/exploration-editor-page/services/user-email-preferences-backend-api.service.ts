@@ -36,13 +36,14 @@ export class UserEmailPreferencesBackendApiService {
 
   saveChangeToBackend(
       requestParams: RequestParams
-  ): Promise<void | EmailPreferencesData> {
+  ): Promise<EmailPreferencesData> {
     let emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
       '/createhandler/notificationpreferences/<exploration_id>', {
         exploration_id: this.explorationDataService.explorationId
       }
     );
-    return this.http.put(emailPreferencesUrl, requestParams).toPromise();
+    return this.http.put<EmailPreferencesData>(
+      emailPreferencesUrl, requestParams).toPromise();
   }
 }
 
