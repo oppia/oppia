@@ -34,37 +34,6 @@ interface EditableCollectionBackendResponse {
   collection: CollectionBackendDict;
 }
 
-interface AddNodeCollectionChange {
-  'cmd': 'add_collection_node';
-  'exploration_id': string;
-}
-
-interface SwapNodesCollectionChange {
-  'cmd': 'swap_nodes';
-  'first_index': number;
-  'second_index': number;
-}
-
-interface DeleteNodeCollectionChange {
-  'cmd': 'delete_collection_node',
-  'exploration_id': string;
-}
-
-interface EditCollectionPropertyChange {
-  'cmd': 'edit_collection_property';
-  'property_name': string;
-  'exploration_id': string;
-  'new_value': Object;
-  'old_value': Object;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type CollectionChange = (
-  AddNodeCollectionChange |
-  SwapNodesCollectionChange |
-  DeleteNodeCollectionChange |
-  EditCollectionPropertyChange);
-
 // TODO(bhenning): I think that this might be better merged with the
 // CollectionBackendApiService. However, that violates the principle of a
 // backend API service being available for exactly one URL. To fix this, the
