@@ -1882,7 +1882,7 @@ pre.oppia-pre-wrapped-text {
   padding: 10px;
 }
 
-.popover-content:after{
+.popover-content:after {
   background-color: rgb(255,255,255);
   border-bottom: 1px solid rgba(0,0,0,0.2);
   border-left: 1px solid rgba(0,0,0,0.2);
