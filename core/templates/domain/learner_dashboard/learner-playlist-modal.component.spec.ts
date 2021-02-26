@@ -41,7 +41,7 @@ class MockUrlInterpolationService {
   }
 }
 
-fdescribe('Learner Playlist Modal Controller', function() {
+describe('Learner Playlist Modal Controller', function() {
   let component: LearnerPlaylistModalComponent;
   let csrfService: CsrfTokenService;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;

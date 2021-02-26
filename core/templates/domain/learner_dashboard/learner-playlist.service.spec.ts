@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,237 +16,278 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
-require('domain/learner_dashboard/learner-playlist.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/csrf-token.service.ts');
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { async, fakeAsync, flushMicrotasks, TestBed } from
+'@angular/core/testing';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
 
+import { AlertsService } from 'services/alerts.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+// import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+// require('domain/learner_dashboard/learner-playlist.service.ts');
+// require('domain/utilities/url-interpolation.service.ts');
+// require('services/csrf-token.service.ts');
+import { LearnerPlaylistService } from
+  'domain/learner_dashboard/learner-playlist.service.ts';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-describe('Learner playlist service factory', function() {
-  var LearnerPlaylistService = null;
-  var $httpBackend = null;
-  var $rootScope = null;
-  var $q = null;
-  var activityType = null;
-  var UrlInterpolationService = null;
-  var activityId = '1';
-  var addToLearnerPlaylistUrl = '';
-  var AlertsService = null;
-  var CsrfService = null;
-  var $uibModal = null;
-  importAllAngularServices();
+class MockNgbModal {
+  open(): void {
+    return;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+fdescribe('Learner playlist service factory', () => {
+  let learnerPlaylistService: LearnerPlaylistService;
+  let http: HttpTestingController;
+  let urlInterpolationService:UrlInterpolationService;
+  let activityId = '1';
+  let activityType = 'exploration'
+  let addToLearnerPlaylistUrl = '';
+  let alertsService: AlertsService;
+  let csrfService: CsrfTokenService;
+  let ngbModal: NgbModal;
+  
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: NgbModal, useClass: MockNgbModal
+        }
+      ]
+    })
   }));
 
-  beforeEach(angular.mock.inject(function($injector, _$q_) {
-    $httpBackend = $injector.get('$httpBackend');
-    LearnerPlaylistService = $injector.get(
-      'LearnerPlaylistService');
-    $rootScope = $injector.get('$rootScope');
-    $q = _$q_;
-    activityType = $injector.get('ACTIVITY_TYPE_EXPLORATION');
-    UrlInterpolationService = $injector.get('UrlInterpolationService');
-    AlertsService = $injector.get('AlertsService');
-    spyOn(AlertsService, 'addInfoMessage').and.callThrough();
-    spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
-    CsrfService = $injector.get('CsrfTokenService');
-    $uibModal = $injector.get('$uibModal');
+  beforeEach(() => {
+    learnerPlaylistService = TestBed.inject(LearnerPlaylistService);
+    ngbModal = TestBed.inject(NgbModal);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    http = TestBed.inject(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
+    alertsService = TestBed.inject(AlertsService);
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
+      });
     });
-  }));
+    spyOn(alertsService, 'addInfoMessage').and.callThrough();
+    spyOn(alertsService, 'addSuccessMessage').and.callThrough();
+  });
 
-  beforeEach(function() {
+  // beforeEach(angular.mock.module('oppia'));
+  // beforeEach(
+  //   angular.mock.module('oppia', TranslatorProviderForTests));
+  // beforeEach(angular.mock.module('oppia', function($provide) {
+  //   let ugs = new UpgradedServices();
+  //   for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+  //     $provide.value(key, value);
+  //   }
+  // }));
+
+  // beforeEach(angular.mock.inject(function($injector, _$q_) {
+  //   $httpBackend = $injector.get('$httpBackend');
+  //   LearnerPlaylistService = $injector.get(
+  //     'LearnerPlaylistService');
+  //   $rootScope = $injector.get('$rootScope');
+  //   $q = _$q_;
+  //   activityType = $injector.get('ACTIVITY_TYPE_EXPLORATION');
+  //   UrlInterpolationService = $injector.get('UrlInterpolationService');
+  //   AlertsService = $injector.get('AlertsService');
+  //   spyOn(AlertsService, 'addInfoMessage').and.callThrough();
+  //   spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
+  //   CsrfService = $injector.get('CsrfTokenService');
+  //   ngbModal = $injector.get('ngbModal');
+
+  //   spyOn(CsrfService, 'getTokenAsync').and.callFake(() => {
+  //     let deferred = $q.defer();
+  //     deferred.resolve('sample-csrf-token');
+  //     return deferred.promise;
+  //   });
+  // }));
+
+  beforeEach(() => {
     addToLearnerPlaylistUrl = (
-      UrlInterpolationService.interpolateUrl(
+      urlInterpolationService.interpolateUrl(
         '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
           activityType: activityType,
           activityId: activityId
         }));
   });
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    http.verify();
   });
 
-  it('should successfully add playlist to play later list', function() {
-    var response = {
+  it('should successfully add playlist to play later list', fakeAsync(() => {
+    let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
-    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    let req = http.expectOne(
+      '/learnerplaylistactivityhandler/exploration/1')
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
 
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
+    flushMicrotasks();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
       'Successfully added to your \'Play Later\' list.');
-    expect(AlertsService.addInfoMessage).not.toHaveBeenCalled();
-  });
+    expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
+  }));
 
   it('should not add playlist to play later list' +
-    'and show belongs to completed or incomplete list', function() {
-    var response = {
+    'and show belongs to completed or incomplete list', fakeAsync(() => {
+    let response = {
       belongs_to_completed_or_incomplete_list: true,
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
-    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    let req = http.expectOne(
+      '/learnerplaylistactivityhandler/exploration/1')
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
 
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+    flushMicrotasks();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'You have already completed or are completing this activity.');
-    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
-  });
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
+  }));
 
   it('should not add playlist to play later list' +
-    'and show belongs to subscribed activities', function() {
-    var response = {
+    'and show belongs to subscribed activities', fakeAsync(() => {
+    let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: true,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
-    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    let req = http.expectOne(
+      '/learnerplaylistactivityhandler/exploration/1')
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
 
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+    flushMicrotasks();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'This is present in your creator dashboard');
-    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
-  });
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
+  }));
 
   it('should not add playlist to play later list' +
-    'and show playlist limit exceeded', function() {
-    var response = {
+    'and show playlist limit exceeded', fakeAsync(() => {
+    let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: true
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
-    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    let req = http.expectOne(
+      '/learnerplaylistactivityhandler/exploration/1')
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
 
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+    flushMicrotasks();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'Your \'Play Later\' list is full!  Either you can ' +
       'complete some or you can head to the learner dashboard ' +
       'and remove some.');
-    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
-  });
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
+  }));
 
-  it('should open an $uibModal when removing from learner playlist',
-    function() {
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-      LearnerPlaylistService.removeFromLearnerPlaylist(
+  it('should open an ngbModal when removing from learner playlist',
+    fakeAsync(() => {
+      const modalSpy = spyOn(ngbModal, 'open');
+      learnerPlaylistService.removeFromLearnerPlaylist(
         '0', 'title', 'exploration', []);
+      flushMicrotasks();
       expect(modalSpy).toHaveBeenCalled();
-    });
+    }));
 
-  it('should remove an exploration from learner playlist', function() {
-    spyOn($uibModal, 'open').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve();
-      return {
-        result: deferred.promise
-      };
-    });
+  // it('should remove an exploration from learner playlist', () => {
+  //   //spyOn(ngbModal, 'open').and.callFake(() => {
+  //     // let deferred = $q.defer();
+  //     // deferred.resolve();
+  //     // return {
+  //     //   result: deferred.promise
+  //     // };
+  //   //});
+  //   const modalSpy = spyOn(ngbModal, 'open').and.callThrough();
 
-    var learnerDashboardActivityIds = LearnerDashboardActivityIds
-      .createFromBackendDict({
-        incomplete_exploration_ids: [],
-        incomplete_collection_ids: [],
-        completed_exploration_ids: [],
-        completed_collection_ids: [],
-        exploration_playlist_ids: ['0', '1', '2'],
-        collection_playlist_ids: []
-      });
+  //   let learnerDashboardActivityIds = LearnerDashboardActivityIds
+  //     .createFromBackendDict({
+  //       incomplete_exploration_ids: [],
+  //       incomplete_collection_ids: [],
+  //       completed_exploration_ids: [],
+  //       completed_collection_ids: [],
+  //       exploration_playlist_ids: ['0', '1', '2'],
+  //       collection_playlist_ids: []
+  //     });
 
-    LearnerPlaylistService.removeFromLearnerPlaylist(
-      '0', 'title', 'exploration', learnerDashboardActivityIds);
-    $rootScope.$apply();
+  //   learnerPlaylistService.removeFromLearnerPlaylist(
+  //     '0', 'title', 'exploration', learnerDashboardActivityIds);
+  //   // $rootScope.$apply();
 
-    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
-      ['1', '2']);
-  });
+  //   expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
+  //     ['1', '2']);
+  // });
 
-  it('should remove a collection from learner playlist', function() {
-    spyOn($uibModal, 'open').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve();
-      return {
-        result: deferred.promise
-      };
-    });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIds
-      .createFromBackendDict({
-        incomplete_exploration_ids: [],
-        incomplete_collection_ids: [],
-        completed_exploration_ids: [],
-        completed_collection_ids: [],
-        exploration_playlist_ids: [],
-        collection_playlist_ids: ['0', '1', '2']
-      });
+  // it('should remove a collection from learner playlist', () => {
+  //   spyOn(ngbModal, 'open').and.callFake(() => {
+  //     let deferred = $q.defer();
+  //     deferred.resolve();
+  //     return {
+  //       result: deferred.promise
+  //     };
+  //   });
+  //   let learnerDashboardActivityIds = LearnerDashboardActivityIds
+  //     .createFromBackendDict({
+  //       incomplete_exploration_ids: [],
+  //       incomplete_collection_ids: [],
+  //       completed_exploration_ids: [],
+  //       completed_collection_ids: [],
+  //       exploration_playlist_ids: [],
+  //       collection_playlist_ids: ['0', '1', '2']
+  //     });
 
-    LearnerPlaylistService.removeFromLearnerPlaylist(
-      '0', 'title', 'collection', learnerDashboardActivityIds);
-    $rootScope.$apply();
+  //   LearnerPlaylistService.removeFromLearnerPlaylist(
+  //     '0', 'title', 'collection', learnerDashboardActivityIds);
+  //   $rootScope.$apply();
 
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
-      ['1', '2']);
-  });
+  //   expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
+  //     ['1', '2']);
+  // });
 
-  it('should not remove anything from learner playlist when cancel' +
-    ' button is clicked', function() {
-    spyOn($uibModal, 'open').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.reject();
-      return {
-        result: deferred.promise
-      };
-    });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIds
-      .createFromBackendDict({
-        incomplete_exploration_ids: [],
-        incomplete_collection_ids: [],
-        completed_exploration_ids: [],
-        completed_collection_ids: [],
-        exploration_playlist_ids: [],
-        collection_playlist_ids: ['0', '1', '2']
-      });
+  // it('should not remove anything from learner playlist when cancel' +
+  //   ' button is clicked', () => {
+  //   spyOn(ngbModal, 'open').and.callFake(() => {
+  //     let deferred = $q.defer();
+  //     deferred.reject();
+  //     return {
+  //       result: deferred.promise
+  //     };
+  //   });
+  //   let learnerDashboardActivityIds = LearnerDashboardActivityIds
+  //     .createFromBackendDict({
+  //       incomplete_exploration_ids: [],
+  //       incomplete_collection_ids: [],
+  //       completed_exploration_ids: [],
+  //       completed_collection_ids: [],
+  //       exploration_playlist_ids: [],
+  //       collection_playlist_ids: ['0', '1', '2']
+  //     });
 
-    LearnerPlaylistService.removeFromLearnerPlaylist(
-      activityId, 'title', 'collection', learnerDashboardActivityIds);
-    $rootScope.$apply();
+  //   LearnerPlaylistService.removeFromLearnerPlaylist(
+  //     activityId, 'title', 'collection', learnerDashboardActivityIds);
+  //   $rootScope.$apply();
 
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
-      ['0', '1', '2']);
-  });
+  //   expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
+  //     ['0', '1', '2']);
+  // });
 });
