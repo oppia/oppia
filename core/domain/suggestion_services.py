@@ -111,8 +111,8 @@ def create_suggestion(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
             raise Exception(
-                'The given content_html does not match the content of the '
-                'exploration.')
+                'The Exploration content has changed since this translation '
+                'was submitted.')
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +

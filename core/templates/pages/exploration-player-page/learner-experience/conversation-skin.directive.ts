@@ -1298,6 +1298,12 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              // TODO(#11996): Remove when migrating to Angular2+.
+              CurrentInteractionService.onAnswerChanged$.subscribe(() => {
+                $rootScope.$applyAsync();
+              })
+            );
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isLoggedIn = null;
             $scope.storyNodeIdToAdd = null;
