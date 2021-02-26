@@ -33,10 +33,10 @@ angular.module('oppia').directive('sideNavigationBar', [
         };
         ctrl.$onInit = function() {
           ctrl.currentUrl = $window.location.pathname;
-          ctrl.showSubmenu = false;
+          ctrl.classroomSubmenuIsShown = false;
         };
         ctrl.toggleClassroomSubmenu = function() {
-          ctrl.showSubmenu = !ctrl.showSubmenu;
+          ctrl.classroomSubmenuIsShown = !ctrl.classroomSubmenuIsShown;
         };
       }]
     };
