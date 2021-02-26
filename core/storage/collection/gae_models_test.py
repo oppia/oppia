@@ -476,7 +476,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
-        commit.put()
+        commit.put_depending_on_id('committer_id')
         self.assertTrue(
             collection_models.CollectionCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
@@ -493,8 +493,8 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False)
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
-        private_commit.put()
-        public_commit.put()
+        private_commit.put_depending_on_id('committer_id')
+        public_commit.put_depending_on_id('committer_id')
         commits = (
             collection_models.CollectionCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=None))
@@ -523,8 +523,8 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         # CollectionModel._trusted_commit().
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
-        private_commit.put()
-        public_commit.put()
+        private_commit.put_depending_on_id('committer_id')
+        public_commit.put_depending_on_id('committer_id')
 
         max_age = datetime.timedelta(hours=1)
         results, _, more = (

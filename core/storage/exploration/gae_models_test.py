@@ -471,7 +471,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
-        commit.put()
+        commit.put_depending_on_id('committer_id')
         self.assertTrue(
             exp_models.ExplorationCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
@@ -490,8 +490,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
         public_commit.exploration_id = 'b'
-        private_commit.put()
-        public_commit.put()
+        private_commit.put_depending_on_id('committer_id')
+        public_commit.put_depending_on_id('committer_id')
         results, _, more = (
             exp_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=None))
@@ -521,8 +521,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit1.exploration_id = 'a'
         commit2.exploration_id = 'a'
-        commit1.put()
-        commit2.put()
+        commit1.put_depending_on_id('committer_id')
+        commit2.put_depending_on_id('committer_id')
 
         actual_models = (
             exp_models.ExplorationCommitLogEntryModel.get_multi(

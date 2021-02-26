@@ -105,7 +105,7 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.story_id = 'b'
-        commit.put()
+        commit.put_depending_on_id('committer_id')
         self.assertTrue(
             story_models.StoryCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
