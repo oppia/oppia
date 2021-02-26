@@ -344,6 +344,9 @@ import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { RatioExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
@@ -640,6 +643,8 @@ export class UpgradedServices {
       new PlaythroughIssueObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
+    upgradedServices['RatioExpressionInputRulesService'] =
+      new RatioExpressionInputRulesService();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
