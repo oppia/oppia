@@ -47,7 +47,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   describe('when reviewing suggestion', function() {
     const reviewable = true;
-    const subheading = "topic_name";
+    const subheading = 'topic_name';
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
       target_id: '1',
@@ -248,7 +248,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   describe('when viewing suggestion', function() {
     const reviewable = false;
     let $httpBackend = null;
-    const subheading = "topic_name";
+    const subheading = 'topic_name';
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
