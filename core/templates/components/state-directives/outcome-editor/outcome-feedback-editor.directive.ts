@@ -16,34 +16,34 @@
  * @fileoverview Directives for the outcome feedback editor.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/context.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
 
-angular.module('oppia').directive('outcomeFeedbackEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        outcome: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/outcome-editor/' +
-        'outcome-feedback-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['ContextService', function(ContextService) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.OUTCOME_FEEDBACK_SCHEMA = {
-            type: 'html',
-            ui_config: {
-              hide_complex_extensions: (
-                ContextService.getEntityType() === 'question')
-            }
-          };
-        };
-      }]
+import { SubtitledHtmlObjectFactory } from 
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UrlInterpolationService } from 
+  'domain/utilities/url-interpolation.service';
+import { ContextService } from 'services/context.service.ts';
+
+@Component({
+  selector: 'outcome-feedback-editor',
+  templateUrl: './outcome-feedback-editor.component.html',
+  styleUrls: []
+})
+export class OutcomeFeedbackEditorComponent implements OnInit {
+  @Input() outcome:string;
+  OUTCOME_FEEDBACK_SCHEMA:object;
+  constructor(
+    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+    private urlInterpolationService: UrlInterpolationService,
+    private contextService: ContextService){}
+
+  ngOnInit(): void {
+    this.OUTCOME_FEEDBACK_SCHEMA = {
+      type: 'html',
+      ui_config: {
+        hide_complex_extensions: (
+          this.contextService.getEntityType() === 'question')
+      }
     };
-  }]);
+  }
+}
