@@ -64,9 +64,10 @@ class QuestionsListHandler(base.BaseHandler):
         (
             question_summaries, merged_question_skill_links, next_start_cursor
         ) = (
-                question_services.get_displayable_question_skill_link_details(
-                    constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
+            question_services.get_displayable_question_skill_link_details(
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor
             )
+        )
         return_dicts = []
         for index, summary in enumerate(question_summaries):
             if summary is not None:

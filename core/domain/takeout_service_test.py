@@ -1004,8 +1004,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             renamed_export_keys = model_class.get_field_names_for_takeout()
             exported_field_names = []
             field_used_as_key_for_takeout_dict = None
-            print(model_class)
-            for field_name in model_class._properties: # pylint: disable=protected-access
+            for field_name in model_class._properties:  # pylint: disable=protected-access
                 if (export_policy[field_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
                     if field_name in renamed_export_keys:
