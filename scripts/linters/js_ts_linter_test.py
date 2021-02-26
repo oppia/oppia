@@ -77,8 +77,6 @@ INVALID_CONSTANT_AJS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_duplicate.constants.ajs.ts')
 INVALID_AS_CONST_CONSTANTS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_as_const.constants.ts')
-INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_comments.ts')
 INVALID_DIRECTIVE_WITH_NO_RETURN_BLOCK = os.path.join(
     LINTER_TESTS_DIR, 'invalid_directive_without_return.ts')
 INVALID_TS_IGNORE_FILEPATH = os.path.join(
@@ -672,32 +670,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = ['SUCCESS  TS expect error check passed']
         self.validate(lint_task_report, expected_messages, 0)
-
-    def test_missing_punctuation_at_end_of_comment(self):
-        def mock_compile_all_ts_files():
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_FORMATTED_COMMENT_FILEPATH)
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_FORMATTED_COMMENT_FILEPATH], FILE_CACHE
-            ).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        expected_messages = [
-            'Line 39: Invalid punctuation used at '
-            'the end of the comment.']
-        self.validate(lint_task_report, expected_messages, 1)
 
     def test_angular_services_index_error(self):
         def mock_compile_all_ts_files():

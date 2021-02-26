@@ -18,20 +18,6 @@
 
 'use strict';
 
-
-/**
- * This is a comment
- * and this one also.
- */
-
- // @ts-expect-error
- // @ts-ignore
- // --params
- // http://
- // https://
- // eslint-disable
- // eslint-enable
-
 module.exports = {
   meta: {
     type: 'layout',
@@ -50,16 +36,155 @@ module.exports = {
 
   create: function(context) {
     const sourceCode = context.getSourceCode();
+    const allowedTerminatingPunctuations = [
+      '.', '?', ';', ',', '{', '^', ')', '}', '>'];
+    const allowedStartPhrases = [
+      '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
+      'eslint-enable'];
+    const allowedEndPhrases = ['http://', 'https://'];
+
+    var raiseLintError = function(comment) {
+      context.report({
+        comment,
+        loc: comment.loc,
+        messageId: 'invalidPunctuation'
+      });
+    };
+
+    var checkComment = function(comment) {
+      var splittedComment = comment.value.split(' ');
+      var allowedStartPhrasePresent = false;
+      allowedStartPhrases.forEach((phrase) => {
+        if (splittedComment[1].startsWith(phrase)) {
+          allowedStartPhrasePresent = true;
+        }
+      });
+      if (allowedStartPhrasePresent) {
+        return true;
+      }
+
+      var allowedEndPhrasePresent = false;
+      allowedEndPhrases.forEach((phrase) => {
+        if (splittedComment[splittedComment.length - 1].includes(phrase)) {
+          allowedEndPhrasePresent = true;
+        }
+      });
+      if (allowedEndPhrasePresent) {
+        return true;
+      }
+
+      var lastWord = splittedComment[splittedComment.length - 1];
+      var lastCharIsInvalid = !(allowedTerminatingPunctuations.includes(
+        lastWord[lastWord.length - 1]));
+
+      if (lastCharIsInvalid) {
+        raiseLintError(comment);
+      }
+    };
+
+    var checkSingleLineComments = function(comments) {
+      for (var i = 0; i < comments.length - 1; i++) {
+        var currentComment = comments[i];
+        var nextComment = comments[i + 1];
+        if (currentComment.loc.start.line + 1 !== nextComment.loc.start.line) {
+          checkComment(currentComment);
+        }
+      }
+      var lastComment = comments[comments.length - 1];
+      checkComment(lastComment);
+    };
+
+    var checkSingleLineBlockComments = function(comments) {
+      for (var i = 0; i < comments.length; i++) {
+        var comment = comments[i];
+        var splittedComment = comment.value.split(' ');
+
+        var allowedStartPhrasePresent = false;
+        allowedStartPhrases.forEach((phrase) => {
+          if (splittedComment[1].startsWith(phrase)) {
+            allowedStartPhrasePresent = true;
+          }
+        });
+        if (allowedStartPhrasePresent) {
+          return true;
+        }
+
+        var allowedEndPhrasePresent = false;
+        allowedEndPhrases.forEach((phrase) => {
+          if (splittedComment[splittedComment.length - 2].includes(phrase)) {
+            allowedEndPhrasePresent = true;
+          }
+        });
+        if (allowedEndPhrasePresent) {
+          return true;
+        }
+
+        var lastWord = splittedComment[splittedComment.length - 2];
+        var lastCharIsInvalid = !(allowedTerminatingPunctuations.includes(
+          lastWord[lastWord.length - 1]));
+
+        if (lastCharIsInvalid) {
+          raiseLintError(comment);
+        }
+      }
+    };
+
+    var checkMultiLineBlockComments = function(comments) {
+      for (var i = 0; i < comments.length; i++) {
+        var comment = comments[i];
+        var splittedComment = comment.value.split(' ');
+
+        var allowedEndPhrasePresent = false;
+        allowedEndPhrases.forEach((phrase) => {
+          if (splittedComment[splittedComment.length - 2].includes(phrase)) {
+            allowedEndPhrasePresent = true;
+          }
+        });
+        if (allowedEndPhrasePresent) {
+          return true;
+        }
+
+        var lastWord = splittedComment[splittedComment.length - 2];
+        var lastCharIsInvalid = !(allowedTerminatingPunctuations.includes(
+          lastWord[lastWord.length - 2]));
+
+        if (lastCharIsInvalid) {
+          raiseLintError(comment);
+        }
+      }
+    };
+
+    var checkBlockComments = function(comments) {
+      var singleLineComments = [];
+      var multiLineComments = [];
+      for (var i = 0; i < comments.length; i++) {
+        var comment = comments[i];
+        if (comment.loc.start.line === comment.loc.end.line) {
+          singleLineComments.push(comment);
+        } else {
+          multiLineComments.push(comment);
+        }
+      }
+      checkSingleLineBlockComments(singleLineComments);
+      checkMultiLineBlockComments(multiLineComments);
+    };
 
     return {
       Program() {
-        var comments = [];
+        var lineComments = [];
+        var blockComments = [];
         const commentTokens = sourceCode.getAllComments();
         commentTokens.forEach((token) => {
-          if (token.type !== 'Shebang') {
-            comments.push(token);
+          if (token.type === 'Block') {
+            blockComments.push(token);
+          } else if (token.type === 'Line') {
+            lineComments.push(token);
+          } else {
+            return true;
           }
         });
+        checkSingleLineComments(lineComments);
+        checkBlockComments(blockComments);
       }
     };
   }

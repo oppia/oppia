@@ -888,96 +888,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_comments(self):
-        """This function ensures that comments follow correct style. Below are
-        some formats of correct comment style:
-        1. A comment can end with the following symbols: ('.', '?', ';', ',',
-        '{', '^', ')', '}', '>'). Example: // Is this is comment?
-        2. If a line contain any of the following words or phrases('@ts-ignore',
-        '--params', 'eslint-disable', 'eslint-enable', 'http://', 'https://')
-        in the comment.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Comments'
-        error_messages = []
-        files_to_check = self.all_filepaths
-        allowed_terminating_punctuations = [
-            '.', '?', ';', ',', '{', '^', ')', '}', '>']
-
-        # We allow comments to not have a terminating punctuation if any of the
-        # below phrases appears at the beginning of the comment.
-        # Example: // eslint-disable max-len
-        # This comment will be excluded from this check.
-        allowed_start_phrases = [
-            '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
-            'eslint-enable']
-
-        # We allow comments to not have a terminating punctuation if any of the
-        # below phrases appears in the last word of a comment.
-        # Example: // Ref: https://some.link.com
-        # This comment will be excluded from this check.
-        allowed_end_phrases = ['http://', 'https://']
-
-        failed = False
-        for filepath in files_to_check:
-            file_content = self.file_cache.readlines(filepath)
-            file_length = len(file_content)
-            for line_num in python_utils.RANGE(file_length):
-                line = file_content[line_num].strip()
-                next_line = ''
-                previous_line = ''
-                if line_num + 1 < file_length:
-                    next_line = file_content[line_num + 1].strip()
-
-                # Exclude comment line containing heading.
-                # Example: // ---- Heading ----
-                # These types of comments will be excluded from this check.
-                if (
-                        line.startswith('//') and line.endswith('-')
-                        and not (
-                            next_line.startswith('//') and
-                            previous_line.startswith('//'))):
-                    continue
-
-                if line.startswith('//') and not next_line.startswith('//'):
-                    # Check if any of the allowed starting phrase is present
-                    # in comment and exclude that line from check.
-                    allowed_start_phrase_present = any(
-                        line.split()[1].startswith(word) for word in
-                        allowed_start_phrases)
-
-                    if allowed_start_phrase_present:
-                        continue
-
-                    # Check if any of the allowed ending phrase is present
-                    # in comment and exclude that line from check. Used 'in'
-                    # instead of 'startswith' because we have some comments
-                    # with urls inside the quotes.
-                    # Example: 'https://oppia.org'
-                    allowed_end_phrase_present = any(
-                        word in line.split()[-1] for word in
-                        allowed_end_phrases)
-
-                    if allowed_end_phrase_present:
-                        continue
-
-                    # Check that the comment ends with the proper
-                    # punctuation.
-                    last_char_is_invalid = line[-1] not in (
-                        allowed_terminating_punctuations)
-                    if last_char_is_invalid:
-                        failed = True
-                        error_message = (
-                            '%s --> Line %s: Invalid punctuation used at '
-                            'the end of the comment.' % (
-                                filepath, line_num + 1))
-                        error_messages.append(error_message)
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_angular_services_index(self):
         """Finds all @Injectable classes and makes sure that they are added to
             Oppia root and Angular Services Index.
@@ -1061,7 +971,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout.append(
             self._match_line_breaks_in_controller_dependencies())
         linter_stdout.append(self._check_constants_declaration())
-        linter_stdout.append(self._check_comments())
         linter_stdout.append(self._check_ts_ignore())
         linter_stdout.append(self._check_ts_expect_error())
         linter_stdout.append(self._check_angular_services_index())
