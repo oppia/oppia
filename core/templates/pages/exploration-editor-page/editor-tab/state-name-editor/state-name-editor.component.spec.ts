@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed, fakeAsync, flush, flushMicrotasks, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { Subscription } from 'rxjs';
 import { EditabilityService } from 'services/editability.service';
 import { StateEditorService } from
@@ -312,12 +312,9 @@ fdescribe('State Name Editor component', function() {
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
   
-  
-  it('should apply autofocus to  main tab elements', fakeAsync(() => {
-      spyOn(routerService, 'getActiveTabName').and.returnValue('main');
-      ctrl.$onInit();
-      flush();
-      expect(focusOnSpy).toHaveBeenCalledWith('oppiaEditableSection');
-    })
-  );
+  // it('should apply autofocus to elements', () => fakeAsync(() =>{
+  //   spyOn(routerService, 'getActiveTabName').and.returnValue('main');
+  //   flushMicrotasks();
+  //   expect(ctrl.TabName).toBe('main');
+  // }))
 });

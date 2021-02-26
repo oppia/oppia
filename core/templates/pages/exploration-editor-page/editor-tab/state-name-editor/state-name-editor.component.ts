@@ -107,19 +107,20 @@ angular.module('oppia').component('stateNameEditor', {
       ctrl.$onInit = function() {
         // If-user refreshes the tab.
         $window.onload = function() {
-          if (RouterService.getActiveTabName() === 'main') {
+          ctrl.TabName = RouterService.getActiveTabName();
+          if (ctrl.TabName === 'main') {
             FocusManagerService.setFocus('oppiaEditableSection');
           }
-          if (RouterService.getActiveTabName() === 'feedback') {
+          if (ctrl.TabName === 'feedback') {
             FocusManagerService.setFocus('newThreadButton');
+            console.log("henlo")
           }
-          if (RouterService.getActiveTabName() === 'history') {
+          if (ctrl.TabName === 'history') {
             FocusManagerService.setFocus('usernameInputField');
           }
         };
-        $rootScope.$watch(() => {
-          RouterService.getActiveTabName();
-        }, function(newValue) {
+        $rootScope.$watch(() => RouterService.getActiveTabName(),
+        (newValue) => {
           if (newValue === 'main') {
             FocusManagerService.setFocus('oppiaEditableSection');
           }
