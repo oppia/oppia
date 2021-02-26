@@ -218,8 +218,9 @@ class ExplorationModel(base_models.VersionedModel):
         and field values that are no longer supported and would cause
         an exception when we try to reconstitute a ExplorationModel from
         them. We need to remove or replace these fields and values.
+
         Args:
-            model_dict: dict. The content of the model. Some fields and field
+            snapshot_dict: dict. The content of the model. Some fields and field
                 values might no longer exist in the ExplorationModel
                 schema.
         Returns:
