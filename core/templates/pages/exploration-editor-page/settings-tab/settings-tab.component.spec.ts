@@ -57,7 +57,7 @@ class MockRouterService {
   }
 }
 
-describe('Settings Tab Component', () => {
+fdescribe('Settings Tab Component', () => {
   let ctrl = null;
   let $httpBackend = null;
   let $q = null;
@@ -453,9 +453,15 @@ describe('Settings Tab Component', () => {
 
     it('should toggle notifications', () => {
       let feedbackNotificationsSpy = spyOn(
-        userEmailPreferencesService, 'setFeedbackNotificationPreferences');
+        userEmailPreferencesService, 'setFeedbackNotificationPreferences')
+        .and.callFake((mute: boolean, callb: () => void) => {
+          callb();
+        });
       let suggestionNotificationsSpy = spyOn(
-        userEmailPreferencesService, 'setSuggestionNotificationPreferences');
+        userEmailPreferencesService, 'setSuggestionNotificationPreferences')
+        .and.callFake((mute: boolean, callb: () => void) => {
+          callb();
+        });
       ctrl.muteFeedbackNotifications();
       expect(feedbackNotificationsSpy)
         .toHaveBeenCalledWith(true, ctrl._successCallback);
