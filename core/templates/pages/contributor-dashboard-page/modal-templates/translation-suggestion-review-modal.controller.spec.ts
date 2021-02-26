@@ -85,7 +85,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $uibModalInstance: $uibModalInstance,
         initialSuggestionId: 'suggestion_1',
         reviewable: reviewable,
-        subheading: "topic_name",
+        subheading: 'topic_name',
         suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
 
       });
