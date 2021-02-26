@@ -62,14 +62,14 @@ import { TopicsAndSkillsDashboardFilter } from
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$scope', '$timeout', '$window', 'AlertsService',
+    '$rootScope', '$scope', '$timeout', 'AlertsService',
     'FocusManagerService', 'SkillCreationService',
     'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
     'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
     'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
-        $rootScope, $scope, $timeout, $window, AlertsService,
+        $rootScope, $scope, $timeout, AlertsService,
         FocusManagerService, SkillCreationService,
         TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, WindowDimensionsService,

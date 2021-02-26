@@ -222,17 +222,18 @@ angular.module('oppia').component('feedbackTab', {
       };
 
       ctrl.$onInit = function() {
-        $rootScope.$watch(() => RouterService.getActiveTabName(),
-        (newValue) => {
-          if (newValue === 'feedback') {
-            if (!ctrl.activeThread) {
-              FocusManagerService.setFocus('newThreadButton');
+        $rootScope.$watch(
+          () => RouterService.getActiveTabName(),
+          (newValue) => {
+            if (newValue === 'feedback') {
+              if (!ctrl.activeThread) {
+                FocusManagerService.setFocus('newThreadButton');
+              }
+              if (ctrl.activeThread) {
+                FocusManagerService.setFocus('tmpMessageText');
+              }
             }
-            if (ctrl.activeThread) {
-              FocusManagerService.setFocus('tmpMessageText');
-            }
-          }
-        });
+          });
         ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
         ctrl.activeThread = null;
         ctrl.userIsLoggedIn = null;

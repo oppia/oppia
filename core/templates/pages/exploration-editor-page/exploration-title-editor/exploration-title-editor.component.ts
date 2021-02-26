@@ -38,12 +38,13 @@ angular.module('oppia').component('explorationTitleEditor', {
       $scope.explorationTitleService = ExplorationTitleService;
       var ctrl = this;
       ctrl.$onInit = function() {
-        $rootScope.$watch(() => RouterService.getActiveTabName(),
-        (newValue) => {
-          if (newValue === 'settings') {
-            FocusManagerService.setFocus(ctrl.focusLabel);
-          }
-        });
+        $rootScope.$watch(
+          () => RouterService.getActiveTabName(),
+          (newValue) => {
+            if (newValue === 'settings') {
+              FocusManagerService.setFocus(ctrl.focusLabel);
+            }
+          });
       };
     }]
 });

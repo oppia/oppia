@@ -283,12 +283,13 @@ angular.module('oppia').component('historyTab', {
       };
 
       ctrl.$onInit = function() {
-        $rootScope.$watch(() => RouterService.getActiveTabName(),
-        (newValue) => {
-          if (newValue === 'history') {
-            FocusManagerService.setFocus('usernameInputField');
-          }
-        });
+        $rootScope.$watch(
+          () => RouterService.getActiveTabName(),
+          (newValue) => {
+            if (newValue === 'history') {
+              FocusManagerService.setFocus('usernameInputField');
+            }
+          });
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshVersionHistory.subscribe((data) => {
             if (

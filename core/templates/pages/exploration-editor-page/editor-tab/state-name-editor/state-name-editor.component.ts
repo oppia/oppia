@@ -52,6 +52,9 @@ angular.module('oppia').component('stateNameEditor', {
 
       ctrl.initStateNameEditor = function() {
         StateNameService.init();
+        if (ctrl.TabName === 'main') {
+          FocusManagerService.setFocus('oppiaEditableSection');
+        }
       };
 
       ctrl.openStateNameEditor = function() {
@@ -113,18 +116,18 @@ angular.module('oppia').component('stateNameEditor', {
           }
           if (ctrl.TabName === 'feedback') {
             FocusManagerService.setFocus('newThreadButton');
-            console.log("henlo")
           }
           if (ctrl.TabName === 'history') {
             FocusManagerService.setFocus('usernameInputField');
           }
         };
-        $rootScope.$watch(() => RouterService.getActiveTabName(),
-        (newValue) => {
-          if (newValue === 'main') {
-            FocusManagerService.setFocus('oppiaEditableSection');
-          }
-        });
+        $rootScope.$watch(
+          () => RouterService.getActiveTabName(),
+          (newValue) => {
+            if (newValue === 'main') {
+              FocusManagerService.setFocus('oppiaEditableSection');
+            }
+          });
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(
             () => {
