@@ -191,7 +191,7 @@ describe('Full exploration editor', function() {
       ' given as query parameter', async function() {
     await users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
     await users.login('user1@editorAndPlayer.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       'Parent Exploration 1',
       'Algebra',
