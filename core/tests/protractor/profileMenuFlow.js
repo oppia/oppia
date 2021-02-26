@@ -112,7 +112,8 @@ describe('Profile menu flow', function() {
         await waitFor.elementToBeClickable(
           notificationsDashboardLink,
           'Could not click on the notifications dashboard link');
-        await action.click('Notifications Dashboard Link', notificationsDashboardLink);
+        await action.click('Notifications Dashboard Link',
+          notificationsDashboardLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
           'http://localhost:9001/notifications');
