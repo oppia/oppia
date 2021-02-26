@@ -223,6 +223,7 @@ class ExplorationModel(base_models.VersionedModel):
             snapshot_dict: dict. The content of the model. Some fields and field
                 values might no longer exist in the ExplorationModel
                 schema.
+
         Returns:
             dict. The content of the model. Only valid fields and values are
             present.
