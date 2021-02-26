@@ -124,7 +124,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  recordChapterCompletion(
+  async recordChapterCompletionAsync(
       topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string,
