@@ -136,8 +136,13 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                        stringified_item in stringified_output]
         return eval_output
 
+    # This test for three deprecated fields is merged into one test because
+    # running three different tests resulted in failures. The failures were
+    # caused because the map() function of
+    # RemoveDeprecatedExplorationModelFieldsOneOffJob was called one time
+    # each by the test but the field was removed in only one test and rest
+    # two tests were failing.
     def test_one_exp_models_with_deprecated_field(self):
-        # This test for three deprecated fields is
         with self.swap(
             exp_models,
             'ExplorationModel',
