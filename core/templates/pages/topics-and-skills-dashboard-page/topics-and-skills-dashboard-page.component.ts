@@ -97,6 +97,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                 return summary.canEditTopic === true;
               }
             ));
+            FocusManagerService.setFocus('createTopicBtn');
             ctrl.totalSkillCount = response.totalSkillCount;
             ctrl.skillsCategorizedByTopics = (
               response.categorizedSkillsDict);
@@ -118,6 +119,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                       ctrl.untriagedSkillSummaries.length !== 0) {
               ctrl.activeTab = ctrl.TAB_NAME_SKILLS;
               ctrl.initSkillDashboard();
+              FocusManagerService.setFocus('createSkillBtn');
             }
             ctrl.classrooms = response.allClassroomNames;
             // Adding the if checks since karma tests adds
@@ -380,13 +382,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
               }
             )
         );
-        $window.onload = function() {
-          if (ctrl.activeTab === 'topics') {
-            FocusManagerService.setFocus('createTopicBtn');
-          } else {
-            FocusManagerService.setFocus('createSkillBtn');
-          }
-        };
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are
         // triggered.
