@@ -80,9 +80,12 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJob(
                 'skill_tags', 'default_skin', 'skin_customizations']:
             if deprecated_field in exp_model._properties:  # pylint: disable=protected-access
                 del exp_model._properties[deprecated_field]  # pylint: disable=protected-access
-                if deprecated_field in exp_model._values:  # pylint: disable=protected-access
-                    del exp_model._values[deprecated_field]  # pylint: disable=protected-access
                 removed_deprecated_field = True
+
+            if deprecated_field in exp_model._values:  # pylint: disable=protected-access
+                del exp_model._values[deprecated_field]  # pylint: disable=protected-access
+                removed_deprecated_field = True
+
         if removed_deprecated_field:
             exp_model.update_timestamps(update_last_updated_time=False)
             exp_models.ExplorationModel.put_multi([exp_model])

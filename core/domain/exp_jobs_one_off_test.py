@@ -164,9 +164,6 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'category': 'category',
             }])
 
-            # exp_model1 = (
-            #     exp_models.ExplorationModel.get_by_id('exp_id1'))
-
             self.assertIsNotNone(exp_model1.skill_tags)
 
             self.assertIn('skill_tags', exp_model1._values) # pylint: disable=protected-access
@@ -217,9 +214,6 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'category': 'category',
             }])
 
-            # exp_model2 = (
-            #     exp_models.ExplorationModel.get_by_id('exp_id2'))
-
             self.assertIsNotNone(exp_model2.default_skin)
 
             self.assertIn('default_skin', exp_model2._values) # pylint: disable=protected-access
@@ -268,9 +262,6 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'title': 'title',
                 'category': 'category',
             }])
-
-            # exp_model3 = (
-            #     exp_models.ExplorationModel.get_by_id('exp_id3'))
 
             self.assertIsNotNone(exp_model3.skin_customizations)
 
