@@ -54,7 +54,7 @@ describe('Profile menu flow', function() {
           '.protractor-test-profile-link'));
         await waitFor.elementToBeClickable(
           profileLink, 'Could not click on the profile link');
-        await profileLink.click();
+        await action.click('Profile Link', profileLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
           'http://localhost:9001/profile/desktopAndMobileVisitor');
@@ -67,7 +67,7 @@ describe('Profile menu flow', function() {
         await waitFor.elementToBeClickable(
           creatorDashboardLink,
           'Could not click on the creator dashboard link');
-        await creatorDashboardLink.click();
+        await action.click('Creator Dashboard Link', creatorDashboardLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
           'http://localhost:9001/creator-dashboard');
@@ -80,7 +80,7 @@ describe('Profile menu flow', function() {
         await waitFor.elementToBeClickable(
           learnerDashboardLink,
           'Could not click on the learner dashboard link');
-        await learnerDashboardLink.click();
+        await action.click('Learner Dashboard Link', learnerDashboardLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
           'http://localhost:9001/learner-dashboard');
@@ -112,7 +112,7 @@ describe('Profile menu flow', function() {
         await waitFor.elementToBeClickable(
           notificationsDashboardLink,
           'Could not click on the notifications dashboard link');
-        await notificationsDashboardLink.click();
+        await action.click('Notifications Dashboard Link', notificationsDashboardLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
           'http://localhost:9001/notifications');
@@ -125,7 +125,7 @@ describe('Profile menu flow', function() {
         await waitFor.elementToBeClickable(
           preferencesLink,
           'Could not click on the preferences link');
-        await preferencesLink.click();
+        await action.click('Preferences Link', preferencesLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
           'http://localhost:9001/preferences');
