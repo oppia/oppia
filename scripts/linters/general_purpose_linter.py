@@ -132,6 +132,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             # same issue. The following was placed due to a necessary sleep as
             # a temporary measure to keep the embedding tests from failing.
             'core/tests/protractor_desktop/embedding.js',
+            'core/tests/protractor_desktop/emailDashboard.js',
         ),
         'excluded_dirs': ()
     },

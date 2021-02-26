@@ -33,13 +33,13 @@ angular.module('oppia').component('emailDashboardPage', {
         UserService, EMAIL_DASHBOARD_PREDICATE_DEFINITION) {
       var ctrl = this;
       ctrl.resetForm = function() {
-        ctrl.data = []
+        ctrl.data = [];
         EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
           ctrl.data.push({
             attribute: predicate.backend_attr,
             value: predicate.default_value,
             default_value: predicate.default_value
-          })
+          });
         });
       };
 
@@ -48,11 +48,11 @@ angular.module('oppia').component('emailDashboardPage', {
           var predicate = {
             attribute: pred.attribute,
             value: null
-          }
-          if (pred.value != pred.default_value) {
+          };
+          if (pred.value !== pred.default_value) {
             predicate.value = pred.value;
           }
-          return predicate
+          return predicate;
         });
         EmailDashboardDataService.submitQueryAsync(data).then(
           function(queries) {
@@ -114,8 +114,8 @@ angular.module('oppia').component('emailDashboardPage', {
       ctrl.$onInit = function() {
         ctrl.username = '';
         LoaderService.showLoadingScreen('Loading');
-        ctrl.customizationArgSpecs = EMAIL_DASHBOARD_PREDICATE_DEFINITION
-        ctrl.resetForm()
+        ctrl.customizationArgSpecs = EMAIL_DASHBOARD_PREDICATE_DEFINITION;
+        ctrl.resetForm();
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.username = userInfo.getUsername();

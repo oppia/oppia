@@ -22,8 +22,8 @@ var action = require('../protractor_utils/action.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-fdescribe('Email Dashboard', function() {
-  EMAIL_DASHBOARD_URL = '/emaildashboard'
+describe('Email Dashboard', function() {
+  EMAIL_DASHBOARD_URL = '/emaildashboard';
   var preferencesPage = null;
 
   beforeAll(async function() {
@@ -40,23 +40,27 @@ fdescribe('Email Dashboard', function() {
   });
 
   it('should query for users', async function() {
-    var schemaEditorElement = element(by.css('.protractor-test-email-dashboard-input-3'))
+    var schemaEditorElement = element(
+      by.css('.protractor-test-email-dashboard-input-3'));
     var inputElement = schemaEditorElement.element(by.tagName('input'));
     var submitButton = element(by.css('.protractor-test-submit-query-button'));
-    
+
     await action.clear('Email dashboard input 3', inputElement);
     await action.sendKeys('Email dashboard input 3', inputElement, 1);
     await action.click('Submit Query button', submitButton);
+
+    // Wait 20 seconds for the job to complete.
     await browser.sleep(20000);
-    var checkStatusButton = element(by.css('.protractor-check-status-button-0'));
+    var checkStatusButton = element(
+      by.css('.protractor-check-status-button-0'));
     var numberOfUsers = element(by.css('.protractor-test-number-of-users-0'));
     await action.click('Check Status Button', checkStatusButton);
     var statusText = element(by.css('.protractor-test-status-0'));
     await waitFor.textToBePresentInElement(statusText, 'completed');
     expect(await numberOfUsers.getText()).toBe('1');
-  })
+  });
 
   afterEach(async function() {
     await users.logout();
   });
-})
+});
