@@ -27,6 +27,8 @@ require(
 require('services/alerts.service.ts');
 require('services/site-analytics.service.ts');
 require('services/validators.service.ts');
+// eslint-disable-next-line max-len
+require('pages/collection-editor-page/services/collection-node-creator-backend-api.service.ts');
 
 angular.module('oppia').directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -39,14 +41,16 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'collection-node-creator.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$http', '$rootScope', 'AlertsService',
+        '$filter', '$rootScope', 'AlertsService',
         'CollectionEditorStateService', 'CollectionLinearizerService',
+        'CollectionNodeCreatorBackendApiService',
         'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         'ValidatorsService', 'INVALID_NAME_CHARS',
         function(
-            $filter, $http, $rootScope, AlertsService,
+            $filter, $rootScope, AlertsService,
             CollectionEditorStateService, CollectionLinearizerService,
+            CollectionNodeCreatorBackendApiService,
             ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             ValidatorsService, INVALID_NAME_CHARS) {
@@ -148,9 +152,9 @@ angular.module('oppia').directive('collectionNodeCreator', [
             }
 
             // Create a new exploration with the given title.
-            $http.post('/contributehandler/create_new', {
-              title: title
-            }).then(function(response) {
+            CollectionNodeCreatorBackendApiService.createNewExploration(
+              title
+            ).then(function(response) {
               ctrl.newExplorationTitle = '';
               var newExplorationId = response.data.exploration_id;
 
