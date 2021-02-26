@@ -254,11 +254,11 @@ describe('Chapter editor functionality', function() {
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
-      if(i===0) {
-        info.push(true)
+      if (i === 0) {
+        info.push(true);
         await workflow.createAndPublishExploration.apply(workflow, info);
       } else {
-        info.push(false)
+        info.push(false);
         await workflow.createAndPublishExploration.apply(workflow, info);
       }
       var url = await browser.getCurrentUrl();

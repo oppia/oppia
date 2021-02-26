@@ -112,7 +112,7 @@ var openEditor = async function(explorationId, expectWelcomeModal) {
   await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  if(expectWelcomeModal){
+  if (expectWelcomeModal) {
     await explorationEditorMainTab.exitTutorial();
   }
 };

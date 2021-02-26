@@ -58,7 +58,7 @@ describe('Collections', function() {
 
     await users.login('creator@explorations.com');
     // Create four test explorations.
-    // expectWelcomeModal: true
+    // Set expectWelcomeModal: true
     await workflow.createAndPublishExploration(
       'First Exploration',
       'Languages',
@@ -66,7 +66,7 @@ describe('Collections', function() {
       true
     );
     firstExplorationId = await general.getExplorationIdFromEditor();
-    // expectWelcomeModal: false
+    // Set expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Second Exploration',
       'Languages',
@@ -74,7 +74,7 @@ describe('Collections', function() {
       false
     );
     secondExplorationId = await general.getExplorationIdFromEditor();
-    // expectWelcomeModal: false
+    // Set expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Third Exploration',
       'Languages',
@@ -82,7 +82,7 @@ describe('Collections', function() {
       false
     );
     thirdExplorationId = await general.getExplorationIdFromEditor();
-    //expectWelcomeModal: false
+    // Set expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Fourth Exploration',
       'Languages',
@@ -98,14 +98,14 @@ describe('Collections', function() {
       'discover the binary search algorithm',
       false
     );
-    // expectWelcomeModal: false
+    // Set expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
       'discover the Root Linear Coefficient Theorem',
       false
     );
-    // expectWelcomeModal: false
+    // Set expectWelcomeModal: false
     await workflow.createAndPublishExploration(
       'Test Exploration for CollectionSuiteTest',
       'Languages',

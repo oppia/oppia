@@ -51,7 +51,7 @@ describe('Exploration translation and voiceover tab', function() {
     await users.createAndLoginAdminUser(
       'superUser@translationTab.com', 'superUser');
     await users.login('user@editorTab.com');
-    //expectWelcomeModal:true
+    // Set expectWelcomeModal:true
     await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('first');

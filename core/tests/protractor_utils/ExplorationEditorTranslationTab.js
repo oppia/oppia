@@ -40,7 +40,7 @@ var ExplorationEditorTranslationTab = function() {
     // Otherwise, if the translation tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
     if (await buttons.count() === 1) {
-      await action.click('Skip button',button.get(0));
+      await action.click('Skip button', button.get(0));
     } else if (await buttons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');

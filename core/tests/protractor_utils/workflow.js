@@ -72,7 +72,7 @@ var createExploration = async function(expectWelcomeModal) {
   await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  if(expectWelcomeModal) {
+  if (expectWelcomeModal) {
     await explorationEditorMainTab.exitTutorial();
   }
 };
@@ -196,7 +196,8 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language, expectWelcomeModal, correctnessFeedbackIsEnabled) {
+    title, category, objective, language, expectWelcomeModal,
+    correctnessFeedbackIsEnabled) {
   await createExploration(expectWelcomeModal);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
