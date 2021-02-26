@@ -17,6 +17,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
@@ -47,3 +48,6 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
     };
   }
 }
+angular.module('oppia').directive(
+  'outcomeFeedbackEditorComponent', downgradeComponent(
+    {component: OutcomeFeedbackEditorComponent}));
