@@ -57,7 +57,7 @@ class MockRouterService {
   }
 }
 
-fdescribe('Settings Tab Component', () => {
+describe('Settings Tab Component', () => {
   let ctrl = null;
   let $httpBackend = null;
   let $q = null;
