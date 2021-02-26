@@ -85,7 +85,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $uibModalInstance: $uibModalInstance,
         initialSuggestionId: 'suggestion_1',
         reviewable: reviewable,
+        subheading: "topic_name",
         suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
+
       });
     }));
 
@@ -95,6 +97,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.reviewable).toBe(reviewable);
         expect($scope.reviewMessage).toBe('');
+        expect($scope.subheading).toBe('topic_name');
       });
 
     it('should register Contributor Dashboard view suggestion for review ' +
