@@ -586,7 +586,7 @@ class MockCollectionRightsModel(
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put()
+            ).put_depending_on_id(committer_id)
 
 
 class MockExplorationRightsModel(exp_models.ExplorationRightsModel):
@@ -633,7 +633,7 @@ class MockExplorationRightsModel(exp_models.ExplorationRightsModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put()
+            ).put_depending_on_id(committer_id)
 
 
 class MockTopicRightsModel(topic_models.TopicRightsModel):
@@ -677,7 +677,7 @@ class MockTopicRightsModel(topic_models.TopicRightsModel):
             post_commit_status=status,
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
-        ).put()
+        ).put_depending_on_id(committer_id)
 
 
 class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
@@ -989,7 +989,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -1020,7 +1020,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                 }
             ],
             deleted=True
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
 
         output = self._run_one_off_job()
         self.assertItemsEqual(output, [['collection-deleted', 1]])
@@ -1036,7 +1036,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -1055,7 +1055,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.USER_1_ID,
             commit_type='edit',
             commit_cmds=[]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
 
         output = self._run_one_off_job()
         self.assertItemsEqual(output, [['exploration-length-0', 1]])
@@ -1075,7 +1075,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -1105,7 +1105,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
         exp_models.ExplorationRightsSnapshotMetadataModel(
             id='%s-1' % self.EXP_1_ID,
             committer_id=self.USER_1_ID,
@@ -1116,7 +1116,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'other_field': 'test'
                 }
             ]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
         exp_models.ExplorationRightsSnapshotMetadataModel(
             id='%s-2' % self.EXP_1_ID,
             committer_id=self.USER_1_ID,
@@ -1127,13 +1127,13 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'other_field': 'test'
                 }
             ]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
         topic_models.TopicRightsSnapshotMetadataModel(
             id='%s-1' % self.TOP_1_ID,
             committer_id=self.USER_1_ID,
             commit_type='edit',
             commit_cmds=[]
-        ).put()
+        ).put_depending_on_id(self.USER_1_ID)
         output = self._run_one_off_job()
         self.assertItemsEqual(
             output,
@@ -1410,7 +1410,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1434,7 +1434,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1458,7 +1458,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1482,7 +1482,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1506,7 +1506,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1530,7 +1530,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1554,7 +1554,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1578,7 +1578,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1687,7 +1687,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS,
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         expected_output = [
             [
@@ -1730,7 +1730,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         expected_output = [
             [
@@ -1769,7 +1769,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         expected_output = [
             [
@@ -1814,7 +1814,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -1870,7 +1870,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='create',
             commit_cmds=self.DUMMY_CREATE_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         actual_output = self._run_one_off_job()
         expected_output = [
@@ -1900,7 +1900,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -1953,7 +1953,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -1992,7 +1992,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.albert_id)
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -2054,17 +2054,20 @@ class SnapshotMetadataCommitMsgAuditOneOffJobTests(
                 id='model_id-%d-%d' % (i, value_less_than_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_less_than_375).put()
+                commit_message='a' * value_less_than_375
+            ).put_depending_on_id('committer_id')
             model_class(
                 id='model_id-%d-%d' % (i, value_equal_to_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_equal_to_375).put()
+                commit_message='a' * value_equal_to_375
+            ).put_depending_on_id('committer_id')
             model_class(
                 id='model_id-%d-%d' % (i, value_greater_than_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_greater_than_375).put()
+                commit_message='a' * value_greater_than_375
+            ).put_depending_on_id('committer_id')
         self.maxDiff = None
         one_off_results = self._run_one_off_job()
         expected_results = [
@@ -2139,7 +2142,8 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
             id='model_id-0',
             committer_id='committer_id',
             commit_type='create',
-            commit_message='a' * 400).put()
+            commit_message='a' * 400
+        ).put_depending_on_id('committer_id')
         self._run_one_off_job()
         self.assertEqual(
             len(model_class.get_by_id('model_id-0').commit_message),

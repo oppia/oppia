@@ -367,6 +367,14 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True))
 
+    @classmethod
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(BaseHumanMaintainedModel, cls).get_export_policy(),
+            **{'last_updated_by_human': EXPORT_POLICY.NOT_APPLICABLE}
+        )
+
     def put(self):
         """Unsupported operation on human-maintained models."""
         raise NotImplementedError('Use put_for_human or put_for_bot instead')
@@ -527,7 +535,7 @@ class BaseCommitLogEntryModel(BaseHumanMaintainedModel):
         relevant to a user for the purposes of Takeout, since commits do not
         contain any personal user data.
         """
-        return dict(BaseModel.get_export_policy(), **{
+        return dict(super(BaseCommitLogEntryModel, cls).get_export_policy(), **{
             'user_id': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_message': EXPORT_POLICY.NOT_APPLICABLE,
@@ -1230,7 +1238,7 @@ class VersionedModel(BaseHumanMaintainedModel):
         because the history of commits is not relevant for the purposes of
         Takeout, since commits do not contain any personal user data.
         """
-        return dict(BaseModel.get_export_policy(), **{
+        return dict(super(VersionedModel, cls).get_export_policy(), **{
             'version': EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -1278,14 +1286,17 @@ class BaseSnapshotMetadataModel(BaseHumanMaintainedModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data to export/delete corresponding to a user."""
-        return dict(BaseModel.get_export_policy(), **{
-            'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
-            'commit_type': EXPORT_POLICY.EXPORTED,
-            'commit_message': EXPORT_POLICY.EXPORTED,
-            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
-            'commit_cmds_user_ids': EXPORT_POLICY.NOT_APPLICABLE,
-            'content_user_ids': EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(BaseSnapshotMetadataModel, cls).get_export_policy(),
+            **{
+                'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
+                'commit_type': EXPORT_POLICY.EXPORTED,
+                'commit_message': EXPORT_POLICY.EXPORTED,
+                'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+                'commit_cmds_user_ids': EXPORT_POLICY.NOT_APPLICABLE,
+                'content_user_ids': EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1387,9 +1398,10 @@ class BaseSnapshotContentModel(BaseModel):
         because the contents of snapshots are note relevant to the user for
         Takeout.
         """
-        return dict(BaseModel.get_export_policy(), **{
-            'content': EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(BaseSnapshotContentModel, cls).get_export_policy(),
+            **{'content': EXPORT_POLICY.NOT_APPLICABLE}
+        )
 
     @classmethod
     def create(cls, snapshot_id, content):
