@@ -322,7 +322,7 @@ class QuestionSkillLinkModel(base_models.BaseHumanMaintainedModel):
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
-            ).order(-cls.last_updated, cls.key).fetch_page(
+            ).order(-cls.last_updated_by_human, cls.key).fetch_page(
                 question_skill_count
             )
         next_cursor_str = (
