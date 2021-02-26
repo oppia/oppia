@@ -16,7 +16,6 @@
  * @fileoverview Constants for collection node creator.
  */
 
-export class CollectionNodeCreatorConstants {
-    public static COLLECTION_NODE_CREATOR_DATA_URL =
-     '/contributehandler/create_new';
-}
+export const CollectionNodeCreatorConstants = {
+  COLLECTION_NODE_CREATOR_DATA_URL: '/contributehandler/create_new'
+} as const;
