@@ -47,6 +47,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   describe('when reviewing suggestion', function() {
     const reviewable = true;
+    const subheading = "topic_name";
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
       target_id: '1',
@@ -84,10 +85,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
         reviewable: reviewable,
-        subheading: 'topic_name',
         suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
-
       });
     }));
 
@@ -97,7 +97,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.reviewable).toBe(reviewable);
         expect($scope.reviewMessage).toBe('');
-        expect($scope.subheading).toBe('topic_name');
       });
 
     it('should register Contributor Dashboard view suggestion for review ' +
@@ -249,6 +248,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   describe('when viewing suggestion', function() {
     const reviewable = false;
     let $httpBackend = null;
+    const subheading = "topic_name";
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -290,6 +290,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
         reviewable: reviewable,
         suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
       });
