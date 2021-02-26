@@ -46,8 +46,13 @@ INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
 INTERACTIONS_THAT_USE_COMPONENTS = [
-    'AlgebraicExpressionInput', 'Continue', 'MathEquationInput',
-    'NumericExpressionInput', 'RatioExpressionInput']
+    'AlgebraicExpressionInput',
+    'Continue',
+    'FractionInput',
+    'MathEquationInput',
+    'NumericExpressionInput',
+    'RatioExpressionInput'
+]
 
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', python_utils.BASESTRING),
@@ -373,7 +378,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * An __init__.py file used to import the Python file.
             #    * A TypeScript file called {InteractionName}.ts.
             #    * If migrated to Angular2+, a module.ts file called
-            #       {InteractionName}-extensions.module.ts
+            #       {InteractionName}-interactions.module.ts
             #    * A directory name 'directives' containing TS and HTML files
             #      for directives
             #    * A directory named 'static' containing at least a .png file.
@@ -394,7 +399,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir,
-                    '%s-extensions.module.ts' % hyphenated_interaction_id)))
+                    '%s-interactions.module.ts' % hyphenated_interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
