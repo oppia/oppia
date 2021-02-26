@@ -29,8 +29,9 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { Observable, Subject } from 'rxjs';
 
-interface InteractionRulesService {
+export interface InteractionRulesService {
   [ruleName: string]: (
     answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
 }
@@ -56,6 +57,7 @@ export class CurrentInteractionService {
   private static onSubmitFn: OnSubmitFn = null;
   private static validityCheckFn: ValidityCheckFn = null;
   private static presubmitHooks: PresubmitHookFn[] = [];
+  private static answerChangedSubject: Subject<void> = new Subject<void>();
 
   setOnSubmitFn(onSubmit: OnSubmitFn): void {
     /**
@@ -66,6 +68,7 @@ export class CurrentInteractionService {
      */
     CurrentInteractionService.onSubmitFn = onSubmit;
   }
+
   registerCurrentInteraction(
       submitAnswerFn: SubmitAnswerFn, validityCheckFn: ValidityCheckFn): void {
     /**
@@ -84,6 +87,7 @@ export class CurrentInteractionService {
     CurrentInteractionService.submitAnswerFn = submitAnswerFn || null;
     CurrentInteractionService.validityCheckFn = validityCheckFn || null;
   }
+
   registerPresubmitHook(hookFn: PresubmitHookFn): void {
     /* Register a hook that will be called right before onSubmit.
      * All hooks for the current interaction will be cleared right
@@ -91,12 +95,14 @@ export class CurrentInteractionService {
      */
     CurrentInteractionService.presubmitHooks.push(hookFn);
   }
+
   clearPresubmitHooks(): void {
     /* Clear out all the hooks for the current interaction. Should
      * be called before loading the next card.
      */
     CurrentInteractionService.presubmitHooks = [];
   }
+
   onSubmit(
       answer: string, interactionRulesService: InteractionRulesService): void {
     for (
@@ -105,6 +111,7 @@ export class CurrentInteractionService {
     }
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
   }
+
   submitAnswer(): void {
     /* This starts the answer submit process, it should be called once the
      * learner presses the "Submit" button.
@@ -126,6 +133,7 @@ export class CurrentInteractionService {
       CurrentInteractionService.submitAnswerFn();
     }
   }
+
   isSubmitButtonDisabled(): boolean {
     /* The submit button should be disabled if the current interaction
      * did not register a _submitAnswerFn. This could occur in
@@ -145,6 +153,14 @@ export class CurrentInteractionService {
       return false;
     }
     return !CurrentInteractionService.validityCheckFn();
+  }
+
+  updateViewWithNewAnswer(): void {
+    CurrentInteractionService.answerChangedSubject.next();
+  }
+
+  get onAnswerChanged$(): Observable<void> {
+    return CurrentInteractionService.answerChangedSubject.asObservable();
   }
 }
 angular.module('oppia').factory('CurrentInteractionService',
