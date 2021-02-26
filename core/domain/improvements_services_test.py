@@ -442,29 +442,6 @@ class PutTasksTests(ImprovementsServicesTestBase):
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
 
-    def test_put_for_updated_task_entries_without_changing_last_updated(self):
-        task_entry = self._new_open_task()
-        created_on = datetime.datetime(2020, 6, 15, 5)
-        updated_on = created_on + datetime.timedelta(minutes=5)
-
-        with self.mock_datetime_utcnow(created_on):
-            improvements_services.put_tasks([task_entry])
-
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
-        self.assertEqual(model.resolver_id, None)
-        self.assertEqual(model.created_on, created_on)
-        self.assertEqual(model.last_updated, created_on)
-
-        task_entry = self._new_resolved_task()
-
-        with self.mock_datetime_utcnow(updated_on):
-            improvements_services.put_tasks([task_entry])
-
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
-        self.assertEqual(model.resolver_id, self.owner_id)
-        self.assertEqual(model.created_on, created_on)
-        self.assertEqual(model.last_updated, created_on)
-
 
 class ApplyChangesToModelTests(ImprovementsServicesTestBase):
     """Unit tests for the apply_changes_to_model function."""

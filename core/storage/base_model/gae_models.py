@@ -440,6 +440,44 @@ class BaseHumanMaintainedModel(BaseModel):
         else:
             return self.put_multi_for_human(instances)
 
+    @classmethod
+    def _fetch_page_sorted_by_last_updated(
+            cls, query, page_size, urlsafe_start_cursor):
+        """Fetches a page of entities sorted by their last_updated attribute in
+        descending order (newly updated first).
+
+        Args:
+            query: datastore_services.Query. The query object to be used to
+                fetch entities.
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of returned
+                entities starts from this datastore cursor. Otherwise,
+                the returned entities start from the beginning of the full
+                list of entities.
+
+        Returns:
+            3-tuple (results, cursor, more). As described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next batch
+                    of results. If there are no more results, this will be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        if urlsafe_start_cursor:
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
+        else:
+            start_cursor = None
+
+        result = query.order(
+            -cls.last_updated_by_human
+        ).fetch_page(page_size, start_cursor=start_cursor)
+        return (
+            result[0], (result[1].urlsafe() if result[1] else None), result[2])
+
 
 class BaseCommitLogEntryModel(BaseHumanMaintainedModel):
     """Base Model for the models that store the log of commits to a
@@ -573,45 +611,6 @@ class BaseCommitLogEntryModel(BaseHumanMaintainedModel):
         raise NotImplementedError(
             'The _get_instance_id() method is missing from the '
             'derived class. It should be implemented in the derived class.')
-
-    @classmethod
-    def _fetch_page_sorted_by_last_updated(
-            cls, query, page_size, urlsafe_start_cursor):
-        """Fetches a page of entities sorted by their last_updated attribute in
-        descending order (newly updated first).
-
-        Args:
-            query: datastore_services.Query. The query object to be used to
-                fetch entities.
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of returned
-                entities starts from this datastore cursor. Otherwise,
-                the returned entities start from the beginning of the full
-                list of entities.
-
-        Returns:
-            3-tuple (results, cursor, more). As described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next batch
-                    of results. If there are no more results, this will be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(
-                urlsafe_cursor=urlsafe_start_cursor)
-        else:
-            start_cursor = None
-
-        result = query.order(-cls.last_updated_by_human).fetch_page(
-            page_size, start_cursor=start_cursor)
-        return (
-            result[0],
-            (result[1].urlsafe() if result[1] else None),
-            result[2])
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):

@@ -193,7 +193,8 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_invalid_all_questions_merged(self):
         question_models.QuestionSkillLinkModel(
             id='question1-0', question_id='question1', skill_id='0',
-            skill_difficulty=0.5).put()
+            skill_difficulty=0.5
+        ).put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for all questions merged '
@@ -472,7 +473,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             skill_models.SkillSnapshotMetadataModel(
                 id='0-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
+        model_with_invalid_version_in_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for skill model '
