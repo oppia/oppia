@@ -42,7 +42,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def test_get_gcs_resource_bucket_name_prod(self):
         # Turn off DEV_MODE.
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
                 self.expected_bucket_name)

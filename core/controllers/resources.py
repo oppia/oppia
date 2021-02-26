@@ -79,7 +79,7 @@ class AssetDevHandler(base.BaseHandler):
             encoded_filename: str. The asset filename. This
                 string is encoded in the frontend using encodeURIComponent().
         """
-        if not constants.DEV_MODE:
+        if not constants.EMULATOR_MODE:
             raise self.PageNotFoundException
 
         try:

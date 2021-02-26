@@ -446,7 +446,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_get_response_with_dev_mode_disabled_returns_404_status(self):
         self.login(self.EDITOR_EMAIL)
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.get_json(
                 '/assetsdevhandler/exploration/0/assets/image/myfile',
                 expected_status_int=404)

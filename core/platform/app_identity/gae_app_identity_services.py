@@ -53,7 +53,7 @@ def get_gcs_resource_bucket_name():
     Returns:
         str. The bucket name for the application's GCS resources.
     """
-    if constants.DEV_MODE:
+    if constants.EMULATOR_MODE:
         return get_default_gcs_bucket_name()
     else:
         return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX
