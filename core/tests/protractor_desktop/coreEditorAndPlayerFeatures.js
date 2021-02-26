@@ -490,6 +490,9 @@ describe('Core exploration functionality', function() {
   });
 
   it('should show warnings when the length of goal < 15', async function() {
+    // TODO: Remove this line. This is an intentional failure to test
+    // that the screenshot reporter properly sanitizes filenames.
+    expect(0).toEqual(1);
     await explorationEditorPage.navigateToSettingsTab();
 
     // Color grey when there is no warning, red when there is a warning.
