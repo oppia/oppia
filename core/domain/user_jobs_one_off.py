@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import copy
-import datetime
 import imghdr
 
 from core import jobs

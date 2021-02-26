@@ -2346,6 +2346,14 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.user_ids = [self.owner_id, self.user_id]
         self.model_instance.put()
 
+        def mock_pre_put_hook(self):
+            """Operations to perform just before the model is `put`
+            into storage.
+            """
+            if self.created_on is None:
+                self.created_on = datetime.datetime.utcnow()
+        self.mock_pre_put_hook = mock_pre_put_hook
+
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             user_query_services.send_email_to_qualified_users(
                 self.user_query_id, 'subject', 'body',
@@ -2473,7 +2481,12 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             self.model_instance.created_on - datetime.timedelta(weeks=5))
         self.model_instance.last_updated = (
             self.model_instance.last_updated - datetime.timedelta(weeks=5))
-        self.model_instance.put()
+        with self.swap(
+            user_models.UserQueryModel,
+            '_pre_put_hook',
+            self.mock_pre_put_hook
+        ):
+            self.model_instance.put()
         expected_output = [(
             '[u\'failed validation check for entity stale check of '
             'UserQueryModel\', [u\'Entity id %s: '
