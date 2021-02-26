@@ -18,11 +18,10 @@
  */
 
 export class StateAndContent {
-
   constructor(
     private stateName: string,
-    private contentID: string, 
-    private contentText: string) {} 
+    private contentID: string,
+    private contentText: string) {}
 
   getStateName(): string {
     return this.stateName;
