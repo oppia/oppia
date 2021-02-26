@@ -76,10 +76,12 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
         # is also done in test_utils.AuditJobsTestBase.
-        self.model_instance_0 = user_models.UserSettingsModel.get(
-            self.user_id, strict=False)
-        self.model_instance_1 = user_models.UserSettingsModel.get(
-            self.admin_id, strict=False)
+        self.model_instance_0 = (
+            user_models.UserSettingsModel.get_marked_as_deleted(
+                self.user_id))
+        self.model_instance_1 = (
+            user_models.UserSettingsModel.get_marked_as_deleted(
+                self.admin_id))
         self.job_class = (
             prod_validation_jobs_one_off.UserSettingsModelAuditOneOffJob)
 
@@ -108,9 +110,8 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
-        user_models.UserSettingsModel.get(
-            self.get_user_id_from_email('tmpsuperadmin@example.com'),
-            strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
         mock_time = (
             datetime.datetime.utcnow() - datetime.timedelta(days=1))
         self.model_instance_0.last_logged_in = mock_time
@@ -196,10 +197,10 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
         # is also done in test_utils.AuditJobsTestBase.
-        self.model_instance_0 = user_models.UserSettingsModel.get(
-            self.user_id, strict=False)
-        self.model_instance_1 = user_models.UserSettingsModel.get(
-            self.admin_id, strict=False)
+        self.model_instance_0 = (
+            user_models.UserSettingsModel.get_marked_as_deleted(self.user_id))
+        self.model_instance_1 = (
+            user_models.UserSettingsModel.get_marked_as_deleted(self.admin_id))
         self.job_class = (
             prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob)
 
@@ -293,8 +294,9 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             learner_progress_services.mark_collection_as_completed(
                 self.user_id, '%s' % (i + 3))
 
-        self.model_instance = user_models.CompletedActivitiesModel.get(
-            self.user_id, strict=False)
+        self.model_instance = (
+            user_models.CompletedActivitiesModel.get_marked_as_deleted(
+                self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off
             .CompletedActivitiesModelAuditOneOffJob)
@@ -337,7 +339,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -351,9 +354,9 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get('2', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_models.ExplorationRightsModel.get('2', strict=False).delete(
+        exp_models.ExplorationRightsModel.get_marked_as_deleted('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -366,10 +369,10 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get('4', strict=False).delete(
+        collection_models.CollectionModel.get_marked_as_deleted('4').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        collection_models.CollectionRightsModel.get('4', strict=False).delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_marked_as_deleted(
+            '4').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for collection_ids '
@@ -498,8 +501,9 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             learner_progress_services.mark_collection_as_incomplete(
                 self.user_id, '%s' % (i + 3))
 
-        self.model_instance = user_models.IncompleteActivitiesModel.get(
-            self.user_id, strict=False)
+        self.model_instance = (
+            user_models.IncompleteActivitiesModel.get_marked_as_deleted(
+                self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off
             .IncompleteActivitiesModelAuditOneOffJob)
@@ -542,7 +546,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -556,9 +561,9 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get('2', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_models.ExplorationRightsModel.get('2', strict=False).delete(
+        exp_models.ExplorationRightsModel.get_marked_as_deleted('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -571,10 +576,10 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get('4', strict=False).delete(
+        collection_models.CollectionModel.get_marked_as_deleted('4').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        collection_models.CollectionRightsModel.get('4', strict=False).delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_marked_as_deleted(
+            '4').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for collection_ids '
@@ -690,7 +695,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
             self.user_id, '0', 'Introduction', 1)
 
         self.model_instance = (
-            user_models.ExpUserLastPlaythroughModel.get_by_id(
+            user_models.ExpUserLastPlaythroughModel.get_marked_as_deleted(
                 '%s.0' % self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off
@@ -734,7 +739,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -748,9 +754,9 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get('0', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_models.ExplorationRightsModel.get('0', strict=False).delete(
+        exp_models.ExplorationRightsModel.get_marked_as_deleted('0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -881,8 +887,9 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
             learner_playlist_services.mark_collection_to_be_played_later(
                 self.user_id, '%s' % (i + 4))
 
-        self.model_instance = user_models.LearnerPlaylistModel.get(
-            self.user_id, strict=False)
+        self.model_instance = (
+            user_models.LearnerPlaylistModel.get_marked_as_deleted(
+                self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob)
 
@@ -924,7 +931,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -938,9 +946,9 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get('2', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_models.ExplorationRightsModel.get('2', strict=False).delete(
+        exp_models.ExplorationRightsModel.get_marked_as_deleted('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -953,10 +961,10 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get('6', strict=False).delete(
+        collection_models.CollectionModel.get_marked_as_deleted('6').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        collection_models.CollectionRightsModel.get('6', strict=False).delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_marked_as_deleted(
+            '6').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for collection_ids '
@@ -1089,10 +1097,12 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
         # We will have three UserContributionsModel here since a model
         # since this model is created when UserSettingsModel is created
         # and we have also signed up super admin user in test_utils.
-        self.model_instance_0 = user_models.UserContributionsModel.get(
-            self.owner_id, strict=False)
-        self.model_instance_1 = user_models.UserContributionsModel.get(
-            self.user_id, strict=False)
+        self.model_instance_0 = (
+            user_models.UserContributionsModel.get_marked_as_deleted(
+                self.owner_id))
+        self.model_instance_1 = (
+            user_models.UserContributionsModel.get_marked_as_deleted(
+                self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob)
 
@@ -1121,9 +1131,8 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
-        user_models.UserContributionsModel.get(
-            self.get_user_id_from_email('tmpsuperadmin@example.com'),
-            strict=False).delete()
+        user_models.UserContributionsModel.get_marked_as_deleted(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'UserContributionsModel\', '
@@ -1138,7 +1147,8 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -1153,7 +1163,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_created_exploration_model_failure(self):
-        exp_models.ExplorationModel.get('exp1', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('exp1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1175,7 +1185,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_edited_exploration_model_failure(self):
         self.model_instance_0.delete()
-        exp_models.ExplorationModel.get('exp0', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('exp0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -1199,8 +1209,9 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         user_services.update_email_preferences(
             self.user_id, True, True, False, True)
 
-        self.model_instance = user_models.UserEmailPreferencesModel.get(
-            self.user_id, strict=False)
+        self.model_instance = (
+            user_models.UserEmailPreferencesModel.get_marked_as_deleted(
+                self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off
             .UserEmailPreferencesModelAuditOneOffJob)
@@ -1243,7 +1254,8 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -1303,8 +1315,9 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.user_id, collection.id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        self.model_instance = user_models.UserSubscriptionsModel.get(
-            self.user_id, strict=False)
+        self.model_instance = (
+            user_models.UserSubscriptionsModel.get_marked_as_deleted(
+                self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off.UserSubscriptionsModelAuditOneOffJob)
 
@@ -1332,8 +1345,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
-        user_models.UserSubscriptionsModel.get(
-            self.owner_id, strict=False).delete()
+        user_models.UserSubscriptionsModel.get_marked_as_deleted(
+            self.owner_id).delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'UserSubscriptionsModel\', '
@@ -1364,8 +1377,9 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_id_in_subscriber_ids(self):
-        subscriber_model = user_models.UserSubscribersModel.get(
-            self.owner_id, strict=False)
+        subscriber_model = (
+            user_models.UserSubscribersModel.get_marked_as_deleted(
+                self.owner_id))
         subscriber_model.subscriber_ids.remove(self.user_id)
         subscriber_model.update_timestamps()
         subscriber_model.put()
@@ -1381,8 +1395,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_subscriber_model_failure(self):
-        user_models.UserSubscribersModel.get(
-            self.owner_id, strict=False).delete()
+        user_models.UserSubscribersModel.get_marked_as_deleted(
+            self.owner_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for subscriber_ids '
@@ -1432,8 +1446,9 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
         subscription_services.subscribe_to_creator(
             self.admin_id, self.owner_id)
 
-        self.model_instance = user_models.UserSubscribersModel.get(
-            self.owner_id, strict=False)
+        self.model_instance = (
+            user_models.UserSubscribersModel.get_marked_as_deleted(
+                self.owner_id))
         self.job_class = (
             prod_validation_jobs_one_off.UserSubscribersModelAuditOneOffJob)
 
@@ -1495,8 +1510,9 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_id_in_creator_ids(self):
-        subscription_model = user_models.UserSubscriptionsModel.get(
-            self.user_id, strict=False)
+        subscription_model = (
+            user_models.UserSubscriptionsModel.get_marked_as_deleted(
+                self.user_id))
         subscription_model.creator_ids.remove(self.owner_id)
         subscription_model.update_timestamps()
         subscription_model.put()
@@ -1509,7 +1525,8 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.owner_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.owner_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -1523,8 +1540,8 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_subscriptions_model_failure(self):
-        user_models.UserSubscriptionsModel.get(
-            self.user_id, strict=False).delete()
+        user_models.UserSubscriptionsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for subscription_ids '
@@ -1606,7 +1623,8 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -1799,7 +1817,8 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -1885,7 +1904,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -1899,7 +1919,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get('exp0', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('exp0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -2055,8 +2075,9 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, '3')
 
-        self.model_instance = user_models.CollectionProgressModel.get_by_id(
-            '%s.col' % self.user_id)
+        self.model_instance = (
+            user_models.CollectionProgressModel.get_marked_as_deleted(
+                '%s.col' % self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off.CollectionProgressModelAuditOneOffJob)
 
@@ -2098,7 +2119,8 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -2112,9 +2134,9 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get('1', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_models.ExplorationRightsModel.get('1', strict=False).delete(
+        exp_models.ExplorationRightsModel.get_marked_as_deleted('1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -2127,10 +2149,10 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get('col', strict=False).delete(
+        collection_models.CollectionModel.get_marked_as_deleted('col').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
-        collection_models.CollectionRightsModel.get('col', strict=False).delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_marked_as_deleted(
+            'col').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for collection_ids '
@@ -2142,8 +2164,8 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_completed_activities_model_failure(self):
-        user_models.CompletedActivitiesModel.get(
-            self.user_id, strict=False).delete()
+        user_models.CompletedActivitiesModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for completed_activities_ids '
@@ -2263,8 +2285,9 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, '0')
 
-        self.model_instance = user_models.StoryProgressModel.get_by_id(
-            '%s.story' % self.user_id)
+        self.model_instance = (
+            user_models.StoryProgressModel.get_marked_as_deleted(
+                '%s.story' % self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off.StoryProgressModelAuditOneOffJob)
 
@@ -2306,7 +2329,8 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -2320,7 +2344,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_story_model_failure(self):
-        story_models.StoryModel.get('story', strict=False).delete(
+        story_models.StoryModel.get_marked_as_deleted('story').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -2334,8 +2358,8 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_private_story(self):
         topic_id = (
-            story_models.StoryModel.get(
-                'story', strict=False).corresponding_topic_id)
+            story_models.StoryModel.get_marked_as_deleted(
+                'story').corresponding_topic_id)
         topic_services.unpublish_story(topic_id, 'story', self.owner_id)
         expected_output = [
             (
@@ -2370,7 +2394,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration(self):
-        exp_models.ExplorationModel.get('1', strict=False).delete(
+        exp_models.ExplorationModel.get_marked_as_deleted('1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [(
             u'[u\'failed validation check for explorations in completed '
@@ -2382,8 +2406,8 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_exploration_not_marked_as_completed(self):
         completed_activities_model = (
-            user_models.CompletedActivitiesModel.get(
-                self.user_id, strict=False))
+            user_models.CompletedActivitiesModel.get_marked_as_deleted(
+                self.user_id))
         completed_activities_model.exploration_ids.remove('1')
         completed_activities_model.update_timestamps()
         completed_activities_model.put()
@@ -2415,8 +2439,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        self.model_instance = user_models.UserQueryModel.get(
-            self.user_query_id, strict=False)
+        self.model_instance = user_models.UserQueryModel.get_marked_as_deleted(
+            self.user_query_id)
         self.model_instance.user_ids = [self.owner_id, self.user_id]
         self.model_instance.update_timestamps()
         self.model_instance.put()
@@ -2472,7 +2496,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -2487,8 +2512,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_sent_email_model_failure(self):
-        email_models.BulkEmailModel.get(
-            self.sent_mail_id, strict=False).delete()
+        email_models.BulkEmailModel.get_marked_as_deleted(
+            self.sent_mail_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for sent_email_model_ids '
@@ -2503,8 +2528,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_extra_recipients(self):
-        bulk_email_model = email_models.BulkEmailModel.get(
-            self.sent_mail_id, strict=False)
+        bulk_email_model = email_models.BulkEmailModel.get_marked_as_deleted(
+            self.sent_mail_id)
         bulk_email_model.recipient_ids.append('invalid')
         bulk_email_model.update_timestamps()
         bulk_email_model.put()
@@ -2520,8 +2545,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_invalid_sender_id(self):
-        bulk_email_model = email_models.BulkEmailModel.get(
-            self.sent_mail_id, strict=False)
+        bulk_email_model = email_models.BulkEmailModel.get_marked_as_deleted(
+            self.sent_mail_id)
         bulk_email_model.sender_id = 'invalid'
         bulk_email_model.update_timestamps()
         bulk_email_model.put()
@@ -2537,8 +2562,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_bulk_email_model(self):
-        user_models.UserBulkEmailsModel.get(
-            self.owner_id, strict=False).delete()
+        user_models.UserBulkEmailsModel.get_marked_as_deleted(
+            self.owner_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user bulk email check of '
@@ -2594,8 +2619,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        query_model = user_models.UserQueryModel.get(
-            self.user_query_id, strict=False)
+        query_model = user_models.UserQueryModel.get_marked_as_deleted(
+            self.user_query_id)
         query_model.user_ids = [self.owner_id, self.user_id]
         query_model.update_timestamps()
         query_model.put()
@@ -2604,8 +2629,9 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
             user_query_services.send_email_to_qualified_users(
                 self.user_query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
-        self.model_instance = user_models.UserBulkEmailsModel.get(
-            self.user_id, strict=False)
+        self.model_instance = (
+            user_models.UserBulkEmailsModel.get_marked_as_deleted(
+                self.user_id))
         self.sent_mail_id = query_model.sent_email_model_id
         self.job_class = (
             prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob)
@@ -2634,8 +2660,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
-        user_models.UserBulkEmailsModel.get(
-            self.owner_id, strict=False).delete()
+        user_models.UserBulkEmailsModel.get_marked_as_deleted(
+            self.owner_id).delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'UserBulkEmailsModel\', '
@@ -2650,7 +2676,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -2665,8 +2692,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_sent_email_model_failure(self):
-        email_models.BulkEmailModel.get(
-            self.sent_mail_id, strict=False).delete()
+        email_models.BulkEmailModel.get_marked_as_deleted(
+            self.sent_mail_id).delete()
         expected_output = [(
             u'[u\'failed validation check for sent_email_model_ids field '
             'check of UserBulkEmailsModel\', [u"Entity id %s: based on '
@@ -2681,8 +2708,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=True)
 
     def test_user_id_not_in_recipient_ids(self):
-        bulk_email_model = email_models.BulkEmailModel.get(
-            self.sent_mail_id, strict=False)
+        bulk_email_model = email_models.BulkEmailModel.get_marked_as_deleted(
+            self.sent_mail_id)
         bulk_email_model.recipient_ids.remove(self.user_id)
         bulk_email_model.update_timestamps()
         bulk_email_model.put()
@@ -2720,8 +2747,9 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, 'skill', 0.8)
 
-        self.model_instance = user_models.UserSkillMasteryModel.get_by_id(
-            id='%s.skill' % self.user_id)
+        self.model_instance = (
+            user_models.UserSkillMasteryModel.get_marked_as_deleted(
+                '%s.skill' % self.user_id))
         self.job_class = (
             prod_validation_jobs_one_off.UserSkillMasteryModelAuditOneOffJob)
 
@@ -2763,7 +2791,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -2777,7 +2806,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get('skill', strict=False).delete(
+        skill_models.SkillModel.get_marked_as_deleted('skill').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -2861,7 +2890,8 @@ class UserContributionProficiencyModelValidatorTests(
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get(self.user_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
@@ -2910,11 +2940,11 @@ class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             self.voice_artist_id, 'hi')
 
         self.translator_model_instance = (
-            user_models.UserContributionRightsModel.get(
-                self.translator_id, strict=False))
+            user_models.UserContributionRightsModel.get_marked_as_deleted(
+                self.translator_id))
         self.voice_artist_model_instance = (
-            user_models.UserContributionRightsModel.get(
-                self.voice_artist_id, strict=False))
+            user_models.UserContributionRightsModel.get_marked_as_deleted(
+                self.voice_artist_id))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -2927,8 +2957,8 @@ class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_get_external_id_relationship_failure(self):
-        user_models.UserSettingsModel.get(
-            self.translator_id, strict=False).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.translator_id).delete()
 
         expected_output = [
             (
@@ -2977,8 +3007,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
         self.process_and_flush_pending_mapreduce_tasks()
 
         self.model_instance = (
-            user_models.PendingDeletionRequestModel.get(
-                self.user_id, strict=False))
+            user_models.PendingDeletionRequestModel.get_marked_as_deleted(
+                self.user_id))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -3022,7 +3052,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get_marked_as_deleted(
+            self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for deleted '
@@ -3033,7 +3064,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_user_settings_model_not_marked_deleted_failure(self):
-        user_model = user_models.UserSettingsModel.get_by_id(
+        user_model = user_models.UserSettingsModel.get_marked_as_deleted(
             self.user_id)
         user_model.deleted = False
         user_model.update_timestamps()
@@ -3082,7 +3113,7 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
             wipeout_service.get_pending_deletion_request(self.user_id))
 
         self.model_instance = (
-            user_models.DeletedUserModel.get_by_id(self.user_id))
+            user_models.DeletedUserModel.get_marked_as_deleted(self.user_id))
 
         self.job_class = (
             prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob)
@@ -3240,10 +3271,9 @@ class DeletedUsernameModelValidatorTests(test_utils.AuditJobsTestBase):
             wipeout_service.get_pending_deletion_request(self.user_id))
 
         self.model_instance = (
-            user_models.DeletedUsernameModel.get(
+            user_models.DeletedUsernameModel.get_marked_as_deleted(
                 utils.convert_to_hash(
-                    USER_NAME, user_models.DeletedUsernameModel.ID_LENGTH),
-                strict=False))
+                    USER_NAME, user_models.DeletedUsernameModel.ID_LENGTH)))
 
         self.job_class = (
             prod_validation_jobs_one_off.DeletedUsernameModelAuditOneOffJob)

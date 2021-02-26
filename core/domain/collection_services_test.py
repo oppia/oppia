@@ -864,7 +864,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # But the models still exist in the backend.
         self.assertIsNotNone(
-            collection_models.CollectionModel.get_by_id(
+            collection_models.CollectionModel.get_marked_as_deleted(
                 self.COLLECTION_0_ID))
 
         # The collection summary is deleted, however.
@@ -930,10 +930,10 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # But the models still exist in the backend.
         self.assertIsNotNone(
-            collection_models.CollectionModel.get_by_id(
+            collection_models.CollectionModel.get_marked_as_deleted(
                 self.COLLECTION_0_ID))
         self.assertIsNotNone(
-            collection_models.CollectionModel.get_by_id(
+            collection_models.CollectionModel.get_marked_as_deleted(
                 self.COLLECTION_1_ID))
 
         # The collection summaries are deleted, however.

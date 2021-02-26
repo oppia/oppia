@@ -215,6 +215,19 @@ class BaseModel(datastore_services.Model):
         return {}
 
     @classmethod
+    def get_marked_as_deleted(cls, entity_id):
+        """Gets an entity by id including entities marked as deleted.
+
+        Args:
+            entity_id: str. The entity id.
+
+        Returns:
+            None|*. Returns entity with the given id even if it is marked as
+            deleted.
+        """
+        return cls.get_by_id(entity_id)
+
+    @classmethod
     def get(cls, entity_id, strict=True):
         """Gets an entity by id.
 

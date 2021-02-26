@@ -1699,11 +1699,11 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
 
-        parent_model = exp_models.ExplorationRightsModel.get_by_id(
-            self.EXP_ID)
+        parent_model = exp_models.ExplorationRightsModel.get(
+            self.EXP_ID, strict=False)
         snapshot_model = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                '%s-%s' % (self.EXP_ID, 1)))
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-%s' % (self.EXP_ID, 1), strict=False))
 
         self.assertIsNone(parent_model)
         self.assertIsNone(snapshot_model)
@@ -1742,11 +1742,11 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
 
-        parent_model = skill_models.SkillModel.get_by_id(
-            self.SKILL_ID)
+        parent_model = skill_models.SkillModel.get(
+            self.SKILL_ID, strict=False)
         snapshot_model = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '%s-%s' % (self.SKILL_ID, 1)))
+            skill_models.SkillSnapshotMetadataModel.get(
+                '%s-%s' % (self.SKILL_ID, 1), strict=False))
 
         self.assertIsNone(parent_model)
         self.assertIsNone(snapshot_model)
@@ -1781,11 +1781,11 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
 
-        parent_model = question_models.QuestionModel.get_by_id(
-            self.QUESTION_ID)
+        parent_model = question_models.QuestionModel.get(
+            self.QUESTION_ID, strict=False)
         snapshot_model = (
-            question_models.QuestionSnapshotContentModel.get_by_id(
-                '%s-%s' % (self.QUESTION_ID, 1)))
+            question_models.QuestionSnapshotContentModel.get(
+                '%s-%s' % (self.QUESTION_ID, 1), strict=False))
 
         self.assertIsNone(parent_model)
         self.assertIsNone(snapshot_model)

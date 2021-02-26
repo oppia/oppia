@@ -80,8 +80,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             self.admin_id, change, score_category, self.thread_id, None)
 
         self.model_instance = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.thread_id))
+            feedback_models.GeneralFeedbackThreadModel.get(
+                self.thread_id, strict=False))
         self.model_instance.has_suggestion = True
         self.model_instance.update_timestamps()
         self.model_instance.put()
@@ -149,7 +149,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -162,8 +162,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_suggestion_model_failure(self):
-        suggestion_models.GeneralSuggestionModel.get_by_id(
-            self.thread_id).delete()
+        suggestion_models.GeneralSuggestionModel.get(
+            self.thread_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for suggestion_ids field '
@@ -176,7 +176,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        user_models.UserSettingsModel.get(self.owner_id, strict=False).delete()
         expected_output = [
             (
                 '[u\'failed validation check for '
@@ -232,7 +232,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_message_model_failure(self):
-        feedback_models.GeneralFeedbackMessageModel.get_by_id(
+        feedback_models.GeneralFeedbackMessageModel.get_marked_as_deleted(
             '%s.0' % self.thread_id).delete()
         expected_output = [
             (
@@ -292,7 +292,7 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
             has_suggestion=False)
 
         self.model_instance = (
-            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            feedback_models.GeneralFeedbackMessageModel.get_marked_as_deleted(
                 '%s.0' % self.thread_id))
 
         self.job_class = (
@@ -348,7 +348,7 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        user_models.UserSettingsModel.get(self.owner_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for author_ids field '
@@ -375,8 +375,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_feedback_thread_model_failure(self):
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id).delete()
+        feedback_models.GeneralFeedbackThreadModel.get(
+            self.thread_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for feedback_thread_ids field '
@@ -429,7 +429,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(
             has_suggestion=False)
 
         self.model_instance = (
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+            feedback_models.GeneralFeedbackThreadUserModel.
+            get_marked_as_deleted(
                 '%s.%s' % (self.owner_id, self.thread_id)))
 
         self.job_class = (
@@ -475,7 +476,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        user_models.UserSettingsModel.get(self.owner_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_ids field '
@@ -488,7 +489,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_message_model_failure(self):
-        feedback_models.GeneralFeedbackMessageModel.get_by_id(
+        feedback_models.GeneralFeedbackMessageModel.get_marked_as_deleted(
             '%s.0' % self.thread_id).delete()
         expected_output = [
             (
@@ -563,7 +564,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('0').delete(
+        exp_models.ExplorationModel.get('0', strict=False).delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -650,7 +651,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        user_models.UserSettingsModel.get(self.owner_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_ids field '
@@ -663,7 +664,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_message_model_failure(self):
-        feedback_models.GeneralFeedbackMessageModel.get_by_id(
+        feedback_models.GeneralFeedbackMessageModel.get_marked_as_deleted(
             '%s.0' % self.thread_id).delete()
         expected_output = [
             (

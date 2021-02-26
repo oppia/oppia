@@ -2774,7 +2774,7 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
                 'title': 'title',
                 'category': 'category',
             }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_rights = exp_models.ExplorationRightsModel.get(exp_id, strict=False)
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,
             title='title',

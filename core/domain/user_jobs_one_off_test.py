@@ -2240,8 +2240,9 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         collection_services.record_played_exploration_in_collection_context(
             self.user_id, 'col', '1')
 
-        self.model_instance = user_models.CollectionProgressModel.get_by_id(
-            '%s.col' % self.user_id)
+        self.model_instance = (
+            user_models.CollectionProgressModel.get_marked_as_deleted(
+                '%s.col' % self.user_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
@@ -2311,8 +2312,9 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             '[u"Model id: %s.col, Collection id: col, Removed exploration ids: '
             '[u\'3\']"]]' % self.user_id)]
         self.assertEqual(output, expected_output)
-        self.model_instance = user_models.CollectionProgressModel.get_by_id(
-            '%s.col' % self.user_id)
+        self.model_instance = (
+            user_models.CollectionProgressModel.get_marked_as_deleted(
+                '%s.col' % self.user_id))
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
 

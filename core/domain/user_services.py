@@ -624,7 +624,7 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     user_id = auth_services.get_user_id_from_auth_id(auth_id)
     user_settings_model = (
         None if user_id is None else
-        user_models.UserSettingsModel.get_by_id(user_id))
+        user_models.UserSettingsModel.get(user_id, strict=False))
     if user_settings_model is not None:
         return _get_user_settings_from_model(user_settings_model)
     elif strict:
@@ -965,8 +965,8 @@ def _save_user_settings(user_settings):
 
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
-    user_model = user_models.UserSettingsModel.get_by_id(
-        user_settings.user_id)
+    user_model = user_models.UserSettingsModel.get(
+        user_settings.user_id, strict=False)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
         user_model.update_timestamps()
@@ -1281,8 +1281,8 @@ def _save_user_auth_details(user_auth_details):
 
     # If user auth details entry with the given user_id does not exist, create
     # a new one.
-    user_auth_details_model = auth_models.UserAuthDetailsModel.get_by_id(
-        user_auth_details.user_id)
+    user_auth_details_model = auth_models.UserAuthDetailsModel.get(
+        user_auth_details.user_id, strict=False)
     user_auth_details_dict = user_auth_details.to_dict()
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
@@ -2544,7 +2544,7 @@ def remove_contribution_reviewer(user_id):
         user_id: str. The unique ID of the user.
     """
     user_contribution_rights_model = (
-        user_models.UserContributionRightsModel.get_by_id(user_id))
+        user_models.UserContributionRightsModel.get(user_id, strict=False))
     if user_contribution_rights_model is not None:
         user_contribution_rights = _create_user_contribution_rights_from_model(
             user_contribution_rights_model)
