@@ -24,10 +24,10 @@ import { UrlService } from 'services/contextual/url.service';
 
 describe('URL Interpolation Service', () => {
   let hashes = require('hashes.json');
-  let uis: UrlInterpolationService = null;
-  let urlService: UrlService = null;
-  let mockLocation = null;
-  let alertsService = null;
+  let uis: UrlInterpolationService;
+  let urlService: UrlService;
+  let mockLocation;
+  let alertsService;
   let alertsObject = {
     alertsService
   };
