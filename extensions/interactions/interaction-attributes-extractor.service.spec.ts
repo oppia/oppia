@@ -23,6 +23,7 @@ import { InteractionAttributesExtractorService } from
   'interactions/interaction-attributes-extractor.service';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { ContinueCustomizationArgs } from './customization-args-defs';
 
 describe('Interaction attributes extractor service', () => {
   let iaes: InteractionAttributesExtractorService = null;
@@ -52,4 +53,19 @@ describe('Interaction attributes extractor service', () => {
         rows: 2
       });
     });
+
+  it('should properly extract migrated customization arguments values from' +
+    'attributes', () => {
+    const buttonTextWithValue = hes.objToEscapedJson({
+      content_id: 'ca_placeholder_0',
+      unicode_str: 'Enter Here'
+    });
+    const attributes = { buttonTextWithValue };
+
+    const caValues = (
+      iaes.getValuesFromAttributes(
+        'Continue', attributes) as ContinueCustomizationArgs);
+    expect(caValues.buttonText.value.unicode).toEqual('Enter Here');
+  }
+  );
 });
