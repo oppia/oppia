@@ -57,7 +57,7 @@ class MockRouterService {
   }
 }
 
-describe('Settings Tab Component', () => {
+fdescribe('Settings Tab Component', () => {
   let ctrl = null;
   let $httpBackend = null;
   let $q = null;
@@ -458,19 +458,19 @@ describe('Settings Tab Component', () => {
         userEmailPreferencesService, 'setSuggestionNotificationPreferences');
       ctrl.muteFeedbackNotifications();
       expect(feedbackNotificationsSpy)
-        .toHaveBeenCalledWith(true, jasmine.any(Function));
+        .toHaveBeenCalledWith(true, ctrl._successCallback);
 
       ctrl.unmuteFeedbackNotifications();
       expect(feedbackNotificationsSpy)
-        .toHaveBeenCalledWith(false, jasmine.any(Function));
+        .toHaveBeenCalledWith(false, ctrl._successCallback);
 
       ctrl.muteSuggestionNotifications();
       expect(suggestionNotificationsSpy)
-        .toHaveBeenCalledWith(true, jasmine.any(Function));
+        .toHaveBeenCalledWith(true, ctrl._successCallback);
 
       ctrl.unmuteSuggestionNotifications();
       expect(suggestionNotificationsSpy)
-        .toHaveBeenCalledWith(false, jasmine.any(Function));
+        .toHaveBeenCalledWith(false, ctrl._successCallback);
     });
 
     it('should open edit roles form and edit username and role', () => {

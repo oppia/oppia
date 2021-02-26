@@ -262,39 +262,31 @@ angular.module('oppia').component('settingsTab', {
           !ExplorationRightsService.viewableIfPrivate());
       };
 
+      ctrl._successCallback = () => {
+        $rootScope.$applyAsync();
+      };
+
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
-        let successCallback = () => {
-          $rootScope.$applyAsync();
-        };
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          true, successCallback);
+          true, ctrl._successCallback);
       };
       ctrl.muteSuggestionNotifications = function() {
-        let successCallback = () => {
-          $rootScope.$applyAsync();
-        };
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
           true,
-          successCallback
+          ctrl._successCallback
         );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
-        let successCallback = () => {
-          $rootScope.$applyAsync();
-        };
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
           false,
-          successCallback
+          ctrl._successCallback
         );
       };
       ctrl.unmuteSuggestionNotifications = function() {
-        let successCallback = () => {
-          $rootScope.$applyAsync();
-        };
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          false, successCallback);
+          false, ctrl._successCallback);
       };
 
       // Methods relating to control buttons.
