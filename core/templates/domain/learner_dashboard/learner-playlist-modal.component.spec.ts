@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { async, ComponentFixture, flushMicrotasks, TestBed } from
   '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -57,7 +57,8 @@ fdescribe('Learner Playlist Modal Component', function() {
           provide: NgbActiveModal,
           useClass: MockActiveModal
         }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
