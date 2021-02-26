@@ -16,8 +16,6 @@
  * @fileoverview Model class for creating new frontend instances of suggestion.
  */
 
-import { SuggestionsService } from 'services/suggestions.service';
-
 interface SuggestionChangeValue {
   html: string;
 }
