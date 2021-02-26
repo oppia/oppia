@@ -96,7 +96,7 @@ export class UserEmailPreferencesService {
    * @param {RequestParam} requestParams - Info about message_type and mute.
    */
   saveChangeToBackend(requestParams: RequestParams) :
-  Promise<EmailPreferencesData> {
+  Promise<void | EmailPreferencesData> {
     return this.backendApiService.saveChangeToBackend(requestParams).then(
       (response: EmailPreferencesData) => {
         let data = response;

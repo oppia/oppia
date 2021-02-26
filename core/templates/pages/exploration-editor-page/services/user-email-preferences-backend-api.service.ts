@@ -36,7 +36,7 @@ export class UserEmailPreferencesBackendApiService {
 
   saveChangeToBackend(
       requestParams: RequestParams
-  ): Promise<EmailPreferencesData> {
+  ): Promise<void | EmailPreferencesData> {
     let emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
       '/createhandler/notificationpreferences/<exploration_id>', {
         exploration_id: this.explorationDataService.explorationId
