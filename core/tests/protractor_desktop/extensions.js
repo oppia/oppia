@@ -46,7 +46,7 @@ describe('rich-text components', function() {
     await users.createAndLoginUser(
       'user@richTextComponents.com', 'userRichTextComponents');
 
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
@@ -126,7 +126,7 @@ describe('Interactions', function() {
   it('should pass their own test suites', async function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('first');
@@ -214,7 +214,7 @@ describe('Interactions', function() {
      */
     await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(

@@ -53,7 +53,7 @@ describe('Topic and Story viewer functionality', function() {
     };
     for (var i = 1; i <= 3; i++) {
       if (i === 1) {
-        // Set expectWelcomeModal: true
+        // Set expectWelcomeModal: true.
         await workflow.createAndPublishTwoCardExploration(
           `Exploration TASV1 - ${i}`,
           EXPLORATION.category,
@@ -63,7 +63,7 @@ describe('Topic and Story viewer functionality', function() {
           true
         );
       } else {
-        // Set expectWelcomeModal: false
+        // Set expectWelcomeModal: false.
         await workflow.createAndPublishTwoCardExploration(
           `Exploration TASV1 - ${i}`,
           EXPLORATION.category,

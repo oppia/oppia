@@ -78,7 +78,7 @@ describe('Enable correctness feedback and set correctness', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -280,7 +280,7 @@ describe('Core exploration functionality', function() {
     await users.createUser(
       `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
     await users.login(`user${userNumber}@stateEditor.com`);
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     userNumber++;

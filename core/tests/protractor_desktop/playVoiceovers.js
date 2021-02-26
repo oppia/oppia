@@ -46,7 +46,7 @@ describe('Voiceover player', function() {
 
     await users.createAndLoginUser(
       'testVoiceovers@voiceovers.com', 'testVoiceovers');
-    // Set expectWelcomeModal:true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(

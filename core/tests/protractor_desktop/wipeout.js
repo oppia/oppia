@@ -55,7 +55,7 @@ describe('When account is deleted it', function() {
   it('should delete private exploration', async function() {
     await users.createUser('voiceArtist@oppia.com', 'voiceArtist');
     await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
@@ -67,7 +67,7 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('voiceArtist@oppia.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
     await general.expect404Error();
     expectedConsoleErrors = [
@@ -77,7 +77,7 @@ describe('When account is deleted it', function() {
   it('should set published exploration as community owned', async function() {
     await users.createUser('user@check.com', 'userForChecking');
     await users.createAndLoginUser('user3@delete.com', 'userToDelete3');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
@@ -92,7 +92,7 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('user@check.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
     await workflow.isExplorationCommunityOwned();
   });
@@ -100,7 +100,7 @@ describe('When account is deleted it', function() {
   it('should keep published exploration with other owner', async function() {
     await users.createUser('secondOwner@check.com', 'secondOwner');
     await users.createAndLoginUser('user4@delete.com', 'userToDelete4');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
@@ -112,7 +112,7 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('secondOwner@check.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
     await explorationEditorPage.navigateToSettingsTab();
     expect(await workflow.getExplorationManagers()).toEqual(['secondOwner']);

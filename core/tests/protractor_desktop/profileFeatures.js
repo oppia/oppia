@@ -144,7 +144,7 @@ describe('Visiting user profile page', function() {
 
     await users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
     await users.login(ANOTHER_EMAIL);
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishTwoCardExploration(
       EXPLORATION.title,
       EXPLORATION.category,
@@ -202,7 +202,7 @@ describe('Playing the exploration', function() {
     await users.login(TEST_EMAIL);
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishTwoCardExploration(
       EXPLORATION.title,
       EXPLORATION.category,

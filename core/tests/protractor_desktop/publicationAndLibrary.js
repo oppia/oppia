@@ -76,7 +76,7 @@ describe('Library index page', function() {
       'earendil@publicationAndLibrary.com', 'earendilPublicationAndLibrary');
 
     await users.login('feanor@publicationAndLibrary.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS,
       CATEGORY_ARCHITECTURE,
@@ -86,7 +86,7 @@ describe('Library index page', function() {
     );
 
     await users.logout();
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await users.login('earendil@publicationAndLibrary.com');
     await workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT,
@@ -101,7 +101,7 @@ describe('Library index page', function() {
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.moveToEditor(true);
     // Moderators can edit explorations.
     await explorationEditorPage.navigateToSettingsTab();
@@ -110,7 +110,7 @@ describe('Library index page', function() {
     await users.logout();
 
     await users.login('celebrimor@publicationAndLibrary.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Celebrimbor wrote this'));
@@ -207,7 +207,7 @@ describe('Library index page', function() {
     await users.createUser('aule@example.com', 'Aule');
 
     await users.login('aule@example.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS,
       CATEGORY_BUSINESS,
@@ -215,7 +215,7 @@ describe('Library index page', function() {
       LANGUAGE_FRANCAIS,
       true
     );
-    // Set expectWelcomeModal: false
+    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT,
       CATEGORY_ENVIRONMENT,
@@ -256,7 +256,7 @@ describe('Permissions for private explorations', function() {
     async function() {
       await users.createUser('checkFor@title.com', 'Thanos');
       await users.login('checkFor@title.com');
-      // Set expectWelcomeModal: true
+      // Set expectWelcomeModal: true.
       await workflow.createExploration(true);
       await explorationEditorPage.navigateToSettingsTab();
 
@@ -276,7 +276,7 @@ describe('Permissions for private explorations', function() {
     await users.createUser('eve@privileges.com', 'evePrivileges');
 
     await users.login('alice@privileges.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('CollaboratorPermissions');
@@ -290,7 +290,7 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('bob@privileges.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('I love you'));
@@ -299,7 +299,7 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('eve@privileges.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
     await general.expect404Error();
     await users.logout();
@@ -311,7 +311,7 @@ describe('Permissions for private explorations', function() {
     await users.createUser('guestUser@oppia.tests', 'guestUser');
 
     await users.login('expOwner@oppia.tests');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 1'));
@@ -328,7 +328,7 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('voiceArtist@oppia.tests');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
     await explorationEditorMainTab.expectContentToMatch(
       await forms.toRichText('this is card 1'));
@@ -337,7 +337,7 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('guestUser@oppia.tests');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
     await general.expect404Error();
     await users.logout();

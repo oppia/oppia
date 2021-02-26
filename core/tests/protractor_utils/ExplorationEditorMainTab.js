@@ -152,7 +152,7 @@ var ExplorationEditorMainTab = function() {
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
-    // Exit the welcome modal
+    // Exit the welcome modal.
     await action.click(
       'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
     await waitFor.invisibilityOf(

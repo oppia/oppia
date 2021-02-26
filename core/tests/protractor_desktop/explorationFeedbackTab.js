@@ -78,7 +78,7 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration.
-    // expectWelcomeModal: true
+    // expectWelcomeModal: true.
     await users.login('user1@ExplorationFeedback.com');
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
@@ -126,7 +126,7 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user3@ExplorationFeedback.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
@@ -182,7 +182,7 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user5@ExplorationFeedback.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
@@ -275,7 +275,7 @@ describe('Suggestions on Explorations', function() {
   it('should accept and reject a suggestion on a published exploration',
     async function() {
       await users.login('user1@ExplorationSuggestions.com');
-      // Set expectWelcomeModal: true
+      // Set expectWelcomeModal: true.
       await workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,

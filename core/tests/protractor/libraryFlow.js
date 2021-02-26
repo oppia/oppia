@@ -54,7 +54,7 @@ describe('Library pages tour', function() {
       await adminPage.reloadExploration(
         'protractor_mobile_test_exploration.yaml');
     } else {
-      // Set expectWelcomeModal: true
+      // Set expectWelcomeModal: true.
       await workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
@@ -146,7 +146,7 @@ describe('Rating', function() {
       await adminPage.reloadExploration('rating_test.yaml');
     } else {
       // For a desktop browser, create and publish an exploration.
-      // expectWelcomeModal: true
+      // expectWelcomeModal: true.
       await workflow.createAndPublishExploration(
         EXPLORATION_RATINGTEST,
         CATEGORY_BUSINESS,

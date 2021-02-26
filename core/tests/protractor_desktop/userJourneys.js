@@ -118,7 +118,7 @@ describe('Site language', function() {
     await users.logout();
 
     await users.login('langCreator@explorations.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(
@@ -239,7 +239,7 @@ describe('Site language', function() {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await general.openEditor(firstExplorationId, true);
 
     // Spanish is still selected.

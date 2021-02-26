@@ -55,7 +55,7 @@ describe('Exploration history', function() {
     // Creating an exploration creates the first commit. Therefore, there
     // should be a date associated with it.
 
-    // Set expectWelcomeModal:true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     // Switch to the history tab because that is where the commit history
@@ -69,7 +69,7 @@ describe('Exploration history', function() {
   it('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     // Check renaming state, editing text, editing interactions and adding
@@ -581,7 +581,7 @@ describe('Exploration history', function() {
   it('should revert to old exploration commit', async function() {
     await users.createUser('user2@historyTab.com', 'user2HistoryTab');
     await users.login('user2@historyTab.com');
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     // Make changes for second commit.
@@ -647,7 +647,7 @@ describe('Exploration history', function() {
     await explorationPlayerPage.expectExplorationToBeOver();
 
     // Verify history states between original and reversion.
-    // expectWelcomeModal: false
+    // expectWelcomeModal: false.
     await general.moveToEditor(false);
     var expectedHistoryStates = [{
       label: 'first',

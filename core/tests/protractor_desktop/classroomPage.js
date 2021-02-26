@@ -48,7 +48,7 @@ describe('Classroom page functionality', function() {
   });
 
   it('should search for explorations from classroom page', async function() {
-    // Set expectWelcomeModal: true
+    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       'Exploration Title',
       'Algorithms',

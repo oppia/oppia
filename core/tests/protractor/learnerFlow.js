@@ -120,7 +120,7 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadExploration('exploration_player_test.yaml');
       } else {
-        // Set expectWelcomeModal: true
+        // Set expectWelcomeModal: true.
         await workflow.createAndPublishExploration(
           'Exploration Player Test',
           'Astronomy',
@@ -149,7 +149,7 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadCollection(0);
       } else {
-        // Set expectWelcomeModal: true
+        // Set expectWelcomeModal: true.
         await workflow.createAndPublishExploration(
           'Demo Exploration',
           'Algebra',
@@ -194,10 +194,10 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-      // expectWelcomeModal: true
+      // expectWelcomeModal: true.
       await createDummyExplorationOnDesktop(true);
       // Create a second exploration named 'Test Exploration'.
-      // expectWelcomeModal: false
+      // expectWelcomeModal: false.
       await workflow.createAndPublishExploration(
         'Test Exploration',
         'Astronomy',
@@ -280,7 +280,7 @@ describe('Learner dashboard functionality', function() {
       // Wait for player page to completely load.
       await waitFor.pageToFullyLoad();
       var explorationId = await general.getExplorationIdFromPlayer();
-      // Set expectWelcomeModal: true
+      // Set expectWelcomeModal: true.
       await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();
@@ -307,10 +307,10 @@ describe('Learner dashboard functionality', function() {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-      // expectWelcomeModal: true
+      // expectWelcomeModal: true.
       await createDummyExplorationOnDesktop(true);
       // Create a second exploration named 'Collection Exploration'.
-      // expectWelcomeModal: true
+      // expectWelcomeModal: true.
       await workflow.createAndPublishExploration(
         'Collection Exploration',
         'Architect',
