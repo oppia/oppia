@@ -1,6 +1,11 @@
 <div>
   <background-banner></background-banner>
-  <div ng-if="$ctrl.collection" class="oppia-collection-player-tiles-container">
+  <div ng-if="!$ctrl.collection.getCollectionNodeCount()" class="no-exploration-created">
+    <div class="oppia-collection-path-section">
+      No Exploration has been added to this Collection.
+    </div>
+  </div>
+  <div ng-if="$ctrl.collection && $ctrl.collection.getCollectionNodeCount()" class="oppia-collection-player-tiles-container">
     <h2 ng-if="!$ctrl.collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading" align="center">
       <span ng-if="!$ctrl.collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Begin <[$ctrl.collection.getTitle()]>:</span>
       <span ng-if="$ctrl.collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Continue <[$ctrl.collection.getTitle()]>:</span>
@@ -112,7 +117,7 @@
       </a>
     </div>
 
-    <div ng-if="$ctrl.collection" class="oppia-collection-table">
+    <div ng-if="$ctrl.collection && $ctrl.collection.getCollectionNodes().length !== 0" class="oppia-collection-table">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
         <a href=""
@@ -299,5 +304,13 @@
   }
   collection-player-page .title-section {
     z-index: 1;
+  }
+
+  .no-exploration-created .oppia-collection-path-section {
+    color: red;
+    font-size: 20px;
+    left: 15em;
+    padding: 70px 40px 90px 40px;
+    top: 228px;
   }
 </style>
