@@ -19,32 +19,32 @@
 
 export class StateAndContent {
   constructor(
-    private stateName: string,
-    private contentID: string,
-    private contentText: string) {}
+    private _stateName: string,
+    private _contentID: string,
+    private _contentText: string) {}
 
-  getStateName(): string {
-    return this.stateName;
+  get stateName(): string {
+    return this._stateName;
   }
 
-  setStateName(stateName: string): void {
-    this.stateName = stateName;
+  set stateName(newStateName: string) {
+    this._stateName = newStateName;
   }
 
-  getContentID(): string {
-    return this.contentID;
+  get contentID(): string {
+    return this._contentID;
   }
 
-  setContentID(contentID: string): void {
-    this.contentID = contentID;
+  set contentID(newContentID: string) {
+    this._contentID = newContentID;
   }
 
-  getContentText(): string {
-    return this.contentText;
+  get contentText(): string {
+    return this._contentText;
   }
 
-  setContentText(contentText: string): void {
-    this.contentText = contentText;
+  set contentText(newContentText: string) {
+    this._contentText = newContentText;
   }
 }
 
@@ -67,10 +67,10 @@ angular.module('oppia').factory('TranslateTextService', [
         return null;
       }
       activeIndex += 1;
-      activeStateName = stateAndContent[activeIndex].getStateName();
-      activeContentId = stateAndContent[activeIndex].getContentID();
+      activeStateName = stateAndContent[activeIndex].stateName;
+      activeContentId = stateAndContent[activeIndex].contentID;
       activeContentText =
-       stateAndContent[activeIndex].getContentText();
+       stateAndContent[activeIndex].contentText;
       return activeContentText;
     };
 
@@ -79,10 +79,10 @@ angular.module('oppia').factory('TranslateTextService', [
         return null;
       }
       activeIndex -= 1;
-      activeStateName = stateAndContent[activeIndex].getStateName();
-      activeContentId = stateAndContent[activeIndex].getContentID();
+      activeStateName = stateAndContent[activeIndex].stateName;
+      activeContentId = stateAndContent[activeIndex].contentID;
       activeContentText =
-        stateAndContent[activeIndex].getContentText();
+        stateAndContent[activeIndex].contentText;
       return activeContentText;
     };
 
