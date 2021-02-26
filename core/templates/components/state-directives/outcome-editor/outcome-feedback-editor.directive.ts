@@ -18,9 +18,9 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 
-import { SubtitledHtmlObjectFactory } from 
+import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { UrlInterpolationService } from 
+import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service.ts';
 
@@ -35,7 +35,7 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
   constructor(
     private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
-    private contextService: ContextService){}
+    private contextService: ContextService) {}
 
   ngOnInit(): void {
     this.OUTCOME_FEEDBACK_SCHEMA = {
