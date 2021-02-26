@@ -72,8 +72,7 @@ export class Suggestion {
 
   static createFromBackendDict(
       suggestionBackendDict: SuggestionBackendDict): Suggestion {
-    let threadId = SuggestionsService.getThreadIdFromSuggestionBackendDict(
-      suggestionBackendDict);
+    let threadId = suggestionBackendDict.suggestion_id;
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
       suggestionBackendDict.suggestion_id,
