@@ -839,7 +839,7 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
         item.content['states'] = versioned_exploration_states['states']
         item.content['states_schema_version'] = current_state_schema_version
-        item.put_for_bot()
+        item.put()
 
         yield ('SUCCESS - Model saved', 1)
 
