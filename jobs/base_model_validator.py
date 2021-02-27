@@ -92,7 +92,8 @@ class ValidateDeleted(beam.DoFn):
 
 class ValidateModelTimeFields(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are
-    valid."""
+    valid.
+    """
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
@@ -116,7 +117,8 @@ class ValidateModelTimeFields(beam.DoFn):
 
 class BaseModelValidator(beam.PTransform):
     """Composite beam Transform which returns a pipeline of validation
-    errors."""
+    errors.
+    """
 
     def expand(self, model_pipe):
         """Function that takes in a beam.PCollection of datastore models and
