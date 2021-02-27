@@ -38,8 +38,6 @@ import { VoiceoverObjectFactory } from
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-// ^^^ This block is to be removed.
-
 import { TranslatorProviderForTests } from 'tests/test.extras';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
@@ -60,7 +58,7 @@ describe('Topic editor state service', function() {
   var secondTopicRightsObject = null;
   var $rootScope = null;
   var $q = null;
-  let contextService : ContextService =  null;
+  let contextService: ContextService = null;
 
   var testSubscriptions = null;
   var subtopicPageLoadedSpy = null;
@@ -200,7 +198,6 @@ describe('Topic editor state service', function() {
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     topicUpdateService = TestBed.get(TopicUpdateService);
     contextService = TestBed.get(ContextService);
-  
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
 
