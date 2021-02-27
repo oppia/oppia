@@ -57,6 +57,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                 NumericInputValidationService.getErrorString(localValue)));
           };
 
+          ctrl.addFocusWithoutScroll = function (label) {
+            FocusManagerService.setFocus(label);
+              setTimeout(function() { window.scrollTo(0,0); }, 5);
+          }
+
           ctrl.onFocus = function() {
             ctrl.hasFocusedAtLeastOnce = true;
             if (ctrl.onInputFocus) {
@@ -120,6 +125,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             // flashing at the outset.
             $timeout(function() {
               ctrl.hasLoaded = true;
+              ctrl.addFocusWithoutScroll(ctrl.labelForFocusTarget());
             });
           };
         }

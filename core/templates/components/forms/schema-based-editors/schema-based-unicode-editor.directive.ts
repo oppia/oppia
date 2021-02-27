@@ -27,7 +27,7 @@ require(
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('services/contextual/device-info.service.ts');
 require('services/schema-form-submitted.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
@@ -48,12 +48,12 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$sce', '$timeout', '$translate',
-        'DeviceInfoService', 'SchemaFormSubmittedService',
-        'StateCustomizationArgsService',
+        'DeviceInfoService', 'FocusManagerService', 
+        'SchemaFormSubmittedService', 'StateCustomizationArgsService',
         function(
             $filter, $sce, $timeout, $translate,
-            DeviceInfoService, SchemaFormSubmittedService,
-            StateCustomizationArgsService) {
+            DeviceInfoService, FocusManagerService,
+            SchemaFormSubmittedService, StateCustomizationArgsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.onKeypress = function(evt) {
@@ -77,8 +77,10 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
 
           ctrl.getRows = function() {
             if (!ctrl.uiConfig()) {
+              ctrl.addFocusWithoutScroll(ctrl.labelForFocusTarget());
               return null;
             } else {
+              ctrl.addFocusWithoutScroll(ctrl.labelForFocusTarget());
               return ctrl.uiConfig().rows;
             }
           };
@@ -95,6 +97,12 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
           };
+          
+          ctrl.addFocusWithoutScroll = function (label) {
+            FocusManagerService.setFocus(label);
+              setTimeout(function() { window.scrollTo(0,0); }, 5);
+          }
+
           ctrl.$onInit = function() {
             if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {
               // Flag that is flipped each time the codemirror view is

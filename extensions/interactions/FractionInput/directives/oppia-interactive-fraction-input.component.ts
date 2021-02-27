@@ -29,7 +29,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 
 import { FractionInputRulesService } from './fraction-input-rules.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-
+import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
 @Component({
   selector: 'oppia-interactive-fraction-input',
   templateUrl: './fraction-input-interaction.component.html',
@@ -59,7 +59,8 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     private fractionInputRulesService: FractionInputRulesService,
     private fractionObjectFactory: FractionObjectFactory,
     private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService
+      InteractionAttributesExtractorService,
+    private focusManagerService: FocusManagerService,
   ) {
     /**
      * Disables the input box if the data entered is not a valid prefix
@@ -106,6 +107,11 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       this.currentInteractionService.updateViewWithNewAnswer();
     }));
   }
+  
+  addFocusWithoutScroll = function (label) {
+    this.focusManagerService.setFocus(label);
+      setTimeout(function() { window.scrollTo(0,0); }, 5);
+  }
 
   ngOnInit(): void {
     const {
@@ -125,9 +131,14 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswerFn, isAnswerValid);
+    setTimeout(() => {
+      this.addFocusWithoutScroll('fractionInputField')
+    }, 400);
+      console.log("hey")
   }
 
   private getAttributesObject() {
+    this.addFocusWithoutScroll('fractionInputField')
     return {
       requireSimplestFormWithValue: this.requireSimplestFormWithValue,
       allowImproperFractionWithValue: this.allowImproperFractionWithValue,

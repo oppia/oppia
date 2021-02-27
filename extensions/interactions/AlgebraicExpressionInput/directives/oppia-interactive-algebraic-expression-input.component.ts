@@ -31,7 +31,7 @@ import { AlgebraicExpressionInputRulesService } from './algebraic-expression-inp
 import constants from 'assets/constants';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-
+import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
 @Component({
   selector: 'oppia-interactive-algebraic-expression-input',
   templateUrl: './algebraic-expression-input-interaction.component.html',
@@ -52,7 +52,8 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private htmlEscaperService: HtmlEscaperService,
-    private mathInteractionsService: MathInteractionsService
+    private mathInteractionsService: MathInteractionsService,
+    private focusManagerService: FocusManagerService,
   ) {}
 
   isCurrentAnswerValid(): boolean {
@@ -84,6 +85,10 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     );
   }
 
+  addFocusWithoutScroll = function (label) {
+    this.focusManagerService.setFocus(label);
+      setTimeout(function() { window.scrollTo(0,0); }, 5);
+  }
   ngOnInit(): void {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
@@ -100,7 +105,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     // We need the 'focus' event while using the on screen keyboard (only
     // for touch-based devices) to capture input from user and the 'change'
     // event while using the normal keyboard.
-    Guppy.event(eventType, () => {
+    Guppy.event("focus", () => {
       const activeGuppyObject = (
         this.guppyInitializationService.findActiveGuppyObject());
       if (activeGuppyObject !== undefined) {

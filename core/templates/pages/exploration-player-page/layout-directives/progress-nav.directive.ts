@@ -34,6 +34,7 @@ require('services/contextual/window-dimensions.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('progressNav', [
   function() {
@@ -51,12 +52,14 @@ angular.module('oppia').directive('progressNav', [
       controller: [
         '$scope', 'BrowserCheckerService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
+        'FocusManagerService',
         'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
         'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
         function(
             $scope, BrowserCheckerService,
             ExplorationEngineService, ExplorationPlayerStateService,
+            FocusManagerService,
             PlayerPositionService, PlayerTranscriptService, UrlService,
             WindowDimensionsService, CONTINUE_BUTTON_FOCUS_LABEL,
             INTERACTION_SPECS, TWO_CARD_THRESHOLD_PX) {
@@ -151,6 +154,7 @@ angular.module('oppia').directive('progressNav', [
 
           $scope.shouldContinueButtonBeShown = function() {
             if ($scope.conceptCardIsBeingShown) {
+              ctrl.addFocusWithoutScroll('continueBtn');
               return true;
             }
             return Boolean(
@@ -158,14 +162,22 @@ angular.module('oppia').directive('progressNav', [
               $scope.displayedCard.isCompleted() &&
               $scope.displayedCard.getLastOppiaResponse());
           };
+          
+          ctrl.addFocusWithoutScroll = function (label) {
+            FocusManagerService.setFocus(label);
+              setTimeout(function() { window.scrollTo(0,0); }, 5);
+          }
 
           ctrl.$onInit = function() {
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isIframed = UrlService.isIframed();
             $scope.$watch(function() {
+              if ($scope.interactionId === ('Continue')) {
+                  ctrl.addFocusWithoutScroll('continueBtn');
+                  }
               return PlayerPositionService.getDisplayedCardIndex();
-            }, updateDisplayedCardInfo);
-
+            }, updateDisplayedCardInfo)
+          
             ctrl.directiveSubscriptions.add(
               PlayerPositionService.onHelpCardAvailable.subscribe(
                 (helpCard) => {

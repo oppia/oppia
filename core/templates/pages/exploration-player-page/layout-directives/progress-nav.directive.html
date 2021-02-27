@@ -22,7 +22,8 @@
     <div ng-if="isSubmitButtonShown() && !shouldContinueButtonBeShown() && !helpCardHasContinueButton">
       <!-- Special case for the 'Continue' interaction. -->
       <md-button ng-if="interactionId === 'Continue'" ng-click="onSubmit()"
-                 class="oppia-learner-confirm-button protractor-test-continue-button">
+                 class="oppia-learner-confirm-button protractor-test-continue-button oppia-autofocus"
+                 focus-on="continueBtn">
         <[interactionCustomizationArgs.buttonText.value.unicode]>
         <i class="fas fa-arrow-right oppia-arrow-right"></i>
       </md-button>
