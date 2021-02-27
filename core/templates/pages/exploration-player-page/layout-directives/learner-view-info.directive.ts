@@ -108,19 +108,13 @@ angular.module('oppia').directive('learnerViewInfo', [
               UrlService.getTopicUrlFragmentFromLearnerUrl());
             var classroomUrlFragment = (
               UrlService.getClassroomUrlFragmentFromLearnerUrl());
-            if (
-              topicUrlFragment === undefined &&
-              classroomUrlFragment === undefined) {
-              topicUrlFragment = '';
-              classroomUrlFragment = '';
-              return;
-            } else {
-              return UrlInterpolationService.interpolateUrl(
+            return topicUrlFragment &&
+             classroomUrlFragment &&
+              UrlInterpolationService.interpolateUrl(
                 TOPIC_VIEWER_STORY_URL_TEMPLATE, {
                   topic_url_fragment: topicUrlFragment,
                   classroom_url_fragment: classroomUrlFragment,
                 });
-            }
           };
 
           ctrl.$onInit = function() {
@@ -132,10 +126,9 @@ angular.module('oppia').directive('learnerViewInfo', [
                 $rootScope.$applyAsync();
               });
             // To check if the exploration is linked to the topic or not.
-            ctrl.isLinkedToTopic =
-              (ctrl.getTopicUrl() !== undefined) ? true : false;
+            ctrl.isLinkedToTopic = ctrl.getTopicUrl() ? true : false;
             // If linked to topic then print topic name in the lesson player.
-            if (ctrl.isLinkedToTopic === true) {
+            if (ctrl.isLinkedToTopic) {
               ctrl.storyViewerBackendApiService = (
                 OppiaAngularRootComponent.storyViewerBackendApiService);
               var topicUrlFragment = (
