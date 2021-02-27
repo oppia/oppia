@@ -28,7 +28,7 @@ export class MockDateTimeFormatService {
   }
 }
 
-fdescribe('Thread table component', () => {
+describe('Thread table component', () => {
   let component : ThreadTableComponent;
   let fixture: ComponentFixture<ThreadTableComponent>;
 
