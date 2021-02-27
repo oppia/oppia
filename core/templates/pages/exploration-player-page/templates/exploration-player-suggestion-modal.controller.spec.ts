@@ -28,19 +28,21 @@ import { StateCardObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { ExplorationEngineService } from
+  'pages/exploration-player-page/services/exploration-engine.service';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Exploration Player Suggestion Modal Controller', function() {
+fdescribe('Exploration Player Suggestion Modal Controller', function() {
   importAllAngularServices();
 
   var $flushPendingTasks = null;
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
-  var ExplorationEngineService = null;
+  var explorationEngineService = null;
   var interactionObjectFactory = null;
   var playerPositionService = null;
   var playerTranscriptService = null;
@@ -52,8 +54,11 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   var card = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value('ExplorationEngineService', ExplorationEngineService);
+  }));
 
-  beforeEach(function() {
+  beforeEach(function($provide) {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     playerPositionService = TestBed.get(PlayerPositionService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
@@ -71,7 +76,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     ContextService = $injector.get('ContextService');
     spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
 
-    ExplorationEngineService = $injector.get('ExplorationEngineService');
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -97,6 +102,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     $scope = $rootScope.$new();
     $controller('ExplorationPlayerSuggestionModalController', {
       $scope: $scope,
+      ExplorationEngineService: explorationEngineService,
       PlayerPositionService: playerPositionService,
       PlayerTranscriptService: playerTranscriptService,
       SuggestionModalService: suggestionModalService,
@@ -130,8 +136,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   });
 
   it('should submit a suggestion when closing the modal', function() {
-    spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(ExplorationEngineService, 'getExplorationVersion').and.returnValue(
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(explorationEngineService, 'getExplorationVersion').and.returnValue(
       '1');
 
     $scope.submitSuggestion();

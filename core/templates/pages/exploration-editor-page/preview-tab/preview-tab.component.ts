@@ -54,6 +54,7 @@ require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 
 import { Subscription } from 'rxjs';
+require('pages/exploration-player-page/services/exploration-engine.service.ts');
 
 angular.module('oppia').component('previewTab', {
   template: require('./preview-tab.component.html'),
@@ -61,8 +62,8 @@ angular.module('oppia').component('previewTab', {
     '$q', '$rootScope', '$timeout', '$uibModal', 'ContextService',
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
-    'ExplorationFeaturesService', 'ExplorationInitStateNameService',
-    'ExplorationPlayerStateService',
+    'ExplorationFeaturesService',
+    'ExplorationInitStateNameService', 'ExplorationPlayerStateService',
     'LearnerParamsService', 'NumberAttemptsService',
     'ParamChangeObjectFactory', 'ParameterMetadataService',
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
@@ -71,8 +72,8 @@ angular.module('oppia').component('previewTab', {
         $q, $rootScope, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
-        ExplorationFeaturesService, ExplorationInitStateNameService,
-        ExplorationPlayerStateService,
+        ExplorationFeaturesService,
+        ExplorationInitStateNameService, ExplorationPlayerStateService,
         LearnerParamsService, NumberAttemptsService,
         ParamChangeObjectFactory, ParameterMetadataService,
         PlayerCorrectnessFeedbackEnabledService, RouterService,

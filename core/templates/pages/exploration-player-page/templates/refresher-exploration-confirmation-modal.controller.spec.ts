@@ -20,6 +20,10 @@
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
+import { TestBed } from '@angular/core/testing';
+import { ExplorationEngineService } from
+  'pages/exploration-player-page/services/exploration-engine.service';
+
 describe('Refresher Exploration Confirmation Modal Controller', function() {
   importAllAngularServices();
 
@@ -28,7 +32,7 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
   var $uibModalInstance = null;
   var $verifyNoPendingTasks = null;
   var ContextService = null;
-  var ExplorationEngineService = null;
+  var explorationEngineService = null;
   var UrlService = null;
 
   var explorationId = 'exp1';
@@ -40,6 +44,7 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
+    $provide.value('ExplorationEngineService', ExplorationEngineService);
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
@@ -48,8 +53,8 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
 
     ContextService = $injector.get('ContextService');
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
-
-    ExplorationEngineService = $injector.get('ExplorationEngineService');
+    explorationEngineService = TestBed.inject(
+      ExplorationEngineService);
     UrlService = $injector.get('UrlService');
 
 
@@ -60,6 +65,7 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
     $controller('RefresherExplorationConfirmationModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
+      ExplorationEngineService: explorationEngineService,
       redirectConfirmationCallback: redirectConfirmationCallback,
       refresherExplorationId: refresherExplorationId
     });
@@ -67,7 +73,7 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
 
   it('should redirect page when clicking on allowing redirect button',
     function() {
-      spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue(
+      spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
         explorationId);
       spyOn(UrlService, 'getUrlParams').and.returnValue({
         collection_id: 'collection_1'

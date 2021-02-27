@@ -55,19 +55,19 @@ import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceoversObjectF
   providedIn: 'root'
 })
 export class ExplorationEngineService {
-  private exploration: Exploration;
-  private currentStateName: string;
-  private nextStateName: string;
-  private _editorPreviewMode: boolean;
-  private _explorationId: string;
-  private alwaysAskLearnersForAnswerDetails: boolean;
-  private manualParamChanges: ParamChange[];
-  private initStateName: string;
-  private answerIsBeingProcessed: boolean;
-  private visitedStateNames: string[];
-  private version: number;
-  private _questionPlayerMode: boolean;
-  private _updateActiveStateIfInEditorEventEmitter = new EventEmitter();
+  exploration: Exploration;
+  currentStateName: string;
+  nextStateName: string;
+  _editorPreviewMode: boolean;
+  _explorationId: string;
+  alwaysAskLearnersForAnswerDetails: boolean;
+  manualParamChanges: ParamChange[];
+  initStateName: string;
+  answerIsBeingProcessed: boolean;
+  visitedStateNames: string[];
+  version: number;
+  _questionPlayerMode: boolean;
+  _updateActiveStateIfInEditorEventEmitter = new EventEmitter();
 
   constructor(
     private alertsService: AlertsService,

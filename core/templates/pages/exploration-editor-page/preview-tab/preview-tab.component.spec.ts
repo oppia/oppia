@@ -20,6 +20,8 @@ import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { EventEmitter } from '@angular/core';
+import { ExplorationEngineService } from
+  'pages/exploration-player-page/services/exploration-engine.service';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
@@ -74,6 +76,7 @@ describe('Preview Tab Component', function() {
     $provide.value('ExplorationDataService', {
       getData: () => $q.resolve()
     });
+    $provide.value('ExplorationEngineService', ExplorationEngineService);
   }));
 
   describe('when there are manual param changes', function() {
@@ -87,7 +90,8 @@ describe('Preview Tab Component', function() {
 
       editableExplorationBackendApiService = $injector.get(
         'EditableExplorationBackendApiService');
-      explorationEngineService = $injector.get('ExplorationEngineService');
+      explorationEngineService = TestBed.inject(
+        ExplorationEngineService);
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
       explorationPlayerStateService = $injector.get(
         'ExplorationPlayerStateService');
@@ -112,6 +116,7 @@ describe('Preview Tab Component', function() {
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
         $scope: $scope,
+        ExplorationEngineService: explorationEngineService,
         ParamChangeObjectFactory: paramChangeObjectFactory
       });
       ctrl.$onInit();
@@ -217,7 +222,8 @@ describe('Preview Tab Component', function() {
         'EditableExplorationBackendApiService');
       explorationInitStateNameService = $injector.get(
         'ExplorationInitStateNameService');
-      explorationEngineService = $injector.get('ExplorationEngineService');
+      explorationEngineService = TestBed.inject(
+        ExplorationEngineService);
       numberAttemptsService = $injector.get('NumberAttemptsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
@@ -243,6 +249,7 @@ describe('Preview Tab Component', function() {
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
         $scope: $scope,
+        ExplorationEngineService: explorationEngineService,
         ParamChangeObjectFactory: paramChangeObjectFactory
       });
       ctrl.$onInit();
