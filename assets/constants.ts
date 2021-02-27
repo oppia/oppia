@@ -5445,8 +5445,8 @@ export default {
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
-  "FIREBASE_CONFIG_API_KEY": "dev-api-key",
-  "FIREBASE_CONFIG_APP_ID": "dev-app-id",
+  "FIREBASE_CONFIG_API_KEY": "fake-api-key",
+  "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
   "FIREBASE_CONFIG_DATABASE_URL": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
@@ -5619,5 +5619,6 @@ export default {
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
 
-  "DEV_MODE": true
+  "DEV_MODE": true,
+  "EMULATOR_MODE": true
 } as const;
