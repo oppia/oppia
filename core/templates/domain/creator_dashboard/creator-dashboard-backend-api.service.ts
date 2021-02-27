@@ -93,6 +93,7 @@ interface CreatorDashboardData {
   providedIn: 'root'
 })
 export class CreatorDashboardBackendApiService {
+  _fetchDashboardData: any;
   constructor(
     private http: HttpClient,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
@@ -129,7 +130,7 @@ export class CreatorDashboardBackendApiService {
     return suggestionThreads;
   }
 
-  _fetchDashboardData(): Promise<CreatorDashboardData> {
+  async _fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this.http.get<CreatorDashboardDataBackendDict>(
       '/creatordashboardhandler/data').toPromise().then(dashboardData => {
       return {
@@ -182,7 +183,7 @@ export class CreatorDashboardBackendApiService {
     });
   }
 
-  fetchDashboardData(): Promise<CreatorDashboardData> {
+  async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this._fetchDashboardData();
   }
 }
