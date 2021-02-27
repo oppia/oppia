@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import unittest
 
+from core.domain import cron_services
 from core.platform import models
 from jobs import base_model_validator_errors as errors
 
@@ -98,8 +99,9 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
 
         error = errors.ModelExpiredError(model)
 
+        days = cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days
         msg = (
             'Entity id %s: Model marked as deleted is older than %s days'
-            % (model.id, errors.PERIOD_TO_HARD_DELETE_MODEL_IN_DAYS))
+            % (model.id, days))
 
         self.assertEqual(error.message, msg)
