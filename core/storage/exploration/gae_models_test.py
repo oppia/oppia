@@ -310,7 +310,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
-
     def test_reconstitute(self):
         exp_models.ExplorationRightsModel(
             id='id_0',
@@ -339,6 +338,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         for field in ['translator_ids', 'all_viewer_ids']:
             self.assertNotIn(field, exp_rights_model._properties) # pylint: disable=protected-access
             self.assertNotIn(field, exp_rights_model._values) # pylint: disable=protected-access
+
 
 class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     """Test the revert method on ExplorationRightsModel class."""

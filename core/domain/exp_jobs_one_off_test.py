@@ -93,7 +93,8 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
-class MockExplorationRightsModelWithDeprecatedFields(exp_models.ExplorationRightsModel):
+class MockExplorationRightsModelWithDeprecatedFields(
+    exp_models.ExplorationRightsModel):
     """Mock ExplorationRightsModel to be able to set translator_ids,
     all_viewer_ids
     """
@@ -124,18 +125,21 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            exp_jobs_one_off.RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
             .create_new()
         )
         (
-            exp_jobs_one_off.RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
             .enqueue(job_id))
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            exp_jobs_one_off.RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
             .get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
@@ -170,7 +174,7 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
                 [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
             exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
-            self.EXP_ID_1)
+                self.EXP_ID_1)
 
             self.assertIsNotNone(exp_rights_model.translator_ids)
             self.assertIsNotNone(exp_rights_model.all_viewer_ids)
@@ -201,7 +205,8 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
             # Run job twice.
             output = self._run_one_off_job()
             self.assertItemsEqual(
-                [['SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', 1]], output)
+                [['SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', 1]],
+                output)
 
     def test_one_exploration_model_without_deprecated_fields(self):
         exp_models.ExplorationRightsModel(
@@ -219,7 +224,7 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
-        self.EXP_ID_1)
+            self.EXP_ID_1)
 
         self.assertNotIn(
             'translator_ids', exp_rights_model._values)  # pylint: disable=protected-access

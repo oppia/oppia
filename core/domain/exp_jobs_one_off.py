@@ -66,7 +66,8 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(RemoveDeprecatedExplorationRightsModelFieldsOneOffJob, cls).enqueue(
+        super(
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob, cls).enqueue(
             job_id, shard_count=64)
 
     @classmethod
@@ -88,11 +89,11 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
         if removed_deprecated_field:
             exp_rights_model.update_timestamps(update_last_updated_time=False)
             exp_models.ExplorationRightsModel.put_multi([exp_rights_model])
-            yield ('SUCCESS_REMOVED - ExplorationRightsModel',
-                exp_rights_model.id)
+            yield (
+                'SUCCESS_REMOVED - ExplorationRightsModel', exp_rights_model.id)
         else:
-            yield ('SUCCESS_ALREADY_REMOVED - ExplorationRightsModel',
-                exp_rights_model.id)
+            yield (
+                'SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', exp_rights_model.id)
 
     @staticmethod
     def reduce(key, values):
