@@ -24,17 +24,21 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
 
 @Component({
-  selector: 'oppia-thread-table',
+  selector: 'thread-table',
   templateUrl: './thread-table.component.html'
 })
 export class ThreadTableComponent {
-  @Output('onClickRow') clickRowEventEmitter: EventEmitter<string> =
+  @Output() clickRow: EventEmitter<string> =
   new EventEmitter();
   @Input() threads?: SuggestionThread[] = [];
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService
   ) { }
+
+  onRowClick(threadId: string): void {
+    this.clickRow.emit(threadId);
+  }
 
   getLabelClass(status: string): string {
     return this.threadStatusDisplayService.getLabelClass(status);
