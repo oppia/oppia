@@ -151,7 +151,7 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.defaultHeaderVisible).toBe(true);
     });
 
-    it('should show collapsed header if window scrollTop is ' +
+    it('should show collapsed header if window scrollTop is' +
       ' scrolled greater than 5', function() {
       mockWindow.scrollTop = 10;
       ctrl.scrollFunction();

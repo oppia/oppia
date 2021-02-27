@@ -53,13 +53,13 @@ angular.module('oppia').component('contributorDashboardPage', {
   controller: [
     '$rootScope', '$window', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
-    'UserService', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
-    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL', 'WindowRef',
+    'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
+    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
         $rootScope, $window, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
-        UserService, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
-        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL, WindowRef) {
+        UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
+        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
       var prevSelectedLanguageCode = (
@@ -102,7 +102,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
         ctrl.defaultHeaderVisible = true;
-        
+
         WindowRef.nativeWindow.addEventListener('scroll', function() {
           ctrl.scrollFunction();
         });
