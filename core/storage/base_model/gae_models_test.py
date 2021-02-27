@@ -276,6 +276,24 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             previous_last_updated_by_human,
             self.model_instance.last_updated_by_human)
 
+    def test_put_depending_on_id_with_admin_id(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.put_depending_on_id(feconf.SYSTEM_COMMITTER_ID)
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_depending_on_id_with_non_admin_id(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.put_depending_on_id('committer_id')
+
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
     def test_put_multi(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
@@ -301,6 +319,26 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             [self.model_instance])
 
         self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_multi_depending_on_id_with_admin_id(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.put_multi_depending_on_id(
+            feconf.SYSTEM_COMMITTER_ID, [self.model_instance])
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_multi_depending_on_id_with_non_admin_id(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.put_multi_depending_on_id(
+            'committer_id', [self.model_instance])
+        
+        self.assertNotEqual(
             previous_last_updated_by_human,
             self.model_instance.last_updated_by_human)
 
