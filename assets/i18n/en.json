@@ -506,6 +506,8 @@
     "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Sorry, your registration session has expired. Please click \"Continue Registration\" to restart the process.",
     "I18N_SIDEBAR_ABOUT_LINK": "About",
     "I18N_SIDEBAR_BLOG": "Blog",
+    "I18N_SIDEBAR_CLASSROOM": "Classroom",
+    "I18N_SIDEBAR_CLASSROOM_BASIC_MATHS": "Basic Mathematics",
     "I18N_SIDEBAR_CONTACT_US": "Contact Us",
     "I18N_SIDEBAR_DONATE": "Donate",
     "I18N_SIDEBAR_FORUM": "Forum",
