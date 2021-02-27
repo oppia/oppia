@@ -55,15 +55,22 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
     def test_set_base_message(self):
         self.assertEqual(self.error.base_message, 'Entity id 123:')
 
-    def test_message_is_none(self):
-        self.assertIsNone(self.error.message)
+    def test_message_raises_not_implemented_error(self):
+        self.assertRaises(
+            NotImplementedError,
+            callableObj=(lambda: self.error.message))
 
     def test_repr_returns_key(self):
-        self.assertEqual(self.error.__repr__(), 'ModelValidationError')
+        self.assertEqual(
+            errors.ModelInvalidIdError(
+                self.model).__repr__(),
+            'ModelInvalidIdError: '
+            'Entity id 123: Entity id does not match regex pattern')
 
     def test_eq_when_classes_are_different(self):
         self.assertEqual(
-            self.error.__eq__(errors.ModelExpiredError(self.model)),
+            errors.ModelInvalidIdError(self.model).__eq__(
+                errors.ModelExpiredError(self.model)),
             NotImplemented)
 
     def test_eq_when_classes_are_same(self):
@@ -73,8 +80,8 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
             last_updated=self.now)
 
         self.assertTrue(
-            self.error.__eq__(
-                errors.ModelValidationError(model_two)))
+            errors.ModelInvalidIdError(self.model).__eq__(
+                errors.ModelInvalidIdError(model_two)))
 
     def test_ne_when_classes_are_same(self):
         model_two = MockModel(
@@ -83,14 +90,14 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
             last_updated=self.now)
 
         self.assertFalse(
-            self.error.__ne__(
-                errors.ModelValidationError(model_two)))
+            errors.ModelInvalidIdError(self.model).__ne__(
+                errors.ModelInvalidIdError(model_two)))
 
     def test_hash(self):
-        err_hash = self.error.__hash__()
+        test_err = errors.ModelInvalidIdError(self.model)
         expected_hash = hash((
-            self.error.__class__, self.error.key, self.error.message))
-        self.assertEqual(err_hash, expected_hash)
+            test_err.__class__, test_err.key, test_err.message))
+        self.assertEqual(test_err.__hash__(), expected_hash)
 
 
 class ModelTimestampRelationshipErrorTests(ValidatorErrorTestBase):
