@@ -42,7 +42,7 @@ class ModelValidationError(python_utils.OBJECT):
     @property
     def message(self):
         """Message property to override in subclasses."""
-        raise NotImplementedError
+        return None
 
     def __repr__(self):
         return '%s: %s' % (self.key, self.message) if self.message else self.key

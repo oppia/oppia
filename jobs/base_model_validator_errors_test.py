@@ -43,6 +43,56 @@ class ValidatorErrorTestBase(unittest.TestCase):
         self.year_later = self.now + datetime.timedelta(weeks=52)
 
 
+class ModelValidationErrorTests(ValidatorErrorTestBase):
+    def setUp(self):
+        super(ModelValidationErrorTests, self).setUp()
+        self.model = MockModel(
+            id='123',
+            created_on=self.year_ago,
+            last_updated=self.now)
+        self.error = errors.ModelValidationError(self.model)
+
+    def test_set_base_message(self):
+        self.assertEqual(self.error.base_message, 'Entity id 123:')
+
+    def test_message_is_none(self):
+        self.assertIsNone(self.error.message)
+
+    def test_repr_returns_key(self):
+        self.assertEqual(self.error.__repr__(), 'ModelValidationError')
+
+    def test_eq_when_classes_are_different(self):
+        self.assertEqual(
+            self.error.__eq__(errors.ModelExpiredError(self.model)),
+            NotImplemented)
+
+    def test_eq_when_classes_are_same(self):
+        model_two = MockModel(
+            id='123',
+            created_on=self.year_ago,
+            last_updated=self.now)
+
+        self.assertTrue(
+            self.error.__eq__(
+                errors.ModelValidationError(model_two)))
+
+    def test_ne_when_classes_are_same(self):
+        model_two = MockModel(
+            id='123',
+            created_on=self.year_ago,
+            last_updated=self.now)
+
+        self.assertFalse(
+            self.error.__ne__(
+                errors.ModelValidationError(model_two)))
+
+    def test_hash(self):
+        err_hash = self.error.__hash__()
+        expected_hash = hash((
+            self.error.__class__, self.error.key, self.error.message))
+        self.assertEqual(err_hash, expected_hash)
+
+
 class ModelTimestampRelationshipErrorTests(ValidatorErrorTestBase):
     def test_model_timestamp_relationship_error(self):
         model = MockModel(
