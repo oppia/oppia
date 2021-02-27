@@ -55,7 +55,7 @@ describe('User Email Preferences Backend Api Service', () => {
   });
 
   it('should successfully send http request and get a valid response',
-    fakeAsync((done: () => void) => {
+    fakeAsync(() => {
       let result : Promise<EmailPreferencesData> =
       userEmailPreferencesBackendApiService
         .saveChangeToBackend({
@@ -69,7 +69,7 @@ describe('User Email Preferences Backend Api Service', () => {
       req.flush(sampleResponse);
       flushMicrotasks();
       result.then((data : EmailPreferencesData) => {
-        expect(data).toBeDefined();
-      }).then(done);
+        expect(data).toEqual(sampleResponse);
+      });
     }));
 });
