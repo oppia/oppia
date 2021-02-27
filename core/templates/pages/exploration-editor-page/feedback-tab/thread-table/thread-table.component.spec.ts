@@ -28,7 +28,7 @@ export class MockDateTimeFormatService {
   }
 }
 
-describe('Thread table component', () => {
+fdescribe('Thread table component', () => {
   let component : ThreadTableComponent;
   let fixture: ComponentFixture<ThreadTableComponent>;
 
@@ -74,4 +74,12 @@ describe('Thread table component', () => {
       expect(component.getLocaleAbbreviatedDateTimeString(NOW_MILLIS)).toBe(
         '11/21/2014');
     });
+
+  it('should emit clickRow event when onRowClick is called', () => {
+    spyOn(fixture.componentInstance.clickRow, 'emit');
+    let threadId = 'testId';
+    component.onRowClick(threadId);
+    expect(fixture.componentInstance.clickRow.emit)
+      .toHaveBeenCalledWith(threadId);
+  });
 });
