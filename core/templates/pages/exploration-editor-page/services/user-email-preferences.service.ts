@@ -53,18 +53,21 @@ export class UserEmailPreferencesService {
     this.feedbackNotificationsMuted = feedbackNotificationsMuted;
     this.suggestionNotificationsMuted = suggestionNotificationsMuted;
   }
+
   /**
    * @return {boolean} Whether the feedback notification is muted.
    */
   areFeedbackNotificationsMuted(): boolean {
     return this.feedbackNotificationsMuted;
   }
+
   /**
    * @return {boolean} Whether the suggestion notification is muted.
    */
   areSuggestionNotificationsMuted(): boolean {
     return this.suggestionNotificationsMuted;
   }
+
   /**
    * Set the message type to feedback and mute to true or false.
    * @param {boolean} mute - Whether the feedback notification is muted.
@@ -78,6 +81,7 @@ export class UserEmailPreferencesService {
       successCallback();
     });
   }
+
   /**
    * Set the message type to suggestion and mute to true or false.
    * @param {boolean} mute - Whether the suggestion notification is muted.
