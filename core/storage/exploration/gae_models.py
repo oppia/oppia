@@ -371,9 +371,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # DEPRECATED in v2.8.3., so translator_ids are not exported.
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -448,6 +446,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # model, we need to remove it.
         if 'all_viewer_ids' in model_dict:
             del model_dict['all_viewer_ids']
+        if 'translator_ids' in model_dict:
+            del model_dict['translator_ids']
 
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.

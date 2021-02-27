@@ -56,6 +56,7 @@ ONE_OFF_JOB_MANAGERS = [
     collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob,
     collection_jobs_one_off.RemoveCollectionModelNodesOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    exp_jobs_one_off.RemoveDeprecatedExplorationRightsModelFieldsOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
