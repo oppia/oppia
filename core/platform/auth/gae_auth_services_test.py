@@ -73,6 +73,20 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             gae_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
+    def test_get_association_that_is_present_and_marked_as_deleted(self):
+        gae_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+
+        assoc_by_auth_id_model = auth_models.UserIdentifiersModel.get('aid')
+        assoc_by_auth_id_model.deleted = True
+        assoc_by_auth_id_model.update_timestamps()
+        assoc_by_auth_id_model.put()
+
+        self.assertEqual(
+            gae_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(
+            gae_auth_services.get_auth_id_from_user_id('uid'), 'aid')
+
     def test_get_association_that_is_missing(self):
         self.assertIsNone(
             gae_auth_services.get_user_id_from_auth_id('does_not_exist'))
