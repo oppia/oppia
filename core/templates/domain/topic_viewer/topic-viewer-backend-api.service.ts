@@ -69,7 +69,7 @@ export class TopicViewerBackendApiService {
       });
   }
 
-  fetchTopicData(
+  async fetchTopicDataAsync(
       topicUrlFragment: string,
       classroomUrlFragment: string
   ): Promise<ReadOnlyTopic> {
