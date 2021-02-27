@@ -19,7 +19,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
  * @fileoverview Component for the header of items in a list.
  */
 
-interface EventData {
+interface DeleteSummaryEventData {
   index: number,
   event: Event
 }
@@ -34,8 +34,8 @@ export class SummaryListHeaderComponent {
  @Input() summary: string;
  @Input() shortSummary: string;
  @Input() isActive: boolean;
- @Output('onDeleteFn') deleteEventEmitter: EventEmitter<EventData> =
-  new EventEmitter();
+ @Output() summaryDelete:
+ EventEmitter<DeleteSummaryEventData> = (new EventEmitter());
  @Input() isDeleteAvailable: boolean;
  @Input() numItems: number;
 
@@ -44,7 +44,7 @@ export class SummaryListHeaderComponent {
      index: this.index,
      event: evt
    };
-   this.deleteEventEmitter.emit(eventData);
+   this.summaryDelete.emit(eventData);
  }
 }
 

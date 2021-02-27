@@ -71,7 +71,7 @@
                                            [short-summary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
                                            [is-active]="$index === activeWorkedExampleIndex"
                                            [is-delete-available]="isEditable"
-                                           (on-delete-fn)="deleteWorkedExample()">
+                                           (summary-delete)="deleteWorkedExample()">
                 </oppia-summary-list-header>
               </a>
               <div ng-if="activeWorkedExampleIndex === $index">
