@@ -18,21 +18,20 @@
 
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { EventEmitter, Pipe } from '@angular/core';
-import { HttpClientTestingModule } from
-  '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AboutPageComponent } from './about-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 import { UserInfo } from 'domain/user/user-info.model.ts';
 import { UserService } from 'services/user.service';
-import { LoaderService } from 'services/loader.service.ts';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -61,7 +60,7 @@ class MockI18nLanguageCodeService {
 }
 
 describe('About Page', () => {
-  const siteAnalyticsServiceStub = new SiteAnalyticsService(
+  const siteAnalyticsService = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
@@ -80,7 +79,7 @@ describe('About Page', () => {
           }
         },
         { provide: TranslateService, useClass: MockTranslateService },
-        { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
+        { provide: SiteAnalyticsService, useValue: siteAnalyticsService },
         UrlInterpolationService,
         {
           provide: WindowRef,
@@ -103,27 +102,27 @@ describe('About Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
-  });
-  let component;
-  beforeEach(() => {
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     component = aboutPageComponent.componentInstance;
   });
+  let component = null;
 
-  it('should successfully instantiate the component from beforeEach block',
+  it('should successfully instantiate the component',
     () => {
       expect(component).toBeDefined();
       component.ngOnInit();
     });
 
-  it('should get static image url', () => {
-    expect(component.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image');
-  });
+  it('should return correct static image url when calling getStaticImageUrl',
+    () => {
+      expect(component.getStaticImageUrl('/path/to/image')).toBe(
+        '/assets/images/path/to/image');
+    });
 
-  it('should check user is not logged in and navigate to create lesson page',
+  // eslint-disable-next-line max-len
+  it('should redirect guest user to the login page when they click create lesson button',
     fakeAsync(() => {
-      const UserInfoObject = {
+      const userInfoBackendDict = {
         is_moderator: false,
         is_admin: false,
         is_super_admin: false,
@@ -135,29 +134,30 @@ describe('About Page', () => {
         user_is_logged_in: null
       };
       spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-        UserInfo.createFromBackendDict(UserInfoObject))
+        UserInfo.createFromBackendDict(userInfoBackendDict))
       );
       component.ngOnInit();
       flushMicrotasks();
       expect(component.userIsLoggedIn).toBe(null);
       spyOn(
-        siteAnalyticsServiceStub, 'registerCreateLessonButtonEvent')
+        siteAnalyticsService, 'registerCreateLessonButtonEvent')
         .and.callThrough();
-      spyOn(global, 'setTimeout');
       component.onClickCreateLessonButton();
-      expect(siteAnalyticsServiceStub.registerCreateLessonButtonEvent)
+
+      expect(siteAnalyticsService.registerCreateLessonButtonEvent)
         .toHaveBeenCalledWith();
       expect(component.loginUrl).toBe('/_ah/login');
     }));
 
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
+
     expect(component.userIsLoggedIn).toBe(null);
     expect(component.classroomUrl).toBe('/learn/math');
     expect(component.loginUrl).toBe('/_ah/login');
   });
 
-  it('should check if loader screen is working', () =>
+  it('should show and hide loading screen with the correct text', () =>
     fakeAsync(() => {
       component.ngOnInit();
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
@@ -165,70 +165,80 @@ describe('About Page', () => {
         .toHaveBeenCalledWith('Loading');
     }));
 
-  it('should check if user is logged in or not', fakeAsync(() => {
-    const UserInfoObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: true
-    };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject))
-    );
-    component.ngOnInit();
-    flushMicrotasks();
-    expect(component.userIsLoggedIn).toBe(true);
-  }));
+  it('should set the correct value for the userIsLoggedIn property',
+    fakeAsync(() => {
+      const UserInfoObject = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: true,
+        preferred_site_language_code: null,
+        username: 'tester',
+        email: 'test@test.com',
+        user_is_logged_in: true
+      };
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+        UserInfo.createFromBackendDict(UserInfoObject))
+      );
 
-  it('should activate when Visit Classroom is clicked', function() {
+      component.ngOnInit();
+      flushMicrotasks();
+
+      expect(component.userIsLoggedIn).toBe(true);
+    }));
+
+  it('should activate Visit Classroom button when clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
+      siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
     component.onClickVisitClassroomButton();
-    expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
+
+    expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalledWith();
   });
 
-  it('should activate when Browse Library is clicked', function() {
+  it('should activate Browse Library button when clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
+      siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
       .and.callThrough();
-    spyOn(global, 'setTimeout');
+
     component.onClickBrowseLibraryButton();
-    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
+
+    expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalledWith();
   });
 
-  it('should activate when Create Lesson is clicked', function() {
+  it('should activate Create Lesson button when clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerCreateLessonButtonEvent')
+      siteAnalyticsService, 'registerCreateLessonButtonEvent')
       .and.callThrough();
-    spyOn(global, 'setTimeout');
+
     component.onClickCreateLessonButton();
-    expect(siteAnalyticsServiceStub.registerCreateLessonButtonEvent)
+
+    expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
   });
 
-  it('should activate when Guide For Teacher is clicked', function() {
+  it('should activate Guide For Teacher button when clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickGuideForTeacherButtonEvent')
+      siteAnalyticsService, 'registerClickGuideForTeacherButtonEvent')
       .and.callThrough();
+
     component.onClickGuideForTeacherButton();
-    expect(siteAnalyticsServiceStub.registerClickGuideForTeacherButtonEvent)
+
+    expect(siteAnalyticsService.registerClickGuideForTeacherButtonEvent)
       .toHaveBeenCalledWith();
   });
 
-  it('should activate when Tip For Parent is clicked', function() {
+  it('should activate Tip For Parent button when clicked', function() {
     spyOn(
-      siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
+      siteAnalyticsService, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
-    component.onClickTipsForParentsButton();
-    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent)
+
+    component.onClickTipForParentsButton();
+
+    expect(siteAnalyticsService.registerClickTipforParentsButtonEvent)
       .toHaveBeenCalledWith();
   });
 });

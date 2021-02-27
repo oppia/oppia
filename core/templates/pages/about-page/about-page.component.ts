@@ -19,13 +19,13 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { LoaderService } from 'services/loader.service.ts';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
+import { UserService } from 'services/user.service';
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
-import { LoaderService } from 'services/loader.service.ts';
 import constants from 'assets/constants';
 
 @Component({
@@ -55,9 +55,8 @@ export class AboutPageComponent implements OnInit {
   }
 
   onClickBrowseLibraryButton(): void {
-    this.siteAnalyticsService.
-      registerClickBrowseLibraryButtonEvent();
-    this.windowRef.nativeWindow.location.href = ('/community-library');
+    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+    this.windowRef.nativeWindow.location.href = '/community-library';
   }
 
   onClickCreateLessonButton(): void {
@@ -75,7 +74,7 @@ export class AboutPageComponent implements OnInit {
     this.windowRef.nativeWindow.location.href = ('/teach');
   }
 
-  onClickTipsForParentsButton(): void {
+  onClickTipForParentsButton(): void {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
     this.windowRef.nativeWindow.location.href = ('/teach');
   }

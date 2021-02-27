@@ -71,14 +71,9 @@ export class SiteAnalyticsService {
       'GuideParentsButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
-  registerClickStartContributingButtonEvent(): void {
+  registerClickTipforParentsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
-      'StartContributingButton', 'click',
-      this.windowRef.nativeWindow.location.pathname);
-  }
-  registerClickStartTeachingButtonEvent(): void {
-    this._sendEventToGoogleAnalytics(
-      'StartTeachingButton', 'click',
+      'TipforParentsButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerClickExploreLessonsButtonEvent(): void {
@@ -91,18 +86,14 @@ export class SiteAnalyticsService {
       'StartLearningButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
-  registerGoToDonationSiteEvent(donationSiteName: string): void {
+  registerClickStartContributingButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
-      'GoToDonationSite', 'click', donationSiteName);
-  }
-  registerClickGuideForTeacherButtonEvent(): void {
-    this._sendEventToGoogleAnalytics(
-      'GuideTeachersButton', 'click',
+      'StartContributingButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
-  registerClickTipforParentsButtonEvent(): void {
+  registerClickStartTeachingButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
-      'TipforParentsButton', 'click',
+      'StartTeachingButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerClickVisitClassroomButtonEvent(): void {
@@ -113,6 +104,15 @@ export class SiteAnalyticsService {
   registerClickBrowseLibraryButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
       'BrowseLibraryButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerGoToDonationSiteEvent(donationSiteName: string): void {
+    this._sendEventToGoogleAnalytics(
+      'GoToDonationSite', 'click', donationSiteName);
+  }
+  registerClickGuideForTeacherButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'GuideTeachersButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerCreateLessonButtonEvent(): void {
