@@ -94,7 +94,7 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
         else:
             yield (
                 'SUCCESS_ALREADY_REMOVED - ExplorationRightsModel',
-                    exp_rights_model.id)
+                exp_rights_model.id)
 
     @staticmethod
     def reduce(key, values):
