@@ -43,7 +43,8 @@ export class UserEmailPreferencesService {
   suggestionNotificationsMuted: boolean;
   constructor(
     private alertsService: AlertsService,
-    private backendApiService: UserEmailPreferencesBackendApiService
+    private userEmailPreferencesBackendApiService:
+    UserEmailPreferencesBackendApiService
   ) { }
 
   init(
@@ -96,15 +97,16 @@ export class UserEmailPreferencesService {
    * @param {RequestParam} requestParams - Info about message_type and mute.
    */
   saveChangeToBackend(requestParams: RequestParams) :
-  Promise<void | EmailPreferencesData> {
-    return this.backendApiService.saveChangeToBackend(requestParams).then(
-      (response: EmailPreferencesData) => {
-        let data = response;
-        this.alertsService.clearWarnings(),
-        this.init(
-          data.email_preferences.mute_feedback_notifications,
-          data.email_preferences.mute_suggestion_notifications);
-      });
+  Promise<void> {
+    return this.userEmailPreferencesBackendApiService
+      .saveChangeToBackend(requestParams).then(
+        (response: EmailPreferencesData) => {
+          let data = response;
+          this.alertsService.clearWarnings(),
+          this.init(
+            data.email_preferences.mute_feedback_notifications,
+            data.email_preferences.mute_suggestion_notifications);
+        });
   }
 }
 
