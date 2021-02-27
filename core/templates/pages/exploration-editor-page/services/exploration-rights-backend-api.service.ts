@@ -92,7 +92,6 @@ export class ExplorationRightsService {
     return this._viewableIfPrivate;
   }
   makeCommunityOwned(): Promise<void> {
-    let that = this;
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
     return this.httpClient.put(requestUrl, {
@@ -101,7 +100,7 @@ export class ExplorationRightsService {
     }).toPromise().then((response: ExplorationRightsBackendResponse) => {
       let data = response;
       this.alertsService.clearWarnings();
-      that.init(
+      this.init(
         data.rights.owner_names, data.rights.editor_names,
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
@@ -110,7 +109,6 @@ export class ExplorationRightsService {
   }
 
   setViewability(viewableIfPrivate: boolean): Promise<void> {
-    let that = this;
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
@@ -120,7 +118,7 @@ export class ExplorationRightsService {
     }).toPromise().then((response: ExplorationRightsBackendResponse) => {
       let data = response;
       this.alertsService.clearWarnings();
-      that.init(
+      this.init(
         data.rights.owner_names, data.rights.editor_names,
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
@@ -129,7 +127,6 @@ export class ExplorationRightsService {
   }
   saveRoleChanges(
       newMemberUsername: string, newMemberRole: string): Promise<void> {
-    let that = this;
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
@@ -139,8 +136,8 @@ export class ExplorationRightsService {
       new_member_username: newMemberUsername
     }).toPromise().then((response: ExplorationRightsBackendResponse) => {
       let data = response;
-      that.alertsService.clearWarnings();
-      that.init(
+      this.alertsService.clearWarnings();
+      this.init(
         data.rights.owner_names, data.rights.editor_names,
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
@@ -148,7 +145,6 @@ export class ExplorationRightsService {
     });
   }
   publish(): Promise<void> {
-    let that = this;
     let requestUrl = (
       '/createhandler/status/' + this.explorationDataService.explorationId);
 
@@ -156,8 +152,8 @@ export class ExplorationRightsService {
       make_public: true
     }).toPromise().then((response: ExplorationRightsBackendResponse) => {
       let data = response;
-      that.alertsService.clearWarnings();
-      that.init(
+      this.alertsService.clearWarnings();
+      this.init(
         data.rights.owner_names, data.rights.editor_names,
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
@@ -165,7 +161,6 @@ export class ExplorationRightsService {
     });
   }
   saveModeratorChangeToBackend(emailBody: string): void {
-    let that = this;
     let explorationModeratorRightsUrl = (
       '/createhandler/moderatorrights/' +
       this.explorationDataService.explorationId);
@@ -175,14 +170,14 @@ export class ExplorationRightsService {
       version: this.explorationDataService.data.version
     }).toPromise().then((response: ExplorationRightsBackendResponse) => {
       let data = response;
-      that.alertsService.clearWarnings();
-      that.init(
+      this.alertsService.clearWarnings();
+      this.init(
         data.rights.owner_names, data.rights.editor_names,
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
         data.rights.community_owned, data.rights.viewable_if_private);
     })['catch'](() => {
-      that.init(
+      this.init(
         undefined, undefined, undefined, undefined,
         undefined, undefined, undefined, undefined);
     });
