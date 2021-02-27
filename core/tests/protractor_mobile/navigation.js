@@ -140,6 +140,27 @@ describe('Navigation features on mobile', function() {
         'http://localhost:9001/community-library');
     });
 
+  it('should navigate to Classroom page using the sidebar menu',
+    async function() {
+      var navbarButton = element(
+        by.css('.protractor-mobile-test-navbar-button'));
+      await waitFor.elementToBeClickable(
+        navbarButton, 'Could not click navbar button');
+      await navbarButton.click();
+      var classroomLink = element(
+        by.css('.protractor-mobile-test-classroom'));
+      await waitFor.elementToBeClickable(
+        classroomLink, 'Could not click classroom link');
+      await classroomLink.click();
+      var mathematicsLink = element(
+        by.css('.protractor-mobile-test-mathematics-link'));
+      await waitFor.elementToBeClickable(
+        mathematicsLink, 'Could not click mathematics link');
+      await mathematicsLink.click();
+      await waitFor.pageToFullyLoad();
+      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/learn/math');
+    });
+
   it('should navigate to Home page by clicking on the Oppia logo',
     async function() {
       var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
