@@ -49,6 +49,7 @@ describe('Image preloader service', () => {
     draft_changes: [],
     is_version_of_draft_valid: true,
     language_code: 'en',
+    auto_tts_enabled: false,
     title: 'My Title',
     init_state_name: initStateName,
     states: {
