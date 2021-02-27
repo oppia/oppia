@@ -13,7 +13,7 @@
         </li>
       </ul>
     </div>
-    <div id="default-header">
+    <div ng-class="{'oppia-fade-in': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
       <div class="oppia-opportunities-tab-custmization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -71,7 +71,7 @@
         </div>
       </div>
     </div>
-    <div class="oppia-contributor-dashboard-collapsible-header" id="collapsible-header">
+    <div ng-class="{'oppia-fade-in': !$ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': $ctrl.defaultHeaderVisible}">
       <div class="collapsed-oppia-opportunities-tab-custmization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -316,14 +316,6 @@
     font-size: 15px;
     position: relative;
     width: 500px
-  }
-  .collapsed-oppia-dashboard-language-container-label {
-    color: #4a4a4a;
-    font-size: 12px;
-    margin-top: 10px;
-  }
-  .collapsed-translation-language-selector {
-    padding-bottom: 10px;
   }
   .collapsed-oppia-opportunities-tab-custmization-container {
     align-items: center;

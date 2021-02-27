@@ -54,12 +54,12 @@ angular.module('oppia').component('contributorDashboardPage', {
     '$rootScope', '$window', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
-    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
+    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL', 'WindowRef',
     function(
         $rootScope, $window, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserService, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
-        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
+        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL, WindowRef) {
       var ctrl = this;
 
       var prevSelectedLanguageCode = (
@@ -102,39 +102,21 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
         ctrl.defaultHeaderVisible = true;
-        ctrl.collapsibleHeaderVisible = false;
-        ctrl.scrollTest = false;
 
         var $win = angular.element($window);
-        var defaultHeader = angular.element(document.querySelector(
-          '#default-header'));
-        var collapsibleHeader = angular.element(document.querySelector(
-          '#collapsible-header'));
-
-        window.onscroll = function() {
+        WindowRef.nativeWindow.addEventListener('scroll', function() {
           ctrl.scrollFunction();
-        };
+        });
 
         ctrl.scrollFunction = function() {
-          if ($win.scrollTop() >= 5) {
-            defaultHeader.removeClass('oppia-fade-in');
-            defaultHeader.addClass('oppia-contributor-dashboard-header');
-            collapsibleHeader.removeClass(
-              'oppia-contributor-dashboard-collapsible-header');
-            collapsibleHeader.addClass(
-              'oppia-fade-in');
+          if ($window.pageYOffset >= 5) {
             ctrl.defaultHeaderVisible = false;
-            ctrl.collapsibleHeaderVisible = true;
           } else {
-            collapsibleHeader.remove(
-              'oppia-fade-in');
-            collapsibleHeader.addClass(
-              'oppia-contributor-dashboard-collapsible-header');
-            defaultHeader.removeClass('oppia-contributor-dashboard-header');
-            defaultHeader.addClass('oppia-fade-in');
             ctrl.defaultHeaderVisible = true;
-            ctrl.collapsibleHeaderVisible = false;
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         };
 
         UserService.getProfileImageDataUrlAsync().then(

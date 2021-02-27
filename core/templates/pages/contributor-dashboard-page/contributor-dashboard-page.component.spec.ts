@@ -144,20 +144,18 @@ describe('Contributor dashboard page', function() {
       expect(scrollSpy).toHaveBeenCalled();
     });
 
-    it('should not be viewed the collapsed header content if' +
-      ' scrolled less than 5', function() {
+    it('should show default header if window scrollTop is ' +
+      'less than 5', function() {
       mockWindow.scrollTop = 3;
       ctrl.scrollFunction();
       expect(ctrl.defaultHeaderVisible).toBe(true);
-      expect(ctrl.collapsibleHeaderVisible).toBe(false);
     });
 
-    it('should not be viewed the collapsed header content if' +
-      ' scrolled less than 5', function() {
+    it('should show collapsed header if window scrollTop is ' +
+      ' scrolled greater than 5', function() {
       mockWindow.scrollTop = 10;
       ctrl.scrollFunction();
       expect(ctrl.defaultHeaderVisible).toBe(false);
-      expect(ctrl.collapsibleHeaderVisible).toBe(true);
     });
   });
 
