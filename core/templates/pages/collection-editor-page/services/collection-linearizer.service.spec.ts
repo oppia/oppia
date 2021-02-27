@@ -219,7 +219,6 @@ describe('Collection linearizer service', function() {
     it('should correctly append a node to a non-empty collection', function() {
       spyOn(
         contextService, 'getExplorationId').and.returnValue('exp_id3');
-    
       var collection = createLinearCollection();
       var newCollectionNodeBackendObject = {
         exploration_id: 'exp_id3',

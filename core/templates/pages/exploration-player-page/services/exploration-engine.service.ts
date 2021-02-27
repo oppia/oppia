@@ -25,7 +25,7 @@ import { AnswerClassificationService, InteractionRulesService } from 'pages/expl
 import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
@@ -400,7 +400,19 @@ export class ExplorationEngineService {
   submitAnswer(
       answer: string,
       interactionRulesService: InteractionRulesService,
-      successCallback): boolean {
+      successCallback: (
+        nextCard: StateCard,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        feedbackAudioTranslations: BindableVoiceovers,
+        refresherExplorationId,
+        missingPrerequisiteSkillId,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string,
+        wasOldStateInitial,
+        isFirstHit,
+        isFinalQuestion: boolean,
+        focusLabel: string) => void): boolean {
     if (this.answerIsBeingProcessed) {
       return;
     }
