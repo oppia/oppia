@@ -24,7 +24,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
 
 @Component({
-  selector: 'thread-table',
+  selector: 'oppia-thread-table',
   templateUrl: './thread-table.component.html'
 })
 export class ThreadTableComponent {
@@ -55,5 +55,5 @@ export class ThreadTableComponent {
 }
 
 angular.module('oppia').directive(
-  'threadTable', downgradeComponent(
+  'oppiaThreadTable', downgradeComponent(
     {component: ThreadTableComponent}));
