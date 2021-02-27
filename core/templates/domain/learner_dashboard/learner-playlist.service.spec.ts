@@ -23,7 +23,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
 import { AlertsService } from 'services/alerts.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 // import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 // import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -32,6 +32,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 // require('services/csrf-token.service.ts');
 import { LearnerPlaylistService } from
   'domain/learner_dashboard/learner-playlist.service.ts';
+import { LearnerPlaylistModalComponent } from
+'domain/learner_dashboard/learner-playlist-modal.component.ts';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { TranslatorProviderForTests } from 'tests/test.extras';
@@ -40,7 +42,30 @@ class MockNgbModal {
   open(): void {
     return;
   }
+
 }
+// class prom {
+//   return new Promise((resolve, reject) => resolve(true));
+// }
+
+export class componentInstance{
+  prompt: undefined;
+  title: undefined;
+}
+
+export class result { 
+}
+
+export class MockNgbModalRef {
+  componentInstance = {
+      prompt: undefined,
+      title: undefined
+  };
+  result: Promise<any> = new Promise((resolve, reject) => resolve(true));
+}
+// export class MockNgbModalRef {
+//   result: Promise<any> = new Promise((resolve, reject) => resolve('x'));
+// }
 
 fdescribe('Learner playlist service factory', () => {
   let learnerPlaylistService: LearnerPlaylistService;
@@ -52,6 +77,8 @@ fdescribe('Learner playlist service factory', () => {
   let alertsService: AlertsService;
   let csrfService: CsrfTokenService;
   let ngbModal: NgbModal;
+  let ngbModalRef: NgbModalRef;
+  let mockModalRef: MockNgbModalRef = new MockNgbModalRef();
   
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -67,6 +94,7 @@ fdescribe('Learner playlist service factory', () => {
   beforeEach(() => {
     learnerPlaylistService = TestBed.inject(LearnerPlaylistService);
     ngbModal = TestBed.inject(NgbModal);
+    //ngbModalRef = TestBed.inject(NgbModalRef);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     http = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
@@ -202,12 +230,19 @@ fdescribe('Learner playlist service factory', () => {
   }));
 
   it('should open an ngbModal when removing from learner playlist',
-    fakeAsync(() => {
-      const modalSpy = spyOn(ngbModal, 'open');
-      learnerPlaylistService.removeFromLearnerPlaylist(
+    fakeAsync(async () => {
+    //   const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    //     // Call the beforeDismiss function to close the dialog
+    //     setTimeout(opt.beforeDismiss);
+    //     return <NgbModalRef>({ componentInstance: MockNgbModalRef})
+    // });
+    const modalSpy = spyOn(ngbModal, 'open').and.callThrough();
+    //const modalSpy2 = spyOn(ngbModal, 'open').and.returnValue(MockNgbModalRef);
+    flushMicrotasks();
+    await learnerPlaylistService.removeFromLearnerPlaylist(
         '0', 'title', 'exploration', []);
       flushMicrotasks();
-      expect(modalSpy).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     }));
 
   // it('should remove an exploration from learner playlist', () => {
