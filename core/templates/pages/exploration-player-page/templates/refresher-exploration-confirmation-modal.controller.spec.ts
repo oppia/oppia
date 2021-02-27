@@ -18,11 +18,9 @@
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
-
 import { TestBed } from '@angular/core/testing';
-import { ExplorationEngineService } from
-  'pages/exploration-player-page/services/exploration-engine.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
 
 describe('Refresher Exploration Confirmation Modal Controller', function() {
   importAllAngularServices();
