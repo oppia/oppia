@@ -338,9 +338,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
