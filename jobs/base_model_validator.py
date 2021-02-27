@@ -117,7 +117,8 @@ class ValidateModelTimeFields(beam.DoFn):
 
 class BaseModelValidator(beam.PTransform):
     """Composite beam Transform which returns a pipeline of validation
-    errors."""
+    errors.
+    """
 
     def expand(self, model_pipe):
         """Function that takes in a beam.PCollection of datastore models and
