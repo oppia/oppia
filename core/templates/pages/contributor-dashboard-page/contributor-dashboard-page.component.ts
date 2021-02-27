@@ -102,8 +102,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
         ctrl.defaultHeaderVisible = true;
-
-        var $win = angular.element($window);
+        
         WindowRef.nativeWindow.addEventListener('scroll', function() {
           ctrl.scrollFunction();
         });
