@@ -61,7 +61,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that sets skill_tags, default_skin, skin_customization fields
     in ExplorationModels to None in order to remove it from the datastore.
-    Job is necessary only for January 2021 release and can be removed after.
+    Job is necessary only for March 2021 release and can be removed after.
     """
 
     @classmethod
