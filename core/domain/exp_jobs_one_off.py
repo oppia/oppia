@@ -68,7 +68,7 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
     def enqueue(cls, job_id, additional_job_params=None):
         super(
             RemoveDeprecatedExplorationRightsModelFieldsOneOffJob, cls).enqueue(
-            job_id, shard_count=64)
+                job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -93,7 +93,8 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
                 'SUCCESS_REMOVED - ExplorationRightsModel', exp_rights_model.id)
         else:
             yield (
-                'SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', exp_rights_model.id)
+                'SUCCESS_ALREADY_REMOVED - ExplorationRightsModel',
+                    exp_rights_model.id)
 
     @staticmethod
     def reduce(key, values):

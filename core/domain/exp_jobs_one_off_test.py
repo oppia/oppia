@@ -94,7 +94,7 @@ def run_job_for_deleted_exp(
 
 
 class MockExplorationRightsModelWithDeprecatedFields(
-    exp_models.ExplorationRightsModel):
+        exp_models.ExplorationRightsModel):
     """Mock ExplorationRightsModel to be able to set translator_ids,
     all_viewer_ids
     """
@@ -102,7 +102,8 @@ class MockExplorationRightsModelWithDeprecatedFields(
     translator_ids = (
         datastore_services.StringProperty(indexed=True, repeated=True))
 
-    all_viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+    all_viewer_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
