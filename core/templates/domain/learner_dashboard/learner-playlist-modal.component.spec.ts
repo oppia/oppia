@@ -17,7 +17,7 @@
  */
 
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from
-'@angular/core/testing';
+  '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
@@ -46,7 +46,7 @@ describe('Learner Playlist Modal Controller', function() {
   let csrfService: CsrfTokenService;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let http:  HttpTestingController;
+  let http: HttpTestingController;
   let urlInterpolationService : UrlInterpolationService;
 
   beforeEach(async(() => {
@@ -58,7 +58,8 @@ describe('Learner Playlist Modal Controller', function() {
           provide: NgbActiveModal, useClass: MockActiveModal
         },
         {
-          provide: UrlInterpolationService, useClass: MockUrlInterpolationService
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService
         }
       ]
     }).compileComponents();
@@ -76,7 +77,7 @@ describe('Learner Playlist Modal Controller', function() {
     component.removeFromLearnerPlaylistUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
     fixture.detectChanges();
-    
+
     csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
@@ -97,17 +98,15 @@ describe('Learner Playlist Modal Controller', function() {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.removeFromLearnerPlaylistUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
-    console.log(component.removeFromLearnerPlaylistUrl);
     component.remove().then(successHandler, failHandler);
     let req = http.expectOne(
-      '/learnerplaylistactivityhandler/exploration/0')
+      '/learnerplaylistactivityhandler/exploration/0');
     expect(req.request.method).toEqual('DELETE');
     req.flush(200);
     flushMicrotasks();
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
     expect(closeSpy).toHaveBeenCalled();
-
   }));
 
   it('should return error response when clicking on' +
