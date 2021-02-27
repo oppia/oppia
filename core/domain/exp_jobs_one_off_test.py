@@ -209,7 +209,7 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
                 [['SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', 1]],
                 output)
 
-    def test_one_exploration_model_without_deprecated_fields(self):
+    def test_one_exp_rights_model_without_deprecated_fields(self):
         exp_models.ExplorationRightsModel(
             id=self.EXP_ID_1,
             owner_ids=[self.USER_ID_1],
