@@ -538,7 +538,6 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
-import { QuestionValidationService } from './question-validation.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;

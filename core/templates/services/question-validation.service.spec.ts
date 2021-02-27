@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for QuestionValidationService.
+ */
+
 import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { QuestionValidationService } from './question-validation.service';
-
-/**
- * @fileoverview Unit tests for QuestionValidationService.
- */
 
 describe('Question Validation Service', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
