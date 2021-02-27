@@ -535,14 +535,14 @@ class MissingStoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
-        self.commit_model_instance = (
+        commit_model_instance = (
             story_models.StoryCommitLogEntryModel.get_by_id(
                 'story-story_id-1'))
-        self.metadata_model_instance = (
+        metadata_model_instance = (
             story_models.StorySnapshotMetadataModel.get_by_id(
                 'story_id-1'))
-        self.commit_model_instance.delete()
-        self.metadata_model_instance.delete()
+        commit_model_instance.delete()
+        metadata_model_instance.delete()
 
         output = self._run_one_off_job()
         self.assertEqual(output, [])
@@ -565,54 +565,54 @@ class MissingStoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             story_fetchers.get_story_by_id(self.STORY_ID)
 
-        self.commit_model_instance1 = (
+        commit_model_instance1 = (
             story_models.StoryCommitLogEntryModel.get_by_id(
                 'story-story_id-1'))
-        self.commit_model_instance2 = (
+        commit_model_instance2 = (
             story_models.StoryCommitLogEntryModel.get_by_id(
                 'story-story_id-2'))
-        self.metadata_model_instance1 = (
+        metadata_model_instance1 = (
             story_models.StorySnapshotMetadataModel.get_by_id(
                 'story_id-1'))
-        self.metadata_model_instance2 = (
+        metadata_model_instance2 = (
             story_models.StorySnapshotMetadataModel.get_by_id(
                 'story_id-2'))
 
         # Ensure the story sub objects are not deleted.
-        self.assertIsNotNone(self.commit_model_instance1)
-        self.assertIsNotNone(self.commit_model_instance2)
-        self.assertIsNotNone(self.metadata_model_instance1)
-        self.assertIsNotNone(self.metadata_model_instance2)
+        self.assertIsNotNone(commit_model_instance1)
+        self.assertIsNotNone(commit_model_instance2)
+        self.assertIsNotNone(metadata_model_instance1)
+        self.assertIsNotNone(metadata_model_instance2)
 
         output = self._run_one_off_job()
         expected_output = [
             [
                 'Story Commit Model deleted-StoryCommitLogEntryModel',
-                ['story-story_id-1','story-story_id-2']
+                ['story-story_id-1', 'story-story_id-2']
             ],
             [
                 'Story Commit Model deleted-' +
                 'StorySnapshotMetadataModel',
-                ['story_id-1','story_id-2']
+                ['story_id-1', 'story_id-2']
             ]
         ]
-        self.commit_model_instance1 = (
+        commit_model_instance1 = (
             story_models.StoryCommitLogEntryModel.get_by_id(
                 'story-story_id-1'))
-        self.commit_model_instance2 = (
+        commit_model_instance2 = (
             story_models.StoryCommitLogEntryModel.get_by_id(
                 'story-story_id-2'))
-        self.metadata_model_instance1 = (
+        metadata_model_instance1 = (
             story_models.StorySnapshotMetadataModel.get_by_id(
                 'story_id-1'))
-        self.metadata_model_instance2 = (
+        metadata_model_instance2 = (
             story_models.StorySnapshotMetadataModel.get_by_id(
                 'story_id-2'))
 
         self.assertItemsEqual(output, expected_output)
 
         # Ensure the story sub objects are deleted.
-        self.assertIsNone(self.commit_model_instance1)
-        self.assertIsNone(self.commit_model_instance2)
-        self.assertIsNone(self.metadata_model_instance1)
-        self.assertIsNone(self.metadata_model_instance2)
+        self.assertIsNone(commit_model_instance1)
+        self.assertIsNone(commit_model_instance2)
+        self.assertIsNone(metadata_model_instance1)
+        self.assertIsNone(metadata_model_instance2)

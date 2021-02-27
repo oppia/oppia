@@ -151,6 +151,7 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, values)
 
+
 class MissingStoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """This job is used to delete story commit log and snapshot metadata
     models for which stody models are missing.
