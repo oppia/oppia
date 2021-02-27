@@ -223,7 +223,7 @@ export class ExplorationEngineService {
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
         interactionId,
-        this.exploration.getInteractionCustomizationArgs(this.currentStateName),
+        this.exploration.getInteractionCustomizationArgs(this.nextStateName),
         true, nextFocusLabel);
     }
 
@@ -275,7 +275,7 @@ export class ExplorationEngineService {
   }
 
   private checkAlwaysAskLearnersForAnswerDetails(): void {
-    this.explorationFeaturesBackendApiService.fetchExplorationFeatures(
+    this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
       this._explorationId).then((featuresData) => {
       this.alwaysAskLearnersForAnswerDetails = (
         featuresData.alwaysAskLearnersForAnswerDetails);

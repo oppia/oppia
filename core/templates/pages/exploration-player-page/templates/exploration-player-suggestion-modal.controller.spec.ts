@@ -30,18 +30,21 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { ExplorationEngineService } from
   'pages/exploration-player-page/services/exploration-engine.service';
+import { ExplorationDataService } from
+  'pages/exploration-editor-page/services/exploration-data.service';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-fdescribe('Exploration Player Suggestion Modal Controller', function() {
+describe('Exploration Player Suggestion Modal Controller', function() {
   importAllAngularServices();
 
   var $flushPendingTasks = null;
   var $scope = null;
   var $uibModalInstance = null;
   var ContextService = null;
+  var explorationDataService = null;
   var explorationEngineService = null;
   var interactionObjectFactory = null;
   var playerPositionService = null;
@@ -55,19 +58,21 @@ fdescribe('Exploration Player Suggestion Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
+    $provide.value('ExplorationDataService', ExplorationDataService);
     $provide.value('ExplorationEngineService', ExplorationEngineService);
   }));
 
-  beforeEach(function($provide) {
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    playerPositionService = TestBed.get(PlayerPositionService);
-    playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    recordedVoiceoversObjectFactory = TestBed.get(
+  beforeEach(function() {
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    recordedVoiceoversObjectFactory = TestBed.inject(
       RecordedVoiceoversObjectFactory);
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
-    suggestionModalService = TestBed.get(SuggestionModalService);
-    writtenTranslationsObjectFactory = TestBed.get(
+    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
+    suggestionModalService = TestBed.inject(SuggestionModalService);
+    writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
+    explorationDataService = TestBed.inject(ExplorationDataService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -102,6 +107,7 @@ fdescribe('Exploration Player Suggestion Modal Controller', function() {
     $scope = $rootScope.$new();
     $controller('ExplorationPlayerSuggestionModalController', {
       $scope: $scope,
+      ExplorationDataService: explorationDataService,
       ExplorationEngineService: explorationEngineService,
       PlayerPositionService: playerPositionService,
       PlayerTranscriptService: playerTranscriptService,
