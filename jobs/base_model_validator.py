@@ -92,7 +92,8 @@ class ValidateDeleted(beam.DoFn):
 
 class ValidateModelTimeFields(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are
-    valid."""
+    valid.
+    """
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
