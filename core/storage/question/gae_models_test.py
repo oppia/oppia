@@ -336,7 +336,6 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         question_skill_link_model2.put_for_human()
         question_skill_link_model3.put_for_human()
 
-
         question_skill_link_models, next_cursor_str = (
             question_models.QuestionSkillLinkModel
             .get_question_skill_links_by_skill_ids(

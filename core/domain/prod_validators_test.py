@@ -483,7 +483,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_message_length(self):
         self.model_instance_0.commit_message = 'a' * (
             constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit message check '
@@ -542,7 +542,7 @@ class ExplorationSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationSnapshotContentModel\', '
@@ -596,7 +596,7 @@ class ExplorationSnapshotContentModelValidatorTests(
             exp_models.ExplorationSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for exploration model '
@@ -1401,7 +1401,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
     def test_model_with_invalid_commit_message_length(self):
         self.model_instance_0.commit_message = 'a' * (
             constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit message check '
