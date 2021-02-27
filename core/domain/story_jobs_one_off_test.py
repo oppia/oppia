@@ -25,6 +25,7 @@ from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_jobs_one_off
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
@@ -469,3 +470,149 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
         for x in output:
             self.assertRegexpMatches(
                 x, 'object has no attribute \'story_contents\'')
+
+
+class MissingStoryMigrationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    STORY_ID = 'story_id'
+
+    def setUp(self):
+        super(MissingStoryMigrationOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.set_admins([self.ALBERT_NAME])
+
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.story_id_1 = 'story_id_1'
+        self.story_id_2 = 'story_id_2'
+        self.story_id_3 = 'story_id_3'
+        self.skill_id_1 = 'skill_id_1'
+        self.skill_id_2 = 'skill_id_2'
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='Name',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            story_jobs_one_off
+            .MissingStoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.MissingStoryMigrationOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            story_jobs_one_off.MissingStoryMigrationOneOffJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_standard_operation(self):
+        job_id = (
+            story_jobs_one_off.MissingStoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.MissingStoryMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = story_jobs_one_off.MissingStoryMigrationOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])
+
+    def test_migration_job_skips_deleted_model(self):
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Story title', 'Story Description', self.TOPIC_ID,
+            'title-two')
+        story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+        self.commit_model_instance = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-story_id-1'))
+        self.metadata_model_instance = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                'story_id-1'))
+        self.commit_model_instance.delete()
+        self.metadata_model_instance.delete()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [])
+
+    def test_migration_job_removes_sub_models_if_story_model_is_missing(
+            self):
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Story title', 'Story Description', self.TOPIC_ID,
+            'title-two')
+        story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+
+        # Delete the story before migration occurs.
+        story_services.delete_story(
+            self.albert_id, self.STORY_ID)
+
+        # Ensure the story is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            story_fetchers.get_story_by_id(self.STORY_ID)
+
+        self.commit_model_instance1 = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-story_id-1'))
+        self.commit_model_instance2 = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-story_id-2'))
+        self.metadata_model_instance1 = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                'story_id-1'))
+        self.metadata_model_instance2 = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                'story_id-2'))
+
+        # Ensure the story sub objects are not deleted.
+        self.assertIsNotNone(self.commit_model_instance1)
+        self.assertIsNotNone(self.commit_model_instance2)
+        self.assertIsNotNone(self.metadata_model_instance1)
+        self.assertIsNotNone(self.metadata_model_instance2)
+
+        output = self._run_one_off_job()
+        expected_output = [
+            [
+                'Story Commit Model deleted-StoryCommitLogEntryModel',
+                ['story-story_id-1','story-story_id-2']
+            ],
+            [
+                'Story Commit Model deleted-' +
+                'StorySnapshotMetadataModel',
+                ['story_id-1','story_id-2']
+            ]
+        ]
+        self.commit_model_instance1 = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-story_id-1'))
+        self.commit_model_instance2 = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-story_id-2'))
+        self.metadata_model_instance1 = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                'story_id-1'))
+        self.metadata_model_instance2 = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                'story_id-2'))
+
+        self.assertItemsEqual(output, expected_output)
+
+        # Ensure the story sub objects are deleted.
+        self.assertIsNone(self.commit_model_instance1)
+        self.assertIsNone(self.commit_model_instance2)
+        self.assertIsNone(self.metadata_model_instance1)
+        self.assertIsNone(self.metadata_model_instance2)

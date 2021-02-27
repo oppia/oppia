@@ -150,3 +150,35 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+class MissingStoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to delete story commit log and snapshot metadata
+    models for which stody models are missing.
+
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            story_models.StoryCommitLogEntryModel,
+            story_models.StorySnapshotMetadataModel
+        ]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        model_class_name = item.__class__.__name__
+        if model_class_name == 'StoryCommitLogEntryModel':
+            model_id = item.story_id
+        else:
+            model_id, _ = item.id.rsplit('-', 1)
+        story = story_models.StoryModel.get(model_id, strict=False)
+        if story is None:
+            item.delete()
+            yield ('Story Commit Model deleted-%s' % model_class_name, item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
