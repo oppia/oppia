@@ -38,8 +38,9 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import requests_mock
 import utils
+
+import requests_mock
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
