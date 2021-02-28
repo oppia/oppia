@@ -44,7 +44,6 @@ describe('Learner Playlist Modal Controller', function() {
   let csrfService: CsrfTokenService;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let urlInterpolationService : UrlInterpolationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -65,7 +64,6 @@ describe('Learner Playlist Modal Controller', function() {
     fixture = TestBed.createComponent(LearnerPlaylistModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     component.activityId = '0';
     component.activityTitle = 'Title';
     component.activityType = 'exploration';
@@ -89,15 +87,13 @@ describe('Learner Playlist Modal Controller', function() {
     component.removeFromLearnerPlaylistUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
     component.remove();
-    // let req = http.expectOne(
-    //   '/learnerplaylistactivityhandler/exploration/0');
-    // expect(req.request.method).toEqual('DELETE');
-    // req.flush(200);
     flushMicrotasks();
-    expect(closeSpy).toHaveBeenCalledWith(component.removeFromLearnerPlaylistUrl);
+    expect(closeSpy).toHaveBeenCalledWith(
+      component.removeFromLearnerPlaylistUrl);
   }));
 
-  it('should not remove exploration in learner playlist when clicking on cancel button', () => {
+  it('should not remove exploration in learner playlist' +
+    'when clicking on cancel button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();

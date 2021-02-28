@@ -17,24 +17,17 @@
  */
 
 import { async, fakeAsync, flushMicrotasks, TestBed } from
-'@angular/core/testing';
+  '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
 import { AlertsService } from 'services/alerts.service';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerPlaylistService } from
   'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-
-class MockNgbModal {
-  open(){
-    return MockNgbModalRef;
-  }
- }
 
 export class MockNgbModalRef {
   componentInstance: {
@@ -47,24 +40,21 @@ export class MockNgbModalRef {
 describe('Learner playlist service factory', () => {
   let learnerPlaylistService: LearnerPlaylistService;
   let http: HttpTestingController;
-  let urlInterpolationService:UrlInterpolationService;
   let activityId = '1';
-  let activityType = 'exploration'
-  let addToLearnerPlaylistUrl = '';
+  let activityType = 'exploration';
   let alertsService: AlertsService;
   let csrfService: CsrfTokenService;
   let ngbModal: NgbModal;
-  
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
-    })
+    });
   }));
 
   beforeEach(() => {
     learnerPlaylistService = TestBed.inject(LearnerPlaylistService);
     ngbModal = TestBed.inject(NgbModal);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     http = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
     alertsService = TestBed.inject(AlertsService);
@@ -78,15 +68,6 @@ describe('Learner playlist service factory', () => {
     spyOn(alertsService, 'addSuccessMessage').and.callThrough();
   });
 
-  beforeEach(() => {
-    addToLearnerPlaylistUrl = (
-      urlInterpolationService.interpolateUrl(
-        '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-          activityType: activityType,
-          activityId: activityId
-      }));
-  });
-  
   afterEach(() => {
     http.verify();
   });
@@ -99,7 +80,7 @@ describe('Learner playlist service factory', () => {
     };
     learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
     let req = http.expectOne(
-      '/learnerplaylistactivityhandler/exploration/1')
+      '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
     req.flush(response);
 
@@ -118,7 +99,7 @@ describe('Learner playlist service factory', () => {
     };
     learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
     let req = http.expectOne(
-      '/learnerplaylistactivityhandler/exploration/1')
+      '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
     req.flush(response);
 
@@ -137,7 +118,7 @@ describe('Learner playlist service factory', () => {
     };
     learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
     let req = http.expectOne(
-      '/learnerplaylistactivityhandler/exploration/1')
+      '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
     req.flush(response);
 
@@ -156,7 +137,7 @@ describe('Learner playlist service factory', () => {
     };
     learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
     let req = http.expectOne(
-      '/learnerplaylistactivityhandler/exploration/1')
+      '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
     req.flush(response);
 
@@ -171,17 +152,19 @@ describe('Learner playlist service factory', () => {
   it('should open an ngbModal when removing from learner playlist',
     () => {
       let learnerDashboardActivityIds = LearnerDashboardActivityIds
-      .createFromBackendDict({
-        incomplete_exploration_ids: [],
-        incomplete_collection_ids: [],
-        completed_exploration_ids: [],
-        completed_collection_ids: [],
-        exploration_playlist_ids: [],
-        collection_playlist_ids: []
-      });
+        .createFromBackendDict({
+          incomplete_exploration_ids: [],
+          incomplete_collection_ids: [],
+          completed_exploration_ids: [],
+          completed_collection_ids: [],
+          exploration_playlist_ids: [],
+          collection_playlist_ids: []
+        });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>({ componentInstance: MockNgbModalRef, result: Promise.resolve('success')})
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>(
+          { componentInstance: MockNgbModalRef,
+            result: Promise.resolve('success')});
       });
       learnerPlaylistService.removeFromLearnerPlaylist(
         '0', 'title', 'exploration', learnerDashboardActivityIds);
@@ -191,8 +174,10 @@ describe('Learner playlist service factory', () => {
   it('should remove an exploration from learner playlist', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>({ componentInstance: MockNgbModalRef, result: Promise.resolve('success')})
-      });
+      return <NgbModalRef>(
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success')});
+    });
 
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
@@ -216,8 +201,10 @@ describe('Learner playlist service factory', () => {
   it('should remove a collection from learner playlist', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>({ componentInstance: MockNgbModalRef, result: Promise.resolve('success')})
-      });
+      return <NgbModalRef>(
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success')});
+    });
 
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
@@ -232,7 +219,7 @@ describe('Learner playlist service factory', () => {
     learnerPlaylistService.removeFromLearnerPlaylist(
       '0', 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
-    
+
     expect(modalSpy).toHaveBeenCalled();
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
       ['1', '2']);
@@ -242,9 +229,11 @@ describe('Learner playlist service factory', () => {
     ' button is clicked', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
-      return <NgbModalRef>({ componentInstance: MockNgbModalRef, result: Promise.reject('fail')})
-      });
-      
+      return <NgbModalRef>(
+        { componentInstance: MockNgbModalRef,
+          result: Promise.reject('fail')});
+    });
+
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
@@ -258,7 +247,7 @@ describe('Learner playlist service factory', () => {
     learnerPlaylistService.removeFromLearnerPlaylist(
       activityId, 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
-    
+
     expect(modalSpy).toHaveBeenCalled();
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
       ['0', '1', '2']);

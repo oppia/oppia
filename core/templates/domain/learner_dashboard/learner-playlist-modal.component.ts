@@ -16,10 +16,10 @@
  * @fileoverview Controller for learnerPlaylistModal.
  */
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Component,Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from
-'domain/utilities/url-interpolation.service';
+  'domain/utilities/url-interpolation.service';
 
 
 @Component({
@@ -40,19 +40,18 @@ export class LearnerPlaylistModalComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
     this.removeFromLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(
-      '/learnerplaylistactivityhandler/' +
-      '<activityType>/<activityId>', {
-        activityType: this.activityType,
-        activityId: this.activityId
-      }));
+        '/learnerplaylistactivityhandler/' +
+        '<activityType>/<activityId>', {
+          activityType: this.activityType,
+          activityId: this.activityId
+        }));
   }
 
   remove(): void {
-    console.log(this.removeFromLearnerPlaylistUrl)
     this.activeModal.close(this.removeFromLearnerPlaylistUrl);
   }
 

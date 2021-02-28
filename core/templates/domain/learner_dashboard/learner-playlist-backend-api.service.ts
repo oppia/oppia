@@ -30,6 +30,18 @@ import { LearnerPlaylistModalComponent } from
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
 
+interface LearnerPlaylistResponseObject {
+  'belongs_to_completed_or_incomplete_list': boolean
+  'belongs_to_subscribed_activities': boolean
+  'is_admin': boolean
+  'is_moderator': boolean
+  'is_super_admin': boolean
+  'is_topic_manager': boolean
+  'playlist_limit_exceeded': boolean
+  'user_email': string
+  'username': string
+  }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,24 +49,14 @@ export class LearnerPlaylistService {
   successfullyAdded: boolean;
   addToLearnerPlaylistUrl: string;
 
-// belongs_to_completed_or_incomplete_list: false
-// belongs_to_subscribed_activities: false
-// is_admin: false
-// is_moderator: false
-// is_super_admin: true
-// is_topic_manager: false
-// playlist_limit_exceeded: false
-// user_email: "test@example.com"
-// username: "Radesh"
-
   constructor(
     private _alertsService: AlertsService,
     private _http: HttpClient,
     private nbgModal: NgbModal,
     private _urlInterpolationService: UrlInterpolationService,
   ) {}
-  
-  addToLearnerPlaylist(activityId: string, activityType: string): boolean{
+
+  addToLearnerPlaylist(activityId: string, activityType: string): boolean {
     this.successfullyAdded = true;
     this.addToLearnerPlaylistUrl = (
       this._urlInterpolationService.interpolateUrl(
@@ -62,10 +64,9 @@ export class LearnerPlaylistService {
           activityType: activityType,
           activityId: activityId
         }));
-    this._http.post<any>(this.addToLearnerPlaylistUrl, {}).toPromise()
+    this._http.post<LearnerPlaylistResponseObject>(
+      this.addToLearnerPlaylistUrl, {}).toPromise()
       .then(response => {
-        console.log(response)
-        console.log(response.belongs_to_completed_or_incomplete_list)
         if (response.belongs_to_completed_or_incomplete_list) {
           this.successfullyAdded = false;
           this._alertsService.addInfoMessage(
@@ -89,18 +90,19 @@ export class LearnerPlaylistService {
             'Successfully added to your \'Play Later\' list.');
         }
       });
-    return this.successfullyAdded; 
+    return this.successfullyAdded;
   }
 
-  removeFromLearnerPlaylist(activityId, activityTitle,
-    activityType, learnerDashboardActivityIds: LearnerDashboardActivityIds) {
-    console.log(learnerDashboardActivityIds)
+  removeFromLearnerPlaylist(
+      activityId:string, activityTitle:string, activityType:string,
+      learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
     const modelRef = this.nbgModal.open(
       LearnerPlaylistModalComponent, {backdrop: true});
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
     modelRef.componentInstance.activityType = activityType;
     modelRef.result.then((playlistUrl) => {
+      // eslint-disable-next-line dot-notation
       this._http.delete<void>(playlistUrl);
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
