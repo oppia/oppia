@@ -1034,7 +1034,7 @@ class ManagedProcessTests(test_utils.TestBase):
         with process_iter_swap, kill_swap, cmdlines_swap, popen_swap:
             common.managed_process(
                 ['a', 1], shell=True, timeout_secs=10, proc_name_to_kill='es')
-        self.assertEqual(killed, [])
+        self.assertEqual(len(killed), 0)
 
     def test_does_not_raise_zombie_process_error_when_trying_to_kill_es(self):
         killed = []
@@ -1062,7 +1062,7 @@ class ManagedProcessTests(test_utils.TestBase):
         with process_iter_swap, kill_swap, cmdlines_swap, popen_swap:
             common.managed_process(
                 ['a', 1], shell=True, timeout_secs=10, proc_name_to_kill='es')
-        self.assertEqual(killed, [])
+        self.assertEqual(len(killed), 0)
 
     def test_concats_command_args_when_shell_is_true(self):
         with contextlib2.ExitStack() as stack:
