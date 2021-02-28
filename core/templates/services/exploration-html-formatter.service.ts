@@ -58,7 +58,8 @@ export class ExplorationHtmlFormatterService {
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
-      labelForFocusTarget: string): string {
+      labelForFocusTarget: string,
+      populateWithSolution=false): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
@@ -67,6 +68,7 @@ export class ExplorationHtmlFormatterService {
         element, interactionCustomizationArgs));
     element.attr(
       'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
+    element.attr('populate-with-solution', populateWithSolution);
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }
