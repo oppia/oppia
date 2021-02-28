@@ -69,10 +69,6 @@ BUF_VERSION = '0.29.0'
 # the version of protobuf library being used.
 PROTOC_VERSION = PROTOBUF_VERSION
 
-# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
-# there is a `make test` bug in redis 6.0.6 where the solution has not been
-# released. This is explained in this issue:
-# https://github.com/redis/redis/issues/7540.
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
 # 2. Extract the cli in the folder that it was downloaded, most likely
@@ -88,7 +84,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-REDIS_CLI_VERSION = '6.0.5'
+REDIS_CLI_VERSION = '6.0.10'
 ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
@@ -849,8 +845,8 @@ def managed_process(
         for proc in procs_to_kill:
             if proc.is_running():
                 procs_still_alive.append(proc)
-                proc.terminate()
                 logging.info('Terminating %s...' % get_debug_info(proc))
+                proc.terminate()
             else:
                 logging.info('%s has ended.' % get_debug_info(proc))
 
@@ -859,8 +855,8 @@ def managed_process(
         for proc in procs_gone:
             logging.info('%s has ended.' % get_debug_info(proc))
         for proc in procs_still_alive:
-            proc.kill()
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
+            proc.kill()
 
         if proc_name_to_kill is not None:
             python_utils.PRINT(
@@ -880,9 +876,9 @@ def managed_process(
                         proc_name_to_kill in cmd_part
                         for cmd_part in proc.cmdline())
                     if proc_should_be_killed:
-                        proc.kill()
                         logging.warn(
                             'Forced to kill %s!' % get_debug_info(proc))
+                        proc.kill()
                 except psutil.AccessDenied:
                     pass
                 except psutil.ZombieProcess:

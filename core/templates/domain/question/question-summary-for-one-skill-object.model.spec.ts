@@ -13,29 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for QuestionSummaryObjectFactory.
+ * @fileoverview Unit tests for QuestionSummaryModel.
  */
 
 import { TestBed } from '@angular/core/testing';
 
 import {
   QuestionSummaryForOneSkillBackendDict,
-  QuestionSummaryForOneSkillObjectFactory
-} from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
+  QuestionSummaryForOneSkill
+} from 'domain/question/question-summary-for-one-skill-object.model';
 
 describe('Question summary for one skill object factory', () => {
-  describe('QuestionSummaryForOneSkillObjectFactory', () => {
-    let questionSummaryForOneSkillObjectFactory:
-      QuestionSummaryForOneSkillObjectFactory = null;
+  describe('QuestionSummaryForOneSkill', () => {
     let backendDict: QuestionSummaryForOneSkillBackendDict;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [QuestionSummaryForOneSkillObjectFactory]
+        providers: [QuestionSummaryForOneSkill]
       });
 
-      questionSummaryForOneSkillObjectFactory = TestBed.get(
-        QuestionSummaryForOneSkillObjectFactory);
       backendDict = {
         skill_id: 'skill_id',
         skill_description: 'Skill 1',
@@ -51,7 +47,7 @@ describe('Question summary for one skill object factory', () => {
 
     it('should create a new question summary for one skill object', () => {
       var questionSummaryForOneSkill =
-        questionSummaryForOneSkillObjectFactory.createFromBackendDict(
+        QuestionSummaryForOneSkill.createFromBackendDict(
           backendDict);
       expect(
         questionSummaryForOneSkill.getQuestionSummary().getQuestionId()

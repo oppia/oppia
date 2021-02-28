@@ -801,6 +801,7 @@ def _update_user_contribution_rights(user_contribution_rights):
         remove_contribution_reviewer(user_contribution_rights.id)
 
 
+@transaction_services.run_in_transaction_wrapper
 def _update_reviewer_counts_in_community_contribution_stats_transactional(
         future_user_contribution_rights):
     """Updates the reviewer counts in the community contribution stats based
@@ -870,8 +871,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
         user_contribution_rights: UserContributionRights. The user contribution
             rights.
     """
-    transaction_services.run_in_transaction(
-        _update_reviewer_counts_in_community_contribution_stats_transactional,
+    _update_reviewer_counts_in_community_contribution_stats_transactional(
         user_contribution_rights)
 
 
