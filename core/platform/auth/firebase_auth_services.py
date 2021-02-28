@@ -445,26 +445,23 @@ def _get_id_token(request):
 
 def _get_auth_claims_from_id_token(token):
     """Returns claims from the ID Token, or None if invalid."""
-    if not token:
-        return None
-    with _suppress_firebase_errors(), _firebase_admin_context():
-        return _create_auth_claims(firebase_auth.verify_id_token(token))
+    if token:
+        with _suppress_firebase_errors(), _firebase_admin_context():
+            return _create_auth_claims(firebase_auth.verify_id_token(token))
     return None
 
 
 def _get_auth_claims_from_session_cookie(cookie):
     """Returns claims from the session cookie, or None if invalid."""
-    if not cookie:
-        return None
-    with _suppress_firebase_errors(), _firebase_admin_context():
-        return _create_auth_claims(firebase_auth.verify_session_cookie(cookie))
+    if cookie:
+        with _suppress_firebase_errors(), _firebase_admin_context():
+            return _create_auth_claims(
+                firebase_auth.verify_session_cookie(cookie))
     return None
 
 
 def _create_auth_claims(firebase_claims):
     """Returns a new AuthClaims domain object from Firebase claims."""
-    if not firebase_claims:
-        return None
     auth_id = firebase_claims.get('sub')
     email = firebase_claims.get('email')
     role_is_super_admin = (

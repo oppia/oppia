@@ -711,7 +711,7 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
     """Tests for session handler."""
 
     def test_get(self):
-        self.get_html_response('/sessionBegin', expected_status_int=200)
+        self.get_html_response('/session_begin', expected_status_int=200)
 
 
 class LogoutPageTests(test_utils.GenericTestBase):
