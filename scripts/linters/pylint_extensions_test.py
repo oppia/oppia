@@ -3270,7 +3270,7 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_empty_line_below_function_definition(self):
-        node_empty_line_below_function_definition = astroid.scoped_nodes.Function(
+        node_empty_line_below_function_def = astroid.scoped_nodes.Function(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -3280,26 +3280,26 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
             tmp.write(
                 u"""
                 def sum(a,b):
-                    
+
                     \"\"\" this  does something \"\"\"
                     return a+b
                 """)
-        node_empty_line_below_function_definition.file = filename
-        node_empty_line_below_function_definition.path = filename
-        node_empty_line_below_function_definition.fromlineno = 2
+        node_empty_line_below_function_def.file = filename
+        node_empty_line_below_function_def.path = filename
+        node_empty_line_below_function_def.fromlineno = 2
 
         self.checker_test_object.checker.check_blank_lines_below_function_definition(
-            node_empty_line_below_function_definition)
+            node_empty_line_below_function_def)
 
         message = testutils.Message(
             msg_id='empty-line-provided-below-function-definiton',
-            node=node_empty_line_below_function_definition)
+            node=node_empty_line_below_function_def)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
     def test_no_empty_line_below_function_definition(self):
-        node_no_empty_line_below_function_definition = astroid.scoped_nodes.Function(
+        node_no_empty_line_below_function_def = astroid.scoped_nodes.Function(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -3312,16 +3312,16 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
                     \"\"\" this  does something \"\"\"
                     return a+b
                 """)
-        node_no_empty_line_below_function_definition.file = filename
-        node_no_empty_line_below_function_definition.path = filename
-        node_no_empty_line_below_function_definition.fromlineno = 2
+        node_no_empty_line_below_function_def.file = filename
+        node_no_empty_line_below_function_def.path = filename
+        node_no_empty_line_below_function_def.fromlineno = 2
 
         self.checker_test_object.checker.check_blank_lines_below_function_definition(
-            node_no_empty_line_below_function_definition)
+            node_no_empty_line_below_function_def)
 
         message = testutils.Message(
             msg_id='no-empty-line-provided',
-            node=node_no_empty_line_below_function_definition)
+            node=node_no_empty_line_below_function_def)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
