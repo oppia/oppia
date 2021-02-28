@@ -229,9 +229,6 @@ class ExplorationModel(base_models.VersionedModel):
             present.
         """
 
-        # The nodes field is moved to collection_contents dict. We
-        # need to move the values from nodes field to collection_contents dict
-        # and delete nodes.
         if 'skill_tags' in snapshot_dict:
             del snapshot_dict['skill_tags']
         if 'default_skin' in snapshot_dict:
