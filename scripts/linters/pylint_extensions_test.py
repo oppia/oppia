@@ -3260,7 +3260,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
 
 class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
-    
+
     def setUp(self):
         super(NoBlankLineBelowFunctionDefinitionTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()

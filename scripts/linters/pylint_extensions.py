@@ -2148,7 +2148,8 @@ class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
                 break
             else:
                 line_number += 1
-        line_before = linecache.getline(node.root().file, line_number - 1).strip()
+        line_before = linecache.getline(
+            node.root().file, line_number - 1).strip()
         if len(line_before.strip()) == 0:
             self.add_message(
                 'empty-line-provided-below-function-definiton', node=node)
