@@ -142,5 +142,38 @@ describe('Pencil Code Editor Validation Service', () => {
       // It checks the getCustomizationArgsWarnings has been called or not.
       expect(pcevs.getCustomizationArgsWarnings).toHaveBeenCalled();
     });
+
+    it('should catch non-string value for initialCode', () => {
+      var statename = 'Introduction';
+      var customizationArgs = {
+        initialCode: {
+          value: 1
+        }
+      };
+      inputBackend = {
+        x: [['<p>one</p>']]
+      };
+      const testOutcome = oof.createNew(
+        'Introduction', 'feedback_0', '<p>YES</p>', []);
+      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+        x: 'CodeString'
+      });
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
+      const testOutcome2 = oof.createNew(
+        'Introduction', 'default_outcome',
+        '<p>no</p>', []);
+      var partialWarningsList = [];
+      partialWarningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The initialCode must be a string.'
+      });
+      expect(pcevs.getAllWarnings(
+        // This throws "Type '1' is not assignable to type 'string'."
+        // Here we are assigning the wrong type of value to
+        // "customizationArguments" in order to test validations.
+        // @ts-expect-error
+        statename, customizationArgs, [answergroup2], testOutcome2)
+      ).toEqual(partialWarningsList);
+    });
   });
 });
