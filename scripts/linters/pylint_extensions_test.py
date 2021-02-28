@@ -3261,37 +3261,67 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
 class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
 
-    def test_no_blank_lines_below_function_definition(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.NoBlankLineBelowFunctionDefinition)
 
-        checker_test_object.setup_method()
-        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+    def setUp(self):
+        super(NoBlankLineBelowFunctionDefinitionTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.NoBlankLineBelowFunctionDefinition)
+        self.checker_test_object.setup_method()
+
+    def test_empty_line_below_function_definition(self):
+        node_empty_line_below_function_definition = astroid.scoped_nodes.Function(
+            name='test',
+            doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                def Sum(a,b):
-
-                    \"\"\"Returns the sum of a and b.
+                def sum(a,b):
+                    
+                    \"\"\" this  does something \"\"\"
                     return a+b
-                    """
-                )
+                """)
+        node_empty_line_below_function_definition.file = filename
+        node_empty_line_below_function_definition.path = filename
+        node_empty_line_below_function_definition.fromlineno = 2
 
-        node.file = filename
-        node.path = filename
+        self.checker_test_object.checker.check_blank_lines_below_function_definition(
+            node_empty_line_below_function_definition)
 
-        checker_test_object.checker.check_blank_lines_below_function_definition(
-            node)
+        message = testutils.Message(
+            msg_id='empty-line-provided-below-function-definiton',
+            node=node_empty_line_below_function_definition)
 
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='newline-below-function-definition',
-                line=1
-            ),
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
 
-        ):
+    def test_no_empty_line_below_function_definition(self):
+        node_no_empty_line_below_function_definition = astroid.scoped_nodes.Function(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def sum(a,b):
+                    \"\"\" this  does something \"\"\"
+                    return a+b
+                """)
+        node_no_empty_line_below_function_definition.file = filename
+        node_no_empty_line_below_function_definition.path = filename
+        node_no_empty_line_below_function_definition.fromlineno = 2
+
+        self.checker_test_object.checker.check_blank_lines_below_function_definition(
+            node_no_empty_line_below_function_definition)
+
+        message = testutils.Message(
+            msg_id='no-empty-line-provided',
+            node=node_no_empty_line_below_function_definition)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
