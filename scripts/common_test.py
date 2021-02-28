@@ -1033,7 +1033,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         with process_iter_swap, kill_swap, cmdlines_swap, popen_swap:
             common.managed_process(
-                ['a', 1],shell=True, timeout_secs=10, proc_name_to_kill='es')
+                ['a', 1], shell=True, timeout_secs=10, proc_name_to_kill='es')
         self.assertEqual(killed, [])
 
     def test_does_not_raise_zombie_process_error_when_trying_to_kill_es(self):
@@ -1050,7 +1050,7 @@ class ManagedProcessTests(test_utils.TestBase):
         def mock_process_iter():
             return [MockPsutilProcess(0)]
 
-        def mock_popen(*args):
+        def mock_popen():
             return
 
         process_iter_swap = self.swap_with_checks(
@@ -1061,7 +1061,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         with process_iter_swap, kill_swap, cmdlines_swap, popen_swap:
             common.managed_process(
-                ['a', 1],shell=True, timeout_secs=10, proc_name_to_kill='es')
+                ['a', 1], shell=True, timeout_secs=10, proc_name_to_kill='es')
         self.assertEqual(killed, [])
 
     def test_concats_command_args_when_shell_is_true(self):
