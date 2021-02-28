@@ -29,7 +29,6 @@ from scripts import common
 
 import pkg_resources
 
-
 IGNORED_LIBRARY_NAME_MISMATCHES = (
     # We depend on a patched version of firebase-admin which is hosted on a git
     # repository. For this reason, we exclude firebase-admin from mismatch

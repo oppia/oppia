@@ -163,18 +163,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._set_user_fragile(uid, email, disabled, custom_claims)
         return self._encode_user_claims(self._get_user(uid))
 
-    def tick(self, days=1):
-        """Ages all cookies by the given number of days and erases expired ones.
-
-        Args:
-            days: int. The number of days to age the cookies by.
-        """
-        delta = datetime.timedelta(days=days)
-        for duration in self._session_cookie_duration_by_id_token.values():
-            duration -= delta
-        # Erase zero and negative counts.
-        self._session_cookie_duration_by_id_token += collections.Counter()
-
     def _create_session_cookie(self, id_token, max_age):
         """Creates a new session cookie which expires after given duration.
 

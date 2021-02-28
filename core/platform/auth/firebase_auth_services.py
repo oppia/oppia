@@ -445,20 +445,20 @@ def _get_id_token(request):
 
 def _get_auth_claims_from_id_token(token):
     """Returns claims from the ID Token, or None if invalid."""
-    firebase_claims = None
-    if token:
-        with _suppress_firebase_errors(), _firebase_admin_context():
-            firebase_claims = firebase_auth.verify_id_token(token)
-    return _create_auth_claims(firebase_claims)
+    if not token:
+        return None
+    with _suppress_firebase_errors(), _firebase_admin_context():
+        return _create_auth_claims(firebase_auth.verify_id_token(token))
+    return None
 
 
 def _get_auth_claims_from_session_cookie(cookie):
     """Returns claims from the session cookie, or None if invalid."""
-    firebase_claims = None
-    if cookie:
-        with _suppress_firebase_errors(), _firebase_admin_context():
-            firebase_claims = firebase_auth.verify_session_cookie(cookie)
-    return _create_auth_claims(firebase_claims)
+    if not cookie:
+        return None
+    with _suppress_firebase_errors(), _firebase_admin_context():
+        return _create_auth_claims(firebase_auth.verify_session_cookie(cookie))
+    return None
 
 
 def _create_auth_claims(firebase_claims):
