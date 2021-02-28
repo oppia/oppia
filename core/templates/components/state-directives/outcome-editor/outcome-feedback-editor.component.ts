@@ -26,7 +26,7 @@ import { UrlInterpolationService } from
 import { ContextService } from 'services/context.service.ts';
 
 @Component({
-  selector: 'outcome-feedback-editor',
+  selector: 'oppia-outcome-feedback-editor',
   templateUrl: './outcome-feedback-editor.component.html',
   styleUrls: []
 })
