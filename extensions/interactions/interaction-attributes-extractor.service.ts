@@ -32,6 +32,11 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
   providedIn: 'root'
 })
 export class InteractionAttributesExtractorService {
+  private readonly migratedInteractions: string[] = [
+    'Continue',
+    'FractionInput'
+  ];
+
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private interactionFactory: InteractionObjectFactory,
@@ -43,7 +48,6 @@ export class InteractionAttributesExtractorService {
     const caBackendDict = {};
     const caSpecs = (
       INTERACTION_SPECS[interactionId].customization_arg_specs);
-
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
       const attributesKey = `${caName}WithValue`;
@@ -55,7 +59,9 @@ export class InteractionAttributesExtractorService {
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
       interactionId, caBackendDict);
-
+    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+      return ca;
+    }
     const caValues = {};
     Object.keys(ca).forEach(caName => {
       caValues[caName] = ca[caName].value;
