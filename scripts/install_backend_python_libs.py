@@ -24,9 +24,18 @@ import shutil
 import subprocess
 import sys
 
-import pkg_resources
 import python_utils
 from scripts import common
+
+import pkg_resources
+
+
+IGNORED_LIBRARY_NAME_MISMATCHES = (
+    # We depend on a patched version of firebase-admin which is hosted on a git
+    # repository. For this reason, we exclude firebase-admin from mismatch
+    # checks.
+    'firebase-admin',
+)
 
 
 def normalize_python_library_name(library_name):
@@ -125,7 +134,7 @@ def _get_requirements_file_contents():
         lines = f.readlines()
         for line in lines:
             trimmed_line = line.strip()
-            if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+            if trimmed_line.startswith(('#', 'git')) or len(trimmed_line) == 0:
                 continue
             library_name_and_version_string = trimmed_line.split(
                 ' ')[0].split('==')
@@ -483,24 +492,27 @@ def get_mismatches():
 
     mismatches = {}
     for normalized_library_name in requirements_contents:
-        # Library exists in the directory and the requirements file.
-        if normalized_library_name in directory_contents:
-            # Library matches but version doesn't match.
-            if (directory_contents[normalized_library_name] !=
-                    requirements_contents[normalized_library_name]):
+        if normalized_library_name not in IGNORED_LIBRARY_NAME_MISMATCHES:
+            # Library exists in the directory and the requirements file.
+            if normalized_library_name in directory_contents:
+                # Library matches but version doesn't match.
+                if (directory_contents[normalized_library_name] !=
+                        requirements_contents[normalized_library_name]):
+                    mismatches[normalized_library_name] = (
+                        requirements_contents[normalized_library_name],
+                        directory_contents[normalized_library_name])
+            # Library exists in the requirements file but not in the directory.
+            else:
                 mismatches[normalized_library_name] = (
-                    requirements_contents[normalized_library_name],
-                    directory_contents[normalized_library_name])
-        # Library exists in the requirements file but not in the directory.
-        else:
-            mismatches[normalized_library_name] = (
-                requirements_contents[normalized_library_name], None)
+                    requirements_contents[normalized_library_name], None)
 
     for normalized_library_name in directory_contents:
-        # Library exists in the directory but is not in the requirements file.
-        if normalized_library_name not in requirements_contents:
-            mismatches[normalized_library_name] = (
-                None, directory_contents[normalized_library_name])
+        if normalized_library_name not in IGNORED_LIBRARY_NAME_MISMATCHES:
+            # Library exists in the directory but is not in the requirements
+            # file.
+            if normalized_library_name not in requirements_contents:
+                mismatches[normalized_library_name] = (
+                    None, directory_contents[normalized_library_name])
 
     return mismatches
 

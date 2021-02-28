@@ -38,7 +38,7 @@ describe('Auth Backend Api Service', () => {
     flushMicrotasks();
 
     const ping = httpTestingController.expectOne('/sessionBegin');
-    expect(ping.request.method).toEqual('POST');
+    expect(ping.request.method).toEqual('GET');
     expect(ping.request.headers.get('Authorization')).toEqual('Bearer TKN');
     ping.flush({});
     flushMicrotasks();

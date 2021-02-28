@@ -20,7 +20,7 @@ contextlib2==0.6.0.post1  # via -r requirements.in
 crcmod==1.7               # via google-resumable-media
 elasticsearch==7.10.0     # via -r requirements.in
 enum34==1.1.10            # via google-cloud-tasks, grpcio
-firebase-admin==3.2.1     # via -r requirements.in
+git+git://github.com/oppia/firebase-admin-python@py2-emulator-support#egg=firebase-admin  # via -r requirements.in
 funcsigs==1.0.2           # via mock
 future==0.18.2            # via -r requirements.in
 futures==3.3.0            # via google-api-core, grpcio

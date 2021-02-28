@@ -707,38 +707,39 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/plain')
 
 
+class SessionBeginHandlerTests(test_utils.GenericTestBase):
+    """Tests for session handler."""
+
+    def test_get(self):
+        self.get_html_response('/sessionBegin', expected_status_int=200)
+
+
 class LogoutPageTests(test_utils.GenericTestBase):
+    """Tests for logout handler."""
 
     def test_logout_page(self):
-        """Tests for logout handler."""
         exp_services.load_demo('0')
+        self.get_html_response('/explore/0')
+
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
         response = self.get_html_response('/logout', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+
+        self.assertNotIn('Set-Cookie', response.headers)
 
     def test_logout_page_with_redirect_url(self):
         exp_services.load_demo('0')
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
+        self.get_html_response('/explore/0')
+
         response = self.get_html_response(
             '/logout?redirect_url=community-library', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+        self.assertNotIn('Set-Cookie', response.headers)
         self.assertIn('community-library', response.headers['Location'])
 
     def test_logout_page_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
-            self.get_html_response(
-                '/logout', expected_status_int=302)
+            self.get_html_response('/logout', expected_status_int=302)
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -956,6 +957,15 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
     applied on them.
     """
 
+    # Following handlers are present in base.py where acl_decorators cannot be
+    # imported.
+    UNDECORATED_HANDLERS = frozenset([
+        'CsrfTokenHandler',
+        'Error404Handler',
+        'LogoutPage',
+        'SessionBeginHandler',
+    ])
+
     def test_every_method_has_decorator(self):
         handlers_checked = []
 
@@ -967,10 +977,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             else:
                 handler = route.handler
 
-            # Following handler are present in base.py where acl_decorators
-            # cannot be imported.
-            if (handler.__name__ in (
-                    ('CsrfTokenHandler', 'Error404Handler', 'LogoutPage'))):
+            if handler.__name__ in self.UNDECORATED_HANDLERS:
                 continue
 
             if handler.get != base.BaseHandler.get:

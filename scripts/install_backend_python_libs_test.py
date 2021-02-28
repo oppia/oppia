@@ -26,10 +26,11 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-import pkg_resources
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
+
+import pkg_resources
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -548,7 +549,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
@@ -628,7 +629,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
@@ -647,7 +648,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')

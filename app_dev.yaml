@@ -262,6 +262,9 @@ env_variables:
 # redirects to these instructions to disable URL fetch:
 # https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
   GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
+# Used by the Admin SDK to connect with the Firebase Authentication emulator.
+# https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
+  FIREBASE_AUTH_EMULATOR_HOST: 'localhost:9099'
 
 skip_files:
 # .pyc and .pyo files

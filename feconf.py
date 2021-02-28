@@ -433,12 +433,6 @@ REDISPORT = 6379
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
-# Used by the Admin SDK to connect with the Firebase Authentication emulator.
-# NOTE: this name is is NOT a typo despite the inclusion of the port number, it
-# is the environment variable expected to be set:
-# https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
-FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
-
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
@@ -1112,6 +1106,10 @@ GAE_AUTH_PROVIDER_ID = 'gae'
 FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
+
+FIREBASE_SESSION_COOKIE_NAME = 'session'
+
+FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=5)
 
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
 # these back to appropriate places (rights_domain, topic_domain).

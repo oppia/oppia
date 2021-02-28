@@ -33,6 +33,31 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
 
     ENABLE_AUTH_SERVICES_STUB = False
 
+    def test_establish_auth_session_does_nothing(self):
+        request = webapp2.Request.blank('/')
+        response = webapp2.Response()
+        # Does not raise.
+        gae_auth_services.establish_auth_session(request, response)
+
+    def test_destroy_auth_session_deletes_cookies(self):
+        response = webapp2.Response()
+        response.set_cookie('ACSID', value='abc')
+        response.set_cookie('SACSID', value='def')
+        response.set_cookie('dev_appserver_login', value='ghi')
+        response.set_cookie('custom', value='123')
+
+        gae_auth_services.destroy_auth_session(response)
+
+        self.assert_matches_regexps(response.headers.get_all('Set-Cookie'), [
+            'ACSID=abc;',
+            'SACSID=def;',
+            'dev_appserver_login=ghi;',
+            'custom=123;',
+            'ACSID=;',
+            'SACSID=;',
+            'dev_appserver_login=;',
+        ])
+
     def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):
         request = webapp2.Request.blank('/')
 
