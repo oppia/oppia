@@ -49,8 +49,8 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
-    'DateTimeFormatService', 'DeviceInfoService',
+    '$http', '$q', '$rootScope', '$scope', '$uibModal',
+    'AlertsService', 'DateTimeFormatService', 'DeviceInfoService',
     'LearnerDashboardBackendApiService', 'LoaderService',
     'SuggestionModalForLearnerDashboardService',
     'ThreadStatusDisplayService', 'UrlInterpolationService',
@@ -61,8 +61,8 @@ angular.module('oppia').component('learnerDashboardPage', {
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $rootScope, $scope, $uibModal, AlertsService,
-        DateTimeFormatService, DeviceInfoService,
+        $http, $q, $rootScope, $scope, $uibModal,
+        AlertsService, DateTimeFormatService, DeviceInfoService,
         LearnerDashboardBackendApiService, LoaderService,
         SuggestionModalForLearnerDashboardService,
         ThreadStatusDisplayService, UrlInterpolationService,
@@ -74,6 +74,9 @@ angular.module('oppia').component('learnerDashboardPage', {
         SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
       var ctrl = this;
       var threadIndex = null;
+
+      const DRAG_DELAY_MOBILE_MSEC = 1000;
+      const DRAG_DELAY_DESKTOP_MSEC = 0;
 
       ctrl.setActiveSection = function(newActiveSectionName) {
         ctrl.activeSection = newActiveSectionName;
@@ -235,7 +238,9 @@ angular.module('oppia').component('learnerDashboardPage', {
       var getPlaylistSortableOptions = function(activityType) {
         return {
           'ui-floating': 'auto',
-          start: function(unusedE, ui) {
+          delay: ctrl.checkMobileView() ?
+            DRAG_DELAY_MOBILE_MSEC : DRAG_DELAY_DESKTOP_MSEC,
+          start: function(e, ui) {
             ui.placeholder.height(ui.item.height());
             $scope.$apply();
           },
@@ -248,7 +253,7 @@ angular.module('oppia').component('learnerDashboardPage', {
               /* eslint-disable-next-line quote-props */
               {'top': '0 px'});
           },
-          update: function(unusedE, ui) {
+          update: function(e, ui) {
             var insertExpInLearnerPlaylistUrl = (
               UrlInterpolationService.interpolateUrl((
                 '/learnerplaylistactivityhandler/<activityType>/' +
@@ -263,7 +268,7 @@ angular.module('oppia').component('learnerDashboardPage', {
             });
             $scope.$apply();
           },
-          stop: function(unusedE, unusedUi) {
+          stop: function(e, ui) {
             $scope.$apply();
           },
           axis: 'y'

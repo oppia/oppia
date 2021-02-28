@@ -207,13 +207,18 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             skillDifficulty: function() {
               return skillDifficulty;
+            },
+            suggestionId: function() {
+              return suggestionId;
             }
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
           ContributionAndReviewService.resolveSuggestiontoSkill(
             targetId, suggestionId, result.action, result.reviewMessage,
-            result.skillDifficulty, resolveSuggestionSuccess);
+            result.skillDifficulty, resolveSuggestionSuccess, () => {
+              AlertsService.addInfoMessage('Failed to submit suggestion.');
+            });
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

@@ -117,7 +117,9 @@ def get_exploration_stats(exp_id, exp_version):
     return exploration_stats
 
 
-def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
+@transaction_services.run_in_transaction_wrapper
+def _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats. The model GET and PUT must be done in a transaction to avoid loss of
     updates that come in rapid succession.
@@ -159,8 +161,8 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    transaction_services.run_in_transaction(
-        _update_stats_transactional, exp_id, exp_version, aggregated_stats)
+    _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):
@@ -658,6 +660,7 @@ def save_exp_issues_model(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain object.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _save_exp_issues_model_transactional():
         """Implementation to be run in a transaction."""
 
@@ -671,8 +674,7 @@ def save_exp_issues_model(exp_issues):
 
     # Run in transaction to help prevent data-races between concurrent learners
     # who may have a playthrough recorded at the same time.
-    transaction_services.run_in_transaction(
-        _save_exp_issues_model_transactional)
+    _save_exp_issues_model_transactional()
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -711,6 +713,7 @@ def delete_playthroughs_multi(playthrough_ids):
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _delete_playthroughs_multi_transactional():
         """Implementation to be run in a transaction."""
         stats_models.PlaythroughModel.delete_multi(
@@ -718,8 +721,7 @@ def delete_playthroughs_multi(playthrough_ids):
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    transaction_services.run_in_transaction(
-        _delete_playthroughs_multi_transactional)
+    _delete_playthroughs_multi_transactional()
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):

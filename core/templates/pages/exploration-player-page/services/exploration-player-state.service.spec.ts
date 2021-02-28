@@ -91,7 +91,7 @@ describe('Exploration Player State Service', () => {
       });
       $provide.value('NumberAttemptsService', {});
       $provide.value('ExplorationFeaturesBackendApiService', {
-        fetchExplorationFeatures: $.noop
+        fetchExplorationFeaturesAsync: $.noop
       });
       $provide.value('ExplorationFeaturesService', {
         init: $.noop
