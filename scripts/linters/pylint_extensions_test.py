@@ -3260,8 +3260,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
 
 class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
-
-
+    
     def setUp(self):
         super(NoBlankLineBelowFunctionDefinitionTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -3288,7 +3287,7 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
         node_empty_line_below_function_def.path = filename
         node_empty_line_below_function_def.fromlineno = 2
 
-        self.checker_test_object.checker.check_blank_lines_below_function_definition(
+        self.checker_test_object.checker.check_blank_lines_below_function_def(
             node_empty_line_below_function_def)
 
         message = testutils.Message(
@@ -3316,7 +3315,7 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
         node_no_empty_line_below_function_def.path = filename
         node_no_empty_line_below_function_def.fromlineno = 2
 
-        self.checker_test_object.checker.check_blank_lines_below_function_definition(
+        self.checker_test_object.checker.check_blank_lines_below_function_def(
             node_no_empty_line_below_function_def)
 
         message = testutils.Message(

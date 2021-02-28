@@ -2130,9 +2130,9 @@ class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
         ),
     }
 
-    def check_blank_lines_below_function_definition(self, node):
+    def check_blank_lines_below_function_def(self, node):
         """Visit a function to ensure that there are no blank lines below
-        function definition..
+        function definition.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -2148,7 +2148,7 @@ class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
                 break
             else:
                 line_number += 1
-        line_before = linecache.getline(node.root().file, line_number-1).strip()
+        line_before = linecache.getline(node.root().file, line_number - 1).strip()
         if len(line_before.strip()) == 0:
             self.add_message(
                 'empty-line-provided-below-function-definiton', node=node)
