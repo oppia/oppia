@@ -2179,4 +2179,4 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
-    # linter.register_checker(NoBlankLineBelowFunctionDefinition(linter))
+    linter.register_checker(NoBlankLineBelowFunctionDefinition(linter))
