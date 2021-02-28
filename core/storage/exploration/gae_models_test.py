@@ -77,9 +77,9 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(
             snapshot_dict)
         exp_model = exp_models.ExplorationModel(**snapshot_dict)
+        snapshot_dict = exp_model.compute_snapshot()
         for field in ['skill_tags', 'default_skin', 'skin_customization']:
-            self.assertNotIn(field, exp_model._properties) # pylint: disable=protected-access
-            self.assertNotIn(field, exp_model._values) # pylint: disable=protected-access
+            self.assertNotIn(field, snapshot_dict)
 
 
 class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
