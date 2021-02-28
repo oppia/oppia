@@ -16,7 +16,6 @@
  * @fileoverview Controller for learnerPlaylistModal.
  */
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Component,Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from
@@ -38,7 +37,6 @@ export class LearnerPlaylistModalComponent implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private http:HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -53,15 +51,9 @@ export class LearnerPlaylistModalComponent implements OnInit {
       }));
   }
 
-  remove(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.delete<void>(this.removeFromLearnerPlaylistUrl).toPromise().then(() => {
-        this.activeModal.close();
-        resolve();
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
+  remove(): void {
+    console.log(this.removeFromLearnerPlaylistUrl)
+    this.activeModal.close(this.removeFromLearnerPlaylistUrl);
   }
 
   cancel(): void {
@@ -73,33 +65,3 @@ angular.module('oppia').controller(
   'LearnerPlaylistModalComponent',
   downgradeComponent(
     {component: LearnerPlaylistModalComponent}));
-
-// require('domain/utilities/url-interpolation.service.ts');
-
-// angular.module('oppia').controller('LearnerPlaylistModalController', [
-//   '$http', '$scope', '$uibModalInstance', 'UrlInterpolationService',
-//   'activityId', 'activityTitle', 'activityType',
-//   function(
-//       $http, $scope, $uibModalInstance, UrlInterpolationService,
-//       activityId, activityTitle, activityType) {
-//     $scope.sectionNameI18nId = (
-//       'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
-//     $scope.activityTitle = activityTitle;
-//     var removeFromLearnerPlaylistUrl = (
-//       UrlInterpolationService.interpolateUrl(
-//         '/learnerplaylistactivityhandler/' +
-//         '<activityType>/<activityId>', {
-//           activityType: activityType,
-//           activityId: activityId
-//         }));
-
-//     $scope.remove = function() {
-//       $http['delete'](removeFromLearnerPlaylistUrl);
-//       $uibModalInstance.close();
-//     };
-
-//     $scope.cancel = function() {
-//       $uibModalInstance.dismiss('cancel');
-//     };
-//   }
-// ]);

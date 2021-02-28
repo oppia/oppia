@@ -29,7 +29,6 @@ import { LearnerPlaylistModalComponent } from
   'domain/learner_dashboard/learner-playlist-modal.component.ts';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
-  import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -101,7 +100,8 @@ export class LearnerPlaylistService {
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
     modelRef.componentInstance.activityType = activityType;
-    modelRef.result.then(() => {
+    modelRef.result.then((playlistUrl) => {
+      this._http.delete<void>(playlistUrl);
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
           activityId);
@@ -109,7 +109,7 @@ export class LearnerPlaylistService {
         learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
           activityId);
       }
-    }, function() {
+    }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
@@ -121,4 +121,3 @@ angular.module('oppia').factory(
   'LearnerPlaylistService',
   downgradeInjectable(LearnerPlaylistService)
 );
-

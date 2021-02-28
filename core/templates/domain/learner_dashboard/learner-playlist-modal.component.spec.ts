@@ -19,8 +19,6 @@
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from
   '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -46,12 +44,10 @@ describe('Learner Playlist Modal Controller', function() {
   let csrfService: CsrfTokenService;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let http: HttpTestingController;
   let urlInterpolationService : UrlInterpolationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       declarations: [LearnerPlaylistModalComponent],
       providers: [
         {
@@ -70,7 +66,6 @@ describe('Learner Playlist Modal Controller', function() {
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    http = TestBed.inject(HttpTestingController);
     component.activityId = '0';
     component.activityTitle = 'Title';
     component.activityType = 'exploration';
@@ -87,53 +82,22 @@ describe('Learner Playlist Modal Controller', function() {
     });
   });
 
-  afterEach(() => {
-    http.verify();
-  });
 
-  it('should call http for deleting from learner playlist when clicking on' +
+  it('should remove exploration in learner playlist when clicking on' +
     ' remove button', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.removeFromLearnerPlaylistUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
-    component.remove().then(successHandler, failHandler);
-    let req = http.expectOne(
-      '/learnerplaylistactivityhandler/exploration/0');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush(200);
+    component.remove();
+    // let req = http.expectOne(
+    //   '/learnerplaylistactivityhandler/exploration/0');
+    // expect(req.request.method).toEqual('DELETE');
+    // req.flush(200);
     flushMicrotasks();
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-    expect(closeSpy).toHaveBeenCalled();
+    expect(closeSpy).toHaveBeenCalledWith(component.removeFromLearnerPlaylistUrl);
   }));
 
-  it('should return error response when clicking on' +
-    ' remove button using invalid Id', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    component.removeFromLearnerPlaylistUrl = (
-      '/learnerplaylistactivityhandler/exploration/invalidId');
-    console.log(component.removeFromLearnerPlaylistUrl);
-    component.remove().then(successHandler, failHandler);
-    let req = http.expectOne(
-      '/learnerplaylistactivityhandler/exploration/invalidId')
-    expect(req.request.method).toEqual('DELETE');
-    req.flush({
-      error: 'Invalid Exploration Id'
-    }, {
-      status: 404, statusText: 'Invalid Exploration Id'
-    });
-    flushMicrotasks();
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-    expect(closeSpy).not.toHaveBeenCalled();
-
-  }));
-
-  it('should not call http delete when clicking on cancel button', () => {
+  it('should not remove exploration in learner playlist when clicking on cancel button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
