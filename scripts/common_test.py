@@ -81,10 +81,10 @@ class MockPsutilProcess(python_utils.OBJECT):
     def is_running(self):
         """Check whether the function is running."""
         return True
-    
-    def children(self, *args):
-       """Returns children of the process."""
-       return []
+
+    def children(self):
+        """Returns children of the process."""
+        return []
 
 
 class CommonTests(test_utils.GenericTestBase):
@@ -1007,7 +1007,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
             # Entering the context should not raise.
             stack.enter_context(common.managed_process(['a'], timeout_secs=10))
-    
+
     def test_does_not_raise_access_denied_error_when_trying_to_kill_es(self):
         killed = []
 
@@ -1016,14 +1016,14 @@ class ManagedProcessTests(test_utils.TestBase):
 
         def mock_cmdlines(p):
             if p.index == 0:
-                raise psutil.AccessDenied()
+                raise psutil.AccessDenied(pid=0)
             return MockPsutilProcess.cmdlines[p.index]
 
         def mock_process_iter():
             return [MockPsutilProcess(0)]
-        
-        def mock_popen(*args):
-            return 
+
+        def mock_popen():
+            return
 
         process_iter_swap = self.swap_with_checks(
             psutil, 'process_iter', mock_process_iter)
@@ -1032,7 +1032,8 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_swap = self.swap(psutil, 'popen', mock_popen)
 
         with process_iter_swap, kill_swap, cmdlines_swap, popen_swap:
-            common.managed_process(['a', 1], 'es')
+            common.managed_process(
+                ['a', 1],shell=True, timeout_secs=10, proc_name_to_kill='es')
         self.assertEqual(killed, [])
 
     def test_does_not_raise_zombie_process_error_when_trying_to_kill_es(self):
@@ -1043,14 +1044,14 @@ class ManagedProcessTests(test_utils.TestBase):
 
         def mock_cmdlines(p):
             if p.index == 0:
-                raise psutil.ZombieProcess()
+                raise psutil.ZombieProcess(pid=0)
             return MockPsutilProcess.cmdlines[p.index]
 
         def mock_process_iter():
             return [MockPsutilProcess(0)]
-        
+
         def mock_popen(*args):
-            return 
+            return
 
         process_iter_swap = self.swap_with_checks(
             psutil, 'process_iter', mock_process_iter)
@@ -1059,7 +1060,8 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_swap = self.swap(psutil, 'popen', mock_popen)
 
         with process_iter_swap, kill_swap, cmdlines_swap, popen_swap:
-            common.managed_process(['a', 1], 'es')
+            common.managed_process(
+                ['a', 1],shell=True, timeout_secs=10, proc_name_to_kill='es')
         self.assertEqual(killed, [])
 
     def test_concats_command_args_when_shell_is_true(self):
