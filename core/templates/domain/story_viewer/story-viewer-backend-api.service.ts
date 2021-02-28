@@ -113,7 +113,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  fetchStoryData(
+  async fetchStoryDataAsync(
       topicUrlFragment:string,
       classroomUrlFragment: string,
       storyUrlFragment: string): Promise<StoryPlaythrough> {
