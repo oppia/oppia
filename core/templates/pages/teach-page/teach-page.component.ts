@@ -26,6 +26,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
 import { UserService } from 'services/user.service';
+import { Subscription } from 'rxjs';
 
 export interface Testimonial {
   quote: string,
@@ -49,6 +50,7 @@ export class TeachPageComponent implements OnInit {
   testimonialCount: number;
   testimonials = [];
   userIsLoggedIn: boolean = null;
+  directiveSubscriptions = new Subscription();
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
@@ -72,9 +74,10 @@ export class TeachPageComponent implements OnInit {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });
+    this.directiveSubscriptions.add(
     this.windowDimensionService.getResizeEvent().subscribe(() => {
       this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
-    });
+    }))
   }
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:

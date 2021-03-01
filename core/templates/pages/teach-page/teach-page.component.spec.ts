@@ -17,7 +17,7 @@
  */
 import { Pipe, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, inject } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
@@ -30,6 +30,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserInfo } from 'domain/user/user-info.model.ts';
 import { UserService } from 'services/user.service';
+import { of, Subscription } from 'rxjs';
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
@@ -54,11 +55,13 @@ class MockI18nLanguageCodeService {
   }
 }
 
-describe('Teach Page', () => {
+fdescribe('Teach Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
+  // var mockWindowDimensionsChangedEventEmitter = new EventEmitter();
+  var testSubscriptions: Subscription;
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -90,27 +93,33 @@ describe('Teach Page', () => {
     }).compileComponents();
   });
   beforeEach(angular.mock.module('oppia'));
-
+  let windowDimensionsService;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
+    windowDimensionsService =TestBed.get(WindowDimensionsService);
+
+    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+      of(new Event('resize')));
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
   });
 
   let component;
-
+  let element;
+  let teachPageComponent
   beforeEach(() => {
-    const teachPageComponent = TestBed.createComponent(TeachPageComponent);
+    teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
+    element = teachPageComponent.nativeElement;
   });
 
   it('should successfully instantiate the component from beforeEach block',
     () => {
       expect(component).toBeDefined();
     });
-
   it('should get static image url', function() {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
@@ -228,7 +237,4 @@ describe('Teach Page', () => {
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 
-  it('should check if screen is narrow or not', function () {
-    expect(component.isWindowNarrow).toBe(true);
-  });
 });
