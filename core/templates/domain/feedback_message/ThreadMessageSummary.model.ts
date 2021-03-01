@@ -34,4 +34,3 @@ export class ThreadMessageSummary {
     return new ThreadMessageSummary(authorUsername, text);
   }
 }
-
