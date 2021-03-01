@@ -61,6 +61,16 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService
   ) {
+    /**
+     * Disables the input box if the data entered is not a valid prefix
+     * for a fraction.
+     * Examples of valid prefixes:
+     * -- 1
+     * -- 1 2
+     * -- 1 2/
+     * -- 2/
+     * -- 1 2/3
+     */
     this.componentSubscriptions.add(this.answerChanged.pipe(
       // Wait 150ms after the last event before emitting last event.
       debounceTime(150),
@@ -98,16 +108,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    /**
-     * Disables the input box if the data entered is not a valid prefix
-     * for a fraction.
-     * Examples of valid prefixes:
-     * -- 1
-     * -- 1 2
-     * -- 1 2/
-     * -- 2/
-     * -- 1 2/3
-     */
     const {
       requireSimplestForm,
       allowImproperFraction,
@@ -178,6 +178,13 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
 
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
+  }
+
+  getPlaceholderText(): string {
+    if (this.allowNonzeroIntegerPart) {
+      return 'I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER';
+    }
+    return 'I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER';
   }
 
   ngOnDestroy(): void {

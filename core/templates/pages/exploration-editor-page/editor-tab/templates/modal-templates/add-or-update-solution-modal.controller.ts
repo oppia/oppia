@@ -16,6 +16,7 @@
  * @fileoverview Controller for add or update solution modal.
  */
 
+import { Subscription } from 'rxjs';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
