@@ -20,13 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('interactions/GraphInput/directives/graph-detail.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('pages/exploration-player-page/services/player-position.service.ts');
-
-require('interactions/interactions-extension.constants.ajs.ts');
-
 import { AfterViewInit, Component, ElementRef, Input, OnInit } from '@angular/core';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
@@ -54,6 +47,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() canDeleteEdge: boolean;
   @Input() canEditEdgeWeight: boolean;
   @Input() interactionIsActive: boolean;
+  @Input() canEditOptions: boolean;
   isMobile: boolean = false;
   helpText: string = '';
   _MODES = {
@@ -112,6 +106,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    console.log(this.graph);
     this.componentSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => this.state.currentMode = null
