@@ -71,8 +71,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 self.assertEqual(user_record.uid, 'uid')
     """
 
-    # YAGNI: https://en.wikipedia.org/wiki/You_aren't_gonna_need_it.
-    _YAGNI_SDK_FUNCTION_NAMES = [
+    _UNIMPLEMENTED_SDK_FUNCTION_NAMES = [
         'create_custom_token',
         'create_user',
         'generate_email_verification_link',
@@ -119,7 +118,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth, 'update_user', self._update_user))
 
-            for function_name in self._YAGNI_SDK_FUNCTION_NAMES:
+            for function_name in self._UNIMPLEMENTED_SDK_FUNCTION_NAMES:
                 swap_stack.enter_context(test.swap_to_always_raise(
                     firebase_admin.auth, function_name, NotImplementedError))
 
@@ -174,7 +173,10 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             str. A session cookie that can validate the user.
         """
         self._session_cookie_duration_by_id_token[id_token] = max_age
-        session_cookie = id_token # NOTE: Implementation detail.
+        # NOTE: Session cookies are often completely different, in terms of
+        # encoding and security, to ID Tokens. Regardless, for the purposes of
+        # this stub, we treat them the same.
+        session_cookie = id_token
         return session_cookie
 
     def _verify_session_cookie(self, session_cookie):
@@ -187,7 +189,10 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             dict(str: *). Claims for the user corresponding to the session
             cookie.
         """
-        id_token = session_cookie # NOTE: Implementation detail.
+        # NOTE: Session cookies are often completely different, in terms of
+        # encoding and security, to ID Tokens. Regardless, for the purposes of
+        # this stub, we treat them the same.
+        id_token = session_cookie
         if id_token not in self._session_cookie_duration_by_id_token:
             raise firebase_exceptions.UnauthenticatedError(
                 'The provided Firebase session cookie is expired')

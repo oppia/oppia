@@ -83,12 +83,17 @@ def establish_auth_session(request, response):
     """
     claims = _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
+    # If there's a session cookie from which we can acquire user claims already,
+    # then there's no action necessary. The session is already established.
     if claims is not None:
         return
 
     token = _get_id_token(request)
     claims = _get_auth_claims_from_id_token(token)
 
+    # Otherwise, the request will need authorization to create a new session
+    # cookie. We expect authorization to come in the form of an ID Token, and
+    # will only proceed with establishing a session if it encodes valid claims.
     if claims is None:
         return
 
@@ -374,6 +379,11 @@ def _suppress_firebase_errors():
 
     Errors raised by the SDK are logged and then discarded.
 
+    We suppress exceptions because we do not want the errors to disrupt the
+    user's experience. If Firebase could not complete an operation, then that
+    simply means that authentication has failed, there's no need to provide a
+    user-facing error.
+
     Yields:
         None. No relevent context expression.
     """
@@ -390,10 +400,12 @@ def _firebase_admin_context():
     Yields:
         None. No relevent context expression.
     """
-    app = firebase_admin.initialize_app(
-        options={'projectId': feconf.OPPIA_PROJECT_ID})
     try:
+        app = firebase_admin.initialize_app(
+            options={'projectId': feconf.OPPIA_PROJECT_ID})
         yield
+    except (ValueError, firebase_exceptions.FirebaseError):
+        logging.exception('Firebase Admin SDK raised an exception!')
     finally:
         if app is not None:
             firebase_admin.delete_app(app)
@@ -444,7 +456,15 @@ def _get_id_token(request):
 
 
 def _get_auth_claims_from_id_token(token):
-    """Returns claims from the ID Token, or None if invalid."""
+    """Returns claims from the ID Token, or None if invalid.
+
+    Args:
+        token: str|None. The token to extract claims from.
+
+    Returns:
+        auth_domain.AuthClaims|None. The claims from the ID Token, if available.
+        Otherwise returns None.
+    """
     if token:
         with _suppress_firebase_errors(), _firebase_admin_context():
             return _create_auth_claims(firebase_auth.verify_id_token(token))
@@ -452,7 +472,15 @@ def _get_auth_claims_from_id_token(token):
 
 
 def _get_auth_claims_from_session_cookie(cookie):
-    """Returns claims from the session cookie, or None if invalid."""
+    """Returns claims from the session cookie, or None if invalid.
+
+    Args:
+        cookie: str|None. The session cookie to extract claims from.
+
+    Returns:
+        auth_domain.AuthClaims|None. The claims from the session cookie, if
+        available. Otherwise returns None.
+    """
     if cookie:
         with _suppress_firebase_errors(), _firebase_admin_context():
             return _create_auth_claims(
@@ -461,7 +489,15 @@ def _get_auth_claims_from_session_cookie(cookie):
 
 
 def _create_auth_claims(firebase_claims):
-    """Returns a new AuthClaims domain object from Firebase claims."""
+    """Returns a new AuthClaims domain object from Firebase claims.
+
+    Args:
+        firebase_claims: dict(str: *). The raw claims returned by the Firebase
+            SDK.
+
+    Returns:
+        auth_domain.AuthClaims. Oppia's representation of auth claims.
+    """
     auth_id = firebase_claims.get('sub')
     email = firebase_claims.get('email')
     role_is_super_admin = (

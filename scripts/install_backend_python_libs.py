@@ -491,27 +491,28 @@ def get_mismatches():
 
     mismatches = {}
     for normalized_library_name in requirements_contents:
-        if normalized_library_name not in IGNORED_LIBRARY_NAME_MISMATCHES:
-            # Library exists in the directory and the requirements file.
-            if normalized_library_name in directory_contents:
-                # Library matches but version doesn't match.
-                if (directory_contents[normalized_library_name] !=
-                        requirements_contents[normalized_library_name]):
-                    mismatches[normalized_library_name] = (
-                        requirements_contents[normalized_library_name],
-                        directory_contents[normalized_library_name])
-            # Library exists in the requirements file but not in the directory.
-            else:
+        if normalized_library_name in IGNORED_LIBRARY_NAME_MISMATCHES:
+            continue
+        # Library exists in the directory and the requirements file.
+        if normalized_library_name in directory_contents:
+            # Library matches but version doesn't match.
+            if (directory_contents[normalized_library_name] !=
+                    requirements_contents[normalized_library_name]):
                 mismatches[normalized_library_name] = (
-                    requirements_contents[normalized_library_name], None)
+                    requirements_contents[normalized_library_name],
+                    directory_contents[normalized_library_name])
+        # Library exists in the requirements file but not in the directory.
+        else:
+            mismatches[normalized_library_name] = (
+                requirements_contents[normalized_library_name], None)
 
     for normalized_library_name in directory_contents:
-        if normalized_library_name not in IGNORED_LIBRARY_NAME_MISMATCHES:
-            # Library exists in the directory but is not in the requirements
-            # file.
-            if normalized_library_name not in requirements_contents:
-                mismatches[normalized_library_name] = (
-                    None, directory_contents[normalized_library_name])
+        if normalized_library_name in IGNORED_LIBRARY_NAME_MISMATCHES:
+            continue
+        # Library exists in the directory but is not in the requirements file.
+        if normalized_library_name not in requirements_contents:
+            mismatches[normalized_library_name] = (
+                None, directory_contents[normalized_library_name])
 
     return mismatches
 
