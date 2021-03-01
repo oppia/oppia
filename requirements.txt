@@ -29,14 +29,15 @@ firebase-admin==3.2.1     # via -r requirements.in
 funcsigs==1.0.2           # via apache-beam, mock
 future==0.18.2            # via -r requirements.in, apache-beam
 futures==3.3.0            # via apache-beam, google-api-core, grpcio, pyarrow
-google-api-core[grpc]==1.22.4  # via firebase-admin, google-api-python-client, google-cloud-core, google-cloud-firestore, google-cloud-tasks
+google-api-core[grpc]==1.22.4  # via firebase-admin, google-api-python-client, google-cloud-core, google-cloud-firestore, google-cloud-tasks, google-cloud-translate
 google-api-python-client==1.12.8  # via firebase-admin
 google-auth-httplib2==0.0.4  # via google-api-python-client
 google-auth==1.22.1       # via google-api-core, google-api-python-client, google-auth-httplib2, google-cloud-storage
-google-cloud-core==1.5.0  # via google-cloud-firestore, google-cloud-storage
+google-cloud-core==1.5.0  # via google-cloud-firestore, google-cloud-storage, google-cloud-translate
 google-cloud-firestore==1.9.0  # via firebase-admin
 google-cloud-storage==1.35.0  # via firebase-admin
 google-cloud-tasks==1.5.0  # via -r requirements.in
+google-cloud-translate==2.0.1  # via -r requirements.in
 google-resumable-media==1.2.0  # via google-cloud-storage
 googleapis-common-protos[grpc]==1.52.0  # via -r requirements.in, google-api-core, grpc-google-iam-v1
 googleappenginecloudstorageclient==1.9.22.1  # via -r requirements.in, googleappenginemapreduce, googleappenginepipeline
