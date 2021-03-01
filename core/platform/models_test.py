@@ -308,6 +308,13 @@ class RegistryUnitTest(test_utils.TestBase):
             self.registry_instance.import_taskqueue_services(),
             dev_mode_taskqueue_services)
 
+    def test_import_cloud_translate_services(self):
+        """Tests import cloud translate services function."""
+        from core.platform.cloud_translate import cloud_translate_services
+        self.assertEqual(
+            self.registry_instance.import_cloud_translate_services(),
+            cloud_translate_services)
+
     def test_import_search_services(self):
         """Tests import search services function."""
         from core.platform.search import elastic_search_services
