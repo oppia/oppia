@@ -39,7 +39,7 @@ describe('Contributor dashboard page', function() {
     can_review_questions: true
   };
   var mockWindow = {
-    scrollTop: 6
+    pageYOffset: 6
   };
 
   importAllAngularServices();
@@ -144,16 +144,16 @@ describe('Contributor dashboard page', function() {
       expect(scrollSpy).toHaveBeenCalled();
     });
 
-    it('should show default header if window scrollTop is ' +
+    it('should show default header if window pageYOffset is ' +
       'less than 5', function() {
-      mockWindow.scrollTop = 3;
+      mockWindow.pageYOffset = 3;
       ctrl.scrollFunction();
       expect(ctrl.defaultHeaderVisible).toBe(true);
     });
 
-    it('should show collapsed header if window scrollTop is' +
+    it('should show collapsed header if window pageYOffset is' +
       ' scrolled greater than 5', function() {
-      mockWindow.scrollTop = 10;
+      mockWindow.pageYOffset = 10;
       ctrl.scrollFunction();
       expect(ctrl.defaultHeaderVisible).toBe(false);
     });
