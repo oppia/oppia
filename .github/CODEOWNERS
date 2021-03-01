@@ -428,6 +428,10 @@
 
 
 # Infrastructure.
+/jobs/__init__.py @brianrodri
+/jobs/base_model_*.py @brianrodri
+/jobs/jobs_utils.py @brianrodri
+/jobs/jobs_utils_test.py @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -639,8 +643,8 @@
 /core/domain/auth*.py @brianrodri
 /core/domain/caching*.py @brianrodri
 /core/domain/taskqueue*.py @brianrodri
-/core/templates/services/auth-interceptor.service*.ts @brianrodri
 /core/templates/services/auth.service*.ts @brianrodri
+/core/templates/services/auth-backend-api.service*.ts @brianrodri
 
 
 # Critical files.
