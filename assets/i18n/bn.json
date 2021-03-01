@@ -120,6 +120,7 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING": "আপনার অন্বেষণ শেয়ার করুন",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "আপনার অন্বেষণের উন্নতি করুন",
 	"I18N_GET_STARTED_PAGE_TITLE": "শুরু করুন",
+	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "ক/খ হিসেবে অনুপাত দাও।",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "প্রান্ত যোগ করুন",
 	"I18N_INTERACTIONS_GRAPH_ADD_NODE": "সংযোগস্থল যোগ করুন",
 	"I18N_INTERACTIONS_GRAPH_DELETE": "অপসারণ",
