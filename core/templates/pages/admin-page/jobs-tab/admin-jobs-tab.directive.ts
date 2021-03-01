@@ -50,6 +50,7 @@ angular.module('oppia').directive('adminJobsTab', [
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              $rootScope.$apply();
             });
         };
 
@@ -60,9 +61,11 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Job started successfully.');
               window.location.reload();
+              $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              $rootScope.$apply();
             });
         };
 
@@ -73,9 +76,11 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to job.');
               window.location.reload();
+              $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              $rootScope.$apply();
             });
         };
 
@@ -86,9 +91,11 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Computation started successfully.');
               window.location.reload();
+              $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              $rootScope.$apply();
             });
         };
 
@@ -99,9 +106,11 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to computation.');
               window.location.reload();
+              $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              $rootScope.$apply();
             });
         };
         ctrl.$onInit = function() {
