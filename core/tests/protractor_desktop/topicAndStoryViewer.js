@@ -33,6 +33,7 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
 describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
@@ -44,6 +45,8 @@ describe('Topic and Story viewer functionality', function() {
   var subTopicViewerPage = null;
   var explorationPlayerPage = null;
   var dummyExplorationIds = [];
+  var skillId = null;
+  var skillEditorPage = null;
 
   var createDummyExplorations = async function() {
     var EXPLORATION = {
@@ -72,6 +75,7 @@ describe('Topic and Story viewer functionality', function() {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
     await users.createAndLoginAdminUser(
@@ -89,6 +93,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.togglePracticeTab();
     await topicEditorPage.saveTopic('Added thumbnail.');
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
@@ -104,10 +109,13 @@ describe('Topic and Story viewer functionality', function() {
       });
 
     await topicsAndSkillsDashboardPage.get();
-    (
-      await
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill TASV1', 'Concept card explanation', false));
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill TASV1', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
@@ -117,6 +125,8 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.addSubtopic(
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
+    await topicEditorPage.addConceptCardToSubtopicExplanation('Skill TASV1');
+    await topicEditorPage.saveSubtopicExplanation();
     await topicEditorPage.saveTopic('Added subtopic.');
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
@@ -162,11 +172,32 @@ describe('Topic and Story viewer functionality', function() {
   it(
     'should check for topic description, stories and revision cards',
     async function() {
+      await users.logout();
+      await users.login(
+        'creator@storyViewer.com', true);
       await topicViewerPage.get('math', 'Topic TASV1');
-      await topicViewerPage.expectedTopicInformationToBe('Description');
-      await topicViewerPage.expectedStoryCountToBe(1);
-      await subTopicViewerPage.get();
-      await subTopicViewerPage.expectedRevisionCardCountToBe(1);
+      await topicViewerPage.expectTopicInformationToBe('Description');
+      await topicViewerPage.expectStoryCountToBe(1);
+      await topicViewerPage.moveToRevisionTab();
+      await subTopicViewerPage.expectRevisionCardCountToBe(1);
+      await subTopicViewerPage.get('Subtopic TASV1');
+      await subTopicViewerPage.expectConceptCardCountToBe(1);
+      await subTopicViewerPage.getConceptCard();
+      await subTopicViewerPage.expectConceptCardInformationToBe(
+        'Concept card explanation');
+      await skillEditorPage.get(skillId);
+      await workflow.createQuestion();
+      await skillEditorPage.get(skillId);
+      await skillEditorPage.moveToQuestionsTab();
+      await topicViewerPage.get('math', 'Topic TASV1');
+      await topicViewerPage.moveToPracticeTab();
+      await topicViewerPage.selectSkillForPractice('Subtopic TASV1');
+      await topicViewerPage.startPractice();
+      await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+      await explorationPlayerPage.clickThroughToNextCard();
+      await topicViewerPage.expectMessageAfterCompletion(
+        'Test complete. Well done!'
+      );
     });
 
   afterEach(async function() {

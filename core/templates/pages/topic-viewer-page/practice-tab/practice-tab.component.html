@@ -9,7 +9,7 @@
       </div>
       <mat-card-content>
         <div *ngFor="let subtopic of availableSubtopics; let i = index" class="practice-tab-subtopic-item">
-          <mat-checkbox color="primary" class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]"
+          <mat-checkbox color="primary" class="practice-tab-mat-checkbox protractor-test-skill-checkbox" [(ngModel)]="selectedSubtopicIndices[i]"
                         (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
             {{ subtopic.getTitle() }}
           </mat-checkbox>
@@ -17,7 +17,7 @@
       </mat-card-content>
       <mat-card-actions>
         <div class="fx-row fx-main-center fx-cross-center full-width">
-          <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button">
+          <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button protractor-test-practice-start-button">
             <span *ngIf="questionsStatusCallIsComplete" class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
             <mat-spinner [diameter]="20" class="question-status-spinner" *ngIf="!questionsStatusCallIsComplete"></mat-spinner>
           </button>
