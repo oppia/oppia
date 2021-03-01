@@ -52,7 +52,9 @@ describe('EditProfilePictureModalController', function() {
         return document.createElement('img');
       });
 
-      var element = $(document.createElement('div'));
+      let dummyDiv = document.createElement('div');
+      dummyDiv.className = 'oppia-profile-image-uploader';
+      document.body.append(dummyDiv);
 
       // This is just a mock base 64 in order to test the FileReader event.
       var dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
@@ -60,8 +62,6 @@ describe('EditProfilePictureModalController', function() {
         window.atob(dataBase64Mock), c => c.charCodeAt(0));
       var file = new File([arrayBuffer], 'filename.mp3');
 
-      spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
-        .returnValue(element);
 
       $scope.onInvalidImageLoaded();
 
@@ -79,7 +79,6 @@ describe('EditProfilePictureModalController', function() {
       // Ref: https://api.jquery.com/fadeout/
       setTimeout(function() {
         $timeout.flush();
-        done();
 
         expect($scope.invalidImageWarningIsShown).toBe(false);
         expect($scope.uploadedImage).toBe(
@@ -98,6 +97,8 @@ describe('EditProfilePictureModalController', function() {
 
         expect($scope.croppedImageDataUrl).toBe(mockUrl);
         expect($uibModalInstance.close).toHaveBeenCalledWith(mockUrl);
+        document.body.removeChild(dummyDiv);
+        done();
       }, 800);
     });
 });
