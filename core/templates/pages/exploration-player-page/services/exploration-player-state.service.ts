@@ -139,7 +139,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       $q.all([
         EditableExplorationBackendApiService.fetchApplyDraftExploration(
           explorationId),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
@@ -178,7 +178,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
           explorationId, storyUrlFragment),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
