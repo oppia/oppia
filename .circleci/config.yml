@@ -96,8 +96,7 @@ commands:
       - run:
           name: Skip build for release changelog update PRs
           command: |
-            PR_BRANCH=$(curl -s https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER} | jq -r '.head.ref')
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ "$PR_BRANCH" == update-changelog-for-release* ]]; then
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ ${CIRCLE_BRANCH} == update-changelog-for-release* ]]; then
               circleci-agent step halt
             fi
 
@@ -147,6 +146,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
