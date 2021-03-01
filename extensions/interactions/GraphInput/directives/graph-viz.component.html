@@ -82,7 +82,7 @@
       </line>
       <g *ngFor="let edge of graph.edges; let idx = index">
         <line class="protractor-test-graph-edge"
-              ng-click="onClickEdge(idx)"
+              (click)="onClickEdge(idx)"
               (mouseenter)="state.hoveredEdge = idx"
               (mouseleave)="state.hoveredEdge = (idx === state.hoveredEdge) ? null : state.hoveredEdge"
               attr.x1="{{graph.vertices[edge.src].x}}"

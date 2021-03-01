@@ -106,7 +106,6 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.graph);
     this.componentSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => this.state.currentMode = null
@@ -210,10 +209,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     // Note: Transform client (X, Y) to SVG (X, Y). This has to be
     // done so that changes due to viewBox attribute are
     // propagated nicely.
-    var pt = this.vizContainer[0].createSVGPoint();
+    const pt = this.vizContainer[0].createSVGPoint();
     pt.x = event.clientX;
     pt.y = event.clientY;
-    var svgp = pt.matrixTransform(
+    const svgp = pt.matrixTransform(
       this.vizContainer[0].getScreenCTM().inverse());
     this.state.mouseX = svgp.x;
     this.state.mouseY = svgp.y;
@@ -494,7 +493,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       endIndex >= this.graph.vertices.length) {
       return;
     }
-    for (var i = 0; i < this.graph.edges.length; i++) {
+    for (let i = 0; i < this.graph.edges.length; i++) {
       if (startIndex === this.graph.edges[i].src &&
           endIndex === this.graph.edges[i].dst) {
         return;
@@ -549,10 +548,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   private _deleteRepeatedUndirectedEdges(): void {
-    for (var i = 0; i < this.graph.edges.length; i++) {
-      var edge1 = this.graph.edges[i];
-      for (var j = i + 1; j < this.graph.edges.length; j++) {
-        var edge2 = this.graph.edges[j];
+    for (let i = 0; i < this.graph.edges.length; i++) {
+      const edge1 = this.graph.edges[i];
+      for (let j = i + 1; j < this.graph.edges.length; j++) {
+        const edge2 = this.graph.edges[j];
         if ((edge1.src === edge2.src && edge1.dst === edge2.dst) ||
             (edge1.src === edge2.dst && edge1.dst === edge2.src)) {
           this.deleteEdge(j);
