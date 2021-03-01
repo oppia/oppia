@@ -327,7 +327,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
 
         snapshot_dict = saved_model.compute_snapshot()
-        snapshot_dict['translator_ids'] = []
+        snapshot_dict['translator_ids'] = ['owner_id']
         snapshot_dict['all_viewer_ids'] = []
 
         snapshot_dict = exp_models.ExplorationRightsModel.convert_to_valid_dict(
