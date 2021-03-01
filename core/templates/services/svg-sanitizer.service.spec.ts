@@ -76,7 +76,7 @@ describe('SvgSanitizerService', () => {
         }
       ]
     });
-    svgSanitizerService = TestBed.get(SvgSanitizerService);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
   });
 
   it('should check for invalid base64 images', () => {
@@ -112,6 +112,31 @@ describe('SvgSanitizerService', () => {
     let cleanedSvgString = (
       svgSanitizerService.cleanMathExpressionSvgString(svgString));
     let expectedCleanSvgString = (
+      '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.429e' +
+      'x" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vertical-a' +
+      'lign: -0.241ex;"><g stroke="currentColor" fill="currentColor" stro' +
+      'ke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+      ' d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 ' +
+      '386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14' +
+      '0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></g></svg>'
+    );
+    expect(cleanedSvgString).toEqual(expectedCleanSvgString);
+  });
+
+  it('should remove custom data attribute from the SVG string', function() {
+    var svgString = (
+      '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
+      'focusable="false" role= "img" style="vertical-align: -0.241ex;" xmln' +
+      's="http://www.w3.org/2000/svg"><g stroke="currentColor" fill="curren' +
+      'tColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stro' +
+      'ke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 ' +
+      '406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 4' +
+      '14 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z' +
+      '" data-custom="datacustom"/></g></svg>'
+    );
+    var cleanedSvgString = (
+      svgSanitizerService.cleanMathExpressionSvgString(svgString));
+    var expectedCleanSvgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.429e' +
       'x" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vertical-a' +
       'lign: -0.241ex;"><g stroke="currentColor" fill="currentColor" stro' +
@@ -167,6 +192,49 @@ describe('SvgSanitizerService', () => {
       verticalPadding: '0d241'
     };
     expect(dimensions).toEqual(expectedDimension);
+  });
+
+  it('should extract dimensions from SVG string without style', function() {
+    var svgString = (
+      '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
+      'focusable="false" style="" xmlns="http://www.w3.org/2000/svg"><g str' +
+      'oke="currentColor" fill="currentColor" stroke-width="0" transform="m' +
+      'atrix(1 0 0 -1 0 0)"><path stroke-width="1" d="M52 289Q59 331 106 38' +
+      '6T222 442Q257 442 2864Q412 404 406 402Q368 386 350 336Q290 115 290 7' +
+      '8Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153' +
+      'H489Q504 153 504 145284 52 289Z"/></g></svg>'
+    );
+    var dimensions = (
+      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
+        svgString));
+    var expectedDimension = {
+      height: '1d429',
+      width: '1d33',
+      verticalPadding: '0'
+    };
+    expect(dimensions).toEqual(expectedDimension);
+  });
+
+  it('should get invalid svg tags and attributes', function() {
+    var dataURI = (
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" widdth="1.33ex" height="1.4' +
+        '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
+        'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
+        'stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-widt' +
+        'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
+        'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
+        '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></' +
+        'g><circel></circel></svg>'
+      ))));
+    var invalidSvgTagsAndAttrs = (
+      svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
+    var expectedInvalidSvgTagsAndAttrs = {
+      tags: ['circel'],
+      attrs: ['svg:widdth']
+    };
+    expect(invalidSvgTagsAndAttrs).toEqual(expectedInvalidSvgTagsAndAttrs);
   });
 
   it('should catch malicious SVGs', () => {
