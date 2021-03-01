@@ -168,7 +168,7 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
                 status='public',
                 viewable_if_private=False,
                 first_published_msec=0.1,
-                translator_ids=[],
+                translator_ids=[self.USER_ID_1],
                 all_viewer_ids=[],
             ).save(
                 self.USER_ID_COMMITTER, 'Created new exploration right',

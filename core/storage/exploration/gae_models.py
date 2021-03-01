@@ -442,12 +442,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             dict. The content of the model. Only valid fields and values are
             present.
         """
-        # The all_viewer_ids field was previously used in some versions of the
-        # model, we need to remove it.
-        if 'all_viewer_ids' in model_dict:
-            del model_dict['all_viewer_ids']
-        if 'translator_ids' in model_dict:
-            del model_dict['translator_ids']
 
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
@@ -460,6 +454,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
             model_dict['translator_ids'] = []
+
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+        if 'translator_ids' in model_dict:
+            del model_dict['translator_ids']
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.
