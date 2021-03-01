@@ -915,7 +915,9 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['ExtractImageFilenamesFromStateService'] =
       new ExtractImageFilenamesFromStateService(
-        upgradedServices['HtmlEscaperService']);
+        upgradedServices['HtmlEscaperService'],
+        upgradedServices['contentTranslationManagerService'],
+        upgradedServices['contentTranslationLanguageService']);
     upgradedServices['FocusManagerService'] = new FocusManagerService(
       upgradedServices['DeviceInfoService'],
       upgradedServices['IdGenerationService']);
