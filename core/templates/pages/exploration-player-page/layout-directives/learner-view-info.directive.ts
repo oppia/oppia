@@ -27,10 +27,17 @@ require(
   'information-card-modal.controller.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
+require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/date-time-format.service.ts');
+
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('learnerViewInfo', [
   function() {
@@ -41,15 +48,20 @@ angular.module('oppia').directive('learnerViewInfo', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$uibModal', 'ContextService',
-        'ReadOnlyExplorationBackendApiService', 'UrlService',
-        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
+        'UrlService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'TOPIC_VIEWER_STORY_URL_TEMPLATE',
         function(
             $http, $log, $rootScope, $uibModal, ContextService,
-            ReadOnlyExplorationBackendApiService, UrlService,
-            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+            ReadOnlyExplorationBackendApiService, UrlInterpolationService,
+            UrlService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+            TOPIC_VIEWER_STORY_URL_TEMPLATE
+        ) {
           var ctrl = this;
           var explorationId = ContextService.getExplorationId();
           var expInfo = null;
+          ctrl.directiveSubscriptions = new Subscription();
+
           ctrl.showInformationCard = function() {
             if (expInfo) {
               openInformationCardModal();
@@ -90,6 +102,21 @@ angular.module('oppia').directive('learnerViewInfo', [
               // No further action is needed.
             });
           };
+
+          ctrl.getTopicUrl = function() {
+            var topicUrlFragment = (
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
+            var classroomUrlFragment = (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl());
+            return topicUrlFragment &&
+             classroomUrlFragment &&
+              UrlInterpolationService.interpolateUrl(
+                TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+                  topic_url_fragment: topicUrlFragment,
+                  classroom_url_fragment: classroomUrlFragment,
+                });
+          };
+
           ctrl.$onInit = function() {
             ctrl.explorationTitle = 'Loading...';
             ReadOnlyExplorationBackendApiService.fetchExploration(
@@ -98,6 +125,31 @@ angular.module('oppia').directive('learnerViewInfo', [
                 ctrl.explorationTitle = response.exploration.title;
                 $rootScope.$applyAsync();
               });
+            // To check if the exploration is linked to the topic or not.
+            ctrl.isLinkedToTopic = ctrl.getTopicUrl() ? true : false;
+            // If linked to topic then print topic name in the lesson player.
+            if (ctrl.isLinkedToTopic) {
+              ctrl.storyViewerBackendApiService = (
+                OppiaAngularRootComponent.storyViewerBackendApiService);
+              var topicUrlFragment = (
+                UrlService.getTopicUrlFragmentFromLearnerUrl());
+              var classroomUrlFragment = (
+                UrlService.getClassroomUrlFragmentFromLearnerUrl());
+              var storyUrlFragment = (
+                UrlService.getStoryUrlFragmentFromLearnerUrl());
+              ctrl.storyViewerBackendApiService.fetchStoryData(
+                topicUrlFragment,
+                classroomUrlFragment,
+                storyUrlFragment).then(
+                function(storyDataDict) {
+                  ctrl.storyPlaythroughObject = storyDataDict;
+                  var topicName = ctrl.storyPlaythroughObject.topicName;
+                  ctrl.topicName = topicName;
+                });
+            }
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

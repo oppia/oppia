@@ -178,6 +178,12 @@ describe('Url Service', () => {
     expect(
       urlService.getTopicUrlFragmentFromLearnerUrl()
     ).toBe('topic-name');
+    mockLocation.pathname = '/explore/16';
+    mockLocation.search = (
+      '?topic_url_fragment=topic');
+    expect(
+      urlService.getTopicUrlFragmentFromLearnerUrl()
+    ).toBe('topic');
     mockLocation.pathname = '/topc/abcdefgijklm';
     expect(function() {
       urlService.getTopicUrlFragmentFromLearnerUrl();
@@ -186,6 +192,12 @@ describe('Url Service', () => {
 
   it('should correctly retrieve classroom name from url', () => {
     mockLocation.pathname = '/learn/math/abcdefgijklm';
+    expect(
+      urlService.getClassroomUrlFragmentFromLearnerUrl()
+    ).toBe('math');
+    mockLocation.pathname = '/explore/16';
+    mockLocation.search = (
+      '&classroom_url_fragment=math');
     expect(
       urlService.getClassroomUrlFragmentFromLearnerUrl()
     ).toBe('math');
