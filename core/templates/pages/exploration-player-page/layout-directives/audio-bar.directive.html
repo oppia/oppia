@@ -1,4 +1,4 @@
-<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}">
+<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
@@ -252,6 +252,16 @@
     top: 3.5em;
   }
 
+  @media(max-width: 768px) {
+    .audio-header {
+      top: 3.5em;
+    }
+
+    .audio-header.headroom--unpinned {
+      margin-top: 32px;
+      top: 0;
+      }
+  }
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;
