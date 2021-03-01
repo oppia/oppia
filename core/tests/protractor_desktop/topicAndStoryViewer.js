@@ -35,7 +35,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
-describe('Topic and Story viewer functionality', function() {
+fdescribe('Topic and Story viewer functionality', function() {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
@@ -172,6 +172,9 @@ describe('Topic and Story viewer functionality', function() {
   it(
     'should check for topic description, stories and revision cards',
     async function() {
+      await users.logout();
+      await users.login(
+        'creator@storyViewer.com', true);
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.expectTopicInformationToBe('Description');
       await topicViewerPage.expectStoryCountToBe(1);
