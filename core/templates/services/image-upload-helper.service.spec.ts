@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for ImageUploadHelperService.
+ * @fileoverview Unit test for imageUploadHelperService.
  */
 
 import { HttpClientTestingModule } from
@@ -21,41 +21,70 @@ import { HttpClientTestingModule } from
 import { TestBed } from '@angular/core/testing';
 import { ImageUploadHelperService } from './image-upload-helper.service';
 
-describe('ImageUploadHelperService', () => {
-  let imageUploadHelperService: ImageUploadHelperService = null;
+describe('imageUploadHelperService', () => {
+  let imageUploadHelperService: ImageUploadHelperService;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
     imageUploadHelperService =
-      TestBed.get(ImageUploadHelperService);
+      TestBed.inject(ImageUploadHelperService);
   });
 
   it('should convert image data to image file', () => {
-    let imageFile = null;
-    imageFile = (
+    const imageFile = (
       imageUploadHelperService.convertImageDataToImageFile(
         'data:image/png;base64,xyz'));
     expect(imageFile instanceof Blob).toBe(true);
   });
 
-  it('should generate a filename for a math SVG', () => {
-    let height = '1d345';
-    let width = '2d455';
-    let verticalPadding = '0d123';
-    let generatedFilename = (
+  it('should return null for non-image data', function() {
+    const imageFile = (
+      imageUploadHelperService.convertImageDataToImageFile(
+        'data:text/plain;base64,xyz'));
+    expect(imageFile).toEqual(null);
+  });
+
+  it('should generate a filename for a math SVG', function() {
+    const height = '1d345';
+    const width = '2d455';
+    const verticalPadding = '0d123';
+    const generatedFilename = (
       imageUploadHelperService.generateMathExpressionImageFilename(
         height, width, verticalPadding));
     expect(generatedFilename.endsWith(
       '_height_1d345_width_2d455_vertical_0d123.svg')).toBe(true);
   });
 
-  it('should generate a filename for a normal image', () => {
-    let height = 720;
-    let width = 180;
-    let format = 'png';
-    let generatedFilename = (
+  it('should throw error for an invalid filename', function() {
+    const height = 'height';
+    const width = '2d455';
+    const verticalPadding = '0d123';
+    expect(() => imageUploadHelperService.generateMathExpressionImageFilename(
+      height, width, verticalPadding))
+      .toThrowError('The Math SVG filename format is invalid.');
+  });
+
+  it('should generate a filename for a normal image', function() {
+    const height = 720;
+    const width = 180;
+    const format = 'png';
+    const generatedFilename = (
       imageUploadHelperService.generateImageFilename(height, width, format));
     expect(generatedFilename.endsWith('_height_720_width_180.png')).toBe(true);
+  });
+
+  it('should get trusted resource Url for thumbnail filename', function() {
+    const imageFileName = 'image.svg';
+    const entityType = 'logo';
+    const entityId = 'id';
+    const trustedResourceUrl = (
+      imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
+        imageFileName, entityType, entityId
+      )
+    );
+    expect(String(trustedResourceUrl)).toEqual(
+      '/assetsdevhandler/logo/id/assets/thumbnail/image.svg'
+    );
   });
 });
