@@ -492,8 +492,6 @@ import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -676,8 +674,6 @@ export class UpgradedServices {
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
-    upgradedServices['ThreadMessageSummaryObjectFactory'] =
-      new ThreadMessageSummaryObjectFactory();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
@@ -725,8 +721,7 @@ export class UpgradedServices {
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+      new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(
         upgradedServices['FractionObjectFactory'],
@@ -854,8 +849,7 @@ export class UpgradedServices {
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ThreadMessageObjectFactory'] =
-      new ThreadMessageObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+      new ThreadMessageObjectFactory();
     upgradedServices['TopicCreationBackendApiService'] =
         new TopicCreationBackendApiService(
           upgradedServices['HttpClient']);
@@ -975,8 +969,7 @@ export class UpgradedServices {
       new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory(
-        upgradedServices['SuggestionObjectFactory'],
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+        upgradedServices['SuggestionObjectFactory']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(

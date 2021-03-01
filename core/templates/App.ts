@@ -31,16 +31,16 @@ require('components/button-directives/create-activity-button.directive.ts');
 require('components/button-directives/social-buttons.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'alert-message.directive.ts');
+   'alert-message.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'promo-bar.directive.ts');
+   'promo-bar.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'side-navigation-bar.directive.ts');
+   'side-navigation-bar.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'top-navigation-bar.directive.ts');
+   'top-navigation-bar.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
@@ -152,7 +152,7 @@ angular.module('oppia').config([
       'SubtopicPageContentsObjectFactory', 'SubtopicPageObjectFactory',
       'SubtopicViewerBackendApiService', 'SuggestionThreadObjectFactory',
       'SuggestionsService', 'TextInputRulesService',
-      'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
+      'ThreadMessageObjectFactory', 'ThreadMessageSummary',
       'ThreadStatusDisplayService', 'TopicObjectFactory',
       'TopicRightsObjectFactory', 'TopicViewerBackendApiService',
       'TranslationLanguageService', 'UrlInterpolationService', 'UrlService',
@@ -254,8 +254,8 @@ angular.module('oppia').config([
               // and we do not want to resurface the error to the user.
               if (
                 rejection.data &&
-                rejection.data.error &&
-                rejection.status < 500
+                 rejection.data.error &&
+                 rejection.status < 500
               ) {
                 warningMessage = rejection.data.error;
               }
@@ -263,10 +263,10 @@ angular.module('oppia').config([
               // The rejection.config is an optional parameter.
               // see https://docs.angularjs.org/api/ng/service/$http
               var rejectionUrl = typeof rejection.config !== 'undefined' ? (
-                rejection.config.url) : '';
+                 rejection.config.url) : '';
               var additionalLoggingInfo = warningMessage +
-                '\n URL: ' + rejectionUrl +
-                '\n data: ' + JSON.stringify(rejection.data);
+                 '\n URL: ' + rejectionUrl +
+                 '\n data: ' + JSON.stringify(rejection.data);
               // $exceptionHandler is called directly instead of
               // throwing an error to invoke it because the return
               // statement below must execute. There are tests

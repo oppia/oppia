@@ -451,8 +451,6 @@ import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
@@ -760,7 +758,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static textInputTokenizer: TextInputTokenizer;
   static textInputValidationService: TextInputValidationService;
   static threadMessageObjectFactory: ThreadMessageObjectFactory;
-  static threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
   static threadStatusDisplayService: ThreadStatusDisplayService;
   static topicCreationBackendApiService: TopicCreationBackendApiService;
   static topicObjectFactory: TopicObjectFactory;
@@ -1054,7 +1051,6 @@ private textInputRulesService: TextInputRulesService,
 private textInputTokenizer: TextInputTokenizer,
 private textInputValidationService: TextInputValidationService,
 private threadMessageObjectFactory: ThreadMessageObjectFactory,
-private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory,
 private threadStatusDisplayService: ThreadStatusDisplayService,
 private topicCreationBackendApiService: TopicCreationBackendApiService,
 private topicObjectFactory: TopicObjectFactory,
@@ -1514,8 +1510,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.textInputValidationService);
     OppiaAngularRootComponent.threadMessageObjectFactory = (
       this.threadMessageObjectFactory);
-    OppiaAngularRootComponent.threadMessageSummaryObjectFactory = (
-      this.threadMessageSummaryObjectFactory);
     OppiaAngularRootComponent.threadStatusDisplayService = (
       this.threadStatusDisplayService);
     OppiaAngularRootComponent.topicCreationBackendApiService = (
