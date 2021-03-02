@@ -2131,8 +2131,8 @@ class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
     }
 
     def check_blank_lines_below_function_def(self, node):
-        """Visit a function to ensure that there are no blank lines below
-        function definition.
+        """Visit each function and checks if there are no
+        new lines below function definition.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
