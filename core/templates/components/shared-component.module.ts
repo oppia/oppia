@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
-    ThumbnailDisplayComponent
+    ThumbnailDisplayComponent,
   ],
 
   exports: [
@@ -134,15 +134,17 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     // Components, directives, and pipes.
+    AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     SharingLinksComponent,
+    SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    ThumbnailDisplayComponent,
+    SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    ThumbnailDisplayComponent,
     TranslatePipe,
-    SummaryListHeaderComponent
   ],
 })
 

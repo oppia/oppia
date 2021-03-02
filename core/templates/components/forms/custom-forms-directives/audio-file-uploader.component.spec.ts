@@ -12,31 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IdGenerationService } from 'services/id-generation.service';
-import { AudioFileUploaderComponent } from './audio-file-uploader.component';
-
 /**
  * @fileoverview Tests for audio-file-uploader component.
  */
+
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { AudioFileUploaderComponent } from './audio-file-uploader.component';
 
 describe('Audio File Uploader Component', () => {
   let component: AudioFileUploaderComponent;
   let fixture:
     ComponentFixture<AudioFileUploaderComponent>;
-  let testId: string = '123';
-
-  class MockIdGenerationService {
-    generateNewId(): string {
-      return testId;
-    }
-  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AudioFileUploaderComponent],
-      providers: [{ provide: IdGenerationService,
-        useClass: MockIdGenerationService }]
     }).compileComponents();
   }));
 
@@ -51,12 +41,6 @@ describe('Audio File Uploader Component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initalize correctly', () => {
-    expect(component.inputFieldClassName)
-      .toEqual('audio-file-uploader-input' + testId);
-    expect(component.inputFieldFormId)
-      .toEqual('audio-file-uploader-form' + testId);
-  });
 
   it('should validate files correctly', () => {
     let mockFile = new File(['foo'], 'audio.mp3', {

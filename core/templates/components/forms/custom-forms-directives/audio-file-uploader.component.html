@@ -1,9 +1,9 @@
 <div class="oppia-audio-container protractor-test-audio-upload-container">
-  <form [id]="inputFieldFormId">
+  <form #inputForm>
     <input type="file"
-           ngClass="inputFieldClassName"
            class="protractor-test-upload-audio-input"
-           (change)="this.addAudio($event)" >
+           (change)="this.addAudio($event)"
+           #fileInput>
   </form>
   <div class="license-warning">
     Please only upload audio files that you created yourself and that you are willing to license under the site's

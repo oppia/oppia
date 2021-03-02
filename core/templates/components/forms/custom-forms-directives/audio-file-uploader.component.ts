@@ -12,40 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { IdGenerationService } from 'services/id-generation.service';
-
 /**
  * @fileoverview Directive that enables the user to upload audio files.
  */
 
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
 @Component({
-  selector: 'audio-file-uploader',
+  selector: 'oppia-audio-file-uploader',
   templateUrl: './audio-file-uploader.component.html',
   styleUrls: []
 })
-export class AudioFileUploaderComponent implements OnInit {
-  @Input() droppedFile?: FileList;
-  @Output() onFileChanged: EventEmitter<File> = new EventEmitter<File>();
-  @Output() onFileCleared: EventEmitter<void> = new EventEmitter<void>();
+export class AudioFileUploaderComponent {
+  @Input() droppedFile: FileList;
+  @Output() changeFile: EventEmitter<File> = new EventEmitter<File>();
+  @Output() clearFile: EventEmitter<void> = new EventEmitter<void>();
+  @ViewChild('fileInput') fileInputRef: ElementRef;
+  @ViewChild('inputForm') inputFormRef: ElementRef;
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
-  inputFieldClassName?: string;
-  inputFieldFormId?: string;
   errorMessage?: string;
-
-  constructor(
-    private idGenerationService: IdGenerationService
-  ) { }
-
-  ngOnInit(): void {
-    // We generate a random class name to distinguish this input from
-    // others in the DOM.
-    this.inputFieldClassName = (
-      'audio-file-uploader-input' + this.idGenerationService.generateNewId());
-    this.inputFieldFormId = (
-      'audio-file-uploader-form' + this.idGenerationService.generateNewId());
-  }
 
   validateUploadedFile(file: File): string {
     if (!file) {
@@ -72,27 +58,23 @@ export class AudioFileUploaderComponent implements OnInit {
   }
 
   addAudio(evt: Event): void {
-    var file = (<HTMLInputElement>evt.currentTarget).files[0];
+    let file = this.fileInputRef.nativeElement.files[0];
     if (!file) {
-      this.onFileCleared.emit();
+      this.clearFile.emit();
       return;
     }
-
     this.errorMessage = this.validateUploadedFile(file);
     if (!this.errorMessage) {
       // Only fire this event if validations pass.
-      this.onFileChanged.emit(file);
+      this.changeFile.emit(file);
     } else {
-      (<HTMLFormElement>document.getElementById(
-        this.inputFieldFormId)).val('');
-      this.onFileCleared.emit();
+      this.inputFormRef.nativeElement.reset();
+      this.clearFile.emit();
     }
   }
 }
 
 angular.module('oppia').directive(
-  'audioFileUploader',
-  downgradeComponent(
-    { component: AudioFileUploaderComponent,
-      inputs: ['droppedFile'], outputs: ['onFileChanged', 'onFileCleared'] })
+  'oppiaAudioFileUploader',
+  downgradeComponent({ component: AudioFileUploaderComponent })
 );
