@@ -115,33 +115,91 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.suggestTranslatedText = function() {
-      if (!$scope.uploadingTranslation && !$scope.loadingData) {
-        SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-          'Translation');
-        $scope.uploadingTranslation = true;
-        var imagesData = ImageLocalStorageService.getStoredImagesData();
-        ImageLocalStorageService.flushStoredImagesData();
-        ContextService.resetImageSaveDestination();
-        TranslateTextService.suggestTranslatedText(
-          $scope.activeWrittenTranslation.html,
-          TranslationLanguageService.getActiveLanguageCode(),
-          imagesData, function() {
-            AlertsService.addSuccessMessage(
-              'Submitted translation for review.');
-            if ($scope.moreAvailable) {
-              var textAndAvailability = (
-                TranslateTextService.getTextToTranslate());
-              $scope.textToTranslate = textAndAvailability.text;
-              $scope.moreAvailable = textAndAvailability.more;
-            }
-            $scope.activeWrittenTranslation.html = '';
-            $scope.uploadingTranslation = false;
-          }, () => {
+      $scope.imgCopyError = false;
+      $scope.imgTextError = false;
+      $scope.originalElements = angular.element(
+        $scope.textToTranslate);
+      $scope.translatedElements = angular.element(
+        $scope.activeWrittenTranslation.html);
+      var translatedImageDetails = [];
+      var translatedImageAltTxts = [];
+      var translatedImageDescriptions = [];
+      var states = [];
+      var duplicateImgAltTextStates = [];
+      var duplicateImgDescriptionStates = [];
+      [].forEach.call($scope.translatedElements, function(ctl) {
+        if (ctl.localName === 'oppia-noninteractive-image') {
+          var altText = ctl.attributes['alt-with-value'].value;
+          var descriptionText = ctl.attributes['caption-with-value'].value;
+          translatedImageDetails.push(ctl.attributes['filepath-with-value']);
+          translatedImageAltTxts.push(altText.substring(6, altText.length - 6));
+          translatedImageDescriptions.push(
+            descriptionText.substring(6, descriptionText.length - 6));
+        }
+      });
+      [].forEach.call($scope.originalElements, function(ctlTranslated) {
+        if (ctlTranslated.localName === 'oppia-noninteractive-image') {
+          var rawAltText = ctlTranslated.attributes['alt-with-value'].value;
+          var rawDescriptionText = ctlTranslated.attributes[
+            'caption-with-value'].value;
+          var altText = rawAltText.substring(
+            6, rawAltText.length - 6);
+          var descriptionText = rawDescriptionText.substring(
+            6, rawDescriptionText.length - 6);
+          const found = translatedImageDetails.some(
+            detail => detail.value === ctlTranslated.attributes[
+              'filepath-with-value'].value);
+          const altTextFound = translatedImageAltTxts.some(
+            translatedAltText => (
+              translatedAltText === altText && altText !== ''));
+          const descriptionTextFound = translatedImageDescriptions.some(
+            translatedDescText => (
+              translatedDescText === descriptionText && descriptionText !== '')
+          );
+          states.push(found);
+          duplicateImgAltTextStates.push(altTextFound);
+          duplicateImgDescriptionStates.push(descriptionTextFound);
+        }
+      });
+      const uncopiedImgLefts = states.some(state => state === false);
+      const duplicateAltTexts = duplicateImgAltTextStates.some(
+        state => state === true);
+      const duplicateDescriptions = duplicateImgDescriptionStates.some(
+        state => state === true);
+      if (uncopiedImgLefts) {
+        $scope.imgCopyError = true;
+      } else if (duplicateAltTexts || duplicateDescriptions) {
+        $scope.imgTextError = true;
+      } else {
+          if (!$scope.uploadingTranslation && !$scope.loadingData) {
+            SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+              'Translation');
+            $scope.uploadingTranslation = true;
+            var imagesData = ImageLocalStorageService.getStoredImagesData();
+            ImageLocalStorageService.flushStoredImagesData();
+            ContextService.resetImageSaveDestination();
+            TranslateTextService.suggestTranslatedText(
+              $scope.activeWrittenTranslation.html,
+              TranslationLanguageService.getActiveLanguageCode(),
+              imagesData, function() {
+              AlertsService.addSuccessMessage(
+                'Submitted translation for review.');
+                if ($scope.moreAvailable) {
+                  var textAndAvailability = (
+                  TranslateTextService.getTextToTranslate());
+                  $scope.textToTranslate = textAndAvailability.text;
+                  $scope.moreAvailable = textAndAvailability.more;
+                }
+                $scope.activeWrittenTranslation.html = '';
+                $scope.uploadingTranslation = false;
+                }, () => {
+                  $uibModalInstance.close();
+                }
+              );
+          }
+          if (!$scope.moreAvailable) {
             $uibModalInstance.close();
-          });
-      }
-      if (!$scope.moreAvailable) {
-        $uibModalInstance.close();
+          }
       }
     };
   }
