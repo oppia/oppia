@@ -29,14 +29,30 @@ describe('Testing FilterForMatchingSubstringPipe', () => {
     expect(pipe).not.toEqual(null);
   });
 
-  it('should get items that contain search text', () => {
+  it('should get items that contain input', () => {
     let list = ['cat', 'dog', 'caterpillar'];
     expect(pipe.transform(list, 'cat')).toEqual(['cat', 'caterpillar']);
     expect(pipe.transform(list, 'dog')).toEqual(['dog']);
   });
 
-  it('should not get items that do not contain search text', () => {
+  it('should get items that contain numerical input', () => {
+    let list = ['c4t', 'd0g', 'c4terpill4r'];
+    expect(pipe.transform(list, '4')).toEqual(['c4t', 'c4terpill4r']);
+    expect(pipe.transform(list, '4t')).toEqual(['c4t', 'c4terpill4r']);
+  });
+
+  it('should get items when input is a space', () => {
+    let list = ['cat and dog', 'dog', 'caterpillar'];
+    expect(pipe.transform(list, ' ')).toEqual(['cat and dog']);
+  });
+
+  it('should not get items that do not contain input', () => {
     let list = ['cat', 'dog', 'caterpillar'];
     expect(pipe.transform(list, 'puppy')).toEqual([]);
+  });
+
+  it('should give all items when input is empty', () => {
+    let list = ['cat', 'dog', 'caterpillar'];
+    expect(pipe.transform(list, '')).toEqual(list);
   });
 });
