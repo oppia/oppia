@@ -102,6 +102,7 @@ def establish_auth_session(request, response):
         fresh_cookie = firebase_auth.create_session_cookie(
             token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
+    # Check that the create_session_cookie function has not failed.
     if fresh_cookie is not None:
         response.set_cookie(
             feconf.FIREBASE_SESSION_COOKIE_NAME, value=fresh_cookie,
@@ -390,6 +391,8 @@ def _suppress_firebase_errors():
     try:
         yield
     except (ValueError, firebase_exceptions.FirebaseError):
+        # NOTE: logging.exception prints the full stack trace automatically.
+        # This message is an additional message printed to the logs.
         logging.exception('Firebase Admin SDK raised an exception!')
 
 
@@ -408,6 +411,8 @@ def _firebase_admin_context():
         logging.exception('Firebase Admin SDK raised an exception!')
     finally:
         if app is not None:
+            # NOTE: This is not dangerous. This is how the Firebase SDK cleans
+            # up the resources it acquires.
             firebase_admin.delete_app(app)
 
 
@@ -462,8 +467,8 @@ def _get_auth_claims_from_id_token(token):
         token: str|None. The token to extract claims from.
 
     Returns:
-        auth_domain.AuthClaims|None. The claims from the ID Token, if available.
-        Otherwise returns None.
+        AuthClaims|None. The claims from the ID Token, if available. Otherwise
+        returns None.
     """
     if token:
         with _suppress_firebase_errors(), _firebase_admin_context():
@@ -478,8 +483,8 @@ def _get_auth_claims_from_session_cookie(cookie):
         cookie: str|None. The session cookie to extract claims from.
 
     Returns:
-        auth_domain.AuthClaims|None. The claims from the session cookie, if
-        available. Otherwise returns None.
+        AuthClaims|None. The claims from the session cookie, if available.
+        Otherwise returns None.
     """
     if cookie:
         with _suppress_firebase_errors(), _firebase_admin_context():
@@ -496,7 +501,7 @@ def _create_auth_claims(firebase_claims):
             SDK.
 
     Returns:
-        auth_domain.AuthClaims. Oppia's representation of auth claims.
+        AuthClaims. Oppia's representation of auth claims.
     """
     auth_id = firebase_claims.get('sub')
     email = firebase_claims.get('email')
