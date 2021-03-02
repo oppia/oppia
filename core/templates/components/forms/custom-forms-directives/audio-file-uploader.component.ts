@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive that enables the user to upload audio files.
+ * @fileoverview Component that enables the user to upload audio files.
  */
 
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';

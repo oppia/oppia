@@ -41,7 +41,6 @@ describe('Audio File Uploader Component', () => {
     expect(component).toBeDefined();
   });
 
-
   it('should validate files correctly', () => {
     let mockFile = new File(['foo'], 'audio.mp3', {
       type: 'audio/mpeg',
