@@ -62,7 +62,7 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind/angular-html-bind-wrapper.directive';
-
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -110,6 +110,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
     ThumbnailDisplayComponent,
+    SummaryListHeaderComponent,
     TranslatePipe,
     TakeBreakModalComponent,
     WrapTextWithEllipsisPipe,
@@ -127,7 +128,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
-    ThumbnailDisplayComponent
+    ThumbnailDisplayComponent,
+    SummaryListHeaderComponent
   ],
 
   exports: [
@@ -148,6 +150,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     TranslatePipe,
     WrapTextWithEllipsisPipe,
+    SummaryListHeaderComponent
   ],
 })
 
