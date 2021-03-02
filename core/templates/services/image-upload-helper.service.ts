@@ -193,4 +193,5 @@ export class ImageUploadHelperService {
 }
 
 angular.module('oppia').factory(
-  'ImageUploadHelperService', downgradeInjectable(ImageUploadHelperService));
+  'ImageUploadHelperService',
+  downgradeInjectable(ImageUploadHelperService));

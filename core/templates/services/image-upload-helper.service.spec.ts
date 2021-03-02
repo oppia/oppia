@@ -15,26 +15,19 @@
 /**
  * @fileoverview Unit test for imageUploadHelperService.
  */
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { ImageUploadHelperService } from './image-upload-helper.service';
 
-
-describe('ImageUploadHelperService', () => {
+describe('imageUploadHelperService', () => {
   let imageUploadHelperService: ImageUploadHelperService;
-  let httpTestingController: HttpTestingController;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule]
     });
-    httpTestingController = TestBed.inject(HttpTestingController);
-    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
-  });
-
-  afterEach(() => {
-    httpTestingController.verify();
+    imageUploadHelperService =
+      TestBed.inject(ImageUploadHelperService);
   });
 
   it('should convert image data to image file', () => {
@@ -55,15 +48,14 @@ describe('ImageUploadHelperService', () => {
       '_height_1d345_width_2d455_vertical_0d123.svg')).toBe(true);
   });
 
-  it('should return null for non-image data', function() {
-    let imageFile = null;
-    imageFile = (
+  it('should return null for non-image data', () => {
+    const imageFile = (
       imageUploadHelperService.convertImageDataToImageFile(
         'data:text/plain;base64,xyz'));
     expect(imageFile).toEqual(null);
   });
 
-  it('should throw error for an invalid filename', function() {
+  it('should throw error for an invalid filename', () => {
     const height = 'height';
     const width = '2d455';
     const verticalPadding = '0d123';
@@ -97,7 +89,7 @@ describe('ImageUploadHelperService', () => {
     expect(cleanedSvgString).toEqual(expectedCleanSvgString);
   });
 
-  it('should remove custom data attribute from the SVG string', function() {
+  it('should remove custom data attribute from the SVG string', () => {
     const svgString = (
       '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
       'focusable="false" role= "img" style="vertical-align: -0.241ex;" xmln' +
@@ -168,7 +160,7 @@ describe('ImageUploadHelperService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
-  it('should extract dimensions from SVG string without style', function() {
+  it('should extract dimensions from SVG string without style', () => {
     const svgString = (
       '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
       'focusable="false" style="" xmlns="http://www.w3.org/2000/svg"><g str' +
@@ -198,8 +190,8 @@ describe('ImageUploadHelperService', () => {
     expect(generatedFilename.endsWith('_height_720_width_180.png')).toBe(true);
   });
 
-  it('should get invalid svg tags and attributes', function() {
-    var dataURI = (
+  it('should get invalid svg tags and attributes', () => {
+    const dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(
         '<svg xmlns="http://www.w3.org/2000/svg" widdth="1.33ex" height="1.4' +
@@ -220,7 +212,7 @@ describe('ImageUploadHelperService', () => {
     expect(invalidSvgTagsAndAttrs).toEqual(expectedInvalidSvgTagsAndAttrs);
   });
 
-  it('should get trusted resource Url for thumbnail filename', function() {
+  it('should get trusted resource Url for thumbnail filename', () => {
     const imageFileName = 'image.svg';
     const entityType = 'logo';
     const entityId = 'id';

@@ -30,8 +30,6 @@ describe('Rte Helper Modal Controller', function() {
   var mockExternalRteSaveEventEmitter = null;
   importAllAngularServices();
 
-  importAllAngularServices();
-
   describe('when customization args has a valid youtube video', function() {
     var customizationArgSpecs = [{
       name: 'heading',

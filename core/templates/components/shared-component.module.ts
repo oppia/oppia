@@ -128,8 +128,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
-    ThumbnailDisplayComponent,
-    SummaryListHeaderComponent
+    SummaryListHeaderComponent,
+    ThumbnailDisplayComponent
   ],
 
   exports: [
