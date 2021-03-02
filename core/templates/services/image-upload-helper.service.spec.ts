@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for ImageUploadHelperService.
+ * @fileoverview Unit test for imageUploadHelperService.
  */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -38,8 +38,7 @@ describe('ImageUploadHelperService', () => {
   });
 
   it('should convert image data to image file', () => {
-    let imageFile = null;
-    imageFile = (
+    const imageFile = (
       imageUploadHelperService.convertImageDataToImageFile(
         'data:image/png;base64,xyz'));
     expect(imageFile instanceof Blob).toBe(true);
