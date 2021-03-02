@@ -104,7 +104,7 @@ describe('Splash Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
-    windowDimensionsService =TestBed.get(WindowDimensionsService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
   let component;
@@ -206,17 +206,15 @@ describe('Splash Page', () => {
     expect(component.userIsLoggedIn).toBe(false);
   }));
 
-  it('should check if loader screen is working', () =>
-  fakeAsync(() => {
+  it('should check if loader screen is working', fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
       component.ngOnInit();
       expect(loaderService.showLoadingScreen)
         .toHaveBeenCalledWith('Loading');
     }));
-  
-  it('should check if the window is narrow or not', () =>
-   fakeAsync(() => {
-    spyOn(windowDimensionsService, "isWindowNarrow")
+
+  it('should check if the window is narrow or not', fakeAsync(() => {
+    spyOn(windowDimensionsService, "isWindowNarrow");
     component.ngOnInit();
     expect(component.isWindowNarrow).toBe(true);
    }))

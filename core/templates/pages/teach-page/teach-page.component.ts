@@ -75,9 +75,9 @@ export class TeachPageComponent implements OnInit {
       this.loaderService.hideLoadingScreen();
     });
     this.directiveSubscriptions.add(
-    this.windowDimensionService.getResizeEvent().subscribe(() => {
-      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
-    }))
+      this.windowDimensionService.getResizeEvent().subscribe(() => {
+        this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+      }));
   }
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:

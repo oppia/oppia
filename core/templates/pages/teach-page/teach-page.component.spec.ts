@@ -17,7 +17,7 @@
  */
 import { Pipe, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks, inject } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
@@ -101,11 +101,11 @@ describe('Teach Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
-    windowDimensionsService =TestBed.get(WindowDimensionsService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
   let component;
-  let teachPageComponent
+  let teachPageComponent;
   beforeEach(() => {
     teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
@@ -232,9 +232,8 @@ describe('Teach Page', () => {
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 
-  it('should check if the window is narrow or not', () =>
-  fakeAsync(() => {
-   spyOn(windowDimensionsService, "isWindowNarrow")
+  it('should check if the window is narrow or not', fakeAsync(() => {
+   spyOn(windowDimensionsService, "isWindowNarrow");
    component.ngOnInit();
    expect(component.isWindowNarrow).toBe(true);
   }))
