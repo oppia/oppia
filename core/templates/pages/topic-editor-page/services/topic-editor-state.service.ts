@@ -243,7 +243,7 @@ export class TopicEditorStateService {
     });
   }
 
-  getGroupedSkillSummaries(): unknown {
+  getGroupedSkillSummaries(): { current: unknown[]; others: unknown[]; } {
     return cloneDeep(this._groupedSkillSummaries);
   }
 
@@ -325,7 +325,7 @@ export class TopicEditorStateService {
     return this._topic;
   }
 
-  getCanonicalStorySummaries(): unknown[] {
+  getCanonicalStorySummaries(): StorySummary[] {
     return this._canonicalStorySummaries;
   }
   /**
