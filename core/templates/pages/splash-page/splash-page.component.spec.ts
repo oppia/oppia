@@ -104,7 +104,7 @@ describe('Splash Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService)
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
   let component;
