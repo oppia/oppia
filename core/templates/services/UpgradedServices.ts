@@ -538,7 +538,6 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
-import { QuestionValidationService } from './question-validation.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -870,9 +869,6 @@ export class UpgradedServices {
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
-    upgradedServices['QuestionValidationService'] =
-      new QuestionValidationService(
-        upgradedServices['StateEditorService']);
 
     // Topological level: 2.
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
