@@ -65,27 +65,29 @@ fdescribe('Learner Playlist Modal Component', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(LearnerPlaylistModalComponent);
     component = fixture.componentInstance;
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.activityType = 'exploration';
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       (): Promise<string> => {
-        var deferred = new Promise<string>((resolve) => {
+        return new Promise<string>((resolve) => {
           resolve('sample-csrf-token');
         });
-        return deferred;
       });
   });
 
   fit('should call http for deleting from learner playlist when clicking on' +
   ' remove button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+    component.remove();
     var req = httpTestingController.expectOne(
       '/learnerplaylistactivityhandler/exploration/0');
     expect(req.request.method).toEqual('DELETE');
     req.flush(200);
     flushMicrotasks();
-    component.remove();
     expect(dismissSpy).toHaveBeenCalled();
   });
 

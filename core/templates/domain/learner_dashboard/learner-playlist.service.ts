@@ -48,9 +48,9 @@ export class LearnerPlaylistService {
     let successfullyAdded = true;
     let addToLearnerPlaylistUrl: string = (
       this.urlInterpolationService.interpolateUrl(
-        '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-          activityType: activityType,
-          activityId: activityId
+        '/learnerplaylistactivityhandler/<getActivityType>/<getActivityId>', {
+          getActivityType: activityType,
+          getActivityId: activityId
         }));
     this.http.post<LearnerPlaylistDict>(
       addToLearnerPlaylistUrl, {}).toPromise().then(

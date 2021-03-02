@@ -16,7 +16,7 @@
  * @fileoverview Controller for learnerPlaylistModal.
  */
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -28,26 +28,28 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   templateUrl: './learner-playlist-modal.component.html',
   styleUrls: []
 })
-export class LearnerPlaylistModalComponent {
+export class LearnerPlaylistModalComponent implements OnInit {
+  @Input() activityId: string;
+  @Input() activityType: string;
+  @Input() activityTitle: string;
+  removeFromLearnerPlaylistUrl: string;
   constructor(
     private activeModal: NgbActiveModal,
     private http: HttpClient,
-    private activityType: string,
-    private activityId: string,
-    private activityTitle: string,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
+
+  ngOnInit(): void {
+    this.removeFromLearnerPlaylistUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        '/learnerplaylistactivityhandler/' +
+          '<getActivityType>/<getActivityId>', {
+          getActivityType: this.activityType,
+          getActivityId: this.activityId
+        }));
+  }
   sectionNameI18nId = (
       'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
-  removeFromLearnerPlaylistUrl = (
-    this.urlInterpolationService.interpolateUrl(
-      '/learnerplaylistactivityhandler/' +
-        '<activityType>/<activityId>', {
-        activityType: this.activityType,
-        activityId: this.activityId
-      }));
-  ngOnInit(): void {
-  }
 
   cancel(): void {
     this.activeModal.dismiss();

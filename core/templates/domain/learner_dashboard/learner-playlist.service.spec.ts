@@ -80,7 +80,7 @@ fdescribe('Learner playlist service factory', () => {
     instance = TestBed.inject(LearnerPlaylistService);
     ref = TestBed.inject(ChangeDetectorRef);
     appRef = TestBed.inject(ApplicationRef);
-    activityType = TestBed.get(AppConstants.ACTIVITY_TYPE_EXPLORATION);
+    activityType = AppConstants.ACTIVITY_TYPE_EXPLORATION;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     alertsService = TestBed.inject(AlertsService);
     csrfService = TestBed.inject(CsrfTokenService);
@@ -90,10 +90,9 @@ fdescribe('Learner playlist service factory', () => {
     spyOn(alertsService, 'addSuccessMessage').and.callThrough();
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       (): Promise<string> => {
-        let deferred = new Promise<string>((resolve) => {
+        return new Promise<string>((resolve) => {
           resolve('sample-csrf-token');
         });
-        return deferred;
       });
   });
 
@@ -134,10 +133,10 @@ fdescribe('Learner playlist service factory', () => {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    instance.addToLearnerPlaylist(activityId, activityType);
     let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
     expect(req.request.method).toEqual('POST');
     req.flush(JSON.stringify(response));
+    instance.addToLearnerPlaylist(activityId, activityType);
 
     flushMicrotasks();
     appRef.tick();
@@ -153,10 +152,10 @@ fdescribe('Learner playlist service factory', () => {
       belongs_to_subscribed_activities: true,
       playlist_limit_exceeded: false
     };
-    instance.addToLearnerPlaylist(activityId, activityType);
     let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
     expect(req.request.method).toEqual('POST');
     req.flush(JSON.stringify(response));
+    instance.addToLearnerPlaylist(activityId, activityType);
 
     flushMicrotasks();
     appRef.tick();
@@ -172,10 +171,10 @@ fdescribe('Learner playlist service factory', () => {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: true
     };
-    instance.addToLearnerPlaylist(activityId, activityType);
     let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
     expect(req.request.method).toEqual('POST');
     req.flush(JSON.stringify(response));
+    instance.addToLearnerPlaylist(activityId, activityType);
 
     flushMicrotasks();
     appRef.tick();
