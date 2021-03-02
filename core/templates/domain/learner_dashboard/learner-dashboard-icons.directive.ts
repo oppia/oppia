@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('learnerDashboardIcons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -148,6 +149,27 @@ angular.module('oppia').directive('learnerDashboardIcons', [
               }
               $scope.disablePlaylistTooltip();
             }
+          };
+
+          $scope.removeFromLearnerPlaylist = function(activityId, activityTitle, activityType) {
+            console.log(activityId,activityTitle,activityType);
+            LearnerPlaylistService.removeFromLearnerPlaylist(activityId,activityTitle,activityType);
+            // var isSuccessfullyAdded = (
+            //   LearnerPlaylistService.addToLearnerPlaylist(
+            //     activityId, activityType));
+            // if (isSuccessfullyAdded) {
+            //   if (activityType === ACTIVITY_TYPE_EXPLORATION) {
+            //     /* eslint-disable-next-line max-len */
+            //     $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
+            //       activityId);
+            //   } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
+            //     /* eslint-disable-next-line max-len */
+            //     $scope.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
+            //       activityId);
+            //   }
+            //   $scope.disablePlaylistTooltip();
+            //   $scope.$apply();
+            // }
           };
         }
       ]

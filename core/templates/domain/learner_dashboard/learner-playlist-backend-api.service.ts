@@ -25,10 +25,10 @@ import { HttpClient } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { LearnerPlaylistModalComponent } from
-  'domain/learner_dashboard/learner-playlist-modal.component.ts';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
+import { LearnerPlaylistModalComponent } from 
+  'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 
 interface LearnerPlaylistResponseObject {
   'belongs_to_completed_or_incomplete_list': boolean
@@ -50,43 +50,43 @@ export class LearnerPlaylistService {
   addToLearnerPlaylistUrl: string;
 
   constructor(
-    private _alertsService: AlertsService,
-    private _http: HttpClient,
+    private alertsService: AlertsService,
+    private http: HttpClient,
     private nbgModal: NgbModal,
-    private _urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   addToLearnerPlaylist(activityId: string, activityType: string): boolean {
     this.successfullyAdded = true;
     this.addToLearnerPlaylistUrl = (
-      this._urlInterpolationService.interpolateUrl(
+      this.urlInterpolationService.interpolateUrl(
         '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
           activityType: activityType,
           activityId: activityId
         }));
-    this._http.post<LearnerPlaylistResponseObject>(
+    this.http.post<LearnerPlaylistResponseObject>(
       this.addToLearnerPlaylistUrl, {}).toPromise()
       .then(response => {
         if (response.belongs_to_completed_or_incomplete_list) {
           this.successfullyAdded = false;
-          this._alertsService.addInfoMessage(
+          this.alertsService.addInfoMessage(
             'You have already completed or are completing this ' +
             'activity.');
         }
         if (response.belongs_to_subscribed_activities) {
           this.successfullyAdded = false;
-          this._alertsService.addInfoMessage(
+          this.alertsService.addInfoMessage(
             'This is present in your creator dashboard');
         }
         if (response.playlist_limit_exceeded) {
           this.successfullyAdded = false;
-          this._alertsService.addInfoMessage(
+          this.alertsService.addInfoMessage(
             'Your \'Play Later\' list is full!  Either you can ' +
             'complete some or you can head to the learner dashboard ' +
             'and remove some.');
         }
         if (this.successfullyAdded) {
-          this._alertsService.addSuccessMessage(
+          this.alertsService.addSuccessMessage(
             'Successfully added to your \'Play Later\' list.');
         }
       });
@@ -103,7 +103,7 @@ export class LearnerPlaylistService {
     modelRef.componentInstance.activityType = activityType;
     modelRef.result.then((playlistUrl) => {
       // eslint-disable-next-line dot-notation
-      this._http.delete<void>(playlistUrl);
+      this.http.delete<void>(playlistUrl);
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
           activityId);
