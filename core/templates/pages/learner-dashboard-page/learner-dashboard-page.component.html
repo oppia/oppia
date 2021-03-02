@@ -298,7 +298,8 @@
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 ng-if="$ctrl.explorationPlaylist.length > 0">
-            <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
+            <span ng-if="$ctrl.checkMobileView()" translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE_MOBILE"></span>
+            <span ng-if="!$ctrl.checkMobileView()" translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
           </span>
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 ng-if="$ctrl.numberNonexistentExplorationsFromPlaylist !== 0">
@@ -889,11 +890,13 @@
   }
 
   .oppia-learner-dashboard-intro-button {
-    background-color: #015c53;
+    background-color: #00645c;
     border-radius: 4px;
     color: #fff;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
     margin-top: 25px;
     padding: 8px;
     text-transform: uppercase;
@@ -903,7 +906,7 @@
   .oppia-learner-dashboard-intro-button:hover,
   .oppia-learner-dashboard-intro-button:focus,
   .oppia-learner-dashboard-intro-button:active {
-    background-color: rgba(5, 190, 178, 1);
+    background-color: #3d9991;
     color: #fff;
   }
 

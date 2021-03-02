@@ -49,7 +49,7 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
@@ -59,22 +59,34 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+
+
+// TODO(#11462): Delete these conditional values once firebase auth is launched.
+const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireModule.initializeApp(AuthService.firebaseConfig),
+  AngularFireAuthModule,
+] : [];
+
+const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireAuth,
+  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+] : [
+  {provide: AngularFireAuth, useValue: null},
+];
 
 
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
-    NgbModalModule,
     BrowserModule,
+    NgbTooltipModule,
     FormsModule,
-    AngularFireModule.initializeApp(AuthService.firebaseConfig),
-    AngularFireAuthModule,
+    ...firebaseAuthModules,
   ],
 
   providers: [
-    AngularFireAuth,
-    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+    ...firebaseAuthProviders,
   ],
 
   declarations: [
@@ -92,8 +104,9 @@ import { AuthService } from 'services/auth.service';
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe,
-    TakeBreakModalComponent
+    SummaryListHeaderComponent,
+    TakeBreakModalComponent,
+    TranslatePipe
   ],
 
   entryComponents: [
@@ -107,13 +120,15 @@ import { AuthService } from 'services/auth.service';
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    SummaryListHeaderComponent
   ],
 
   exports: [
     // Modules.
     FormsModule,
     MaterialModule,
+    NgbTooltipModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
@@ -121,7 +136,8 @@ import { AuthService } from 'services/auth.service';
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    SummaryListHeaderComponent
   ],
 })
 

@@ -12,11 +12,11 @@
         </h3>
         <ul>
           <li ng-repeat="explanation in skill.getRubricExplanations(skillDifficultyString)">
-            <span ng-bind-html="explanation"></span>
+            <span ng-bind-html="explanation" class="d-block mt-1"></span>
           </li>
         </ul>
       </div>
-      <h3>Question Editor</h3>
+      <h3>Your Practice Question</h3>
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"
                        question-state-data="questionStateData"

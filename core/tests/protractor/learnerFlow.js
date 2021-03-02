@@ -109,7 +109,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and plays the correct exploration',
+  it('should visit the exploration player and play the correct exploration',
     async function() {
       await users.createUser(
         'expCreator@learnerDashboard.com', 'expCreator');
@@ -126,7 +126,7 @@ describe('Learner dashboard functionality', function() {
         );
       }
       await users.logout();
-      var PLAYER_USERNAME = 'expPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'expPlayerDM';
       await users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
@@ -134,7 +134,7 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playExploration('Exploration Player Test');
     });
 
-  it('should visit the collection player and plays the correct collection',
+  it('should visit the collection player and play the correct collection',
     async function() {
       await users.createUser(
         'expOfCollectionCreator@learnerDashboard.com',
@@ -169,7 +169,7 @@ describe('Learner dashboard functionality', function() {
         await collectionEditorPage.saveChanges();
       }
       await users.logout();
-      var PLAYER_USERNAME = 'collectionPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'collectionPlayerDM';
       await users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
