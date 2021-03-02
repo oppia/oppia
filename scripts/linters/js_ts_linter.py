@@ -59,7 +59,16 @@ TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
 INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
     'UpgradedServices', # We don't want this service to be present in the index.
-    'ExplorationEngineService' # Context Service needs spyon.
+    # ExplorationEngineService requires ContextService to get explorationID.
+    # ExplorationEngineService initiates explorationID through
+    # getExplorationID() in ContextService.
+    # In unit testing, the test fails as ExplorationEngineService is added to
+    # angular-services.index which causes importAllAngularServices() to injects
+    # ExplorationEngineService causing ContextService to throw error on L240.
+    # A spyOn is needed for the ContextService.
+    # If ExplorationEngineService is not added in angular-services.index causes
+    # js_ts_linter error.
+    'ExplorationEngineService'
 ]
 
 

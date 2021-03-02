@@ -43,7 +43,6 @@ import { State } from 'domain/state/StateObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceoversObjectFactory';
-import { leftShiftDependencies } from 'mathjs';
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
