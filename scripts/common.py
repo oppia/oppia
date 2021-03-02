@@ -84,7 +84,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-REDIS_CLI_VERSION = '6.0.5'
+REDIS_CLI_VERSION = '6.0.10'
 ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
