@@ -310,7 +310,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
-    def test_reconstitute(self):
+    def test_reconstitute_excludes_deprecated_properties(self):
         exp_models.ExplorationRightsModel(
             id='id_0',
             owner_ids=['owner_id'],
