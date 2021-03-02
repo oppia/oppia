@@ -172,8 +172,8 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.imgTextError = true;
       } else {
         if (!$scope.uploadingTranslation && !$scope.loadingData) {
-          SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-            'Translation');
+          SiteAnalyticsService.
+            registerContributorDashboardSubmitSuggestionEvent('Translation');
           $scope.uploadingTranslation = true;
           var imagesData = ImageLocalStorageService.getStoredImagesData();
           ImageLocalStorageService.flushStoredImagesData();
@@ -182,20 +182,20 @@ angular.module('oppia').controller('TranslationModalController', [
             $scope.activeWrittenTranslation.html,
             TranslationLanguageService.getActiveLanguageCode(),
             imagesData, function() {
-            AlertsService.addSuccessMessage(
-              'Submitted translation for review.');
+              AlertsService.addSuccessMessage(
+                'Submitted translation for review.');
               if ($scope.moreAvailable) {
                 var textAndAvailability = (
-                TranslateTextService.getTextToTranslate());
+                  TranslateTextService.getTextToTranslate());
                 $scope.textToTranslate = textAndAvailability.text;
                 $scope.moreAvailable = textAndAvailability.more;
               }
               $scope.activeWrittenTranslation.html = '';
               $scope.uploadingTranslation = false;
-              }, () => {
-                $uibModalInstance.close();
-              }
-            );
+            }, () => {
+              $uibModalInstance.close();
+            }
+          );
         }
         if (!$scope.moreAvailable) {
           $uibModalInstance.close();
