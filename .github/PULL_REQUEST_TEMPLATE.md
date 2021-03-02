@@ -20,6 +20,7 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 
 <!--
 Add videos/screenshots of the user-facing interface to demonstrate that the changes made in this PR work correctly.
+If proof cannot be provided include a sentence saying "No proof of changes needed because {{Reason}}" and the reason why proof of changes cannot be provided.
 -->
 
 ## PR Pointers
