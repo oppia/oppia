@@ -60,7 +60,6 @@ describe('Teach Page', () => {
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
-  let windowDimensionsService : WindowDimensionsService;
   var resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
@@ -101,7 +100,6 @@ describe('Teach Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
   let component;
@@ -232,9 +230,4 @@ describe('Teach Page', () => {
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 
-  it('should check if the window is narrow or not', fakeAsync(() => {
-    spyOn(windowDimensionsService, 'isWindowNarrow');
-    component.ngOnInit();
-    expect(component.isWindowNarrow).toBe(true);
-  }));
 });

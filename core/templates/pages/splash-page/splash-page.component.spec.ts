@@ -62,7 +62,6 @@ describe('Splash Page', () => {
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
-  let windowDimensionsService : WindowDimensionsService;
   var resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
@@ -104,7 +103,6 @@ describe('Splash Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
   let component;
@@ -211,12 +209,6 @@ describe('Splash Page', () => {
     component.ngOnInit();
     expect(loaderService.showLoadingScreen)
       .toHaveBeenCalledWith('Loading');
-  }));
-
-  it('should check if the window is narrow or not', fakeAsync(() => {
-    spyOn(windowDimensionsService, 'isWindowNarrow');
-    component.ngOnInit();
-    expect(component.isWindowNarrow).toBe(true);
   }));
 
   it('should set component properties when ngOnInit() is called', () => {
