@@ -103,15 +103,15 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
-    StorySummaryTileDirective,
     SocialButtonsComponent,
+    StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    ThreadTableComponent,
-    TruncatePipe,
-    ThumbnailDisplayComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
+    TranslatePipe,
+    TruncatePipe,
   ],
 
   entryComponents: [
@@ -126,9 +126,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
-    ThreadTableComponent,
     SummaryListHeaderComponent,
-    ThumbnailDisplayComponent
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
   ],
 
   exports: [
@@ -142,10 +142,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    ThumbnailDisplayComponent,
+    SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    ThumbnailDisplayComponent,
     TranslatePipe,
-    SummaryListHeaderComponent
   ],
 })
 
