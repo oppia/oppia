@@ -688,6 +688,5 @@ export const angularServices: [string, Type<{}>][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['baseInteractionValidationService', baseInteractionValidationService],
-  ['UndoRedoService', UndoRedoService],
   ['CollectionEditorStateService', CollectionEditorStateService]
 ];

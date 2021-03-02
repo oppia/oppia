@@ -538,8 +538,6 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
-import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -698,8 +696,6 @@ export class UpgradedServices {
       new baseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
       new ɵangular_packages_common_http_http_d();
-    upgradedServices['UndoRedoService'] =
-      new UndoRedoService();
 
     // Topological level: 1.
     upgradedServices['AlgebraicExpressionInputValidationService'] =
@@ -1300,13 +1296,6 @@ export class UpgradedServices {
     upgradedServices['SubtopicPageObjectFactory'] =
       new SubtopicPageObjectFactory(
         upgradedServices['SubtopicPageContentsObjectFactory']);
-    upgradedServices['CollectionEditorStateService'] =
-      new CollectionEditorStateService(
-        upgradedServices['AlertsService'],
-        upgradedServices['CollectionRightsBackendApiService'],
-        upgradedServices['EditableCollectionBackendApiService'],
-        upgradedServices['UndoRedoService']
-      );
 
     // Topological level: 5.
     upgradedServices['AnswerClassificationService'] =
