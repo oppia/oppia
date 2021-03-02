@@ -121,7 +121,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ['No files to check'], self.linter_stdout)
 
     def test_main_with_non_other_shard(self):
-        def mock_get_filepaths_from_path(path):
+        def mock_get_filepaths_from_path(unused_path):
             return [VALID_PY_FILEPATH]
 
         get_filenames_from_path_swap = self.swap_with_checks(
@@ -132,11 +132,11 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         with self.print_swap, self.sys_swap:
             with self.install_swap:
                 with get_filenames_from_path_swap:
-                    pre_commit_linter.main(['--shard', '1'])
+                    pre_commit_linter.main(args=['--shard', '1'])
         self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_invalid_shards(self):
-        def mock_get_filepaths_from_path(path):
+        def mock_get_filepaths_from_path(unused_path):
             return ['mock_file', 'mock_file']
 
         def mock_install_third_party_main():
@@ -154,8 +154,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         with self.print_swap, self.sys_swap, install_swap:
             with get_filenames_from_path_swap:
                 with self.assertRaisesRegexp(
-                        RuntimeError, 'mock_file in multiple shards'):
-                    pre_commit_linter.main(['--shard', '1'])
+                    RuntimeError, 'mock_file in multiple shards'):
+                    pre_commit_linter.main(args=['--shard', '1'])
 
     def test_main_with_other_shard(self):
         def mock_get_filepaths_from_path(path):
@@ -176,7 +176,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             with self.install_swap:
                 with get_filenames_from_path_swap:
                     pre_commit_linter.main(
-                        ['--shard', pre_commit_linter.OTHER_SHARD_NAME])
+                        args=['--shard', pre_commit_linter.OTHER_SHARD_NAME])
         self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self):

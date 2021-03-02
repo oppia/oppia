@@ -355,7 +355,7 @@ def _get_filepaths_from_path(input_path):
         input_path: str. Path to look for files under.
 
     Returns:
-        Paths to lintable files.
+        list. Paths to lintable files.
     """
     input_path = os.path.join(os.getcwd(), input_path)
     if not os.path.exists(input_path):
@@ -382,19 +382,18 @@ def _get_filepaths_from_non_other_shard(shard):
         shard: str. Shard name.
 
     Returns:
-        Paths to lintable files.
+        list(str). Paths to lintable files.
     """
     filepaths = []
     assert shard != OTHER_SHARD_NAME
-    for path in SHARDS[shard]:
-        filepaths.extend(_get_filepaths_from_path(path))
-    print('Filepaths:', filepaths)
+    for filepath in SHARDS[shard]:
+        filepaths.extend(_get_filepaths_from_path(filepath))
     if len(filepaths) != len(set(filepaths)):
-        # Shards are invalid because of a duplicate file
-        for path in filepaths:
-            if filepaths.count(path) > 1:
+        # Shards are invalid because of a duplicate file.
+        for filepath in filepaths:
+            if filepaths.count(filepath) > 1:
                 raise RuntimeError(
-                    '%s in multiple shards.' % path)
+                    '%s in multiple shards.' % filepath)
         raise AssertionError(
             'There is a file duplicated across shards. '
             'We should have been able to find it but failed.')
@@ -408,7 +407,7 @@ def _get_filepaths_from_other_shard():
     all. The other shard has the name specified by OTHER_SHARD_NAME.
 
     Returns:
-        Paths to lintable files.
+        list(str). Paths to lintable files.
     """
     all_filepaths = set(_get_filepaths_from_path(os.getcwd()))
     filepaths_in_shards = set()
