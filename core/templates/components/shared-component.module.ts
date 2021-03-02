@@ -56,11 +56,12 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -105,10 +106,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe,
-    TakeBreakModalComponent,
     ThreadTableComponent,
-    TruncatePipe
+    TruncatePipe,
+    ThumbnailDisplayComponent,
+    SummaryListHeaderComponent,
+    TakeBreakModalComponent,
+    TranslatePipe
   ],
 
   entryComponents: [
@@ -123,7 +126,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
-    ThreadTableComponent
+    ThreadTableComponent,
+    SummaryListHeaderComponent,
+    ThumbnailDisplayComponent
   ],
 
   exports: [
@@ -137,8 +142,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    SummaryListHeaderComponent
   ],
 })
 
