@@ -48,6 +48,9 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.AddMissingCommitLogsOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
+    (
+        activity_jobs_one_off
+        .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob),
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,

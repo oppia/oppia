@@ -32,13 +32,15 @@ import feconf
 import python_utils
 
 (
-    base_models, config_models, collection_models, exp_models,
-    skill_models, story_models, topic_models, subtopic_models,
-    question_models
+    base_models, config_models, collection_models,
+    exp_models, feedback_models, skill_models,
+    story_models, topic_models, subtopic_models,
+    suggestion_models, question_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config, models.NAMES.collection,
-    models.NAMES.exploration, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.topic, models.NAMES.subtopic, models.NAMES.question
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.topic, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.question
 ])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -707,3 +709,70 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that fills the last_updated_by_human for all the models that newly
+    inherit from BaseHumanMaintainedModel. Needed only for the March 2021
+    release.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob, cls
+        ).enqueue(job_id, shard_count=16)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            feedback_models.GeneralFeedbackMessageModel,
+            feedback_models.GeneralFeedbackThreadModel,
+            question_models.QuestionSkillLinkModel,
+            suggestion_models.GeneralSuggestionModel,
+            # BaseSnapshotMetadataModel models.
+            config_models.ConfigPropertySnapshotMetadataModel,
+            config_models.PlatformParameterSnapshotMetadataModel,
+            collection_models.CollectionRightsSnapshotMetadataModel,
+            collection_models.CollectionSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            skill_models.SkillSnapshotMetadataModel,
+            story_models.StorySnapshotMetadataModel,
+            subtopic_models.SubtopicPageSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotMetadataModel,
+            topic_models.TopicSnapshotMetadataModel,
+            question_models.QuestionSnapshotMetadataModel,
+            # BaseCommitLogEntryModel models.
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            subtopic_models.SubtopicPageCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
+            # VersionedModel models.
+            collection_models.CollectionModel,
+            collection_models.CollectionRightsModel,
+            config_models.ConfigPropertyModel,
+            config_models.PlatformParameterModel,
+            exp_models.ExplorationModel,
+            exp_models.ExplorationRightsModel,
+            question_models.QuestionModel,
+            skill_models.SkillModel,
+            story_models.StoryModel,
+            subtopic_models.SubtopicPageModel,
+            topic_models.TopicModel,
+            topic_models.TopicRightsModel,
+        ]
+
+    @staticmethod
+    def map(item):
+        item.last_updated_by_human = item.last_updated
+        item.put_for_bot()
+        yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

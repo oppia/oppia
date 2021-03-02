@@ -2157,7 +2157,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
             'b', 0, 'committer_id', 'a', 'a' * 400, [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
-        commit.put_for_human()
+        commit.put_depending_on_id('committer_id')
         self._run_one_off_job()
         self.assertEqual(
             len(

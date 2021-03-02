@@ -337,7 +337,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             self.model_instance.last_updated_by_human)
         self.model_instance.put_multi_depending_on_id(
             'committer_id', [self.model_instance])
-        
+
         self.assertNotEqual(
             previous_last_updated_by_human,
             self.model_instance.last_updated_by_human)
