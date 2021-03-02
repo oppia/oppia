@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { GraphUtilsService } from 'interactions/GraphInput/directives/graph-utils.service';
 
 
-describe('GraphUtilsService', () => {
+describe('graphUtilsService', () => {
   let utilsService: GraphUtilsService;
 
   beforeEach(() => {
