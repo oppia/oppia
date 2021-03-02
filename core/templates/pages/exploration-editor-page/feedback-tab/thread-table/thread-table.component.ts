@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying the list of threads in the feedback
+ * @fileoverview Component for displaying the list of threads in the feedback
  * tab of the exploration editor.
  */
 
@@ -30,7 +30,7 @@ import { ThreadStatusDisplayService } from '../services/thread-status-display.se
 export class ThreadTableComponent {
   @Output() rowClick: EventEmitter<string> = (
     new EventEmitter());
-  @Input() threads?: SuggestionThread[] = [];
+  @Input() threads: SuggestionThread[] = [];
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService

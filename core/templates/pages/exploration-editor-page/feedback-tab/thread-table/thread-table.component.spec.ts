@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for threadTable.
+ * @fileoverview Unit tests for threadTableComponent.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
@@ -70,7 +70,7 @@ describe('Thread table component', () => {
 
   it('should get formatted date string from the timestamp in milliseconds',
     () => {
-      var NOW_MILLIS = 1416563100000;
+      let NOW_MILLIS = 1416563100000;
       expect(component.getLocaleAbbreviatedDateTimeString(NOW_MILLIS)).toBe(
         '11/21/2014');
     });
