@@ -44,6 +44,11 @@ CUSTOMIZATION OPTIONS
         python -m scripts.linters.pre_commit_linter
             --only-check-file-extensions py js
 
+6. To run a shard of the lint tests
+        python -m scripts.linters.pre_commit_linter --shard shard_name
+
+   Shards are defined in the SHARDS constant in this file.
+
 Note that the root folder MUST be named 'oppia'.
  """
 
@@ -341,6 +346,17 @@ def _get_file_extensions(file_extensions_to_lint):
 
 
 def _get_filepaths_from_path(input_path):
+    """Get paths to all lintable files recursively under a path.
+
+    This function applies some ignore rules (from .eslintignore) but not
+    all.
+
+    Args:
+        input_path: str. Path to look for files under.
+
+    Returns:
+        Paths to lintable files.
+    """
     input_path = os.path.join(os.getcwd(), input_path)
     if not os.path.exists(input_path):
         python_utils.PRINT(
@@ -357,6 +373,17 @@ def _get_filepaths_from_path(input_path):
 
 
 def _get_filepaths_from_non_other_shard(shard):
+    """Get paths to lintable files in a shard besides the other shard.
+
+    This function applies some ignore rules (from .eslintignore) but not
+    all.
+
+    Args:
+        shard: str. Shard name.
+
+    Returns:
+        Paths to lintable files.
+    """
     filepaths = []
     assert shard != OTHER_SHARD_NAME
     for path in SHARDS[shard]:
@@ -375,6 +402,14 @@ def _get_filepaths_from_non_other_shard(shard):
 
 
 def _get_filepaths_from_other_shard():
+    """Get paths to lintable files in the other shard.
+
+    This function applies some ignore rules (from .eslintignore) but not
+    all. The other shard has the name specified by OTHER_SHARD_NAME.
+
+    Returns:
+        Paths to lintable files.
+    """
     all_filepaths = set(_get_filepaths_from_path(os.getcwd()))
     filepaths_in_shards = set()
     for shard in SHARDS:
