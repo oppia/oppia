@@ -290,4 +290,3 @@ describe('GraphUtilsService', () => {
     ], [2, 0, 1])).toBe(true);
   });
 });
-
