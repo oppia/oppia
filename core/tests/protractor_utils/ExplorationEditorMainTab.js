@@ -485,7 +485,6 @@ var ExplorationEditorMainTab = function() {
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
-    await waitFor.elementToBeClickable(stateEditButton);
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(

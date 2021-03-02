@@ -166,7 +166,6 @@ var createAndPublishExploration = async function(
   await createExploration(expectWelcomeModal);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  await explorationEditorMainTab.exitTutorial();
   await explorationEditorMainTab.setContent(
     await forms.toRichText('new exploration'));
   await explorationEditorMainTab.setInteraction('EndExploration');
