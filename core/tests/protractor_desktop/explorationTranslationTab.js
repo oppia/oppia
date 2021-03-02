@@ -120,7 +120,6 @@ describe('Exploration translation and voiceover tab', function() {
       await users.login('voiceArtist@translationTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorMainTab.exitTutorial();
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.expectSelectedLanguageToBe(
         'English');
@@ -137,7 +136,6 @@ describe('Exploration translation and voiceover tab', function() {
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.changeLanguage('Hindi');
-    await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
     await users.logout();
   });
