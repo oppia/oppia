@@ -28,8 +28,8 @@ import { ThreadStatusDisplayService } from '../services/thread-status-display.se
   templateUrl: './thread-table.component.html'
 })
 export class ThreadTableComponent {
-  @Output() clickRow: EventEmitter<string> =
-  (new EventEmitter());
+  @Output() rowClick: EventEmitter<string> = (
+    new EventEmitter());
   @Input() threads?: SuggestionThread[] = [];
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -37,7 +37,7 @@ export class ThreadTableComponent {
   ) { }
 
   onRowClick(threadId: string): void {
-    this.clickRow.emit(threadId);
+    this.rowClick.emit(threadId);
   }
 
   getLabelClass(status: string): string {

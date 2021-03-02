@@ -381,7 +381,7 @@
           <h2>Suggestions created</h2>
           <oppia-thread-table ng-if="$ctrl.mySuggestionsList"
                               [threads]="$ctrl.mySuggestionsList"
-                              (click-row)="$ctrl.setActiveThread($event)">
+                              (row-click)="$ctrl.setActiveThread($event)">
           </oppia-thread-table>
           <br>
         </div>
@@ -390,7 +390,7 @@
           <h2>Suggestions to review</h2>
           <oppia-thread-table ng-if="$ctrl.suggestionsToReviewList"
                               [threads]="$ctrl.suggestionsToReviewList"
-                              (click-row)="$ctrl.setActiveThread($event)">
+                              (row-click)="$ctrl.setActiveThread($event)">
           </oppia-thread-table>
           <br>
         </div>

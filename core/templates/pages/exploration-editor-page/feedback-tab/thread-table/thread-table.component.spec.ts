@@ -75,11 +75,11 @@ describe('Thread table component', () => {
         '11/21/2014');
     });
 
-  it('should emit clickRow event when onRowClick is called', () => {
-    spyOn(fixture.componentInstance.clickRow, 'emit');
+  it('should emit rowClick event when onRowClick is called', () => {
+    spyOn(fixture.componentInstance.rowClick, 'emit');
     let threadId = 'testId';
     component.onRowClick(threadId);
-    expect(fixture.componentInstance.clickRow.emit)
+    expect(fixture.componentInstance.rowClick.emit)
       .toHaveBeenCalledWith(threadId);
   });
 });
