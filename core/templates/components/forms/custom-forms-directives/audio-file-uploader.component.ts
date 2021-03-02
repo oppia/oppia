@@ -21,8 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-audio-file-uploader',
-  templateUrl: './audio-file-uploader.component.html',
-  styleUrls: []
+  templateUrl: './audio-file-uploader.component.html'
 })
 export class AudioFileUploaderComponent {
   @Input() droppedFile: FileList;
@@ -31,7 +30,7 @@ export class AudioFileUploaderComponent {
   @ViewChild('fileInput') fileInputRef: ElementRef;
   @ViewChild('inputForm') inputFormRef: ElementRef;
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
-  errorMessage?: string;
+  errorMessage: string;
 
   validateUploadedFile(file: File): string {
     if (!file) {
