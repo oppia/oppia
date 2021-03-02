@@ -32,6 +32,7 @@ import { OppiaAdminProdModeActivitiesTabComponent } from
   './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 
 @NgModule({
   imports: [
@@ -43,12 +44,14 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminJobsTabComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminJobsTabComponent
   ],
   providers: [
     {
