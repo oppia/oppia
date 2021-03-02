@@ -17,10 +17,13 @@
  * matching strings.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'filterForMatchingSubtring'
+})
+@Injectable({
+  providedIn: 'root'
 })
 export class FilterForMatchingSubstringPipe implements PipeTransform {
   transform(input: string[], matcher: string): string[] {

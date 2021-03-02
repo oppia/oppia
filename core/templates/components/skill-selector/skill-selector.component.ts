@@ -29,7 +29,6 @@ require('domain/utilities/url-interpolation.service.ts');
 @Component({
   selector: 'skill-selector',
   templateUrl: './skill-selector.component.html',
-  styleUrls: []
 })
 export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
