@@ -180,9 +180,6 @@ class CollectionModel(base_models.VersionedModel):
 
         collection_rights = CollectionRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when collections
-        # are changed).
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, collection_rights.status,

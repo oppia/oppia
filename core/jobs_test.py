@@ -703,6 +703,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
 
+        @transaction_services.run_in_transaction_wrapper
         def _increment_counter():
             """Increments the count, if the realtime model corresponding to the
             active real-time model id exists.
@@ -715,7 +716,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
                 id=realtime_model_id, count=1,
                 realtime_layer=active_realtime_layer).put()
 
-        transaction_services.run_in_transaction(_increment_counter)
+        _increment_counter()
 
     # Public query method.
     @classmethod
