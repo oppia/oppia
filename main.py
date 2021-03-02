@@ -77,7 +77,7 @@ transaction_services = models.Registry.import_transaction_services()
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
 # which makes it tiresome to identify the actual error.
-logging.getLogger('chardet.charsetprober').setLevel(logging.INFO)
+logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
 class FrontendErrorHandler(base.BaseHandler):
