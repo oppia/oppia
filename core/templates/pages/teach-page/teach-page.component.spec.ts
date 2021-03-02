@@ -233,9 +233,8 @@ describe('Teach Page', () => {
   });
 
   it('should check if the window is narrow or not', fakeAsync(() => {
-   spyOn(windowDimensionsService, "isWindowNarrow");
-   component.ngOnInit();
-   expect(component.isWindowNarrow).toBe(true);
-  }))
-
+    spyOn(windowDimensionsService, 'isWindowNarrow');
+    component.ngOnInit();
+    expect(component.isWindowNarrow).toBe(true);
+  }));
 });

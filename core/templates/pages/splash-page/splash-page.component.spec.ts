@@ -207,17 +207,17 @@ describe('Splash Page', () => {
   }));
 
   it('should check if loader screen is working', fakeAsync(() => {
-      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-      component.ngOnInit();
-      expect(loaderService.showLoadingScreen)
-        .toHaveBeenCalledWith('Loading');
-    }));
+    spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+    component.ngOnInit();
+    expect(loaderService.showLoadingScreen)
+      .toHaveBeenCalledWith('Loading');
+  }));
 
   it('should check if the window is narrow or not', fakeAsync(() => {
-    spyOn(windowDimensionsService, "isWindowNarrow");
+    spyOn(windowDimensionsService, 'isWindowNarrow');
     component.ngOnInit();
     expect(component.isWindowNarrow).toBe(true);
-   }))
+  }));
 
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
