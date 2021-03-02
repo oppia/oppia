@@ -297,6 +297,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
@@ -327,6 +328,7 @@ import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/servi
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
@@ -472,6 +474,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ImageClickInputRulesService', ImageClickInputRulesService],
   ['ImageClickInputValidationService', ImageClickInputValidationService],
   ['ImagePreloaderService', ImagePreloaderService],
+  ['ImageUploadHelperService', ImageUploadHelperService],
   ['ImprovementsService', ImprovementsService],
   ['InteractionAttributesExtractorService',
     InteractionAttributesExtractorService],
@@ -648,6 +651,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionObjectFactory', SuggestionObjectFactory],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
+  ['SvgSanitizerService', SvgSanitizerService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
   ['TextInputTokenizer', TextInputTokenizer],

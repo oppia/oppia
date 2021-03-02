@@ -59,8 +59,8 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
@@ -110,6 +110,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     TranslatePipe
@@ -128,7 +129,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
-    SummaryListHeaderComponent
+    SummaryListHeaderComponent,
+    ThumbnailDisplayComponent
   ],
 
   exports: [
@@ -144,6 +146,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TakeBreakModalComponent,
     TranslatePipe,
     SummaryListHeaderComponent
