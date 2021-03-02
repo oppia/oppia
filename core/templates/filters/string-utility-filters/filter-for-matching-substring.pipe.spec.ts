@@ -33,7 +33,7 @@ describe('Testing FilterForMatchingSubstringPipe', () => {
     let list = ['cat', 'dog', 'caterpillar'];
     expect(pipe.transform(list, 'cat')).toEqual(['cat', 'caterpillar']);
     expect(pipe.transform(list, 'dog')).toEqual(['dog']);
-    expect(pipe.transform(list, 'c')).toEqual(['c', 'caterpillar']);
+    expect(pipe.transform(list, 'c')).toEqual(['cat', 'caterpillar']);
   });
 
   it('should not get items that do not contain input', () => {
