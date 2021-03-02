@@ -139,6 +139,7 @@ export class SplashPageComponent implements OnInit {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.windowDimensionService.getResizeEvent().subscribe(() => {
       this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     });

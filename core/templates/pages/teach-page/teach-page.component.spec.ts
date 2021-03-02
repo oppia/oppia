@@ -60,6 +60,7 @@ describe('Teach Page', () => {
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
+  let windowDimensionsService: WindowDimensionsService;
   var resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
@@ -100,6 +101,7 @@ describe('Teach Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
   let component;
@@ -123,6 +125,9 @@ describe('Teach Page', () => {
     expect(component.displayedTestimonialId).toBe(0);
     expect(component.testimonialCount).toBe(3);
     expect(component.classroomUrl).toBe('/learn/math');
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
+    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
+    expect(component.isWindowNarrow).toBe(true);
   });
 
   it('should check if loader screen is working', () =>

@@ -74,6 +74,7 @@ export class TeachPageComponent implements OnInit {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
