@@ -91,7 +91,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             mock_install_third_party_libs_main)
 
     def test_main_with_no_files(self):
-        def mock_get_all_filepaths(unused_path, unused_files):
+        def mock_get_all_filepaths(
+                unused_path, unused_files, unused_shard):
             return []
 
         all_filepath_swap = self.swap(
@@ -118,6 +119,65 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                     pre_commit_linter.main()
         self.assert_same_list_elements(
             ['No files to check'], self.linter_stdout)
+
+    def test_main_with_non_other_shard(self):
+        def mock_get_filepaths_from_path(path):
+            return [VALID_PY_FILEPATH]
+
+        get_filenames_from_path_swap = self.swap_with_checks(
+            pre_commit_linter, '_get_filepaths_from_path',
+            mock_get_filepaths_from_path, expected_args=[
+                ('core/templates/',)])
+
+        with self.print_swap, self.sys_swap:
+            with self.install_swap:
+                with get_filenames_from_path_swap:
+                    pre_commit_linter.main(['--shard', '1'])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+
+    def test_main_with_invalid_shards(self):
+        def mock_get_filepaths_from_path(path):
+            return ['mock_file', 'mock_file']
+
+        def mock_install_third_party_main():
+            raise AssertionError(
+                'Third party libs should not be installed.')
+
+        get_filenames_from_path_swap = self.swap_with_checks(
+            pre_commit_linter, '_get_filepaths_from_path',
+            mock_get_filepaths_from_path, expected_args=[
+                ('core/templates/',)])
+        install_swap = self.swap(
+            install_third_party_libs, 'main',
+            mock_install_third_party_main)
+
+        with self.print_swap, self.sys_swap, install_swap:
+            with get_filenames_from_path_swap:
+                with self.assertRaisesRegexp(
+                        RuntimeError, 'mock_file in multiple shards'):
+                    pre_commit_linter.main(['--shard', '1'])
+
+    def test_main_with_other_shard(self):
+        def mock_get_filepaths_from_path(path):
+            if os.path.abspath(path) == os.getcwd():
+                return [VALID_PY_FILEPATH, 'nonexistent_file']
+            elif path == 'core/templates/':
+                return ['nonexistent_file']
+            else:
+                return []
+
+        get_filenames_from_path_swap = self.swap_with_checks(
+            pre_commit_linter, '_get_filepaths_from_path',
+            mock_get_filepaths_from_path, expected_args=[
+                (os.getcwd(),),
+                ('core/templates/',)])
+
+        with self.print_swap, self.sys_swap:
+            with self.install_swap:
+                with get_filenames_from_path_swap:
+                    pre_commit_linter.main(
+                        ['--shard', pre_commit_linter.OTHER_SHARD_NAME])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self):
         with self.print_swap, self.sys_swap:

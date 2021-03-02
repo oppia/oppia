@@ -74,6 +74,15 @@ from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
 
+OTHER_SHARD_NAME = 'other'
+
+SHARDS = {
+    '1': [
+        'core/templates/',
+    ],
+    'other': None,
+}
+
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _PARSER.add_argument(
@@ -96,6 +105,9 @@ _PARSER.add_argument(
     help='specific file extensions to be linted. Space separated list. '
     'If either of js or ts used then both js and ts files will be linted.',
     action='store')
+_PARSER.add_argument(
+    '--shard',
+    help='Name of shard to run lint checks for')
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -328,7 +340,52 @@ def _get_file_extensions(file_extensions_to_lint):
     return all_file_extensions_type
 
 
-def _get_all_filepaths(input_path, input_filenames):
+def _get_filepaths_from_path(input_path):
+    input_path = os.path.join(os.getcwd(), input_path)
+    if not os.path.exists(input_path):
+        python_utils.PRINT(
+            'Could not locate file or directory %s. Exiting.' % input_path)
+        python_utils.PRINT('----------------------------------------')
+        sys.exit(1)
+    if os.path.isfile(input_path):
+        return [input_path]
+    else:
+        eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
+        excluded_glob_patterns = FILE_CACHE.readlines(eslintignore_path)
+        return _get_all_files_in_directory(
+            input_path, excluded_glob_patterns)
+
+
+def _get_filepaths_from_non_other_shard(shard):
+    filepaths = []
+    assert shard != OTHER_SHARD_NAME
+    for path in SHARDS[shard]:
+        filepaths.extend(_get_filepaths_from_path(path))
+    print('Filepaths:', filepaths)
+    if len(filepaths) != len(set(filepaths)):
+        # Shards are invalid because of a duplicate file
+        for path in filepaths:
+            if filepaths.count(path) > 1:
+                raise RuntimeError(
+                    '%s in multiple shards.' % path)
+        raise AssertionError(
+            'There is a file duplicated across shards. '
+            'We should have been able to find it but failed.')
+    return filepaths
+
+
+def _get_filepaths_from_other_shard():
+    all_filepaths = set(_get_filepaths_from_path(os.getcwd()))
+    filepaths_in_shards = set()
+    for shard in SHARDS:
+        if shard == OTHER_SHARD_NAME:
+            continue
+        filepaths_in_shards |= set(
+            _get_filepaths_from_non_other_shard(shard))
+    return list(all_filepaths - filepaths_in_shards)
+
+
+def _get_all_filepaths(input_path, input_filenames, input_shard):
     """This function is used to return the filepaths which needs to be linted
     and checked.
 
@@ -336,24 +393,14 @@ def _get_all_filepaths(input_path, input_filenames):
         input_path: str. The path of the directory to be linted and checked.
         input_filenames: list(str). The list of filenames to be linted and
             checked, ignored if input_path is specified.
+        input_shard: str. Name of shard to lint. Ignored if either
+            input_path or input_filenames are specified.
 
     Returns:
         list(str). The list of filepaths to be linted and checked.
     """
-    eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     if input_path:
-        input_path = os.path.join(os.getcwd(), input_path)
-        if not os.path.exists(input_path):
-            python_utils.PRINT(
-                'Could not locate file or directory %s. Exiting.' % input_path)
-            python_utils.PRINT('----------------------------------------')
-            sys.exit(1)
-        if os.path.isfile(input_path):
-            all_filepaths = [input_path]
-        else:
-            excluded_glob_patterns = FILE_CACHE.readlines(eslintignore_path)
-            all_filepaths = _get_all_files_in_directory(
-                input_path, excluded_glob_patterns)
+        all_filepaths = _get_filepaths_from_path(input_path)
     elif input_filenames:
         valid_filepaths = []
         invalid_filepaths = []
@@ -368,6 +415,12 @@ def _get_all_filepaths(input_path, input_filenames):
                 'Exiting.' % invalid_filepaths)
             sys.exit(1)
         all_filepaths = valid_filepaths
+    elif input_shard:
+        if input_shard != OTHER_SHARD_NAME:
+            all_filepaths = _get_filepaths_from_non_other_shard(
+                input_shard)
+        else:
+            all_filepaths = _get_filepaths_from_other_shard()
     else:
         all_filepaths = _get_changed_filepaths()
     all_filepaths = [
@@ -489,7 +542,8 @@ def main(args=None):
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
-    all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+    all_filepaths = _get_all_filepaths(
+        parsed_args.path, parsed_args.files, parsed_args.shard)
 
     install_third_party_libs.main()
     common.fix_third_party_imports()
