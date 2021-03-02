@@ -56,7 +56,7 @@
         <label>Filter By Subtopic</label>
       </mat-card>
       <div class="oppia-list-view-item-container">
-        <mat-card *ngIf="subTopicFilterDict.length" class="list-view-item">
+        <mat-card class="list-view-item">
           <div *ngFor="let topic of subTopicFilterDict | keyvalue">
             <!-- topic.key = topicName, topic.value = subtopics -->
             <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>

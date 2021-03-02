@@ -44,11 +44,11 @@ export class SkillSelectorComponent implements OnInit {
   currCategorizedSkills: CategorizedSkills = null;
   selectedSkill = null;
   skillFilterText = '';
-
   topicFilterList = [];
   subTopicFilterDict: { [topicName: string]:
      { subTopicName: string; checked: boolean }[] } = {};
   intialSubTopicFilterDict = {};
+
   private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe = (
     new FilterForMatchingSubstringPipe()
   );
@@ -128,7 +128,7 @@ export class SkillSelectorComponent implements OnInit {
       if (isAnyTopicChecked) {
         this.currCategorizedSkills = angular.copy(updatedSkillsDict);
       } else {
-        // If no filter is applied on both subtopics and topics, we	
+        // If no filter is applied on both subtopics and topics, we
         // need to display all the skills (the original list).
         this.currCategorizedSkills = angular.copy(this.categorizedSkills);
       }
