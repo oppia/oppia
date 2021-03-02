@@ -23,6 +23,8 @@ import datetime
 import imghdr
 
 from core import jobs
+from core.domain import draft_upgrade_services
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import image_services
 from core.domain import rights_manager
@@ -1073,3 +1075,64 @@ class UniqueHashedNormalizedUsernameAuditJob(
 
         if len(values) != 1:
             yield ('FAILURE', values)
+
+
+class ExpUserDraftAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits whether exp drafts can be updated."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpUserDraftAuditJob, cls).enqueue(job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationUserDataModel]
+
+    @staticmethod
+    def map(model):
+        exploration_id = model.exploration_id
+        user_id = model.user_id
+        if model.draft_change_list is None:
+            return
+
+        if model.last_updated.timetuple().tm_year <= 2019:
+            yield ('FAILURE - Old draft', 1)
+            return
+
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False)
+        if exploration is None:
+            yield ('FAILURE - No exp found', 1)
+            return
+        if exploration.version == model.draft_change_list_exp_version:
+            yield ('FAILURE - No need for version upgrade', 1)
+            return
+
+        try:
+            draft_change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in model.draft_change_list]
+        except utils.ValidationError as e:
+            yield ('INDIV - Validation error', '%s %s' % (model.id, e))
+            return
+
+        new_draft_change_list = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list,
+                model.draft_change_list_exp_version,
+                exploration.version, exploration_id))
+        if new_draft_change_list is not None:
+            yield (
+                'INDIV - Upgraded %s' % exploration_id,
+                'From v%s to v%s' % (
+                    draft_change_list_exp_version, exploration.version))
+        else:
+            yield ('FAILURE - Failed to upgrade exp draft', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith('INDIV'):
+            yield (key, values)
+        else:
+            yield (key, len(values))

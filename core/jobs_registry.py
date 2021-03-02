@@ -118,6 +118,7 @@ ONE_OFF_JOB_MANAGERS = [
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
+    suggestion_jobs_one_off.SuggestionFormatAuditJob,
     topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob,
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
@@ -138,7 +139,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
     user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
-    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob
+    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob,
+    user_jobs_one_off.ExpUserDraftAuditJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

@@ -343,9 +343,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-                new_value = (
-                    state_domain.Outcome.convert_html_in_outcome(
-                        new_value, conversion_fn))
+                if new_value is not None:
+                    new_value = (
+                        state_domain.Outcome.convert_html_in_outcome(
+                            new_value, conversion_fn))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                 new_value = [
@@ -353,7 +354,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         hint_dict, conversion_fn))
                     for hint_dict in new_value]
             elif (change.property_name ==
-                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
+                  new_value is not None):
                 new_value['explanation']['html'] = (
                     conversion_fn(new_value['explanation']['html']))
                 # TODO(#9413): Find a way to include a reference to the
@@ -387,6 +389,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         html_field_types_to_rule_specs
                     )
                     for answer_group in new_value]
+
             if new_value is not None:
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': change.cmd,
