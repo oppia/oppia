@@ -30,7 +30,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserInfo } from 'domain/user/user-info.model.ts';
 import { UserService } from 'services/user.service';
-import { of, Subscription } from 'rxjs';
+import { of } from 'rxjs';
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
@@ -55,13 +55,13 @@ class MockI18nLanguageCodeService {
   }
 }
 
-fdescribe('Teach Page', () => {
+describe('Teach Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
-  // var mockWindowDimensionsChangedEventEmitter = new EventEmitter();
-  var testSubscriptions: Subscription;
+  let windowDimensionsService : WindowDimensionsService;
+  var resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -73,7 +73,8 @@ fdescribe('Teach Page', () => {
         {
           provide: WindowDimensionsService,
           useValue: {
-            isWindowNarrow: () => true
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
           }
         },
         { provide: TranslateService, useClass: MockTranslateService },
@@ -93,7 +94,7 @@ fdescribe('Teach Page', () => {
     }).compileComponents();
   });
   beforeEach(angular.mock.module('oppia'));
-  let windowDimensionsService;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -101,19 +102,13 @@ fdescribe('Teach Page', () => {
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
     windowDimensionsService =TestBed.get(WindowDimensionsService);
-
-    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      of(new Event('resize')));
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
   });
 
   let component;
-  let element;
   let teachPageComponent
   beforeEach(() => {
     teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
-    element = teachPageComponent.nativeElement;
   });
 
   it('should successfully instantiate the component from beforeEach block',
@@ -236,5 +231,12 @@ fdescribe('Teach Page', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
+
+  it('should check if the window is narrow or not', () =>
+  fakeAsync(() => {
+   spyOn(windowDimensionsService, "isWindowNarrow")
+   component.ngOnInit();
+   expect(component.isWindowNarrow).toBe(true);
+  }))
 
 });

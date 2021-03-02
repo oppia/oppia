@@ -31,6 +31,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserInfo } from 'domain/user/user-info.model.ts';
 import { UserService } from 'services/user.service';
 import { SplashPageComponent } from './splash-page.component';
+import { of } from 'rxjs';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -61,6 +62,8 @@ describe('Splash Page', () => {
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
+  let windowDimensionsService : WindowDimensionsService;
+  var resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [SplashPageComponent, MockTranslatePipe],
@@ -72,7 +75,8 @@ describe('Splash Page', () => {
         {
           provide: WindowDimensionsService,
           useValue: {
-            isWindowNarrow: () => true
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
           }
         },
         { provide: TranslateService, useClass: MockTranslateService },
@@ -100,6 +104,7 @@ describe('Splash Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
+    windowDimensionsService =TestBed.get(WindowDimensionsService);
   });
 
   let component;
@@ -202,12 +207,19 @@ describe('Splash Page', () => {
   }));
 
   it('should check if loader screen is working', () =>
-    fakeAsync(() => {
-      component.ngOnInit();
+  fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+      component.ngOnInit();
       expect(loaderService.showLoadingScreen)
         .toHaveBeenCalledWith('Loading');
     }));
+  
+  it('should check if the window is narrow or not', () =>
+   fakeAsync(() => {
+    spyOn(windowDimensionsService, "isWindowNarrow")
+    component.ngOnInit();
+    expect(component.isWindowNarrow).toBe(true);
+   }))
 
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
