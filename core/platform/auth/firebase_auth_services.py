@@ -403,17 +403,14 @@ def _firebase_admin_context():
     Yields:
         None. No relevent context expression.
     """
+    app = firebase_admin.initialize_app(
+        options={'projectId': feconf.OPPIA_PROJECT_ID})
     try:
-        app = firebase_admin.initialize_app(
-            options={'projectId': feconf.OPPIA_PROJECT_ID})
         yield
-    except (ValueError, firebase_exceptions.FirebaseError):
-        logging.exception('Firebase Admin SDK raised an exception!')
     finally:
-        if app is not None:
-            # NOTE: This is not dangerous. This is how the Firebase SDK cleans
-            # up the resources it acquires.
-            firebase_admin.delete_app(app)
+        # NOTE: This is not dangerous. This is how the Firebase SDK cleans up
+        # the resources it acquires.
+        firebase_admin.delete_app(app)
 
 
 def _get_session_cookie(request):
