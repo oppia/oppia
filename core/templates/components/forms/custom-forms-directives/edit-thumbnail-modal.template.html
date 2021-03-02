@@ -50,7 +50,7 @@
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
           <div>
-            <img ng-if="uploadedImage" class="oppia-thumbnail-image" ng-src="<[uploadedImage]>" height="<[aspectRatio === '4:3' ? '186px' : '180px']>" width="<[aspectRatio === '4:3' ? '248px' : '320px']>">
+            <oppia-thumbnail-display ng-if="uploadedImage" [classes]="['oppia-thumbnail-image']" [img-src]="uploadedImage" [aspect-ratio]="aspectRatio" [background]="bgColor"></oppia-thumbnail-display>
             <div class="oppia-thumbnail-preview-title">
               <[getPreviewTitle()]>
             </div>
