@@ -18,9 +18,10 @@
 
 require('mathjaxConfig.ts');
 require('directives/mathjax-bind.directive.ts');
-require('services/image-upload-helper.service.ts');
 require('services/alerts.service.ts');
 require('services/external-rte-save.service.ts');
+require('services/image-upload-helper.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -30,7 +31,10 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('mathExpressionContentEditor', [
   'AlertsService', 'ExternalRteSaveService', 'ImageUploadHelperService',
-  function(AlertsService, ExternalRteSaveService, ImageUploadHelperService) {
+  'SvgSanitizerService',
+  function(
+      AlertsService, ExternalRteSaveService, ImageUploadHelperService,
+      SvgSanitizerService) {
     return {
       restrict: 'E',
       scope: {},
@@ -85,10 +89,10 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
         // backend.
         var processAndSaveSvg = function() {
           var cleanedSvgString = (
-            ImageUploadHelperService.cleanMathExpressionSvgString(
+            SvgSanitizerService.cleanMathExpressionSvgString(
               ctrl.svgString));
           var dimensions = (
-            ImageUploadHelperService.
+            SvgSanitizerService.
               extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
           var fileName = (
             ImageUploadHelperService.generateMathExpressionImageFilename(
@@ -99,7 +103,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
             'data:image/svg+xml;base64,' +
             btoa(unescape(encodeURIComponent(cleanedSvgString))));
           var invalidTagsAndAttributes = (
-            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+            SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
           var tags = invalidTagsAndAttributes.tags;
           var attrs = invalidTagsAndAttributes.attrs;
           if (tags.length === 0 && attrs.length === 0) {
