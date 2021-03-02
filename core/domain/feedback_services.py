@@ -312,7 +312,10 @@ def create_messages(
 
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id))):
+            user_services.is_user_registered(author_id)) and
+            # TODO(#12079): Figure out a better way to avoid sending feedback
+            # thread emails for contributor dashboard suggestions.
+            (len(text) > 0 or old_statuses[index] != new_statuses[index])):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
@@ -1137,6 +1140,12 @@ def _add_message_to_email_buffer(
         old_status: str. One of STATUS_CHOICES. Value of old thread status.
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
     """
+    # Return early if there's no email to send. Message likely corresponds to
+    # a new contributor dashboard suggestion.
+    # See https://github.com/oppia/oppia/issues/12061.
+    if old_status == new_status and message_length == 0:
+        return
+
     thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
     exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
