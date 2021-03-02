@@ -56,10 +56,14 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+<<<<<<< HEAD
 import { LearnerPlaylistModalComponent } from 'domain/learner_dashboard/learner-playlist-modal.component';
+=======
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+>>>>>>> upstream/develop
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -105,8 +109,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe,
-    TakeBreakModalComponent
+    ThumbnailDisplayComponent,
+    SummaryListHeaderComponent,
+    TakeBreakModalComponent,
+    TranslatePipe
   ],
 
   entryComponents: [
@@ -121,7 +127,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    SummaryListHeaderComponent,
+    ThumbnailDisplayComponent
   ],
 
   exports: [
@@ -136,8 +144,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    SummaryListHeaderComponent
   ],
 })
 

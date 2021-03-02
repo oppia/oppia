@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -145,6 +145,7 @@
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
     "hammerjs": "^2.0.8",
+    "hash-wasm": "^4.4.1",
     "lodash": "^4.17.14",
     "mathjs": "^9.0.0",
     "mousetrap": "^1.6.5",

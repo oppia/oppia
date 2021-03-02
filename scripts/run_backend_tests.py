@@ -86,6 +86,8 @@ LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 # each shard.
 SHARDS_SPEC_PATH = os.path.join(
     os.getcwd(), 'scripts', 'backend_test_shards.json')
+SHARDS_WIKI_LINK = (
+    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors')
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 _PARSER = argparse.ArgumentParser(
@@ -282,10 +284,12 @@ def _check_shards_match_tests(include_load_tests=True):
     shard_modules_set = set(shard_modules)
     shard_extra = shard_modules_set - test_modules_set
     if shard_extra:
-        return 'Modules {} in shards not found.'.format(shard_extra)
+        return 'Modules {} in shards not found. See {}.'.format(
+            shard_extra, SHARDS_WIKI_LINK)
     test_extra = test_modules_set - shard_modules_set
     assert test_extra
-    return 'Modules {} not in shards.'.format(test_extra)
+    return 'Modules {} not in shards. See {}.'.format(
+        test_extra, SHARDS_WIKI_LINK)
 
 
 def main(args=None):
