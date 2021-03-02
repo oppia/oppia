@@ -394,7 +394,10 @@ def _get_filepaths_from_non_other_shard(shard):
             if filepaths.count(filepath) > 1:
                 raise RuntimeError(
                     '%s in multiple shards.' % filepath)
-        raise AssertionError(
+        # We exempt this line from test coverage because it is
+        # un-testable. It should never be reached, but we raise an
+        # assertion error to catch coding errors above.
+        raise AssertionError(  # pragma: no cover
             'There is a file duplicated across shards. '
             'We should have been able to find it but failed.')
     return filepaths
