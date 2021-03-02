@@ -7,7 +7,7 @@
       </mat-card>
       <div class="skill-list-box">
         <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
-          <div *ngFor="let topic of categorizedSkills | keyvalue">
+          <div *ngFor="let topic of currCategorizedSkills | keyvalue">
             <!-- topic.key = topicName, topic.value = subtopics -->
             <mat-card class="list-view-item" *ngIf="checkTopicIsNotEmpty(topic.key)">
               <mat-card layout="row" class="list-view-item">

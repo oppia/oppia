@@ -41,6 +41,7 @@ export class SkillSelectorComponent implements OnInit {
   @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() allowSkillsFromOtherTopics: boolean;
   @Output() selectedSkillIdChanged: EventEmitter<string> = new EventEmitter();
+  currCategorizedSkills: CategorizedSkills = null;
   selectedSkill = null;
   skillFilterText = '';
 
@@ -55,13 +56,14 @@ export class SkillSelectorComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    for (let topicName in this.categorizedSkills) {
+    this.currCategorizedSkills = this.categorizedSkills;
+    for (let topicName in this.currCategorizedSkills) {
       var topicNameDict = {
         topicName: topicName,
         checked: false
       };
       this.topicFilterList.push(topicNameDict);
-      var subTopics = this.categorizedSkills[topicName];
+      var subTopics = this.currCategorizedSkills[topicName];
       this.subTopicFilterDict[topicName] = [];
       for (let subTopic in subTopics) {
         var subTopicNameDict = {
@@ -79,8 +81,8 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   checkTopicIsNotEmpty(topicName: string): boolean {
-    for (let key in this.categorizedSkills[topicName]) {
-      if (Object.keys(this.categorizedSkills[topicName][key]).length) {
+    for (let key in this.currCategorizedSkills[topicName]) {
+      if (Object.keys(this.currCategorizedSkills[topicName][key]).length) {
         return true;
       }
     }
@@ -118,16 +120,20 @@ export class SkillSelectorComponent implements OnInit {
       for (var i = 0; i < this.topicFilterList.length; i++) {
         if (this.topicFilterList[i].checked) {
           var tempCategorizedSkills = this.categorizedSkills;
-          var topicName:string = this.topicFilterList[i].topicName;
+          var topicName: string = this.topicFilterList[i].topicName;
           updatedSkillsDict[topicName] = tempCategorizedSkills[topicName];
           isAnyTopicChecked = true;
         }
       }
       if (isAnyTopicChecked) {
-        this.categorizedSkills = angular.copy(updatedSkillsDict);
+        this.currCategorizedSkills = angular.copy(updatedSkillsDict);
+      } else {
+        // If no filter is applied on both subtopics and topics, we	
+        // need to display all the skills (the original list).
+        this.currCategorizedSkills = angular.copy(this.categorizedSkills);
       }
     } else {
-      this.categorizedSkills = angular.copy(updatedSkillsDict);
+      this.currCategorizedSkills = angular.copy(updatedSkillsDict);
     }
   }
 
