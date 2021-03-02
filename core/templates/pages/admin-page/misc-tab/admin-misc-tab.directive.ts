@@ -24,11 +24,11 @@ require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window',
+  '$http', '$sce', '$window',
   'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window,
+      $http, $sce, $window,
       AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
@@ -52,8 +52,22 @@ angular.module('oppia').directive('adminMiscTab', [
           '/numberofdeletionrequestshandler');
         const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
+        const explorationStatsRegenerationUtilityCsvRows = [
+          [
+            'Exploration ID',
+            'No. of valid Exploration Stats',
+            'No. of valid State Stats',
+            'Missing Exploration Stats',
+            'Missing State Stats',
+            'Errors'
+          ]
+        ];
 
         ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
+
+        ctrl.resetExplorationStatsRegenerationUtilityCsvRows = function() {
+          explorationStatsRegenerationUtilityCsvRows.length = 1;
+        };
 
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -99,31 +113,60 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
+        const populateExplorationStatsRegenerationCsvResult = function(expIds) {
+          if (expIds.length === 0) {
+            let csvContent = explorationStatsRegenerationUtilityCsvRows.map(
+              row => row.join(',')).join('\n');
+            ctrl.csvUri = $sce.trustAsResourceUrl(
+              window.URL.createObjectURL(
+                new Blob([csvContent], { type: 'text/csv' })));
+            ctrl.csvFilename = (
+              `missing-exp-stats-output-${(new Date()).getTime()}.csv`);
+            ctrl.missingExplorationStatsRegenerationMessage = (
+              'Process complete. Please download the CSV output.');
+            return;
+          }
+          let expIdToRegenerate = expIds.pop();
+          ctrl.missingExplorationStatsRegenerationMessage = (
+            `Regenerating stats for Exploration id ${expIdToRegenerate}` +
+            '. Please wait.');
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'regenerate_missing_exploration_stats',
+            exp_id: expIdToRegenerate
+          }).then(function(response) {
+            explorationStatsRegenerationUtilityCsvRows.push([
+              expIdToRegenerate,
+              response.data.num_valid_exp_stats,
+              response.data.num_valid_state_stats,
+              response.data.missing_exp_stats.join(', ') || 'NA',
+              response.data.missing_state_stats.join(', ') || 'NA',
+              'NA'
+            ]);
+            populateExplorationStatsRegenerationCsvResult(expIds);
+          }, function(errorResponse) {
+            explorationStatsRegenerationUtilityCsvRows.push([
+              expIdToRegenerate,
+              'NA',
+              'NA',
+              'NA',
+              'NA',
+              errorResponse.data.error]);
+            populateExplorationStatsRegenerationCsvResult(expIds);
+          });
+        };
+
         ctrl.regenerateMissingExplorationStats = function() {
+          ctrl.csvUri = null;
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           if (!$window.confirm(irreversibleActionMessage)) {
             return;
           }
-          ctrl.regenerationMessage = 'Regenerating opportunities...';
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'regenerate_missing_exploration_stats',
-            exp_id: ctrl.explorationIdForRegeneratingMissingStats
-          }).then(function(response) {
-            ctrl.missingExplorationStatsRegenerationMessage = (
-              'No. of valid Exploration Stats: ' +
-              `${response.data.num_valid_exp_stats}\n` +
-              'No. of valid State Stats: ' +
-              `${response.data.num_valid_state_stats}\n` +
-              'Missing Exploration Stats: ' +
-              `${response.data.missing_exp_stats.join(', ') || 'NA'}\n` +
-              'Missing State Stats: ' +
-              `${response.data.missing_state_stats.join(', ') || 'NA'}\n`);
-          }, function(errorResponse) {
-            ctrl.missingExplorationStatsRegenerationMessage = (
-              'Server error: ' + errorResponse.data.error);
-          });
+          let expIds = (
+            ctrl.explorationIdsForRegeneratingMissingStats.replaceAll(
+              ' ', '').split(','));
+          populateExplorationStatsRegenerationCsvResult(expIds);
         };
 
         ctrl.uploadTopicSimilaritiesFile = function() {
