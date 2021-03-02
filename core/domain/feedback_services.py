@@ -1140,12 +1140,6 @@ def _add_message_to_email_buffer(
         old_status: str. One of STATUS_CHOICES. Value of old thread status.
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
     """
-    # Return early if there's no email to send. Message likely corresponds to
-    # a new contributor dashboard suggestion.
-    # See https://github.com/oppia/oppia/issues/12061.
-    if old_status == new_status and message_length == 0:
-        return
-
     thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
     exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
