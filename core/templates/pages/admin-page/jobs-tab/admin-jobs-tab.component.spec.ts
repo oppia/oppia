@@ -30,6 +30,22 @@ import { AdminDataService } from '../services/admin-data.service';
 import { AdminJobsTabComponent } from './admin-jobs-tab.component';
 
 
+interface FakeThen {
+  then: (
+        successCallback: (responseData?: object) => void,
+        errorCallback: (errorData?: object) => void) => void
+}
+
+interface FakePromise {
+  toPromise: () => FakeThen
+}
+
+interface FakeWindowRefDict {
+  location: {
+    reload: () => void
+  }
+}
+
 describe('Admin Jobs Tab Component', () => {
   let componentInstance: AdminJobsTabComponent;
   let fixture: ComponentFixture<AdminJobsTabComponent>;
@@ -63,11 +79,13 @@ describe('Admin Jobs Tab Component', () => {
   };
 
   class MockHttpClient {
-    get(url: string): object {
+    get(url: string): FakePromise {
       return {
         toPromise: () => {
           return {
-            then: (successCallback, errorCallback) => {
+            then: (
+                successCallback: (responseData?: object) => void,
+                errorCallback: (errorData?: object) => void) => {
               if (url === 'success') {
                 successCallback({
                   output: [1, 2, 3]
@@ -83,11 +101,14 @@ describe('Admin Jobs Tab Component', () => {
       };
     }
 
-    post(url: string, requestData: object): object {
+    post(url: string, requestData: object): FakePromise {
       return {
         toPromise: () => {
           return {
-            then: (successCallback, errorCallback) => {
+            then: (
+                successCallback: (responseData?: object) => void,
+                errorCallback: (errorData?: object) => void
+            ) => {
               if ('job_type' in requestData) {
                 if (requestData.job_type === 'error') {
                   errorCallback({
@@ -112,7 +133,7 @@ describe('Admin Jobs Tab Component', () => {
   }
 
   class MockAdminDataService {
-    getDataAsync(): object {
+    getDataAsync(): FakeThen {
       return {
         then: (callback: (adminDataObject: AdminPageData) => void) => {
           callback(mockAdminPageData);
@@ -121,7 +142,7 @@ describe('Admin Jobs Tab Component', () => {
     }
   }
 
-  class MockUrlInterpolatinService {
+  class MockUrlInterpolationService {
     interpolateUrl(
         urlTemplate: string,
         interpolationValues: InterpolationValuesType): string {
@@ -135,7 +156,7 @@ describe('Admin Jobs Tab Component', () => {
   }
 
   class MockWindowRef {
-    _window(): object {
+    _window(): FakeWindowRefDict {
       return {
         location: {
           reload: () => {}
@@ -165,7 +186,7 @@ describe('Admin Jobs Tab Component', () => {
         },
         {
           provide: UrlInterpolationService,
-          useClass: MockUrlInterpolatinService
+          useClass: MockUrlInterpolationService
         }
       ]
     }).compileComponents();
@@ -202,7 +223,7 @@ describe('Admin Jobs Tab Component', () => {
   it('should work as expected when showJobOutput is called', () => {
     componentInstance =
     (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
-    let element = document.createElement('div');
+    let element: HTMLElement = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(element);
     spyOn(element, 'scrollIntoView');
 
@@ -217,7 +238,8 @@ describe('Admin Jobs Tab Component', () => {
     (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.showJobOutput('error');
-    expect(componentInstance.setStatusMessage.emit).toHaveBeenCalled();
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith('Server error: test error');
   });
 
   it('should work as expected when startNewJob is called', () =>{
@@ -235,7 +257,7 @@ describe('Admin Jobs Tab Component', () => {
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.startNewJob('error');
     expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalled();
+      .toHaveBeenCalledWith('Server error: test error');
   });
 
   it('should start computation', () => {
@@ -255,7 +277,7 @@ describe('Admin Jobs Tab Component', () => {
     componentInstance
       .startComputation('error');
     expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalled();
+      .toHaveBeenCalledWith('Server error: test error');
   });
 
   it('should stop computation', () => {
@@ -276,7 +298,7 @@ describe('Admin Jobs Tab Component', () => {
     componentInstance
       .stopComputation('error');
     expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalled();
+      .toHaveBeenCalledWith('Server error: test error');
   });
 
   it('should cancel job', () => {
@@ -296,6 +318,6 @@ describe('Admin Jobs Tab Component', () => {
     componentInstance
       .cancelJob('error', 'error');
     expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalled();
+      .toHaveBeenCalledWith('Server error: test error');
   });
 });

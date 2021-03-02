@@ -24,6 +24,13 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { ComputationData } from 'domain/admin/computation-data.model';
+import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
+import { Job } from 'domain/admin/job.model';
+
+interface AdminJobOutputResponse {
+  output: string[]
+}
 
 @Component({
   selector: 'oppia-admin-jobs-tab',
@@ -35,13 +42,12 @@ export class AdminJobsTabComponent {
   );
   showingJobOutput: boolean;
   jobOutput = [];
-  HUMAN_READABLE_CURRENT_TIME = '';
-  CONTINUOUS_COMPUTATIONS_DATA = [];
-  ONE_OFF_JOB_SPECS = [];
-  UNFINISHED_JOB_DATA = [];
-  AUDIT_JOB_SPECS = [];
-  RECENT_JOB_DATA = [];
-
+  HUMAN_READABLE_CURRENT_TIME: string = '';
+  CONTINUOUS_COMPUTATIONS_DATA: ComputationData[] = [];
+  ONE_OFF_JOB_SPECS: JobStatusSummary[] = [];
+  UNFINISHED_JOB_DATA: Job[] = [];
+  AUDIT_JOB_SPECS: JobStatusSummary[] = [];
+  RECENT_JOB_DATA: Job[] = [];
   constructor(
     private httpClient: HttpClient,
     private adminDataService: AdminDataService,
@@ -56,17 +62,18 @@ export class AdminJobsTabComponent {
       AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
         jobId: jobId
       });
-    this.httpClient.get(adminJobOutputUrl).toPromise().then((response) => {
-      this.showingJobOutput = true;
-      this.jobOutput = response.output || [];
-      this.jobOutput.sort();
-      document.querySelector('#job-output')
-        .scrollIntoView();
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.error
-      );
-    });
+    this.httpClient.get(adminJobOutputUrl).toPromise()
+      .then((adminJobOutputResponse: AdminJobOutputResponse) => {
+        this.showingJobOutput = true;
+        this.jobOutput = adminJobOutputResponse.output || [];
+        this.jobOutput.sort();
+        document.querySelector('#job-output')
+          .scrollIntoView();
+      }, (errorResponse) => {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.error
+        );
+      });
   }
 
   startNewJob(
