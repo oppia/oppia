@@ -155,6 +155,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.interactionIsActive) {
       this.init();
     }
+    console.log(this);
   }
 
   getEdgeColor(index: number): string {

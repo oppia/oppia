@@ -24,6 +24,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { GraphVizComponent } from './directives/graph-viz.component';
+import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
 
 @NgModule({
   imports: [
@@ -33,12 +34,15 @@ import { GraphVizComponent } from './directives/graph-viz.component';
     SharedComponentsModule
   ],
   declarations: [
+    InteractiveGraphInput,
     GraphVizComponent
   ],
   entryComponents: [
+    InteractiveGraphInput,
     GraphVizComponent
   ],
   exports: [
+    InteractiveGraphInput,
     GraphVizComponent
   ],
 })
