@@ -54,7 +54,7 @@ export class LearnerPlaylistService {
         }));
     this.http.post<LearnerPlaylistDict>(
       addToLearnerPlaylistUrl, {}).toPromise().then(
-      (response) => {
+      response => {
         if (response.belongs_to_completed_or_incomplete_list) {
           successfullyAdded = false;
           this.alertsService.addInfoMessage(
