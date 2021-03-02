@@ -43,6 +43,7 @@ import { State } from 'domain/state/StateObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import { leftShiftDependencies } from 'mathjs';
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
@@ -117,7 +118,6 @@ export class ExplorationEngineService {
         .loadExploration(this._explorationId, this.version)
         .then((exploration) => {
           this.version = exploration.version;
-          // $rootScope.$applyAsync();
         });
     }
   }
@@ -143,7 +143,7 @@ export class ExplorationEngineService {
     // previous one, and thus indirectly forces a refresh.
     let randomSuffix = '';
     let N = Math.round(Math.random() * 1000);
-    for (var i = 0; i < N; i++) {
+    for (let i = 0; i < N; i++) {
       randomSuffix += ' ';
     }
     return randomSuffix;
