@@ -109,5 +109,185 @@ describe('GraphUtilsService', () => {
     utilsService.markAccessible(startVertex, adjacencyLists, isvisited);
     expect(isvisited).toEqual([true, true, true]);
   });
+
+  it('should check for cycle in the graph', () => {
+    let currentVertex: number = 0;
+    let previousVertex: number = 0;
+    let adjacencyLists: number[][] = [
+      [1],
+      [0, 2],
+      [1]];
+    let nodeStatus: string[] = ['unvisited', 'unvisited', 'unvisited'];
+    let isDirected: boolean = false;
+    let ans = utilsService.findCycle(
+      currentVertex, previousVertex,
+      adjacencyLists, nodeStatus, isDirected);
+    expect(ans).toEqual(false);
+    adjacencyLists = [[1], [2], []];
+    isDirected = true;
+    currentVertex = 0;
+    previousVertex = 0;
+    nodeStatus = ['unvisited', 'unvisited', 'unvisited'];
+    ans = utilsService.findCycle(
+      currentVertex, previousVertex,
+      adjacencyLists, nodeStatus, isDirected);
+    expect(ans).toEqual(false);
+    adjacencyLists = [[1, 2], [0, 2], [1, 0]];
+    isDirected = false;
+    currentVertex = 0;
+    previousVertex = 0;
+    nodeStatus = ['unvisited', 'unvisited', 'unvisited'];
+    ans = utilsService.findCycle(
+      currentVertex, previousVertex,
+      adjacencyLists, nodeStatus, isDirected);
+    expect(ans).toEqual(true);
+  });
+
+  it('should construct an adjacency matrix from a graph', () => {
+    expect(utilsService.constructAdjacencyMatrix({
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }, {
+        x: 3.0,
+        y: 3.0,
+        label: 'c'
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: 1
+      }, {
+        src: 1,
+        dst: 2,
+        weight: 2
+      }],
+      isDirected: false,
+      isWeighted: true,
+      isLabeled: true
+    })).toEqual([
+      [null, 1, null],
+      [1, null, 2],
+      [null, 2, null]
+    ]);
+    expect(utilsService.constructAdjacencyMatrix({
+      vertices: [{
+        label: 'a',
+        x: 1.0,
+        y: 1.0
+      }, {
+        label: 'b',
+        x: 2.0,
+        y: 2.0
+      }, {
+        label: 'c',
+        x: 3.0,
+        y: 3.0
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: 1
+      }, {
+        src: 1,
+        dst: 2,
+        weight: 2
+      }],
+      isDirected: false,
+      isWeighted: false,
+      isLabeled: true
+    })).toEqual([
+      [null, 1, null],
+      [1, null, 1],
+      [null, 1, null]
+    ]);
+  });
+
+  it('should find the next lexicographical permutation', () => {
+    let permutation: number[] = [0, 1, 2, 3];
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([0, 1, 3, 2]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([0, 2, 1, 3]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([0, 2, 3, 1]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([0, 3, 1, 2]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([0, 3, 2, 1]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([1, 0, 2, 3]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([1, 0, 3, 2]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([1, 2, 0, 3]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([1, 2, 3, 0]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([1, 3, 0, 2]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([1, 3, 2, 0]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([2, 0, 1, 3]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([2, 0, 3, 1]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([2, 1, 0, 3]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([2, 1, 3, 0]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([2, 3, 0, 1]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([2, 3, 1, 0]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([3, 0, 1, 2]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([3, 0, 2, 1]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([3, 1, 0, 2]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([3, 1, 2, 0]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([3, 2, 0, 1]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toEqual([3, 2, 1, 0]);
+    permutation = utilsService.nextPermutation(permutation);
+    expect(permutation).toBe(null);
+  });
+
+  it('should compare adjacency matrices with a permutation', () => {
+    expect(utilsService.areAdjacencyMatricesEqualWithPermutation([
+      [null, 1, 1],
+      [2, null, 1],
+      [1, 1, null]
+    ], [
+      [null, 1, 1],
+      [2, null, 1],
+      [1, 1, null]
+    ], [0, 1, 2])).toBe(true);
+    expect(utilsService.areAdjacencyMatricesEqualWithPermutation([
+      [null, 1, 1],
+      [2, null, 1],
+      [1, 1, null]
+    ], [
+      [null, 1, null],
+      [2, null, 1],
+      [1, 1, null]
+    ], [0, 1, 2])).toBe(false);
+    expect(utilsService.areAdjacencyMatricesEqualWithPermutation([
+      [null, 1, 2],
+      [2, null, 1],
+      [1, 1, null]
+    ], [
+      [null, 1, 1],
+      [2, null, 1],
+      [1, 2, null]
+    ], [2, 0, 1])).toBe(true);
+  });
 });
 
