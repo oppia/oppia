@@ -461,7 +461,6 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             new_collection_model.to_dict(exclude=self.excluded_fields)
         )
 
-
     def test_revert_to_check_deprecated_fields_are_absent(self):
         with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
