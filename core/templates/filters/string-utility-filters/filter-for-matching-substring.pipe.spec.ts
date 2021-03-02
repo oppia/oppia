@@ -33,6 +33,12 @@ describe('Testing FilterForMatchingSubstringPipe', () => {
     let list = ['cat', 'dog', 'caterpillar'];
     expect(pipe.transform(list, 'cat')).toEqual(['cat', 'caterpillar']);
     expect(pipe.transform(list, 'dog')).toEqual(['dog']);
+    expect(pipe.transform(list, 'c')).toEqual(['c', 'caterpillar']);
+  });
+
+  it('should not get items that do not contain input', () => {
+    let list = ['cat', 'dog', 'caterpillar'];
+    expect(pipe.transform(list, 'puppy')).toEqual([]);
   });
 
   it('should get items that contain numerical input', () => {
@@ -41,14 +47,17 @@ describe('Testing FilterForMatchingSubstringPipe', () => {
     expect(pipe.transform(list, '4t')).toEqual(['c4t', 'c4terpill4r']);
   });
 
-  it('should get items when input is a space', () => {
-    let list = ['cat and dog', 'dog', 'caterpillar'];
-    expect(pipe.transform(list, ' ')).toEqual(['cat and dog']);
+  it('should get items that contain punctuation input', () => {
+    let list = ['.', 'dog.', 'cat..and..dog'];
+    expect(pipe.transform(list, '.')).toEqual(['.', 'dog.', 'cat..and..dog']);
+    expect(pipe.transform(list, '..')).toEqual(['cat..and..dog']);
   });
 
-  it('should not get items that do not contain input', () => {
-    let list = ['cat', 'dog', 'caterpillar'];
-    expect(pipe.transform(list, 'puppy')).toEqual([]);
+  it('should get items when input is a space', () => {
+    let list = ['cat and dog', 'dog', 'caterpillar', 'cat  and dog', '  '];
+    expect(pipe.transform(list, ' '))
+      .toEqual(['cat and dog', 'cat  and dog', '  ']);
+    expect(pipe.transform(list, '  ')).toEqual(['cat  and dog', '  ']);
   });
 
   it('should give all items when input is empty', () => {
