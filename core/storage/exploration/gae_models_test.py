@@ -462,6 +462,21 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
 
+    def test_revert_to_check_deprecated_fields_are_absent(self):
+         with self.allow_revert_swap, self.allowed_commands_swap:
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
+
+            exp_rights_model = (
+                exp_models.ExplorationRightsModel.get_by_id(
+                    self.EXPLORATION_ID_1))
+
+            snapshot_dict = exp_rights_model.compute_snapshot()
+
+            self.assertNotIn('translator_ids', snapshot_dict)
+            self.assertNotIn('all_viewer_ids', snapshot_dict)
+
+
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationCommitLogEntryModel class."""
 
