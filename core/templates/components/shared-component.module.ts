@@ -59,6 +59,7 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -103,8 +104,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe,
-    TakeBreakModalComponent
+    SummaryListHeaderComponent,
+    TakeBreakModalComponent,
+    TranslatePipe
   ],
 
   entryComponents: [
@@ -118,7 +120,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    SummaryListHeaderComponent
   ],
 
   exports: [
@@ -133,7 +136,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    SummaryListHeaderComponent
   ],
 })
 
