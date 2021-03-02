@@ -87,7 +87,7 @@
       <th>Time finished</th>
       <th></th>
     </tr>
-      <tr *ngFor="let job of UNFINISHED_JOB_DATA" class="protractor-test-unfinished-one-off-jobs-rows">
+    <tr *ngFor="let job of UNFINISHED_JOB_DATA" class="protractor-test-unfinished-one-off-jobs-rows">
       <td class="protractor-test-unfinished-one-off-jobs-id">{{job.id}}</td>
       <td>{{job.statusCode}}</td>
       <td>{{job.humanReadableTimeStarted}}</td>
@@ -107,24 +107,24 @@
   <h3>Recent jobs</h3>
   <em>Note: This table may be stale; refresh to see the latest state.</em>
   <table class="table">
-  <tr>
-    <th>Job ID</th>
-    <th>Status</th>
-    <th>Time started</th>
-    <th>Time finished</th>
-    <th></th>
-  </tr>
-  <tr *ngFor="let job of RECENT_JOB_DATA">
-    <td>{{job.id}}</td>
-    <td>{{job.statusCode}}</td>
-    <td>{{job.humanReadableTimeStarted}}</td>
-    <td>{{job.humanReadableTimeFinished}}</td>
-    <td>
-      <button (click)="showJobOutput(job.id)">
-        View Output
-      </button>
-    </td>
-  </tr>
+    <tr>
+      <th>Job ID</th>
+      <th>Status</th>
+      <th>Time started</th>
+      <th>Time finished</th>
+      <th></th>
+    </tr>
+    <tr *ngFor="let job of RECENT_JOB_DATA">
+      <td>{{job.id}}</td>
+      <td>{{job.statusCode}}</td>
+      <td>{{job.humanReadableTimeStarted}}</td>
+      <td>{{job.humanReadableTimeFinished}}</td>
+      <td>
+        <button (click)="showJobOutput(job.id)">
+          View Output
+        </button>
+      </td>
+    </tr>
   </table>
   <div [hidden]="!showingJobOutput" id="job-output">
     <h4>Job Output</h4>
