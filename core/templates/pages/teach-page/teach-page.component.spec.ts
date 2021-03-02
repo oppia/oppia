@@ -229,5 +229,4 @@ describe('Teach Page', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
-
 });
