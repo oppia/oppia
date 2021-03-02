@@ -32,7 +32,7 @@ class CloudTranslateServicesUnitTests(test_utils.TestBase):
             cloud_translate_services.translate_text(
                 'hello world', 'invalid', 'es')
 
-    def test_translate_text_with_invalid_source_language_raises_error(self):
+    def test_translate_text_with_invalid_target_language_raises_error(self):
         with self.assertRaisesRegexp(ValueError, 'invalid language code: invalid'):
             cloud_translate_services.translate_text(
                 'hello world', 'en', 'invalid')
