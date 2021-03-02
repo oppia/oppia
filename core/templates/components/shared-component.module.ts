@@ -59,11 +59,8 @@ import { ProfileLinkTextComponent } from
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
-<<<<<<< HEAD
 import { LearnerPlaylistModalComponent } from 'domain/learner_dashboard/learner-playlist-modal.component';
-=======
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
->>>>>>> upstream/develop
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
