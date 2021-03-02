@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Tests for cloud_translate_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -29,12 +30,14 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
         self.emulator = cloud_translate_emulator.TranslateEmulator()
 
     def test_translate_text_with_invalid_source_language_raises_error(self):
-        with self.assertRaisesRegexp(ValueError, 'invalid language code: invalid'):
+        with self.assertRaisesRegexp(
+            ValueError, 'invalid language code: invalid'):
             self.emulator.translate_text(
                 'hello world', 'invalid', 'es')
 
     def test_translate_text_with_invalid_target_language_raises_error(self):
-        with self.assertRaisesRegexp(ValueError, 'invalid language code: invalid'):
+        with self.assertRaisesRegexp(
+            ValueError, 'invalid language code: invalid'):
             self.emulator.translate_text(
                 'hello world', 'en', 'invalid')
 
@@ -43,8 +46,8 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
             ('en', 'es', 'hello world'), 'hola mundo')
         translated_text = self.emulator.translate_text(
             'hello world', 'en', 'es')
-        self.assertEquals('hola mundo', translated_text)
+        self.assertEqual('hola mundo', translated_text)
 
     def test_translate_text_without_translation_returns_empty_string(self):
-      translated_text = self.emulator.translate_text('some text', 'en', 'es')
-      self.assertEquals('', translated_text)
+        translated_text = self.emulator.translate_text('some text', 'en', 'es')
+        self.assertEqual('', translated_text)

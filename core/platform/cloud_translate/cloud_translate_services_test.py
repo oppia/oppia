@@ -14,35 +14,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for cloud_translate_services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.cloud_translate import cloud_translate_services
 from core.tests import test_utils
 
+
 class CloudTranslateServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_translate_services."""
 
-    def setUp(self):
-        super(CloudTranslateServicesUnitTests, self).setUp()
-
-
     def test_translate_text_with_invalid_source_language_raises_error(self):
-        with self.assertRaisesRegexp(ValueError, 'invalid language code: invalid'):
+        with self.assertRaisesRegexp(
+            ValueError, 'invalid language code: invalid'):
+
             cloud_translate_services.translate_text(
                 'hello world', 'invalid', 'es')
 
     def test_translate_text_with_invalid_target_language_raises_error(self):
-        with self.assertRaisesRegexp(ValueError, 'invalid language code: invalid'):
+        with self.assertRaisesRegexp(
+            ValueError, 'invalid language code: invalid'):
+
             cloud_translate_services.translate_text(
                 'hello world', 'en', 'invalid')
 
     def test_translate_text_with_valid_input_calls_translate_api(self):
-        self.mock_response = 'hola mundo'
 
-        def mock_translate_call(text, source_language, target_language):
+        def mock_translate_call(
+                text, source_language, target_language):
+            self.assertEqual(text, 'hello world')
+            self.assertEqual(source_language, 'en')
+            self.assertEqual(target_language, 'es')
             return {
-              'translatedText': self.mock_response
+                'translatedText': 'hola mundo'
             }
 
         with self.swap(
