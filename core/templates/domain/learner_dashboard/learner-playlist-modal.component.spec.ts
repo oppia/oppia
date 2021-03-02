@@ -41,7 +41,7 @@ class MockTranslatePipe {
   }
 }
 
-describe('Learner Playlist Modal Component', function() {
+fdescribe('Learner Playlist Modal Component', function() {
   let component: LearnerPlaylistModalComponent;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -79,19 +79,20 @@ describe('Learner Playlist Modal Component', function() {
       });
   });
 
-  it('should call http for deleting from learner playlist when clicking on' +
+  fit('should call http for deleting from learner playlist when clicking on' +
   ' remove button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.remove();
-    var req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       '/learnerplaylistactivityhandler/exploration/0');
     expect(req.request.method).toEqual('DELETE');
     req.flush(200);
     flushMicrotasks();
+
     expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should not call http delete when clicking on cancel button', () => {
+  fit('should not call http delete when clicking on cancel button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     httpTestingController.verify();

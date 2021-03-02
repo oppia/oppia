@@ -42,8 +42,8 @@ export class MockNgbModalRef {
   result: Promise<void> = new Promise((resolve) => resolve());
 }
 
-describe('Learner playlist service factory', () => {
-  let activityType: string;
+fdescribe('Learner playlist service factory', () => {
+  let activityType: string = 'exploration';
   let urlInterpolationService: UrlInterpolationService;
   let activityId = '1';
   let addToLearnerPlaylistUrl = '';
@@ -80,7 +80,6 @@ describe('Learner playlist service factory', () => {
     instance = TestBed.inject(LearnerPlaylistService);
     ref = TestBed.inject(ChangeDetectorRef);
     appRef = TestBed.inject(ApplicationRef);
-    activityType = AppConstants.ACTIVITY_TYPE_EXPLORATION;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     alertsService = TestBed.inject(AlertsService);
     csrfService = TestBed.inject(CsrfTokenService);
@@ -108,7 +107,7 @@ describe('Learner playlist service factory', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully add playlist to play later list', fakeAsync(() => {
+  fit('should successfully add playlist to play later list', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,
@@ -117,7 +116,7 @@ describe('Learner playlist service factory', () => {
     instance.addToLearnerPlaylist(activityId, activityType);
     let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
     expect(req.request.method).toEqual('POST');
-    req.flush(JSON.stringify(response));
+    req.flush(response);
 
     flushMicrotasks();
     appRef.tick();
@@ -126,7 +125,7 @@ describe('Learner playlist service factory', () => {
     expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
   }));
 
-  it('should not add playlist to play later list' +
+  fit('should not add playlist to play later list' +
     ' and show belongs to completed or incomplete list', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: true,
@@ -136,7 +135,7 @@ describe('Learner playlist service factory', () => {
     instance.addToLearnerPlaylist(activityId, activityType);
     let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
     expect(req.request.method).toEqual('POST');
-    req.flush(JSON.stringify(response));
+    req.flush(response);
 
     flushMicrotasks();
     appRef.tick();
@@ -145,7 +144,7 @@ describe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  it('should not add playlist to play later list' +
+  fit('should not add playlist to play later list' +
     ' and show belongs to subscribed activities', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
@@ -155,7 +154,7 @@ describe('Learner playlist service factory', () => {
     instance.addToLearnerPlaylist(activityId, activityType);
     let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
     expect(req.request.method).toEqual('POST');
-    req.flush(JSON.stringify(response));
+    req.flush(response);
 
     flushMicrotasks();
     appRef.tick();
@@ -164,7 +163,7 @@ describe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  it('should not add playlist to play later list' +
+  fit('should not add playlist to play later list' +
     ' and show playlist limit exceeded', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
@@ -174,7 +173,7 @@ describe('Learner playlist service factory', () => {
     instance.addToLearnerPlaylist(activityId, activityType);
     let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
     expect(req.request.method).toEqual('POST');
-    req.flush(JSON.stringify(response));
+    req.flush(response);
 
     flushMicrotasks();
     appRef.tick();
@@ -185,7 +184,7 @@ describe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  it('should open an ngbModal when removing from learner playlist',
+  fit('should open an ngbModal when removing from learner playlist',
     fakeAsync(() => {
       let learnerDashboardActivityIds = LearnerDashboardActivityIds
         .createFromBackendDict({
@@ -202,7 +201,7 @@ describe('Learner playlist service factory', () => {
       expect(modalSpy).toHaveBeenCalled();
     }));
 
-  it('should remove an exploration from learner playlist', fakeAsync(() => {
+  fit('should remove an exploration from learner playlist', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
     let deferred = new Promise<void>((resolve) => {
       resolve();
@@ -227,7 +226,7 @@ describe('Learner playlist service factory', () => {
       ['1', '2']);
   }));
 
-  it('should remove a collection from learner playlist', fakeAsync(() => {
+  fit('should remove a collection from learner playlist', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
     let deferred = new Promise<void>((resolve) => {
       resolve();
@@ -251,7 +250,7 @@ describe('Learner playlist service factory', () => {
       ['1', '2']);
   }));
 
-  it('should not remove anything from learner playlist when cancel' +
+  fit('should not remove anything from learner playlist when cancel' +
     ' button is clicked', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
     let deferred = new Promise<void>((reject) => {
