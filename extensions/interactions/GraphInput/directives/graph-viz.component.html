@@ -109,7 +109,7 @@
         </text>
       </g>
       <g *ngFor="let vertex of graph.vertices; let idx = index"
-        attr.transform="{{'translate(' + vertex.x + ',' + vertex.y + ')'}}">
+         attr.transform="{{'translate(' + vertex.x + ',' + vertex.y + ')'}}">
         <text *ngIf="graph.isLabeled"
               x="0"
               y="-10"
