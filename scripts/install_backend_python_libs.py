@@ -29,10 +29,11 @@ from scripts import common
 
 import pkg_resources
 
+# We depend on a patched version of firebase-admin which is hosted on a git
+# repository. For this reason, we exclude firebase-admin from mismatch checks.
+# TODO(#11474): Remove this special-case logic once we can use the Python 3
+# version of the Firebase SDK.
 IGNORED_LIBRARY_NAME_MISMATCHES = (
-    # We depend on a patched version of firebase-admin which is hosted on a git
-    # repository. For this reason, we exclude firebase-admin from mismatch
-    # checks.
     'firebase-admin',
 )
 
@@ -491,6 +492,8 @@ def get_mismatches():
 
     mismatches = {}
     for normalized_library_name in requirements_contents:
+        # TODO(#11474): Remove this special-case logic once we can use the
+        # Python 3 version of the Firebase SDK.
         if normalized_library_name in IGNORED_LIBRARY_NAME_MISMATCHES:
             continue
         # Library exists in the directory and the requirements file.
@@ -507,6 +510,8 @@ def get_mismatches():
                 requirements_contents[normalized_library_name], None)
 
     for normalized_library_name in directory_contents:
+        # TODO(#11474): Remove this special-case logic once we can use the
+        # Python 3 version of the Firebase SDK.
         if normalized_library_name in IGNORED_LIBRARY_NAME_MISMATCHES:
             continue
         # Library exists in the directory but is not in the requirements file.

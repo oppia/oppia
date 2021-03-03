@@ -41,21 +41,23 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
 
     def test_destroy_auth_session_deletes_cookies(self):
         response = webapp2.Response()
-        response.set_cookie('ACSID', value='abc')
-        response.set_cookie('SACSID', value='def')
-        response.set_cookie('dev_appserver_login', value='ghi')
-        response.set_cookie('custom', value='123')
+        response.set_cookie('ACSID', value='abc', max_age=5)
+        response.set_cookie('SACSID', value='def', max_age=5)
+        response.set_cookie('dev_appserver_login', value='ghi', max_age=5)
+        response.set_cookie('custom', value='123', max_age=5)
 
         gae_auth_services.destroy_auth_session(response)
 
         self.assert_matches_regexps(response.headers.get_all('Set-Cookie'), [
-            'ACSID=abc;',
-            'SACSID=def;',
-            'dev_appserver_login=ghi;',
-            'custom=123;',
-            'ACSID=;',
-            'SACSID=;',
-            'dev_appserver_login=;',
+            'ACSID=abc;.* Max-Age=5;',
+            'SACSID=def;.* Max-Age=5;',
+            'dev_appserver_login=ghi;.* Max-Age=5;',
+            'custom=123;.* Max-Age=5;',
+            # NOTE: These latter cookies overwrite the former values.
+            'ACSID=;.* Max-Age=0;',
+            'SACSID=;.* Max-Age=0;',
+            'dev_appserver_login=;.* Max-Age=0;',
+            # The `custom` cookie was not overwritten.
         ])
 
     def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):

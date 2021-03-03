@@ -722,17 +722,14 @@ class LogoutPageTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
         self.get_html_response('/explore/0')
 
-        def stub(*_):
-            """Updates the called variable when the function is called."""
-            stub.called = True
-        stub.called = False
+        call_counter = test_utils.CallCounter(lambda _: None)
 
-        with self.swap(auth_services, 'destroy_auth_session', stub):
+        with self.swap(auth_services, 'destroy_auth_session', call_counter):
             # Logout with valid query arg. This test only validates that the
             # login cookies have expired after hitting the logout url.
             self.get_html_response('/logout', expected_status_int=302)
 
-        self.assertTrue(stub.called)
+        self.assertEqual(call_counter.times_called, 1)
 
     def test_logout_page_with_redirect_url(self):
         exp_services.load_demo('0')

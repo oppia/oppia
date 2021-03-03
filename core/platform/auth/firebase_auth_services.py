@@ -73,7 +73,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 # Session cookies only provide temporary authentication, so they are expected to
 # become obsolete over time. The following errors is the full list of situations
-# this happens.
+# where this happens.
 EXPECTED_SESSION_COOKIE_EXCEPTIONS = (
     firebase_auth.InvalidSessionCookieError,
     firebase_auth.ExpiredSessionCookieError,
@@ -103,9 +103,17 @@ def establish_auth_session(request, response):
             _get_id_token(request), feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
     response.set_cookie(
-        feconf.FIREBASE_SESSION_COOKIE_NAME, value=fresh_cookie,
+        feconf.FIREBASE_SESSION_COOKIE_NAME,
+        value=fresh_cookie,
         max_age=feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
-        httponly=True, overwrite=True, secure=not constants.DEV_MODE)
+        overwrite=True,
+        # Toggles https vs http. The production server uses https, but the local
+        # developement server uses http.
+        secure=(not constants.DEV_MODE),
+        # Using the HttpOnly flag when generating a cookie helps mitigate the
+        # risk of client side script accessing the protected cookie (if the
+        # browser supports it).
+        httponly=True)
 
 
 def destroy_auth_session(response):
@@ -164,7 +172,8 @@ def mark_user_for_deletion(user_id):
             firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
     except (firebase_exceptions.FirebaseError, ValueError):
         # NOTE: logging.exception appends the stack trace automatically.
-        logging.exception('[WIPEOUT] Failed to disable Firebase account!')
+        logging.exception(
+            '[WIPEOUT] Failed to disable Firebase account! Stack trace:')
 
 
 def delete_external_auth_associations(user_id):
@@ -465,7 +474,6 @@ def _get_auth_claims_from_session_cookie(cookie):
         except EXPECTED_SESSION_COOKIE_EXCEPTIONS:
             # NOTE: logging.exception appends the stack trace automatically.
             logging.exception('User session has ended and must be renewed')
-            raise
     return None
 
 

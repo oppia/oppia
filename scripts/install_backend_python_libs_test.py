@@ -152,6 +152,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 },
                 install_backend_python_libs.get_mismatches())
 
+    # TODO(#11474): Remove this test for special-case logic once we can use the
+    # Python 3 version of the Firebase SDK.
     def test_ignored_library_name_mismatches_are_respected(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',

@@ -57,13 +57,13 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
             def setUp(self):
                 super(Test, self).setUp()
-                self.sdk_stub = FirebaseAdminSdkStub(self)
-                self.sdk_stub.install()
+                self.firebase_sdk_stub = FirebaseAdminSdkStub(self)
+                self.firebase_sdk_stub.install()
 
-                self.sdk_stub.create_user('foo')
+                self.firebase_sdk_stub.create_user('foo')
 
             def tearDown(self):
-                self.sdk_stub.uninstall()
+                self.firebase_sdk_stub.uninstall()
                 super(Test, self).tearDown()
 
             def test_sdk(self):
@@ -454,12 +454,14 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
 
     def test_logs_error_when_cookie_is_invalid(self):
+        cookie = firebase_admin.auth.create_session_cookie(
+            self.sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            datetime.timedelta(days=0))
+
         with self.capture_logging() as logs:
-            self.assertRaisesRegexp(
-                firebase_admin.auth.InvalidSessionCookieError,
-                'The provided Firebase session cookie is invalid',
-                lambda: firebase_auth_services.get_auth_claims_from_request(
-                    self.create_request(session_cookie='FAKE')))
+            self.assertIsNone(
+                firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)))
 
         self.assertTrue(
             logs[0].startswith('User session has ended and must be renewed'))
