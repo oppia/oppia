@@ -1,4 +1,4 @@
-<div>
+<div onload="$ctrl.windowOnload()">
   <span class="protractor-test-state-name-container">
     <span ng-if="$ctrl.EditabilityService.isEditable()">
       <span ng-if="!$ctrl.StateNameService.isStateNameEditorShown()" ng-click="$ctrl.openStateNameEditor()" class="oppia-editable-section">

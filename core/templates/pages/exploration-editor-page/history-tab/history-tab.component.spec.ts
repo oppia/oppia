@@ -51,6 +51,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
 
 describe('History tab component', function() {
   var ctrl = null;
@@ -63,6 +64,8 @@ describe('History tab component', function() {
   var editabilityService = null;
   var csrfTokenService = null;
   var dateTimeFormatService = null;
+  var focusManagerService = null;
+  var routerService = null;
   var windowRef = null;
 
   var mockRefreshVersionHistoryEmitter = new EventEmitter();
@@ -94,6 +97,7 @@ describe('History tab component', function() {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
     editabilityService = TestBed.get(EditabilityService);
     windowRef = TestBed.get(WindowRef);
+    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -140,7 +144,10 @@ describe('History tab component', function() {
       })
     });
     $provide.value('RouterService', {
-      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter
+      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter,
+      getActiveTabName() {
+        return('main')
+      },
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
@@ -154,6 +161,8 @@ describe('History tab component', function() {
     $uibModal = $injector.get('$uibModal');
     compareVersionsService = $injector.get('CompareVersionsService');
     csrfTokenService = $injector.get('CsrfTokenService');
+    focusManagerService = $injector.get('FocusManagerService');
+    routerService = $injector.get('RouterService');
 
     spyOn(csrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
@@ -432,5 +441,15 @@ describe('History tab component', function() {
       ctrl.totalExplorationVersionMetadata[1]);
     expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
       ctrl.totalExplorationVersionMetadata[2]);
+  });
+
+  it('should apply autofocus to history tab element when tab is switched',
+  function() {
+    spyOn(routerService, 'getActiveTabName').and.returnValues('feedback', 'history');
+    spyOn(focusManagerService, 'setFocus');
+    $rootScope.$apply(routerService.getActiveTabName());
+    $rootScope.$apply(routerService.getActiveTabName());
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'usernameInputField');
   });
 });

@@ -107,20 +107,24 @@ angular.module('oppia').component('stateNameEditor', {
           RouterService.navigateToMainTab(normalizedStateName);
         }
       };
+
+      ctrl.windowOnload = function() {
+        ctrl.TabName = RouterService.getActiveTabName();
+        if (ctrl.TabName === 'main') {
+          FocusManagerService.setFocus('oppiaEditableSection');
+        }
+        if (ctrl.TabName === 'feedback') {
+          FocusManagerService.setFocus('newThreadButton');
+        }
+        if (ctrl.TabName === 'history') {
+          FocusManagerService.setFocus('usernameInputField');
+        }
+      };
+
       ctrl.$onInit = function() {
         // If-user refreshes the tab.
-        $window.onload = function() {
-          ctrl.TabName = RouterService.getActiveTabName();
-          if (ctrl.TabName === 'main') {
-            FocusManagerService.setFocus('oppiaEditableSection');
-          }
-          if (ctrl.TabName === 'feedback') {
-            FocusManagerService.setFocus('newThreadButton');
-          }
-          if (ctrl.TabName === 'history') {
-            FocusManagerService.setFocus('usernameInputField');
-          }
-        };
+        $window.onload = ctrl.windowOnload();
+
         $rootScope.$watch(
           () => RouterService.getActiveTabName(),
           (newValue) => {

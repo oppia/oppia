@@ -31,7 +31,7 @@ require(
 require('services/stateful/focus-manager.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-require('services/stateful/focus-manager.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 angular.module('oppia').component('translatorOverview', {
   bindings: {
     isTranslationTabBusy: '='
