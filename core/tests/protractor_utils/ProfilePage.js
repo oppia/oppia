@@ -41,19 +41,22 @@ var ProfilePage = function() {
   };
 
   this.expectCurrUserToHaveProfilePhoto = async function() {
-    await waitFor.visibilityOf(currUserProfilePhoto,
+    await waitFor.visibilityOf(
+       currUserProfilePhoto,
       'Current User Profile Photo Taking too Long To Display');
     expect(await currUserProfilePhoto.isPresent()).toBe(true);
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
-    await waitFor.visibilityOf(otherUserProfilePhoto,
+    await waitFor.visibilityOf(
+       otherUserProfilePhoto,
       'Other User Profile Photo Taking Too Long to Display');
     expect(await otherUserProfilePhoto.isPresent()).toBe(true);
   };
 
   this.expectUserToHaveBio = async function(expectedText) {
-    await waitFor.visibilityOf(bio,
+    await waitFor.visibilityOf(
+       bio,
       'Bio is Taking too Long to appear');                         
     expect(await bio.getText()).toMatch(expectedText);
   };
@@ -76,7 +79,8 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveInterestPlaceholder = async function(expectedText) {
-    await waitFor.visibilityOf(interestPlaceholder,
+    await waitFor.visibilityOf(
+       interestPlaceholder,
       'Interest Place Holder is not present or Taking Time To Display');
     expect(await interestPlaceholder.getText()).toMatch(expectedText);
   };
@@ -109,7 +113,8 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveCreatedExplorationStat = async function(expectedStat) {
-    await waitFor.visibilityOf(createdExplorationStat,
+    await waitFor.visibilityOf(
+       createdExplorationStat,
       'Create Exploration State is Taking Too Long to Display');
     expect(await createdExplorationStat.getText()).toMatch(expectedStat);
   };
