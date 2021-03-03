@@ -57,7 +57,7 @@ var ProfilePage = function() {
   this.expectUserToHaveBio = async function(expectedText) {
     await waitFor.visibilityOf(
       bio,
-      'Bio is Taking too Long to appear');                         
+      'Bio is Taking too Long to appear');
     expect(await bio.getText()).toMatch(expectedText);
   };
 
