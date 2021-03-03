@@ -30,6 +30,30 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 transaction_services = models.Registry.import_transaction_services()
 
 
+def establish_auth_session(unused_request, unused_response):
+    """Sets login cookies to maintain a user's sign-in session.
+
+    Args:
+        unused_request: webapp2.Request. Unused because App Engine handles user
+            authentication implicitly.
+        unused_response: webapp2.Response. Unused because App Engine handles
+            user authentication implicitly.
+    """
+    pass
+
+
+def destroy_auth_session(response):
+    """Clears login cookies from the given response headers.
+
+    Args:
+        response: webapp2.Response. Response to clear the cookies from.
+    """
+    # Google App Engine sets the ACSID cookie for 'http' and the SACSID cookie
+    # for 'https'. dev_appserver_login cookie is used by the dev server.
+    for cookie_name in ('ACSID', 'SACSID', 'dev_appserver_login'):
+        response.delete_cookie(cookie_name)
+
+
 def get_auth_claims_from_request(unused_request):
     """Authenticates the request and returns claims about its authorizer.
 
