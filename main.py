@@ -794,6 +794,7 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.NumberOfDeletionRequestsHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+    get_redirect_route(r'/session_begin', base.SessionBeginHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (
