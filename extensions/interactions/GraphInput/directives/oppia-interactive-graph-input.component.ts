@@ -25,7 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { GraphInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
