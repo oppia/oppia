@@ -797,7 +797,7 @@ angular.module('oppia').directive('conversationSkin', [
                     $rootScope.$apply();
                   });
                 if ($scope.isLoggedIn) {
-                  StoryViewerBackendApiService.recordChapterCompletion(
+                  StoryViewerBackendApiService.recordChapterCompletionAsync(
                     topicUrlFragment, classroomUrlFragment,
                     storyUrlFragment, nodeId
                   ).then(function(returnObject) {
