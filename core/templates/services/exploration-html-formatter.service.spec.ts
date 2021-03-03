@@ -61,11 +61,11 @@ describe('Exploration Html Formatter Service', () => {
       placeholder: {value: new SubtitledUnicode('enter here', '')},
       rows: {value: 1}
     };
-    var expectedHtmlTag = '<oppia-interactive-text-input ' +
+    var expectedHtmlTag = '<oppia-interactive-graph-input ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
-      '</oppia-interactive-text-input>';
+      '</oppia-interactive-graph-input>';
     expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null))
       .toBe(expectedHtmlTag);
   });
@@ -75,7 +75,7 @@ describe('Exploration Html Formatter Service', () => {
       var interactionId = 'TextInput';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-text-input ' +
-        'label-for-focus-target="' + focusLabel + '"last-answer="null">' +
+        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
         '</oppia-interactive-text-input>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel)
