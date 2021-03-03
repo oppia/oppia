@@ -59,7 +59,7 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryData(
+      storyViewerBackendApiService.fetchStoryDataAsync(
         'abbrev', 'staging', '0').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -81,7 +81,7 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryData(
+      storyViewerBackendApiService.fetchStoryDataAsync(
         'abbrev', 'staging', '0').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

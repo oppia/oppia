@@ -776,7 +776,7 @@ angular.module('oppia').directive('conversationSkin', [
                     classroom_url_fragment: classroomUrlFragment,
                     story_url_fragment: storyUrlFragment
                   });
-                StoryViewerBackendApiService.fetchStoryData(
+                StoryViewerBackendApiService.fetchStoryDataAsync(
                   topicUrlFragment, classroomUrlFragment,
                   storyUrlFragment).then(
                   function(res) {
