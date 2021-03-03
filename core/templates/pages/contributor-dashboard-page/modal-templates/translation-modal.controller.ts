@@ -92,15 +92,15 @@ angular.module('oppia').controller('TranslationModalController', [
       // Checks whether there are any mathematical equations are copied
       // as mathematical equations are also wrapped by <p> elements.
       // If there are no mathematical equations copied, shows the paragraph
-      // copy error. Fixes issue #11683
+      // copy error. It is related to issue 11683.
       if ($event.target.localName === 'p') {
         paragraphChildrenElements = Array.from($event.target.children);
         if (!(paragraphChildrenElements
           .some(child => child.localName === 'oppia-noninteractive-math'))) {
-            $scope.hasParagraphCopyError = true;
-          } else {
-            $scope.copyContent($event);
-          }
+          $scope.hasParagraphCopyError = true;
+        } else {
+          $scope.copyContent($event);
+        }
       } else {
         $scope.copyContent($event);
       }
@@ -111,7 +111,7 @@ angular.module('oppia').controller('TranslationModalController', [
         $event.stopPropagation();
       }
       CkEditorCopyContentService.broadcastCopy($event.target);
-    }
+    };
 
     $scope.isCopyModeActive = function() {
       return CkEditorCopyContentService.copyModeActive;
@@ -127,7 +127,7 @@ angular.module('oppia').controller('TranslationModalController', [
 
     $scope.hasTranslationErrors = function(data, behaviour) {
       return data.some(state => state === behaviour);
-    }
+    };
 
     $scope.suggestTranslatedText = function() {
       $scope.hasImgCopyError = false;
@@ -147,10 +147,13 @@ angular.module('oppia').controller('TranslationModalController', [
         if (element.localName === 'oppia-noninteractive-image') {
           var altText = element.attributes['alt-with-value'].value;
           var descriptionText = element.attributes['caption-with-value'].value;
-          foundTranslatedImageFilePaths.push(element.attributes['filepath-with-value']);
-          foundTranslatedImageAltTxts.push(altText.substring(textWrapperLength, altText.length - textWrapperLength));
+          foundTranslatedImageFilePaths.push(
+            element.attributes['filepath-with-value']);
+          foundTranslatedImageAltTxts.push(altText.substring(
+            textWrapperLength, altText.length - textWrapperLength));
           foundTranslatedImageDescriptions.push(
-            descriptionText.substring(textWrapperLength, descriptionText.length - textWrapperLength));
+            descriptionText.substring(
+              textWrapperLength, descriptionText.length - textWrapperLength));
         }
       });
       [].forEach.call($scope.originalElements, function(element) {
@@ -177,9 +180,12 @@ angular.module('oppia').controller('TranslationModalController', [
           duplicateImgDescriptionStates.push(descriptionTextFound);
         }
       });
-      const hasUncopiedImgs = $scope.hasTranslationErrors(copiedImgStates, false);
-      const hasDuplicateAltTexts = $scope.hasTranslationErrors(duplicateImgAltTextStates, true);
-      const hasDuplicateDescriptions = $scope.hasTranslationErrors(duplicateImgDescriptionStates, true);
+      const hasUncopiedImgs = $scope.hasTranslationErrors(
+        copiedImgStates, false);
+      const hasDuplicateAltTexts = $scope.hasTranslationErrors(
+        duplicateImgAltTextStates, true);
+      const hasDuplicateDescriptions = $scope.hasTranslationErrors(
+        duplicateImgDescriptionStates, true);
       if (hasUncopiedImgs) {
         $scope.hasImgCopyError = true;
       } else if (hasDuplicateAltTexts || hasDuplicateDescriptions) {

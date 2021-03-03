@@ -174,7 +174,7 @@ describe('Translation Modal Controller', function() {
       '</oppia-noninteractive-image>';
 
     $scope.suggestTranslatedText();
-    
+
     expect(
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
       .toHaveBeenCalledWith('Translation');
