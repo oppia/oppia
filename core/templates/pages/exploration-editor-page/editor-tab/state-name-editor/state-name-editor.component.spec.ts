@@ -303,9 +303,10 @@ describe('State Name Editor component', function() {
     mockExternalSaveEventEmitter.emit();
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
-  
+
   it('should apply autofocus to elements', fakeAsync(() => {
-    spyOn(routerService, 'getActiveTabName').and.returnValues('main','feedback','history');
+    spyOn(routerService, 'getActiveTabName').and.returnValues(
+      'main', 'feedback', 'history');
     spyOn(focusManagerService, 'setFocus');
     ctrl.windowOnload();
     expect(ctrl.TabName).toBe('main');
@@ -321,12 +322,13 @@ describe('State Name Editor component', function() {
       'usernameInputField');
   }));
 
-  it('should apply autofocus when tabs are switched in exploration editor', function() {
+  it('should apply autofocus when tabs are switched in exploration editor',
+    function() {
     spyOn(routerService, 'getActiveTabName').and.returnValues('feedback', 'main');
     spyOn(focusManagerService, 'setFocus');
     $rootScope.$apply(routerService.getActiveTabName());
     $rootScope.$apply(routerService.getActiveTabName());
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'oppiaEditableSection');
-  })
+    });
 });

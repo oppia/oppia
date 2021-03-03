@@ -146,7 +146,7 @@ describe('History tab component', function() {
     $provide.value('RouterService', {
       onRefreshVersionHistory: mockRefreshVersionHistoryEmitter,
       getActiveTabName() {
-        return('main')
+        return ('main');
       },
     });
     $provide.value(
@@ -444,12 +444,12 @@ describe('History tab component', function() {
   });
 
   it('should apply autofocus to history tab element when tab is switched',
-  function() {
-    spyOn(routerService, 'getActiveTabName').and.returnValues('feedback', 'history');
-    spyOn(focusManagerService, 'setFocus');
-    $rootScope.$apply(routerService.getActiveTabName());
-    $rootScope.$apply(routerService.getActiveTabName());
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'usernameInputField');
-  });
+    function() {
+      spyOn(routerService, 'getActiveTabName').and.returnValues('feedback', 'history');
+      spyOn(focusManagerService, 'setFocus');
+      $rootScope.$apply(routerService.getActiveTabName());
+      $rootScope.$apply(routerService.getActiveTabName());
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'usernameInputField');
+    });
 });

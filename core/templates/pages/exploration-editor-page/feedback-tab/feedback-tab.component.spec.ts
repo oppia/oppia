@@ -486,25 +486,27 @@ describe('Feedback Tab Component', function() {
     expect(ctrl.isExplorationEditable()).toBe(false);
   });
 
-  it('should apply autofocus to feedback element when tab is switched in active thread',
+  it('should apply autofocus to feedback element when tab is in active thread',
   function() {
-    spyOn(routerService, 'getActiveTabName').and.returnValues('history', 'feedback');
-    spyOn(focusManagerService, 'setFocus');
-    ctrl.activeThread = false;
-    $rootScope.$apply(routerService.getActiveTabName());
-    $rootScope.$apply(routerService.getActiveTabName());
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'newThreadButton');
+      spyOn(routerService, 'getActiveTabName')
+      .and.returnValues('history', 'feedback');
+      spyOn(focusManagerService, 'setFocus');
+      ctrl.activeThread = false;
+      $rootScope.$apply(routerService.getActiveTabName());
+      $rootScope.$apply(routerService.getActiveTabName());
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'newThreadButton');
   });
 
-  it('should apply autofocus to feedback tab element when tab is switched in active thread',
-  function(){
-    spyOn(routerService, 'getActiveTabName').and.returnValues('history', 'feedback');
-    spyOn(focusManagerService, 'setFocus');
-    ctrl.activeThread = true;
-    $rootScope.$apply(routerService.getActiveTabName());
-    $rootScope.$apply(routerService.getActiveTabName());
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'tmpMessageText');
-  })
+  it('should apply focus to feedback  element when tab is not in active thread',
+    function(){
+      spyOn(routerService, 'getActiveTabName')
+      .and.returnValues('history', 'feedback');
+      spyOn(focusManagerService, 'setFocus');
+      ctrl.activeThread = true;
+      $rootScope.$apply(routerService.getActiveTabName());
+      $rootScope.$apply(routerService.getActiveTabName());
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'tmpMessageText');
+    });
 });

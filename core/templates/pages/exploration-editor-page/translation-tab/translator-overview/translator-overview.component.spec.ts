@@ -60,7 +60,7 @@ describe('Translator Overview component', function() {
   var explorationLanguageCode = 'hi';
   var focusManagerService = null;
   var routerService = null;
-  
+
   var mockWindow = null;
   beforeEach(angular.mock.module('oppia'));
 
@@ -210,10 +210,10 @@ describe('Translator Overview component', function() {
   });
 
   it('should apply autofocus to history tab element when tab is switched',
-  function() {
-    spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
-    spyOn(focusManagerService, 'setFocus');
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'audioTranslationLanguageCodeField');
-  });
+    function() {
+      spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
+      spyOn(focusManagerService, 'setFocus');
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'audioTranslationLanguageCodeField');
+    });
 });
