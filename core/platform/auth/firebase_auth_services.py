@@ -113,6 +113,7 @@ def establish_auth_session(request, response):
         # Using the HttpOnly flag when generating a cookie helps mitigate the
         # risk of client side script accessing the protected cookie (if the
         # browser supports it).
+        # Learn more: https://owasp.org/www-community/HttpOnly.
         httponly=True)
 
 
@@ -471,6 +472,8 @@ def _get_auth_claims_from_session_cookie(cookie):
             with _firebase_admin_context():
                 return _create_auth_claims(
                     firebase_auth.verify_session_cookie(cookie))
+        # NOTE: We're OK with cookies becoming obsolete with time, and will
+        # suppress the errors related to this. See the constant for details.
         except EXPECTED_SESSION_COOKIE_EXCEPTIONS:
             # NOTE: logging.exception appends the stack trace automatically.
             logging.exception('User session has ended and must be renewed')
