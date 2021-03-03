@@ -39,7 +39,7 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-class AuditUserEmailsOneOffJob(test_utils.GenericTestBase):
+class AuditUserEmailsOneOffJobTests(test_utils.GenericTestBase):
 
     def count_one_off_jobs_in_queue(self):
         """Returns the number of one off jobs in the taskqueue."""
