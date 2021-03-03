@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnInit } from '@angular/core';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
@@ -29,9 +29,32 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UtilsService } from 'services/utils.service';
 import { EdgeCentre, GraphDetailService } from './graph-detail.service';
-import $ from 'jquery';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+const debounce = (delay: number = 5): MethodDecorator => {
+  return function(
+      target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+    const original = descriptor.value;
+    const key = `__timeout__${propertyKey}`;
+
+    descriptor.value = function(...args) {
+      clearTimeout(this[key]);
+      this[key] = setTimeout(() => original.apply(this, args), delay);
+    };
+    return descriptor;
+  };
+};
+
+interface GraphButton {
+  text: string;
+  description: string;
+  mode: number
+}
+
+interface GraphOption {
+  text: string;
+  option: string;
+}
 @Component({
   selector: 'graph-viz',
   templateUrl: './graph-viz.component.html',
@@ -87,14 +110,14 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     mouseDragStartY: 0
   };
   selectedEdgeWeightValue: number | string;
-  buttons: {text: string, description: string, mode: number}[] = [];
+  buttons: GraphButton[] = [];
   private vizContainer: SVGSVGElement[];
   componentSubscriptions: Subscription = new Subscription();
   shouldShowWrongWeightWarning: boolean;
   VERTEX_RADIUS: number;
   EDGE_WIDTH: number;
   vizWidth: SVGAnimatedLength;
-  graphOptions: { text: string; option: string; }[];
+  graphOptions: GraphOption[];
   svgViewBox: string;
   constructor(
     private deviceInfoService: DeviceInfoService,
@@ -140,7 +163,6 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       option: 'isWeighted'
     }];
     this.helpText = null;
-    $(document).on('mouseup', () => this.onMouseupDocument());
     const svgContainer = this.element.nativeElement.querySelectorAll(
       '.oppia-graph-viz-svg')[0];
     const boundingBox = svgContainer.getBBox();
@@ -456,6 +478,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   // ---- Document event ----
+  @HostListener('document:mouseup', ['$event'])
+  @debounce()
   onMouseupDocument():void {
     if (this.isMobile) {
       return;
@@ -562,9 +586,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   deleteVertex(index: number): void {
-    // Using jQuery's map instead of normal array.map because
-    // it removes elements for which the callback returns null.
-    this.graph.edges = $.map(this.graph.edges, (edge) => {
+    this.graph.edges = this.graph.edges.map((edge) => {
       if (edge.src === index || edge.dst === index) {
         return null;
       }
@@ -576,6 +598,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       }
       return edge;
     });
+    this.graph.edges.filter(edge => edge !== null);
     this.graph.vertices.splice(index, 1);
     this.state.hoveredVertex = null;
   }

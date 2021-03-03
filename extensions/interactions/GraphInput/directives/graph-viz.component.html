@@ -40,7 +40,9 @@
                   attr.y="{{10 + 50 * idx}}"
                   rx="5"
                   ry="5"
-                  [style.fill]="'white'" [style.stroke]="'black'" [style.strokeWidth]="graph[button.option] ? '3' : '1'"
+                  [style.fill]="'white'"
+                  [style.stroke]="'black'"
+                  [style.strokeWidth]="graph[button.option] ? '3' : '1'"
                   (click)="toggleGraphOption(button.option)">
             </rect>
             <text class="unselectable-text unclickable-text oppia-graph-type-text"
@@ -63,7 +65,9 @@
               (click)="onClickModeButton(button.mode, $event)"
               (mouseenter)="state.hoveredModeButton = button.mode"
               (mouseleave)="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
-              [style.fill]="'white'" [style.stroke]="'black'" style.strokeWidth="{{state.currentMode == button.mode ? '3' : '1'}}">
+              [style.fill]="'white'"
+              [style.stroke]="'black'"
+              style.strokeWidth="{{state.currentMode == button.mode ? '3' : '1'}}">
         </rect>
         <text class="oppia-graph-button-label unselectable-text unclickable-text" x="18" attr.y="{{32 + 50 * idx}}">
           {{button.text}}
@@ -142,7 +146,9 @@
   <div class="oppia-update-button-container">
     <div *ngIf="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
       <input type="text" [(ngModel)]="selectedVertexLabel" [oppiaFocusOn]="vertexLabelEditBegun">
-      <button mat-raised-button (click)="state.selectedVertex = null" [innerHTML] = "'I18N_INTERACTIONS_GRAPH_UPDATE_LABEL' | translate"></button>
+      <button mat-raised-button
+              (click)="state.selectedVertex = null"
+              [innerHTML] = "'I18N_INTERACTIONS_GRAPH_UPDATE_LABEL' | translate"></button>
     </div>
     <div *ngIf="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
       <input type="number"
@@ -151,7 +157,9 @@
              [ngStyle]="shouldShowWrongWeightWarning ? {'border': '1px solid red'}: {}"
              (blur)="shouldShowWrongWeightWarning = !isValidEdgeWeight()"
              (focus)="shouldShowWrongWeightWarning = false">
-      <button mat-raised-button (click)="onUpdateEdgeWeight()" [innerHTML] = "'I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT' | translate"></button>
+      <button mat-raised-button
+              (click)="onUpdateEdgeWeight()"
+              [innerHTML] = "'I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT' | translate"></button>
     </div>
   </div>
 </div>

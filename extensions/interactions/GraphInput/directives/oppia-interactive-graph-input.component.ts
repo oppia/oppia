@@ -145,7 +145,6 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
   }
 
   submitGraph(): void {
-    // Here, angular.copy is needed to strip $$hashkey from the graph.
     this.currentInteractionService.onSubmit(
       cloneDeep<GraphAnswer>(this.graph) as unknown as string,
       this.graphInputRulesService as unknown as InteractionRulesService);
