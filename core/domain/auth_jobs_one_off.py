@@ -48,8 +48,8 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-class AuditUserEmailsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to confirm whether every user has a unique email address."""
+class AuditFirebaseImportReadinessOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to confirm whether users are ready for Firebase import."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -57,15 +57,22 @@ class AuditUserEmailsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user):
-        yield (user.email, user.id)
+        if user.deleted:
+            yield ('[DELETED]', user.id)
+        else:
+            yield (user.email, user.id)
 
     @staticmethod
-    def reduce(email, user_ids):
-        if len(user_ids) > 1:
-            yield (
-                'ERROR: %s is a shared email' % email,
-                # NOTE: These are only sorted to make unit tests simpler.
-                ', '.join(sorted(user_ids)))
+    def reduce(key, user_ids):
+        # NOTE: These are only sorted to make unit tests simpler.
+        joined_user_ids = ', '.join(sorted(user_ids))
+
+        if key == '[DELETED]':
+            yield ('ERROR: Found deleted users', joined_user_ids)
+        else:
+            email = key
+            if len(user_ids) > 1:
+                yield ('ERROR: %s is a shared email' % email, joined_user_ids)
 
 
 class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -86,6 +93,9 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user):
+        if user.deleted:
+            return
+
         auth_id = firebase_auth_services.get_auth_id_from_user_id(user.id)
         if auth_id is not None:
             yield (POPULATED_KEY, 1)
@@ -95,8 +105,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 ID_HASHING_FUNCTION(user.id) %
                 PopulateFirebaseAccountsOneOffJob.NUM_SHARDS)
             yield (
-                sharding_key,
-                (_strip_uid_prefix(user.id), user.id, user.email, user.deleted))
+                sharding_key, (_strip_uid_prefix(user.id), user.id, user.email))
 
     @staticmethod
     def reduce(key, values):
@@ -117,9 +126,8 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_fields = sorted(ast.literal_eval(v) for v in values)
         user_records = [
             firebase_auth.ImportUserRecord(
-                uid=auth_id, email=email, disabled=disabled,
-                email_verified=True)
-            for auth_id, _, email, disabled in user_fields
+                uid=auth_id, email=email, email_verified=True)
+            for auth_id, _, email in user_fields
         ]
 
         # The Firebase Admin SDK places a hard-limit on the number of users that
@@ -205,4 +213,4 @@ def _populate_firebase(user_records):
 
 def _strip_uid_prefix(user_id):
     """Removes the 'uid_' prefix from a user_id and returns the result."""
-    return user_id[4:]
+    return user_id[4:] if user_id.startswith('uid_') else user_id

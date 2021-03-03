@@ -39,7 +39,9 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-class AuditUserEmailsOneOffJobTests(test_utils.GenericTestBase):
+class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
+
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
 
     def count_one_off_jobs_in_queue(self):
         """Returns the number of one off jobs in the taskqueue."""
@@ -52,25 +54,27 @@ class AuditUserEmailsOneOffJobTests(test_utils.GenericTestBase):
         Returns:
             *. The output of the one off job.
         """
-        job_id = auth_jobs.AuditUserEmailsOneOffJob.create_new()
+        job_id = auth_jobs.AuditFirebaseImportReadinessOneOffJob.create_new()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
-        auth_jobs.AuditUserEmailsOneOffJob.enqueue(job_id)
+        auth_jobs.AuditFirebaseImportReadinessOneOffJob.enqueue(job_id)
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
         return sorted(
             ast.literal_eval(o) for o in
-            auth_jobs.AuditUserEmailsOneOffJob.get_output(job_id))
+            auth_jobs.AuditFirebaseImportReadinessOneOffJob.get_output(job_id))
 
-    def create_user(self, user_id, email):
+    def create_user(self, user_id, email, deleted=False):
         """Creates a new user with the provided ID and email address.
 
         Args:
             user_id: str. The user's ID.
             email: str. The user's email address.
+            deleted: bool. Value for the user's deleted property.
         """
         user_models.UserSettingsModel(
-            id=user_id, email=email, role=feconf.ROLE_ID_EXPLORATION_EDITOR,
+            id=user_id, email=email, deleted=deleted,
+            role=feconf.ROLE_ID_EXPLORATION_EDITOR,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
         ).put()
 
@@ -88,11 +92,20 @@ class AuditUserEmailsOneOffJobTests(test_utils.GenericTestBase):
             ['ERROR: a@test.com is a shared email', 'u1, u2'],
         ])
 
+    def test_deleted_users_are_reported(self):
+        self.create_user('u1', 'u1@test.com', deleted=True)
+        self.create_user('u2', 'u2@test.com', deleted=True)
+        self.create_user('u3', 'u3@test.com', deleted=False)
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ERROR: Found deleted users', 'u1, u2'],
+        ])
+
 
 class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
 
-    ENABLE_AUTH_SERVICES_STUB = False
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+    ENABLE_AUTH_SERVICES_STUB = False
 
     def setUp(self):
         super(PopulateFirebaseAccountsOneOffJobTests, self).setUp()
@@ -133,12 +146,19 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
             ast.literal_eval(o) for o in
             auth_jobs.PopulateFirebaseAccountsOneOffJob.get_output(job_id))
 
-    def create_oppia_user(self):
-        """Returns an (auth_id, user_id) pair for a new user."""
+    def create_oppia_user(self, deleted=False):
+        """Returns an (auth_id, user_id) pair for a new user.
+
+        Args:
+            deleted: bool. Value for the user's deleted property.
+
+        Returns:
+            AuthIdUserIdPair. The association the user should create.
+        """
         auth_id = 'aid%d' % python_utils.NEXT(self._auth_id_generator)
         user_id = 'uid_%s' % auth_id
         user_models.UserSettingsModel(
-            id=user_id, email=('email_%s@test.com' % auth_id),
+            id=user_id, email=('email_%s@test.com' % auth_id), deleted=deleted,
             role=feconf.ROLE_ID_EXPLORATION_EDITOR,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
         ).put()
@@ -239,6 +259,11 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [
             ['INFO: Pre-existing Firebase accounts', 11],
         ])
+
+    def test_skips_deleted_users(self):
+        self.create_oppia_user(deleted=True)
+
+        self.assertItemsEqual(self.run_one_off_job(), [])
 
     def test_initialize_app_error_is_reported(self):
         self.exit_stack.enter_context(self.sdk_stub.mock_initialize_app_error())
