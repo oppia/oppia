@@ -227,10 +227,14 @@ import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedba
 import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
 import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
+import { UserEmailPreferencesService } from 'pages/exploration-editor-page/services/user-email-preferences.service';
+import { UserEmailPreferencesBackendApiService } from 'pages/exploration-editor-page/services/user-email-preferences-backend-api.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
@@ -338,8 +342,6 @@ import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 
@@ -685,6 +687,10 @@ export const angularServices: [string, Type<{}>][] = [
   ['UrlService', UrlService],
   ['UserBackendApiService', UserBackendApiService],
   ['UserService', UserService],
+  ['UserEmailPreferencesService',
+    UserEmailPreferencesService],
+  ['UserEmailPreferencesBackendApiService',
+    UserEmailPreferencesBackendApiService],
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
