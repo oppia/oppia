@@ -29,7 +29,6 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { ApplicationRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
 
 export class MockChangeDetectorRef {
   detectChanges: () => void;
@@ -42,7 +41,7 @@ export class MockNgbModalRef {
   result: Promise<void> = new Promise((resolve) => resolve());
 }
 
-fdescribe('Learner playlist service factory', () => {
+describe('Learner playlist service', () => {
   let activityType: string = 'exploration';
   let urlInterpolationService: UrlInterpolationService;
   let activityId = '1';
@@ -107,7 +106,7 @@ fdescribe('Learner playlist service factory', () => {
     httpTestingController.verify();
   });
 
-  fit('should successfully add playlist to play later list', fakeAsync(() => {
+  it('should successfully add playlist to play later list', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,
@@ -125,7 +124,7 @@ fdescribe('Learner playlist service factory', () => {
     expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
   }));
 
-  fit('should not add playlist to play later list' +
+  it('should not add playlist to play later list' +
     ' and show belongs to completed or incomplete list', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: true,
@@ -144,7 +143,7 @@ fdescribe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  fit('should not add playlist to play later list' +
+  it('should not add playlist to play later list' +
     ' and show belongs to subscribed activities', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
@@ -163,7 +162,7 @@ fdescribe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  fit('should not add playlist to play later list' +
+  it('should not add playlist to play later list' +
     ' and show playlist limit exceeded', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
@@ -184,7 +183,7 @@ fdescribe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  fit('should open an ngbModal when removing from learner playlist',
+  it('should open an ngbModal when removing from learner playlist',
     fakeAsync(() => {
       let learnerDashboardActivityIds = LearnerDashboardActivityIds
         .createFromBackendDict({
@@ -201,7 +200,7 @@ fdescribe('Learner playlist service factory', () => {
       expect(modalSpy).toHaveBeenCalled();
     }));
 
-  fit('should remove an exploration from learner playlist', fakeAsync(() => {
+  it('should remove an exploration from learner playlist', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
     let deferred = new Promise<void>((resolve) => {
       resolve();
@@ -226,7 +225,7 @@ fdescribe('Learner playlist service factory', () => {
       ['1', '2']);
   }));
 
-  fit('should remove a collection from learner playlist', fakeAsync(() => {
+  it('should remove a collection from learner playlist', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
     let deferred = new Promise<void>((resolve) => {
       resolve();
@@ -250,7 +249,7 @@ fdescribe('Learner playlist service factory', () => {
       ['1', '2']);
   }));
 
-  fit('should not remove anything from learner playlist when cancel' +
+  it('should not remove anything from learner playlist when cancel' +
     ' button is clicked', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
     let deferred = new Promise<void>((reject) => {

@@ -24,9 +24,9 @@ import { HttpClient } from '@angular/common/http';
 import { AlertsService } from 'services/alerts.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerDashboardActivityIds } from
-  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
+
 
 export interface LearnerPlaylistDict {
   'belongs_to_completed_or_incomplete_list': boolean;
