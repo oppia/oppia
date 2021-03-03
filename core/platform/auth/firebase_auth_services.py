@@ -447,22 +447,6 @@ def _get_id_token(request):
     return token if scheme == 'Bearer' else None
 
 
-def _get_auth_claims_from_id_token(token):
-    """Returns claims from the ID Token, or None if invalid.
-
-    Args:
-        token: str|None. The token to extract claims from.
-
-    Returns:
-        AuthClaims|None. The claims from the ID Token, if available. Otherwise
-        returns None.
-    """
-    if token:
-        with _firebase_admin_context():
-            return _create_auth_claims(firebase_auth.verify_id_token(token))
-    return None
-
-
 def _get_auth_claims_from_session_cookie(cookie):
     """Returns claims from the session cookie, or None if invalid.
 
