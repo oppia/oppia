@@ -331,7 +331,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         # this stub, we treat them the same.
         id_token = session_cookie
         if id_token not in self._session_cookie_duration_by_id_token:
-            raise firebase_admin.auth.InvalidSessionCookieError(
+            raise firebase_admin.auth.ExpiredSessionCookieError(
                 'The provided Firebase session cookie is invalid', None)
         return self._decode_user_claims(id_token)
 
@@ -479,11 +479,11 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
     def setUp(self):
         super(FirebaseAuthServicesTestBase, self).setUp()
-        self.sdk_stub = FirebaseAdminSdkStub()
-        self.sdk_stub.install(self)
+        self.firebase_sdk_stub = FirebaseAdminSdkStub()
+        self.firebase_sdk_stub.install(self)
 
     def tearDown(self):
-        self.sdk_stub.uninstall()
+        self.firebase_sdk_stub.uninstall()
         super(FirebaseAuthServicesTestBase, self).tearDown()
 
     def capture_logging(self, min_level=logging.INFO):
@@ -544,7 +544,7 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
     def setUp(self):
         super(EstablishAuthSessionTests, self).setUp()
         self.id_token = (
-            self.sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL))
+            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL))
 
     def test_adds_cookie_to_response_from_id_token_in_request(self):
         req = self.create_request(id_token=self.id_token)
@@ -594,7 +594,7 @@ class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
 class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
     def test_returns_none_if_cookie_is_missing(self):
-        id_token = self.sdk_stub.create_user(self.AUTH_ID)
+        id_token = self.firebase_sdk_stub.create_user(self.AUTH_ID)
 
         self.assertIsNone(firebase_auth_services.get_auth_claims_from_request(
             self.create_request()))
@@ -603,7 +603,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
     def test_returns_claims_if_cookie_is_present(self):
         cookie = firebase_admin.auth.create_session_cookie(
-            self.sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
             datetime.timedelta(days=1))
 
         self.assertEqual(
@@ -613,7 +613,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
     def test_logs_error_when_cookie_is_invalid(self):
         cookie = firebase_admin.auth.create_session_cookie(
-            self.sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
             datetime.timedelta(days=0))
 
         with self.capture_logging() as logs:
@@ -737,7 +737,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
                  auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
 
     def test_present_association_is_not_considered_to_be_deleted(self):
-        self.sdk_stub.create_user('aid')
+        self.firebase_sdk_stub.create_user('aid')
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -751,7 +751,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             .verify_external_auth_associations_are_deleted('does_not_exist'))
 
     def test_delete_association_when_it_is_present(self):
-        self.sdk_stub.create_user('aid')
+        self.firebase_sdk_stub.create_user('aid')
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         self.assertFalse(
@@ -770,7 +770,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             'does_not_exist')
 
     def test_disable_association_marks_user_for_deletion(self):
-        self.sdk_stub.create_user('aid')
+        self.firebase_sdk_stub.create_user('aid')
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -785,7 +785,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         self.assertTrue(firebase_admin.auth.get_user('aid').disabled)
 
     def test_disable_association_warns_when_firebase_fails_to_init(self):
-        self.sdk_stub.create_user('aid')
+        self.firebase_sdk_stub.create_user('aid')
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         init_swap = self.swap_to_always_raise(
@@ -805,7 +805,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
 
     def test_disable_association_warns_when_firebase_fails_to_update_user(self):
-        self.sdk_stub.create_user('aid')
+        self.firebase_sdk_stub.create_user('aid')
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         update_user_swap = self.swap_to_always_raise(
@@ -833,7 +833,7 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
 
     def setUp(self):
         super(FirebaseSpecificAssociationTests, self).setUp()
-        self.sdk_stub.create_user(self.AUTH_ID)
+        self.firebase_sdk_stub.create_user(self.AUTH_ID)
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
 
@@ -898,7 +898,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     def setUp(self):
         super(DeleteAuthAssociationsTests, self).setUp()
-        self.sdk_stub.create_user(self.AUTH_ID)
+        self.firebase_sdk_stub.create_user(self.AUTH_ID)
         self.signup(self.EMAIL, self.USERNAME)
         self.user_id = self.get_user_id_from_email(self.EMAIL)
         firebase_auth_services.associate_auth_id_with_user_id(

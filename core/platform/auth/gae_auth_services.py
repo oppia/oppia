@@ -19,6 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+import http.cookies
+
 from core.domain import auth_domain
 from core.platform import models
 import python_utils
@@ -48,10 +51,16 @@ def destroy_auth_session(response):
     Args:
         response: webapp2.Response. Response to clear the cookies from.
     """
-    # Google App Engine sets the ACSID cookie for 'http' and the SACSID cookie
-    # for 'https'. dev_appserver_login cookie is used by the dev server.
-    for cookie_name in ('ACSID', 'SACSID', 'dev_appserver_login'):
-        response.delete_cookie(cookie_name)
+    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
+    # for https:// . We just unset both below. We also unset dev_appserver_login
+    # cookie used in local server.
+    for cookie_name in (b'ACSID', b'SACSID', b'dev_appserver_login'):
+        cookie = http.cookies.SimpleCookie()
+        cookie[cookie_name] = ''
+        cookie[cookie_name]['expires'] = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        response.headers.add_header(*cookie.output().split(b': ', 1))
 
 
 def get_auth_claims_from_request(unused_request):
