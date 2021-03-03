@@ -41,14 +41,14 @@
       </div>
     </div>
     <div class="oppia-translation-error-section">
-      <p ng-if="imgCopyError">
-        All images should be copied!
+      <p ng-if="hasImgCopyError">
+        All images should be copied.
       </p>
-      <p ng-if="imgTextError">
-        Image alt text or description should be translated if exists!
+      <p ng-if="hasImgTextError">
+        Image caption and/or description should be translated if they exist.
       </p>
-      <p ng-if="paragraphCopyerror">
-        Paragraphs are not allowed to copy!
+      <p ng-if="hasParagraphCopyError">
+        Paragraphs are not allowed to be copied. Please make sure to translate the text.
       </p>
     </div>
   </div>

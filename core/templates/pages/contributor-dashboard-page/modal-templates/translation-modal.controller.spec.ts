@@ -118,7 +118,9 @@ describe('Translation Modal Controller', function() {
       'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
     $scope.activeWrittenTranslation.html = '';
+
     $scope.suggestTranslatedText();
+
     expect(
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
       .not.toHaveBeenCalledWith('Translation');
@@ -143,7 +145,9 @@ describe('Translation Modal Controller', function() {
       '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
       'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
+
     $scope.suggestTranslatedText();
+
     expect(
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
       .not.toHaveBeenCalledWith('Translation');
@@ -168,7 +172,9 @@ describe('Translation Modal Controller', function() {
       '"&quot;caption&quot;" filepath-with-value="&amp;quot;' +
       'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
       '</oppia-noninteractive-image>';
+
     $scope.suggestTranslatedText();
+    
     expect(
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
       .toHaveBeenCalledWith('Translation');

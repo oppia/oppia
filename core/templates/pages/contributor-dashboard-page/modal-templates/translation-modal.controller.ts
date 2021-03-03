@@ -67,9 +67,9 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.loadingData = true;
     $scope.moreAvailable = false;
     $scope.textToTranslate = '';
-    $scope.imgCopyError = false;
-    $scope.paragraphCopyerror = false;
-    $scope.imgTextError = false;
+    $scope.hasImgCopyError = false;
+    $scope.hasParagraphCopyError = false;
+    $scope.hasImgTextError = false;
     $scope.languageDescription = (
       TranslationLanguageService.getActiveLanguageDescription());
     TranslateTextService.init(
@@ -84,23 +84,34 @@ angular.module('oppia').controller('TranslationModalController', [
       });
 
     $scope.onContentClick = function($event) {
-      $scope.paragraphCopyerror = false;
-      var children = [];
+      $scope.hasParagraphCopyError = false;
+      var paragraphChildrenElements = [];
+
+      // All the child elements are copied into paragraphChildrenElements
+      // if the copied snippet is a paragraph.
+      // Checks whether there are any mathematical equations are copied
+      // as mathematical equations are also wrapped by <p> elements.
+      // If there are no mathematical equations copied, shows the paragraph
+      // copy error. Fixes issue #11683
       if ($event.target.localName === 'p') {
-        [].forEach.call($event.target.children, function(child) {
-          children.push(child);
-        });
-      }
-      if ($event.target.localName === 'p' && !(children.some(
-        child => child.localName === 'oppia-noninteractive-math'))) {
-        $scope.paragraphCopyerror = true;
+        paragraphChildrenElements = Array.from($event.target.children);
+        if (!(paragraphChildrenElements
+          .some(child => child.localName === 'oppia-noninteractive-math'))) {
+            $scope.hasParagraphCopyError = true;
+          } else {
+            $scope.copyContent($event);
+          }
       } else {
-        if ($scope.isCopyModeActive()) {
-          $event.stopPropagation();
-        }
-        CkEditorCopyContentService.broadcastCopy($event.target);
+        $scope.copyContent($event);
       }
     };
+
+    $scope.copyContent = function($event) {
+      if ($scope.isCopyModeActive()) {
+        $event.stopPropagation();
+      }
+      CkEditorCopyContentService.broadcastCopy($event.target);
+    }
 
     $scope.isCopyModeActive = function() {
       return CkEditorCopyContentService.copyModeActive;
@@ -114,62 +125,65 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.activeWrittenTranslation.html = '';
     };
 
+    $scope.hasTranslationErrors = function(data, behaviour) {
+      return data.some(state => state === behaviour);
+    }
+
     $scope.suggestTranslatedText = function() {
-      $scope.imgCopyError = false;
-      $scope.imgTextError = false;
+      $scope.hasImgCopyError = false;
+      $scope.hasImgTextError = false;
       $scope.originalElements = angular.element(
         $scope.textToTranslate);
       $scope.translatedElements = angular.element(
         $scope.activeWrittenTranslation.html);
-      var translatedImageDetails = [];
-      var translatedImageAltTxts = [];
-      var translatedImageDescriptions = [];
-      var states = [];
+      var foundTranslatedImageFilePaths = [];
+      var foundTranslatedImageAltTxts = [];
+      var foundTranslatedImageDescriptions = [];
+      var copiedImgStates = [];
       var duplicateImgAltTextStates = [];
       var duplicateImgDescriptionStates = [];
-      [].forEach.call($scope.translatedElements, function(ctl) {
-        if (ctl.localName === 'oppia-noninteractive-image') {
-          var altText = ctl.attributes['alt-with-value'].value;
-          var descriptionText = ctl.attributes['caption-with-value'].value;
-          translatedImageDetails.push(ctl.attributes['filepath-with-value']);
-          translatedImageAltTxts.push(altText.substring(6, altText.length - 6));
-          translatedImageDescriptions.push(
-            descriptionText.substring(6, descriptionText.length - 6));
+      const textWrapperLength = 6;
+      [].forEach.call($scope.translatedElements, function(element) {
+        if (element.localName === 'oppia-noninteractive-image') {
+          var altText = element.attributes['alt-with-value'].value;
+          var descriptionText = element.attributes['caption-with-value'].value;
+          foundTranslatedImageFilePaths.push(element.attributes['filepath-with-value']);
+          foundTranslatedImageAltTxts.push(altText.substring(textWrapperLength, altText.length - textWrapperLength));
+          foundTranslatedImageDescriptions.push(
+            descriptionText.substring(textWrapperLength, descriptionText.length - textWrapperLength));
         }
       });
-      [].forEach.call($scope.originalElements, function(ctlTranslated) {
-        if (ctlTranslated.localName === 'oppia-noninteractive-image') {
-          var rawAltText = ctlTranslated.attributes['alt-with-value'].value;
-          var rawDescriptionText = ctlTranslated.attributes[
+      [].forEach.call($scope.originalElements, function(element) {
+        if (element.localName === 'oppia-noninteractive-image') {
+          var rawAltText = element.attributes['alt-with-value'].value;
+          var rawDescriptionText = element.attributes[
             'caption-with-value'].value;
           var altText = rawAltText.substring(
-            6, rawAltText.length - 6);
+            textWrapperLength, rawAltText.length - textWrapperLength);
           var descriptionText = rawDescriptionText.substring(
-            6, rawDescriptionText.length - 6);
-          const found = translatedImageDetails.some(
-            detail => detail.value === ctlTranslated.attributes[
+            textWrapperLength, rawDescriptionText.length - textWrapperLength);
+          const found = foundTranslatedImageFilePaths.some(
+            detail => detail.value === element.attributes[
               'filepath-with-value'].value);
-          const altTextFound = translatedImageAltTxts.some(
+          const altTextFound = foundTranslatedImageAltTxts.some(
             translatedAltText => (
               translatedAltText === altText && altText !== ''));
-          const descriptionTextFound = translatedImageDescriptions.some(
+          const descriptionTextFound = foundTranslatedImageDescriptions.some(
             translatedDescText => (
               translatedDescText === descriptionText && descriptionText !== '')
           );
-          states.push(found);
+          copiedImgStates.push(found);
           duplicateImgAltTextStates.push(altTextFound);
           duplicateImgDescriptionStates.push(descriptionTextFound);
         }
       });
-      const uncopiedImgLefts = states.some(state => state === false);
-      const duplicateAltTexts = duplicateImgAltTextStates.some(
-        state => state === true);
-      const duplicateDescriptions = duplicateImgDescriptionStates.some(
-        state => state === true);
-      if (uncopiedImgLefts) {
-        $scope.imgCopyError = true;
-      } else if (duplicateAltTexts || duplicateDescriptions) {
-        $scope.imgTextError = true;
+      const hasUncopiedImgs = $scope.hasTranslationErrors(copiedImgStates, false);
+      const hasDuplicateAltTexts = $scope.hasTranslationErrors(duplicateImgAltTextStates, true);
+      const hasDuplicateDescriptions = $scope.hasTranslationErrors(duplicateImgDescriptionStates, true);
+      if (hasUncopiedImgs) {
+        $scope.hasImgCopyError = true;
+      } else if (hasDuplicateAltTexts || hasDuplicateDescriptions) {
+        $scope.hasImgTextError = true;
       } else {
         if (!$scope.uploadingTranslation && !$scope.loadingData) {
           SiteAnalyticsService.
