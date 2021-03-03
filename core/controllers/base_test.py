@@ -712,7 +712,12 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
     """Tests for session handler."""
 
     def test_get(self):
-        self.get_html_response('/session_begin', expected_status_int=200)
+        call_counter = test_utils.CallCounter(lambda *_: None)
+
+        with self.swap(auth_services, 'establish_auth_session', call_counter):
+            self.get_html_response('/session_begin', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
 
 
 class LogoutPageTests(test_utils.GenericTestBase):
