@@ -115,7 +115,7 @@ var ProfilePage = function() {
   this.expectToHaveCreatedExplorationStat = async function(expectedStat) {
     await waitFor.visibilityOf(
       createdExplorationStat,
-      'Create Exploration State is Taking Too Long to Display');
+      'Create Exploration State is Taking Too Long to appear');
     expect(await createdExplorationStat.getText()).toMatch(expectedStat);
   };
 };
