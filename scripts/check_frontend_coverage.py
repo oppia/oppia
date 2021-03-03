@@ -209,7 +209,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-drag-and-drop-sort-input.directive.ts',
     'oppia-short-response-end-exploration.directive.ts',
     'oppia-short-response-fraction-input.component.ts',
-    'oppia-short-response-graph-input.directive.ts',
+    'oppia-short-response-graph-input.component.ts',
     'oppia-short-response-image-click-input.directive.ts',
     'oppia-short-response-interactive-map.directive.ts',
     'oppia-short-response-item-selection-input.directive.ts',
