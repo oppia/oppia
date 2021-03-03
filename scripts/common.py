@@ -940,15 +940,9 @@ def managed_firebase_auth_emulator():
 
     emulator_args = [
         FIREBASE_PATH, 'emulators:start', '--only', 'auth',
-        '--project', feconf.OPPIA_PROJECT_ID
+        '--project', feconf.OPPIA_PROJECT_ID,
     ]
     with contextlib2.ExitStack() as stack:
-        # These two environment values allow the Firebase SDKs to acknowledge
-        # the existence of the Firebase emulator.
-        stack.enter_context(swap_env('GCLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
-        stack.enter_context(swap_env(
-            'FIREBASE_AUTH_EMULATOR_HOST', feconf.FIREBASE_AUTH_EMULATOR_HOST))
-
         # OK to use shell=True here because we are passing string literals and
         # constants, so no risk of shell-injection attacks.
         yield stack.enter_context(managed_process(emulator_args, shell=True))
