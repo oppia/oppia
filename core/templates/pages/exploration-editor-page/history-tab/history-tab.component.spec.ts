@@ -445,7 +445,8 @@ describe('History tab component', function() {
 
   it('should apply autofocus to history tab element when tab is switched',
     function() {
-      spyOn(routerService, 'getActiveTabName').and.returnValues('feedback', 'history');
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValues('feedback', 'history');
       spyOn(focusManagerService, 'setFocus');
       $rootScope.$apply(routerService.getActiveTabName());
       $rootScope.$apply(routerService.getActiveTabName());

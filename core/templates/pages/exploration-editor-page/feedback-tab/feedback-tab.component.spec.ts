@@ -487,21 +487,21 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should apply autofocus to feedback element when tab is in active thread',
-  function() {
+    function() {
       spyOn(routerService, 'getActiveTabName')
-      .and.returnValues('history', 'feedback');
+        .and.returnValues('history', 'feedback');
       spyOn(focusManagerService, 'setFocus');
       ctrl.activeThread = false;
       $rootScope.$apply(routerService.getActiveTabName());
       $rootScope.$apply(routerService.getActiveTabName());
       expect(focusManagerService.setFocus).toHaveBeenCalledWith(
         'newThreadButton');
-  });
+    });
 
-  it('should apply focus to feedback  element when tab is not in active thread',
-    function(){
+  it('should apply focus to feedback element when tab is not in active thread',
+    function() {
       spyOn(routerService, 'getActiveTabName')
-      .and.returnValues('history', 'feedback');
+        .and.returnValues('history', 'feedback');
       spyOn(focusManagerService, 'setFocus');
       ctrl.activeThread = true;
       $rootScope.$apply(routerService.getActiveTabName());

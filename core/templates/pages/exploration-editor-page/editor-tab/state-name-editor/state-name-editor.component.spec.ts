@@ -324,11 +324,12 @@ describe('State Name Editor component', function() {
 
   it('should apply autofocus when tabs are switched in exploration editor',
     function() {
-    spyOn(routerService, 'getActiveTabName').and.returnValues('feedback', 'main');
-    spyOn(focusManagerService, 'setFocus');
-    $rootScope.$apply(routerService.getActiveTabName());
-    $rootScope.$apply(routerService.getActiveTabName());
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'oppiaEditableSection');
-    });
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValues('feedback', 'main');
+      spyOn(focusManagerService, 'setFocus');
+      $rootScope.$apply(routerService.getActiveTabName());
+      $rootScope.$apply(routerService.getActiveTabName());
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'oppiaEditableSection');
+      });
 });
