@@ -3262,7 +3262,8 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(DisallowBlankLinesBelowFunctionDefinitionCheckerTests, self).setUp()
+        super(
+            DisallowBlankLinesBelowFunctionDefinitionCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowBlankLinesBelowFunctionDefinitionChecker)
@@ -3279,7 +3280,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""
                 def sum(a,b):
-                    
+
                     \"\"\" this  does something \"\"\"
                     return a+b
                 """)

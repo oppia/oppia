@@ -2126,7 +2126,7 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
     }
 
     def visit_functiondef(self, node):
-        """Visits every function and ensures there are no blank lines below 
+        """Visits every function and ensures there are no blank lines below
         function definition.
 
         Args:
@@ -2169,4 +2169,5 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
-    linter.register_checker(DisallowBlankLinesBelowFunctionDefinitionChecker(linter))
+    linter.register_checker(
+        DisallowBlankLinesBelowFunctionDefinitionChecker(linter))
