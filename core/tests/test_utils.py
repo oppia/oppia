@@ -1247,6 +1247,10 @@ class TestBase(unittest.TestCase):
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
+    # NOTE: For tests that do not/can not use the default super-admin, authors
+    # can override the following class-level constant.
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
+
     # This is the value that gets returned by default when
     # app_identity.get_application_id() is called during tests.
     EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
@@ -1773,13 +1777,7 @@ tags: []
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
-        # NOTE: For tests that do not/can not use the default super-admin,
-        # authors can add the following class-level constant:
-        #
-        #     SIGNUP_DEFAULT_SUPERADMIN_USER = False
-        #
-        # Otherwise, the default value of True will be obeyed instead.
-        if getattr(self, 'SIGNUP_DEFAULT_SUPERADMIN_USER', True):
+        if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
         self._es_stub.reset()
 

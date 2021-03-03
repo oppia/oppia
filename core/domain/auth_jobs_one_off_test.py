@@ -92,7 +92,7 @@ class AuditUserEmailsOneOffJobTests(test_utils.GenericTestBase):
 class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
 
     ENABLE_AUTH_SERVICES_STUB = False
-    SIGNUP_DEFAULT_SUPERADMIN_USER = False
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
 
     def setUp(self):
         super(PopulateFirebaseAccountsOneOffJobTests, self).setUp()
@@ -102,6 +102,11 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
 
         self.sdk_stub.install(self)
         self.exit_stack.callback(self.sdk_stub.uninstall)
+
+        # Forces all users to produce the same hash value during unit tests to
+        # prevent them from being sharded and complicating the testing logic.
+        self.exit_stack.enter_context(self.swap_to_always_return(
+            auth_jobs, 'ID_HASHING_FUNCTION', value=1))
 
     def tearDown(self):
         self.exit_stack.close()
@@ -219,7 +224,7 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_successfully_imports_users_in_bulk(self):
         self.exit_stack.enter_context(
-            self.swap(auth_jobs, 'FIREBASE_IMPORT_USERS_MAX_LEN', 3))
+            self.swap(auth_jobs, 'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
 
         auth_assocs = self.create_multi_oppia_users(11)
 
@@ -296,7 +301,7 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_single_import_batch_error_is_reported(self):
         self.exit_stack.enter_context(
-            self.swap(auth_jobs, 'FIREBASE_IMPORT_USERS_MAX_LEN', 3))
+            self.swap(auth_jobs, 'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
         mock_import_users_error = self.sdk_stub.mock_import_users_error(
             call_error_sequence=(False, True, False))
 
@@ -333,7 +338,7 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_individual_user_import_errors_are_reported(self):
         self.exit_stack.enter_context(
-            self.swap(auth_jobs, 'FIREBASE_IMPORT_USERS_MAX_LEN', 3))
+            self.swap(auth_jobs, 'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
         mock_import_users_error = self.sdk_stub.mock_import_users_error(
             user_error_sequence=(False, True, False, False))
 

@@ -32,7 +32,9 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 
-FIREBASE_IMPORT_USERS_MAX_LEN = 1000
+ID_HASHING_FUNCTION = hash
+
+MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL = 1000
 
 AUDIT_KEY = 'INFO: Pre-existing Firebase accounts'
 FAILURE_KEY = 'FAILURE: Failed to create Firebase accounts'
@@ -76,6 +78,10 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     sign up with Firebase will have an entirely different ID.
     """
 
+    # Arbitrary value. We chose 50 because we have roughly 50K users at the time
+    # of writing this job.
+    NUM_SHARDS = 50
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]
@@ -86,8 +92,12 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if auth_id is not None:
             yield (POPULATED_KEY, 1)
         else:
+            # Split-up users into different shards to help speed up the job.
+            sharding_key = (
+                ID_HASHING_FUNCTION(user.id) %
+                PopulateFirebaseAccountsOneOffJob.NUM_SHARDS)
             yield (
-                NOT_POPULATED_KEY,
+                sharding_key,
                 (_strip_uid_prefix(user.id), user.id, user.email, user.deleted))
 
     @staticmethod
@@ -97,7 +107,10 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         try:
-            app = firebase_admin.initialize_app()
+            # NOTE: "app" is the term Firebase uses for the "entry point" to the
+            # Firebase SDK. Oppia only has one server, so it only needs to
+            # instantiate one app.
+            firebase_connection = firebase_admin.initialize_app()
         except Exception as exception:
             yield (WARNING_KEY, repr(exception))
             return
@@ -115,11 +128,11 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # can be "imported" in a single call. To compensate, we break up the
         # users into chunks.
         offsets = python_utils.RANGE(
-            0, len(user_records), FIREBASE_IMPORT_USERS_MAX_LEN)
+            0, len(user_records), MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL)
         results = (
             _populate_firebase([record for record in record_group if record])
             for record_group in _grouper(
-                user_records, FIREBASE_IMPORT_USERS_MAX_LEN))
+                user_records, MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL))
 
         assocs_to_create = []
         for offset, (result, exception) in python_utils.ZIP(offsets, results):
@@ -144,7 +157,9 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (SUCCESS_KEY, len(assocs_to_create))
 
         try:
-            firebase_admin.delete_app(app)
+            # NOTE: This is not dangerous. We are just deleting the resources
+            # used to form a connection to Firebase servers.
+            firebase_admin.delete_app(firebase_connection)
         except Exception as exception:
             yield (WARNING_KEY, repr(exception))
 
