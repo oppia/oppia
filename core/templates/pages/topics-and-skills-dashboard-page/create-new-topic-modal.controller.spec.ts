@@ -30,12 +30,14 @@ describe('Create new topic modal', function() {
   beforeEach(angular.mock.module('oppia'));
 
   var $scope = null;
+  var $rootScope = null;
+  var $q = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
   var TopicEditorStateService = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-
+    $rootScope = $injector.get('$rootScope');
+    $q = $injector.get('$q');
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     $scope = $rootScope.$new();
@@ -83,19 +85,20 @@ describe('Create new topic modal', function() {
   });
 
   it('should check if url fragment already exists', function() {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    TopicEditorStateService.updateExistenceOfTopicUrlFragment.then(
-      successHandler, failHandler
-    );
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
+    spyOn(TopicEditorStateService, 'updateExistenceOfTopicUrlFragment')
+      .and.callFake(
+        function(arg) {
+          var deferred = $q.defer();
+          deferred.resolve();
+          return deferred.promise;
+        });
     spyOn(
       TopicEditorStateService,
       'getTopicWithUrlFragmentExists').and.returnValue(true);
     expect($scope.topicUrlFragmentExists).toBeFalse();
     $scope.newlyCreatedTopic.urlFragment = 'test-url';
     $scope.onTopicUrlFragmentChange();
+    $rootScope.$apply();
     expect($scope.topicUrlFragmentExists).toBeTrue();
   });
 
@@ -110,20 +113,19 @@ describe('Create new topic modal', function() {
     });
 
   it('should check if topic name already exists', function() {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    TopicEditorStateService.updateExistenceOfTopicName.then(
-      successHandler, failHandler
-    );
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-
+    spyOn(TopicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
+      function(arg) {
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      });
     spyOn(
       TopicEditorStateService,
       'getTopicWithNameExists').and.returnValue(true);
     expect($scope.topicNameExists).toBeFalse();
     $scope.newlyCreatedTopic.name = 'test';
     $scope.onTopicNameChange();
+    $rootScope.$apply();
     expect($scope.topicNameExists).toBeTrue();
   });
 

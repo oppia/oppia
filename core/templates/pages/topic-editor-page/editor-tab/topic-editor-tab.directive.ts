@@ -159,10 +159,7 @@ angular.module('oppia').directive('topicEditorTab', [
           // editor, it gets assigned to that topic, and to reflect that
           // change, we need to fetch the topic again from the backend.
           $scope.refreshTopic = function() {
-            TopicEditorStateService.loadTopic($scope.topic.getId()).then(
-              () => {
-                $rootScope.$applyAsync();
-              });
+            TopicEditorStateService.loadTopic($scope.topic.getId());
           };
 
           $scope.getStaticImageUrl = function(imagePath) {
@@ -258,7 +255,6 @@ angular.module('oppia').directive('topicEditorTab', [
                 });
             } else {
               TopicUpdateService.setTopicName($scope.topic, newName);
-              $rootScope.$applyAsync();
               $scope.topicNameEditorIsShown = false;
             }
           };

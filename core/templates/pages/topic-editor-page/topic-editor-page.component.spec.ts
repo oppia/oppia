@@ -28,6 +28,8 @@ import { EventEmitter } from '@angular/core';
 describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
+  var $q = null;
+  var $rootScope = null;
   var ContextService = null;
   var PageTitleService = null;
   var TopicEditorRoutingService = null;
@@ -43,7 +45,8 @@ describe('Topic editor page', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
+    $q = $injector.get('$q');
     ContextService = $injector.get('ContextService');
     UndoRedoService = $injector.get('UndoRedoService');
     PageTitleService = $injector.get('PageTitleService');
@@ -79,7 +82,7 @@ describe('Topic editor page', function() {
     });
   }));
 
-  xit('should load topic based on its id on url when component is initialized' +
+  it('should load topic based on its id on url when component is initialized' +
     ' and set page title', function() {
     let topicInitializedEventEmitter = new EventEmitter();
     let topicReinitializedEventEmitter = new EventEmitter();
@@ -88,6 +91,9 @@ describe('Topic editor page', function() {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
       undoRedoChangeEventEmitter.emit();
+      var deferred = $q.defer();
+      deferred.resolve();
+      return deferred.promise;
     });
     spyOnProperty(
       TopicEditorStateService, 'onTopicInitialized').and.returnValue(
@@ -98,9 +104,9 @@ describe('Topic editor page', function() {
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
     ctrl.$onInit();
+    $rootScope.$apply();
     expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topic_1');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
-
     ctrl.$onDestroy();
   });
 

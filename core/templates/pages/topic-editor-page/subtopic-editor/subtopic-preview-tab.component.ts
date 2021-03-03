@@ -32,8 +32,8 @@ angular.module('oppia').component('subtopicPreviewTab', {
     '$rootScope', '$scope', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'WindowDimensionsService',
     function(
-        $rootScope, $scope, TopicEditorRoutingService, TopicEditorStateService,
-        WindowDimensionsService) {
+        $rootScope, $scope, TopicEditorRoutingService,
+        TopicEditorStateService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var _initEditor = function() {
