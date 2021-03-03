@@ -90,7 +90,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if auth_id is not None:
             yield (POPULATED_KEY, 1)
         else:
-            # Split-up users into different shards to help speed up the job.
+            # Split up users into different shards to help speed up the job.
             sharding_key = (
                 ID_HASHING_FUNCTION(user.id) %
                 PopulateFirebaseAccountsOneOffJob.NUM_SHARDS)
