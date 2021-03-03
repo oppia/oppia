@@ -69,8 +69,11 @@ class AuditUserEmailsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that maps over UserSettingsModels and imports them to Oppia's
     Firebase server. The latter requires that we "specify [an ID] at a minimum",
-    so we use Oppia's user_id as the value. NOTE: THIS RELATIONSHIP **MUST NOT**
-    BE DEPENDED UPON!!
+    so we use Oppia's user_id as the value.
+
+    NOTE: **DO NOT** ASSUME THAT FIREBASE IDS AND OPPIA USER IDS WILL BE THE
+    SAME! We are only doing this for users that already exist; future users that
+    sign up with Firebase will have an entirely different ID.
     """
 
     @classmethod
@@ -146,7 +149,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (WARNING_KEY, repr(exception))
 
 
-def _grouper(iterable, chunk_len):
+def _grouper(iterable, chunk_len, fillvalue=None):
     """Collect data into fixed-length chunks.
 
     Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
@@ -157,12 +160,16 @@ def _grouper(iterable, chunk_len):
     Args:
         iterable: iterable. Any kind of iterable object.
         chunk_len: int. The chunk size to group values.
+        fillvalue: *. The value used to fill out the last chunk when the
+            iterable is exhausted.
 
     Returns:
         iterable(iterable). A sequence of chunks over the input data.
     """
+    # To understand how/why this works, please refer to the following
+    # stackoverflow post: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return itertools.izip_longest(*args, fillvalue=None) # pylint: disable=deprecated-itertools-function
+    return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
 
 
 def _populate_firebase(user_records):

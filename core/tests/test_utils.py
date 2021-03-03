@@ -1773,6 +1773,12 @@ tags: []
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
+        # NOTE: For tests that do not/can not use the default superadmin,
+        # authors can the class-level constant:
+        #
+        #     SIGNUP_DEFAULT_SUPERADMIN_USER = False
+        #
+        # Otherwise, the default value of True will be obeyed instead.
         if getattr(self, 'SIGNUP_DEFAULT_SUPERADMIN_USER', True):
             self.signup_superadmin_user()
         self._es_stub.reset()
