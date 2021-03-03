@@ -467,6 +467,8 @@ def _get_auth_claims_from_session_cookie(cookie):
         AuthClaims|None. The claims from the session cookie, if available.
         Otherwise returns None.
     """
+    # It's OK for a session cookie to be None, it just means that the request
+    # isn't authenticated.
     if cookie:
         try:
             with _firebase_admin_context():
