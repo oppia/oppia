@@ -331,5 +331,5 @@ describe('State Name Editor component', function() {
       $rootScope.$apply(routerService.getActiveTabName());
       expect(focusManagerService.setFocus).toHaveBeenCalledWith(
         'oppiaEditableSection');
-      });
+    });
 });
