@@ -36,7 +36,6 @@ import time
 
 import constants
 from core.tests import test_utils
-import feconf
 import python_utils
 
 import contextlib2
@@ -1154,20 +1153,11 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_kill_signal=False)
 
     def test_managed_firebase_emulator(self):
-        os.environ['GCLOUD_PROJECT'] = 'foo'
-        os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = ''
         with contextlib2.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(common.managed_firebase_auth_emulator())
-            self.assertEqual(
-                os.environ['GCLOUD_PROJECT'], feconf.OPPIA_PROJECT_ID)
-            self.assertEqual(
-                os.environ['FIREBASE_AUTH_EMULATOR_HOST'],
-                feconf.FIREBASE_AUTH_EMULATOR_HOST)
 
-        self.assertEqual(os.environ['GCLOUD_PROJECT'], 'foo')
-        self.assertEqual(os.environ['FIREBASE_AUTH_EMULATOR_HOST'], '')
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('firebase', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
