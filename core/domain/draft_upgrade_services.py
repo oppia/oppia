@@ -342,11 +342,11 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                                         language_code]['html'])
                             )
             elif (change.property_name ==
-                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-                if new_value is not None:
-                    new_value = (
-                        state_domain.Outcome.convert_html_in_outcome(
-                            new_value, conversion_fn))
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
+                  new_value is not None):
+                new_value = (
+                    state_domain.Outcome.convert_html_in_outcome(
+                        new_value, conversion_fn))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                 new_value = [

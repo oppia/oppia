@@ -350,7 +350,8 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class ContentSuggestionFormatUpdateJob(jobs.BaseMapReduceOneOffJobManager):
+class ContentSuggestionFormatUpdateOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that migrates the format of content suggestions."""
 
     @classmethod
@@ -375,10 +376,14 @@ class ContentSuggestionFormatUpdateJob(jobs.BaseMapReduceOneOffJobManager):
         # Validate the eventual suggestion format.
         try:
             assert set(item.change_cmd.keys()) == set([
-                'state_name', 'cmd', 'new_value', 'property_name'])
-            assert item.change_cmd['cmd'] == 'edit_state_property'
-            assert item.change_cmd['property_name'] == 'content'
-            assert item.change_cmd['new_value'].keys() == ['html']
+                'state_name', 'cmd', 'new_value', 'property_name']), (
+                    'Bad change_cmd keys')
+            assert item.change_cmd['cmd'] == 'edit_state_property', (
+                'Wrong cmd in change_cmd')
+            assert item.change_cmd['property_name'] == 'content', (
+                'Bad property name')
+            assert item.change_cmd['new_value'].keys() == ['html'], (
+                'Bad new_value keys')
         except AssertionError as e:
             yield ('Failed assertion', '%s %s' % (item.id, e))
 

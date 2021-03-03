@@ -1075,7 +1075,7 @@ class UniqueHashedNormalizedUsernameAuditJob(
             yield ('FAILURE', values)
 
 
-class OldDraftDeletionJob(jobs.BaseMapReduceOneOffJobManager):
+class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that discards any drafts that were last updated in 2019 or prior.
 
     This is done to avoid issues arising from old schema version
@@ -1085,7 +1085,7 @@ class OldDraftDeletionJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(OldDraftDeletionJob, cls).enqueue(job_id, shard_count=64)
+        super(DiscardOldDraftsOneOffJob, cls).enqueue(job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1101,7 +1101,7 @@ class OldDraftDeletionJob(jobs.BaseMapReduceOneOffJobManager):
 
         if exploration is None:
             yield ('DISCARDED - Exploration is missing', model.id)
-        elif model.last_updated.timetuple().tm_year <= 2019:
+        elif model.draft_change_list_last_updated.timetuple().tm_year <= 2019:
             yield ('DISCARDED - Draft is old', model.id)
         else:
             return
