@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 @Component({
-  selector: 'skill-editor-navbar-breadcrumb',
+  selector: 'oppia-skill-editor-navbar-breadcrumb',
   templateUrl: './skill-editor-navbar-breadcrumb.component.html',
   styleUrls: []
 })
@@ -30,7 +30,7 @@ export class SkillEditorNavbarBreadcrumbComponent {
     private skillEditorStateService: SkillEditorStateService) {}
 
   getTruncatedDescription(): string {
-    let skill = this.skillEditorStateService.getSkill();
+    const skill = this.skillEditorStateService.getSkill();
     let truncatedDescription = skill.getDescription().substr(0, 35);
     if (skill.getDescription().length > 35) {
       truncatedDescription += '...';
