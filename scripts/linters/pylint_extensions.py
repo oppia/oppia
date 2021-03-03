@@ -2109,39 +2109,31 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
-class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
-    """Checks if there are no blank lines available below function
-    definition.
+class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
+    """Custom pylint checker to ensure there are no blank lines
+    below function definition.
     """
 
     _implements_ = interfaces.IAstroidChecker
-    name = 'newline-below-function-definition'
+    name = 'disallow-blank-lines-below-function-definition'
     priority = -1
     msgs = {
-        'W0034': (
-            'Please remove the empty line below the function definition.',
-            'empty-line-provided-below-function-definiton',
+        'C0035': (
+            'Please remove the blank line(s) below the function definition.',
+            'remove-blank-lines-below-function-definiton.',
             'Disallow blank lines below function definition.'
-        ),
-        'W0035': (
-            'No blank space below function definition.',
-            'no-empty-line-provided',
-            'No empty line should be provided..'
         ),
     }
 
-    def check_blank_lines_below_function_def(self, node):
-        """Visit each function and checks if there are no
-        new lines below function definition.
+    def visit_functiondef(self, node):
+        """Visits every function and ensures there are no blank lines below 
+        function definition.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.scoped_nodes.Function. Node for a function or method
+                definition in the AST.
         """
-        # Check if the given node has docstring.
-        if node.doc is None:
-            return
         line_number = node.fromlineno
-        # Iterate till the start of docstring.
         while True:
             line = linecache.getline(node.root().file, line_number).strip()
             if line.startswith((b'\'', b'"')):
@@ -2152,10 +2144,7 @@ class NoBlankLineBelowFunctionDefinition(checkers.BaseChecker):
             node.root().file, line_number - 1).strip()
         if len(line_before.strip()) == 0:
             self.add_message(
-                'empty-line-provided-below-function-definiton', node=node)
-        else:
-            self.add_message(
-                'no-empty-line-provided', node=node)
+                'remove-blank-lines-below-function-definiton.', node=node)
 
 
 def register(linter):
@@ -2180,4 +2169,4 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
-    linter.register_checker(NoBlankLineBelowFunctionDefinition(linter))
+    linter.register_checker(DisallowBlankLinesBelowFunctionDefinitionChecker(linter))

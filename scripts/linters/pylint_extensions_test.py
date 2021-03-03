@@ -3259,16 +3259,16 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(def_node)
 
 
-class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
+class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(NoBlankLineBelowFunctionDefinitionTests, self).setUp()
+        super(DisallowBlankLinesBelowFunctionDefinitionCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.NoBlankLineBelowFunctionDefinition)
+            pylint_extensions.DisallowBlankLinesBelowFunctionDefinitionChecker)
         self.checker_test_object.setup_method()
 
-    def test_empty_line_below_function_definition(self):
+    def test_empty_line_below_function_definition_raises_error(self):
         node_empty_line_below_function_def = astroid.scoped_nodes.Function(
             name='test',
             doc='Custom test')
@@ -3279,7 +3279,7 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
             tmp.write(
                 u"""
                 def sum(a,b):
-
+                    
                     \"\"\" this  does something \"\"\"
                     return a+b
                 """)
@@ -3287,17 +3287,17 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
         node_empty_line_below_function_def.path = filename
         node_empty_line_below_function_def.fromlineno = 2
 
-        self.checker_test_object.checker.check_blank_lines_below_function_def(
+        self.checker_test_object.checker.visit_functiondef(
             node_empty_line_below_function_def)
 
         message = testutils.Message(
-            msg_id='empty-line-provided-below-function-definiton',
+            msg_id='remove-blank-lines-below-function-definiton.',
             node=node_empty_line_below_function_def)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_no_empty_line_below_function_definition(self):
+    def test_empty_line_below_function_definition_raises_no_error(self):
         node_no_empty_line_below_function_def = astroid.scoped_nodes.Function(
             name='test',
             doc='Custom test')
@@ -3315,12 +3315,8 @@ class NoBlankLineBelowFunctionDefinitionTests(unittest.TestCase):
         node_no_empty_line_below_function_def.path = filename
         node_no_empty_line_below_function_def.fromlineno = 2
 
-        self.checker_test_object.checker.check_blank_lines_below_function_def(
+        self.checker_test_object.checker.visit_functiondef(
             node_no_empty_line_below_function_def)
 
-        message = testutils.Message(
-            msg_id='no-empty-line-provided',
-            node=node_no_empty_line_below_function_def)
-
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
