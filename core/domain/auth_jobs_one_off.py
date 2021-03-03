@@ -78,9 +78,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     sign up with Firebase will have an entirely different ID.
     """
 
-    # Arbitrary value. We chose 50 because we have roughly 50K users at the time
-    # of writing this job.
-    NUM_SHARDS = 50
+    NUM_SHARDS = 50 # Arbitrary value.
 
     @classmethod
     def entity_classes_to_map_over(cls):
