@@ -71,15 +71,6 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 transaction_services = models.Registry.import_transaction_services()
 
-# Session cookies only provide temporary authentication, so they are expected to
-# become obsolete over time. The following errors is the full list of situations
-# where this happens.
-EXPECTED_SESSION_COOKIE_EXCEPTIONS = (
-    firebase_auth.InvalidSessionCookieError,
-    firebase_auth.ExpiredSessionCookieError,
-    firebase_auth.RevokedSessionCookieError,
-)
-
 
 def establish_auth_session(request, response):
     """Sets login cookies to maintain a user's sign-in session.
@@ -172,7 +163,10 @@ def mark_user_for_deletion(user_id):
         with _firebase_admin_context():
             firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
     except (firebase_exceptions.FirebaseError, ValueError):
-        # NOTE: logging.exception appends the stack trace automatically.
+        # NOTE: logging.exception appends the stack trace automatically. The
+        # errors are not re-raised because wipeout_services, the user of this
+        # function, does not use exceptions to keep track of failures. It uses
+        # the verify_external_auth_associations_are_deleted() function instead.
         logging.exception(
             '[WIPEOUT] Failed to disable Firebase account! Stack trace:')
 
@@ -191,7 +185,10 @@ def delete_external_auth_associations(user_id):
         with _firebase_admin_context():
             firebase_auth.delete_user(auth_id)
     except (firebase_exceptions.FirebaseError, ValueError):
-        # NOTE: logging.exception appends the stack trace automatically.
+        # NOTE: logging.exception appends the stack trace automatically. The
+        # errors are not re-raised because wipeout_services, the user of this
+        # function, does not use exceptions to keep track of failures. It uses
+        # the verify_external_auth_associations_are_deleted() function instead.
         logging.exception('[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
 
 
@@ -216,7 +213,10 @@ def verify_external_auth_associations_are_deleted(user_id):
     except firebase_auth.UserNotFoundError:
         return True
     except (firebase_exceptions.FirebaseError, ValueError):
-        # NOTE: logging.exception appends the stack trace automatically.
+        # NOTE: logging.exception appends the stack trace automatically. The
+        # errors are not re-raised because wipeout_services, the user of this
+        # function, will keep retrying the other "delete" family of functions
+        # until this returns True (in 12h intervals).
         logging.exception('[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
     return False
 
@@ -472,9 +472,12 @@ def _get_auth_claims_from_session_cookie(cookie):
             with _firebase_admin_context():
                 return _create_auth_claims(
                     firebase_auth.verify_session_cookie(cookie))
-        # NOTE: We're OK with cookies becoming obsolete with time, and will
-        # suppress the errors related to this. See the constant for details.
-        except EXPECTED_SESSION_COOKIE_EXCEPTIONS:
+        # NOTE: Session cookies only provide temporary authentication, so they
+        # are expected to become obsolete over time. The following errors are
+        # situations where this can happen.
+        except (
+                firebase_auth.ExpiredSessionCookieError,
+                firebase_auth.RevokedSessionCookieError):
             # NOTE: logging.exception appends the stack trace automatically.
             logging.exception('User session has ended and must be renewed')
     return None
