@@ -27,7 +27,7 @@ describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
 
   beforeEach(() => {
-    let sampleBackendDict: TranslatableTextsBackendDict = {
+    const sampleBackendDict: TranslatableTextsBackendDict = {
       state_names_to_content_id_mapping: {
         state1: {
           1: 'text1',
@@ -44,7 +44,7 @@ describe('Translatable Texts model', () => {
   });
 
   it('should get state name to content id mapping', () => {
-    let expectedStatewiseContents: StateNamesToContentIdMapping = {
+    const expectedStatewiseContents: StateNamesToContentIdMapping = {
       state1: {
         1: 'text1',
         2: 'text2'

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview AngularHtmlBind Directive wrapper upgrade
+ * @fileoverview AngularHtmlBind Directive wrapper upgrade.
  * This is specifically for use in TranslationModalContent. angular-html-bind
  * should not be used in migrated files unless strictly necessary.
  */

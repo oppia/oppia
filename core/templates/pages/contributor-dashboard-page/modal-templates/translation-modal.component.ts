@@ -45,7 +45,7 @@ export class TranslationOpportunityDict {
 
 @Component({
   selector: 'translation-modal',
-  templateUrl: './translation-modal.directive.html',
+  templateUrl: './translation-modal.component.html',
   styleUrls: [],
   providers: []
 })
