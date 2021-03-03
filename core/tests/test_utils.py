@@ -1773,8 +1773,8 @@ tags: []
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
-        # NOTE: For tests that do not/can not use the default superadmin,
-        # authors can the class-level constant:
+        # NOTE: For tests that do not/can not use the default super-admin,
+        # authors can add the following class-level constant:
         #
         #     SIGNUP_DEFAULT_SUPERADMIN_USER = False
         #

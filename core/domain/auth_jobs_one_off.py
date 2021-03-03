@@ -69,7 +69,7 @@ class AuditUserEmailsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that maps over UserSettingsModels and imports them to Oppia's
     Firebase server. The latter requires that we "specify [an ID] at a minimum",
-    so we use Oppia's user_id as the value.
+    so we use Oppia's user_id as the value (with the uid_ prefix stripped).
 
     NOTE: **DO NOT** ASSUME THAT FIREBASE IDS AND OPPIA USER IDS WILL BE THE
     SAME! We are only doing this for users that already exist; future users that
