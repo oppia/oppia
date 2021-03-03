@@ -172,7 +172,10 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         Returns:
             str. A session cookie that can validate the user.
         """
-        self._session_cookie_duration_by_id_token[id_token] = max_age
+        if not id_token:
+            raise firebase_admin.auth.InvalidIdTokenError('missing id_token')
+        if max_age > datetime.timedelta(days=0):
+            self._session_cookie_duration_by_id_token[id_token] = max_age
         # NOTE: Session cookies are often completely different, in terms of
         # encoding and security, to ID Tokens. Regardless, for the purposes of
         # this stub, we treat them the same.
@@ -194,8 +197,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         # this stub, we treat them the same.
         id_token = session_cookie
         if id_token not in self._session_cookie_duration_by_id_token:
-            raise firebase_exceptions.UnauthenticatedError(
-                'The provided Firebase session cookie is expired')
+            raise firebase_admin.auth.InvalidSessionCookieError(
+                'The provided Firebase session cookie is invalid', None)
         return self._decode_user_claims(id_token)
 
     def _verify_id_token(self, token):
@@ -404,11 +407,14 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
         self.assertEqual(res.headers.get_all('Set-Cookie'), [])
 
-    def test_does_nothing_if_request_missing_both_cookie_and_id_token(self):
+    def test_reports_error_if_request_missing_both_cookie_and_id_token(self):
         req = self.create_request()
         res = self.create_response()
 
-        firebase_auth_services.establish_auth_session(req, res)
+        self.assertRaisesRegexp(
+            firebase_admin.auth.InvalidIdTokenError,
+            'missing id_token',
+            lambda: firebase_auth_services.establish_auth_session(req, res))
 
         self.assertEqual(res.headers.get_all('Set-Cookie'), [])
 
@@ -446,6 +452,17 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)),
             auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
+
+    def test_logs_error_when_cookie_is_invalid(self):
+        with self.capture_logging() as logs:
+            self.assertRaisesRegexp(
+                firebase_admin.auth.InvalidSessionCookieError,
+                'The provided Firebase session cookie is invalid',
+                lambda: firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie='FAKE')))
+
+        self.assertTrue(
+            logs[0].startswith('User session has ended and must be renewed'))
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):

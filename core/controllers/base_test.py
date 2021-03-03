@@ -51,6 +51,7 @@ import webapp2
 import webtest
 
 current_user_services = models.Registry.import_current_user_services()
+auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
@@ -717,15 +718,21 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
 class LogoutPageTests(test_utils.GenericTestBase):
     """Tests for logout handler."""
 
-    def test_logout_page(self):
+    def test_logout_page_calls_destroy_auth_session(self):
         exp_services.load_demo('0')
         self.get_html_response('/explore/0')
 
-        # Logout with valid query arg. This test only validates that the login
-        # cookies have expired after hitting the logout url.
-        response = self.get_html_response('/logout', expected_status_int=302)
+        def stub(*_):
+            """Updates the called variable when the function is called."""
+            stub.called = True
+        stub.called = False
 
-        self.assertNotIn('Set-Cookie', response.headers)
+        with self.swap(auth_services, 'destroy_auth_session', stub):
+            # Logout with valid query arg. This test only validates that the
+            # login cookies have expired after hitting the logout url.
+            self.get_html_response('/logout', expected_status_int=302)
+
+        self.assertTrue(stub.called)
 
     def test_logout_page_with_redirect_url(self):
         exp_services.load_demo('0')
@@ -734,7 +741,6 @@ class LogoutPageTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/logout?redirect_url=community-library', expected_status_int=302)
 
-        self.assertNotIn('Set-Cookie', response.headers)
         self.assertIn('community-library', response.headers['Location'])
 
     def test_logout_page_with_dev_mode_disabled(self):

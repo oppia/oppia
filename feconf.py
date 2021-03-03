@@ -1114,7 +1114,7 @@ FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the
 # duration expires, a new cookie will need to be generated. Generating a new
 # cookie requires the user to sign-in _explicitly_.
-FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=5)
+FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=14)
 
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
 # these back to appropriate places (rights_domain, topic_domain).

@@ -71,6 +71,15 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 transaction_services = models.Registry.import_transaction_services()
 
+# Session cookies only provide temporary authentication, so they are expected to
+# become obsolete over time. The following errors is the full list of situations
+# this happens.
+EXPECTED_SESSION_COOKIE_EXCEPTIONS = (
+    firebase_auth.InvalidSessionCookieError,
+    firebase_auth.ExpiredSessionCookieError,
+    firebase_auth.RevokedSessionCookieError,
+)
+
 
 def establish_auth_session(request, response):
     """Sets login cookies to maintain a user's sign-in session.
@@ -81,33 +90,22 @@ def establish_auth_session(request, response):
         response: webapp2.Response. The response to establish the new session
             upon.
     """
-    claims = _get_auth_claims_from_session_cookie(_get_session_cookie(request))
+    cookie_claims = (
+        _get_auth_claims_from_session_cookie(_get_session_cookie(request)))
 
-    # If there's a session cookie from which we can acquire user claims already,
-    # then there's no action necessary. The session is already established.
-    if claims is not None:
+    # If the request already contains a valid session cookie, then there's no
+    # action necessary; the session is already established.
+    if cookie_claims is not None:
         return
 
-    token = _get_id_token(request)
-    claims = _get_auth_claims_from_id_token(token)
-
-    # Otherwise, the request will need authorization to create a new session
-    # cookie. We expect authorization to come in the form of an ID Token, and
-    # will only proceed with establishing a session if it encodes valid claims.
-    if claims is None:
-        return
-
-    fresh_cookie = None
-    with _suppress_firebase_errors(), _firebase_admin_context():
+    with _firebase_admin_context():
         fresh_cookie = firebase_auth.create_session_cookie(
-            token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
+            _get_id_token(request), feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
-    # Check that the create_session_cookie function has not failed.
-    if fresh_cookie is not None:
-        response.set_cookie(
-            feconf.FIREBASE_SESSION_COOKIE_NAME, value=fresh_cookie,
-            max_age=feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
-            httponly=True, overwrite=True, secure=not constants.DEV_MODE)
+    response.set_cookie(
+        feconf.FIREBASE_SESSION_COOKIE_NAME, value=fresh_cookie,
+        max_age=feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
+        httponly=True, overwrite=True, secure=not constants.DEV_MODE)
 
 
 def destroy_auth_session(response):
@@ -161,8 +159,12 @@ def mark_user_for_deletion(user_id):
         assoc_by_auth_id_model.update_timestamps()
         assoc_by_auth_id_model.put()
 
-    with _suppress_firebase_errors(), _firebase_admin_context():
-        firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
+    try:
+        with _firebase_admin_context():
+            firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
+    except (firebase_exceptions.FirebaseError, ValueError):
+        # NOTE: logging.exception appends the stack trace automatically.
+        logging.exception('[WIPEOUT] Failed to disable Firebase account!')
 
 
 def delete_external_auth_associations(user_id):
@@ -175,8 +177,12 @@ def delete_external_auth_associations(user_id):
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
         return
-    with _suppress_firebase_errors(), _firebase_admin_context():
-        firebase_auth.delete_user(auth_id)
+    try:
+        with _firebase_admin_context():
+            firebase_auth.delete_user(auth_id)
+    except (firebase_exceptions.FirebaseError, ValueError):
+        # NOTE: logging.exception appends the stack trace automatically.
+        logging.exception('[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
 
 
 def verify_external_auth_associations_are_deleted(user_id):
@@ -194,11 +200,14 @@ def verify_external_auth_associations_are_deleted(user_id):
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
         return True
-    with _suppress_firebase_errors(), _firebase_admin_context():
-        try:
+    try:
+        with _firebase_admin_context():
             firebase_auth.get_user(auth_id)
-        except firebase_auth.UserNotFoundError:
-            return True
+    except firebase_auth.UserNotFoundError:
+        return True
+    except (firebase_exceptions.FirebaseError, ValueError):
+        # NOTE: logging.exception appends the stack trace automatically.
+        logging.exception('[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
     return False
 
 
@@ -375,42 +384,23 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
 
 
 @contextlib.contextmanager
-def _suppress_firebase_errors():
-    """Returns a context manager to suppress Firebase Admin SDK exceptions.
-
-    Errors raised by the SDK are logged and then discarded.
-
-    We suppress exceptions because we do not want the errors to disrupt the
-    user's experience. If Firebase could not complete an operation, then that
-    simply means that authentication has failed, there's no need to provide a
-    user-facing error.
-
-    Yields:
-        None. No relevent context expression.
-    """
-    try:
-        yield
-    except (ValueError, firebase_exceptions.FirebaseError):
-        # NOTE: logging.exception prints the full stack trace automatically.
-        # This message is an additional message printed to the logs.
-        logging.exception('Firebase Admin SDK raised an exception!')
-
-
-@contextlib.contextmanager
 def _firebase_admin_context():
     """Returns a context for calling the Firebase Admin SDK.
 
     Yields:
         None. No relevent context expression.
     """
-    app = firebase_admin.initialize_app(
+    # NOTE: "app" is the term Firebase uses for the "entry point" to the
+    # Firebase SDK. Oppia only has one server, so it only needs to instantiate
+    # one app.
+    firebase_connection = firebase_admin.initialize_app(
         options={'projectId': feconf.OPPIA_PROJECT_ID})
     try:
         yield
     finally:
-        # NOTE: This is not dangerous. This is how the Firebase SDK cleans up
-        # the resources it acquires.
-        firebase_admin.delete_app(app)
+        # NOTE: This is not dangerous. We are just deleting the resources used
+        # to form a connection to Firebase servers.
+        firebase_admin.delete_app(firebase_connection)
 
 
 def _get_session_cookie(request):
@@ -468,7 +458,7 @@ def _get_auth_claims_from_id_token(token):
         returns None.
     """
     if token:
-        with _suppress_firebase_errors(), _firebase_admin_context():
+        with _firebase_admin_context():
             return _create_auth_claims(firebase_auth.verify_id_token(token))
     return None
 
@@ -484,9 +474,14 @@ def _get_auth_claims_from_session_cookie(cookie):
         Otherwise returns None.
     """
     if cookie:
-        with _suppress_firebase_errors(), _firebase_admin_context():
-            return _create_auth_claims(
-                firebase_auth.verify_session_cookie(cookie))
+        try:
+            with _firebase_admin_context():
+                return _create_auth_claims(
+                    firebase_auth.verify_session_cookie(cookie))
+        except EXPECTED_SESSION_COOKIE_EXCEPTIONS:
+            # NOTE: logging.exception appends the stack trace automatically.
+            logging.exception('User session has ended and must be renewed')
+            raise
     return None
 
 
