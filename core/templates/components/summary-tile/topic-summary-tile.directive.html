@@ -4,31 +4,26 @@
   <a ng-href="<[$ctrl.getTopicPageUrl()]>" class="protractor-test-topic-link">
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
-      <picture class="fx-row" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
+      <picture class="fx-row fx-main-center" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
         <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
       </picture>
     </div>
     <div class="topic-details" ng-style="{'background-color': $ctrl.getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !$ctrl.isPublished()}">
       <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
-      <span class="topic-story-count">
+      <span class="topic-story-count" ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() > 0">
         <[$ctrl.getTopicSummary().getCanonicalStoryCount()]>
         <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
-        <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
       </span>
     </div>
   </a>
 </div>
 <style>
-  .faded-topic-card {
-    pointer-events: none;
-  }
-
   .topic-card .margin-top-offset {
     margin-top: -1.5em;
   }
 
   .topic-card .grayscale-effect {
-    filter: brightness(0.5);
+    backdrop-filter: brightness(0.5);
   }
 
   .topic-card .mask-effect {
@@ -90,6 +85,10 @@
     border: none;
     border-radius: 0.2em 0.2em 0 0;
     max-width: 100%;
+  }
+
+  .topic-card .grayscale-effect .img-thumbnail {
+    filter: brightness(0.5);
   }
 
   .topic-card .topic-details {

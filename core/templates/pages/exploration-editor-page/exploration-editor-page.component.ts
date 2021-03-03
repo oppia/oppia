@@ -237,7 +237,7 @@ angular.module('oppia').component('explorationEditorPage', {
                 lostChanges, explorationId);
             }
           }),
-          ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+          ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
           ThreadDataBackendApiService.getOpenThreadsCountAsync()
         ]).then(async([explorationData, featuresData, openThreadsCount]) => {

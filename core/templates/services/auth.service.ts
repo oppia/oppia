@@ -20,23 +20,19 @@ import { Injectable, Optional } from '@angular/core';
 import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Observable, of } from 'rxjs';
-
 import { AppConstants } from 'app.constants';
+
+import firebase from 'firebase/app';
+import { md5 } from 'hash-wasm';
+import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(@Optional() private angularFireAuth?: AngularFireAuth) {}
-
-  get idToken$(): Observable<string | null> {
-    return this.angularFireAuth?.idToken ?? of(null);
-  }
-
-  async signOutAsync(): Promise<void> {
-    await this.angularFireAuth?.signOut();
-  }
+  constructor(
+      @Optional() private angularFireAuth: AngularFireAuth,
+      private authBackendApiService: AuthBackendApiService) {}
 
   static get firebaseAuthIsEnabled(): boolean {
     return AppConstants.FIREBASE_AUTH_ENABLED;
@@ -62,6 +58,60 @@ export class AuthService {
   static get firebaseEmulatorConfig(): readonly [string, number] {
     return AuthService.firebaseEmulatorIsEnabled ?
       ['localhost', 9099] : undefined;
+  }
+
+  /**
+   * Prompts the user to sign-in with a trusted identity provider, then fulfills
+   * with true if the user is new, otherwise fulfills with false.
+   * Rejects when sign-in failed.
+   */
+  async signInAsync(): Promise<boolean> {
+    if (!this.angularFireAuth) {
+      throw new Error('AngularFireAuth is not available');
+    }
+
+    const creds = AuthService.firebaseEmulatorIsEnabled ?
+      await this.emulatorSignInAsync() : await this.productionSignInAsync();
+
+    const idToken = await creds.user.getIdToken();
+    await this.authBackendApiService.beginSessionAsync(idToken);
+
+    return creds.additionalUserInfo.isNewUser;
+  }
+
+  async signOutAsync(): Promise<void> {
+    if (!this.angularFireAuth) {
+      throw new Error('AngularFireAuth is not available');
+    }
+
+    await this.angularFireAuth.signOut();
+  }
+
+  /** Assumes that angularFireAuth is not null. */
+  private async emulatorSignInAsync(): Promise<firebase.auth.UserCredential> {
+    const email = prompt('Please enter the email address to sign-in with');
+    const password = await md5(email);
+    try {
+      return await this.angularFireAuth.signInWithEmailAndPassword(
+        email, password);
+    } catch (err) {
+      if (err.code !== 'auth/user-not-found') {
+        throw err;
+      }
+    }
+    return await this.angularFireAuth.createUserWithEmailAndPassword(
+      email, password);
+  }
+
+  /** Assumes that angularFireAuth is not null. */
+  private async productionSignInAsync(): Promise<firebase.auth.UserCredential> {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    // Oppia only needs an email address for account management.
+    provider.addScope('email');
+    // Always prompt the user to select an account, even when they only own one.
+    provider.setCustomParameters({prompt: 'select_account'});
+    await this.angularFireAuth.signInWithRedirect(provider);
+    return await this.angularFireAuth.getRedirectResult();
   }
 }
 
