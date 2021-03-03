@@ -27,7 +27,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { MIGRATED_INTERACTIONS } from 'interactions/interactions-extension.constants';
+import { MIGRATED_INTERACTIONS } from 'interactions/interactions.module';
 
 
 // A service that provides a number of utility functions useful to both the

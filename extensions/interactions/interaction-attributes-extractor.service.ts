@@ -25,7 +25,7 @@ import { InteractionCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { MIGRATED_INTERACTIONS } from './interactions-extension.constants';
+import { MIGRATED_INTERACTIONS } from './interactions.module';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

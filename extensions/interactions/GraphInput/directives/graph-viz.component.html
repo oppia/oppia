@@ -49,8 +49,8 @@
             {{button.text}}
             </text>
           </g>
-      </ng-container>
-    </svg>
+        </ng-container>
+      </svg>
 
       <g *ngFor="let button of buttons; let idx = index">
         <rect attr.class="protractor-test-{{(button.description | translate).replace(' ','-')}}-button"
@@ -92,10 +92,10 @@
               attr.style="{{'stroke:' + getEdgeColor(idx) + '; stroke-width:' + EDGE_WIDTH}}">
         </line>
         <polygon *ngIf="graph.isDirected"
-                (mouseenter)="state.hoveredEdge = idx"
-                (mouseleave)="state.hoveredEdge = (idx === state.hoveredEdge) ? null : state.hoveredEdge"
-                [attr.points]="getDirectedEdgeArrowPoints(idx)"
-                attr.style="{{'fill:' + getEdgeColor(idx)}}">
+                 (mouseenter)="state.hoveredEdge = idx"
+                 (mouseleave)="state.hoveredEdge = (idx === state.hoveredEdge) ? null : state.hoveredEdge"
+                 [attr.points]="getDirectedEdgeArrowPoints(idx)"
+                 attr.style="{{'fill:' + getEdgeColor(idx)}}">
         </polygon>
         <text *ngIf="graph.isWeighted"
               [attr.x]="getEdgeCentre(idx).x"
@@ -146,11 +146,11 @@
     </div>
     <div *ngIf="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
       <input type="number"
-            [(ngModel)]="selectedEdgeWeight"
-            [oppiaFocusOn]="edgeWeightEditBegun"
-            [ngStyle]="shouldShowWrongWeightWarning ? {'border': '1px solid red'}: {}"
-            (blur)="shouldShowWrongWeightWarning = !isValidEdgeWeight()"
-            (focus)="shouldShowWrongWeightWarning = false">
+             [(ngModel)]="selectedEdgeWeight"
+             [oppiaFocusOn]="edgeWeightEditBegun"
+             [ngStyle]="shouldShowWrongWeightWarning ? {'border': '1px solid red'}: {}"
+             (blur)="shouldShowWrongWeightWarning = !isValidEdgeWeight()"
+             (focus)="shouldShowWrongWeightWarning = false">
       <button mat-raised-button (click)="onUpdateEdgeWeight()" [innerHTML] = "'I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT' | translate"></button>
     </div>
   </div>

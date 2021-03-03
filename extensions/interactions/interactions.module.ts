@@ -46,3 +46,9 @@ import { GraphInputInteractionModule } from './GraphInput/graph-input-interactio
   ],
 })
 export class InteractionExtensionsModule { }
+
+export const MIGRATED_INTERACTIONS: string[] = [
+  'Continue',
+  'FractionInput',
+  'GraphInput'
+];

@@ -32,8 +32,6 @@ export interface EdgeCentre {
 export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
-  static VERTEX_RADIUS: any;
-  static EDGE_WIDTH: any;
 
   getDirectedEdgeArrowPoints(graph: GraphAnswer, index: number): string {
     var ARROW_WIDTH = 5;

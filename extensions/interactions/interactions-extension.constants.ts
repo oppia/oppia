@@ -47,9 +47,3 @@ export const InteractionsExtensionsConstants = {
   TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD: 0.7,
 
 } as const;
-
-export const MIGRATED_INTERACTIONS: string[] = [
-  'Continue',
-  'FractionInput',
-  'GraphInput'
-];
