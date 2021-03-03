@@ -26,10 +26,11 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-import pkg_resources
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
+
+import pkg_resources
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -40,6 +41,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'requirements_test.txt')
+    TEST_IGNORABLE_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
+        THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'ignorable_requirements_test.txt')
 
     def setUp(self):
         super(InstallBackendPythonLibsTests, self).setUp()
@@ -146,6 +149,48 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     u'dependency3': (u'3.1.5', None),
                     u'dependency4': (u'0.3.0.1', None),
                     u'dependency5': (None, u'0.5.3')
+                },
+                install_backend_python_libs.get_mismatches())
+
+    # TODO(#11474): Remove this test for special-case logic once we can use the
+    # Python 3 version of the Firebase SDK.
+    def test_ignored_library_name_mismatches_are_respected(self):
+        swap_requirements = self.swap(
+            common, 'COMPILED_REQUIREMENTS_FILE_PATH',
+            self.TEST_IGNORABLE_REQUIREMENTS_TXT_FILE_PATH)
+
+        def mock_find_distributions(paths): # pylint: disable=unused-argument
+            class Distribution(python_utils.OBJECT):
+                """Distribution object containing python library information."""
+
+                def __init__(self, library_name, version_string):
+                    """Creates mock distribution metadata class that contains
+                    the name and version information for a python library.
+
+                    Args:
+                        library_name: str. The name of the library this object
+                            is representing.
+                        version_string: str. The stringified version of this
+                            library.
+                    """
+                    self.project_name = library_name
+                    self.version = version_string
+            return [
+                Distribution('dependency1', '1.5.1'),
+                Distribution('dependency2', '4.9.1.2'),
+                Distribution('dependency3', '0.5.3'),
+            ]
+
+        swap_find_distributions = self.swap(
+            pkg_resources, 'find_distributions', mock_find_distributions)
+        swap_ignored_names = self.swap(
+            install_backend_python_libs, 'IGNORED_LIBRARY_NAME_MISMATCHES',
+            ('dependency3', 'dependency4'))
+        with swap_requirements, swap_find_distributions, swap_ignored_names:
+            self.assertEqual(
+                {
+                    u'dependency1': (u'1.6.1', u'1.5.1'),
+                    u'dependency2': (u'4.9.1', u'4.9.1.2'),
                 },
                 install_backend_python_libs.get_mismatches())
 
@@ -548,7 +593,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
@@ -628,7 +673,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
@@ -647,7 +692,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')

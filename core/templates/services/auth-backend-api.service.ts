@@ -27,7 +27,7 @@ export class AuthBackendApiService {
   constructor(private httpClient: HttpClient) {}
 
   async beginSessionAsync(idToken: string): Promise<void> {
-    await this.httpClient.post('/sessionBegin', {}, {
+    await this.httpClient.get('/session_begin', {
       headers: {Authorization: `Bearer ${idToken}`}
     }).toPromise();
   }

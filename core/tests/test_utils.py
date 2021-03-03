@@ -67,7 +67,6 @@ import main_mail
 import main_taskqueue
 from proto import text_classifier_pb2
 import python_utils
-import requests_mock
 import schema_utils
 import utils
 
@@ -76,6 +75,7 @@ import elasticsearch
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
+import requests_mock
 import webtest
 
 (
@@ -540,6 +540,12 @@ class AuthServicesStub(python_utils.OBJECT):
             stub = cls()
 
             stack.enter_context(test.swap(
+                platform_auth_services, 'establish_auth_session',
+                stub.establish_auth_session))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'destroy_auth_session',
+                stub.destroy_auth_session))
+            stack.enter_context(test.swap(
                 platform_auth_services, 'get_auth_claims_from_request',
                 stub.get_auth_claims_from_request))
             stack.enter_context(test.swap(
@@ -579,6 +585,28 @@ class AuthServicesStub(python_utils.OBJECT):
             # in reverse order.
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
+
+    @classmethod
+    def establish_auth_session(cls, unused_request, unused_response):
+        """Sets login cookies to maintain a user's sign-in session.
+
+        Args:
+            unused_request: webapp2.Request. Unused because os.environ handles
+                sessions.
+            unused_response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        pass
+
+    @classmethod
+    def destroy_auth_session(cls, unused_response):
+        """Clears login cookies from the given response headers.
+
+        Args:
+            unused_response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        pass
 
     @classmethod
     def get_auth_claims_from_request(cls, unused_request):

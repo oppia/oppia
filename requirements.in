@@ -9,7 +9,11 @@ beautifulSoup4==4.9.1
 bleach==3.1.5
 callbacks==0.3.0
 contextlib2==0.6.0.post1
-firebase-admin==3.2.1
+# TODO(#11474): Use a regular dependency after upgrading to Python 3. Until
+# then, we must depend on a patched version of firebase-admin==3.2.1 (hosted on
+# the following repository) because that is the last version which supports
+# Python 2, but is missing a feature which we were forced to patch in.
+git+git://github.com/oppia/firebase-admin-python@py2-emulator-support#egg=firebase-admin
 future==0.18.2
 GoogleAppEngineCloudStorageClient==1.9.22.1
 GoogleAppEngineMapReduce==1.9.22.0

@@ -61,6 +61,27 @@ def get_all_profiles_by_parent_user_id(parent_user_id):
     ).fetch()
 
 
+def establish_auth_session(request, response):
+    """Sets login cookies to maintain a user's sign-in session.
+
+    Args:
+        request: webapp2.Request. The request with the authorization to begin a
+            new session.
+        response: webapp2.Response. The response to establish the new session
+            upon.
+    """
+    platform_auth_services.establish_auth_session(request, response)
+
+
+def destroy_auth_session(response):
+    """Clears login cookies from the given response headers.
+
+    Args:
+        response: webapp2.Response. Response to clear the cookies from.
+    """
+    platform_auth_services.destroy_auth_session(response)
+
+
 def get_user_auth_details_from_model(user_auth_details_model):
     """Returns a UserAuthDetails domain object from the given model.
 
