@@ -16,19 +16,18 @@
  * @fileoverview Directive for the jobs tab in the admin panel.
  */
 
+require('domain/admin/admin-backend-api.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminJobsTab', [
-  '$http', '$rootScope', '$timeout', 'AdminDataService',
-  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
+  '$rootScope', '$timeout', 'AdminBackendApiService',
+  'AdminDataService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, AdminDataService,
-      UrlInterpolationService, ADMIN_HANDLER_URL,
-      ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
+      $rootScope, $timeout, AdminBackendApiService,
+      AdminDataService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,79 +40,78 @@ angular.module('oppia').directive('adminJobsTab', [
       controller: [function() {
         var ctrl = this;
         ctrl.showJobOutput = function(jobId) {
-          var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(
-            ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
-              jobId: jobId
+          AdminBackendApiService.fetchJobOutputAsync(jobId)
+            .then(function(jobOutput) {
+              ctrl.showingJobOutput = true;
+              ctrl.jobOutput = jobOutput;
+              $timeout(function() {
+                document.querySelector('#job-output').scrollIntoView();
+              });
+            }, function(errorMessage) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorMessage);
+              $rootScope.$apply();
             });
-          $http.get(adminJobOutputUrl).then(function(response) {
-            ctrl.showingJobOutput = true;
-            ctrl.jobOutput = response.data.output || [];
-            ctrl.jobOutput.sort();
-            $timeout(function() {
-              document.querySelector('#job-output').scrollIntoView();
-            });
-          });
         };
 
         ctrl.startNewJob = function(jobType) {
           ctrl.setStatusMessage('Starting new job...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'start_new_job',
-            job_type: jobType
-          }).then(function() {
-            ctrl.setStatusMessage('Job started successfully.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-          });
+          AdminBackendApiService.startNewJobAsync(jobType)
+            .then(function() {
+              ctrl.setStatusMessage('Job started successfully.');
+              window.location.reload();
+              $rootScope.$apply();
+            }, function(errorMessage) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorMessage);
+              $rootScope.$apply();
+            });
         };
 
         ctrl.cancelJob = function(jobId, jobType) {
           ctrl.setStatusMessage('Cancelling job...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'cancel_job',
-            job_id: jobId,
-            job_type: jobType
-          }).then(function() {
-            ctrl.setStatusMessage('Abort signal sent to job.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-          });
+          AdminBackendApiService.cancelJobAsync(jobId, jobType)
+            .then(function() {
+              ctrl.setStatusMessage('Abort signal sent to job.');
+              window.location.reload();
+              $rootScope.$apply();
+            }, function(errorMessage) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorMessage);
+              $rootScope.$apply();
+            });
         };
 
         ctrl.startComputation = function(computationType) {
           ctrl.setStatusMessage('Starting computation...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'start_computation',
-            computation_type: computationType
-          }).then(function() {
-            ctrl.setStatusMessage('Computation started successfully.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-          });
+          AdminBackendApiService.startComputationAsync(computationType)
+            .then(function() {
+              ctrl.setStatusMessage('Computation started successfully.');
+              window.location.reload();
+              $rootScope.$apply();
+            }, function(errorMessage) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorMessage);
+              $rootScope.$apply();
+            });
         };
 
         ctrl.stopComputation = function(computationType) {
           ctrl.setStatusMessage('Stopping computation...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'stop_computation',
-            computation_type: computationType
-          }).then(function() {
-            ctrl.setStatusMessage('Abort signal sent to computation.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-          });
+          AdminBackendApiService.stopComputationAsync(computationType)
+            .then(function() {
+              ctrl.setStatusMessage('Abort signal sent to computation.');
+              window.location.reload();
+              $rootScope.$apply();
+            }, function(errorMessage) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorMessage);
+              $rootScope.$apply();
+            });
         };
         ctrl.$onInit = function() {
           ctrl.HUMAN_READABLE_CURRENT_TIME = '';

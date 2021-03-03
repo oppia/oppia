@@ -42,6 +42,8 @@ import {
   PlatformParameter,
   PlatformParameterBackendDict
 } from 'domain/platform_feature/platform-parameter.model';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 
 interface UserRoles {
@@ -60,6 +62,10 @@ interface RoleGraphData {
 
 interface ConfigProperties {
   [property: string]: Object;
+}
+
+interface JobOutput {
+  output: string[];
 }
 
 export interface AdminPageDataBackendDict {
@@ -103,7 +109,8 @@ export interface AdminPageData {
 })
 export class AdminBackendApiService {
   constructor(
-    private http: HttpClient) {}
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
 
   async getDataAsync(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -135,6 +142,64 @@ export class AdminBackendApiService {
               dict)
           )
         });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  private _postAdminActionAsync(action:string, payload:Object): Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL, { action, ...payload }).toPromise()
+      .then(response => {
+        return response;
+      }, errorResonse => {
+        return errorResonse.error.error;
+      });
+  }
+
+  async startNewJobAsync(jobType: string): Promise<void> {
+    let action = 'start_new_job';
+    let payload = {
+      job_type: jobType
+    };
+    return this._postAdminActionAsync(action, payload);
+  }
+
+  async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
+    let action = 'cancel_job';
+    let payload = {
+      job_id: jobId,
+      job_type: jobType
+    };
+    return this._postAdminActionAsync(action, payload);
+  }
+
+  async startComputationAsync(computationType: string): Promise<void> {
+    let action = 'start_computation';
+    let payload = {
+      computation_type: computationType
+    };
+    return this._postAdminActionAsync(action, payload);
+  }
+
+  async stopComputationAsync(computationType: string): Promise<void> {
+    let action = 'stop_computation';
+    let payload = {
+      computation_type: computationType
+    };
+    return this._postAdminActionAsync(action, payload);
+  }
+
+  async fetchJobOutputAsync(jobId: string): Promise<string[]> {
+    let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
+      AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
+        jobId: jobId
+      });
+    return new Promise((resolve, reject) => {
+      this.http.get<JobOutput>(
+        adminJobOutputUrl).toPromise().then(response => {
+        resolve(Array.isArray(response.output) ? response.output.sort() : []);
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
