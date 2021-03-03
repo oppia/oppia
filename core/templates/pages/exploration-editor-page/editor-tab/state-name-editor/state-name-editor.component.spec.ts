@@ -329,7 +329,7 @@ describe('State Name Editor component', function() {
       spyOn(focusManagerService, 'setFocus');
       $rootScope.$apply(routerService.getActiveTabName());
       $rootScope.$apply(routerService.getActiveTabName());
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      expect(focusManagerService.setFocus()).toHaveBeenCalledWith(
         'oppiaEditableSection');
     });
 });

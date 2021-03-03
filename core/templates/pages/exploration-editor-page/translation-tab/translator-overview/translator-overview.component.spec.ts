@@ -213,7 +213,8 @@ describe('Translator Overview component', function() {
     function() {
       spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
       spyOn(focusManagerService, 'setFocus');
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      ctrl.$onInit();
+      expect(focusManagerService.setFocus()).toHaveBeenCalledWith(
         'audioTranslationLanguageCodeField');
     });
 });

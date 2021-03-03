@@ -494,7 +494,7 @@ describe('Feedback Tab Component', function() {
       ctrl.activeThread = false;
       $rootScope.$apply(routerService.getActiveTabName());
       $rootScope.$apply(routerService.getActiveTabName());
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      expect(focusManagerService.setFocus()).toHaveBeenCalledWith(
         'newThreadButton');
     });
 
@@ -506,7 +506,7 @@ describe('Feedback Tab Component', function() {
       ctrl.activeThread = true;
       $rootScope.$apply(routerService.getActiveTabName());
       $rootScope.$apply(routerService.getActiveTabName());
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      expect(focusManagerService.setFocus()).toHaveBeenCalledWith(
         'tmpMessageText');
     });
 });
