@@ -46,7 +46,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
   @Input() canAddEdgeWithValue: string;
   @Input() canDeleteEdgeWithValue: string;
   @Input() canEditEdgeWeightWithValue: string;
-  @Input() lastAnswer: undefined | null | GraphAnswer;
+  @Input() lastAnswer: null | GraphAnswer = null;
 
   graph: GraphAnswer;
   canAddVertex: boolean = false;
@@ -94,9 +94,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
       isWeighted: false,
       isLabeled: false
     };
-    if (this.lastAnswer !== null && this.lastAnswer !== undefined) {
-      this.interactionIsActive = (this.lastAnswer === null);
-    }
+    this.interactionIsActive = (this.lastAnswer === null);
 
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitGraph(), () => this.validityCheckFn());
@@ -104,9 +102,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
     if (this.interactionIsActive) {
       this.resetGraph();
     } else {
-      if (this.lastAnswer !== null && this.lastAnswer !== undefined) {
-        this.graph = this.lastAnswer;
-      }
+      this.graph = this.lastAnswer;
     }
     const {
       canAddVertex,
@@ -120,7 +116,6 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
       'GraphInput',
       this._getAttrs()
     ) as GraphInputCustomizationArgs;
-
     this.canAddVertex = this.interactionIsActive ? canAddVertex.value : false;
     this.canDeleteVertex = this.interactionIsActive ?
       canDeleteVertex.value : false;

@@ -25,6 +25,8 @@ import { FormsModule } from '@angular/forms';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { GraphVizComponent } from './directives/graph-viz.component';
 import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
+import { ResponseGraphInput } from './directives/oppia-response-graph-input.component';
+import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
 
 @NgModule({
   imports: [
@@ -35,15 +37,21 @@ import { InteractiveGraphInput } from './directives/oppia-interactive-graph-inpu
   ],
   declarations: [
     InteractiveGraphInput,
-    GraphVizComponent
+    GraphVizComponent,
+    ResponseGraphInput,
+    ShortResponseGraphInput
   ],
   entryComponents: [
     InteractiveGraphInput,
-    GraphVizComponent
+    GraphVizComponent,
+    ResponseGraphInput,
+    ShortResponseGraphInput
   ],
   exports: [
     InteractiveGraphInput,
-    GraphVizComponent
+    GraphVizComponent,
+    ResponseGraphInput,
+    ShortResponseGraphInput
   ],
 })
 

@@ -25,6 +25,7 @@ import { InteractionCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { MIGRATED_INTERACTIONS } from './interactions-extension.constants';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -32,12 +33,6 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
   providedIn: 'root'
 })
 export class InteractionAttributesExtractorService {
-  private readonly migratedInteractions: string[] = [
-    'Continue',
-    'FractionInput',
-    'GraphInput'
-  ];
-
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private interactionFactory: InteractionObjectFactory,
@@ -60,7 +55,7 @@ export class InteractionAttributesExtractorService {
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
       interactionId, caBackendDict);
-    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+    if (MIGRATED_INTERACTIONS.indexOf(interactionId) >= 0) {
       return ca;
     }
     const caValues = {};

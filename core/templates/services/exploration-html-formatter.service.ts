@@ -27,6 +27,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { MIGRATED_INTERACTIONS } from 'interactions/interactions-extension.constants';
 
 
 // A service that provides a number of utility functions useful to both the
@@ -65,12 +66,21 @@ export class ExplorationHtmlFormatterService {
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
-    element.attr(
-      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }
-    return element.get(0).outerHTML;
+    element.attr(
+      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
+    let val = element.get(0).outerHTML;
+    if (MIGRATED_INTERACTIONS.indexOf('GraphInput') >= 0) {
+      val = val.replace(
+        'last-answer="null"></oppia-interactive-graph-input>',
+        '[last-answer]="null"></oppia-interactive-graph-input>');
+      val = val.replace(
+        'last-answer="lastAnswer"></oppia-interactive-graph-input>',
+        '[last-answer]="lastAnswer"></oppia-interactive-graph-input>');
+    }
+    return val;
   }
 
   getAnswerHtml(
