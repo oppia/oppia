@@ -84,7 +84,7 @@ describe('Library pages tour', function() {
     await rateExploration();
     await libraryPage.get();
     var topRatedButton = element(by.css('.protractor-test-library-top-rated'));
-    await action.click('Test Top Rated Button',topRatedButton);
+    await action.click('Test Top Rated Button', topRatedButton);
     await waitFor.pageToFullyLoad();
     expect(await browser.getCurrentUrl()).toContain(
       'community-library/top-rated');
