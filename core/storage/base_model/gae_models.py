@@ -95,10 +95,12 @@ class BaseModel(datastore_services.Model):
     # the model's id is not used as the key for the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY = False
 
-    # When this entity was first created. This value should not be modified.
+    # When this entity was last updated. This value should only be modified in
+    # this class only and nowhere else.
     created_on = (
         datastore_services.DateTimeProperty(required=True, indexed=True))
-    # When this entity was last updated. This value should not be modified.
+    # When this entity was last updated. This value should only be modified in
+    # this class only and nowhere else.
     last_updated = (
         datastore_services.DateTimeProperty(required=True, indexed=True))
     # Whether the current version of the model instance is deleted.

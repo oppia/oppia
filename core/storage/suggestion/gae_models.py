@@ -250,7 +250,7 @@ class GeneralSuggestionModel(base_models.BaseHumanMaintainedModel):
             change_cmd=change_cmd,
             score_category=score_category,
             language_code=language_code
-        ).put_for_human()
+        ).put_depending_on_id(author_id)
 
     @classmethod
     def query_suggestions(cls, query_fields_and_values):
