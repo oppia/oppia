@@ -114,7 +114,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class MultipleChoiceInteractionLimitOneOffJob(
-    jobs.BaseMapReduceOneOffJobManager):
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
     Multiple selection interaction whose choice length is less than 30.
     """
@@ -129,12 +129,12 @@ class MultipleChoiceInteractionLimitOneOffJob(
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():
+        for state in exploration.states.items():
             if state.interaction.id == 'MultipleChoiceInput':
                 for choice in state.interaction.customization_args[
                         'choices'].value:
                     choice_length = len(choice.html)
-                    if(choice_length > 30):  
+                    if choice_length > 30:   
                         yield (
                             item.id, 30)
 
@@ -183,7 +183,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ItemSelectionInteractionLimitOneOffJob(
-    jobs.BaseMapReduceOneOffJobManager):
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
     Item selection interaction whose choice length is less than 30.
     """
@@ -198,12 +198,12 @@ class ItemSelectionInteractionLimitOneOffJob(
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():
+        for state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
                 for choice in state.interaction.customization_args[
                         'choices'].value:
                     choice_length = len(choice.html)
-                    if(choice_length > 30):   
+                    if choice_length > 30:    
                         yield (
                             item.id, 30)
 

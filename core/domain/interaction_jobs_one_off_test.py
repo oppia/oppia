@@ -587,10 +587,12 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
         state1.update_next_content_id_index(2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start MultipleChoiceInteractionLimitOneOffJob job on sample exploration.
+        # Start MultipleChoiceInteractionLimitOneOffJob job 
+        # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLimitOneOffJob.create_new())
+            .MultipleChoiceInteractionLimitOneOffJob.
+            create_new())
         interaction_jobs_one_off.MultipleChoiceInteractionLimitOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
@@ -623,10 +625,12 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start MultipleChoiceInteractionLimitOneOffJob job on sample exploration.
+        # Start MultipleChoiceInteractionLimitOneOffJob job 
+        # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLimitOneOffJob.create_new())
+            .MultipleChoiceInteractionLimitOneOffJob.
+            create_new())
         interaction_jobs_one_off.MultipleChoiceInteractionLimitOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
@@ -668,7 +672,8 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(
-            self, interaction_jobs_one_off.MultipleChoiceInteractionLimitOneOffJob)
+            self, interaction_jobs_one_off.
+            MultipleChoiceInteractionLimitOneOffJob)
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
