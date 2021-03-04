@@ -1406,7 +1406,7 @@ class DragAndDropPositiveInt(BaseObject):
     """
 
     description = (
-        'The rank(position) of a drag and drop item in the given list of sets' +
+        'The rank(position) of a drag and drop item in the given list of sets '
         'of drag and drop items.')
     default_value = 1
 

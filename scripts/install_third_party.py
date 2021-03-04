@@ -370,7 +370,7 @@ def install_elasticsearch_dev_server():
         raise Exception('Unrecognized or unsupported operating system.')
 
     download_and_extract(
-        'https://artifacts.elastic.co/downloads/elasticsearch/' +
+        'https://artifacts.elastic.co/downloads/elasticsearch/'
         'elasticsearch-%s-%s-x86_64.%s' % (
             common.ELASTICSEARCH_VERSION,
             common.OS_NAME.lower(),

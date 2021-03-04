@@ -98,9 +98,8 @@ def make_graph():
                                     break
 
                             dep_lines = dep_lines + (
-                                'require (' + line[
-                                    line.find('\''):line.rfind('\'') + 1
-                                    ] + ');\n')
+                                'require (%s);\n' % line[
+                                    line.find('\''):line.rfind('\'') + 1])
                             index += 1
                         else:
                             index += 1
@@ -120,7 +119,7 @@ def make_graph():
                                         argument.left.value +
                                         argument.right.value)
                                 if not dep_path.endswith('.ts'):
-                                    dep_path = dep_path + '.ts'
+                                    dep_path = '%s.ts' % dep_path
                                 if dep_path.endswith(SERVICE_FILES_SUFFICES):
                                     dep_name = os.path.basename(dep_path)
                                     adj_list[dep_name].append(filename)

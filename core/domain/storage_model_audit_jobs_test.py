@@ -90,7 +90,7 @@ class StorageModelAuditJobsTest(test_utils.GenericTestBase):
         model_class_names_with_missing_audit_jobs = [
             model_class_name
             for model_class_name in names_of_ndb_model_subclasses if (
-                model_class_name + 'AuditOneOffJob' not in (
+                '%sAuditOneOffJob' % model_class_name not in (
                     names_of_all_audit_job_classes))]
         self.assertFalse(
             model_class_names_with_missing_audit_jobs,

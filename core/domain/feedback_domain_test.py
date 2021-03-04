@@ -86,7 +86,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     MESSAGE_ID = 'message0'
     THREAD_ID = 'exploration.exp0.thread0'
-    FULL_MESSAGE_ID = THREAD_ID + '.' + MESSAGE_ID
+    FULL_MESSAGE_ID = '%s.%s' % (THREAD_ID, MESSAGE_ID)
 
     def setUp(self):
         super(FeedbackMessageDomainUnitTests, self).setUp()

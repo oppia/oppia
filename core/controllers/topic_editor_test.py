@@ -871,7 +871,7 @@ class TopicPublishSendMailHandlerTests(
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s, please review'
             ' and publish if it looks good.'
-            % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
+            % '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
         self.assertEqual(len(messages), 1)
         self.assertIn(
             expected_email_html_body,

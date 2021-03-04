@@ -100,7 +100,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
                     python_utils.UNICODE(
                         content[topics_to_compare][topic]))
             if len(similarity_list):
-                data = data + '%s\n' % ','.join(similarity_list)
+                data = '%s%s\n' % (data, ','.join(similarity_list))
 
         try:
             recommendations_services.validate_topic_similarities(data)

@@ -185,8 +185,8 @@ def send_mail(
         html_body.encode(encoding='utf-8'), bcc, reply_to, None)
     if not response:
         raise Exception((
-            'Email to %s failed to send. Please try again later or ' +
-            'contact us to report a bug at ' +
+            'Email to %s failed to send. Please try again later or '
+            'contact us to report a bug at '
             'https://www.oppia.org/contact.') % recipient_email)
 
 
@@ -236,5 +236,5 @@ def send_bulk_mail(
         html_body.encode(encoding='utf-8'))
     if not response:
         raise Exception(
-            'Bulk email failed to send. Please try again later or contact us ' +
+            'Bulk email failed to send. Please try again later or contact us '
             'to report a bug at https://www.oppia.org/contact.')

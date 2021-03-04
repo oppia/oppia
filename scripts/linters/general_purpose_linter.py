@@ -143,8 +143,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     },
     {
         'regexp': re.compile(r'bypass'),
-        'message': 'The use of the word "bypass" is not allowed, ' +
-                   'particularly with regards to bypassSecurityTrustHTML() ' +
+        'message': 'The use of the word "bypass" is not allowed, '
+                   'particularly with regards to bypassSecurityTrustHTML() '
                    'and similar functions in Angular.',
         'excluded_files': (
             warranted_angular_security_bypasses
@@ -221,8 +221,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     },
     {
         'regexp': re.compile(r'\$parent'),
-        'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object' +
+        'message': 'Please do not access parent properties '
+                   'using $parent. Use the scope object'
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -239,7 +239,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
-            'core/templates/components/ck-editor-helpers/' +
+            'core/templates/components/ck-editor-helpers/'
             'ck-editor-copy-content-service.spec.ts',
             'core/templates/tests/unit-test-utils.ts'),
         'excluded_dirs': ('core/tests/',)
@@ -353,8 +353,8 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     },
     {
         'regexp': re.compile(r'\$parent'),
-        'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object ' +
+        'message': 'Please do not access parent properties '
+                   'using $parent. Use the scope object '
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()

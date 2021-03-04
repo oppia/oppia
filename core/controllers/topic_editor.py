@@ -394,7 +394,7 @@ class TopicPublishSendMailHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def put(self, topic_id):
         """Returns the TopicRights object of a topic."""
-        topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
+        topic_url = '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id)
         if feconf.CAN_SEND_EMAILS:
             email_manager.send_mail_to_admin(
                 'Request to review and publish a topic',

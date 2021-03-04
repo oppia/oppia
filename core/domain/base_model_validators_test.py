@@ -229,8 +229,8 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_external_model_fetcher_with_user_settings_raise_error(self):
         with self.assertRaisesRegexp(
             Exception,
-            'When fetching instances of UserSettingsModel, please use ' +
-            'UserSettingsModelFetcherDetails instead of ' +
+            'When fetching instances of UserSettingsModel, please use '
+            'UserSettingsModelFetcherDetails instead of '
             'ExternalModelFetcherDetails'):
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,

@@ -383,7 +383,7 @@ class ExportAccountHandler(base.BaseHandler):
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
                 % self.user_id)
             user_data_json_string = (
-                'There was an error while exporting ' +
+                'There was an error while exporting '
                 'data. Please contact %s to export your data.'
                 % feconf.ADMIN_EMAIL_ADDRESS)
             user_images = []
@@ -396,7 +396,8 @@ class ExportAccountHandler(base.BaseHandler):
             for image in user_images:
                 decoded_png = utils.convert_png_data_url_to_binary(
                     image.b64_image_data)
-                zfile.writestr('images/' + image.image_export_path, decoded_png)
+                zfile.writestr(
+                    'images/%s' % image.image_export_path, decoded_png)
 
         # Render file for download.
         self.render_downloadable_file(

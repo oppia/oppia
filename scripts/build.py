@@ -859,7 +859,7 @@ def filter_hashes(file_hashes):
     filtered_hashes = dict()
     for filepath, file_hash in file_hashes.items():
         if is_file_hash_provided_to_frontend(filepath):
-            filtered_hashes['/' + filepath] = file_hash
+            filtered_hashes['/%s' % filepath] = file_hash
     return filtered_hashes
 
 

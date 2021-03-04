@@ -92,7 +92,7 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
         for dir_path in dirs:
             # Adding "/" in the end of the dir path according to the git dir
             # path structure.
-            if (not self._is_path_ignored(dir_path + '/')) and (
+            if (not self._is_path_ignored('%s/' % dir_path)) and (
                     dir_path not in exclude_dirs):
                 for x in self._walk_with_gitignore(dir_path, exclude_dirs):
                     yield x

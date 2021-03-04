@@ -1026,7 +1026,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 1, strict=False)
-        self.assertEqual(subtopic_page.id, self.TOPIC_ID + '-1')
+        self.assertEqual(subtopic_page.id, '%s-1' % self.TOPIC_ID)
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Removed 1 subtopic.')
@@ -1084,7 +1084,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[1].id, 2)
         self.assertEqual(topic.next_subtopic_id, 3)
         self.assertEqual(subtopic_page.topic_id, topic.id)
-        self.assertEqual(subtopic_page.id, self.TOPIC_ID + '-2')
+        self.assertEqual(subtopic_page.id, '%s-2' % self.TOPIC_ID)
 
         # Tests invalid case where skill id is not present in the old subtopic.
         changelist = [

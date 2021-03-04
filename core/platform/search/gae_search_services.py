@@ -277,10 +277,10 @@ def search(
     # described here:
     #   https://developers.google.com/appengine/docs/python/search/query_strings
     category_suffix = (
-        ' category=("' + '" OR "'.join(categories) + '")'
+        ' category=("%s")' % '" OR "'.join(categories)
         if categories else '')
     language_code_suffix = (
-        ' language_code=("' + '" OR "'.join(language_codes) + '")'
+        ' language_code=("%s")' % '" OR "'.join(language_codes)
         if language_codes else '')
     gae_query_string = query_string + category_suffix + language_code_suffix
 

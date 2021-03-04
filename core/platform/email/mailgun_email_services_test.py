@@ -76,10 +76,10 @@ class EmailTests(test_utils.GenericTestBase):
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             (
-                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body' +
-                '+%F0%9F%98%82&bcc=c%40c.com&recipient_variables=%7Bu' +
-                '%27b%40b.com%27%3A+%7Bu%27id%27%3A+1%2C+u%27first%27%3A+u%' +
-                '27Bob%27%7D%7D&to=b%40b.com&html=Hi+abc%2C%3Cbr%3E+%F0%9F%9' +
+                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body'
+                '+%F0%9F%98%82&bcc=c%40c.com&recipient_variables=%7Bu'
+                '%27b%40b.com%27%3A+%7Bu%27id%27%3A+1%2C+u%27first%27%3A+u%'
+                '27Bob%27%7D%7D&to=b%40b.com&html=Hi+abc%2C%3Cbr%3E+%F0%9F%9'
                 '8%82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
@@ -108,11 +108,11 @@ class EmailTests(test_utils.GenericTestBase):
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             (
-                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F' +
-                '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&' +
-                'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+' +
-                '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html=' +
-                'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82' +
+                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F'
+                '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&'
+                'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+'
+                '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html='
+                'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82'
                 '+-+invitation+to+collaborate'),
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
@@ -197,11 +197,11 @@ class EmailTests(test_utils.GenericTestBase):
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             (
-                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F' +
-                '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&' +
-                'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+' +
-                '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html=' +
-                'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82' +
+                'from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F'
+                '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&'
+                'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+'
+                '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html='
+                'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82'
                 '+-+invitation+to+collaborate'),
             {'Authorization': 'Basic'})
         swapped_request = lambda *args: args

@@ -649,8 +649,8 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         """Returns the search query derived from terms and categories."""
         query = ' '.join(terms)
         if categories:
-            query += ' category=(' + ' OR '.join([
-                '"%s"' % category for category in categories]) + ')'
+            query += ' category=(%s)' % ' OR '.join([
+                '"%s"' % category for category in categories])
         return query
 
     def test_get_collection_summaries_matching_ids(self):

@@ -36,7 +36,7 @@ from . import setup
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
 TEST_DATA_DIR = os.path.join('core', 'tests', 'data', '')
-MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v' + common.YARN_VERSION)
+MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v%s' % common.YARN_VERSION)
 
 
 class MockCD(python_utils.OBJECT):
@@ -233,9 +233,10 @@ class SetupTests(test_utils.GenericTestBase):
         # Creates a dummy yarn folder and then checks if `v` was removed
         # upon function call.
         os.mkdir(MOCK_YARN_PATH)
-        setup.rename_yarn_folder('yarn-v' + common.YARN_VERSION, TEST_DATA_DIR)
+        setup.rename_yarn_folder(
+            'yarn-v%s' % common.YARN_VERSION, TEST_DATA_DIR)
         target = os.path.join(
-            TEST_DATA_DIR, 'yarn-' + common.YARN_VERSION)
+            TEST_DATA_DIR, 'yarn-%s' % common.YARN_VERSION)
         self.assertTrue(os.path.exists(target))
         os.rmdir(target)
 
@@ -504,7 +505,7 @@ class SetupTests(test_utils.GenericTestBase):
     def test_chrome_bin_setup_with_windows_chrome(self):
         def mock_isfile(path):
             return path == (
-                'c:\\Program Files (x86)\\Google\\Chrome\\' +
+                'c:\\Program Files (x86)\\Google\\Chrome\\'
                 'Application\\Chrome.exe')
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         with self.test_py_swap, self.create_swap, self.uname_swap:

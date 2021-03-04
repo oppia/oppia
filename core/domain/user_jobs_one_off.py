@@ -634,7 +634,8 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model.created_on = min_date
             user_settings_model.put()
             yield (
-                'SUCCESS_UPDATED_USING_' + python_utils.UNICODE(model_name), 1)
+                'SUCCESS_UPDATED_USING_%s' % python_utils.UNICODE(
+                    model_name), 1)
 
             # Yield an additional error key for user_models created after
             # cutoff date July 1, 2020 and having a discrepancy in their
@@ -793,7 +794,7 @@ class UserSettingsCreatedOnAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if user_settings_model.created_on - min_date > (
                 time_delta_for_correctness):
             yield (
-                'ERROR_NEED_TO_UPDATE_USING_' + python_utils.UNICODE(
+                'ERROR_NEED_TO_UPDATE_USING_%s' % python_utils.UNICODE(
                     model_name), user_id)
         else:
             yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)

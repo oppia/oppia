@@ -118,8 +118,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].reply_to,
-                'reply+' + python_utils.UNICODE(reply_id) + '@' +
-                feconf.INCOMING_EMAILS_DOMAIN_NAME)
+                'reply+%s@%s' % (
+                    python_utils.UNICODE(reply_id),
+                    feconf.INCOMING_EMAILS_DOMAIN_NAME))
 
     def test_send_bulk_mail_exception_for_invalid_permissions(self):
         """Tests the send_bulk_mail exception raised for invalid user
@@ -220,7 +221,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Test that unsuccessful status codes returned raises an exception."""
 
         email_exception = self.assertRaisesRegexp(
-            Exception, 'Bulk email failed to send. Please try again later or' +
+            Exception, 'Bulk email failed to send. Please try again later or'
             ' contact us to report a bug at https://www.oppia.org/contact.')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         swap_send_email_to_recipients = self.swap(
@@ -235,8 +236,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         email_exception = self.assertRaisesRegexp(
             Exception, (
-                'Email to %s failed to send. Please try again later or ' +
-                'contact us to report a bug at ' +
+                'Email to %s failed to send. Please try again later or '
+                'contact us to report a bug at '
                 'https://www.oppia.org/contact.') % feconf.ADMIN_EMAIL_ADDRESS)
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         swap_send_email_to_recipients = self.swap(

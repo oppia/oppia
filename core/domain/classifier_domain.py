@@ -303,7 +303,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
 
         if not isinstance(self.next_scheduled_check_time, datetime.datetime):
             raise utils.ValidationError(
-                'Expected next_scheduled_check_time to be datetime,' +
+                'Expected next_scheduled_check_time to be datetime,'
                 ' received %s' % self.next_scheduled_check_time)
 
         if not isinstance(self.state_name, python_utils.BASESTRING):

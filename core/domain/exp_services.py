@@ -430,7 +430,7 @@ def apply_change_list(exploration_id, change_list):
                       exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
-                            'Expected solicit_answer_details to be a ' +
+                            'Expected solicit_answer_details to be a '
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
                 elif (change.property_name ==

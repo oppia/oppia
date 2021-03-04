@@ -638,7 +638,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
         pattern_to_match = (
-            r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
+            r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)'
             r'function\((?P<function_parameters>[\S\s]*?)\)')
 
         for filepath in files_to_check:
@@ -694,7 +694,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             if filepath.endswith('.constants.ts'):
                 filename_without_extension = filepath[:-3]
                 corresponding_angularjs_filepath = (
-                    filename_without_extension + '.ajs.ts')
+                    '%s.ajs.ts' % filename_without_extension)
 
                 is_corresponding_angularjs_filepath = (
                     os.path.isfile(corresponding_angularjs_filepath))
@@ -1094,7 +1094,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             else:
                 error_message = line
             trimmed_error_messages.append(error_message)
-        return '\n'.join(trimmed_error_messages) + '\n'
+        return '%s\n' % '\n'.join(trimmed_error_messages)
 
     def _lint_js_and_ts_files(self):
         """Prints a list of lint errors in the given list of JavaScript files.

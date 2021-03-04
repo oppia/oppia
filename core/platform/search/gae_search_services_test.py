@@ -184,7 +184,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             doc = search.Document(doc_id='doc%d' % i, fields=[field])
             index.put([doc])
         gae_search_services.delete_documents_from_index(
-            ['doc' + python_utils.UNICODE(i) for i in python_utils.RANGE(10)],
+            ['doc%s' % python_utils.UNICODE(i) for i in python_utils.RANGE(10)],
             'my_index')
         for i in python_utils.RANGE(10):
             self.assertIsNone(index.get('doc%d' % i))

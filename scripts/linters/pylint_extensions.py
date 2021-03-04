@@ -2116,7 +2116,7 @@ class ConcatenationChecker(checkers.BaseChecker):
     concatenation is present or not
     """
 
-    __implements__ = interfaces.ITokenChecker
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'string-concatenation'
     priority = -1
@@ -2129,36 +2129,22 @@ class ConcatenationChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_tokens(self, tokens):
+    def visit_binop(self, node):
         """Custom pylint checker which makes sure that string concatenation
         is not used.
 
         Args:
-            tokens: Token. Object to access all tokens of a module.
+            node: astroid.node.BinOp. Node to access module content.
         """
-        prev_token = None
-        prev_token_type = None
-        for (token_type, token, (line_num, _), _, _) in tokens:
-            if (prev_token and
-                    prev_token_type == tokenize.STRING and token == '+'):
-                # The condition checks for
-                # ('text' +)
-                self.add_message(
-                    'string-concatenation',
-                    args=(prev_token),
-                    line=line_num)
-
-            if (prev_token and
-                    prev_token == '+' and token_type == tokenize.STRING):
-                # The condition checks for
-                # (+ 'text')
-                self.add_message(
-                    'string-concatenation',
-                    args=(token),
-                    line=line_num)
-
-            prev_token_type = token_type
-            prev_token = token
+        if node.op == b'+':
+            for operand in node.get_children():
+                if (isinstance(operand, astroid.nodes.Const) and
+                        ('str' in operand.pytype())):
+                    self.add_message(
+                        'string-concatenation',
+                        args=(operand.as_string()),
+                        node=node)
+                    break
 
 
 def register(linter):

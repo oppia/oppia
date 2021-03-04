@@ -435,7 +435,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 self.model_instance.reply_to_id) <= (
                     email_models.REPLY_TO_ID_LENGTH):
             self.model_instance.reply_to_id = (
-                self.model_instance.reply_to_id + 'invalid')
+                '%sinvalid' % self.model_instance.reply_to_id)
         self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(

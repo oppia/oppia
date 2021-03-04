@@ -96,8 +96,8 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
         """
         if model_class == user_models.UserSettingsModel:
             raise Exception(
-                'When fetching instances of UserSettingsModel, please use ' +
-                'UserSettingsModelFetcherDetails instead of ' +
+                'When fetching instances of UserSettingsModel, please use '
+                'UserSettingsModelFetcherDetails instead of '
                 'ExternalModelFetcherDetails')
         validated_model_ids = []
         model_id_errors = []

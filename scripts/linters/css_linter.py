@@ -71,7 +71,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             else:
                 error_message = line
             trimmed_error_messages.append(error_message)
-        return '\n'.join(trimmed_error_messages) + '\n'
+        return '%s\n' % '\n'.join(trimmed_error_messages)
 
     def lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
@@ -94,7 +94,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         name = 'Stylelint'
 
         stylelint_cmd_args = [
-            node_path, stylelint_path, '--config=' + self.config_path]
+            node_path, stylelint_path, '--config=%s' % self.config_path]
         proc_args = stylelint_cmd_args + self.all_filepaths
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

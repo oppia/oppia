@@ -52,8 +52,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     """Test the functions in suggestion_services."""
 
     score_category = (
-        suggestion_models.SCORE_TYPE_CONTENT +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
+        '%s%sAlgebra' % (
+            suggestion_models.SCORE_TYPE_CONTENT,
+            suggestion_models.SCORE_CATEGORY_DELIMITER))
 
     target_id = 'exp1'
     target_id_2 = 'exp2'
@@ -766,8 +767,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (
-        suggestion_models.SCORE_TYPE_TRANSLATION +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER))
 
     target_id_1 = 'exp1'
     target_id_2 = 'exp2'
@@ -1265,8 +1267,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
 
     score_category = (
-        suggestion_models.SCORE_TYPE_CONTENT +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
+        '%s%sAlgebra' % (
+            suggestion_models.SCORE_TYPE_CONTENT,
+            suggestion_models.SCORE_CATEGORY_DELIMITER))
 
     THREAD_ID = 'exploration.exp1.thread_1'
 

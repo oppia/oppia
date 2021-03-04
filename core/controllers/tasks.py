@@ -58,7 +58,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 
             message_text = message.text
             if len(message_text) > 200:
-                message_text = message_text[:200] + '...'
+                message_text = '%s...' % message_text[:200]
 
             if exploration.id in messages:
                 messages[exploration.id]['messages'].append(message_text)

@@ -371,8 +371,9 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         }
 
         score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'invalid_sub_category')
+            '%s%sinvalid_sub_category' % (
+                suggestion_models.SCORE_TYPE_QUESTION,
+                suggestion_models.SCORE_CATEGORY_DELIMITER))
 
         thread_id = feedback_services.create_thread(
             'skill', '0', self.owner_id, 'description',

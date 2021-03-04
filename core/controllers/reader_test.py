@@ -344,7 +344,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         for _ in python_utils.RANGE(
                 feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             skill_id = skill_services.get_new_skill_id()
-            skill_ids_for_url = skill_ids_for_url + skill_id + ','
+            skill_ids_for_url = '%s%s,' % (skill_ids_for_url, skill_id)
             self.save_new_skill(skill_id, 'user', description='Description')
             question_id = question_services.get_new_question_id()
             self.save_new_question(
@@ -357,7 +357,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         # so that these are filtered out correctly.
         for _ in python_utils.RANGE(5):
             skill_id = skill_services.get_new_skill_id()
-            skill_ids_for_url = skill_ids_for_url + skill_id + ','
+            skill_ids_for_url = '%s%s,' % (skill_ids_for_url, skill_id)
             self.save_new_skill(skill_id, 'user', description='Description')
             skill_services.create_user_skill_mastery(
                 self.user_id, skill_id, 0.5)

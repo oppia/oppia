@@ -557,7 +557,7 @@ class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.SYSTEM_COMMITTER_ID, parent_model.id,
                 force_deletion=True)
             yield (
-                'SUCCESS-Parent model marked deleted-' +
+                'SUCCESS-Parent model marked deleted-'
                 'Deleted all related models-%s' % (
                     model_class_name), snapshot_model.id)
             return

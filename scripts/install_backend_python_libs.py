@@ -604,7 +604,7 @@ def main():
             '# Developers: Please do not modify this auto-generated file. If\n'
             '# you want to add, remove, upgrade, or downgrade libraries,\n'
             '# please change the `requirements.in` file, and then follow\n'
-            '# the instructions there to regenerate this file.\n' + content)
+            '# the instructions there to regenerate this file.\n%s' % content)
 
     mismatches = get_mismatches()
     if mismatches:

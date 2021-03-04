@@ -246,7 +246,7 @@ def main():
                 continue
             if line.strip().endswith('"ConverterMapping",'):
                 pylint_newlines.append(
-                    line[:line.find('"ConverterMapping"')] + '\n')
+                    '%s\n' % line[:line.find('"ConverterMapping"')])
             else:
                 pylint_newlines.append(line)
     with python_utils.open_file(PYLINT_CONFIGPARSER_FILEPATH, 'w+') as f:

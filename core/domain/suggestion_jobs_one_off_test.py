@@ -1610,7 +1610,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         ).put()
 
         feedback_models.GeneralFeedbackMessageModel(
-            id=self.EXPLORATION_THREAD_ID + '.0',
+            id='%s.0' % self.EXPLORATION_THREAD_ID,
             thread_id=self.EXPLORATION_THREAD_ID,
             message_id=0,
             author_id=self.reviewer_id,
@@ -1639,7 +1639,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         ).put()
 
         feedback_models.GeneralFeedbackMessageModel(
-            id=self.EXPLORATION_THREAD_ID + '.0',
+            id='%s.0' % self.EXPLORATION_THREAD_ID,
             thread_id=self.EXPLORATION_THREAD_ID,
             message_id=0,
             author_id=self.reviewer_id,
@@ -1691,14 +1691,14 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         ).put()
 
         feedback_models.GeneralFeedbackMessageModel(
-            id=self.EXPLORATION_THREAD_ID + '.0',
+            id='%s.0' % self.EXPLORATION_THREAD_ID,
             thread_id=self.EXPLORATION_THREAD_ID,
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
         ).put()
         feedback_models.GeneralFeedbackMessageModel(
-            id=self.EXPLORATION_THREAD_ID + '.1',
+            id='%s.1' % self.EXPLORATION_THREAD_ID,
             thread_id=self.EXPLORATION_THREAD_ID,
             message_id=1,
             author_id=self.reviewer_id,

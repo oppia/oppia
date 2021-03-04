@@ -94,7 +94,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             return True
 
         def mock_rename(origin_name, new_name):
-            self.assertEqual(origin_name + '.sh', new_name)
+            self.assertEqual('%s.sh' % origin_name, new_name)
             mock_rename.called = True
         mock_rename.called = False
         isfile_swap = self.swap(os.path, 'isfile', mock_is_file)

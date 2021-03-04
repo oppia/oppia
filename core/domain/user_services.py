@@ -349,7 +349,7 @@ class UserSettings(python_utils.OBJECT):
         elif len(first_part) <= 3:
             first_part = '%s..' % first_part[0]
         else:
-            first_part = first_part[:-3] + '..'
+            first_part = '%s..' % first_part[:-3]
         return '%s%s' % (first_part, last_part)
 
     @property

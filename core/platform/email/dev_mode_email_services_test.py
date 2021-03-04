@@ -62,8 +62,8 @@ class EmailTests(test_utils.GenericTestBase):
                 'subject', 4, 4))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
-            'You are not currently sending out real emails since this is a ' +
-            'dev environment. Emails are sent out in the production' +
+            'You are not currently sending out real emails since this is a '
+            'dev environment. Emails are sent out in the production'
             ' environment.')
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -119,8 +119,8 @@ class EmailTests(test_utils.GenericTestBase):
                 len(recipient_variables)))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
-            'You are not currently sending out real emails since this is a ' +
-            'dev environment. Emails are sent out in the production' +
+            'You are not currently sending out real emails since this is a '
+            'dev environment. Emails are sent out in the production'
             ' environment.')
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)

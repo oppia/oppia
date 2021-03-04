@@ -1239,7 +1239,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             ['FOUND COMMIT LOGS - CollectionSnapshotMetadataModel', 1],
             ['FOUND PARENT MODEL - CollectionSnapshotMetadataModel', 1],
             [
-                'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST - ' +
+                'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST - '
                 'CollectionRightsSnapshotMetadataModel',
                 1
             ]
@@ -1265,7 +1265,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST - ' +
+                'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST - '
                 'ExplorationRightsSnapshotMetadataModel',
                 1
             ],
@@ -1409,12 +1409,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - CollectionSnapshotMetadataModel',
                 ['collection_id0-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - CollectionSnapshotMetadataModel',
                 ['collection_id0-1']
             ]
@@ -1433,12 +1433,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
@@ -1457,12 +1457,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ]
@@ -1481,12 +1481,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ]
@@ -1505,12 +1505,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - StorySnapshotMetadataModel',
                 ['story_id0-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - StorySnapshotMetadataModel',
                 ['story_id0-1']
             ]
@@ -1529,12 +1529,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - TopicSnapshotMetadataModel',
                 ['topic_id0-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - TopicSnapshotMetadataModel',
                 ['topic_id0-1']
             ]
@@ -1553,12 +1553,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - SubtopicPageSnapshotMetadataModel',
                 ['topic_id0-1-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - SubtopicPageSnapshotMetadataModel',
                 ['topic_id0-1-1']
             ]
@@ -1577,12 +1577,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'VALIDATION FAILURE - MISSING PARENT MODEL' +
+                'VALIDATION FAILURE - MISSING PARENT MODEL'
                 ' - TopicRightsSnapshotMetadataModel',
                 ['topic_rights_id0-1']
             ],
             [
-                'VALIDATION FAILURE - MISSING COMMIT LOGS' +
+                'VALIDATION FAILURE - MISSING COMMIT LOGS'
                 ' - TopicRightsSnapshotMetadataModel',
                 ['topic_rights_id0-1']
             ]
@@ -1685,7 +1685,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'SUCCESS-Parent model marked deleted-Deleted all '
                 'related models-ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
@@ -1728,7 +1728,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'SUCCESS-Parent model marked deleted-Deleted all '
                 'related models-SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ]
@@ -1767,7 +1767,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'SUCCESS-Parent model marked deleted-Deleted all '
                 'related models-QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ]
@@ -1817,7 +1817,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'SUCCESS-Added missing commit log model-' +
+                'SUCCESS-Added missing commit log model-'
                 'ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
@@ -1869,7 +1869,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
         expected_output = [
             [
-                'Found commit log model-' +
+                'Found commit log model-'
                 'ExplorationRightsSnapshotMetadataModel',
                 1
             ]
@@ -1903,7 +1903,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'SUCCESS-Added missing commit log model-' +
+                'SUCCESS-Added missing commit log model-'
                 'QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ]
@@ -1956,7 +1956,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'SUCCESS-Added missing commit log model-' +
+                'SUCCESS-Added missing commit log model-'
                 'SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ]
@@ -1995,7 +1995,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'Missing Parent Model-No changes-' +
+                'Missing Parent Model-No changes-'
                 'SkillSnapshotMetadataModel',
                 1
             ]
@@ -2063,9 +2063,9 @@ class SnapshotMetadataCommitMsgAuditOneOffJobTests(
         one_off_results = self._run_one_off_job()
         expected_results = [
             ['GREATER_THAN_375', [
-                'ConfigPropertySnapshotMetadataModel with id model_id-0-400.' +
+                'ConfigPropertySnapshotMetadataModel with id model_id-0-400.'
                 ' Message: %s' % ('a' * value_greater_than_375),
-                'ConfigPropertySnapshotMetadataModel with id model_id-1-400.' +
+                'ConfigPropertySnapshotMetadataModel with id model_id-1-400.'
                 ' Message: %s' % ('a' * value_greater_than_375),
             ]],
             ['LESS_OR_EQUAL_TO_375', 2 * num_models_per_category + 1]]

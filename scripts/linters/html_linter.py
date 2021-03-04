@@ -70,7 +70,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         # Check the indentation of the tag.
         expected_indentation = self.indentation_level * self.indentation_width
         tag_line = self.file_lines[line_number - 1].lstrip()
-        opening_tag = '<' + tag
+        opening_tag = '<%s' % tag
 
         # Check the indentation for content of style tag.
         if tag_line.startswith(opening_tag) and tag == 'style':
@@ -122,7 +122,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     expected_value = value
                     rendered_text = starttag_text.replace('&quot;', '"')
                 else:
-                    expected_value = '"' + value + '"'
+                    expected_value = '"%s"' % value
                     rendered_text = starttag_text
 
                 if not expected_value in rendered_text:
@@ -327,7 +327,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
 
         for line in html_output_lines:
             trimmed_error_messages.append(line)
-        return '\n'.join(trimmed_error_messages) + '\n'
+        return '%s\n' % '\n'.join(trimmed_error_messages)
 
     def lint_html_files(self):
         """This function is used to check HTML files for linting errors.

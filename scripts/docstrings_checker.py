@@ -258,7 +258,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
         """
         if len(function_args) > 0:
             formatted_args = ['({}:)'.format(arg) for arg in function_args]
-            return r'(Args:)[\S\s]*' + r'[\S\s]*'.join(formatted_args)
+            return r'(Args:)[\S\s]*%s' % r'[\S\s]*'.join(formatted_args)
 
     @classmethod
     def compare_arg_order(cls, func_def_args, docstring):
@@ -285,7 +285,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
 
         # First check that each arg is in the docstring.
         for arg_name in func_def_args:
-            arg_name_colon = arg_name + ':'
+            arg_name_colon = '%s:' % arg_name
             if arg_name_colon not in docstring:
                 if arg_name not in docstring:
                     results.append('Arg missing from docstring: {}'.format(

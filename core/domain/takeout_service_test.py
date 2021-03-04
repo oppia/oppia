@@ -301,8 +301,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     SCORE_CATEGORY_1 = 'category_1'
     SCORE_CATEGORY_2 = 'category_2'
     SCORE_CATEGORY = (
-        suggestion_models.SCORE_TYPE_TRANSLATION +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER))
     GENERIC_MODEL_ID = 'model-id-1'
     COMMIT_TYPE = 'create'
     COMMIT_MESSAGE = 'This is a commit.'
@@ -365,8 +366,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                username='username' + creator_id,
-                email=creator_id + '@example.com'
+                username='username%s' % creator_id,
+                email='%s@example.com' % creator_id
             ).put()
 
         user_models.UserSubscriptionsModel(
@@ -1187,7 +1188,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_general_feedback_message_data = {
-            thread_id + '.0': {
+            '%s.0' % thread_id: {
                 'thread_id': thread_id,
                 'message_id': 0,
                 'updated_status': self.THREAD_STATUS,
@@ -1195,7 +1196,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'text': self.MESSAGE_TEXT,
                 'received_via_email': self.MESSAGE_RECEIEVED_VIA_EMAIL
             },
-            thread_id + '.1': {
+            '%s.1' % thread_id: {
                 'thread_id': thread_id,
                 'message_id': 1,
                 'updated_status': self.THREAD_STATUS,

@@ -520,7 +520,7 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 ['skill_id-1']
             ],
             [
-                'Skill Commit Model deleted-' +
+                'Skill Commit Model deleted-'
                 'SkillSnapshotMetadataModel',
                 ['skill_id-1']
             ]

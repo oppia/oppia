@@ -1370,7 +1370,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             param1.validate()
 
     def test_validate_with_long_name_raises_exception(self):
-        long_name = 'Long_' * 50 + 'Name'
+        long_name = '%sName' % ('Long_' * 50)
         param = parameter_domain.PlatformParameter.from_dict({
             'name': long_name,
             'description': 'for test',

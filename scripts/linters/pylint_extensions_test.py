@@ -3284,86 +3284,36 @@ class ConcatenationCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_string_concatenation_present_error(self):
-        node_string_concatenation_present_error = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        binop_node1, binop_node2, binop_node3 = astroid.extract_node(
+            """
+        'string1' + 'string2' #@
+        a + 'string1' #@
+        'string2' + b #@
+        """)
 
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                """
-                a = 'string1' + 'string2'
-
-                b = a + 'string1'
-
-                c = 'string2' + b
-
-                """)
-        node_string_concatenation_present_error.file = filename
-        node_string_concatenation_present_error.path = filename
-
-        self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_string_concatenation_present_error))
-
-        double_message1 = testutils.Message(
-            msg_id='string-concatenation', args=('\'string1\''), line=2)
-        double_message2 = testutils.Message(
-            msg_id='string-concatenation', args=('\'string2\''), line=2)
+        str_str_message = testutils.Message(
+            msg_id='string-concatenation', args=('\'string1\''),
+            node=binop_node1)
         right_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string1\''), line=4)
+            msg_id='string-concatenation', args=('\'string1\''),
+            node=binop_node2)
         left_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string2\''), line=6)
+            msg_id='string-concatenation', args=('\'string2\''),
+            node=binop_node3)
 
         with self.checker_test_object.assertAddsMessages(
-            double_message1, double_message2, right_message, left_message):
-            temp_file.close()
+            str_str_message, right_message, left_message):
+            self.checker_test_object.checker.visit_binop(binop_node1)
+            self.checker_test_object.checker.visit_binop(binop_node2)
+            self.checker_test_object.checker.visit_binop(binop_node3)
 
     def test_string_concatenation_not_present(self):
-        node_string_concatenation_not_present = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                """
-                d = 'string1%s' % (string2)
-
-                e = '%sstring2' % d
-                """)
-        node_string_concatenation_not_present.file = filename
-        node_string_concatenation_not_present.path = filename
-
-        self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_string_concatenation_not_present))
+        binop_node1, binop_node2 = astroid.extract_node(
+            """
+        'string1%s' % (string2) #@
+        '%sstring2' % d #@
+        """)
 
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_string_concatenation_present_inside_a_string_no_error(self):
-        node_string_concatenation_present_inside_a_string_no_error = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                """
-                a = '\'string1\' + \'string2\''
-
-                """)
-        node_string_concatenation_present_inside_a_string_no_error.file = (
-            filename)
-        node_string_concatenation_present_inside_a_string_no_error.path = (
-            filename)
-
-        self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(
-                node_string_concatenation_present_inside_a_string_no_error))
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_binop(binop_node1)
+            self.checker_test_object.checker.visit_binop(binop_node2)

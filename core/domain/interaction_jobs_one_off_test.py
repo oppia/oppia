@@ -479,7 +479,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             .MultipleChoiceInteractionOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'exp_id0\', '
-            u'[u\'State name: State2, AnswerGroup: 0, Rule: 1 is invalid.' +
+            u'[u\'State name: State2, AnswerGroup: 0, Rule: 1 is invalid.'
             '(Indices here are 0-indexed.)\']]'
         )]
         self.assertEqual(actual_output, expected_output)

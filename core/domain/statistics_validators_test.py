@@ -104,7 +104,7 @@ class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_output_for_non_whitelisted_playthrough(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id + 'differentiated'])
+            ['%sdifferentiated' % self.exp.id])
         playthrough = self.create_playthrough()
         self.create_exp_issues_with_playthroughs([[playthrough.id]])
 
@@ -146,7 +146,7 @@ class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
             [self.exp.id])
         playthrough = self.create_playthrough()
         self.create_exp_issues_with_playthroughs([
-            [playthrough.id + '-different'],
+            ['%s-different' % playthrough.id],
         ])
         expected_output = [
             (

@@ -34,7 +34,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     """Test the story fetchers module."""
 
     STORY_ID = None
-    NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_1 = '%s1' % story_domain.NODE_ID_PREFIX
     NODE_ID_2 = 'node_2'
     USER_ID = 'user'
     story = None

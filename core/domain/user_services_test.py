@@ -121,17 +121,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_username_for_pseudonymous_id(self):
         self.assertEqual(
             'User_Aaaaaaaa',
-            user_services.get_username('pid_' + 'a' * 32))
+            user_services.get_username('pid_%s' % ('a' * 32)))
         self.assertEqual(
             'User_Bbbbbbbb',
-            user_services.get_username('pid_' + 'b' * 32))
+            user_services.get_username('pid_%s' % ('b' * 32)))
 
     def test_get_usernames_for_pseudonymous_ids(self):
 
         # Handle usernames that exists.
         self.assertEqual(
             ['User_Aaaaaaaa', 'User_Bbbbbbbb'],
-            user_services.get_usernames(['pid_' + 'a' * 32, 'pid_' + 'b' * 32]))
+            user_services.get_usernames(
+                ['pid_%s' % ('a' * 32), 'pid_%s' % ('b' * 32)]))
 
     def test_get_usernames_empty_list(self):
         # Return empty list when no user id passed.

@@ -366,9 +366,9 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             beginning_sequence = 'varRICH_TEXT_COMPONENTS={'
             first_bracket_index = text.find(beginning_sequence)
             last_bracket_index = text.find('};')
-            text_inside_constant = text[
+            text_inside_constant = '%s,' % (text[
                 first_bracket_index + len(beginning_sequence):
-                last_bracket_index] + ','
+                last_bracket_index])
 
             rte_components_with_test = []
             while text_inside_constant.find(',') != -1:

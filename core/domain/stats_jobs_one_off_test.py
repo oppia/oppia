@@ -1607,8 +1607,8 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 
         output = self.run_one_off_job()
         self.assertEqual(
-            output, [u'[u\'Missing model at version 1\', [u\''
-                     + self.EXP_ID + '\']]'])
+            output, [u'[u\'Missing model at version 1\', [u\'%s\']]'
+                     % self.EXP_ID])
 
     def test_job_yields_no_change_when_no_regeneration_is_needed(self):
         self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
