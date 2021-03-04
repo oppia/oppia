@@ -182,7 +182,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class ItemSelectionLimitInteractionOneOffJob(
+class ItemSelectionInteractionLimitOneOffJob(
     jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
     Item selection interaction whose choice length is less than 30.
