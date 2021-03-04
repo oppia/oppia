@@ -244,7 +244,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
     };
 
     var checkAlwaysAskLearnersForAnswerDetails = function() {
-      ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+      ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
         _explorationId).then(function(featuresData) {
         alwaysAskLearnersForAnswerDetails = (
           featuresData.alwaysAskLearnersForAnswerDetails);

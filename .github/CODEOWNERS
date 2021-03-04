@@ -429,6 +429,10 @@
 
 
 # Infrastructure.
+/jobs/__init__.py @brianrodri
+/jobs/base_model_*.py @brianrodri
+/jobs/jobs_utils.py @brianrodri
+/jobs/jobs_utils_test.py @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -656,6 +660,7 @@
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
 # 8 lines.
+/core/templates/services/svg-sanitizer.service.ts @BenHenning
 /scripts/linters/warranted_angular_security_bypasses.py @BenHenning
 /core/controllers/acl_decorators*.py @BenHenning
 /core/controllers/base*.py @BenHenning
