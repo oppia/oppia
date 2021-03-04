@@ -23,14 +23,10 @@ export const AdminPageConstants = {
   ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL: '/admintopicscsvdownloadhandler',
 
   ADMIN_JOB_OUTPUT_URL_TEMPLATE: '/adminjoboutput?job_id=<jobId>',
-  ADMIN_JOB_ADD_CONTRIBUTION_REVIEWER_HANDLER:
-    '/addcontributionreviewerhandler',
-  ADMIN_JOB_CONTRIBUTION_REVIEWER_RIGHTS_HANDLER:
-    '/contributionreviewerrightsdatahandler',
-  ADMIN_JOB_GET_CONTRIBUTION_REVIEWERS:
-    '/getcontributionreviewershandler',
-  ADMIN_JOB_REMOVE_CONTRIBUTION_REVIEWER:
-    '/removecontributionreviewerhandler',
+  ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER: '/addcontributionrightshandler',
+  ADMIN_CONTRIBUTION_RIGHTS_HANDLER: '/contributionrightsdatahandler',
+  ADMIN_GET_CONTRIBUTOR_USERS_HANDLER: '/getcontributorusershandler',
+  ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER: '/removecontributionrightshandler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#activities',

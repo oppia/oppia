@@ -63,6 +63,7 @@ angular.module('oppia').directive('adminRolesTab', [
         var handleErrorResponse = function(errorResponse) {
           ctrl.setStatusMessage(
             'Server error: ' + errorResponse.error.error);
+          $rootScope.$apply();
         };
 
         var getLanguageDescriptions = function(languageCodes) {
@@ -153,11 +154,11 @@ angular.module('oppia').directive('adminRolesTab', [
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then(function(response) {
-              console.log(response);
               ctrl.result.usernames = response.usernames;
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
+              $rootScope.$apply();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
@@ -172,8 +173,8 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
-                questions: response.data.can_review_questions,
-                can_submit_questions: response.data.can_submit_questions
+                questions: response.can_review_questions,
+                can_submit_questions: response.can_submit_questions
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');

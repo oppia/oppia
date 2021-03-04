@@ -238,8 +238,8 @@ export class AdminBackendApiService {
       category: string, username: string, languageCode: string
   ): Promise<void> {
     return this.http.post<void>(
-      AdminPageConstants.ADMIN_JOB_ADD_CONTRIBUTION_REVIEWER_HANDLER, {
-        review_category: category,
+      AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER, {
+        category: category,
         username: username,
         language_code: languageCode
       }
@@ -249,11 +249,10 @@ export class AdminBackendApiService {
   async viewContributionReviewersAsync(
       category: string, languageCode: string
   ): Promise<Object> {
-    console.log(category, languageCode);
     return this.http.get<Object>(
-      AdminPageConstants.ADMIN_JOB_GET_CONTRIBUTION_REVIEWERS, {
+      AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
         params: {
-          review_category: category,
+          category: category,
           language_code: languageCode
         }
       }
@@ -262,7 +261,7 @@ export class AdminBackendApiService {
 
   async contributionReviewerRightsAsync(username: string): Promise<Object> {
     return this.http.get<Object>(
-      AdminPageConstants.ADMIN_JOB_CONTRIBUTION_REVIEWER_RIGHTS_HANDLER, {
+      AdminPageConstants. ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
         params: {
           username: username
         }
@@ -275,10 +274,10 @@ export class AdminBackendApiService {
       category: string, languageCode: string
   ): Promise<void> {
     return this.http.put<void>(
-      AdminPageConstants.ADMIN_JOB_REMOVE_CONTRIBUTION_REVIEWER, {
+      AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
         username: username,
         removal_type: method,
-        review_category: category,
+        category: category,
         language_code: languageCode
       }
     ).toPromise();
