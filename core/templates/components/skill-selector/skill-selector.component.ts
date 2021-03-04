@@ -51,7 +51,7 @@ export class SkillSelectorComponent implements OnInit {
   skillFilterText: string = '';
   topicFilterList: { topicName: string ; checked: boolean }[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
-  intialSubTopicFilterDict: SubTopicFilterDict = {};
+  initialSubTopicFilterDict: SubTopicFilterDict = {};
 
   private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe = (
     new FilterForMatchingSubstringPipe()
@@ -77,7 +77,7 @@ export class SkillSelectorComponent implements OnInit {
         this.subTopicFilterDict[topicName].push(subTopicNameDict);
       }
     }
-    this.intialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
+    this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
   }
 
   checkIfEmpty(skills: any[]): boolean {
@@ -151,17 +151,17 @@ export class SkillSelectorComponent implements OnInit {
       if (this.topicFilterList[i].checked) {
         let topicName = this.topicFilterList[i].topicName;
         updatedSubTopicFilterList[topicName] = (
-          cloneDeep(this.intialSubTopicFilterDict[topicName]));
+          cloneDeep(this.initialSubTopicFilterDict[topicName]));
         isAnyTopicChecked = true;
       }
     }
     if (!isAnyTopicChecked) {
       // If there are no topics checked on topic filter, we have to
       // display subtopics from all the topics in the subtopic filter.
-      for (let topic in this.intialSubTopicFilterDict) {
+      for (let topic in this.initialSubTopicFilterDict) {
         if (!this.subTopicFilterDict.hasOwnProperty(topic)) {
           this.subTopicFilterDict[topic] = (
-            cloneDeep(this.intialSubTopicFilterDict[topic]));
+            cloneDeep(this.initialSubTopicFilterDict[topic]));
         }
       }
     } else {
