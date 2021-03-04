@@ -41,8 +41,7 @@ describe('Suggestion data model', () => {
       },
       last_updated_msecs: 1000
     };
-    let suggestion = Suggestion.createFromBackendDict(
-      suggestionBackendDict);
+    let suggestion = Suggestion.createFromBackendDict(suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
     expect(suggestion.targetId).toEqual('exp1');

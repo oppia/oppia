@@ -117,8 +117,7 @@ export class SuggestionThreadObjectFactory {
         'edit_exploration_state_content') {
       return null;
     }
-    return Suggestion.createFromBackendDict(
-      suggestionBackendDict);
+    return Suggestion.createFromBackendDict(suggestionBackendDict);
   }
 
   createFromBackendDicts(
