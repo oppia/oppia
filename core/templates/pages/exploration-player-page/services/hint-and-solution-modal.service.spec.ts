@@ -19,49 +19,37 @@
 // eslint-disable-next-line max-len
 require('pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Hint and Solution modal service factory', () => {
   var HintAndSolutionModalService = null;
   var $uibModal = null;
+
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
   beforeEach(angular.mock.inject(function($injector) {
     HintAndSolutionModalService = $injector.get(
       'HintAndSolutionModalService');
     $uibModal = $injector.get('$uibModal');
   }));
 
-  it('should open an $uibModal when clicking displayHintModal', () => {
+  it('should open a modal when clicking display hint button', () => {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
     HintAndSolutionModalService.displayHintModal('0');
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should open an $uibModal when clicking displaySolutionModal', () => {
+  it('should open a modal when clicking display solution button', () => {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
     HintAndSolutionModalService.displaySolutionModal();
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should open an $uibModal when clicking displayHintModal', () => {
+  it('should open a modal when clicking display solution' +
+    'interstitial button', () => {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
     HintAndSolutionModalService.displaySolutionInterstitialModal();
     expect(modalSpy).toHaveBeenCalled();
