@@ -113,7 +113,8 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class MultipleChoiceInteractionLimitOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class MultipleChoiceInteractionLimitOneOffJob(
+    jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
     Multiple selection interaction whose choice length is less than 30.
     """
@@ -132,17 +133,17 @@ class MultipleChoiceInteractionLimitOneOffJob(jobs.BaseMapReduceOneOffJobManager
             if state.interaction.id == 'MultipleChoiceInput':
                 for choice in state.interaction.customization_args[
                         'choices'].value:
-                    choice_length=len(choice.html);
+                    choice_length = len(choice.html)
                     if(choice_length > 30):  
                         yield (
-                            item.id,30)
+                            item.id, 30)
 
     @staticmethod
     def reduce(key, values):
         yield (key, values)
 
 
-class ItemSelectionInteractionLimitOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs that use the item
     selection interaction and that have rules that do not match the answer
     choices. These probably need to be fixed manually.
@@ -181,7 +182,8 @@ class ItemSelectionInteractionLimitOneOffJob(jobs.BaseMapReduceOneOffJobManager)
         yield (key, values)
 
 
-class ItemSelectionLimitInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class ItemSelectionLimitInteractionOneOffJob(
+    jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
     Item selection interaction whose choice length is less than 30.
     """
@@ -200,10 +202,10 @@ class ItemSelectionLimitInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager)
             if state.interaction.id == 'ItemSelectionInput':
                 for choice in state.interaction.customization_args[
                         'choices'].value:
-                    choice_length=len(choice.html);
+                    choice_length = len(choice.html)
                     if(choice_length > 30):   
                         yield (
-                            item.id,30)
+                            item.id, 30)
 
     @staticmethod
     def reduce(key, values):
