@@ -16,6 +16,7 @@
  * @fileoverview Directive for uploading images.
  */
 
+require('./thumbnail-display.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');

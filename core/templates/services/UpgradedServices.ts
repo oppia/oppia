@@ -992,7 +992,8 @@ export class UpgradedServices {
 
     // Topological level: 3.
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
-      upgradedServices['HttpClient']);
+      upgradedServices['HttpClient'],
+      upgradedServices['UrlInterpolationService']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['AssetsBackendApiService'] =
