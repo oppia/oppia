@@ -593,8 +593,8 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
             interaction_jobs_one_off
             .MultipleChoiceInteractionLimitOneOffJob.
             create_new())
-        interaction_jobs_one_off.MultipleChoiceInteractionLimitOneOffJob.
-        enqueue(job_id)
+        interaction_jobs_one_off.
+        MultipleChoiceInteractionLimitOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -929,7 +929,6 @@ class ItemSelectionInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
             'minAllowableSelectionCount': {'value': 0},
             'maxAllowableSelectionCount': {'value': 1}
         }
-
 
         state1.update_interaction_id('ItemSelectionInput')
         state1.update_interaction_customization_args(customization_args_dict1)
