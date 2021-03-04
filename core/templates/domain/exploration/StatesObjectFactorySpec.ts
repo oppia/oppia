@@ -35,7 +35,7 @@ describe('States Object Factory', () => {
   let newState2 = null;
   let secondState = null;
   let statesWithCyclicOutcomeDict = null;
-  let statesWithAudioDict = null;
+  let statesWithAudioAndWrittenTranslationsDict = null;
   let vof = null;
 
   beforeEach(() => {
@@ -375,7 +375,7 @@ describe('States Object Factory', () => {
       },
     };
 
-    statesWithAudioDict = {
+    statesWithAudioAndWrittenTranslationsDict = {
       'first state': {
         content: {
           content_id: 'content',
@@ -497,12 +497,48 @@ describe('States Object Factory', () => {
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
-            content: {},
-            ca_placeholder_3: {},
-            default_outcome: {},
-            feedback_1: {},
-            hint_1: {},
-            hint_2: {}
+            content: {
+              en: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            ca_placeholder_3: {
+              'hi-en': {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            default_outcome: {
+              he: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            feedback_1: {
+              zh: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            hint_1: {
+              es: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            hint_2: {
+              cs: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            }
           }
         }
       },
@@ -538,11 +574,13 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly delete a state', () => {
-    let statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-    statesWithAudio.deleteState('first state');
-    expect(statesWithAudio).toEqual(ssof.createFromBackendDict({
-      'second state': secondState
-    }));
+    let statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+      statesWithAudioAndWrittenTranslationsDict);
+    statesWithAudioAndWrittenTranslations.deleteState('first state');
+    expect(statesWithAudioAndWrittenTranslations).toEqual(
+      ssof.createFromBackendDict({
+        'second state': secondState
+      }));
   });
 
   it('should correctly set any states\' interaction.defaultOutcomes that ' +
@@ -611,14 +649,27 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly get all audio language codes in states', () => {
-    const statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-    expect(statesWithAudio.getAllVoiceoverLanguageCodes())
+    const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+      statesWithAudioAndWrittenTranslationsDict);
+    expect(statesWithAudioAndWrittenTranslations.getAllVoiceoverLanguageCodes())
       .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
   });
 
+  it('should correctly get all written translation language codes in states',
+    () => {
+      const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+        statesWithAudioAndWrittenTranslationsDict);
+      expect(
+        statesWithAudioAndWrittenTranslations
+          .getAllWrittenTranslationLanguageCodes()
+      ).toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs']);
+    }
+  );
+
   it('should correctly get all audio translations in states', () => {
-    const statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-    expect(statesWithAudio.getAllVoiceovers('hi-en'))
+    const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+      statesWithAudioAndWrittenTranslationsDict);
+    expect(statesWithAudioAndWrittenTranslations.getAllVoiceovers('hi-en'))
       .toEqual({
         'first state': [vof.createFromBackendDict({
           filename: 'myfile3.mp3',
@@ -638,5 +689,99 @@ describe('States Object Factory', () => {
           duration_secs: 0.8
         })]
       });
+  });
+
+  describe('areWrittenTranslationsDisplayable', () => {
+    // TODO(#11581): Add rule translation support for TextInput and SetInput
+    // interactions. Remove this test case afterwards.
+    it('should return false for states that contains a state with' +
+       'a TextInput interaction', () => {
+      const states = ssof.createFromBackendDict(statesDict);
+      expect(
+        states.areWrittenTranslationsDisplayable('fr')
+      ).toBe(false);
+    });
+
+    it('should return true for states that have no missing or update needed ' +
+       'translations', () => {
+      const states = ssof.createFromBackendDict(statesDict);
+      const state = states.getState('first state');
+
+      spyOn(state.interaction, 'id').and.returnValue(null);
+      spyOn(state, 'getRequiredWrittenTranslationContentIds').and.returnValue(
+        new Set(['content', 'default_outcome']));
+
+      state.writtenTranslations.addWrittenTranslation(
+        'content', 'fr', 'html', '<p>translation</p>');
+      state.writtenTranslations.addWrittenTranslation(
+        'default_outcome', 'fr', 'html', '<p>translation</p>');
+
+      expect(
+        states.areWrittenTranslationsDisplayable('fr')
+      ).toBe(true);
+    });
+
+    it('should return true for states that have the minimum acceptable ' +
+       'number of missing or update needed translations', () => {
+      const states = ssof.createFromBackendDict(statesDict);
+      const state = states.getState('first state');
+
+      spyOn(state.interaction, 'id').and.returnValue(null);
+
+      state.writtenTranslations.addContentId('feedback_1');
+      state.writtenTranslations.addContentId('feedback_2');
+      state.writtenTranslations.addContentId('feedback_3');
+      state.writtenTranslations.addContentId('feedback_4');
+
+      // Test the case that a content id is not required.
+      state.writtenTranslations.addContentId('feedback_5');
+
+      spyOn(state, 'getRequiredWrittenTranslationContentIds').and.returnValue(
+        new Set([
+          'content',
+          'default_outcome',
+          'feedback_1',
+          'feedback_2',
+          'feedback_3',
+          'feedback_4',
+        ]));
+
+      state.writtenTranslations.addWrittenTranslation(
+        'content', 'fr', 'html', '<p>translation</p>');
+
+      state.writtenTranslations.addWrittenTranslation(
+        'default_outcome', 'fr', 'html', '<p>translation</p>');
+      state.writtenTranslations.toggleNeedsUpdateAttribute(
+        'default_outcome', 'fr');
+
+      expect(
+        states.areWrittenTranslationsDisplayable('fr')
+      ).toBe(true);
+    });
+
+    it('should return false for states that have less than the minimum ' +
+       'acceptable number of missing or update needed translations', () => {
+      const states = ssof.createFromBackendDict(statesDict);
+      const state = states.getState('first state');
+
+      spyOn(state.interaction, 'id').and.returnValue(null);
+      state.writtenTranslations.addContentId('feedback_1');
+      state.writtenTranslations.addContentId('feedback_2');
+      state.writtenTranslations.addContentId('feedback_3');
+      state.writtenTranslations.addContentId('feedback_4');
+      spyOn(state, 'getRequiredWrittenTranslationContentIds').and.returnValue(
+        new Set([
+          'content',
+          'default_outcome',
+          'feedback_1',
+          'feedback_2',
+          'feedback_3',
+          'feedback_4',
+        ]));
+
+      expect(
+        states.areWrittenTranslationsDisplayable('fr')
+      ).toBe(false);
+    });
   });
 });

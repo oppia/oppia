@@ -234,19 +234,24 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, cursor=None, offset=None,
+        query_string, index_name, categories, language_codes, offset=None,
         size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents in an index.
 
     Args:
         query_string: str. The search query.
-            The syntax used is described here:
-            https://developers.google.com/appengine/docs/python/search/query_strings
         index_name: str. The name of the index to search.
-        cursor: str. A cursor string, as returned by this function. Pass this in
-            to get the next 'page' of results. Leave as None to start at the
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        offset: str. An offset string, as returned by this function. Pass this
+            in to get the next 'page' of results. Leave as None to start at the
             beginning.
-        offset: int|None. Not used in this implementation.
         size: int. The maximum number of documents to return.
         ids_only: bool. Whether to only return document ids.
 
@@ -254,28 +259,37 @@ def search(
         2-tuple of (result_docs, result_cursor). Where:
             result_docs: list(dict). Represents search documents. If ids_only is
                 True, this will be a list of strings, doc_ids.
-            result_cursor: str. A cursor that you can pass back in to get
+            result_offset: str. An offset that you can pass back in to get
                 the next page of results. This wil be a web safe string that you
                 can use in urls. It will be None if there is no next page.
     """
-    assert offset is None
-
-    if cursor is None:
+    if offset is None:
         gae_cursor = gae_search.Cursor()
     else:
-        gae_cursor = gae_search.Cursor(web_safe_string=cursor)
+        gae_cursor = gae_search.Cursor(web_safe_string=offset)
 
     options = gae_search.QueryOptions(
         limit=size,
         cursor=gae_cursor,
         ids_only=ids_only)
 
+    # Convert the query to a query_string accepted by GAE. The syntax used is
+    # described here:
+    #   https://developers.google.com/appengine/docs/python/search/query_strings
+    category_suffix = (
+        ' category=("' + '" OR "'.join(categories) + '")'
+        if categories else '')
+    language_code_suffix = (
+        ' language_code=("' + '" OR "'.join(language_codes) + '")'
+        if language_codes else '')
+    gae_query_string = query_string + category_suffix + language_code_suffix
+
     try:
-        query = gae_search.Query(query_string, options=options)
+        query = gae_search.Query(gae_query_string, options=options)
     except gae_search.QueryError as e:
         # This can happen for query strings like "NOT" or a string that
         # contains backslashes.
-        logging.exception('Could not parse query string %s' % query_string)
+        logging.exception('Could not parse query string %s' % gae_query_string)
         return [], None
 
     index = gae_search.Index(index_name)
@@ -287,9 +301,8 @@ def search(
         logging.exception('something went wrong while searching.')
         raise SearchFailureError(e)
 
-    result_cursor = None
-    if results.cursor:
-        result_cursor = results.cursor.web_safe_string
+    result_offset = (
+        results.cursor.web_safe_string if results.cursor else None)
 
     if ids_only:
         result_docs = [doc.doc_id for doc in results.results]
@@ -297,19 +310,4 @@ def search(
         result_docs = [
             _search_document_to_dict(doc) for doc in results.results]
 
-    return result_docs, result_cursor
-
-
-def get_document_from_index(doc_id, index_name):
-    """Returns a document with a give doc_id(s) from the index.
-
-    Args:
-        doc_id: str. A doc_id as a string.
-        index_name: str. The name of an index.
-
-    Returns:
-        dict. The requested document as a dict.
-    """
-    assert isinstance(index_name, python_utils.BASESTRING)
-    index = gae_search.Index(index_name)
-    return _search_document_to_dict(index.get(doc_id))
+    return result_docs, result_offset

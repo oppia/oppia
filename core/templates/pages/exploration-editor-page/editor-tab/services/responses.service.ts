@@ -26,7 +26,6 @@ import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AppConstants } from 'app.constants';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -62,7 +61,6 @@ export class ResponsesService {
 
   constructor(
     private alertsService: AlertsService,
-    private answerGroupsCacheService: AnswerGroupsCacheService,
     private loggerService: LoggerService,
     private outcomeObjectFactory: OutcomeObjectFactory,
     private solutionValidityService: SolutionValidityService,
@@ -212,19 +210,11 @@ export class ResponsesService {
   // The 'data' arg is a list of interaction handlers for the
   // currently-active state.
   init(data: Interaction): void {
-    this.answerGroupsCacheService.reset();
-
     this._answerGroups = cloneDeep(data.answerGroups);
     this._defaultOutcome = cloneDeep(data.defaultOutcome);
     this._confirmedUnclassifiedAnswers = cloneDeep(
       data.confirmedUnclassifiedAnswers
     );
-    if (this.stateInteractionIdService.savedMemento !== null) {
-      this.answerGroupsCacheService.set(
-        this.stateInteractionIdService.savedMemento,
-        this._answerGroups
-      );
-    }
 
     this._answerGroupsMemento = cloneDeep(this._answerGroups);
     this._defaultOutcomeMemento = cloneDeep(this._defaultOutcome);
@@ -263,11 +253,7 @@ export class ResponsesService {
       newInteractionId: string,
       callback: (value: AnswerGroup[], value2: Outcome) => void
   ): void {
-    if (this.answerGroupsCacheService.contains(newInteractionId)) {
-      this._answerGroups = this.answerGroupsCacheService.get(newInteractionId);
-    } else {
-      this._answerGroups = [];
-    }
+    this._answerGroups = [];
 
     // Preserve the default outcome unless the interaction is terminal.
     // Recreate the default outcome if switching away from a terminal
@@ -290,9 +276,6 @@ export class ResponsesService {
     this._saveAnswerGroups(this._answerGroups);
     this._saveDefaultOutcome(this._defaultOutcome);
     this._saveConfirmedUnclassifiedAnswers(this._confirmedUnclassifiedAnswers);
-    if (newInteractionId) {
-      this.answerGroupsCacheService.set(newInteractionId, this._answerGroups);
-    }
 
     this._answerGroupsMemento = cloneDeep(this._answerGroups);
     this._defaultOutcomeMemento = cloneDeep(this._defaultOutcome);

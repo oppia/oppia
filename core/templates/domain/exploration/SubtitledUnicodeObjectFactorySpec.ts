@@ -32,24 +32,24 @@ describe('SubtitledUnicode object factory', () => {
   });
 
   it('should get and set unicode correctly', () => {
-    expect(subtitledUnicode.getUnicode()).toEqual('some string');
-    subtitledUnicode.setUnicode('new string');
-    expect(subtitledUnicode.getUnicode()).toEqual('new string');
+    expect(subtitledUnicode.unicode).toEqual('some string');
+    subtitledUnicode.unicode = 'new string';
+    expect(subtitledUnicode.unicode).toEqual('new string');
   });
 
   it('should get and set contentId correctly', () => {
-    expect(subtitledUnicode.getContentId()).toEqual('content_id');
-    subtitledUnicode.setContentId('new_content_id');
-    expect(subtitledUnicode.getContentId()).toEqual('new_content_id');
+    expect(subtitledUnicode.contentId).toEqual('content_id');
+    subtitledUnicode.contentId = 'new_content_id';
+    expect(subtitledUnicode.contentId).toEqual('new_content_id');
   });
 
   it('should correctly check emptiness', () => {
     expect(subtitledUnicode.isEmpty()).toBe(false);
 
-    subtitledUnicode.setUnicode('');
+    subtitledUnicode.unicode = '';
     expect(subtitledUnicode.isEmpty()).toBe(true);
 
-    subtitledUnicode.setUnicode('hello');
+    subtitledUnicode.unicode = 'hello';
     expect(subtitledUnicode.isEmpty()).toBe(false);
   });
 
@@ -63,7 +63,7 @@ describe('SubtitledUnicode object factory', () => {
   it('should create default object', () => {
     const defaultSubtitledUnicode = suof
       .createDefault('test string', 'content_id');
-    expect(defaultSubtitledUnicode.getUnicode()).toEqual('test string');
-    expect(defaultSubtitledUnicode.getContentId()).toEqual('content_id');
+    expect(defaultSubtitledUnicode.unicode).toEqual('test string');
+    expect(defaultSubtitledUnicode.contentId).toEqual('content_id');
   });
 });

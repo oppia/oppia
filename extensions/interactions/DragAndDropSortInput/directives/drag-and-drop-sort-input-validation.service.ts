@@ -58,7 +58,7 @@ export class DragAndDropSortInputValidationService {
     }
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i].getHtml();
+      var choice = customizationArgs.choices.value[i].html;
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -145,10 +145,15 @@ export class DragAndDropSortInputValidationService {
         areAnyItemsDuplicated = false;
 
         let choiceValues = (
-          customizationArgs.choices.value.map(x => x.getHtml()));
+          customizationArgs.choices.value.map(x => x.html));
+        const choiceContentIdToHtml = {};
+        customizationArgs.choices.value.forEach(
+          choice => choiceContentIdToHtml[
+            choice.contentId] = choice.html);
+
         switch (rule.type) {
           case 'HasElementXAtPositionY':
-            if (!choiceValues.includes(<string>inputs.x)) {
+            if (!choiceContentIdToHtml.hasOwnProperty(<string>inputs.x)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -177,8 +182,8 @@ export class DragAndDropSortInputValidationService {
               });
             }
             if (
-              !choiceValues.includes(<string>inputs.x) ||
-              !choiceValues.includes(<string>inputs.y)) {
+              !choiceContentIdToHtml.hasOwnProperty(<string>inputs.x) ||
+              !choiceContentIdToHtml.hasOwnProperty(<string>inputs.y)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -192,27 +197,23 @@ export class DragAndDropSortInputValidationService {
           case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
             var xInputs = <string[][]>inputs.x;
             for (var k = 0; k < xInputs.length; k++) {
-              if (inputs.x[k].length === 0) {
+              if (xInputs[k].length === 0) {
                 areAnyItemsEmpty = true;
-              } else {
-                for (var l = 0; l < xInputs[k].length; l++) {
-                  var item = xInputs[k][l];
-                  if (item.trim().length === 0) {
-                    areAnyItemsEmpty = true;
-                  }
-                  if (seenItems.indexOf(item) !== -1) {
-                    areAnyItemsDuplicated = true;
-                  }
-                  seenItems.push(item);
+              }
+              for (var l = 0; l < xInputs[k].length; l++) {
+                const itemContentId = xInputs[k][l];
+                const item = choiceContentIdToHtml[itemContentId];
+                if (seenItems.indexOf(item) !== -1) {
+                  areAnyItemsDuplicated = true;
                 }
+                seenItems.push(item);
               }
             }
 
             if (areAnyItemsEmpty || xInputs.length === 0) {
-              var message = areAnyItemsEmpty ? 'the items are' : 'the list is';
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: `Please ensure ${message} nonempty.`
+                message: 'Please ensure the list is nonempty.'
               });
             }
 
@@ -237,7 +238,8 @@ export class DragAndDropSortInputValidationService {
             }
             var sortedCustomArgsChoices = choiceValues.sort();
             var flattenedAndSortedXInputs = (
-              xInputs.reduce((acc, val) => acc.concat(val), []).sort());
+              xInputs.reduce((acc, val) => acc.concat(val), [])
+            ).map(contentId => choiceContentIdToHtml[contentId]).sort();
             if (
               !angular.equals(
                 sortedCustomArgsChoices, flattenedAndSortedXInputs)) {

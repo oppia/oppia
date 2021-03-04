@@ -81,7 +81,7 @@ angular.module('oppia').directive('learnerLocalNav', [
               template: require(
                 'pages/exploration-player-page/templates/' +
                 'flag-exploration-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'FlagExplorationModalController',
             }).result.then(function(result) {
               var flagExplorationUrl = UrlInterpolationService.interpolateUrl(

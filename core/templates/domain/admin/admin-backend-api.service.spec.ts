@@ -29,9 +29,12 @@ import { PlatformParameterFilterType } from 'domain/platform_feature/platform-pa
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Admin backend api service', () => {
+fdescribe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
   let adminBackendResponse = {
     unfinished_job_data: [],
     role_graph_data: {
@@ -128,6 +131,9 @@ describe('Admin backend api service', () => {
 
     abas = TestBed.get(AdminBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
     adminDataObject = {
       demoExplorations: adminBackendResponse.demo_explorations,
       demoCollections: adminBackendResponse.demo_collections,
@@ -157,6 +163,10 @@ describe('Admin backend api service', () => {
         dict => PlatformParameter.createFromBackendDict(dict)
       )
     };
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
+    });
   });
 
   afterEach(() => {
@@ -178,9 +188,6 @@ describe('Admin backend api service', () => {
 
   it('should use the rejection handler if the backend request failed.',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
       abas.getDataAsync().then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
@@ -198,34 +205,174 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
-});
+ 
+  // Test cases for Admin Jobs Tab
+  it('should request to start a new job when calling startNewJobAsync',
+    fakeAsync(() => {
+      let jobType = 'ActivityContributorsSummaryOneOffJob';
+      let payload = {
+        action: 'start_new_job',
+        job_type: jobType
+      };
+      abas.startNewJobAsync(jobType).then(successHandler, failHandler);
 
-describe('Admin Backend API service for Roles Tab', () => {
-  let adminBackendApiService: AdminBackendApiService;
-  let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush(200);
+      flushMicrotasks();
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AdminBackendApiService]
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should request to cancel the job given its id' +
+    'and type when calling cancelJobAsync', fakeAsync(() => {
+    let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
+    let jobType = 'AuditContributorsOneOffJob';
+    let payload = {
+      action: 'cancel_job',
+      job_id: jobId,
+      job_type: jobType
+    };
+    abas.cancelJobAsync(jobId, jobType).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to start computation given the job' +
+    'name when calling startComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'start_computation',
+      computation_type: computationType
+    };
+    abas.startComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to stop computation given the job' +
+    'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    abas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to stop computation given the job' +
+    'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'InvalidComputaionType';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    abas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush('Internal Server Error', {
+      status: 500,
+      statusText: 'Internal Server Error'
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    adminBackendApiService = TestBed.get(AdminBackendApiService);
-    csrfService = TestBed.get(CsrfTokenService);
-    successHandler = jasmine.createSpy('success');
-    failHandler = jasmine.createSpy('fail');
+    flushMicrotasks();
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-      return Promise.resolve('sample-csrf-token');
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to show the output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
+      'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: ['[u\'fully-validated UserSettingsModel\', 1]']};
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to show the sorted output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
+      'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: ['[u\'SUCCESS_KEPT\', 1]',
+      '[u\'SUCCESS_DELETED\', 1]']};
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to show the output of invalid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'Invalid jobId';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=Invalid%20jobId';
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Internal Server Error'
+    }, {
+      status: 500, statusText: 'NoneType object has no attribute output'
     });
-  });
+    flushMicrotasks();
 
-  afterEach(() => {
-    httpTestingController.verify();
-  });
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Internal Server Error');
+  }
+  ));
+
+  // Test cases for Admin Jobs Tab
   it('should get the data of user regarding username',
     fakeAsync(() => {
       let filterCriterion = 'username';
@@ -234,7 +381,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let result = {
         validUser: 'ADMIN'
       };
-      adminBackendApiService.viewUsersRoleAsync(filterCriterion, role, username)
+      abas.viewUsersRoleAsync(filterCriterion, role, username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -259,7 +406,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let result = {
         validUser: 'ADMIN'
       };
-      adminBackendApiService.viewUsersRoleAsync(filterCriterion, role, username)
+      abas.viewUsersRoleAsync(filterCriterion, role, username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -281,7 +428,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let filterCriterion = 'username';
       let role = null;
       let username = 'InvalidUser';
-      adminBackendApiService.viewUsersRoleAsync(filterCriterion, role, username)
+      abas.viewUsersRoleAsync(filterCriterion, role, username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -303,7 +450,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let topicId = null;
       let newRole = 'ADMIN';
       let username = 'validUser';
-      adminBackendApiService.updateUserRoleAsync(newRole, username, topicId)
+      abas.updateUserRoleAsync(newRole, username, topicId)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/adminrolehandler');
@@ -322,7 +469,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let topicId = null;
       let newRole = 'ADMIN';
       let username = 'InvalidUser';
-      adminBackendApiService.updateUserRoleAsync(newRole, username, topicId)
+      abas.updateUserRoleAsync(newRole, username, topicId)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/adminrolehandler');
@@ -342,7 +489,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let category = 'voiceover';
       let languageCode = 'en';
       let username = 'validUser';
-      adminBackendApiService.addContributionReviewerAsync(
+      abas.addContributionReviewerAsync(
         category, username, languageCode
       ).then(successHandler, failHandler);
 
@@ -363,7 +510,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let category = 'voiceover';
       let languageCode = 'en';
       let username = 'InvalidUser';
-      adminBackendApiService.addContributionReviewerAsync(
+      abas.addContributionReviewerAsync(
         category, username, languageCode
       ).then(successHandler, failHandler);
 
@@ -385,7 +532,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let category = 'voiceover';
       let languageCode = 'en';
       let result = ['validUsername'];
-      adminBackendApiService.viewContributionReviewersAsync(
+      abas.viewContributionReviewersAsync(
         category, languageCode
       ).then(successHandler, failHandler);
 
@@ -406,7 +553,7 @@ describe('Admin Backend API service for Roles Tab', () => {
   it('should get the data of ContributionReviewer regarding username',
     fakeAsync(() => {
       let username = 'validUsername';
-      adminBackendApiService.contributionReviewerRightsAsync(username)
+      abas.contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -425,7 +572,7 @@ describe('Admin Backend API service for Roles Tab', () => {
   it('should fail to get the data of ContributionReviewer',
     fakeAsync(() => {
       let username = 'InvalidUsername';
-      adminBackendApiService.contributionReviewerRightsAsync(username)
+      abas.contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -448,7 +595,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let languageCode = null;
       let username = 'validUser';
       let method = 'all';
-      adminBackendApiService.removeContributionReviewerAsync(
+      abas.removeContributionReviewerAsync(
         username, method, category, languageCode
       ).then(successHandler, failHandler);
 
@@ -470,7 +617,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let languageCode = 'en';
       let username = 'validUser';
       let method = 'specific';
-      adminBackendApiService.removeContributionReviewerAsync(
+      abas.removeContributionReviewerAsync(
         username, method, category, languageCode
       ).then(successHandler, failHandler);
 
@@ -492,7 +639,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let languageCode = null;
       let username = 'validUser';
       let method = 'all';
-      adminBackendApiService.removeContributionReviewerAsync(
+      abas.removeContributionReviewerAsync(
         username, method, category, languageCode
       ).then(successHandler, failHandler);
 

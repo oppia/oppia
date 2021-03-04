@@ -76,8 +76,9 @@ export class TranslateService {
    * @returns {Promise<TranslationsDict>} - A promise that resolves to the
    * translations
    */
-  fetchTranslations(languageCode: string): Promise<TranslationsDict> {
-    return this.translationsBackendApiService.fetchTranslations(languageCode);
+  async fetchTranslationAsync(languageCode: string): Promise<TranslationsDict> {
+    return this.translationsBackendApiService.fetchTranslationsAsync(
+      languageCode);
   }
 
   /**
@@ -93,7 +94,7 @@ export class TranslateService {
       return;
     }
     // Otherwise fetch the translations.
-    this.translations[newLanguageCode] = this.fetchTranslations(
+    this.translations[newLanguageCode] = this.fetchTranslationAsync(
       newLanguageCode).then(
       translations => {
         this.translations[newLanguageCode] = translations;

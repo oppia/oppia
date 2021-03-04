@@ -305,8 +305,11 @@ class BaseModel(datastore_services.Model):
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
-    def put_multi(cls, entities):
-        """Stores the given datastore_services.Model instances.
+    @transaction_services.run_in_transaction_wrapper
+    def put_multi_transactional(cls, entities):
+        """Stores the given datastore_services.Model instances and runs it
+        through a transaction. Either all models are stored, or none of them
+        in the case when the transaction fails.
 
         Args:
             entities: list(datastore_services.Model). List of model instances to
@@ -315,17 +318,14 @@ class BaseModel(datastore_services.Model):
         datastore_services.put_multi(entities)
 
     @classmethod
-    def put_multi_async(cls, entities):
-        """Stores the given datastore_services.Model instances asynchronously.
+    def put_multi(cls, entities):
+        """Stores the given datastore_services.Model instances.
 
         Args:
-            entities: list(datastore_services.Model). The list of model
-                instances to be stored.
-
-        Returns:
-            list(future). A list of futures.
+            entities: list(datastore_services.Model). List of model instances to
+                be stored.
         """
-        return datastore_services.put_multi_async(entities)
+        datastore_services.put_multi(entities)
 
     @classmethod
     def delete_multi(cls, entities):
@@ -430,6 +430,69 @@ class BaseModel(datastore_services.Model):
             result[0],
             (result[1].urlsafe() if result[1] else None),
             result[2])
+
+
+class BaseHumanMaintainedModel(BaseModel):
+    """A model that tracks the last time it was updated by a human.
+
+    When the model is updated by a human, use `self.put_for_human()` to store
+    it. For example: after the title of an exploration is changed
+    by its creator.
+
+    Otherwise, when the model is updated by some non-human or automated process,
+    use `self.put_for_bot()`. For example: by a one-off job updating the
+    schema version of a property.
+    """
+
+    # When this entity was last updated on behalf of a human.
+    last_updated_by_human = (
+        datastore_services.DateTimeProperty(indexed=True, required=True))
+
+    def put(self):
+        """Unsupported operation on human-maintained models."""
+        raise NotImplementedError('Use put_for_human or put_for_bot instead')
+
+    def put_for_human(self):
+        """Stores the model instance on behalf of a human."""
+        self.last_updated_by_human = datetime.datetime.utcnow()
+        return super(BaseHumanMaintainedModel, self).put()
+
+    def put_for_bot(self):
+        """Stores the model instance on behalf of a non-human."""
+        return super(BaseHumanMaintainedModel, self).put()
+
+    @classmethod
+    def put_multi(cls, unused_instances):
+        """Unsupported operation on human-maintained models."""
+        raise NotImplementedError(
+            'Use put_multi_for_human or put_multi_for_bot instead')
+
+    @classmethod
+    def put_multi_for_human(cls, instances):
+        """Stores the given model instances on behalf of a human.
+
+        Args:
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        now = datetime.datetime.utcnow()
+        for instance in instances:
+            instance.last_updated_by_human = now
+        return super(BaseHumanMaintainedModel, cls).put_multi(instances)
+
+    @classmethod
+    def put_multi_for_bot(cls, instances):
+        """Stores the given model instances on behalf of a non-human.
+
+        Args:
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        return super(BaseHumanMaintainedModel, cls).put_multi(instances)
 
 
 class BaseCommitLogEntryModel(BaseModel):
@@ -771,7 +834,7 @@ class VersionedModel(BaseModel):
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self]
         self.update_timestamps_multi(entities)
-        transaction_services.run_in_transaction(BaseModel.put_multi, entities)
+        BaseModel.put_multi_transactional(entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -872,8 +935,7 @@ class VersionedModel(BaseModel):
                     0,
                     len(all_models_keys),
                     feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-                transaction_services.run_in_transaction(
-                    datastore_services.delete_multi,
+                datastore_services.delete_multi_transactional(
                     all_models_keys[
                         i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
         else:
@@ -902,8 +964,7 @@ class VersionedModel(BaseModel):
                 snapshot_metadata_models + snapshot_content_models +
                 versioned_models)
             cls.update_timestamps_multi(entities)
-            transaction_services.run_in_transaction(
-                BaseModel.put_multi, entities)
+            BaseModel.put_multi_transactional(entities)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
@@ -1034,10 +1095,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError as e:
+        except cls.EntityNotFoundError:
             if not strict:
                 return None
-            raise e
+            python_utils.reraise_exception()
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):

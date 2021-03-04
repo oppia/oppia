@@ -16,16 +16,14 @@
  * @fileoverview Unit tests for the topics and skills dashboard controller.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { SkillSummary, SkillSummaryBackendDict } from
+  'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardFilter } from
-  // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-import { TopicSummary, TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
-
+import { TopicSummary, TopicSummaryBackendDict } from
+  'domain/topic/topic-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require(
@@ -35,12 +33,7 @@ require(
 describe('Topics and Skills Dashboard Page', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   var $scope = null, ctrl = null;
   var $uibModal = null;
@@ -91,7 +84,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             topicSummaries: sampleDataResults.topic_summary_dicts.map(
@@ -109,7 +102,7 @@ describe('Topics and Skills Dashboard Page', function() {
           });
           return deferred.promise;
         },
-        fetchSkillsDashboardData: () => {
+        fetchSkillsDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             skillSummaries: sampleDataResults.skill_summary_dicts
@@ -377,7 +370,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             topicSummaries: sampleDataResults2.topic_summary_dicts,
@@ -390,7 +383,7 @@ describe('Topics and Skills Dashboard Page', function() {
           });
           return deferred.promise;
         },
-        fetchSkillsDashboardData: () => {
+        fetchSkillsDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             skillSummaries: [
@@ -510,7 +503,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           var errorResponse = {
             status: 500
@@ -560,7 +553,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           var errorResponse = {
             status: 402

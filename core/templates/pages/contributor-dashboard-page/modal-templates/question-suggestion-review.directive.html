@@ -3,6 +3,9 @@
     <h3><[questionHeader]></h3>
     <h4 class="author-header">Submitted by <[authorName]></h4>
   </div>
+  <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>
 
 <div class="modal-body">
@@ -11,7 +14,9 @@
       <div>
         <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
         <div ng-if="skillRubricExplanations.length > 0">
-          <strong>Difficulty Explanations</strong>
+          <strong title="Use these notes to make sure your question is at the right difficulty.">
+            Notes from Skill Rubric
+          </strong>
           <ul>
             <li ng-repeat="explanation in skillRubricExplanations">
               <span ng-bind-html="explanation"></span>

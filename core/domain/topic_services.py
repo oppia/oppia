@@ -303,6 +303,7 @@ def apply_change_list(topic_id, change_list):
             topic_id, existing_subtopic_page_ids_to_be_modified))
     for subtopic_page in modified_subtopic_pages_list:
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
+
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
@@ -451,7 +452,7 @@ def apply_change_list(topic_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, topic_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_topic(committer_id, topic, commit_message, change_list):

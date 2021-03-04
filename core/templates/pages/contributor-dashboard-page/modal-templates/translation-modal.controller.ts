@@ -56,7 +56,10 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        hide_complex_extensions: 'true'
+        hide_complex_extensions: 'true',
+        language: TranslationLanguageService.getActiveLanguageCode(),
+        languageDirection: (
+          TranslationLanguageService.getActiveLanguageDirection())
       }
     };
     $scope.subheading = opportunity.subheading;
@@ -118,6 +121,8 @@ angular.module('oppia').controller('TranslationModalController', [
             }
             $scope.activeWrittenTranslation.html = '';
             $scope.uploadingTranslation = false;
+          }, () => {
+            $uibModalInstance.close();
           });
       }
       if (!$scope.moreAvailable) {

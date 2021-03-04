@@ -108,8 +108,10 @@ class CompletedActivitiesModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 item.exploration_ids),
@@ -153,8 +155,10 @@ class IncompleteActivitiesModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 item.exploration_ids),
@@ -202,9 +206,10 @@ class ExpUserLastPlaythroughModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 [item.exploration_id])]
@@ -339,8 +344,10 @@ class LearnerPlaylistModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 item.exploration_ids),
@@ -400,8 +407,10 @@ class UserContributionsModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'created_exploration_ids', exp_models.ExplorationModel,
                 item.created_exploration_ids),
@@ -417,8 +426,10 @@ class UserEmailPreferencesModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
 
 class UserSubscriptionsModelValidator(
@@ -429,7 +440,9 @@ class UserSubscriptionsModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'activity_ids', exp_models.ExplorationModel, item.activity_ids),
+                'exploration_ids',
+                exp_models.ExplorationModel,
+                item.exploration_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 item.collection_ids),
@@ -437,13 +450,17 @@ class UserSubscriptionsModelValidator(
                 'general_feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel,
                 item.general_feedback_thread_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'creator_ids', user_models.UserSettingsModel, item.creator_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'creator_ids', item.creator_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'subscriber_ids', user_models.UserSubscribersModel,
                 item.creator_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'id', user_models.UserSettingsModel, [item.id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'id', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_last_checked(cls, item):
@@ -521,11 +538,14 @@ class UserSubscribersModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'subscriber_ids', user_models.UserSettingsModel,
-                item.subscriber_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'subscriber_ids', item.subscriber_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'subscription_ids', user_models.UserSubscriptionsModel,
                 item.subscriber_ids)]
@@ -605,8 +625,10 @@ class UserRecentChangesBatchModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_job_queued_msec(cls, item):
@@ -636,8 +658,10 @@ class UserStatsModelValidator(base_model_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_schema_version(cls, item):
@@ -703,9 +727,10 @@ class ExplorationUserDataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 [item.exploration_id])]
@@ -862,9 +887,10 @@ class CollectionProgressModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 [item.collection_id]),
@@ -977,9 +1003,10 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel, [item.story_id])]
 
@@ -1144,9 +1171,11 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, (
-                    item.user_ids + [item.submitter_id])),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', (
+                    item.user_ids + [item.submitter_id]),
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'sent_email_model_ids', email_models.BulkEmailModel,
                 [item.sent_email_model_id])]
@@ -1280,8 +1309,10 @@ class UserBulkEmailsModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'sent_email_model_ids', email_models.BulkEmailModel,
                 item.sent_email_model_ids)]
@@ -1344,9 +1375,10 @@ class UserSkillMasteryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, [item.skill_id])]
 
@@ -1380,9 +1412,10 @@ class UserContributionProficiencyModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_score(cls, item):
@@ -1412,14 +1445,16 @@ class UserContributionRightsModelValidator(
         return user_domain.UserContributionRights(
             item.id, item.can_review_translation_for_language_codes,
             item.can_review_voiceover_for_language_codes,
-            item.can_review_questions)
+            item.can_review_questions,
+            item.can_submit_questions)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
 
 class PendingDeletionRequestModelValidator(
@@ -1552,53 +1587,3 @@ class DeletedUsernameModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return []
-
-
-class UserAuthDetailsModelValidator(
-        base_model_validators.BaseUserModelValidator):
-    """Class for validating UserAuthDetailsModels."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_identifiers_ids',
-                user_models.UserIdentifiersModel,
-                [item.gae_id]
-            )
-        ]
-
-
-class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating UserIdentifiersModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        """Returns a regex for model id.
-
-        This method can be overridden by subclasses, if needed.
-
-        Args:
-            unused_item: datastore_services.Model. Entity to validate.
-
-        Returns:
-            str. A regex pattern to be followed by the model id.
-        """
-        return '^[0-9-]{1,24}$'
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids',
-                user_models.UserSettingsModel,
-                [item.user_id]
-            ),
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_auth_details_ids',
-                user_models.UserAuthDetailsModel,
-                [item.user_id]
-            )
-        ]

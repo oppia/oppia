@@ -173,9 +173,6 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when explorations
-        # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, exp_rights.status, exp_rights.community_owned
@@ -223,7 +220,7 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models.append(exploration_commit_log)
             ExplorationCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
 
 
 class ExplorationContextModel(base_models.BaseModel):
@@ -520,9 +517,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when explorations
-            # are changed).
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -535,7 +529,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))

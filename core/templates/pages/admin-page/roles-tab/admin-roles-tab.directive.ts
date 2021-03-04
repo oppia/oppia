@@ -30,17 +30,35 @@ angular.module('oppia').directive('adminRolesTab', [
   '$rootScope', 'AdminBackendApiService',
   'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService',
+<<<<<<< HEAD
   'ACTION_REMOVE_ALL_REVIEW_RIGHTS', 'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
   'REVIEW_CATEGORY_QUESTION',
   'REVIEW_CATEGORY_TRANSLATION', 'REVIEW_CATEGORY_VOICEOVER',
+=======
+  'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
+  'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
+  'ADMIN_ROLE_HANDLER_URL', 'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
+  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
+  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
+  'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
+>>>>>>> upstream/develop
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
       $rootScope, AdminBackendApiService,
       AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService,
+<<<<<<< HEAD
       ACTION_REMOVE_ALL_REVIEW_RIGHTS, ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS,
       REVIEW_CATEGORY_QUESTION,
       REVIEW_CATEGORY_TRANSLATION, REVIEW_CATEGORY_VOICEOVER,
+=======
+      ACTION_REMOVE_ALL_REVIEW_RIGHTS,
+      ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
+      ADMIN_ROLE_HANDLER_URL, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+      CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+>>>>>>> upstream/develop
       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
@@ -71,8 +89,8 @@ angular.module('oppia').directive('adminRolesTab', [
 
         ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
           return (
-            reviewCategory === REVIEW_CATEGORY_TRANSLATION ||
-            reviewCategory === REVIEW_CATEGORY_VOICEOVER);
+            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
+            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
         };
 
         ctrl.submitRoleViewForm = function(formResponse) {
@@ -119,16 +137,24 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitAddContributionReviewerForm = function(formResponse) {
+        ctrl.submitAddContributionRightsForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
+<<<<<<< HEAD
           AdminBackendApiService.addContributionReviewerAsync(
             formResponse.category, formResponse.username,
             formResponse.languageCode
           ).then(function(response) {
+=======
+          $http.post('/addcontributionrightshandler', {
+            category: formResponse.category,
+            username: formResponse.username,
+            language_code: formResponse.languageCode
+          }).then(function(response) {
+>>>>>>> upstream/develop
             ctrl.setStatusMessage(
               'Successfully added "' + formResponse.username + '" as ' +
               formResponse.category + ' reviewer.');
@@ -137,26 +163,47 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitViewContributionReviewersForm = function(formResponse) {
+        ctrl.submitViewContributorUsersForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
+<<<<<<< HEAD
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then(function(response) {
               ctrl.result.usernames = response.usernames;
+=======
+            $http.get(
+              '/getcontributorusershandler', {
+                params: {
+                  category: formResponse.category,
+                  language_code: formResponse.languageCode
+                }
+              }).then(function(response) {
+              ctrl.result.usernames = response.data.usernames;
+>>>>>>> upstream/develop
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
+              refreshFormData();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
             var voiceoverLanguages = [];
+<<<<<<< HEAD
             AdminBackendApiService.contributionReviewerRightsAsync(
               formResponse.username
             ).then(function(response) {
+=======
+            $http.get(
+              '/contributionrightsdatahandler', {
+                params: {
+                  username: formResponse.username
+                }
+              }).then(function(response) {
+>>>>>>> upstream/develop
               translationLanguages = getLanguageDescriptions(
                 response.can_review_translation_for_language_codes);
               voiceoverLanguages = getLanguageDescriptions(
@@ -164,7 +211,12 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
+<<<<<<< HEAD
                 questions: response.can_review_questions
+=======
+                questions: response.data.can_review_questions,
+                can_submit_questions: response.data.can_submit_questions
+>>>>>>> upstream/develop
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
@@ -173,16 +225,26 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitRemoveContributionReviewerForm = function(formResponse) {
+        ctrl.submitRemoveContributionRightsForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
+<<<<<<< HEAD
           AdminBackendApiService.removeContributionReviewerAsync(
             formResponse.username, formResponse.method,
             formResponse.category, formResponse.languageCode
           ).then(function(response) {
+=======
+          $http.put(
+            '/removecontributionrightshandler', {
+              username: formResponse.username,
+              removal_type: formResponse.method,
+              category: formResponse.category,
+              language_code: formResponse.languageCode
+            }).then(function(response) {
+>>>>>>> upstream/develop
             ctrl.setStatusMessage('Success.');
             refreshFormData();
           }, handleErrorResponse);
@@ -284,16 +346,17 @@ angular.module('oppia').directive('adminRolesTab', [
         ctrl.$onInit = function() {
           ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
             ACTION_REMOVE_ALL_REVIEW_RIGHTS);
-          ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS = (
-            ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS);
+          ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
+            ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
           ctrl.USER_FILTER_CRITERION_ROLE = USER_FILTER_CRITERION_ROLE;
           ctrl.UPDATABLE_ROLES = {};
           ctrl.VIEWABLE_ROLES = {};
-          ctrl.REVIEW_CATEGORIES = {
-            TRANSLATION: REVIEW_CATEGORY_TRANSLATION,
-            VOICEOVER: REVIEW_CATEGORY_VOICEOVER,
-            QUESTION: REVIEW_CATEGORY_QUESTION
+          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+            REVIEW_TRANSLATION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            REVIEW_VOICEOVER: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+            REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+            SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
           };
           refreshFormData();
           ctrl.resultRolesVisible = false;

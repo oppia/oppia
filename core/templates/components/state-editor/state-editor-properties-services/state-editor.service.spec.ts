@@ -110,8 +110,8 @@ describe('Editor state service', () => {
     const customizationArgsForItemSelectionAndDragAndDropInput = {
       choices: {
         value: [
-          new SubtitledHtml('Choice 1', ''),
-          new SubtitledHtml('Choice 2', '')
+          new SubtitledHtml('Choice 1', 'ca_choices_0'),
+          new SubtitledHtml('Choice 2', 'ca_choices_1')
         ]
       }
     };
@@ -120,10 +120,10 @@ describe('Editor state service', () => {
         'ItemSelectionInput',
         customizationArgsForItemSelectionAndDragAndDropInput)
     ).toEqual([{
-      val: 'Choice 1',
+      val: 'ca_choices_0',
       label: 'Choice 1',
     }, {
-      val: 'Choice 2',
+      val: 'ca_choices_1',
       label: 'Choice 2',
     }]);
     expect(
@@ -131,10 +131,10 @@ describe('Editor state service', () => {
         'DragAndDropSortInput',
         customizationArgsForItemSelectionAndDragAndDropInput)
     ).toEqual([{
-      val: 'Choice 1',
+      val: 'ca_choices_0',
       label: 'Choice 1',
     }, {
-      val: 'Choice 2',
+      val: 'ca_choices_1',
       label: 'Choice 2',
     }]);
   });

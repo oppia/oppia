@@ -74,6 +74,11 @@ from webapp2_extras import routes
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
+# Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
+# Without this, a lot of unnecessary debug logs are printed in error logs,
+# which makes it tiresome to identify the actual error.
+logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
+
 
 class FrontendErrorHandler(base.BaseHandler):
     """Handles errors arising from the frontend."""
@@ -222,17 +227,17 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionreviewerhandler',
-        admin.AddContributionReviewerHandler),
+        r'/addcontributionrightshandler',
+        admin.AddContributionRightsHandler),
     get_redirect_route(
-        r'/removecontributionreviewerhandler',
-        admin.RemoveContributionReviewerHandler),
+        r'/removecontributionrightshandler',
+        admin.RemoveContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributionreviewershandler',
-        admin.ContributionReviewersListHandler),
+        r'/getcontributorusershandler',
+        admin.ContributorUsersListHandler),
     get_redirect_route(
-        r'/contributionreviewerrightsdatahandler',
-        admin.ContributionReviewerRightsDataHandler),
+        r'/contributionrightsdatahandler',
+        admin.ContributionRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
@@ -323,6 +328,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
+        skill_editor.SkillDescriptionHandler),
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
@@ -791,6 +799,7 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.NumberOfDeletionRequestsHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+    get_redirect_route(r'/session_begin', base.SessionBeginHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (
