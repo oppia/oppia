@@ -105,7 +105,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchQuestionSummaries(
+  private _fetchQuestionSummariesAsync(
       skillId: string, cursor: string,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
@@ -201,7 +201,7 @@ export class QuestionBackendApiService {
       skillId: string,
       cursor: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestionSummaries(skillId, cursor, resolve, reject);
+      this._fetchQuestionSummariesAsync(skillId, cursor, resolve, reject);
     });
   }
 }
