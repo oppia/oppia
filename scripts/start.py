@@ -27,6 +27,8 @@ import re
 import subprocess
 import time
 
+from constants import constants
+
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
@@ -160,8 +162,9 @@ def main(args=None):
     with contextlib2.ExitStack() as stack:
         python_utils.PRINT('Starting ElasticSearch development server.')
         stack.enter_context(common.managed_elasticsearch_dev_server())
-        python_utils.PRINT('Starting Firebase emulators')
-        stack.enter_context(common.managed_firebase_auth_emulator())
+        if constants.EMULATOR_MODE:
+            python_utils.PRINT('Starting Firebase emulators')
+            stack.enter_context(common.managed_firebase_auth_emulator())
         python_utils.PRINT('Starting GAE development server')
         stack.enter_context(managed_dev_appserver)
 
