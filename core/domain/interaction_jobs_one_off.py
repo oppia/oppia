@@ -133,7 +133,7 @@ class MultipleChoiceInteractionLimitOneOffJob(jobs.BaseMapReduceOneOffJobManager
                 for choice in state.interaction.customization_args[
                         'choices'].value:
                     choice_length=len(choice.html);
-                    if(choice_length > 30)   
+                    if(choice_length > 30):  
                         yield (
                             item.id,30)
 
@@ -201,7 +201,7 @@ class ItemSelectionLimitInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager)
                 for choice in state.interaction.customization_args[
                         'choices'].value:
                     choice_length=len(choice.html);
-                    if(choice_length > 30)   
+                    if(choice_length > 30):   
                         yield (
                             item.id,30)
 
