@@ -1066,3 +1066,26 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
         })
+
+
+class GetModelsRelatedToUserHandler(base.BaseHandler):
+    """Handler for getting all the models related to a user with specific ID."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        user_id = self.payload.get('user_id')
+        related_models_exist = wipeout_service.verify_user_deleted(
+            user_id, include_delete_at_end_models=True)
+        self.render_json({'related_models_exist': related_models_exist})
+
+
+class DeleteUserHandler(base.BaseHandler):
+    """Handler for deleting a user with specific ID."""
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        user_id = self.payload.get('user_id')
+        wipeout_service.pre_delete_user(user_id)
+        self.render_json({'success': True})
