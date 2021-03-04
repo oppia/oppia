@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive for creating a new collection node.
  */
-
+require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
 require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -27,8 +27,6 @@ require(
 require('services/alerts.service.ts');
 require('services/site-analytics.service.ts');
 require('services/validators.service.ts');
-// eslint-disable-next-line max-len
-require('pages/collection-editor-page/services/collection-node-creator-backend-api.service.ts');
 
 angular.module('oppia').directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -43,14 +41,14 @@ angular.module('oppia').directive('collectionNodeCreator', [
       controller: [
         '$filter', '$rootScope', 'AlertsService',
         'CollectionEditorStateService', 'CollectionLinearizerService',
-        'CollectionNodeCreatorBackendApiService',
+        'ExplorationCreationService',
         'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         'ValidatorsService', 'INVALID_NAME_CHARS',
         function(
             $filter, $rootScope, AlertsService,
             CollectionEditorStateService, CollectionLinearizerService,
-            CollectionNodeCreatorBackendApiService,
+            ExplorationCreationService,
             ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             ValidatorsService, INVALID_NAME_CHARS) {
@@ -152,9 +150,9 @@ angular.module('oppia').directive('collectionNodeCreator', [
             }
 
             // Create a new exploration with the given title.
-            CollectionNodeCreatorBackendApiService.createNewExploration(
-              title
-            ).then(function(response) {
+            ExplorationCreationService.createNewExploration({
+              title: title
+            }).then(function(response) {
               ctrl.newExplorationTitle = '';
               var newExplorationId = response.data.exploration_id;
 
