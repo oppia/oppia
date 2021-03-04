@@ -593,8 +593,8 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
             interaction_jobs_one_off
             .MultipleChoiceInteractionLimitOneOffJob.
             create_new())
-        interaction_jobs_one_off.
-        MultipleChoiceInteractionLimitOneOffJob.enqueue(job_id)
+        interaction_jobs_one_off
+        .MultipleChoiceInteractionLimitOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
