@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from constants import constants
 from core import jobs_registry
 from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
@@ -338,6 +339,26 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
                     'Entity id mock-12345: '
                     'The user id invalid_user_id in the field \'user_id\' is '
                     'invalid'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_error_raised_when_commit_message_large(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=feconf.MIGRATION_BOT_USER_ID,
+            commit_cmds=[],
+            commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'commit message check': [
+                    'Entity id mock-12345: '
+                    'Commit message larger than accepted length'
                 ]
             },
             mock_validator.errors

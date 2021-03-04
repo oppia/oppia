@@ -136,7 +136,6 @@ angular.module('oppia').config([
       'PlaythroughIssuesBackendApiService',
       'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
       'ProfilePageBackendApiService', 'QuestionBackendApiService',
-      'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
       'RatingComputationService',
       'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
       'RubricObjectFactory', 'SchemaDefaultValueService',

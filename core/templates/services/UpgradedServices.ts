@@ -344,12 +344,11 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
-import { QuestionSummaryForOneSkillObjectFactory }
-  from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
-import { QuestionSummaryObjectFactory } from
-  'domain/question/QuestionSummaryObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { RatioExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
@@ -644,10 +643,10 @@ export class UpgradedServices {
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
-    upgradedServices['QuestionSummaryObjectFactory'] =
-      new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
+    upgradedServices['RatioExpressionInputRulesService'] =
+      new RatioExpressionInputRulesService();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
@@ -816,9 +815,6 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
-    upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =
-      new QuestionSummaryForOneSkillObjectFactory(
-        upgradedServices['QuestionSummaryObjectFactory']);
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['baseInteractionValidationService']);
@@ -988,7 +984,8 @@ export class UpgradedServices {
 
     // Topological level: 3.
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
-      upgradedServices['HttpClient']);
+      upgradedServices['HttpClient'],
+      upgradedServices['UrlInterpolationService']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['AssetsBackendApiService'] =

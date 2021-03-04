@@ -32,6 +32,8 @@ PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
     ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
+    ('certifi', '2020.12.5', os.path.join(
+        TOOLS_DIR, 'certifi-2020.12.5')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:

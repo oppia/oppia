@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,101 +16,102 @@
  * @fileoverview Unit tests for the UserEmailPreferencesService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { UserEmailPreferencesService } from './user-email-preferences.service';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { ExplorationDataService } from './exploration-data.service';
 
-require(
-  'pages/exploration-editor-page/services/user-email-preferences.service.ts');
-
-describe('User Email Preferences Service', function() {
-  var UserEmailPreferencesService = null;
-  var httpBackend = null;
-  var CsrfService = null;
-  var expId = '12345';
-  var sampleResponse = {
+describe('User Email Preferences Service', () => {
+  let expId = '12345';
+  let sampleResponse = {
     email_preferences: {
       mute_feedback_notifications: false,
       mute_suggestion_notifications: false
     }
   };
+  class MockExplorationDataService {
+    explorationId: string = expId;
+  }
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
+  let userEmailPreferencesService :
+  UserEmailPreferencesService;
+  let httpTestingController: HttpTestingController;
+  let csrfTokenService: CsrfTokenService;
 
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: ExplorationDataService,
+        useClass: MockExplorationDataService }]
     });
+    userEmailPreferencesService = TestBed.inject(UserEmailPreferencesService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
 
-    angular.mock.inject(function($injector, $q) {
-      UserEmailPreferencesService = $injector
-        .get('UserEmailPreferencesService');
-      CsrfService = $injector.get('CsrfTokenService');
-      httpBackend = $injector.get('$httpBackend');
-
-      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve('sample-csrf-token');
-        return deferred.promise;
+    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
       });
     });
   });
 
-  afterEach(function() {
-    httpBackend.verifyNoOutstandingExpectation();
-    httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
-  it('should successfully intialise the service', function() {
-    expect(UserEmailPreferencesService.feedbackNotificationsMuted)
+  it('should successfully intialise the service', () => {
+    expect(userEmailPreferencesService.feedbackNotificationsMuted)
       .toBeUndefined();
-    expect(UserEmailPreferencesService.suggestionNotificationsMuted)
+    expect(userEmailPreferencesService.suggestionNotificationsMuted)
       .toBeUndefined();
 
-    UserEmailPreferencesService.init(true, true);
+    userEmailPreferencesService.init(true, true);
 
-    expect(UserEmailPreferencesService.feedbackNotificationsMuted).toBe(true);
-    expect(UserEmailPreferencesService.suggestionNotificationsMuted).toBe(true);
+    expect(userEmailPreferencesService.feedbackNotificationsMuted).toBe(true);
+    expect(userEmailPreferencesService.suggestionNotificationsMuted).toBe(true);
   });
 
   it('should successfully return the feedbackNotificationsMuted value',
-    function() {
-      UserEmailPreferencesService.init(true, true);
-      expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+    () => {
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully return the suggestionNotificationsMuted value',
-    function() {
-      UserEmailPreferencesService.init(true, true);
-      expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+    () => {
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
         .toBe(true);
     });
 
   it('should successfully set the feedback notification preferences',
-    function() {
-      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-        .respond(200, sampleResponse);
-      UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
-      httpBackend.flush();
-      expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+    fakeAsync(() => {
+      userEmailPreferencesService
+        .setFeedbackNotificationPreferences(false, () => {});
+      let req = httpTestingController.expectOne(
+        '/createhandler/notificationpreferences/' + expId);
+      expect(req.request.method).toEqual('PUT');
+      req.flush(sampleResponse);
+      flushMicrotasks();
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
         .toBe(false);
-    });
+    }));
 
   it('should successfully set the suggestion notification preferences',
-    function() {
-      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-        .respond(200, sampleResponse);
-      UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
-      httpBackend.flush();
-      expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+    fakeAsync(() => {
+      userEmailPreferencesService
+        .setSuggestionNotificationPreferences(false, () => {});
+
+      let req = httpTestingController.expectOne(
+        '/createhandler/notificationpreferences/' + expId
+      );
+      expect(req.request.method).toEqual('PUT');
+      req.flush(sampleResponse);
+      flushMicrotasks();
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
         .toBe(false);
-    });
+    }));
 });
