@@ -77,13 +77,15 @@ export class ExplorationHtmlFormatterService {
     element.attr(
       'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
     let val = element.get(0).outerHTML;
-    if (this.migratedInteractions.indexOf('GraphInput') >= 0) {
+    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
       val = val.replace(
-        'last-answer="null"></oppia-interactive-graph-input>',
-        '[last-answer]="null"></oppia-interactive-graph-input>');
+        'last-answer="null"></oppia-interactive-' + htmlInteractionId + '>',
+        '[last-answer]="null"></oppia-interactive-' + htmlInteractionId + '>');
       val = val.replace(
-        'last-answer="lastAnswer"></oppia-interactive-graph-input>',
-        '[last-answer]="lastAnswer"></oppia-interactive-graph-input>');
+        'last-answer="lastAnswer"></oppia-interactive-' +
+        htmlInteractionId + '>',
+        '[last-answer]="lastAnswer"></oppia-interactive-' +
+        htmlInteractionId + '>');
     }
     return val;
   }

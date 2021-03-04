@@ -598,7 +598,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       }
       return edge;
     });
-    this.graph.edges.filter(edge => edge !== null);
+    this.graph.edges = this.graph.edges.filter(edge => edge !== null);
     this.graph.vertices.splice(index, 1);
     this.state.hoveredVertex = null;
   }
