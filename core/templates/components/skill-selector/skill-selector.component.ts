@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the select skill viewer.
+ * @fileoverview Controller for the skill-selector component.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
@@ -25,6 +26,10 @@ import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/f
 import { ShortSkillSummary } from 'core/templates/domain/skill/ShortSkillSummaryObjectFactory';
 
 require('domain/utilities/url-interpolation.service.ts');
+
+interface SubTopicFilterDict {
+  [topicName: string] : { subTopicName: string; checked: boolean }[]
+}
 
 @Component({
   selector: 'skill-selector',
@@ -42,12 +47,11 @@ export class SkillSelectorComponent implements OnInit {
   @Input() allowSkillsFromOtherTopics: boolean;
   @Output() selectedSkillIdChanged: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills: CategorizedSkills = null;
-  selectedSkill = null;
-  skillFilterText = '';
-  topicFilterList = [];
-  subTopicFilterDict: { [topicName: string]:
-     { subTopicName: string; checked: boolean }[] } = {};
-  intialSubTopicFilterDict = {};
+  selectedSkill: string = null;
+  skillFilterText: string = '';
+  topicFilterList: { topicName: string ; checked: boolean }[] = [];
+  subTopicFilterDict: SubTopicFilterDict = {};
+  intialSubTopicFilterDict: SubTopicFilterDict = {};
 
   private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe = (
     new FilterForMatchingSubstringPipe()
@@ -58,25 +62,25 @@ export class SkillSelectorComponent implements OnInit {
   ngOnInit(): void {
     this.currCategorizedSkills = this.categorizedSkills;
     for (let topicName in this.currCategorizedSkills) {
-      var topicNameDict = {
+      let topicNameDict = {
         topicName: topicName,
         checked: false
       };
       this.topicFilterList.push(topicNameDict);
-      var subTopics = this.currCategorizedSkills[topicName];
+      let subTopics = this.currCategorizedSkills[topicName];
       this.subTopicFilterDict[topicName] = [];
       for (let subTopic in subTopics) {
-        var subTopicNameDict = {
+        let subTopicNameDict = {
           subTopicName: subTopic,
           checked: false
         };
         this.subTopicFilterDict[topicName].push(subTopicNameDict);
       }
     }
-    this.intialSubTopicFilterDict = angular.copy(this.subTopicFilterDict);
+    this.intialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
   }
 
-  checkIfEmpty(skills: string[]): boolean {
+  checkIfEmpty(skills: any[]): boolean {
     return skills.length === 0;
   }
 
@@ -96,17 +100,17 @@ export class SkillSelectorComponent implements OnInit {
   // The folowing function is called when the subtopic filter changes.
   // This updates the list of Skills displayed in the selector.
   updateSkillsListOnSubtopicFilterChange(): void {
-    var updatedSkillsDict = {};
-    var isAnySubTopicChecked = false;
+    let updatedSkillsDict: CategorizedSkills = {};
+    let isAnySubTopicChecked: boolean = false;
     for (let topicName in this.subTopicFilterDict) {
       var subTopics = this.subTopicFilterDict[topicName];
       for (var i = 0; i < subTopics.length; i++) {
         if (subTopics[i].checked) {
           if (!updatedSkillsDict.hasOwnProperty(topicName)) {
-            updatedSkillsDict[topicName] = {};
+            updatedSkillsDict[topicName] = { uncategorized: [] };
           }
-          var tempCategorizedSkills = this.categorizedSkills;
-          var subTopicName = subTopics[i].subTopicName;
+          let tempCategorizedSkills: CategorizedSkills = this.categorizedSkills;
+          let subTopicName: string = subTopics[i].subTopicName;
           updatedSkillsDict[topicName][subTopicName] =
             tempCategorizedSkills[topicName][subTopicName];
           isAnySubTopicChecked = true;
@@ -116,24 +120,24 @@ export class SkillSelectorComponent implements OnInit {
     if (!isAnySubTopicChecked) {
       // If no subtopics are checked in the subtop filter, we have
       // to display all the skills from checked topics.
-      var isAnyTopicChecked = false;
+      let isAnyTopicChecked: boolean = false;
       for (var i = 0; i < this.topicFilterList.length; i++) {
         if (this.topicFilterList[i].checked) {
-          var tempCategorizedSkills = this.categorizedSkills;
-          var topicName: string = this.topicFilterList[i].topicName;
+          let tempCategorizedSkills: CategorizedSkills = this.categorizedSkills;
+          let topicName: string = this.topicFilterList[i].topicName;
           updatedSkillsDict[topicName] = tempCategorizedSkills[topicName];
           isAnyTopicChecked = true;
         }
       }
       if (isAnyTopicChecked) {
-        this.currCategorizedSkills = angular.copy(updatedSkillsDict);
+        this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
       } else {
         // If no filter is applied on both subtopics and topics, we
         // need to display all the skills (the original list).
-        this.currCategorizedSkills = angular.copy(this.categorizedSkills);
+        this.currCategorizedSkills = cloneDeep(this.categorizedSkills);
       }
     } else {
-      this.currCategorizedSkills = angular.copy(updatedSkillsDict);
+      this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
     }
   }
 
@@ -141,28 +145,28 @@ export class SkillSelectorComponent implements OnInit {
   // First, the subtopic filter is updated according to the changed
   // topic filter list. Then the main Skills list is updated.
   updateSkillsListOnTopicFilterChange(): void {
-    var updatedSubTopicFilterList = {};
-    var isAnyTopicChecked = false;
+    let updatedSubTopicFilterList: SubTopicFilterDict = {};
+    let isAnyTopicChecked: boolean = false;
     for (var i = 0; i < this.topicFilterList.length; i++) {
       if (this.topicFilterList[i].checked) {
-        var topicName = this.topicFilterList[i].topicName;
+        let topicName = this.topicFilterList[i].topicName;
         updatedSubTopicFilterList[topicName] = (
-          angular.copy(this.intialSubTopicFilterDict[topicName]));
+          cloneDeep(this.intialSubTopicFilterDict[topicName]));
         isAnyTopicChecked = true;
       }
     }
     if (!isAnyTopicChecked) {
       // If there are no topics checked on topic filter, we have to
       // display subtopics from all the topics in the subtopic filter.
-      for (var topic in this.intialSubTopicFilterDict) {
+      for (let topic in this.intialSubTopicFilterDict) {
         if (!this.subTopicFilterDict.hasOwnProperty(topic)) {
           this.subTopicFilterDict[topic] = (
-            angular.copy(this.intialSubTopicFilterDict[topic]));
+            cloneDeep(this.intialSubTopicFilterDict[topic]));
         }
       }
     } else {
       this.subTopicFilterDict =
-         angular.copy(updatedSubTopicFilterList);
+         cloneDeep(updatedSubTopicFilterList);
     }
     // After we update the subtopic filter list, we need to update
     // the main skills list.
@@ -193,12 +197,12 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   clearAllFilters(): void {
-    for (var i = 0; i < this.topicFilterList.length; i++) {
+    for (let i = 0; i < this.topicFilterList.length; i++) {
       this.topicFilterList[i].checked = false;
     }
     for (let topicName in this.subTopicFilterDict) {
-      var length = this.subTopicFilterDict[topicName].length;
-      for (var j = 0; j < length; j++) {
+      let length: number = this.subTopicFilterDict[topicName].length;
+      for (let j = 0; j < length; j++) {
         this.subTopicFilterDict[topicName][j].checked = false;
       }
     }
