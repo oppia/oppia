@@ -70,7 +70,7 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
             ctrl.collectionId = UrlService.getCollectionIdFromExplorationUrl();
             if (ctrl.collectionId) {
               ReadOnlyCollectionBackendApiService
-                .loadCollection(ctrl.collectionId)
+                .loadCollectionAsync(ctrl.collectionId)
                 .then(function(collection) {
                   ctrl.getCollectionTitle = function() {
                     return collection.getTitle();

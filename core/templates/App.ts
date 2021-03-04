@@ -23,6 +23,7 @@
  * It won't be required in Angular 9.
  * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
+import 'firebase/auth';
 import 'hammerjs';
 require('app.constants.ajs.ts');
 
@@ -135,7 +136,6 @@ angular.module('oppia').config([
       'PlaythroughIssuesBackendApiService',
       'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
       'ProfilePageBackendApiService', 'QuestionBackendApiService',
-      'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
       'RatingComputationService',
       'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
       'RubricObjectFactory', 'SchemaDefaultValueService',

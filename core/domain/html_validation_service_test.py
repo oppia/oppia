@@ -29,6 +29,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+import contextlib2
+
 
 class ContentMigrationTests(test_utils.GenericTestBase):
     """Tests the function associated with the migration of html
@@ -1368,17 +1370,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
     def test_add_dimensions_to_image_tags_with_invalid_filepath_with_value(
             self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception, 'No JSON object could be decoded')
-
         html_content = (
             '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
             '</oppia-noninteractive-image>Hello this is test case to check that'
@@ -1389,21 +1380,29 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit('image/abc1.png', raw_image, mimetype='image/png')
 
-        with assert_raises_context_manager, logging_swap:
+        with contextlib2.ExitStack() as stack:
+            captured_logs = stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            stack.enter_context(
+                self.assertRaisesRegexp(
+                    Exception, 'No JSON object could be decoded')
+            )
             html_validation_service.add_dimensions_to_image_tags(
                 exp_id, html_content)
 
-        self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
-            observed_log_messages[0],
-            'Exploration exp_id failed to load image: abc1.png')
+        self.assertEqual(len(captured_logs), 1)
+        self.assertIn(
+            'Exploration exp_id failed to load image: abc1.png',
+            captured_logs[0]
+        )
 
     def test_add_dimensions_to_image_tags_when_no_filepath_specified(self):
         test_cases = [{
@@ -1650,12 +1649,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
         with self.assertRaisesRegexp(
-            Exception, 'Invalid math tag with no proper attribute found'):
+            Exception, 'Invalid math tag with no proper attribute found'
+        ):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[0]['html_content'])
 
         with self.assertRaisesRegexp(
-            Exception, 'Invalid raw_latex string found in the math tag'):
+            Exception, 'No JSON object could be decoded'
+        ):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[1]['html_content'])
 

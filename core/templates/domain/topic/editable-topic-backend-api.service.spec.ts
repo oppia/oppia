@@ -94,7 +94,8 @@ describe('Editable topic backend API service', () => {
           },
         },
         language_code: 'en'
-      }
+      },
+      skill_creation_is_allowed: true
     };
   });
 
@@ -122,7 +123,8 @@ describe('Editable topic backend API service', () => {
         groupedSkillSummaries: sampleDataResults.grouped_skill_summary_dicts,
         skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict,
         skillQuestionCountDict: sampleDataResults.skill_question_count_dict,
-        classroomUrlFragment: sampleDataResults.classroom_url_fragment
+        classroomUrlFragment: sampleDataResults.classroom_url_fragment,
+        skillCreationIsAllowed: true
       });
       expect(failHandler).not.toHaveBeenCalled();
     }));
