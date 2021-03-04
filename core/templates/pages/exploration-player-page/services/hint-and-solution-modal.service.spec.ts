@@ -53,17 +53,17 @@ describe('Hint and Solution modal service factory', () => {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
     HintAndSolutionModalService.displayHintModal('0');
     expect(modalSpy).toHaveBeenCalled();
-    });
+  });
 
   it('should open an $uibModal when clicking displaySolutionModal', () => {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
     HintAndSolutionModalService.displaySolutionModal();
     expect(modalSpy).toHaveBeenCalled();
-    });
+  });
 
   it('should open an $uibModal when clicking displayHintModal', () => {
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
     HintAndSolutionModalService.displaySolutionInterstitialModal();
     expect(modalSpy).toHaveBeenCalled();
-    });
+  });
 });
