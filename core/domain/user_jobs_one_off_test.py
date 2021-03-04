@@ -2796,3 +2796,104 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
             output = self._run_one_off_job()
 
         self.assertEqual(output, [['FAILURE', ['username1', 'username2']]])
+
+
+class DiscardOldDraftsOneOffJobTests(test_utils.GenericTestBase):
+
+    EXP_USER_DATA_MODEL_ID = 'user_id.exp_id'
+    USER_ID = 'user_id'
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(DiscardOldDraftsOneOffJobTests, self).setUp()
+        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the DiscardOldDraftsOneOffJob and verifies that the output
+        matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one-off
+                job.
+        """
+        job_id = user_jobs_one_off.DiscardOldDraftsOneOffJob.create_new()
+        user_jobs_one_off.DiscardOldDraftsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = user_jobs_one_off.DiscardOldDraftsOneOffJob.get_output(
+            job_id)
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    def _create_exp_user_data_model(self, draft_change_list, last_updated):
+        """Creates a new ExplorationUserDataModel with the given parameters.
+
+        Args:
+            draft_change_list: list(dict)|None. The change list corresponding
+                to the user's draft for this exploration, or None if there is
+                no such draft.
+            last_updated: datetime.datetime. When the draft was last updated.
+        """
+        user_models.ExplorationUserDataModel(
+            id=self.EXP_USER_DATA_MODEL_ID,
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID,
+            rating=2,
+            rated_on=datetime.datetime(2018, 1, 1),
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=last_updated,
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1
+        ).put()
+
+    def test_models_without_drafts_are_ignored(self):
+        self._create_exp_user_data_model(None, None)
+        self._run_job_and_verify_output([])
+
+    def test_draft_left_alone_if_it_is_current(self):
+        self._create_exp_user_data_model(
+            {'new_content': {}}, datetime.datetime(2021, 1, 1))
+        self._run_job_and_verify_output([])
+
+    def test_draft_discarded_if_exploration_is_missing(self):
+        exp_services.delete_exploration(self.USER_ID, self.EXP_ID)
+
+        self._create_exp_user_data_model(
+            {'new_content': {}}, datetime.datetime(2021, 1, 1))
+        old_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertIsNotNone(old_model.draft_change_list)
+        self.assertIsNotNone(old_model.draft_change_list_last_updated)
+        self.assertIsNotNone(old_model.draft_change_list_exp_version)
+
+        self._run_job_and_verify_output([
+            '[u\'DISCARDED - Exploration is missing\', [u\'%s\']]' %
+            self.EXP_USER_DATA_MODEL_ID,
+            '[u\'SUCCESS - Discarded draft\', 1]'
+        ])
+        new_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertLess(old_model.last_updated, new_model.last_updated)
+        self.assertIsNone(new_model.draft_change_list)
+        self.assertIsNone(new_model.draft_change_list_last_updated)
+        self.assertIsNone(new_model.draft_change_list_exp_version)
+
+    def test_draft_discarded_if_it_is_too_old(self):
+        self._create_exp_user_data_model(
+            {'new_content': {}}, datetime.datetime(2017, 1, 1))
+        old_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertIsNotNone(old_model.draft_change_list)
+        self.assertIsNotNone(old_model.draft_change_list_last_updated)
+        self.assertIsNotNone(old_model.draft_change_list_exp_version)
+
+        self._run_job_and_verify_output([
+            '[u\'DISCARDED - Draft is old\', [u\'%s\']]' %
+            self.EXP_USER_DATA_MODEL_ID,
+            '[u\'SUCCESS - Discarded draft\', 1]'
+        ])
+        new_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertLess(old_model.last_updated, new_model.last_updated)
+        self.assertIsNone(new_model.draft_change_list)
+        self.assertIsNone(new_model.draft_change_list_last_updated)
+        self.assertIsNone(new_model.draft_change_list_exp_version)
