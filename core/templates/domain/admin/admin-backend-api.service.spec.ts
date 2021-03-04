@@ -205,8 +205,8 @@ fdescribe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
- 
-  // Test cases for Admin Jobs Tab
+
+  // Test cases for Admin Jobs Tab.
   it('should request to start a new job when calling startNewJobAsync',
     fakeAsync(() => {
       let jobType = 'ActivityContributorsSummaryOneOffJob';
@@ -372,7 +372,7 @@ fdescribe('Admin backend api service', () => {
   }
   ));
 
-  // Test cases for Admin Jobs Tab
+  // Test cases for Admin Jobs Tab.
   it('should get the data of user regarding username',
     fakeAsync(() => {
       let filterCriterion = 'username';

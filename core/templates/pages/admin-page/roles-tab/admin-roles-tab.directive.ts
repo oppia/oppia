@@ -30,35 +30,23 @@ angular.module('oppia').directive('adminRolesTab', [
   '$rootScope', 'AdminBackendApiService',
   'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService',
-<<<<<<< HEAD
-  'ACTION_REMOVE_ALL_REVIEW_RIGHTS', 'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
-  'REVIEW_CATEGORY_QUESTION',
-  'REVIEW_CATEGORY_TRANSLATION', 'REVIEW_CATEGORY_VOICEOVER',
-=======
   'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
   'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
   'ADMIN_ROLE_HANDLER_URL', 'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
   'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
->>>>>>> upstream/develop
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
       $rootScope, AdminBackendApiService,
       AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService,
-<<<<<<< HEAD
-      ACTION_REMOVE_ALL_REVIEW_RIGHTS, ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS,
-      REVIEW_CATEGORY_QUESTION,
-      REVIEW_CATEGORY_TRANSLATION, REVIEW_CATEGORY_VOICEOVER,
-=======
       ACTION_REMOVE_ALL_REVIEW_RIGHTS,
       ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
       ADMIN_ROLE_HANDLER_URL, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
       CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
->>>>>>> upstream/develop
       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
@@ -143,18 +131,10 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
-<<<<<<< HEAD
           AdminBackendApiService.addContributionReviewerAsync(
             formResponse.category, formResponse.username,
             formResponse.languageCode
           ).then(function(response) {
-=======
-          $http.post('/addcontributionrightshandler', {
-            category: formResponse.category,
-            username: formResponse.username,
-            language_code: formResponse.languageCode
-          }).then(function(response) {
->>>>>>> upstream/develop
             ctrl.setStatusMessage(
               'Successfully added "' + formResponse.username + '" as ' +
               formResponse.category + ' reviewer.');
@@ -170,21 +150,11 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-<<<<<<< HEAD
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then(function(response) {
+              console.log(response);
               ctrl.result.usernames = response.usernames;
-=======
-            $http.get(
-              '/getcontributorusershandler', {
-                params: {
-                  category: formResponse.category,
-                  language_code: formResponse.languageCode
-                }
-              }).then(function(response) {
-              ctrl.result.usernames = response.data.usernames;
->>>>>>> upstream/develop
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
@@ -192,18 +162,9 @@ angular.module('oppia').directive('adminRolesTab', [
           } else {
             var translationLanguages = [];
             var voiceoverLanguages = [];
-<<<<<<< HEAD
             AdminBackendApiService.contributionReviewerRightsAsync(
               formResponse.username
             ).then(function(response) {
-=======
-            $http.get(
-              '/contributionrightsdatahandler', {
-                params: {
-                  username: formResponse.username
-                }
-              }).then(function(response) {
->>>>>>> upstream/develop
               translationLanguages = getLanguageDescriptions(
                 response.can_review_translation_for_language_codes);
               voiceoverLanguages = getLanguageDescriptions(
@@ -211,12 +172,8 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
-<<<<<<< HEAD
-                questions: response.can_review_questions
-=======
                 questions: response.data.can_review_questions,
                 can_submit_questions: response.data.can_submit_questions
->>>>>>> upstream/develop
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
@@ -231,20 +188,10 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
-<<<<<<< HEAD
           AdminBackendApiService.removeContributionReviewerAsync(
             formResponse.username, formResponse.method,
             formResponse.category, formResponse.languageCode
           ).then(function(response) {
-=======
-          $http.put(
-            '/removecontributionrightshandler', {
-              username: formResponse.username,
-              removal_type: formResponse.method,
-              category: formResponse.category,
-              language_code: formResponse.languageCode
-            }).then(function(response) {
->>>>>>> upstream/develop
             ctrl.setStatusMessage('Success.');
             refreshFormData();
           }, handleErrorResponse);

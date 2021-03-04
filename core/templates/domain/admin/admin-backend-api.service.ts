@@ -148,7 +148,7 @@ export class AdminBackendApiService {
     });
   }
 
-  // Admin Jobs Tab Services
+  // Admin Jobs Tab Services.
   private _postAdminActionAsync(action:string, payload:Object): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, { action, ...payload }).toPromise()
@@ -207,7 +207,7 @@ export class AdminBackendApiService {
     });
   }
 
-  // Admin Roles Tab Services
+  // Admin Roles Tab Services.
   async viewUsersRoleAsync(
       filterCriterion: string, role: string, username: string
   ): Promise<Object> {
@@ -236,7 +236,7 @@ export class AdminBackendApiService {
 
   async addContributionReviewerAsync(
       category: string, username: string, languageCode: string
-  ):Promise<void> {
+  ): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_JOB_ADD_CONTRIBUTION_REVIEWER_HANDLER, {
         review_category: category,
@@ -249,6 +249,7 @@ export class AdminBackendApiService {
   async viewContributionReviewersAsync(
       category: string, languageCode: string
   ): Promise<Object> {
+    console.log(category, languageCode);
     return this.http.get<Object>(
       AdminPageConstants.ADMIN_JOB_GET_CONTRIBUTION_REVIEWERS, {
         params: {
