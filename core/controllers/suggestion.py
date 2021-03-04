@@ -93,6 +93,11 @@ class SuggestionHandler(base.BaseHandler):
     @acl_decorators.can_suggest_changes
     def post(self):
         """Handles POST requests."""
+        if (self.payload.get('suggestion_type') ==
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            raise self.InvalidInputException(
+                'Content suggestion submissions are no longer supported.')
+
         try:
             suggestion = suggestion_services.create_suggestion(
                 self.payload.get('suggestion_type'),
