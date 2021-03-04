@@ -1073,3 +1073,52 @@ class UniqueHashedNormalizedUsernameAuditJob(
 
         if len(values) != 1:
             yield ('FAILURE', values)
+
+
+class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that discards any drafts that were last updated in 2019 or prior.
+
+    This is done to avoid issues arising from old schema version
+    incompatibility. It is unlikely that such drafts are being used or relied
+    on anyway, since they have been abandoned for over a year.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(DiscardOldDraftsOneOffJob, cls).enqueue(job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationUserDataModel]
+
+    @staticmethod
+    def map(model):
+        if model.draft_change_list is None:
+            return
+
+        exploration = exp_fetchers.get_exploration_by_id(
+            model.exploration_id, strict=False)
+
+        if exploration is None:
+            yield ('DISCARDED - Exploration is missing', model.id)
+        elif model.draft_change_list_last_updated.timetuple().tm_year <= 2019:
+            yield ('DISCARDED - Draft is old', model.id)
+        else:
+            return
+
+        # Discard the draft.
+        model.draft_change_list = None
+        model.draft_change_list_last_updated = None
+        model.draft_change_list_exp_version = None
+        model.update_timestamps()
+        model.put()
+
+        yield ('SUCCESS - Discarded draft', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
