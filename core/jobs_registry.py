@@ -77,8 +77,8 @@ ONE_OFF_JOB_MANAGERS = [
         .InteractionCustomizationArgsValidationOneOffJob),
     interaction_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob,
-    interaction_jobs_one_off.ItemSelectionInteractionLimitOneOffJob,
-    interaction_jobs_one_off.MultipleChoiceInteractionLimitOneOffJob,
+    interaction_jobs_one_off.ItemSelectionInteractionLtOneOffJob,
+    interaction_jobs_one_off.MultipleChoiceInteractionLtOneOffJob,
     interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     (

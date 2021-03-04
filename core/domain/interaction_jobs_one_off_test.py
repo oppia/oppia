@@ -542,7 +542,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             self, interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob)
 
 
-class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
+class MultipleChoiceInteractionLtOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -552,7 +552,7 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(MultipleChoiceInteractionLimitOneOffJobTests, self).setUp()
+        super(MultipleChoiceInteractionLtOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -591,15 +591,15 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLimitOneOffJob.
+            .MultipleChoiceInteractionLtOneOffJob.
             create_new())
-        interaction_jobs_one_off.MultipleChoiceInteractionLimitOneOffJob.enqueue(
+        interaction_jobs_one_off.MultipleChoiceInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLimitOneOffJob.get_output(job_id))
+            .MultipleChoiceInteractionLtOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
@@ -629,15 +629,15 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLimitOneOffJob.
+            .MultipleChoiceInteractionLtOneOffJob.
             create_new())
-        interaction_jobs_one_off.MultipleChoiceInteractionLimitOneOffJob.enqueue(
+        interaction_jobs_one_off.MultipleChoiceInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLimitOneOffJob.get_output(job_id))
+            .MultipleChoiceInteractionLtOneOffJob.get_output(job_id))
         expected_output = 30
         self.assertEqual(actual_output, expected_output)
 
@@ -673,7 +673,7 @@ class MultipleChoiceInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, interaction_jobs_one_off.
-            MultipleChoiceInteractionLimitOneOffJob)
+            MultipleChoiceInteractionLtOneOffJob)
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -889,7 +889,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             self, interaction_jobs_one_off.ItemSelectionInteractionOneOffJob)
 
 
-class ItemSelectionInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
+class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -899,7 +899,7 @@ class ItemSelectionInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ItemSelectionInteractionLimitOneOffJobTests, self).setUp()
+        super(ItemSelectionInteractionLtOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -938,14 +938,14 @@ class ItemSelectionInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
         # Start ItemSelectionInteractionLimitOneOff job on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLimitOneOffJob.create_new())
-        interaction_jobs_one_off.ItemSelectionInteractionLimitOneOffJob.enqueue(
+            .ItemSelectionInteractionLtOneOffJob.create_new())
+        interaction_jobs_one_off.ItemSelectionInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLimitOneOffJob.get_output(job_id))
+            .ItemSelectionInteractionLtOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
@@ -969,14 +969,14 @@ class ItemSelectionInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
         # Start ItemSelectionInteractionOneOff job on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLimitOneOffJob.create_new())
-        interaction_jobs_one_off.ItemSelectionInteractionLimitOneOffJob.enqueue(
+            .ItemSelectionInteractionLtOneOffJob.create_new())
+        interaction_jobs_one_off.ItemSelectionInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLimitOneOffJob.get_output(job_id))
+            .ItemSelectionInteractionLtOneOffJob.get_output(job_id))
         expected_output = 30
         self.assertEqual(actual_output, expected_output)
 
@@ -1013,7 +1013,7 @@ class ItemSelectionInteractionLimitOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, interaction_jobs_one_off.
-            ItemSelectionInteractionLimitOneOffJob)
+            ItemSelectionInteractionLtOneOffJob)
 
 
 class InteractionCustomizationArgsValidationOneOffJobTests(
