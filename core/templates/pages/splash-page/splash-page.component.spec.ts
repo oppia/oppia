@@ -63,7 +63,7 @@ describe('Splash Page', () => {
   let loaderService: LoaderService = null;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
-  var resizeEvent = new Event('resize');
+  let resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [SplashPageComponent, MockTranslatePipe],
