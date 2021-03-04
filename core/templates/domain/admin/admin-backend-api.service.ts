@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,6 +66,17 @@ interface ConfigProperties {
 
 interface JobOutput {
   output: string[];
+}
+
+interface ViewContributionObject {
+  usernames: string[];
+}
+
+interface ContributionRightsObject {
+  'can_review_questions': boolean,
+  'can_review_translation_for_language_codes': string[],
+  'can_review_voiceover_for_language_codes': string[],
+  'can_submit_questions': boolean
 }
 
 export interface AdminPageDataBackendDict {
@@ -210,16 +221,22 @@ export class AdminBackendApiService {
   // Admin Roles Tab Services.
   async viewUsersRoleAsync(
       filterCriterion: string, role: string, username: string
-  ): Promise<Object> {
-    return this.http.get<Object>(
-      AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
-        params: {
-          filter_criterion: filterCriterion,
-          role: role,
-          username: username
+  ): Promise<UserRoles> {
+    return new Promise((resolve, reject) => {
+      this.http.get<UserRoles>(
+        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
+          params: {
+            filter_criterion: filterCriterion,
+            role: role,
+            username: username
+          }
         }
-      }
-    ).toPromise();
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
   }
 
   async updateUserRoleAsync(
@@ -248,39 +265,58 @@ export class AdminBackendApiService {
 
   async viewContributionReviewersAsync(
       category: string, languageCode: string
-  ): Promise<Object> {
-    return this.http.get<Object>(
-      AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
-        params: {
-          category: category,
-          language_code: languageCode
+  ): Promise<ViewContributionObject> {
+    return new Promise((resolve, reject) => {
+      this.http.get<ViewContributionObject>(
+        AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
+          params: {
+            category: category,
+            language_code: languageCode
+          }
         }
-      }
-    ).toPromise();
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
   }
 
-  async contributionReviewerRightsAsync(username: string): Promise<Object> {
-    return this.http.get<Object>(
-      AdminPageConstants. ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
-        params: {
-          username: username
+  async contributionReviewerRightsAsync(
+      username: string): Promise<ContributionRightsObject> {
+    return new Promise((resolve, reject) => {
+      this.http.get<ContributionRightsObject>(
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
+          params: {
+            username: username
+          }
         }
-      }
-    ).toPromise();
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
   }
 
   async removeContributionReviewerAsync(
       username: string, method: string,
       category: string, languageCode: string
   ): Promise<void> {
-    return this.http.put<void>(
-      AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
-        username: username,
-        removal_type: method,
-        category: category,
-        language_code: languageCode
-      }
-    ).toPromise();
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
+          username: username,
+          removal_type: method,
+          category: category,
+          language_code: languageCode
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
   }
 }
 

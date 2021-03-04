@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ angular.module('oppia').directive('adminRolesTab', [
   'LanguageUtilService', 'UrlInterpolationService',
   'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
   'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
-  'ADMIN_ROLE_HANDLER_URL', 'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
+  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
   'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
@@ -43,7 +43,7 @@ angular.module('oppia').directive('adminRolesTab', [
       LanguageUtilService, UrlInterpolationService,
       ACTION_REMOVE_ALL_REVIEW_RIGHTS,
       ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
-      ADMIN_ROLE_HANDLER_URL, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
       CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
@@ -63,7 +63,7 @@ angular.module('oppia').directive('adminRolesTab', [
         var handleErrorResponse = function(errorResponse) {
           ctrl.setStatusMessage(
             'Server error: ' + errorResponse.error.error);
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         };
 
         var getLanguageDescriptions = function(languageCodes) {
@@ -94,8 +94,8 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminBackendApiService.viewUsersRoleAsync(
             formResponse.filterCriterion, formResponse.role,
             formResponse.username
-          ).then(function(response) {
-            ctrl.result = response;
+          ).then((userRoles) => {
+            ctrl.result = userRoles;
             if (Object.keys(ctrl.result).length === 0) {
               ctrl.resultRolesVisible = false;
               ctrl.setStatusMessage('No results.');
@@ -103,6 +103,7 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.resultRolesVisible = true;
               ctrl.setStatusMessage('Success.');
             }
+            $rootScope.$applyAsync();
             refreshFormData();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
@@ -117,11 +118,12 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminBackendApiService.updateUserRoleAsync(
             formResponse.newRole, formResponse.username,
             formResponse.topicId
-          ).then(function(response) {
+          ).then(() => {
             ctrl.setStatusMessage(
               'Role of ' + formResponse.username + ' successfully updated to ' +
               formResponse.newRole);
             refreshFormData();
+            $rootScope.$applyAsync();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
@@ -135,11 +137,12 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminBackendApiService.addContributionReviewerAsync(
             formResponse.category, formResponse.username,
             formResponse.languageCode
-          ).then(function(response) {
+          ).then(() => {
             ctrl.setStatusMessage(
               'Successfully added "' + formResponse.username + '" as ' +
               formResponse.category + ' reviewer.');
             refreshFormData();
+            $rootScope.$applyAsync();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
@@ -153,31 +156,31 @@ angular.module('oppia').directive('adminRolesTab', [
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
-            ).then(function(response) {
-              ctrl.result.usernames = response.usernames;
+            ).then((usersObject) => {
+              ctrl.result.usernames = usersObject.usernames;
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
-              $rootScope.$apply();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
             var voiceoverLanguages = [];
             AdminBackendApiService.contributionReviewerRightsAsync(
               formResponse.username
-            ).then(function(response) {
+            ).then((contributionRights) => {
               translationLanguages = getLanguageDescriptions(
-                response.can_review_translation_for_language_codes);
+                contributionRights.can_review_translation_for_language_codes);
               voiceoverLanguages = getLanguageDescriptions(
-                response.can_review_voiceover_for_language_codes);
+                contributionRights.can_review_voiceover_for_language_codes);
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
-                questions: response.can_review_questions,
-                can_submit_questions: response.can_submit_questions
+                questions: contributionRights.can_review_questions,
+                can_submit_questions: contributionRights.can_submit_questions
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
+              $rootScope.$applyAsync();
             }, handleErrorResponse);
           }
           AdminTaskManagerService.finishTask();
@@ -192,9 +195,10 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminBackendApiService.removeContributionReviewerAsync(
             formResponse.username, formResponse.method,
             formResponse.category, formResponse.languageCode
-          ).then(function(response) {
+          ).then(() => {
             ctrl.setStatusMessage('Success.');
             refreshFormData();
+            $rootScope.$applyAsync();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
