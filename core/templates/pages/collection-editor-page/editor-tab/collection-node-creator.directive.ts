@@ -15,6 +15,7 @@
 /**
  * @fileoverview Directive for creating a new collection node.
  */
+
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
 require('domain/summary/exploration-summary-backend-api.service.ts');
