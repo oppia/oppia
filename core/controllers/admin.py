@@ -1075,10 +1075,12 @@ class GetModelsRelatedToUserHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        user_id = self.payload.get('user_id')
-        related_models_exist = wipeout_service.verify_user_deleted(
+        user_id = self.request.get('user_id', None)
+        if user_id is None:
+            raise self.InvalidInputException('Missing user_id param')
+        user_is_deleted = wipeout_service.verify_user_deleted(
             user_id, include_delete_at_end_models=True)
-        self.render_json({'related_models_exist': related_models_exist})
+        self.render_json({'related_models_exist': not user_is_deleted})
 
 
 class DeleteUserHandler(base.BaseHandler):
@@ -1086,6 +1088,8 @@ class DeleteUserHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self):
-        user_id = self.payload.get('user_id')
+        user_id = self.request.get('user_id', None)
+        if user_id is None:
+            raise self.InvalidInputException('Missing user_id param')
         wipeout_service.pre_delete_user(user_id)
         self.render_json({'success': True})

@@ -204,9 +204,9 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.getModelsRelatedToUser = function() {
           ctrl.setStatusMessage('Getting the models related to user...');
-          $http.get(
-            GET_MODELS_RELATED_TO_USER_HANDLER_URL, {user_id: ctrl.userIdToGet}
-          ).then(
+          $http.get(GET_MODELS_RELATED_TO_USER_HANDLER_URL, {
+            params: { user_id: ctrl.userIdToGet }
+          }).then(
             function(response) {
               if (response.data.related_models_exist) {
                 ctrl.setStatusMessage(
@@ -226,9 +226,9 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.deleteUser = function() {
           ctrl.setStatusMessage('Starting the deletion of the user...');
-          $http['delete'](
-            DELETE_USER_HANDLER_URL, {user_id: ctrl.userIdToDelete}
-          ).then(
+          $http['delete'](DELETE_USER_HANDLER_URL, {
+            params: { user_id: ctrl.userIdToDelete }
+          }).then(
             function() {
               ctrl.setStatusMessage('The deletion process was started.');
             },
