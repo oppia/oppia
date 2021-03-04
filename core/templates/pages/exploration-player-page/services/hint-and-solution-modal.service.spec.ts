@@ -28,7 +28,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-fdescribe('Hint and Solution modal service factory', () => {
+describe('Hint and Solution modal service factory', () => {
   var HintAndSolutionModalService = null;
   var $uibModal = null;
   importAllAngularServices();
