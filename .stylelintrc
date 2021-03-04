@@ -21,6 +21,8 @@
     "block-opening-brace-space-before": "always",
     "declaration-colon-space-after": "always",
     "declaration-colon-space-before": "never",
-    "order/properties-alphabetical-order": true
+    "order/properties-alphabetical-order": true,
+    "indentation": 2,
+    "length-zero-no-unit": true
   }
 }
