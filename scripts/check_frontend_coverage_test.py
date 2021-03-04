@@ -216,7 +216,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     SystemExit,
                     r'\033\[1mfile.ts\033\[0m seems to be fully covered!'
-                    ' Before removing it manually from the blacklist'
+                    ' Before removing it manually from the denylist'
                     ' in the file'
                     ' scripts/check_frontend_test_coverage.py, please'
                     ' make sure you\'ve followed the unit tests rules'
@@ -246,9 +246,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     r'\033\[1mnewfilename.ts\033\[0m seems to be not completely'
                     ' tested. Make sure it\'s fully covered.\n'
                     r'\033\[1mfile.ts\033\[0m is in the frontend test coverage'
-                    ' blacklist but it doesn\'t exist anymore. If you have'
+                    ' denylist but it doesn\'t exist anymore. If you have'
                     ' renamed it, please make sure to remove the old file name'
-                    ' and add the new file name in the blacklist in the file'
+                    ' and add the new file name in the denylist in the file'
                     ' scripts/check_frontend_test_coverage.py.\n'):
                     check_frontend_coverage.check_coverage_changes()
 
