@@ -141,10 +141,16 @@ export class ExtractImageFilenamesFromStateService {
           state.interaction.id === this.INTERACTION_TYPE_ITEM_SELECTION ||
           state.interaction.id === this.INTERACTION_TYPE_DRAG_AND_DROP_SORT) {
         let customizationArgsHtml = '';
+        let languageCode = (
+          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+        );
+        const self = this;
         (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
           .choices.value.forEach(function(value) {
             customizationArgsHtml = (
-              customizationArgsHtml.concat(value.html));
+              customizationArgsHtml.concat(
+                self.contentTranslationManagerService.getTranslatedHtml(
+                  state.writtenTranslations, languageCode, value)));
           });
         _allHtmlInTheState.push(customizationArgsHtml);
       }
