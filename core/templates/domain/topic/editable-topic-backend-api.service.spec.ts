@@ -51,7 +51,7 @@ describe('Editable topic backend API service', () => {
         id: '0',
         name: 'Topic Name',
         description: 'Topic Description',
-        version: '1',
+        version: 1,
         canonical_story_references: [{
           story_id: 'story_1',
           story_is_published: true
@@ -207,7 +207,7 @@ describe('Editable topic backend API service', () => {
       flushMicrotasks();
 
       topic.name = 'New Name';
-      topic.version = '2';
+      topic.version = 2;
       let topicWrapper = {
         topic_dict: topic,
         skill_id_to_description_dict: {
