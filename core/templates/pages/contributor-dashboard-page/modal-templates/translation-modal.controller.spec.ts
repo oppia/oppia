@@ -223,10 +223,31 @@ describe('Translation Modal Controller', function() {
         ]
       }
     };
+
     $scope.onContentClick(mockEvent);
 
     expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
     expect(CkEditorCopyContentService.broadcastCopy).not.toHaveBeenCalledWith(
+      mockEvent.target);
+  });
+
+  it('should broadcast copy to ck editor when clicking on content' +
+  ' when a math equation is clicked',
+  function() {
+    spyOn(CkEditorCopyContentService, 'broadcastCopy').and
+      .callFake(() => {});
+
+    var mockEvent = {
+      stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
+      target: {
+        localName: 'img'
+      }
+    };
+
+    $scope.onContentClick(mockEvent);
+
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+    expect(CkEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
       mockEvent.target);
   });
 
@@ -239,9 +260,15 @@ describe('Translation Modal Controller', function() {
     var mockEvent = {
       stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
       target: {
-        localName: 'oppia-noninteractive-image'
+        localName: 'p',
+        children: [
+          {
+            localName: 'oppia-noninteractive-math'
+          }
+        ]
       }
     };
+    
     $scope.onContentClick(mockEvent);
 
     expect(mockEvent.stopPropagation).toHaveBeenCalled();
