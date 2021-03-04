@@ -113,7 +113,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class MultipleChoiceLimitInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class MultipleChoiceInteractionLimitOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
     Multiple selection interaction whose choice length is less than 30.
     """
@@ -142,7 +142,7 @@ class MultipleChoiceLimitInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager
         yield (key, values)
 
 
-class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class ItemSelectionInteractionLimitOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs that use the item
     selection interaction and that have rules that do not match the answer
     choices. These probably need to be fixed manually.
