@@ -82,11 +82,11 @@ describe('Learner Playlist Modal Component', function() {
   it('should call http for deleting from learner playlist when clicking on' +
   ' remove button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    component.remove();
     let req = httpTestingController.expectOne(
       '/learnerplaylistactivityhandler/exploration/0');
     expect(req.request.method).toEqual('DELETE');
     req.flush(200);
+    component.remove();
     flushMicrotasks();
 
     expect(dismissSpy).toHaveBeenCalled();

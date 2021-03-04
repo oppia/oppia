@@ -17,7 +17,6 @@
  */
 
 
-import constants from 'assets/constants';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -26,6 +25,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
+import { AppConstants } from 'app.constants';
 
 
 export interface LearnerPlaylistDict {
@@ -83,7 +83,7 @@ export class LearnerPlaylistService {
 
   removeFromLearnerPlaylist(
       activityId: string, activityTitle: string, activityType: string,
-      learnerDashboardActivityIds: LearnerDashboardActivityIds):void {
+      learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
     const modalRef = this.ngbModal.open(
       LearnerPlaylistModalComponent,
       {
@@ -92,15 +92,15 @@ export class LearnerPlaylistService {
     modalRef.componentInstance.activityId = activityId;
     modalRef.componentInstance.activityType = activityType;
     modalRef.componentInstance.activityTitle = activityTitle;
-    modalRef.result.then(function() {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+    modalRef.result.then(() => {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
           activityId);
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
           activityId);
       }
-    }, function() {
+    }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.

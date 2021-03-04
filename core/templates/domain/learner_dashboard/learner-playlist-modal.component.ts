@@ -33,6 +33,8 @@ export class LearnerPlaylistModalComponent implements OnInit {
   @Input() activityType: string;
   @Input() activityTitle: string;
   removeFromLearnerPlaylistUrl: string;
+  sectionNameI18nId: string;
+
   constructor(
     private activeModal: NgbActiveModal,
     private http: HttpClient,
@@ -40,6 +42,8 @@ export class LearnerPlaylistModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.sectionNameI18nId = (
+      'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
     this.removeFromLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/learnerplaylistactivityhandler/' +
@@ -48,8 +52,6 @@ export class LearnerPlaylistModalComponent implements OnInit {
           getActivityId: this.activityId
         }));
   }
-  sectionNameI18nId = (
-      'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
 
   cancel(): void {
     this.activeModal.dismiss();
