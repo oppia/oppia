@@ -34,7 +34,7 @@ interface QueryDatum {
   value: string | number
 }
 
-export interface QueryData extends Array<QueryDatum> {}
+export type QueryData = QueryDatum[];
 
 @Injectable({
   providedIn: 'root'

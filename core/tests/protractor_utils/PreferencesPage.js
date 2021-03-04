@@ -96,7 +96,7 @@ var PreferencesPage = function() {
     await saveNewChanges('User Bio');
   };
 
-  this.toggleEmailUpdatesCheckboxCheckbox = async function() {
+  this.toggleEmailUpdatesCheckbox = async function() {
     await action.click('Email Updates checkbox', emailUpdatesCheckbox);
     await saveNewChanges('Email Updates');
   };
