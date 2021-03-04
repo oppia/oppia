@@ -25,8 +25,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class AudioFileUploaderComponent {
   @Input() droppedFile: FileList;
-  @Output() changeFile: EventEmitter<File> = new EventEmitter<File>();
-  @Output() clearFile: EventEmitter<void> = new EventEmitter<void>();
+  @Output() fileChange: EventEmitter<File> = new EventEmitter<File>();
+  @Output() fileClear: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('fileInput') fileInputRef: ElementRef;
   @ViewChild('inputForm') inputFormRef: ElementRef;
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
@@ -59,16 +59,16 @@ export class AudioFileUploaderComponent {
   addAudio(evt: Event): void {
     let file = this.fileInputRef.nativeElement.files[0];
     if (!file) {
-      this.clearFile.emit();
+      this.fileClear.emit();
       return;
     }
     this.errorMessage = this.validateUploadedFile(file);
     if (!this.errorMessage) {
       // Only fire this event if validations pass.
-      this.changeFile.emit(file);
+      this.fileChange.emit(file);
     } else {
       this.inputFormRef.nativeElement.reset();
-      this.clearFile.emit();
+      this.fileClear.emit();
     }
   }
 }
