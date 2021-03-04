@@ -776,7 +776,7 @@ angular.module('oppia').directive('conversationSkin', [
                     classroom_url_fragment: classroomUrlFragment,
                     story_url_fragment: storyUrlFragment
                   });
-                StoryViewerBackendApiService.fetchStoryData(
+                StoryViewerBackendApiService.fetchStoryDataAsync(
                   topicUrlFragment, classroomUrlFragment,
                   storyUrlFragment).then(
                   function(res) {
@@ -797,7 +797,7 @@ angular.module('oppia').directive('conversationSkin', [
                     $rootScope.$apply();
                   });
                 if ($scope.isLoggedIn) {
-                  StoryViewerBackendApiService.recordChapterCompletion(
+                  StoryViewerBackendApiService.recordChapterCompletionAsync(
                     topicUrlFragment, classroomUrlFragment,
                     storyUrlFragment, nodeId
                   ).then(function(returnObject) {

@@ -136,7 +136,7 @@ angular.module('oppia').component('storyViewerPage', {
           UrlService.getClassroomUrlFragmentFromLearnerUrl());
         var storyUrlFragment = (
           UrlService.getStoryUrlFragmentFromLearnerUrl());
-        ctrl.storyViewerBackendApiService.fetchStoryData(
+        ctrl.storyViewerBackendApiService.fetchStoryDataAsync(
           topicUrlFragment,
           classroomUrlFragment,
           storyUrlFragment).then(
