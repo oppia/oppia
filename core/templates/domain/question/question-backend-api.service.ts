@@ -56,7 +56,7 @@ export class QuestionBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _fetchQuestions(
+  private _fetchQuestionsAsync(
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean,
       successCallback: (value: QuestionBackendDict[]) => void,
@@ -185,7 +185,7 @@ export class QuestionBackendApiService {
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestions(
+      this._fetchQuestionsAsync(
         skillIds, questionCount, questionsSortedByDifficulty,
         resolve, reject);
     });
