@@ -268,7 +268,7 @@ describe('Translation Modal Controller', function() {
         ]
       }
     };
-    
+
     $scope.onContentClick(mockEvent);
 
     expect(mockEvent.stopPropagation).toHaveBeenCalled();
