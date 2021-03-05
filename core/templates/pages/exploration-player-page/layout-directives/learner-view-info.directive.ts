@@ -137,7 +137,7 @@ angular.module('oppia').directive('learnerViewInfo', [
                 UrlService.getClassroomUrlFragmentFromLearnerUrl());
               var storyUrlFragment = (
                 UrlService.getStoryUrlFragmentFromLearnerUrl());
-              ctrl.storyViewerBackendApiService.fetchStoryData(
+              ctrl.storyViewerBackendApiService.fetchStoryDataAsync(
                 topicUrlFragment,
                 classroomUrlFragment,
                 storyUrlFragment).then(
