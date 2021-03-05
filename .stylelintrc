@@ -22,7 +22,6 @@
     "declaration-colon-space-after": "always",
     "declaration-colon-space-before": "never",
     "order/properties-alphabetical-order": true,
-    "indentation": [ 2, { baseIndentLevel: 1 } ],
     "length-zero-no-unit": true
   }
 }
