@@ -211,7 +211,7 @@
         "scripts.linters.other_files_linter_test",
         "scripts.regenerate_requirements_test",
         "scripts.install_third_party_test",
-        "scripts.check_frontend_coverage_test",
+        "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
         "scripts.release_scripts.update_changelog_and_credits_test",
         "scripts.setup_test",
