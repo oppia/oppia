@@ -204,20 +204,20 @@ class ItemSelectionInteractionLtOneOffJob(
         exploration = exp_fetchers.get_exploration_from_model(item)
         for state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
-                choices=state.interaction.customization_args['choices']
+                choices = state.interaction.customization_args['choices']
                 for choice in choices.value:
                     choice_length = len(choice)
                     if choice_length > 30:
                         yield ('LONGER_THAN_30', (item.id, choice_length))
                     else:
-                        yield('SUCCESS', item.id)
+                        yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
         if key == 'SUCCESS':
             yield (key, values)
         else:
-            yeild (key, 30)
+            yield (key, 30)
 
 
 class InteractionCustomizationArgsValidationOneOffJob(
