@@ -208,7 +208,7 @@ class ItemSelectionInteractionLtOneOffJob(
                 for choice in choices.value:
                     choice_length = len(choice)
                     if choice_length > 30:
-                        yield ('LONGER_THAN_30', (item.id, choice_length))
+                        yield ('LONGER_THAN_30', (item.id, choice_length)d)
                     else:
                         yield('SUCCESS', item.id)
 
