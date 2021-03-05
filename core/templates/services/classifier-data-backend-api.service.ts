@@ -28,8 +28,6 @@ import { AppConstants } from 'app.constants';
 import { Classifier } from 'domain/classifier/classifier.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-const Constants = require('constants.ts');
-
 interface ClassifierMetaDataBackendDict {
   'algorithm_id': string,
   'algorithm_version': number,
@@ -51,15 +49,27 @@ export class ClassifierDataBackendApiService {
   constructor(
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
-    if (!Constants.DEV_MODE && !Constants.GCS_RESOURCE_BUCKET_NAME) {
+    if (
+      !ClassifierDataBackendApiService.DEV_MODE &&
+      !ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
 
-    const urlPrefix = Constants.DEV_MODE ?
-      '/_ah/gcs/' + Constants.DEFAULT_GCS_RESOURCE_BUCKET_NAME :
-      'https://storage.googleapis.com/' + Constants.GCS_RESOURCE_BUCKET_NAME;
+    const urlPrefix = ClassifierDataBackendApiService.DEV_MODE ?
+      '/_ah/gcs/' : 'https://storage.googleapis.com/';
     this.classifierDataDownloadUrlTemplate = (
-      urlPrefix + '/<entity_type>/<entity_id>/assets/<filename>');
+      urlPrefix + ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME +
+      '/<entity_type>/<entity_id>/assets/<filename>');
+  }
+
+  static get DEV_MODE(): boolean {
+    return AppConstants.DEV_MODE;
+  }
+
+  static get GCS_RESOURCE_BUCKET_NAME(): string {
+    return ClassifierDataBackendApiService.DEV_MODE ?
+      AppConstants.DEFAULT_GCS_RESOURCE_BUCKET_NAME :
+      AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
   private getDownloadUrl(

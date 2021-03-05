@@ -20,10 +20,9 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { deflateSync } from 'zlib';
 
+import { AppConstants } from 'app.constants';
 import { ClassifierDataBackendApiService } from
   'services/classifier-data-backend-api.service';
-
-const Constants = require('constants.ts');
 
 describe('Classifier Data Backend API Service', () => {
   describe('on dev mode', () => {
@@ -32,17 +31,18 @@ describe('Classifier Data Backend API Service', () => {
 
     const classifierMetaDataRequestUrl = '/ml/trainedclassifierhandler';
     const classifierDataRequestUrl = (
-      '/_ah/gcs/' + Constants.DEFAULT_GCS_RESOURCE_BUCKET_NAME +
+      '/_ah/gcs/' + AppConstants.DEFAULT_GCS_RESOURCE_BUCKET_NAME +
       '/exploration/0/assets/classifier.pb.xz');
     const classifierBuffer = deflateSync(Buffer.alloc(10));
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
+        providers: [ClassifierDataBackendApiService]
       });
-      classifierDataBackendApiService = TestBed.get(
+      classifierDataBackendApiService = TestBed.inject(
         ClassifierDataBackendApiService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      httpTestingController = TestBed.inject(HttpTestingController);
     });
 
     afterEach(() => {
@@ -131,31 +131,22 @@ describe('Classifier Data Backend API Service', () => {
   });
 
   describe('without dev mode settings', () => {
-    let oldGcsResourceBucketName: string = null;
-    let oldDevMode: boolean = null;
-    beforeAll(() => {
-      oldGcsResourceBucketName = Constants.GCS_RESOURCE_BUCKET_NAME;
-      Constants.GCS_RESOURCE_BUCKET_NAME = '';
-      oldDevMode = Constants.DEV_MODE;
-      Constants.DEV_MODE = false;
-    });
-
-    afterAll(() => {
-      Constants.GCS_RESOURCE_BUCKET_NAME = oldGcsResourceBucketName;
-      Constants.DEV_MODE = oldDevMode;
-    });
-
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         providers: [ClassifierDataBackendApiService]
       });
+      spyOnProperty(ClassifierDataBackendApiService, 'DEV_MODE', 'get')
+        .and.returnValue(false);
+      spyOnProperty(
+        ClassifierDataBackendApiService, 'GCS_RESOURCE_BUCKET_NAME', 'get')
+        .and.returnValue('');
     });
 
     it('should throw an error when is not on dev mode and Google Cloud' +
         ' Service bucket name is not set', fakeAsync(() => {
       expect(() => {
-        TestBed.get(ClassifierDataBackendApiService);
+        TestBed.inject(ClassifierDataBackendApiService);
       }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }));
   });

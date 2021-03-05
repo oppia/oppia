@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for ExplorationWarningsService.
  */
 
+import {
+  HttpClient,
+  HttpXhrBackend,
+  // eslint-disable-next-line camelcase
+  ɵangular_packages_common_http_http_d
+} from '@angular/common/http';
 import { fakeAsync } from '@angular/core/testing';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
@@ -60,6 +66,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UrlService } from 'services/contextual/url.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -85,7 +92,7 @@ describe('Exploration Warnings Service', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide, $http, $window) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
@@ -116,9 +123,11 @@ describe('Exploration Warnings Service', function() {
     $provide.value(
       'StateClassifierMappingService', new StateClassifierMappingService(
         new ClassifierDataBackendApiService(
-          $http, new UrlInterpolationService(
-            new AlertsService(new LoggerService()), new UrlService($window),
-            new UtilsService())),
+          new HttpClient(new HttpXhrBackend(
+            new ɵangular_packages_common_http_http_d())),
+          new UrlInterpolationService(
+            new AlertsService(new LoggerService()),
+            new UrlService(new WindowRef()), new UtilsService())),
         new LoggerService()
       ));
     $provide.value(

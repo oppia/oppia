@@ -16,14 +16,24 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
+import {
+  HttpClient,
+  HttpXhrBackend,
+  // eslint-disable-next-line camelcase
+  ɵangular_packages_common_http_http_d
+} from '@angular/common/http';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // translation-status.service.ts is upgraded to Angular 8.
+import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
+import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { LoggerService } from 'services/contextual/logger.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -41,20 +51,17 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { UtilsService } from 'services/utils.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { AlertsService } from 'services/alerts.service';
-import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { UpgradedServices } from 'services/UpgradedServices';
-import { UtilsService } from 'services/utils.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-
 // ^^^ This block is to be removed.
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -80,7 +87,7 @@ describe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide, $http, $window) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
       getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
@@ -110,9 +117,11 @@ describe('Translation status service', function() {
     $provide.value(
       'StateClassifierMappingService', new StateClassifierMappingService(
         new ClassifierDataBackendApiService(
-          $http, new UrlInterpolationService(
-            new AlertsService(new LoggerService()), new UrlService($window),
-            new UtilsService())),
+          new HttpClient(new HttpXhrBackend(
+            new ɵangular_packages_common_http_http_d())),
+          new UrlInterpolationService(
+            new AlertsService(new LoggerService()),
+            new UrlService(new WindowRef()), new UtilsService())),
         new LoggerService()
       ));
     $provide.value(
