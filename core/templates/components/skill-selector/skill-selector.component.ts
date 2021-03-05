@@ -25,8 +25,6 @@ import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-ed
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { ShortSkillSummary } from 'core/templates/domain/skill/ShortSkillSummaryObjectFactory';
 
-require('domain/utilities/url-interpolation.service.ts');
-
 interface SubTopicFilterDict {
   [topicName: string] : { subTopicName: string; checked: boolean }[]
 }
@@ -53,11 +51,9 @@ export class SkillSelectorComponent implements OnInit {
   subTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
 
-  private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe = (
-    new FilterForMatchingSubstringPipe()
-  );
-
-  constructor() {}
+  constructor(
+    private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe
+  ) {}
 
   ngOnInit(): void {
     this.currCategorizedSkills = this.categorizedSkills;
@@ -80,7 +76,7 @@ export class SkillSelectorComponent implements OnInit {
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
   }
 
-  checkIfEmpty(skills: any[]): boolean {
+  checkIfEmpty(skills: string[]): boolean {
     return skills.length === 0;
   }
 

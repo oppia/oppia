@@ -8,13 +8,11 @@
       <div class="skill-list-box">
         <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
           <div *ngFor="let topic of currCategorizedSkills | keyvalue">
-            <!-- topic.key = topicName, topic.value = subtopics -->
             <mat-card class="list-view-item" *ngIf="checkTopicIsNotEmpty(topic.key)">
               <mat-card class="list-view-item">
                 <h2><label class="oppia-topic-name-text">{{ topic.key }}</label></h2>
               </mat-card>
               <div *ngFor="let subtopic of topic.value | keyvalue" class="list-view-item ">
-                <!-- subtopic.key = subtopicName (string) / uncategorized, subtopic.value = skills (ShortSkillSummary[]) -->
                 <div *ngIf="!checkIfEmpty(subtopic.value)">
                   <mat-card class="list-view-item">
                     <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
@@ -48,7 +46,6 @@
       <div *ngIf="allowSkillsFromOtherTopics" class="oppia-list-view-item-container">
         <mat-card *ngIf="topicFilterList.length" class="list-view-item ">
           <mat-checkbox class="oppia-skills-list-item" *ngFor="let topic of topicFilterList" [(ngModel)]="topic.checked" (change)="updateSkillsListOnTopicFilterChange()">{{ topic.topicName }}</mat-checkbox>
-          <!-- topic = { topicName : checked } -->
         </mat-card>
       </div>
       <br>
@@ -58,7 +55,6 @@
       <div class="oppia-list-view-item-container">
         <mat-card class="list-view-item">
           <div *ngFor="let topic of subTopicFilterDict | keyvalue">
-            <!-- topic.key = topicName, topic.value = subtopics -->
             <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>
             <mat-card class="list-view-item">
               <mat-checkbox class="oppia-skills-list-item" *ngFor="let subtopic of topic.value" [(ngModel)]="subtopic.checked" (change)="updateSkillsListOnSubtopicFilterChange()">{{ subtopic.subTopicName }}</mat-checkbox>

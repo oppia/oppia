@@ -16,8 +16,7 @@
  * @fileoverview Tests for CamelCaseToHyphens pipe for Oppia.
  */
 
-import { FilterForMatchingSubstringPipe } from
-  'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 
 describe('Testing FilterForMatchingSubstringPipe', () => {
   let pipe: FilterForMatchingSubstringPipe;
