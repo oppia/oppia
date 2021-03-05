@@ -32,7 +32,7 @@ interface SubTopicFilterDict {
 }
 
 @Component({
-  selector: 'skill-selector',
+  selector: 'oppia-skill-selector',
   templateUrl: './skill-selector.component.html',
 })
 export class SkillSelectorComponent implements OnInit {
@@ -211,7 +211,7 @@ export class SkillSelectorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'skillSelector', downgradeComponent(
+  'oppiaSkillSelector', downgradeComponent(
     { component: SkillSelectorComponent }
   )
 );
