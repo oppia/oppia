@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import base64
 import datetime
 import hmac
-import http.cookies
 import json
 import logging
 import os
@@ -47,26 +46,6 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 
-def _clear_login_cookies(response_headers):
-    """Clears login cookies from the given response headers.
-
-    Args:
-        response_headers: webapp2.ResponseHeaders. Response headers are used
-            to give a more detailed context of the response.
-    """
-    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
-    # for https:// . We just unset both below. We also unset dev_appserver_login
-    # cookie used in local server.
-    for cookie_name in [b'ACSID', b'SACSID', b'dev_appserver_login']:
-        cookie = http.cookies.SimpleCookie()
-        cookie[cookie_name] = ''
-        cookie[cookie_name]['expires'] = (
-            datetime.datetime.utcnow() +
-            datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
-        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response_headers.add_header(*cookie.output().split(b': ', 1))
-
-
 @backports.functools_lru_cache.lru_cache(maxsize=128)
 def load_template(filename):
     """Return the HTML file contents at filepath.
@@ -83,6 +62,14 @@ def load_template(filename):
     return html_text
 
 
+class SessionBeginHandler(webapp2.RequestHandler):
+    """Class which handles the creation of a new authentication session."""
+
+    def get(self):
+        """Establishes a new auth session."""
+        auth_services.establish_auth_session(self.request, self.response)
+
+
 class LogoutPage(webapp2.RequestHandler):
     """Class which handles the logout URL."""
 
@@ -91,7 +78,7 @@ class LogoutPage(webapp2.RequestHandler):
         page (or the home page if no follow-up page is specified).
         """
 
-        _clear_login_cookies(self.response.headers)
+        auth_services.destroy_auth_session(self.response)
         url_to_redirect_to = (
             python_utils.convert_to_bytes(
                 self.request.get('redirect_url', '/')))
@@ -195,7 +182,7 @@ class BaseHandler(webapp2.RequestHandler):
                     logging.error(
                         'Cannot find user %s with email %s on page %s' % (
                             auth_id, email, self.request.uri))
-                    _clear_login_cookies(self.response.headers)
+                    auth_services.destroy_auth_session(self.response)
                     return
 
             self.values['user_email'] = user_settings.email
