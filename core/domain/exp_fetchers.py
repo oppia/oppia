@@ -120,6 +120,10 @@ def get_multiple_explorations_by_version(
                     exploration_model, run_conversion=run_conversion))
         except utils.ExplorationConversionError:
             error_versions.append(version_numbers[index])
+        except KeyError as e:
+            raise Exception(
+                'Exploration %s, version %s failed domain object conversion: '
+                '%s' % (exp_id, version_numbers[index], e))
 
     if error_versions:
         raise Exception(
