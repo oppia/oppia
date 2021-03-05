@@ -49,7 +49,7 @@ describe('Contributor dashboard page', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-    $provide.value('WindowRef.nativeWindow', mockWindow);
+    $provide.value('$window', mockWindow);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
