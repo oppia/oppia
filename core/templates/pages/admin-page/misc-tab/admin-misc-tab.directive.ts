@@ -138,8 +138,8 @@ angular.module('oppia').directive('adminMiscTab', [
               expIdToRegenerate,
               response.data.num_valid_exp_stats,
               response.data.num_valid_state_stats,
-              response.data.missing_exp_stats.join(', ') || 'NA',
-              response.data.missing_state_stats.join(', ') || 'NA',
+              `"${response.data.missing_exp_stats.join(', ')}"` || 'NA',
+              `"${response.data.missing_state_stats.join(', ')}"` || 'NA',
               'NA'
             ]);
             populateExplorationStatsRegenerationCsvResult(expIds);
