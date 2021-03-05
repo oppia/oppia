@@ -159,9 +159,9 @@ describe('Contributor dashboard page', function() {
 
     it('should show collapsed header if window pageYOffset is' +
       ' scrolled greater than 5', function() {
-        const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-        nativeWindowSpy.and.returnValue({
-          pageYOffset: 6
+      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+      nativeWindowSpy.and.returnValue({
+        pageYOffset: 6
         });
 
       ctrl.scrollFunction();
