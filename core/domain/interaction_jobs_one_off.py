@@ -133,7 +133,7 @@ class MultipleChoiceInteractionLtOneOffJob(
             if state.interaction.id == 'MultipleChoiceInput':
                 for choice in state.interaction.customization_args[
                         'choices'].value:
-                    choice_length = len(choice.html)
+                    choice_length = len(choice)
                     if choice_length > 30:
                         yield (
                             item.id, 30)
@@ -202,7 +202,7 @@ class ItemSelectionInteractionLtOneOffJob(
             if state.interaction.id == 'ItemSelectionInput':
                 for choice in state.interaction.customization_args[
                         'choices'].value:
-                    choice_length = len(choice.html)
+                    choice_length = len(choice)
                     if choice_length > 30:
                         yield (
                             item.id, 30)
