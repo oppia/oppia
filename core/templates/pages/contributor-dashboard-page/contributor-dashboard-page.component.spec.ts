@@ -162,7 +162,7 @@ describe('Contributor dashboard page', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 6
-        });
+      });
 
       ctrl.scrollFunction();
 
