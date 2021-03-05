@@ -38,7 +38,8 @@ export class ExplorationHtmlFormatterService {
   private readonly migratedInteractions: string[] = [
     'Continue',
     'FractionInput',
-    'GraphInput'
+    'GraphInput',
+    'ImageClickInput'
   ];
 
   constructor(

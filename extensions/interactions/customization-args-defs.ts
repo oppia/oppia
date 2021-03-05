@@ -24,14 +24,14 @@ import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 
-interface LabeledRegion {
+export interface LabeledRegion {
   region: {
     area: number[][];
   };
   label: string;
 }
 
-interface ImageWithRegions {
+export interface ImageWithRegions {
   labeledRegions: LabeledRegion[];
   imagePath: string;
 }

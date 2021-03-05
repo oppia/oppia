@@ -24,7 +24,7 @@ require(
   'image-click-input-validation.service.ts');
 require(
   'interactions/ImageClickInput/directives/' +
-  'oppia-interactive-image-click-input.directive.ts');
+  'oppia-interactive-image-click-input.component.ts');
 require(
   'interactions/ImageClickInput/directives/' +
   'oppia-response-image-click-input.directive.ts');
