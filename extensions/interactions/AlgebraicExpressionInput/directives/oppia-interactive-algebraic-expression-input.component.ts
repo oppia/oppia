@@ -84,11 +84,11 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
       this.algebraicExpressionInputRulesService as unknown as InteractionRulesService
     );
   }
-
-  addFocusWithoutScroll = function (label) {
+  addFocusWithoutScroll(label):void {
     this.focusManagerService.setFocus(label);
       setTimeout(function() { window.scrollTo(0,0); }, 5);
   }
+
   ngOnInit(): void {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
@@ -105,7 +105,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     // We need the 'focus' event while using the on screen keyboard (only
     // for touch-based devices) to capture input from user and the 'change'
     // event while using the normal keyboard.
-    Guppy.event("focus", () => {
+    Guppy.event(eventType, () => {
       const activeGuppyObject = (
         this.guppyInitializationService.findActiveGuppyObject());
       if (activeGuppyObject !== undefined) {

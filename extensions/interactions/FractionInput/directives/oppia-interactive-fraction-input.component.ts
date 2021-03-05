@@ -126,11 +126,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswerFn, isAnswerValid);
-      window.onload = () => {
-      setTimeout(() => { this.addFocusWithoutScroll('fractionInputField');
-      console.log("hey")
-       },5)
-    }
   }
 
   private getAttributesObject() {
@@ -197,7 +192,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.focusManagerService.setFocus(label);
     setTimeout(() => {
       window.scrollTo(0,0);
-      console.log('inside me')}, 5);
+    }, 5);
   }
 
   ngOnDestroy(): void {
