@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for library flow.
  */
 
+var action = require('../protractor_utils/action.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
