@@ -110,7 +110,7 @@ describe('Site language', function() {
     var EDITOR_USERNAME = 'langCollections';
 
     await users.createUser('lang@collections.com', EDITOR_USERNAME);
-    await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    await users.createAndLoginAdminUser('langCreator@explorations.com', CREATOR_USERNAME);
     await users.createAndLoginAdminUser(
       'testlangadm@collections.com', 'testlangadm');
     await adminPage.get();
@@ -234,7 +234,7 @@ describe('Site language', function() {
   );
 
   it('should not change in an exploration', async function() {
-    await users.login('langCreator@explorations.com', true);
+    await users.login('langCreator@explorations.com');
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');

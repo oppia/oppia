@@ -111,9 +111,8 @@ describe('Learner dashboard functionality', function() {
 
   it('should visit the exploration player and play the correct exploration',
     async function() {
-      await users.createUser(
+      await users.createAndLoginAdminUser(
         'expCreator@learnerDashboard.com', 'expCreator');
-      await users.login('expCreator@learnerDashboard.com', true);
       // Create or load an exploration named 'Exploration Player Test'.
       if (browser.isMobile) {
         await adminPage.reloadExploration('exploration_player_test.yaml');
@@ -136,10 +135,9 @@ describe('Learner dashboard functionality', function() {
 
   it('should visit the collection player and play the correct collection',
     async function() {
-      await users.createUser(
+      await users.createAndLoginAdminUser(
         'expOfCollectionCreator@learnerDashboard.com',
         'expOfCollectionCreator');
-      await users.login('expOfCollectionCreator@learnerDashboard.com', true);
       // Create or load a collection named
       // 'Introduction to Collections in Oppia'.
       if (browser.isMobile) {
@@ -178,9 +176,8 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('should display incomplete and completed explorations', async function() {
-    await users.createUser(
+    await users.createAndLoginAdminUser(
       'originalCreator@learnerDashboard.com', 'originalCreator');
-    await users.login('originalCreator@learnerDashboard.com', true);
     // Create or load explorations.
     if (browser.isMobile) {
       await adminPage.reloadExploration('learner_flow_test.yaml');
@@ -289,9 +286,8 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should display incomplete and completed collections', async function() {
-    await users.createUser(
+    await users.createAndLoginAdminUser(
       'explorationCreator@learnerDashboard.com', 'explorationCreator');
-    await users.login('explorationCreator@learnerDashboard.com', true);
     // Create or load a collection.
     if (browser.isMobile) {
       await adminPage.reloadCollection(1);

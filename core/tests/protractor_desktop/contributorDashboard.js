@@ -255,7 +255,7 @@ describe('Admin page contribution rights form', function() {
   });
 
   beforeEach(async function() {
-    await users.login(ADMIN_EMAIL, true);
+    await users.login(ADMIN_EMAIL);
   });
 
   it('should allow admin to add translation reviewer', async function() {

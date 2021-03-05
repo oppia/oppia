@@ -47,8 +47,8 @@ describe('Feature Gating Flow', function() {
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
-    await users.createUser(ADMIN_USER1_EMAIL, ADMIN_USERNAME1);
-    await users.createUser(ADMIN_USER2_EMAIL, ADMIN_USERNAME2);
+    await users.createAndLoginAdminUser(ADMIN_USER1_EMAIL, ADMIN_USERNAME1);
+    await users.createAndLoginAdminUser(ADMIN_USER2_EMAIL, ADMIN_USERNAME2);
   });
 
   afterEach(async function() {
@@ -57,7 +57,7 @@ describe('Feature Gating Flow', function() {
   });
 
   afterAll(async function() {
-    await users.login(ADMIN_USER1_EMAIL, true);
+    await users.login(ADMIN_USER1_EMAIL);
 
     await adminPage.getFeaturesTab();
     const dummy = await adminPage.getDummyFeatureElement();
@@ -68,7 +68,7 @@ describe('Feature Gating Flow', function() {
 
   it('should not show indicators gated by dummy feature when disabled',
     async() => {
-      await users.login(ADMIN_USER1_EMAIL, true);
+      await users.login(ADMIN_USER1_EMAIL);
       await adminPage.getFeaturesTab();
 
       expect(await agDummyFeatureIndicator.isPresent()).toBe(false);
@@ -77,7 +77,7 @@ describe('Feature Gating Flow', function() {
   );
 
   it('should show dummy feature in the features tab', async() => {
-    await users.login(ADMIN_USER1_EMAIL, true);
+    await users.login(ADMIN_USER1_EMAIL);
 
     await adminPage.getFeaturesTab();
 
@@ -87,14 +87,14 @@ describe('Feature Gating Flow', function() {
   });
 
   it('should show indicators after enabling dummy_feature', async() => {
-    await users.login(ADMIN_USER1_EMAIL, true);
+    await users.login(ADMIN_USER1_EMAIL);
 
     await adminPage.getFeaturesTab();
     const dummy = await adminPage.getDummyFeatureElement();
     await adminPage.enableFeatureForDev(dummy);
 
     await users.logout();
-    await users.login(ADMIN_USER2_EMAIL, true);
+    await users.login(ADMIN_USER2_EMAIL);
 
     await adminPage.getFeaturesTab();
 
