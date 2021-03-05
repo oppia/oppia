@@ -75,7 +75,6 @@ import { ReviewTestBackendApiService } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { TranslateService } from 'services/translate.service';
-import { $Injector } from './ajs-services-provided-in-angular.index';
 @Component({
   selector: 'oppia-angular-root',
   template: ''
@@ -90,7 +89,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static translateService: TranslateService;
-  static $injector: $Injector;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,

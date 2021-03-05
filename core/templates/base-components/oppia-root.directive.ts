@@ -22,7 +22,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 angular.module('oppia').directive('oppiaRoot', [
-  '$injector', '$translate', function($injector, $translate) {
+  '$translate', function($translate) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
@@ -31,7 +31,6 @@ angular.module('oppia').directive('oppiaRoot', [
       controller: ['$scope',
         function($scope) {
           $scope.initialized = false;
-          OppiaAngularRootComponent.$injector = $injector;
           $scope.onInit = function() {
             const translateService = (
               OppiaAngularRootComponent.translateService);
