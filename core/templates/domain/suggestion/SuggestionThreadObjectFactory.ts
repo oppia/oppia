@@ -20,8 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SuggestionBackendDict, Suggestion, SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionBackendDict, Suggestion } from
+  'domain/suggestion/suggestion.model';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary } from
@@ -107,17 +107,13 @@ export class SuggestionThread {
 
 @Injectable({providedIn: 'root'})
 export class SuggestionThreadObjectFactory {
-  constructor(
-    private suggestionObjectFactory: SuggestionObjectFactory) {}
-
   private createEditExplorationStateContentSuggestionFromBackendDict(
       suggestionBackendDict: SuggestionBackendDict): Suggestion {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
       return null;
     }
-    return this.suggestionObjectFactory.createFromBackendDict(
-      suggestionBackendDict);
+    return Suggestion.createFromBackendDict(suggestionBackendDict);
   }
 
   createFromBackendDicts(
