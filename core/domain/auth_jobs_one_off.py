@@ -26,6 +26,8 @@ from core import jobs
 from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
+from core.platform.auth import gae_auth_services
+import feconf
 import python_utils
 
 import firebase_admin
@@ -57,6 +59,13 @@ class AuditFirebaseImportReadinessOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user):
+        gae_auth_id = gae_auth_services.get_auth_id_from_user_id(user.id)
+        # NOTE: This committer ID is a legacy ACL-bypass that we no longer
+        # depend on. Because it is obsolete, we do not want it to have a
+        # Firebase account associated with it, or even consider it for import.
+        if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
+            return
+
         if user.deleted:
             yield ('[DELETED]', user.id)
         else:
@@ -94,6 +103,13 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(user):
         if user.deleted:
+            return
+
+        gae_auth_id = gae_auth_services.get_auth_id_from_user_id(user.id)
+        # NOTE: This committer ID is a legacy ACL-bypass that we no longer
+        # depend on. Because it is obsolete, we do not want it to have a
+        # Firebase account associated with it.
+        if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
             return
 
         auth_id = firebase_auth_services.get_auth_id_from_user_id(user.id)

@@ -42,6 +42,7 @@ auth_models, user_models = (
 class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
 
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+    ENABLE_AUTH_SERVICES_STUB = False
 
     def count_one_off_jobs_in_queue(self):
         """Returns the number of one off jobs in the taskqueue."""
@@ -100,6 +101,29 @@ class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(self.run_one_off_job(), [
             ['ERROR: Found deleted users', 'u1, u2'],
         ])
+
+    def test_system_committer_is_ignored_by_duplicate_email_check(self):
+        self.create_user('xx', 'admin@test.com')
+        self.create_user('yy', 'admin@test.com')
+        auth_models.UserAuthDetailsModel(
+            id='xx', gae_id=feconf.SYSTEM_COMMITTER_ID
+        ).put()
+        auth_models.UserIdentifiersModel(
+            id=feconf.SYSTEM_COMMITTER_ID, user_id='xx'
+        ).put()
+
+        self.assertEqual(self.run_one_off_job(), [])
+
+    def test_system_committer_is_ignored_by_deleted_check(self):
+        self.create_user('u1', 'admin@test.com', deleted=True)
+        auth_models.UserAuthDetailsModel(
+            id='u1', gae_id=feconf.SYSTEM_COMMITTER_ID
+        ).put()
+        auth_models.UserIdentifiersModel(
+            id=feconf.SYSTEM_COMMITTER_ID, user_id='u1'
+        ).put()
+
+        self.assertEqual(self.run_one_off_job(), [])
 
 
 class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
@@ -402,3 +426,17 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [
             ['INFO: Pre-existing Firebase accounts', 10],
         ])
+
+    def test_system_comitter_is_ignored(self):
+        auth_assoc = self.create_oppia_user()
+        auth_models.UserAuthDetailsModel(
+            id=auth_assoc.user_id, gae_id=feconf.SYSTEM_COMMITTER_ID
+        ).put()
+        auth_models.UserIdentifiersModel(
+            id=feconf.SYSTEM_COMMITTER_ID, user_id=auth_assoc.user_id
+        ).put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [])
+
+        self.assert_auth_mapping_does_not_exist(auth_assoc)
+        self.sdk_stub.assert_firebase_user_does_not_exist(auth_assoc.auth_id)
