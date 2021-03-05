@@ -35,7 +35,7 @@ describe('Exploration Title Editor directive', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -72,14 +72,14 @@ describe('Exploration Title Editor directive', function() {
     });
 
   it('should apply autofocus to settings tab element when tab is switched',
-  function() {
-    spyOn(routerService, 'getActiveTabName')
-      .and.returnValues('feedback', 'settings');
-    spyOn(focusManagerService, 'setFocus');
-    ctrl.focusLabel = 'xyzz';
-    $rootScope.$apply(routerService.getActiveTabName());
-    $rootScope.$apply(routerService.getActiveTabName());
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'xyzz');
-  });
+    function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValues('feedback', 'settings');
+      spyOn(focusManagerService, 'setFocus');
+      ctrl.focusLabel = 'xyzz';
+      $rootScope.$apply(routerService.getActiveTabName());
+      $rootScope.$apply(routerService.getActiveTabName());
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'xyzz');
+    });
 });
