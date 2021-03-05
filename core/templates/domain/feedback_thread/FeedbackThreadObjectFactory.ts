@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
+  'domain/feedback_message/ThreadMessage.model';
 import { ThreadMessageSummary } from
   'domain/feedback_message/ThreadMessageSummary.model';
 

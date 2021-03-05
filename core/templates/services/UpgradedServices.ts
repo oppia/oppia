@@ -483,8 +483,6 @@ import { TextInputRulesService } from
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
-import { ThreadMessageObjectFactory } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -839,8 +837,6 @@ export class UpgradedServices {
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['ThreadMessageObjectFactory'] =
-      new ThreadMessageObjectFactory();
     upgradedServices['TopicCreationBackendApiService'] =
         new TopicCreationBackendApiService(
           upgradedServices['HttpClient']);

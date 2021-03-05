@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { SuggestionBackendDict, Suggestion } from
   'domain/suggestion/suggestion.model';
 import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
+  'domain/feedback_message/ThreadMessage.model';
 import { ThreadMessageSummary } from
   'domain/feedback_message/ThreadMessageSummary.model';
 import { FeedbackThreadBackendDict } from

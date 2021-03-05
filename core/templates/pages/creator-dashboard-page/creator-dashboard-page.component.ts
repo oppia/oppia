@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Component for the creator dashboard.
  */
 
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -56,7 +58,7 @@ angular.module('oppia').component('creatorDashboardPage', {
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-    'ThreadMessageObjectFactory', 'ThreadStatusDisplayService',
+    'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
     'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -69,7 +71,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
-        ThreadMessageObjectFactory, ThreadStatusDisplayService,
+        ThreadStatusDisplayService,
         UrlInterpolationService, UserService,
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
         DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
@@ -174,7 +176,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           for (var i = 0; i < allThreads.length; i++) {
             if (allThreads[i].threadId === threadId) {
               allThreads[i].setMessages(response.data.messages.map(
-                m => ThreadMessageObjectFactory.createFromBackendDict(m)));
+                m => ThreadMessage.createFromBackendDict(m)));
               break;
             }
           }
