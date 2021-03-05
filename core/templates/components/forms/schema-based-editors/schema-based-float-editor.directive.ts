@@ -60,7 +60,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           ctrl.addFocusWithoutScroll = function(label) {
             FocusManagerService.setFocus(label);
             setTimeout(function() {
-              window.scrollTo(0,0)
+              window.scrollTo(0, 0);
             }, 5);
           };
 

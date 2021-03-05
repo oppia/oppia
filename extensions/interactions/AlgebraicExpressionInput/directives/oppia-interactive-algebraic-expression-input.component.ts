@@ -87,7 +87,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   addFocusWithoutScroll(label: string):void {
     this.focusManagerService.setFocus(label);
     setTimeout(function() {
-      window.scrollTo(0, 0)
+      window.scrollTo(0, 0);
     }, 5);
   }
 
