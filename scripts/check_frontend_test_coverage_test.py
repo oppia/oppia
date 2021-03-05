@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/check_frontend_coverage.py."""
+"""Unit tests for scripts/check_frontend_test_coverage.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -23,7 +23,7 @@ import sys
 from core.tests import test_utils
 import python_utils
 
-from . import check_frontend_coverage
+from . import check_frontend_test_coverage
 
 
 class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
@@ -78,7 +78,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         with self.open_file_swap:
-            stanzas = check_frontend_coverage.get_stanzas_from_lcov_file()
+            stanzas = check_frontend_test_coverage.get_stanzas_from_lcov_file()
             self.assertEqual(stanzas[0].file_name, 'file.ts')
             self.assertEqual(stanzas[0].total_lines, 10)
             self.assertEqual(stanzas[0].covered_lines, 5)
@@ -101,7 +101,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 Exception,
                 'The test path is empty or null. '
                 'It\'s not possible to diff the test coverage correctly.'):
-                check_frontend_coverage.get_stanzas_from_lcov_file()
+                check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_get_stanzas_from_lcov_file_total_lines_exception(self):
         self.lcov_items_list = (
@@ -115,7 +115,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 Exception,
                 'It wasn\'t possible to get the total lines of file.ts file.'
                 'It\'s not possible to diff the test coverage correctly.'):
-                check_frontend_coverage.get_stanzas_from_lcov_file()
+                check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_get_stanzas_from_lcov_file_covered_lines_exception(self):
         self.lcov_items_list = (
@@ -129,7 +129,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 Exception,
                 'It wasn\'t possible to get the covered lines of file.ts file.'
                 'It\'s not possible to diff the test coverage correctly.'):
-                check_frontend_coverage.get_stanzas_from_lcov_file()
+                check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_check_coverage_changes(self):
         self.lcov_items_list = (
@@ -143,7 +143,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
+            check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES', [
                 'file.ts',
                 'file2.ts'
@@ -161,7 +161,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
         with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
-                check_frontend_coverage.check_coverage_changes()
+                check_frontend_test_coverage.check_coverage_changes()
             self.assertEqual(
                 check_function_calls,
                 expected_check_function_calls)
@@ -175,7 +175,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 Exception,
                 'Expected lcov file to be'
                 r' available at [A-Za-z\._/]+, but the file does not exist.'):
-                check_frontend_coverage.check_coverage_changes()
+                check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_for_covered_files(self):
         self.lcov_items_list = (
@@ -185,7 +185,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
+            check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES', []
         )
 
@@ -195,7 +195,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     SystemExit,
                     r'\033\[1mfile.ts\033\[0m seems to be not completely'
                     ' tested. Make sure it\'s fully covered.\n'):
-                    check_frontend_coverage.check_coverage_changes()
+                    check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_remove_file(self):
         self.lcov_items_list = (
@@ -205,7 +205,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
+            check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES', [
                 'file.ts'
             ]
@@ -223,7 +223,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     ' correctly on:'
                     ' https://github.com/oppia/oppia/wiki/Frontend-unit'
                     '-tests-guide#rules\n'):
-                    check_frontend_coverage.check_coverage_changes()
+                    check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_when_renaming_file(self):
         self.lcov_items_list = (
@@ -233,7 +233,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
+            check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES', [
                 'file.ts'
             ]
@@ -250,7 +250,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     ' renamed it, please make sure to remove the old file name'
                     ' and add the new file name in the denylist in the file'
                     ' scripts/check_frontend_test_coverage.py.\n'):
-                    check_frontend_coverage.check_coverage_changes()
+                    check_frontend_test_coverage.check_coverage_changes()
 
     def test_fully_covered_filenames_is_sorted(self):
         self.lcov_items_list = (
@@ -264,7 +264,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
+            check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES', [
                 'anotherfile.ts'
                 'file.ts',
@@ -283,7 +283,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
                 (
-                    check_frontend_coverage
+                    check_frontend_test_coverage
                     .check_not_fully_covered_filenames_list_is_sorted())
                 self.assertEqual(
                     check_function_calls,
@@ -301,7 +301,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
+            check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES', [
                 'file.ts',
                 'anotherfile.ts'
@@ -315,7 +315,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     r'The \033\[1mNOT_FULLY_COVERED_FILENAMES\033\[0m list'
                     ' must be kept in alphabetical order.'):
                     (
-                        check_frontend_coverage
+                        check_frontend_test_coverage
                         .check_not_fully_covered_filenames_list_is_sorted())
 
     def test_function_calls(self):
@@ -326,12 +326,12 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
+            check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES', [
                 'file.ts'
             ])
         with self.check_call_swap, self.exists_swap, self.open_file_swap:
             with not_fully_covered_files_swap:
-                check_frontend_coverage.main()
+                check_frontend_test_coverage.main()
             self.assertEqual(
                 self.check_function_calls, self.expected_check_function_calls)
