@@ -40,5 +40,5 @@ export class SkillEditorNavbarBreadcrumbComponent {
 }
 
 angular.module('oppia').directive(
-  'skillEditorNavbarBreadcrumb', downgradeComponent(
+  'oppiaSkillEditorNavbarBreadcrumb', downgradeComponent(
     {component: SkillEditorNavbarBreadcrumbComponent}));
