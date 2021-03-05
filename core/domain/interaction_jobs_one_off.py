@@ -140,7 +140,10 @@ yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
 
 
 class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
