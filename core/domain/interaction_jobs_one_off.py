@@ -136,6 +136,7 @@ class MultipleChoiceInteractionLtOneOffJob(
                     choice_length = len(choice)
                     if choice_length > 30:
                         yield ('LONGER_THAN_30', (item.id, choice_length))
+yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
