@@ -93,7 +93,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         // We need the 'focus' event while using the on screen keyboard (only
         // for touch-based devices) to capture input from user and the 'change'
         // event while using the normal keyboard.
-        Guppy.event('focus', () => {
+        Guppy.event(eventType, () => {
           var activeGuppyObject = (
             GuppyInitializationService.findActiveGuppyObject());
           if (activeGuppyObject !== undefined) {

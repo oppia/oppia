@@ -21,7 +21,7 @@
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
                      is-learn-again-button="isLearnAgainButton()"
                      ng-click="onClickContinueButton()"
-                     class="d-inline-block">
+                     class="d-inline-block continue-btn">
     </continue-button>
   </div>
 
@@ -36,6 +36,11 @@
 </div>
 
 <style>
+  continue-button .continue-btn {
+    margin-top: 12px;
+    margin: 6px 8px;
+  }
+
   .conversation-skin-help-card {
     background: #fff;
     border-radius: 2px;

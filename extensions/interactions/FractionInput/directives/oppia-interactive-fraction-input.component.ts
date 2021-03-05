@@ -107,11 +107,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       this.currentInteractionService.updateViewWithNewAnswer();
     }));
   }
-  
-  addFocusWithoutScroll = function (label) {
-    this.focusManagerService.setFocus(label);
-      setTimeout(function() { window.scrollTo(0,0); }, 5);
-  }
 
   ngOnInit(): void {
     const {
@@ -131,14 +126,14 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswerFn, isAnswerValid);
-    setTimeout(() => {
-      this.addFocusWithoutScroll('fractionInputField')
-    }, 400);
+      window.onload = () => {
+      setTimeout(() => { this.addFocusWithoutScroll('fractionInputField');
       console.log("hey")
+       },5)
+    }
   }
 
   private getAttributesObject() {
-    this.addFocusWithoutScroll('fractionInputField')
     return {
       requireSimplestFormWithValue: this.requireSimplestFormWithValue,
       allowImproperFractionWithValue: this.allowImproperFractionWithValue,
@@ -196,6 +191,13 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       return 'I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER';
     }
     return 'I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER';
+  }
+
+  addFocusWithoutScroll(label): void {
+    this.focusManagerService.setFocus(label);
+    setTimeout(() => {
+      window.scrollTo(0,0);
+      console.log('inside me')}, 5);
   }
 
   ngOnDestroy(): void {

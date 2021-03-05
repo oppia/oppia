@@ -1,9 +1,9 @@
 <form autocomplete="off" [attr.disabled]="!isValid ? true : null" role="form" class="form-horizontal fraction-input-interaction">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
-  <input type="text" name="answer" [(ngModel)]="answer" (ngModelChange)="answerValueChanged()" class="form-control oopia-autofocus" 
+  <input type="text" name="answer" [(ngModel)]="answer" (ngModelChange)="answerValueChanged()" class="form-control oppia-autofocus" 
          (keyup.enter)="submitAnswer()"
          placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}"
-         focus-on="fractionInputField">
+         focus-on="true">
 
   <div class="oppia-form-error oppia-fraction-input-error">
     {{errorMessage}}
