@@ -136,14 +136,15 @@ class MultipleChoiceInteractionLtOneOffJob(
                     choice_length = len(choice)
                     if choice_length > 30:
                         yield ('LONGER_THAN_30', (item.id, choice_length))
-yield ('SUCCESS', item.id)
+                    else:
+                        yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
         if key == 'SUCCESS':
-            yield (key, len(values))
-        else:
             yield (key, values)
+        else:
+            yield (key, 30)
 
 
 class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -203,16 +204,20 @@ class ItemSelectionInteractionLtOneOffJob(
         exploration = exp_fetchers.get_exploration_from_model(item)
         for state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
-                for choice in state.interaction.customization_args[
-                        'choices'].value:
+                choices=state.interaction.customization_args['choices']
+                for choice in choices.value:
                     choice_length = len(choice)
                     if choice_length > 30:
-                        yield (
-                            item.id, 30)
+                        yield ('LONGER_THAN_30', (item.id, choice_length))
+                    else:
+                        yield('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == 'SUCCESS':
+            yield (key, values)
+        else:
+            yeild (key, 30)
 
 
 class InteractionCustomizationArgsValidationOneOffJob(
