@@ -23,8 +23,9 @@ require(
 import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
-fdescribe('Exploration Title Editor directive', function() {
+describe('Exploration Title Editor directive', function() {
   var $scope = null;
   var $rootScope = null;
   var ExplorationTitleService = null;
@@ -32,6 +33,9 @@ fdescribe('Exploration Title Editor directive', function() {
   var routerService = null;
   var ctrl = null;
 
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+  
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
