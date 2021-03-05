@@ -41,16 +41,10 @@ var ProfilePage = function() {
   };
 
   this.expectCurrUserToHaveProfilePhoto = async function() {
-    await waitFor.visibilityOf(
-      currUserProfilePhoto,
-      'Current User Profile Photo Taking too Long To Display');
     expect(await currUserProfilePhoto.isPresent()).toBe(true);
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
-    await waitFor.visibilityOf(
-      otherUserProfilePhoto,
-      'Other User Profile Photo Taking Too Long to Display');
     expect(await otherUserProfilePhoto.isPresent()).toBe(true);
   };
 
@@ -71,7 +65,10 @@ var ProfilePage = function() {
     expect(numInterests).toEqual(expectedInterests.length);
 
     var interestTexts = await interests.map(async function(interestElem) {
-      return await interestElem.getText();
+      await waitFor.visibilityOf(
+        interestElem,
+        'interestElem is taking too Long to appear');
+      expect(await interestElem.getText()).toMatch(expectedInterests);
     });
     interestTexts.forEach(function(interestText) {
       expect(expectedInterests.includes(interestText)).toBe(true);
