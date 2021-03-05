@@ -55,6 +55,7 @@ interface GraphOption {
   text: string;
   option: string;
 }
+
 @Component({
   selector: 'graph-viz',
   templateUrl: './graph-viz.component.html',
@@ -325,7 +326,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  toggleGraphOption(option: string):void {
+  toggleGraphOption(option: string): void {
     // Handle the case when we have two edges s -> d and d -> s.
     if (option === 'isDirected' && this.graph[option]) {
       this._deleteRepeatedUndirectedEdges();
@@ -363,7 +364,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // TODO(czx): Consider if there's a neat way to write a reset()
+  // TODO(#12104): Consider if there's a neat way to write a reset()
   // function to clear bits of this.state
   // (e.g. currentlyDraggedVertex, addEdgeVertex).
 
@@ -480,7 +481,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   // ---- Document event ----
   @HostListener('document:mouseup', ['$event'])
   @debounce()
-  onMouseupDocument():void {
+  onMouseupDocument(): void {
     if (this.isMobile) {
       return;
     }

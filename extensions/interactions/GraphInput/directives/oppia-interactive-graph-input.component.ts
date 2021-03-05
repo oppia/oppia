@@ -74,7 +74,6 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => {
           this.interactionIsActive = false;
-
           this.canAddVertex = false;
           this.canDeleteVertex = false;
           this.canEditVertexLabel = false;
@@ -165,7 +164,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
     }
   }
 
-  // TODO(czxcjx): Write this function.
+  // TODO(#12104): Write this function.
   checkValidGraph(graph: GraphAnswer): boolean {
     return Boolean(graph);
   }
