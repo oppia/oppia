@@ -13,14 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of suggestion
-   domain objects.
+ * @fileoverview Model class for creating new frontend instances of suggestion.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { SuggestionsService } from 'services/suggestions.service';
 
 interface SuggestionChangeValue {
   html: string;
@@ -74,30 +68,23 @@ export class Suggestion {
     this.lastUpdatedMsecs = lastUpdatedMsecs;
   }
 
-  getThreadId(): string {
-    return this.threadId;
-  }
-}
-
-@Injectable({providedIn: 'root'})
-export class SuggestionObjectFactory {
-  constructor(private suggestionsService: SuggestionsService) {}
-  createFromBackendDict(
+  static createFromBackendDict(
       suggestionBackendDict: SuggestionBackendDict): Suggestion {
-    let threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
-      suggestionBackendDict);
+    let threadId = suggestionBackendDict.suggestion_id;
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
-      suggestionBackendDict.suggestion_id, threadId,
-      suggestionBackendDict.target_type, suggestionBackendDict.target_id,
-      suggestionBackendDict.status, suggestionBackendDict.author_name,
+      suggestionBackendDict.suggestion_id,
+      threadId,
+      suggestionBackendDict.target_type,
+      suggestionBackendDict.target_id,
+      suggestionBackendDict.status,
+      suggestionBackendDict.author_name,
       suggestionBackendDict.change.state_name,
       suggestionBackendDict.change.new_value,
       suggestionBackendDict.change.old_value,
       suggestionBackendDict.last_updated_msecs);
   }
+  getThreadId(): string {
+    return this.threadId;
+  }
 }
-
-angular.module('oppia').factory(
-  'SuggestionObjectFactory',
-  downgradeInjectable(SuggestionObjectFactory));

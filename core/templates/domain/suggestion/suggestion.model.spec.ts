@@ -13,21 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SuggestionObjectFactory.
+ * @fileoverview Unit tests for SuggestionDataModel.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { Suggestion } from 'domain/suggestion/suggestion.model';
 
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-
-describe('SuggestionObjectFactory', () => {
-  let suggestionObjectFactory: SuggestionObjectFactory;
-
-  beforeEach(() => {
-    suggestionObjectFactory = TestBed.get(SuggestionObjectFactory);
-  });
-
+describe('Suggestion data model', () => {
   it('should create a new suggestion from a backend dict.', () => {
     let suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
@@ -50,8 +41,7 @@ describe('SuggestionObjectFactory', () => {
       },
       last_updated_msecs: 1000
     };
-    let suggestion = suggestionObjectFactory.createFromBackendDict(
-      suggestionBackendDict);
+    let suggestion = Suggestion.createFromBackendDict(suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
     expect(suggestion.targetId).toEqual('exp1');

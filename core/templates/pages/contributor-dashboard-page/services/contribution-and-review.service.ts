@@ -17,7 +17,7 @@
  */
 
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
-require('domain/suggestion/SuggestionObjectFactory.ts');
+require('domain/suggestion/suggestion.model.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
