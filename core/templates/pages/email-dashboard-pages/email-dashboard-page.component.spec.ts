@@ -90,16 +90,29 @@ describe('Email Dashboard Page', function() {
     EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
       ctrl.data.push({
         attribute: predicate.backend_attr,
-        value: 1,
-        default_value: predicate.default_value
+        value: 1
       });
     });
 
     ctrl.resetForm();
 
     ctrl.data.forEach(element => {
-      expect(element.value).toBe(element.default_value);
+      expect(element.value).toBe(null);
     });
+  });
+
+  it('should check if all inputs are empty', function() {
+    ctrl.resetForm();
+    expect(ctrl.areAllInputsEmpty()).toBe(true);
+
+    EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
+      ctrl.data.push({
+        attribute: predicate.backend_attr,
+        value: 1,
+        default_value: predicate.default_value
+      });
+    });
+    expect(ctrl.areAllInputsEmpty()).toBe(false);
   });
 
   it('should submit query when submitting form', function() {
@@ -110,7 +123,6 @@ describe('Email Dashboard Page', function() {
       ctrl.data.push({
         attribute: predicate.backend_attr,
         value: 1,
-        default_value: predicate.default_value
       });
     });
 
@@ -126,10 +138,6 @@ describe('Email Dashboard Page', function() {
 
     expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
     expect(ctrl.showSuccessMessage).toBe(true);
-
-    ctrl.data.forEach(element => {
-      expect(element.value).toBe(element.default_value);
-    });
   });
 
   it('should get next page of queries', function() {

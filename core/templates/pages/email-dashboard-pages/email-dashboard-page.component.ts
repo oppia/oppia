@@ -32,29 +32,28 @@ angular.module('oppia').component('emailDashboardPage', {
         $rootScope, EmailDashboardDataService, LoaderService,
         UserService, EMAIL_DASHBOARD_PREDICATE_DEFINITION) {
       var ctrl = this;
+      ctrl.notRequired = true;
       ctrl.resetForm = function() {
         ctrl.data = [];
         EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
           ctrl.data.push({
             attribute: predicate.backend_attr,
             value: predicate.default_value,
-            default_value: predicate.default_value
           });
         });
       };
 
-      ctrl.submitQueryAsync = async function() {
-        var data = ctrl.data.map(pred => {
-          var predicate = {
-            attribute: pred.attribute,
-            value: null
-          };
-          if (pred.value !== pred.default_value) {
-            predicate.value = pred.value;
+      ctrl.areAllInputsEmpty = function() {
+        for (var i = 0; i < ctrl.data.length; i++) {
+          if (ctrl.data[i].value !== null) {
+            return false;
           }
-          return predicate;
-        });
-        EmailDashboardDataService.submitQueryAsync(data).then(
+        }
+        return true;
+      };
+
+      ctrl.submitQueryAsync = async function() {
+        EmailDashboardDataService.submitQueryAsync(ctrl.data).then(
           function(queries) {
             ctrl.currentPageOfQueries = queries;
             // TODO(#8521): Remove the use of $rootScope.$apply()

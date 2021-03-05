@@ -5,20 +5,19 @@
         <md-card class="oppia-page-card oppia-long-text">
           <form class="form-horizontal" ng-submit="$ctrl.submitQueryAsync()" name="form.schemaForm">
             <legend>Email Dashboard</legend>
-            Note: -1 indicates query not considered.
             <div ng-repeat="customizationArgSpec in $ctrl.customizationArgSpecs track by $index">
               <div class="d-xl-inline-flex form-group">
                 <label class="col-3 col-form-label" for="label-target-role-method">
                   <[customizationArgSpec.description]>:
                 </label>
                 <div class="col-7">
-                  <schema-based-editor local-value="$ctrl.data[$index].value" schema="customizationArgSpec.schema"
+                  <schema-based-editor local-value="$ctrl.data[$index].value" schema="customizationArgSpec.schema" not-required="$ctrl.notRequired"
                                        class="protractor-test-email-dashboard-input-{{ $index }}">
                   </schema-based-editor>
                 </div>
               </div>
             </div>
-            <input type="submit" value="submit query" ng-disabled="form.schemaForm.$invalid" class="protractor-test-submit-query-button">
+            <input type="submit" value="submit query" ng-disabled="form.schemaForm.$invalid || $ctrl.areAllInputsEmpty()" class="protractor-test-submit-query-button">
             <input type="reset" value="reset" ng-click="$ctrl.resetForm()">
           </form>
         </md-card>

@@ -5631,7 +5631,7 @@ export default {
           "min_value": -1
         }]
       },
-      "default_value": -1
+      "default_value": null
     },
     {
       "backend_id": "user_login_activity",
@@ -5644,7 +5644,7 @@ export default {
           "min_value": -1
         }]
       },
-      "default_value": -1
+      "default_value": null
     },
     {
       "backend_id": "minimum_exp_created",
@@ -5657,7 +5657,7 @@ export default {
           "min_value": -1
         }]
       },
-      "default_value": -1
+      "default_value": null
     },
     {
       "backend_id": "maximum_exp_created",
@@ -5670,7 +5670,7 @@ export default {
           "min_value": -1
         }]
       },
-      "default_value": -1
+      "default_value": null
     },
     {
       "backend_id": "minimum_exp_edited",
@@ -5683,7 +5683,7 @@ export default {
           "min_value": -1
         }]
       },
-      "default_value": -1
+      "default_value": null
     },
     {
       "backend_id": "maximum_exp_edited",
@@ -5696,7 +5696,7 @@ export default {
           "min_value": -1
         }]
       },
-      "default_value": -1
+      "default_value": null
     }
   ],
 
