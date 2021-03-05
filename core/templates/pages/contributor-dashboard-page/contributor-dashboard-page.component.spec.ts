@@ -49,7 +49,7 @@ describe('Contributor dashboard page', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-    $provide.value('$window', mockWindow);
+    $provide.value('WindowRef.nativeWindow', mockWindow);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
@@ -140,21 +140,27 @@ describe('Contributor dashboard page', function() {
       var e = document.createEvent('Event');
       var scrollSpy = spyOn(ctrl, 'scrollFunction');
       e.initEvent('scroll', true, true);
+
       window.dispatchEvent(e);
+
       expect(scrollSpy).toHaveBeenCalled();
     });
 
     it('should show default header if window pageYOffset is ' +
       'less than 5', function() {
       mockWindow.pageYOffset = 3;
+
       ctrl.scrollFunction();
+
       expect(ctrl.defaultHeaderVisible).toBe(true);
     });
 
     it('should show collapsed header if window pageYOffset is' +
       ' scrolled greater than 5', function() {
       mockWindow.pageYOffset = 10;
+
       ctrl.scrollFunction();
+      
       expect(ctrl.defaultHeaderVisible).toBe(false);
     });
   });
