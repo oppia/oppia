@@ -21,6 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
@@ -38,9 +39,7 @@ describe('Contributor dashboard page', function() {
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
     can_review_questions: true
   };
-  var mockWindow = {
-    pageYOffset: 6
-  };
+  var windowRef = new WindowRef();
 
   importAllAngularServices();
 
@@ -48,8 +47,8 @@ describe('Contributor dashboard page', function() {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
+      $provide.value('WindowRef', windowRef);
     }
-    $provide.value('$window', mockWindow);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
@@ -148,7 +147,10 @@ describe('Contributor dashboard page', function() {
 
     it('should show default header if window pageYOffset is ' +
       'less than 5', function() {
-      mockWindow.pageYOffset = 3;
+      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+      nativeWindowSpy.and.returnValue({
+        pageYOffset: 4
+      });
 
       ctrl.scrollFunction();
 
@@ -157,7 +159,10 @@ describe('Contributor dashboard page', function() {
 
     it('should show collapsed header if window pageYOffset is' +
       ' scrolled greater than 5', function() {
-      mockWindow.pageYOffset = 10;
+        const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+        nativeWindowSpy.and.returnValue({
+          pageYOffset: 6
+        });
 
       ctrl.scrollFunction();
 
