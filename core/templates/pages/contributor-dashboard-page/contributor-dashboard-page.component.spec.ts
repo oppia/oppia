@@ -160,7 +160,7 @@ describe('Contributor dashboard page', function() {
       mockWindow.pageYOffset = 10;
 
       ctrl.scrollFunction();
-      
+
       expect(ctrl.defaultHeaderVisible).toBe(false);
     });
   });

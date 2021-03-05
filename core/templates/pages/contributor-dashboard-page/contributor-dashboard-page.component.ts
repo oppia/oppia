@@ -51,12 +51,12 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$window', 'LanguageUtilService', 'LocalStorageService',
+    '$rootScope', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
-        $rootScope, $window, LanguageUtilService, LocalStorageService,
+        $rootScope, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
