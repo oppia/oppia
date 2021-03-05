@@ -188,10 +188,10 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     return 'I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER';
   }
 
-  addFocusWithoutScroll(label): void {
+  addFocusWithoutScroll(label: string): void {
     this.focusManagerService.setFocus(label);
     setTimeout(() => {
-      window.scrollTo(0,0);
+      window.scrollTo(0, 0);
     }, 5);
   }
 

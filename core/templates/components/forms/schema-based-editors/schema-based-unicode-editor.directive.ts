@@ -48,7 +48,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$sce', '$timeout', '$translate',
-        'DeviceInfoService', 'FocusManagerService', 
+        'DeviceInfoService', 'FocusManagerService',
         'SchemaFormSubmittedService', 'StateCustomizationArgsService',
         function(
             $filter, $sce, $timeout, $translate,
@@ -97,11 +97,13 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
           };
-          
-          ctrl.addFocusWithoutScroll = function (label) {
+
+          ctrl.addFocusWithoutScroll = function(label) {
             FocusManagerService.setFocus(label);
-              setTimeout(function() { window.scrollTo(0,0); }, 5);
-          }
+            setTimeout(function() {
+              window.scrollTo(0,0)
+            }, 5);
+          };
 
           ctrl.$onInit = function() {
             if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {

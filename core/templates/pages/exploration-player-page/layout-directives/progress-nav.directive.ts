@@ -162,22 +162,23 @@ angular.module('oppia').directive('progressNav', [
               $scope.displayedCard.isCompleted() &&
               $scope.displayedCard.getLastOppiaResponse());
           };
-          
-          ctrl.addFocusWithoutScroll = function (label) {
+
+          ctrl.addFocusWithoutScroll = function(label) {
             FocusManagerService.setFocus(label);
-              setTimeout(function() { window.scrollTo(0,0); }, 5);
-          }
+            setTimeout(function() {
+              window.scrollTo(0, 0)
+            }, 5);
+          };
 
           ctrl.$onInit = function() {
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isIframed = UrlService.isIframed();
             $scope.$watch(function() {
               if ($scope.interactionId === ('Continue')) {
-                  ctrl.addFocusWithoutScroll('continueBtn');
-                  }
+                ctrl.addFocusWithoutScroll('continueBtn');
+              }
               return PlayerPositionService.getDisplayedCardIndex();
-            }, updateDisplayedCardInfo)
-          
+            }, updateDisplayedCardInfo);
             ctrl.directiveSubscriptions.add(
               PlayerPositionService.onHelpCardAvailable.subscribe(
                 (helpCard) => {

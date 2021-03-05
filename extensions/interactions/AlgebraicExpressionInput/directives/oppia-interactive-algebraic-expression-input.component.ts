@@ -84,9 +84,11 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
       this.algebraicExpressionInputRulesService as unknown as InteractionRulesService
     );
   }
-  addFocusWithoutScroll(label):void {
+  addFocusWithoutScroll(label: string):void {
     this.focusManagerService.setFocus(label);
-      setTimeout(function() { window.scrollTo(0,0); }, 5);
+    setTimeout(function() {
+      window.scrollTo(0, 0)
+    }, 5);
   }
 
   ngOnInit(): void {

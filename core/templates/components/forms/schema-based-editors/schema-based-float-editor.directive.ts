@@ -57,10 +57,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                 NumericInputValidationService.getErrorString(localValue)));
           };
 
-          ctrl.addFocusWithoutScroll = function (label) {
+          ctrl.addFocusWithoutScroll = function(label) {
             FocusManagerService.setFocus(label);
-              setTimeout(function() { window.scrollTo(0,0); }, 5);
-          }
+            setTimeout(function() {
+              window.scrollTo(0,0)
+            }, 5);
+          };
 
           ctrl.onFocus = function() {
             ctrl.hasFocusedAtLeastOnce = true;
