@@ -49,7 +49,7 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
@@ -59,6 +59,7 @@ import { ProfileLinkTextComponent } from
 import { TakeBreakModalComponent } from
   'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { RefresherExplorationConfirmationModalComponent } from 'pages/exploration-player-page/templates/refresher-exploration-confirmation-modal.component';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -82,6 +83,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     FormsModule,
     ...firebaseAuthModules,
+    NgbModalModule
   ],
 
   providers: [
@@ -104,7 +106,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
     TranslatePipe,
-    TakeBreakModalComponent
+    TakeBreakModalComponent,
+    RefresherExplorationConfirmationModalComponent
   ],
 
   entryComponents: [
@@ -118,7 +121,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    RefresherExplorationConfirmationModalComponent
   ],
 
   exports: [

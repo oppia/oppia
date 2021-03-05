@@ -236,6 +236,7 @@ import { AudioPreloaderService } from 'pages/exploration-player-page/services/au
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
@@ -247,6 +248,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
+import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
@@ -418,6 +420,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationEngineService', ExplorationEngineService],
   ['ExplorationFeaturesBackendApiService',
     ExplorationFeaturesBackendApiService],
   ['ExplorationFeaturesService', ExplorationFeaturesService],
@@ -568,6 +571,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RecordedVoiceoversObjectFactory', RecordedVoiceoversObjectFactory],
+  ['RefresherExplorationConfirmationModalService',
+    RefresherExplorationConfirmationModalService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],

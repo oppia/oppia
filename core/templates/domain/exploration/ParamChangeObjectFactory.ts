@@ -45,11 +45,11 @@ interface RandomSelectorCustomizationArgs {
   'list_of_values': string[];
 }
 
-type ParamChangeCustomizationArgs = (
-  CopierCustomizationArgs | RandomSelectorCustomizationArgs);
+// type ParamChangeCustomizationArgs = (
+//   CopierCustomizationArgs | RandomSelectorCustomizationArgs);
 
 export interface ParamChangeBackendDict {
-  'customization_args': ParamChangeCustomizationArgs;
+  'customization_args': CopierCustomizationArgs;
   'generator_id': string;
   'name': string;
 }

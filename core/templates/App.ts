@@ -114,6 +114,7 @@ angular.module('oppia').config([
       'EditabilityService', 'EditorFirstTimeEventsService',
       'ExplorationFeaturesService', 'ExplorationHtmlFormatterService',
       'ExplorationImprovementsBackendApiService',
+      'ExplorationEngine',
       'ExplorationImprovementsService', 'ExplorationObjectFactory',
       'ExplorationRecommendationsService', 'ExpressionEvaluatorService',
       'ExpressionParserService', 'ExpressionSyntaxTreeService',

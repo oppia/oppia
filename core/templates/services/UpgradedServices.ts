@@ -538,6 +538,7 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -1374,6 +1375,28 @@ export class UpgradedServices {
       upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']);
+
+    // // Topological level: 18
+    // upgradedServices['ExplorationEngineService'] = new ExplorationEngineService(
+    //   upgradedServices['AlertsService'],
+    //   upgradedServices['AnswerClassificationService'],
+    //   upgradedServices['AudioPreloaderService'],
+    //   upgradedServices['AudioTranslationLanguageService'],
+    //   upgradedServices['ContentTranslationLanguageService'],
+    //   upgradedServices['ContextService'],
+    //   upgradedServices['ExplorationFeaturesBackendApiService'],
+    //   upgradedServices['ExplorationHtmlFormatterService'],
+    //   upgradedServices['ExplorationObjectFactory'],
+    //   upgradedServices['ExpressionInterpolationService'],
+    //   upgradedServices['FocusManagerService'],
+    //   upgradedServices['ImagePreloaderService'],
+    //   upgradedServices['LearnerParamsService'],
+    //   upgradedServices['PlayerTranscriptService'],
+    //   upgradedServices['ReadOnlyExplorationBackendApiService'],
+    //   upgradedServices['StateCardObjectFactory'],
+    //   upgradedServices['StatsReportingService'],
+    //   upgradedServices['UrlService']
+    // );
 
     /* eslint-enable dot-notation */
     return upgradedServices;
