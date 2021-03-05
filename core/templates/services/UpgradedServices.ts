@@ -168,9 +168,6 @@ import { ExpressionSyntaxTreeService } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExternalSaveService } from 'services/external-save.service.ts';
-import { ExtractImageFilenamesFromStateService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -199,8 +196,6 @@ import { ImageClickInputRulesService } from
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import { ImagePreloaderService } from
-  'pages/exploration-player-page/services/image-preloader.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionAttributesExtractorService } from
   'interactions/interaction-attributes-extractor.service';
@@ -913,9 +908,6 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
-    upgradedServices['ExtractImageFilenamesFromStateService'] =
-      new ExtractImageFilenamesFromStateService(
-        upgradedServices['HtmlEscaperService']);
     upgradedServices['FocusManagerService'] = new FocusManagerService(
       upgradedServices['DeviceInfoService'],
       upgradedServices['IdGenerationService']);
@@ -1316,11 +1308,6 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
-    upgradedServices['ImagePreloaderService'] = new ImagePreloaderService(
-      upgradedServices['AssetsBackendApiService'],
-      upgradedServices['ComputeGraphService'],
-      upgradedServices['ContextService'],
-      upgradedServices['ExtractImageFilenamesFromStateService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],
