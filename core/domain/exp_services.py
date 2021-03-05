@@ -1798,12 +1798,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
     exp_stats_list = stats_services.get_multiple_exploration_stats_by_version(
         exp_id, exp_versions)
 
-    try:
-        exp_list = exp_fetchers.get_multiple_explorations_by_version(
-            exp_id, exp_versions, run_conversion=False)
-    except:
-        raise Exception(
-            'Failed to fetch Exploration(exp_id=%r) versions' % exp_id)
+    exp_list = exp_fetchers.get_multiple_explorations_by_version(
+        exp_id, exp_versions, run_conversion=False)
 
     if all(exp_stats is None for exp_stats in exp_stats_list):
         for index, version in enumerate(exp_versions):

@@ -4983,23 +4983,6 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID'), (
                 [], [], 1, 1))
 
-    def test_fails_to_fetch_explorations_by_versions(self):
-        self.save_new_default_exploration('ID', 'owner_id')
-
-        def _mock_get_multiple_explorations_by_version(
-                unused_exp_id, unused_exp_versions):
-            """Mocks get_multiple_explorations_by_version() to raise an
-            Exception.
-            """
-            raise Exception('something')
-
-        error_message = 'Failed to fetch Exploration'
-        with self.swap(
-            exp_fetchers, 'get_multiple_explorations_by_version',
-            _mock_get_multiple_explorations_by_version):
-            with self.assertRaisesRegexp(Exception, error_message):
-                exp_services.regenerate_missing_stats_for_exploration('ID')
-
     def test_fail_to_fetch_exploration_snapshots(self):
         self.save_new_default_exploration('ID', 'owner_id')
         exp_snapshot_id = exp_models.ExplorationModel.get_snapshot_id('ID', 1)
