@@ -23,7 +23,7 @@ require('pages/exploration-player-page/services/hint-and-solution-modal.service.
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Hint and Solution modal service factory', () => {
+describe('Hint and Solution modal service', () => {
   var HintAndSolutionModalService = null;
   var $uibModal = null;
 
