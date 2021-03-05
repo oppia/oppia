@@ -135,8 +135,11 @@ describe('SvgFilenameEditor', function() {
     },
     generateImageFilename: function(height, width, extension) {
       return height + '_' + width + '.' + extension;
-    },
-    getInvalidSvgTagsAndAttrs: function(dataUri) {
+    }
+  };
+
+  var mockSvgSanitizerService = {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataUri) {
       return { tags: [], attrs: [] };
     }
   };
@@ -188,6 +191,7 @@ describe('SvgFilenameEditor', function() {
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController, $q) {
     contextService = $injector.get('ContextService');
@@ -492,15 +496,16 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('circle');
   });
 
-  it('should set title with onOpen color picker function', function() {
-    setTimeout(() => {
+  it('should set title with onOpen color picker function', function(done) {
+    $(document).ready(() => {
       svgFilenameCtrl.bgPicker.onOpen();
       let alphaSliders = document.querySelectorAll(
         '.picker_alpha .picker_selector');
       alphaSliders.forEach(function(element) {
         expect(element.getAttribute('title')).toBe('Transparency Slider');
       });
-    }, 1000);
+      done();
+    });
   });
 
   it('should trigger object selection and scaling events', function() {
@@ -623,6 +628,7 @@ describe('SvgFilenameEditor initialized with value attribute',
       $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
       $provide.value('ImagePreloaderService', mockImagePreloaderService);
       $provide.value('ImageUploadHelperService', {});
+      $provide.value('SvgSanitizerService', {});
     }));
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
@@ -680,8 +686,11 @@ describe('SvgFilenameEditor with image save destination as ' +
     },
     generateImageFilename: function(height, widht, extension) {
       return height + '_' + widht + '.' + extension;
-    },
-    getInvalidSvgTagsAndAttrs: function(dataUri) {
+    }
+  };
+
+  var mockSvgSanitizerService = {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataUri) {
       return { tags: [], attrs: [] };
     }
   };
@@ -728,6 +737,7 @@ describe('SvgFilenameEditor with image save destination as ' +
     $provide.value('ImageLocalStorageService', mockilss);
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     contextService = $injector.get('ContextService');
@@ -777,8 +787,8 @@ describe('SvgFilenameEditor with image save destination as ' +
 
 describe('should fail svg tag validation', function() {
   var svgFilenameCtrl = null;
-  var mockImageUploadHelperService = {
-    getInvalidSvgTagsAndAttrs: function(dataURI) {
+  var mockSvgSanitizerService = {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataURI) {
       return { tags: ['script'], attrs: [] };
     }
   };
@@ -788,7 +798,8 @@ describe('should fail svg tag validation', function() {
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', {});
-    $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+    $provide.value('ImageUploadHelperService', {});
+    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
   }));
   beforeEach(angular.mock.inject(function($componentController) {
     svgFilenameCtrl = $componentController('svgFilenameEditor');
@@ -808,8 +819,8 @@ describe('should fail svg tag validation', function() {
 
 describe('should fail svg attribute validation', function() {
   var svgFilenameCtrl = null;
-  var mockImageUploadHelperService = {
-    getInvalidSvgTagsAndAttrs: function(dataURI) {
+  var mockSvgSanitizerService = {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataURI) {
       return { tags: [], attrs: ['widht'] };
     }
   };
@@ -819,7 +830,8 @@ describe('should fail svg attribute validation', function() {
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', {});
-    $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+    $provide.value('ImageUploadHelperService', {});
+    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
   }));
   beforeEach(angular.mock.inject(function($componentController) {
     svgFilenameCtrl = $componentController('svgFilenameEditor');

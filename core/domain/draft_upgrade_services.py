@@ -342,7 +342,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                                         language_code]['html'])
                             )
             elif (change.property_name ==
-                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
+                  new_value is not None):
                 new_value = (
                     state_domain.Outcome.convert_html_in_outcome(
                         new_value, conversion_fn))
@@ -353,7 +354,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         hint_dict, conversion_fn))
                     for hint_dict in new_value]
             elif (change.property_name ==
-                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
+                  new_value is not None):
                 new_value['explanation']['html'] = (
                     conversion_fn(new_value['explanation']['html']))
                 # TODO(#9413): Find a way to include a reference to the

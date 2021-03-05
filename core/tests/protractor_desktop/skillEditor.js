@@ -16,9 +16,9 @@
  * @fileoverview End-to-end tests for the skill editor page.
  */
 
-var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -32,7 +32,6 @@ describe('Skill Editor functionality', function() {
   var skillEditorPage = null;
   var skillId = null;
   var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
 
   beforeAll(async function() {
     topicsAndSkillsDashboardPage = (
@@ -144,27 +143,7 @@ describe('Skill Editor functionality', function() {
   });
 
   it('should create a question for the skill', async function() {
-    await skillEditorPage.moveToQuestionsTab();
-    await skillEditorPage.clickCreateQuestionButton();
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
-    await explorationEditorMainTab.setInteraction(
-      'TextInput', 'Placeholder', 5);
-    await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', ['correct']);
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.markAsCorrect();
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setFeedback(await forms.toRichText('Try again'));
-    await explorationEditorMainTab.addHint('Hint 1');
-    await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'correct',
-      explanation: 'It is correct'
-    });
-    await skillEditorPage.saveQuestion();
-
+    await workflow.createQuestion();
     await skillEditorPage.get(skillId);
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.expectNumberOfQuestionsToBe(1);
