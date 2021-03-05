@@ -108,7 +108,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         });
 
         ctrl.scrollFunction = function() {
-          if (WindowRef.nativeWindow.pageYOffset >= 1) {
+          if (WindowRef.nativeWindow.pageYOffset >= 5) {
             ctrl.defaultHeaderVisible = false;
           } else {
             ctrl.defaultHeaderVisible = true;
