@@ -37,6 +37,7 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 
 class MockContentTranslationLanguageService {
   getCurrentContentLanguageCode() {
@@ -60,6 +61,7 @@ describe('Content language selector component', () => {
   let recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory;
   let stateCardObjectFactory: StateCardObjectFactory;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  let imagePreloaderService: ImagePreloaderService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -86,6 +88,7 @@ describe('Content language selector component', () => {
       RecordedVoiceoversObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
+    imagePreloaderService = TestBed.get(ImagePreloaderService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -113,11 +116,13 @@ describe('Content language selector component', () => {
       writtenTranslationsObjectFactory.createEmpty(),
       'content');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
+    spyOn(imagePreloaderService, 'restartImagePreloader');
 
     component.onSelectLanguage('fr');
 
     expect(setCurrentContentLanguageCodeSpy).toHaveBeenCalledWith('fr');
     expect(component.selectedLanguageCode).toBe('fr');
+    expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
   });
 
   it('should correctly open the refresh required modal when refresh is ' +
@@ -138,8 +143,10 @@ describe('Content language selector component', () => {
       isHint: false
     });
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
+    spyOn(imagePreloaderService, 'restartImagePreloader');
 
     component.onSelectLanguage('fr');
     expect(setCurrentContentLanguageCodeSpy).not.toHaveBeenCalled();
+    expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
   });
 });
