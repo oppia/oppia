@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0034.
+presubmit checks. Next message id would be C0035.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -2118,7 +2118,7 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
     name = 'disallow-blank-lines-below-function-definition'
     priority = -1
     msgs = {
-        'C0035': (
+        'C0034': (
             'Please remove the blank line(s) below the function definition.',
             'remove-blank-lines-below-function-definiton.',
             'Disallow blank lines below function definition.'
