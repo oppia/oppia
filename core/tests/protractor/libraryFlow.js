@@ -132,7 +132,8 @@ describe('Rating', function() {
 
   it('should display ratings on exploration when minimum ratings have been ' +
      'submitted', async function() {
-    await users.createAndLoginAdminUser('user11@explorationRating.com', 'user11Rating');
+    await users.createAndLoginAdminUser(
+      'user11@explorationRating.com', 'user11Rating');
     // Create a test exploration.
 
     // We need a test exploration here.

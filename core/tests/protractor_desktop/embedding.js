@@ -146,7 +146,8 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    await users.createAndLoginAdminUser('user1@embedding.com', 'user1Embedding');
+    await users.createAndLoginAdminUser(
+      'user1@embedding.com', 'user1Embedding');
 
     // Create exploration.
     // Version 1 is creation of the exploration.

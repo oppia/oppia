@@ -65,7 +65,8 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   beforeAll(async function() {
     // Should create a user and login.
-    await users.createAndLoginAdminUser('user11@accessibility.com', 'user11accessibility');
+    await users.createAndLoginAdminUser(
+      'user11@accessibility.com', 'user11accessibility');
   });
 
   beforeAll(function() {
