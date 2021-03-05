@@ -1178,9 +1178,9 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls = stack.enter_context(self._swap_popen())
             stack.enter_context(common.managed_elasticsearch_dev_server())
 
-        self.assertIn(
-            '%s/bin/elasticsearch' % common.ES_PATH,
-            popen_calls[0].program_args)
+        self.assertEqual(
+            popen_calls[0].program_args,
+            '%s/bin/elasticsearch -s' % common.ES_PATH)
         self.assertEqual(popen_calls[0].kwargs, {
             'shell': True,
             'env': {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR},
