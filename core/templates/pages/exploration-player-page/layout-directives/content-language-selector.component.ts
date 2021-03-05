@@ -32,6 +32,7 @@ import { PlayerTranscriptService } from
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 
 @Component({
   selector: 'content-language-selector',
@@ -44,7 +45,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
       ContentTranslationLanguageService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private imagePreloaderService: ImagePreloaderService
   ) {}
 
   selectedLanguageCode: string;
@@ -67,6 +69,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
         newLanguageCode);
       this.selectedLanguageCode = newLanguageCode;
     }
+    this.imagePreloaderService.restartImagePreloader(
+      this.playerTranscriptService.getCard(0).getStateName());
 
     return this.selectedLanguageCode;
   }

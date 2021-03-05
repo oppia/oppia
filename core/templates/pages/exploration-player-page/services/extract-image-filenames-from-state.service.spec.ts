@@ -27,12 +27,14 @@ import { ExplorationObjectFactory } from
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 
 
 describe('Extracting Image file names in the state service', () => {
   let eifss: ExtractImageFilenamesFromStateService;
   let eof: ExplorationObjectFactory;
   let ecs: ContextService;
+  let ctms: ContentTranslationManagerService;
   let explorationDict;
   let ImageFilenamesInExploration;
   beforeEach(() => {
@@ -42,7 +44,12 @@ describe('Extracting Image file names in the state service', () => {
     eof = TestBed.get(ExplorationObjectFactory);
     ecs = TestBed.get(ContextService);
     eifss = TestBed.get(ExtractImageFilenamesFromStateService);
+    ctms = TestBed.get(ContentTranslationManagerService);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
+    spyOn(ctms, 'getTranslatedHtml').and.callFake(
+      (unusedWrittenTranslations, unusedLanguageCode, content) => {
+        return content.html;
+      });
 
     explorationDict = {
       id: 1,
