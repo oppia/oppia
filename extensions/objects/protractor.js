@@ -179,6 +179,19 @@ var ParameterNameEditor = function(elem) {
   };
 };
 
+var PositiveIntEditor = function(elem) {
+  return {
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
+    },
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
+    }
+  };
+};
+
 var RatioExpressionEditor = function(elem) {
   return {
     setValue: async function(value) {
@@ -258,6 +271,7 @@ var OBJECT_EDITORS = {
   NumericExpression: MathEditor,
   ParameterName: ParameterNameEditor,
   PositionOfTerms: ParameterNameEditor,
+  PositiveInt: PositiveIntEditor,
   RatioExpression: RatioExpressionEditor,
   SanitizedUrl: SanitizedUrlEditor,
   TranslatableSetOfNormalizedString: TranslatableSetOfNormalizedStringEditor,
@@ -276,6 +290,7 @@ exports.NonnegativeIntEditor = NonnegativeIntEditor;
 exports.NormalizedStringEditor = NormalizedStringEditor;
 exports.NumberWithUnitsEditor = NumberWithUnitsEditor;
 exports.ParameterNameEditor = ParameterNameEditor;
+exports.PositiveIntEditor = PositiveIntEditor;
 exports.RatioExpressionEditor = RatioExpressionEditor;
 exports.SanitizedUrlEditor = SanitizedUrlEditor;
 exports.SkillSelector = SkillSelector;
