@@ -290,58 +290,6 @@ describe('Learner dashboard page', function() {
       expect(ctrl.noActivity).toBe(false);
     });
 
-    it('should set ui height when sorting collection playlist', function() {
-      var mockedUi = {
-        placeholder: {
-          height: (setHeight) => {
-            if (setHeight) {
-              return setHeight;
-            }
-            return 0;
-          }
-        },
-        item: {
-          height: () => 50
-        }
-      };
-      spyOn(mockedUi.placeholder, 'height').and.callThrough();
-
-      ctrl.collectionPlaylistSortableOptions.start(null, mockedUi);
-      expect(mockedUi.placeholder.height).toHaveBeenCalled();
-    });
-
-    it('should set ui top to 0 when stop collection playlist sorting',
-      function() {
-        var mockedUi = {
-          helper: {
-            css: () => {}
-          }
-        };
-        spyOn(mockedUi.helper, 'css').and.callThrough();
-
-        ctrl.collectionPlaylistSortableOptions.stop(null, null);
-        ctrl.collectionPlaylistSortableOptions.sort(null, mockedUi);
-        expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
-      });
-
-    it('should sort collection playlist by index', function() {
-      var mockedUi = {
-        item: {
-          sortable: {
-            index: 1
-          }
-        }
-      };
-      $httpBackend.expect(
-        'POST', '/learnerplaylistactivityhandler/collection/' +
-        (mockedUi.item.sortable.index + 1)).respond(200);
-      ctrl.collectionPlaylistSortableOptions.update(null, mockedUi);
-      $httpBackend.flush();
-
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
     it('should get static image url', function() {
       var imagePath = '/path/to/image.png';
       expect(ctrl.getStaticImageUrl(imagePath)).toBe(
