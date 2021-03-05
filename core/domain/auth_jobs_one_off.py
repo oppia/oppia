@@ -43,6 +43,8 @@ FAILURE_KEY = 'FAILURE: Failed to create Firebase accounts'
 SUCCESS_KEY = 'SUCCESS: Created Firebase accounts'
 WARNING_KEY = 'WARNING: No action needed'
 
+SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
+
 POPULATED_KEY = 'ALREADY_DONE'
 NOT_POPULATED_KEY = 'NEEDS_WORK'
 
@@ -64,6 +66,7 @@ class AuditFirebaseImportReadinessOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # depend on. Because it is obsolete, we do not want it to have a
         # Firebase account associated with it, or even consider it for import.
         if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
+            yield (SYSTEM_COMMITTER_ACK, user.id)
             return
 
         if user.deleted:
@@ -72,15 +75,19 @@ class AuditFirebaseImportReadinessOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (user.email, user.id)
 
     @staticmethod
-    def reduce(key, user_ids):
+    def reduce(key, values):
         # NOTE: These are only sorted to make unit tests simpler.
-        joined_user_ids = ', '.join(sorted(user_ids))
+        if key == SYSTEM_COMMITTER_ACK:
+            yield (SYSTEM_COMMITTER_ACK, values)
+            return
+
+        joined_user_ids = ', '.join(sorted(values))
 
         if key == '[DELETED]':
             yield ('ERROR: Found deleted users', joined_user_ids)
         else:
             email = key
-            if len(user_ids) > 1:
+            if len(values) > 1:
                 yield ('ERROR: %s is a shared email' % email, joined_user_ids)
 
 
@@ -110,6 +117,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # depend on. Because it is obsolete, we do not want it to have a
         # Firebase account associated with it.
         if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
+            yield (SYSTEM_COMMITTER_ACK, user.id)
             return
 
         auth_id = firebase_auth_services.get_auth_id_from_user_id(user.id)
@@ -127,6 +135,9 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         if key == POPULATED_KEY:
             yield (AUDIT_KEY, len(values))
+            return
+        elif key == SYSTEM_COMMITTER_ACK:
+            yield (SYSTEM_COMMITTER_ACK, values)
             return
 
         try:

@@ -112,7 +112,9 @@ class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
             id=feconf.SYSTEM_COMMITTER_ID, user_id='xx'
         ).put()
 
-        self.assertEqual(self.run_one_off_job(), [])
+        self.assertEqual(self.run_one_off_job(), [
+            ['INFO: SYSTEM_COMMITTER_ID skipped', ['xx']],
+        ])
 
     def test_system_committer_is_ignored_by_deleted_check(self):
         self.create_user('u1', 'admin@test.com', deleted=True)
@@ -123,7 +125,9 @@ class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
             id=feconf.SYSTEM_COMMITTER_ID, user_id='u1'
         ).put()
 
-        self.assertEqual(self.run_one_off_job(), [])
+        self.assertEqual(self.run_one_off_job(), [
+            ['INFO: SYSTEM_COMMITTER_ID skipped', ['u1']],
+        ])
 
 
 class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
@@ -436,7 +440,9 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
             id=feconf.SYSTEM_COMMITTER_ID, user_id=auth_assoc.user_id
         ).put()
 
-        self.assertItemsEqual(self.run_one_off_job(), [])
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['INFO: SYSTEM_COMMITTER_ID skipped', [auth_assoc.user_id]],
+        ])
 
         self.assert_auth_mapping_does_not_exist(auth_assoc)
         self.sdk_stub.assert_firebase_user_does_not_exist(auth_assoc.auth_id)
