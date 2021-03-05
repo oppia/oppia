@@ -126,7 +126,7 @@ export class SuggestionThreadObjectFactory {
       feedbackThreadBackendDict.last_updated_msecs,
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.thread_id,
-      ThreadMessageSummary.createNew(
+      new ThreadMessageSummary(
         feedbackThreadBackendDict.last_nonempty_message_author,
         feedbackThreadBackendDict.last_nonempty_message_text),
       this.createEditExplorationStateContentSuggestionFromBackendDict(

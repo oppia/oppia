@@ -99,7 +99,7 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
       feedbackThreadBackendDict.thread_id,
-      ThreadMessageSummary.createNew(
+      new ThreadMessageSummary(
         feedbackThreadBackendDict.last_nonempty_message_author,
         feedbackThreadBackendDict.last_nonempty_message_text));
   }

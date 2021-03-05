@@ -29,8 +29,4 @@ export class ThreadMessageSummary {
   hasText(): boolean {
     return this.text.length > 0;
   }
-
-  static createNew(authorUsername: string, text: string): ThreadMessageSummary {
-    return new ThreadMessageSummary(authorUsername, text);
-  }
 }

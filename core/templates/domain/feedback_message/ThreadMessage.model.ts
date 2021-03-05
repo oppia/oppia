@@ -77,7 +77,7 @@ export class ThreadMessage {
       threadMessageBackendDict.message_id, threadMessageBackendDict.text,
       threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,
-      ThreadMessageSummary.createNew(
+      new ThreadMessageSummary(
         threadMessageBackendDict.author_username,
         threadMessageBackendDict.text));
   }

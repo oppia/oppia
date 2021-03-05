@@ -24,7 +24,7 @@ describe('Thread message summary object factory', () => {
   describe('.createNew', () => {
     it('should create new thread message summary from arguments.', () => {
       let threadMessageSummary =
-       ThreadMessageSummary.createNew(
+       new ThreadMessageSummary(
          'author', 'message content');
 
       expect(threadMessageSummary.authorUsername).toEqual('author');
@@ -35,14 +35,14 @@ describe('Thread message summary object factory', () => {
   describe('.hasText', () => {
     it('should be true when text is nonempty string', () => {
       let threadMessageSummary =
-       ThreadMessageSummary.createNew('author', 'nonempty!');
+       new ThreadMessageSummary('author', 'nonempty!');
 
       expect(threadMessageSummary.hasText()).toBe(true);
     });
 
     it('should be false when text is empty string', () => {
       let threadMessageSummary =
-       ThreadMessageSummary.createNew('author', '');
+       new ThreadMessageSummary('author', '');
 
       expect(threadMessageSummary.hasText()).toBe(false);
     });
