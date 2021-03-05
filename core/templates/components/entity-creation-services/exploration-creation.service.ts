@@ -39,7 +39,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
     var explorationCreationInProgress = false;
 
     return {
-      createNewExploration: function(params = {}) {
+      createNewExploration: function() {
         if (explorationCreationInProgress) {
           return;
         }
@@ -48,22 +48,22 @@ angular.module('oppia').factory('ExplorationCreationService', [
         AlertsService.clearWarnings();
         LoaderService.showLoadingScreen('Creating exploration');
 
-        $http.post('/contributehandler/create_new', params)
-          .then(function(response) {
-            SiteAnalyticsService.registerCreateNewExplorationEvent(
-              response.data.exploration_id);
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                  exploration_id: response.data.exploration_id
-                }
-              );
-            }, 150);
-            return false;
-          }, function() {
-            LoaderService.hideLoadingScreen();
-            explorationCreationInProgress = false;
-          });
+        $http.post('/contributehandler/create_new', {
+        }).then(function(response) {
+          SiteAnalyticsService.registerCreateNewExplorationEvent(
+            response.data.exploration_id);
+          $timeout(function() {
+            $window.location = UrlInterpolationService.interpolateUrl(
+              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                exploration_id: response.data.exploration_id
+              }
+            );
+          }, 150);
+          return false;
+        }, function() {
+          LoaderService.hideLoadingScreen();
+          explorationCreationInProgress = false;
+        });
       },
       showUploadExplorationModal: function() {
         AlertsService.clearWarnings();
@@ -115,6 +115,11 @@ angular.module('oppia').factory('ExplorationCreationService', [
           // Note to developers:
           // This callback is triggered when the Cancel button is
           // clicked. No further action is needed.
+        });
+      },
+      createNewExplorationNode: function(title: string) {
+        return $http.post('/contributehandler/create_new', {
+          title: title
         });
       }
     };

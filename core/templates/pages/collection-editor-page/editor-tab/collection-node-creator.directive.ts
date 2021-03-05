@@ -151,17 +151,16 @@ angular.module('oppia').directive('collectionNodeCreator', [
             }
 
             // Create a new exploration with the given title.
-            ExplorationCreationService.createNewExploration({
-              title: title
-            }).then(function(response) {
-              ctrl.newExplorationTitle = '';
-              var newExplorationId = response.data.exploration_id;
+            ExplorationCreationService.createNewExplorationNode(title)
+              .then(function(response) {
+                ctrl.newExplorationTitle = '';
+                var newExplorationId = response.data.exploration_id;
 
-              SiteAnalyticsService
-                .registerCreateNewExplorationInCollectionEvent(
-                  newExplorationId);
-              addExplorationToCollection(newExplorationId);
-            });
+                SiteAnalyticsService
+                  .registerCreateNewExplorationInCollectionEvent(
+                    newExplorationId);
+                addExplorationToCollection(newExplorationId);
+              });
           };
 
           // Checks whether the user has left a '#' at the end of their ID
