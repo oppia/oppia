@@ -98,7 +98,10 @@ var ProfilePage = function() {
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
         var cardTitle = card.element(cardTitleCss);
-        var title = await cardTitle.getText();
+        var title = await waitFor.visibilityOf(
+       cardTitle,
+      'cardTitle is not present or taking Too Long to Dispaly');
+      expect(await cardTitle.getText()).toMatch(explorationName);
         return title === explorationName;
       });
 
