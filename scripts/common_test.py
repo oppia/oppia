@@ -1181,7 +1181,10 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn(
             '%s/bin/elasticsearch' % common.ES_PATH,
             popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(popen_calls[0].kwargs, {
+            'shell': True,
+            'env': {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR},
+        })
 
     def test_start_server_removes_elasticsearch_data(self):
         check_function_calls = {
