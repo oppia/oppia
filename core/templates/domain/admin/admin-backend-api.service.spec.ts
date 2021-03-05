@@ -27,10 +27,14 @@ import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
   let adminBackendResponse = {
     unfinished_job_data: [],
     role_graph_data: {
@@ -127,6 +131,9 @@ describe('Admin backend api service', () => {
 
     abas = TestBed.get(AdminBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
     adminDataObject = {
       demoExplorations: adminBackendResponse.demo_explorations,
       demoCollections: adminBackendResponse.demo_collections,
@@ -156,6 +163,10 @@ describe('Admin backend api service', () => {
         dict => PlatformParameter.createFromBackendDict(dict)
       )
     };
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
+    });
   });
 
   afterEach(() => {
@@ -177,9 +188,6 @@ describe('Admin backend api service', () => {
 
   it('should use the rejection handler if the backend request failed.',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
       abas.getDataAsync().then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
@@ -197,4 +205,169 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
+
+  it('should request to start a new job when calling startNewJobAsync',
+    fakeAsync(() => {
+      let jobType = 'ActivityContributorsSummaryOneOffJob';
+      let payload = {
+        action: 'start_new_job',
+        job_type: jobType
+      };
+      abas.startNewJobAsync(jobType).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should request to cancel the job given its id' +
+    'and type when calling cancelJobAsync', fakeAsync(() => {
+    let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
+    let jobType = 'AuditContributorsOneOffJob';
+    let payload = {
+      action: 'cancel_job',
+      job_id: jobId,
+      job_type: jobType
+    };
+    abas.cancelJobAsync(jobId, jobType).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to start computation given the job' +
+    'name when calling startComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'start_computation',
+      computation_type: computationType
+    };
+    abas.startComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to stop computation given the job' +
+    'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    abas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to stop computation given the job' +
+    'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'InvalidComputaionType';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    abas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush('Internal Server Error', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to show the output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
+      'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: ['[u\'fully-validated UserSettingsModel\', 1]']};
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to show the sorted output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
+      'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: ['[u\'SUCCESS_KEPT\', 1]',
+      '[u\'SUCCESS_DELETED\', 1]']};
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to show the output of invalid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'Invalid jobId';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=Invalid%20jobId';
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Internal Server Error'
+    }, {
+      status: 500, statusText: 'NoneType object has no attribute output'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Internal Server Error');
+  }
+  ));
 });
