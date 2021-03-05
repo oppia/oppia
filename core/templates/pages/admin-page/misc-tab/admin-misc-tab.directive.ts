@@ -50,8 +50,8 @@ angular.module('oppia').directive('adminMiscTab', [
         const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
         const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
           '/numberofdeletionrequestshandler');
-        const GET_MODELS_RELATED_TO_USER_HANDLER_URL = (
-          '/getmodelsrelatedtouserhandlerhandler');
+        const VERIFY_USER_MODELS_DELETED_HANDLER_URL = (
+          '/verifyusermodelsdeletedhandler');
         const DELETE_USER_HANDLER_URL = '/deleteuserhandler';
         const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -204,7 +204,7 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.getModelsRelatedToUser = function() {
           ctrl.setStatusMessage('Getting the models related to user...');
-          $http.get(GET_MODELS_RELATED_TO_USER_HANDLER_URL, {
+          $http.get(VERIFY_USER_MODELS_DELETED_HANDLER_URL, {
             params: { user_id: ctrl.userIdToGet }
           }).then(
             function(response) {
@@ -227,7 +227,10 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.deleteUser = function() {
           ctrl.setStatusMessage('Starting the deletion of the user...');
           $http['delete'](DELETE_USER_HANDLER_URL, {
-            params: { user_id: ctrl.userIdToDelete }
+            params: {
+              user_id: ctrl.userIdToDelete,
+              username: ctrl.usernameToDelete
+            }
           }).then(
             function() {
               ctrl.setStatusMessage('The deletion process was started.');
