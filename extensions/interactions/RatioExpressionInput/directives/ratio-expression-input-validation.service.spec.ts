@@ -34,7 +34,7 @@ import { RatioExpressionInputCustomizationArgs } from
 
 import { AppConstants } from 'app.constants';
 
-fdescribe('RatioExpressionInputValidationService', () => {
+describe('RatioExpressionInputValidationService', () => {
   let validatorService: RatioExpressionInputValidationService;
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
@@ -248,7 +248,6 @@ fdescribe('RatioExpressionInputValidationService', () => {
       message: 'Rule 1 from answer group 1 will never be matched because ' +
       'it expects more terms than the answer allows.'
     }]);
-
   });
 
   it('should catch non-integer value for # terms', () => {

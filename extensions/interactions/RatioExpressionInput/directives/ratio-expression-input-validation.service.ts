@@ -119,8 +119,8 @@ export class RatioExpressionInputValidationService {
           currentInput = <number> rules[j].inputs.y;
         } else if (currentRuleType === 'HasSpecificTermEqualTo') {
           currentInput = [
-            <number> rules[j].inputs.x,  // x-th term
-            <number> rules[j].inputs.y,  // has value y
+            <number> rules[j].inputs.x, // The x-th term
+            <number> rules[j].inputs.y, // Should have value y
           ];
         } else {
           currentInput = <number[]> rules[j].inputs.x;
@@ -139,8 +139,8 @@ export class RatioExpressionInputValidationService {
               });
             }
           } else if (currentRuleType === 'HasSpecificTermEqualTo') {
-            let term_index = currentInput[0];  // Note term_index is 1-indexed.
-            if (term_index > expectedNumberOfTerms) {
+            let termIndex = currentInput[0]; // Note: termIndex is 1-indexed.
+            if (termIndex > expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -171,13 +171,13 @@ export class RatioExpressionInputValidationService {
             seenInput = <number> seenRule.inputs.y;
           } else if (seenRuleType === 'HasSpecificTermEqualTo') {
             seenInput = [
-              <number> seenRule.inputs.x,  // x-th term
-              <number> seenRule.inputs.y,  // has value y
+              <number> seenRule.inputs.x, // The x-th term
+              <number> seenRule.inputs.y, // Should have value y
             ];
           } else {
             seenInput = <number[]> seenRule.inputs.x;
           }
-          
+
           if (
             seenRuleType === 'Equals' &&
             currentRuleType !== 'IsEquivalent' &&

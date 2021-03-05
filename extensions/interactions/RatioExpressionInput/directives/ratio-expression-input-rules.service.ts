@@ -45,7 +45,7 @@ export class RatioExpressionInputRulesService {
   HasSpecificTermEqualTo(
       answer: RatioInputAnswer,
       inputs: RatioInputHasSpecificTermEqualToRuleInputs): boolean {
-    return answer[inputs.x-1] === inputs.y;
+    return answer[inputs.x - 1] === inputs.y;
   }
 
   IsEquivalent(

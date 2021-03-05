@@ -21,33 +21,32 @@
 // in via initArgs.
 
 angular.module('oppia').directive('positiveIntEditor', [
-    function() {
-      return {
-        restrict: 'E',
-        scope: {},
-        bindToController: {
-          value: '='
-        },
-        template: require('./positive-int-editor.directive.html'),
-        controllerAs: '$ctrl',
-        controller: [function() {
-          var ctrl = this;
-          ctrl.$onInit = function() {
-            ctrl.SCHEMA = {
-              type: 'int',
-              validators: [{
-                id: 'is_at_least',
-                min_value: 1
-              }, {
-                id: 'is_integer'
-              }]
-            };
-  
-            if (!ctrl.value) {
-              ctrl.value = 1;
-            }
+  function() {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        value: '='
+      },
+      template: require('./positive-int-editor.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'int',
+            validators: [{
+              id: 'is_at_least',
+              min_value: 1
+            }, {
+              id: 'is_integer'
+            }]
           };
-        }]
-      };
-    }]);
-  
+
+          if (!ctrl.value) {
+            ctrl.value = 1;
+          }
+        };
+      }]
+    };
+  }]);
