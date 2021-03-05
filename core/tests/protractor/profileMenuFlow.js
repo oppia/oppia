@@ -17,6 +17,7 @@
  * and then logout.
  */
 
+var action = require('../protractor_utils/action.js');
 var LearnerDashboardPage = require(
   '../protractor_utils/LearnerDashboardPage.js');
 var general = require('../protractor_utils/general.js');
