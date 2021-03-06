@@ -103,7 +103,7 @@ var ProfilePage = function() {
             cardTitle,
             'cardTitle is not present or taking Too Long to Dispaly');
           expect(await cardTitle.getText()).toMatch(explorationName);
-      });
+      }}));
 
     if (await explorationsCardByName.length === 0) {
       throw new Error(
