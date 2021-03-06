@@ -19,7 +19,7 @@
 import { ThreadMessageSummary } from
   'domain/feedback_message/thread-message-summary.model';
 
-fdescribe('Thread message summary', () => {
+describe('Thread message summary', () => {
   describe('.createNew', () => {
     it('should create new thread message summary from arguments.', () => {
       let threadMessageSummary =
