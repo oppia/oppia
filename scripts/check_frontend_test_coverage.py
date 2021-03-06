@@ -332,7 +332,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
-    'suggestion-modal-for-exploration-player.service.ts',
     'summary-list-header.component.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
@@ -523,6 +522,7 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when check_frontend_coverage.py is used as a script.
+# it will only be called when check_frontend_test_coverage.py
+# is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()
