@@ -126,7 +126,9 @@ angular.module('oppia').directive('collectionEditorNavbar', [
               },
               controller: 'CollectionEditorSaveModalController'
             }).result.then(function(commitMessage) {
-              CollectionEditorStateService.saveCollection(commitMessage);
+              CollectionEditorStateService.saveCollection(commitMessage, () => {
+                $rootScope.$applyAsync();
+              });
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
