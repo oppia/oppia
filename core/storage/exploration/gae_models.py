@@ -173,9 +173,6 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when explorations
-        # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, exp_rights.status, exp_rights.community_owned

@@ -118,7 +118,7 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
+      topicViewerBackendApiService.fetchTopicDataAsync('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/topic_data_handler/staging/0');
@@ -136,7 +136,7 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
+      topicViewerBackendApiService.fetchTopicDataAsync('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/topic_data_handler/staging/0');
