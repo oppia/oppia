@@ -35,7 +35,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service.ts'
   templateUrl: './fraction-input-interaction.component.html',
   styleUrls: []
 })
-export class InteractiveFractionInputComponent implements 
+export class InteractiveFractionInputComponent implements
   AfterViewInit, OnInit, OnDestroy {
     @Input() requireSimplestFormWithValue: string = '';
     @Input() allowImproperFractionWithValue: string = '';
@@ -90,7 +90,8 @@ export class InteractiveFractionInputComponent implements
           /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
         if (INVALID_CHARS_LENGTH_REGEX.test(newValue)) {
           this.errorMessage = (
-            ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS_LENGTH);
+            ObjectsDomainConstants
+              .FRACTION_PARSING_ERRORS.INVALID_CHARS_LENGTH);
           this.isValid = false;
         } else if (INVALID_CHARS_REGEX.test(newValue)) {
           this.errorMessage = (
@@ -166,7 +167,8 @@ export class InteractiveFractionInputComponent implements
         } else {
           this.currentInteractionService.onSubmit(
             fraction as unknown as string,
-            this.fractionInputRulesService as unknown as InteractionRulesService);
+            this.fractionInputRulesService as unknown as
+              InteractionRulesService);
         }
       } catch (parsingError) {
         this.errorMessage = parsingError.message;
@@ -203,7 +205,7 @@ export class InteractiveFractionInputComponent implements
     ngOnDestroy(): void {
       this.componentSubscriptions.unsubscribe();
     }
-  }
+}
 
 angular.module('oppia').directive(
   'oppiaInteractiveFractionInput', downgradeComponent({
