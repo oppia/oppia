@@ -16,7 +16,7 @@
  * @fileoverview Directive for the FractionInput interaction.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -35,7 +35,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service.ts'
   templateUrl: './fraction-input-interaction.component.html',
   styleUrls: []
 })
-export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
+export class InteractiveFractionInputComponent implements AfterViewInit, OnInit, OnDestroy {
   @Input() requireSimplestFormWithValue: string = '';
   @Input() allowImproperFractionWithValue: string = '';
   @Input() allowNonzeroIntegerPartWithValue: string = '';
@@ -193,6 +193,10 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       window.scrollTo(0, 0);
     }, 5);
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.addFocusWithoutScroll('fractionInputField'), 500);
   }
 
   ngOnDestroy(): void {

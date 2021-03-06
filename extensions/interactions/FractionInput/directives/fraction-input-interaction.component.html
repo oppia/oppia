@@ -2,7 +2,8 @@
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <input type="text" name="answer" [(ngModel)]="answer" (ngModelChange)="answerValueChanged()" class="form-control oppia-autofocus"
          (keyup.enter)="submitAnswer()"
-         placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}">
+         placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}"
+         focus-on="fractionInputField">
   <div class="oppia-form-error oppia-fraction-input-error">
     {{errorMessage}}
   </div>
