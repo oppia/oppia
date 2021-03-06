@@ -11,13 +11,18 @@
                   <[customizationArgSpec.description]>:
                 </label>
                 <div class="col-7">
-                  <schema-based-editor local-value="$ctrl.data[$index].value" schema="customizationArgSpec.schema" not-required="$ctrl.notRequired"
+                  <schema-based-editor local-value="$ctrl.data[$index].value"
+                                       schema="customizationArgSpec.schema"
+                                       not-required="$ctrl.notRequired"
                                        class="protractor-test-email-dashboard-input-{{ $index }}">
                   </schema-based-editor>
                 </div>
               </div>
             </div>
-            <input type="submit" value="submit query" ng-disabled="form.schemaForm.$invalid || $ctrl.areAllInputsEmpty()" class="protractor-test-submit-query-button">
+            <input type="submit"
+                   value="submit query"
+                   ng-disabled="form.schemaForm.$invalid || $ctrl.areAllInputsEmpty()"
+                   class="protractor-test-submit-query-button">
             <input type="reset" value="reset" ng-click="$ctrl.resetForm()">
           </form>
         </md-card>
