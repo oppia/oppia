@@ -129,8 +129,7 @@ class MultipleItemInteractionLtOneOffJob(
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        a = 'MultipleChoiceInput'
-        b = 'ItemSelectionInput'
+        interactions_to_check = ('MultipleChoiceInput', 'ItemSelectionInput')
         for state in exploration.states.items():
             if state.interaction.id in interactions_to_check:
                 choices = state.interaction.customization_args['choices']
