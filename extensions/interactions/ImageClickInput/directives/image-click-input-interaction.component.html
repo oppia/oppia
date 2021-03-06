@@ -48,23 +48,23 @@
 
   <div class="image-click-container" *ngIf="!isLoadingIndicatorShown && !isTryAgainShown">
     <img [src]="imageUrl"
-        class="oppia-image-click-img"
-        (click)="onClickImage($event)"
-        (mousemove)="onMousemoveImage($event)"
-        (style)="imageContainerStyle">
+         class="oppia-image-click-img"
+         (click)="onClickImage($event)"
+         (mousemove)="onMousemoveImage($event)"
+         (style)="imageContainerStyle">
     <div *ngIf="highlightRegionsOnHover">
       <div *ngFor="let region of allRegions; let idx = index"
-          class="oppia-click-region position-absolute"
-          [style.height] = "getRegionDimensions(idx).height + 'px'"
-          [style.width] = "getRegionDimensions(idx).width + 'px'"
-          [style.left] = "getRegionDimensions(idx).left + 'px'"
-          [style.top] = "getRegionDimensions(idx).top + 'px'"
-          [style.display] = "getRegionDisplay(region.label)">
+           class="oppia-click-region position-absolute"
+           [style.height] = "getRegionDimensions(idx).height + 'px'"
+           [style.width] = "getRegionDimensions(idx).width + 'px'"
+           [style.left] = "getRegionDimensions(idx).left + 'px'"
+           [style.top] = "getRegionDimensions(idx).top + 'px'"
+           [style.display] = "getRegionDisplay(region.label)">
       </div>
     </div>
     <div *ngIf="!highlightRegionsOnHover && !interactionIsActive"
-        class="oppia-highlighted-region"
-        [ngStyle]="{
+         class="oppia-highlighted-region"
+         [ngStyle]="{
           'display': getDotDisplay(),
           'left': getDotLocation().left + 'px',
           'top': getDotLocation().top + 'px'}">
