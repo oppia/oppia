@@ -93,7 +93,7 @@ angular.module('oppia').component('contributorDashboardPage', {
       };
       ctrl.onTabClick = function(activeTabName) {
         ctrl.activeTabName = activeTabName;
-        if(ctrl.activeTabName === 'translateTextTab') {
+        if (ctrl.activeTabName === 'translateTextTab') {
           setTimeout(() => {
             ctrl.addFocusWithoutScroll('selectLangDropDown');
           }, 0);

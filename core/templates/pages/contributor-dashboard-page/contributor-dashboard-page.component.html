@@ -64,7 +64,7 @@
         <span class="oppia-dashboard-language-container-label">Translate to</span>
         <button focus-on="selectLangDropDown" class="oppia-autofocus border-0 p-0">
           <translation-language-selector [active-language-code]="$ctrl.languageCode"
-                                          (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+                                         (set-active-language-code)="$ctrl.onChangeLanguage($event)">
           </translation-language-selector>
         </button>
       </div>
@@ -85,7 +85,7 @@
 </div>
 <style>
   button.oppia-autofocus:focus {
-    outline:0;
+    outline: 0;
   }
   .oppia-dashboard-language-container-label {
     color: #4a4a4a;

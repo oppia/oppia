@@ -365,10 +365,12 @@ angular.module('oppia').directive('storyEditor', [
 
             ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryInitialized.subscribe(
-                () =>{ _init();
-                setTimeout(() => {
-                  FocusManagerService.setFocus('metaTagInputField');
-                }, 0);}
+                () =>{
+                  _init();
+                  setTimeout(() => {
+                    FocusManagerService.setFocus('metaTagInputField');
+                  }, 0);
+                }
               ));
             ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryReinitialized.subscribe(
