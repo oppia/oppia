@@ -36,6 +36,48 @@ import python_utils
     [models.NAMES.skill, models.NAMES.topic])
 
 
+class RemoveDeprecatedTopicModelFieldsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets abbreviated_name in TopicModels to None in order to remove
+    it from the datastore. Job is necessary only for March 2021 release and can
+    be removed after.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveDeprecatedTopicModelFieldsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(topic_model):
+        removed_deprecated_field = False
+
+        if 'abbreviated_name' in topic_model._properties:  # pylint: disable=protected-access
+            del topic_model._properties['abbreviated_name']  # pylint: disable=protected-access
+            removed_deprecated_field = True
+
+        if 'abbreviated_name' in topic_model._values:  # pylint: disable=protected-access
+            del topic_model._values['abbreviated_name']  # pylint: disable=protected-access
+            removed_deprecated_field = True
+
+
+        if removed_deprecated_field:
+            topic_model.update_timestamps(update_last_updated_time=False)
+            topic_models.TopicModel.put_multi([topic_model])
+            yield ('SUCCESS_REMOVED - TopicModel', topic_model.id)
+        else:
+            yield ('SUCCESS_ALREADY_REMOVED - TopicModel', topic_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
 class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate subtopic schema
     versions in the topic schema. This job will load all existing topics
