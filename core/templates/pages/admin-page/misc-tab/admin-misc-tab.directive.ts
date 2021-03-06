@@ -25,11 +25,11 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
   '$rootScope', '$window', 'AdminBackendApiService',
-  'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
       $rootScope, $window, AdminBackendApiService,
-      AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      AdminTaskManagerService, UrlInterpolationService,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
@@ -145,7 +145,6 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.getMemoryCacheProfile = function() {
           AdminBackendApiService.getMemoryCacheProfileAsync()
             .then(response => {
-              console.log(response);
               ctrl.result = {
                 totalAllocatedInBytes: response.total_allocation,
                 peakAllocatedInBytes: response.peak_allocation,
@@ -181,7 +180,6 @@ angular.module('oppia').directive('adminMiscTab', [
           AdminBackendApiService.getNumberOfPendingDeletionRequestAsync()
             .then(
               pendingDeletionRequests => {
-                console.log(pendingDeletionRequests)
                 ctrl.setStatusMessage(
                   'The number of users that are being deleted is: ' +
                 pendingDeletionRequests.number_of_pending_deletion_models);

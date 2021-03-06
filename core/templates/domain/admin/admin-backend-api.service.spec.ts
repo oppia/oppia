@@ -653,7 +653,7 @@ describe('Admin backend api service', () => {
       expect(req.request.method).toEqual('GET');
 
       req.flush({
-        error: 'User with given username does not exist'
+        error: 'User with given username does not exist.'
       }, {
         status: 500, statusText: 'Internal Server Error'
       });
@@ -661,7 +661,7 @@ describe('Admin backend api service', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'User with given username does not exist');
+        'User with given username does not exist.');
     }
     ));
 
@@ -745,7 +745,7 @@ describe('Admin backend api service', () => {
       expect(req.request.body).toEqual(payload);
 
       req.flush({
-        error: 'User with given username does not exist'
+        error: 'User with given username does not exist.'
       }, {
         status: 500, statusText: 'Internal Server Error'
       });
@@ -753,7 +753,196 @@ describe('Admin backend api service', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'User with given username does not exist');
+        'User with given username does not exist.');
+    }
+    ));
+
+  // Test cases for Admin Misc Tab.
+  it('should flush the memory cache',
+    fakeAsync(() => {
+      abas.flushMemoryCacheAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/memorycacheadminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should clear search index',
+    fakeAsync(() => {
+      abas.clearSearchIndexAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should regenerate topic related oppurtunities if id is incorrect',
+    fakeAsync(() => {
+      let topicId = 'topic_1';
+      abas.regenerateOpportunitiesRelatedToTopicAsync(
+        topicId
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should upload topic similarities',
+    fakeAsync(() => {
+      let data = 'topic_similarities.csv';
+      abas.uploadTopicSimilaritiesAsync(data)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should send dummy mail to admin',
+    fakeAsync(() => {
+      abas.sendDummyMailToAdminAsync()
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/senddummymailtoadminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should get data of memory cache profile',
+    fakeAsync(() => {
+      abas.getMemoryCacheProfileAsync()
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/memorycacheadminhandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to get data of memory cache profile',
+    fakeAsync(() => {
+      abas.getMemoryCacheProfileAsync()
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/memorycacheadminhandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Failed to get data.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+    }
+    ));
+
+  it('should update the username of oppia account',
+    fakeAsync(() => {
+      let oldUsername = 'old name';
+      let newUsername = 'new name';
+      abas.updateUserNameAsync(oldUsername, newUsername)
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/updateusernamehandler');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to update the username of oppia account',
+    fakeAsync(() => {
+      let oldUsername = 'Invalid name';
+      let newUsername = 'Invalid name';
+      abas.updateUserNameAsync(oldUsername, newUsername)
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/updateusernamehandler');
+      expect(req.request.method).toEqual('PUT');
+      req.flush({
+        error: 'Failed to update username.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to update username.');
+    }
+    ));
+
+  it('should get the data of number of pending delete requests',
+    fakeAsync(() => {
+      abas.getNumberOfPendingDeletionRequestAsync()
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/numberofdeletionrequestshandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail get the data of number of pending delete requests',
+    fakeAsync(() => {
+      abas.getNumberOfPendingDeletionRequestAsync()
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/numberofdeletionrequestshandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Failed to get data.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
     }
     ));
 });
