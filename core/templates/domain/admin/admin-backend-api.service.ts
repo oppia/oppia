@@ -79,6 +79,16 @@ interface ContributionRightsObject {
   'can_submit_questions': boolean
 }
 
+interface MemoryCacheProfile {
+  'peak_allocation': string
+  'total_allocation': string
+  'total_keys_stored': string  
+}
+
+interface PendingDeletionRequest {
+  'number_of_pending_deletion_models': string
+}
+
 export interface AdminPageDataBackendDict {
   'demo_explorations': string[][];
   'demo_collections': string[][];
@@ -159,23 +169,25 @@ export class AdminBackendApiService {
     });
   }
 
-  // Admin Jobs Tab Services.
-  private _postAdminActionAsync(action:string, payload:Object): Promise<void> {
-    return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL, { action, ...payload }).toPromise()
-      .then(response => {
-        return response;
-      }, errorResonse => {
-        return errorResonse.error.error;
-      });
+  private _postAdminActionAsync(
+    action:string, payload:Object, handlerUrl:string): Promise<void> {
+      return this.http.post<void>(
+        handlerUrl, { action, ...payload }).toPromise()
+        .then(response => {
+          return response;
+        }, errorResonse => {
+          return errorResonse.error.error;
+        });
   }
-
+  
+// Admin Jobs Tab Services.
   async startNewJobAsync(jobType: string): Promise<void> {
     let action = 'start_new_job';
     let payload = {
       job_type: jobType
     };
-    return this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
   async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
@@ -184,7 +196,8 @@ export class AdminBackendApiService {
       job_id: jobId,
       job_type: jobType
     };
-    return this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
   async startComputationAsync(computationType: string): Promise<void> {
@@ -192,7 +205,8 @@ export class AdminBackendApiService {
     let payload = {
       computation_type: computationType
     };
-    return this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
   async stopComputationAsync(computationType: string): Promise<void> {
@@ -200,7 +214,8 @@ export class AdminBackendApiService {
     let payload = {
       computation_type: computationType
     };
-    return this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
   async fetchJobOutputAsync(jobId: string): Promise<string[]> {
@@ -242,25 +257,28 @@ export class AdminBackendApiService {
   async updateUserRoleAsync(
       newRole: string, username: string, topicId: string
   ): Promise<void> {
-    return this.http.post<void>(
-      AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
-        role: newRole,
-        username: username,
-        topic_id: topicId
-      }
-    ).toPromise();
+    let action = null;
+    let payload = {
+      role: newRole,
+      username: username,
+      topic_id: topicId
+    };
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_ROLE_HANDLER_URL);
   }
 
   async addContributionReviewerAsync(
       category: string, username: string, languageCode: string
   ): Promise<void> {
-    return this.http.post<void>(
-      AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER, {
-        category: category,
-        username: username,
-        language_code: languageCode
-      }
-    ).toPromise();
+    let action = null;
+    let payload = {
+      category: category,
+      username: username,
+      language_code: languageCode
+    };
+    return this._postAdminActionAsync(
+      action, payload,
+      AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER);
   }
 
   async viewContributionReviewersAsync(
@@ -311,6 +329,87 @@ export class AdminBackendApiService {
           category: category,
           language_code: languageCode
         }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  // Admin Misc Tab Services.
+  async flushMemoryCacheAsync(): Promise<void> {
+    let action = null;
+    let payload = null;
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL);
+  }
+
+  async clearSearchIndexAsync(): Promise<void> {
+    let action = null;
+    let payload = null;
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_HANDLER_URL);
+  }
+
+  async regenerateOpportunitiesRelatedToTopicAsync(
+      topicId: string): Promise<void> {
+        let action = 'regenerate_topic_related_opportunities';
+        let payload = {
+          topic_id: topicId
+        };
+        return this._postAdminActionAsync(
+          action, payload, AdminPageConstants.ADMIN_HANDLER_URL);
+  }
+
+  async uploadTopicSimilaritiesAsync(data: string): Promise<void> {
+    let action = 'upload_topic_similarities';
+    let payload = {
+      data: data
+    };
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_HANDLER_URL);
+  }
+
+  async sendDummyMailToAdminAsync(): Promise<void> {
+    let action = null;
+    let payload = null;
+    return this._postAdminActionAsync(
+      action, payload, AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL);
+  }
+
+  async getMemoryCacheProfileAsync(): Promise<MemoryCacheProfile> {
+    return new Promise((resolve, reject) => {
+      this.http.get<MemoryCacheProfile>(
+        AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async updateUserNameAsync(
+      oldUsername: string, newUsername: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.ADMIN_UPDATE_USERNAME_HANDLER_URL, {
+          old_username: oldUsername,
+          new_username: newUsername
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async getNumberOfPendingDeletionRequestAsync(): Promise<PendingDeletionRequest> {
+    return new Promise((resolve, reject) => {
+      this.http.get<PendingDeletionRequest>(
+        AdminPageConstants.ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {}
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {

@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive for the miscellaneous tab in the admin panel.
  */
-
+require('domain/admin/admin-backend-api.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
@@ -24,11 +24,11 @@ require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window',
+  '$rootScope', '$window', 'AdminBackendApiService',
   'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window,
+      $rootScope, $window, AdminBackendApiService,
       AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
@@ -44,12 +44,6 @@ angular.module('oppia').directive('adminMiscTab', [
         const ctrl = this;
         const DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-        const SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/senddummymailtoadminhandler');
-        const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
-        const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
-          '/numberofdeletionrequestshandler');
         const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
@@ -66,16 +60,15 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.setStatusMessage('Clearing search index...');
 
           AdminTaskManagerService.startTask();
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'clear_search_index'
-          }).then(function() {
-            ctrl.setStatusMessage('Index successfully cleared.');
-            AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-            AdminTaskManagerService.finishTask();
-          });
+          AdminBackendApiService.clearSearchIndexAsync()
+            .then(() => {
+              ctrl.setStatusMessage('Index successfully cleared.');
+              AdminTaskManagerService.finishTask();
+            }, errorResponse => {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+              AdminTaskManagerService.finishTask();
+            });
         };
 
         ctrl.regenerateOpportunitiesRelatedToTopic = function() {
@@ -86,16 +79,16 @@ angular.module('oppia').directive('adminMiscTab', [
             return;
           }
           ctrl.regenerationMessage = 'Regenerating opportunities...';
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'regenerate_topic_related_opportunities',
-            topic_id: ctrl.topicIdForRegeneratingOpportunities
-          }).then(function(response) {
+          AdminBackendApiService.regenerateOpportunitiesRelatedToTopicAsync(
+            ctrl.topicIdForRegeneratingOpportunities).then(response => {
             ctrl.regenerationMessage = (
               'No. of opportunities model created: ' +
-              response.data.opportunities_count);
-          }, function(errorResponse) {
+              response);
+            $rootScope.$apply();
+          }, errorResponse => {
             ctrl.regenerationMessage = (
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse.error.error);
+            $rootScope.$apply();
           });
         };
 
@@ -106,16 +99,16 @@ angular.module('oppia').directive('adminMiscTab', [
           var reader = new FileReader();
           reader.onload = function(e) {
             var data = (<FileReader>e.target).result;
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'upload_topic_similarities',
-              data: data
-            }).then(function() {
-              ctrl.setStatusMessage(
-                'Topic similarities uploaded successfully.');
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
+            AdminBackendApiService.uploadTopicSimilaritiesAsync(data)
+              .then(() => {
+                ctrl.setStatusMessage(
+                  'Topic similarities uploaded successfully.');
+                $rootScope.$apply();
+              }, errorResponse => {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse.error.error);
+                $rootScope.$apply();
+              });
           };
           reader.readAsText(file);
         };
@@ -130,73 +123,74 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.sendDummyMailToAdmin = function() {
-          $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
-            .then(function(response) {
+          AdminBackendApiService.sendDummyMailToAdminAsync()
+            .then(() => {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
-            }, function(errorResponse) {
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             });
         };
 
         ctrl.flushMemoryCache = function() {
-          $http.post(MEMORY_CACHE_HANDLER_URL)
-            .then(function(response) {
+          AdminBackendApiService.flushMemoryCacheAsync()
+            .then(() => {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
-            }, function(errorResponse) {
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             });
         };
 
         ctrl.getMemoryCacheProfile = function() {
-          $http.get(MEMORY_CACHE_HANDLER_URL)
-            .then(function(response) {
+          AdminBackendApiService.getMemoryCacheProfileAsync()
+            .then(response => {
+              console.log(response);
               ctrl.result = {
-                totalAllocatedInBytes: response.data.total_allocation,
-                peakAllocatedInBytes: response.data.peak_allocation,
-                totalKeysStored: response.data.total_keys_stored
+                totalAllocatedInBytes: response.total_allocation,
+                peakAllocatedInBytes: response.peak_allocation,
+                totalKeysStored: response.total_keys_stored
               };
               ctrl.memoryCacheDataFetched = true;
               ctrl.setStatusMessage('Success!');
-            }, function(errorResponse) {
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             });
         };
 
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
-          $http.put(
-            UPDATE_USERNAME_HANDLER_URL, {
-              old_username: ctrl.oldUsername,
-              new_username: ctrl.newUsername
-            }).then(
-            function(response) {
-              ctrl.setStatusMessage(
-                'Successfully renamed ' + ctrl.oldUsername + ' to ' +
-                  ctrl.newUsername + '!');
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            }
-          );
+          AdminBackendApiService.updateUserNameAsync(
+            ctrl.oldUsername, ctrl.newUsername)
+            .then(
+              () => {
+                ctrl.setStatusMessage(
+                  'Successfully renamed ' + ctrl.oldUsername + ' to ' +
+                    ctrl.newUsername + '!');
+              }, errorResponse => {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse.error.error);
+              }
+            );
         };
 
         ctrl.getNumberOfPendingDeletionRequestModels = function() {
           ctrl.setStatusMessage(
             'Getting the number of users that are being deleted...');
-          $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(
-            function(response) {
-              ctrl.setStatusMessage(
-                'The number of users that are being deleted is: ' +
-                response.data.number_of_pending_deletion_models);
-            },
-            function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            }
-          );
+          AdminBackendApiService.getNumberOfPendingDeletionRequestAsync()
+            .then(
+              pendingDeletionRequests => {
+                console.log(pendingDeletionRequests)
+                ctrl.setStatusMessage(
+                  'The number of users that are being deleted is: ' +
+                pendingDeletionRequests.number_of_pending_deletion_models);
+              },
+              errorResponse => {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse.error.error);
+              }
+            );
         };
 
         ctrl.submitQuery = function() {
