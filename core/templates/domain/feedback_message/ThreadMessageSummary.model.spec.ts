@@ -13,23 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ThreadMessageSummary-model.ts.
+ * @fileoverview Unit tests for ThreadMessageSummary model.
  */
 
 
-import { ThreadMessageSummary } from
-  'domain/feedback_message/ThreadMessageSummary.model';
+import { ThreadMessageSummary } from 'domain/feedback_message/ThreadMessageSummary.model';
 
 describe('Thread message summary object factory', () => {
-  describe('.createNew', () => {
-    it('should create new thread message summary from arguments.', () => {
-      let threadMessageSummary =
+  it('should create new thread message summary from arguments.', () => {
+    let threadMessageSummary =
        new ThreadMessageSummary(
          'author', 'message content');
 
-      expect(threadMessageSummary.authorUsername).toEqual('author');
-      expect(threadMessageSummary.text).toEqual('message content');
-    });
+    expect(threadMessageSummary.authorUsername).toEqual('author');
+    expect(threadMessageSummary.text).toEqual('message content');
   });
 
   describe('.hasText', () => {
