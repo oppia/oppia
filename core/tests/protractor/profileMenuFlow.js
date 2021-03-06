@@ -43,6 +43,8 @@ describe('Profile menu flow', function() {
 
   describe('profile dropdown menu', function() {
     beforeEach(async function() {
+      await users.logout();
+
       await users.login('desktopAndMobileVisitor@profileMenuFlow.com');
       await learnerDashboardPage.get();
       await general.openProfileDropdown();

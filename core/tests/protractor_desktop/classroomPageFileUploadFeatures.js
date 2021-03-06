@@ -49,6 +49,7 @@ describe('Classroom page functionality', function() {
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
+    await users.logout();
   });
 
   beforeEach(async function() {
@@ -107,10 +108,10 @@ describe('Classroom page functionality', function() {
       await topicEditorPage.publishTopic();
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(1);
-      await users.logout();
     });
 
   afterEach(async function() {
+    await users.logout();
     await general.checkForConsoleErrors([]);
   });
 });

@@ -176,7 +176,7 @@ describe('Preferences', function() {
   );
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
     await users.logout();
+    await general.checkForConsoleErrors([]);
   });
 });

@@ -70,6 +70,10 @@ describe('Enable correctness feedback and set correctness', function() {
     await users.createAndLoginUser('user@markCorrect.com', 'userMarkCorrect');
   });
 
+  afterAll(async function() {
+    await users.logout();
+  });
+
   beforeEach(async function() {
     explorationTitle = EXPLORATION_TITLE + String(currentExplorationIndex);
     libraryPage = new LibraryPage.LibraryPage();
@@ -559,7 +563,7 @@ describe('Core exploration functionality', function() {
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
     await users.logout();
+    await general.checkForConsoleErrors([]);
   });
 });

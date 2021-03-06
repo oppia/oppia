@@ -64,9 +64,11 @@ describe('Voiceover upload features', function() {
     await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorPage.saveChanges(
       'Created exploration for voiceover upload.');
+    await users.logout();
   });
 
   beforeEach(async function() {
+    await users.login(TEST_EMAIL);
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     await explorationEditorPage.navigateToTranslationTab();
@@ -155,6 +157,7 @@ describe('Voiceover upload features', function() {
   });
 
   afterEach(async function() {
+    await users.logout();
     await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
       '(Bad Request)', {status_code: 400,

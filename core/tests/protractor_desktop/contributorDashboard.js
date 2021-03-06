@@ -156,6 +156,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(1);
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       'Question 1', SKILL_DESCRIPTIONS[0], 'Accepted', null);
+    await users.logout();
   });
 
   it('should allow reviewer to reject question suggestions', async function() {
@@ -218,6 +219,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(2);
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       'Question 1', SKILL_DESCRIPTIONS[0], 'Rejected', null);
+    await users.logout();
   });
 
   afterEach(async function() {

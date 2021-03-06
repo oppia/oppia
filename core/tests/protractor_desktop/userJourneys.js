@@ -112,6 +112,7 @@ describe('Site language', function() {
     await users.createUser('lang@collections.com', EDITOR_USERNAME);
     await users.createAndLoginAdminUser(
       'langCreator@explorations.com', CREATOR_USERNAME);
+    await users.logout();
     await users.createAndLoginAdminUser(
       'testlangadm@collections.com', 'testlangadm');
     await adminPage.get();

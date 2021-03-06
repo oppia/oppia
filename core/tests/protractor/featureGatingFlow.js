@@ -48,12 +48,14 @@ describe('Feature Gating Flow', function() {
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     await users.createAndLoginAdminUser(ADMIN_USER1_EMAIL, ADMIN_USERNAME1);
+    await users.logout();
     await users.createAndLoginAdminUser(ADMIN_USER2_EMAIL, ADMIN_USERNAME2);
+    await users.logout();
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
     await users.logout();
+    await general.checkForConsoleErrors([]);
   });
 
   afterAll(async function() {
@@ -64,6 +66,7 @@ describe('Feature Gating Flow', function() {
 
     await adminPage.removeAllRulesOfFeature(dummy);
     await adminPage.saveChangeOfFeature(dummy);
+    await users.logout();
   });
 
   it('should not show indicators gated by dummy feature when disabled',
