@@ -84,7 +84,6 @@ angular.module('oppia').controller('TranslationModalController', [
       });
 
     $scope.onContentClick = function($event) {
-
       // All the child elements are copied into paragraphChildrenElements
       // if the copied snippet is a paragraph.
       // Checks whether there are any mathematical equations are copied
@@ -131,27 +130,32 @@ angular.module('oppia').controller('TranslationModalController', [
       const textWrapperLength = 6;
       attributes = Array.prototype.map.call(elements, function(element) {
         if (element.localName === 'oppia-noninteractive-image') {
-          var attribute = element.attributes[type].value; // type = alt-with-value or caption-with-value
-          if (type == 'filepath-with-value') {
+          var attribute = element.attributes[type].value;
+          if (type === 'filepath-with-value') {
             return attribute;
           }
           return attribute.substring(
             textWrapperLength, attribute.length - textWrapperLength);
         }
       });
-      return attributes.filter(attribute => attribute != null);
-    }
+      return attributes.filter(attribute => attribute !== null);
+    };
 
-    $scope.findAvailableElements = function(originalElements, translatedElements, isRawImage) {
+    $scope.findAvailableElements = function(
+      originalElements, translatedElements, isRawImage) {
       var states = [];
-      states = Array.prototype.map.call(originalElements, function(originalElement) {
-        if(isRawImage) {
-          return translatedElements.some(translatedElement => (translatedElement === originalElement));
+      states = Array.prototype.map.call(
+        originalElements, function(originalElement) {
+        if (isRawImage) {
+          return translatedElements.some(
+            translatedElement => (translatedElement === originalElement));
         }
-        return translatedElements.some(translatedElement => (translatedElement === originalElement && originalElement !== ''));
-      })
+        return translatedElements.some(
+          translatedElement => (
+            translatedElement === originalElement && originalElement !== ''));
+      });
       return states;
-    }
+    };
 
     $scope.suggestTranslatedText = function() {
       $scope.hasImgCopyError = false;
@@ -180,7 +184,8 @@ angular.module('oppia').controller('TranslationModalController', [
       const duplicateImgAltTextStates = $scope.findAvailableElements(
         foundOriginalImageAltTxts, foundTranslatedImageAltTxts, false);
       const duplicateImgDescriptionStates = $scope.findAvailableElements(
-        foundOriginalImageDescriptions, foundTranslatedImageDescriptions, false);
+        foundOriginalImageDescriptions,
+        foundTranslatedImageDescriptions, false);
 
       const hasUncopiedImgs = $scope.hasTranslationErrors(
         copiedImgStates, false);
