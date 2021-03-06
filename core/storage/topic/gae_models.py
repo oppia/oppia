@@ -61,9 +61,6 @@ class TopicModel(base_models.VersionedModel):
     # The canonical name of the topic, created by making `name` lowercase.
     canonical_name = (
         datastore_services.StringProperty(required=True, indexed=True))
-    # The abbreviated name of the topic.
-    abbreviated_name = (
-        datastore_services.StringProperty(indexed=True, default=''))
     # The thumbnail filename of the topic.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the topic.

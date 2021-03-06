@@ -41,6 +41,22 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
+class MockTopicModelWithDeprecatedFields(topic_models.TopicModel):
+    """Mock TopicModel to be able to set abbreviated_name"""
+
+    abbreviated_name = (
+        datastore_services.StringProperty(indexed=True, default=''))
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Override this to escape recursion, which will otherwise occur
+        when super() is used in a mocked class.
+        """
+
+        base_models.VersionedModel._trusted_commit( # pylint: disable=protected-access
+            self, committer_id, commit_type, commit_message, commit_cmds)
+
+
 class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
