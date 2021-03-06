@@ -29,8 +29,8 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
-from core.domain import taskqueue_services
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
@@ -205,7 +205,7 @@ class RemoveDeprecatedTopicModelFieldsOneOffJobTests(
             [['SUCCESS_ALREADY_REMOVED - TopicModel', 1]], output)
 
         migrated_topic_model = (
-                topic_models.TopicModel.get_by_id(self.TOPIC_ID))
+            topic_models.TopicModel.get_by_id(self.TOPIC_ID))
         self.assertNotIn(
             'abbreviated_name', migrated_topic_model._values)  # pylint: disable=protected-access
         self.assertNotIn(

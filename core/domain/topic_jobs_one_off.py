@@ -64,7 +64,6 @@ class RemoveDeprecatedTopicModelFieldsOneOffJob(
             del topic_model._values['abbreviated_name']  # pylint: disable=protected-access
             removed_deprecated_field = True
 
-
         if removed_deprecated_field:
             topic_model.update_timestamps(update_last_updated_time=False)
             topic_models.TopicModel.put_multi([topic_model])
