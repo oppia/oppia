@@ -123,6 +123,8 @@ angular.module('oppia').factory('TranslateTextService', [
               stateWiseContents[stateName])) {
               if (text !== '') {
                 contentIds.push(contentId);
+                // text needs to be cast as string or else it is recognized
+                // as unknown.
                 stateAndContent.push(
                   new StateAndContent(
                     stateName, contentId, text as string));
