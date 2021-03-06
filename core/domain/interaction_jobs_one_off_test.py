@@ -552,7 +552,7 @@ class MultipleChoiceInteractionLtOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(MultipleChoiceinteractionLtOneOffJobTests, self).setUp()
+        super(MultipleChoiceInteractionLtOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -587,7 +587,7 @@ class MultipleChoiceInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         state1.update_next_content_id_index(2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start MultipleInputInteractionLtOneOffJob job
+        # Start MultipleItemInteractionLtOneOffJob job
         # on sample exploration.
         job_id = (
             interaction_jobs_one_off
@@ -899,7 +899,7 @@ class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ItemSelectioninteractionLtOneOffJobTests, self).setUp()
+        super(ItemSelectionInteractionLtOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -929,7 +929,7 @@ class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
             'showChoicesInShuffledOrder': {'value': True}
         }
 
-        state1.update_interaction_id('ItemChoiceInput')
+        state1.update_interaction_id('ItemSelectionInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
         exp_services.save_new_exploration(self.albert_id, exploration)
