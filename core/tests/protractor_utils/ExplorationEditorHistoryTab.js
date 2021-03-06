@@ -195,7 +195,7 @@ var ExplorationEditorHistoryTab = function() {
       /**
        * This method compares text contents of 2 version's state contents to
        * provided text contents
-       * v1 is most recent state and v2 is older state
+       * v1 is older state and v2 is most recent state
        *    Args:
        *        v1StateContents(dict of dict) : dicts containing state details
        *                                        of v1
@@ -222,7 +222,7 @@ var ExplorationEditorHistoryTab = function() {
       /*
        *  This function compares regular/highlighted text contents of 2
        *  versions' state contents to provided text contents
-       *  v1 is most recent state and v2 is older state
+       *  v1 is older state and v2 is most recent state
        *    Args:
        *        v1StateContents(dict) : dicts containing state details of v1
        *        v2StateContents(dict) : dicts containing state details of v2
