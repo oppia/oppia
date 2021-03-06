@@ -115,26 +115,6 @@ describe('Full exploration editor', function() {
     await explorationPlayerPage.reportExploration();
   });
 
-  it('should let learners suggest changes to an exploration', async function() {
-    await users.createUser(
-      'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
-    await users.login('creator2@editorAndPlayer.com');
-    await workflow.createAndPublishExploration(
-      'Adding Fractions', 'Mathematics', 'Let us learn how to add fractions',
-      'English');
-    await users.logout();
-
-    await users.createUser('learner2@editorAndPlayer.com', 'learner2');
-    await users.login('learner2@editorAndPlayer.com');
-    await libraryPage.get();
-    await libraryPage.findExploration('Adding Fractions');
-    await libraryPage.playExploration('Adding Fractions');
-    await explorationPlayerPage.clickSuggestChangesButton();
-    await explorationPlayerPage.fillAndSubmitSuggestion(
-      'Lets test the suggestion feature', 'Oh wow, It works!');
-    await users.logout();
-  });
-
   it('should prevent going back when help card is shown', async function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
@@ -165,8 +145,11 @@ describe('Full exploration editor', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
     var backButton = element(by.css('.protractor-test-back-button'));
+    var nextCardButton = element(by.css('.protractor-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('LogicProof');
+    await waitFor.visibilityOf(
+      nextCardButton, 'Next Card button taking too long to show up.');
     await waitFor.invisibilityOf(
       backButton, 'Back button takes too long to disappear.');
 
