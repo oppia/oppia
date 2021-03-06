@@ -27,18 +27,22 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+//import { LearnerDashboardIconsComponent } from './learner-dashboard-icons.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    // LearnerDashboardIconsComponent
   ],
   declarations: [
     OppiaAngularRootComponent,
+    // LearnerDashboardIconsComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
+    // LearnerDashboardIconsComponent
   ],
   providers: [
     {
