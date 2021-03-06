@@ -211,8 +211,7 @@ describe('Translation Modal Controller', function() {
   function() {
     spyOn(CkEditorCopyContentService, 'broadcastCopy').and
       .callFake(() => {});
-
-    var mockEvent = {
+    const mockEvent = {
       stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
       target: {
         localName: 'p',
@@ -236,8 +235,7 @@ describe('Translation Modal Controller', function() {
   function() {
     spyOn(CkEditorCopyContentService, 'broadcastCopy').and
       .callFake(() => {});
-
-    var mockEvent = {
+    const mockEvent = {
       stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
       target: {
         localName: 'img'
@@ -256,8 +254,7 @@ describe('Translation Modal Controller', function() {
   function() {
     spyOn(CkEditorCopyContentService, 'broadcastCopy').and
       .callFake(() => {});
-
-    var mockEvent = {
+    const mockEvent = {
       stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
       target: {
         localName: 'p',

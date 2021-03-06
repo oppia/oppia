@@ -86,6 +86,7 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.onContentClick = function($event) {
       $scope.hasParagraphCopyError = false;
       var paragraphChildrenElements = [];
+      console.log($event);
 
       // All the child elements are copied into paragraphChildrenElements
       // if the copied snippet is a paragraph.
