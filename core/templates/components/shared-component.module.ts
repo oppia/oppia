@@ -49,7 +49,7 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
@@ -61,6 +61,7 @@ import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates
 import { AuthService } from 'services/auth.service';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -82,6 +83,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BrowserModule,
     NgbTooltipModule,
     FormsModule,
+    NgbModule,
     ...firebaseAuthModules,
   ],
 
@@ -108,7 +110,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     TranslatePipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    LearnerPlaylistModalComponent
   ],
 
   entryComponents: [
@@ -125,7 +128,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    LearnerPlaylistModalComponent
   ],
 
   exports: [
@@ -143,7 +147,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     TranslatePipe,
     SummaryListHeaderComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    LearnerPlaylistModalComponent
   ],
 })
 

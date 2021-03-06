@@ -24,8 +24,8 @@ import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerPlaylistService } from
   'domain/learner_dashboard/learner-playlist-backend-api.service';
-  import { LearnerDashboardActivityIds } from
-    'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 @Component({
   selector: 'learner-dashboard-icons',
@@ -51,7 +51,6 @@ export class LearnerDashboardIconsComponent implements OnInit {
     private learnerDashboardIdsBackendApiService:
       LearnerDashboardIdsBackendApiService,
     private learnerPlaylistService: LearnerPlaylistService
-
   ) {}
 
   ngOnInit(): void {
@@ -161,7 +160,9 @@ export class LearnerDashboardIconsComponent implements OnInit {
 
   removeFromLearnerPlaylist(activityId, activityTitle, activityType) {
     console.log(activityId,activityTitle,activityType);
-    //this.learnerPlaylistService.removeFromLearnerPlaylist(activityId,activityTitle,activityType);
+    this.learnerPlaylistService.removeFromLearnerPlaylist(
+      activityId, activityTitle, activityType,
+      this.learnerDashboardActivityIds);
   }
 }
 
