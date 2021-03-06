@@ -36,6 +36,7 @@ require('services/alerts.service.ts');
 require('services/prevent-page-unload-event.service.ts');
 require('services/user.service.ts');
 require('services/utils.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').component('preferencesPage', {
   bindings: {
@@ -48,6 +49,7 @@ angular.module('oppia').component('preferencesPage', {
   controller: [
     '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
     '$window', 'AlertsService', 'I18nLanguageCodeService',
+    'FocusManagerService',
     'LanguageUtilService', 'LoaderService', 'PreventPageUnloadEventService',
     'UrlInterpolationService', 'UserService',
     'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
@@ -55,6 +57,7 @@ angular.module('oppia').component('preferencesPage', {
     'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES', function(
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
         $window, AlertsService, I18nLanguageCodeService,
+        FocusManagerService,
         LanguageUtilService, LoaderService, PreventPageUnloadEventService,
         UrlInterpolationService, UserService,
         DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
@@ -179,6 +182,14 @@ angular.module('oppia').component('preferencesPage', {
           // No further action is needed.
         });
       };
+
+      ctrl.addFocusWithoutScroll = function(label) {
+        FocusManagerService.setFocus(label);
+        setTimeout(function() {
+          window.scrollTo(0, 0);
+        }, 5);
+      };
+
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = '';
         ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
@@ -231,6 +242,9 @@ angular.module('oppia').component('preferencesPage', {
 
         $q.all([userInfoPromise, preferencesPromise]).then(function() {
           LoaderService.hideLoadingScreen();
+          setTimeout(() => {
+            ctrl.addFocusWithoutScroll('bioInputField');
+          }, 0);
         });
         ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
         ctrl.userCanExportAccount = ENABLE_ACCOUNT_EXPORT;

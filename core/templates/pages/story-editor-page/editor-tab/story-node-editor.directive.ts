@@ -37,7 +37,7 @@ require(
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/page-title.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
@@ -64,13 +64,15 @@ angular.module('oppia').directive('storyNodeEditor', [
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'ExplorationIdValidationService', 'PageTitleService',
+        'ExplorationIdValidationService', 'FocusManagerService',
+        'PageTitleService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_CHAPTER_TITLE', function(
             $rootScope, $scope, $uibModal, AlertsService,
-            ExplorationIdValidationService, PageTitleService,
+            ExplorationIdValidationService, FocusManagerService,
+            PageTitleService,
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
@@ -432,6 +434,9 @@ angular.module('oppia').directive('storyNodeEditor', [
               )
             );
             _init();
+            setTimeout(() => {
+              FocusManagerService.setFocus('storyNodeDesc');
+            }, 0);
           };
 
           ctrl.$onDestroy = function() {

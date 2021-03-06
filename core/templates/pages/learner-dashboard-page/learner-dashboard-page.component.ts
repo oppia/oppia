@@ -43,7 +43,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/user.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').component('learnerDashboardPage', {
@@ -51,6 +51,7 @@ angular.module('oppia').component('learnerDashboardPage', {
   controller: [
     '$http', '$q', '$rootScope', '$uibModal',
     'AlertsService', 'DateTimeFormatService', 'DeviceInfoService',
+    'FocusManagerService',
     'LearnerDashboardBackendApiService', 'LoaderService',
     'SuggestionModalForLearnerDashboardService',
     'ThreadStatusDisplayService', 'UrlInterpolationService',
@@ -62,6 +63,7 @@ angular.module('oppia').component('learnerDashboardPage', {
     function(
         $http, $q, $rootScope, $uibModal,
         AlertsService, DateTimeFormatService, DeviceInfoService,
+        FocusManagerService,
         LearnerDashboardBackendApiService, LoaderService,
         SuggestionModalForLearnerDashboardService,
         ThreadStatusDisplayService, UrlInterpolationService,
@@ -380,6 +382,14 @@ angular.module('oppia').component('learnerDashboardPage', {
         return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
           millisSinceEpoch);
       };
+
+      ctrl.addFocusWithoutScroll = function(label) {
+        FocusManagerService.setFocus(label);
+        setTimeout(function() {
+          window.scrollTo(0, 0);
+        }, 5);
+      };
+
       ctrl.$onInit = function() {
         ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
           EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -487,6 +497,9 @@ angular.module('oppia').component('learnerDashboardPage', {
 
         $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
           LoaderService.hideLoadingScreen();
+          setTimeout(() => {
+            ctrl.addFocusWithoutScroll('ourLessonsBtn');
+          }, 0);
         });
 
         ctrl.loadingFeedbacks = false;
