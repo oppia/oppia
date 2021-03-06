@@ -1504,8 +1504,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.textInputValidationService);
     OppiaAngularRootComponent.threadMessageObjectFactory = (
       this.threadMessageObjectFactory);
-    OppiaAngularRootComponent.threadMessageSummaryObjectFactory = (
-      this.threadMessageSummaryObjectFactory);
     OppiaAngularRootComponent.threadStatusDisplayService = (
       this.threadStatusDisplayService);
     OppiaAngularRootComponent.topicCreationBackendApiService = (
