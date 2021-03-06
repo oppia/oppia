@@ -253,8 +253,8 @@ angular.module('oppia').config([
               // and we do not want to resurface the error to the user.
               if (
                 rejection.data &&
-                 rejection.data.error &&
-                 rejection.status < 500
+                rejection.data.error &&
+                rejection.status < 500
               ) {
                 warningMessage = rejection.data.error;
               }
