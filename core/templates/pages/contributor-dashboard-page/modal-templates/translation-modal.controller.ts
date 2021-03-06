@@ -142,18 +142,18 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.findAvailableElements = function(
-      originalElements, translatedElements, isRawImage) {
+        originalElements, translatedElements, isRawImage) {
       var states = [];
       states = Array.prototype.map.call(
         originalElements, function(originalElement) {
-        if (isRawImage) {
+          if (isRawImage) {
+            return translatedElements.some(
+              translatedElement => (translatedElement === originalElement));
+          }
           return translatedElements.some(
-            translatedElement => (translatedElement === originalElement));
-        }
-        return translatedElements.some(
-          translatedElement => (
-            translatedElement === originalElement && originalElement !== ''));
-      });
+            translatedElement => (
+              translatedElement === originalElement && originalElement !== ''));
+        });
       return states;
     };
 
