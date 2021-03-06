@@ -132,7 +132,7 @@ class MultipleItemInteractionLtOneOffJob(
         a = 'MultipleChoiceInput'
         b = 'ItemSelectionInput'
         for state in exploration.states.items():
-            if state.interaction.id == a or state.interaction.id == b:
+            if state.interaction.id in interactions_to_check:
                 choices = state.interaction.customization_args['choices']
                 for choice in choices.value:
                     choice_length = len(choice)
