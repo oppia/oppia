@@ -20,28 +20,34 @@
  * followed by the name of the arg.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+interface ClickRegion {
+  clickPosition: number[],
+  clickedRegions: string[]
+}
+@Component({
+  selector: 'oppia-response-image-click-input',
+  templateUrl: './image-click-input-response.component.html',
+  styleUrls: []
+})
+export class ResponseImageClickInput implements OnInit {
+  @Input() answer: string;
+  clickRegionLabel: string;
 
-angular.module('oppia').directive('oppiaResponseImageClickInput', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./image-click-input-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$attrs', 'HtmlEscaperService',
-        function($attrs, HtmlEscaperService) {
-          var ctrl = this;
-          ctrl.$onInit = function() {
-            var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-            ctrl.clickRegionLabel = '(Clicks on ' + (
-              _answer.clickedRegions.length > 0 ?
-                '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
-          };
-        }
-      ]
-    };
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    const _answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer) as ClickRegion;
+    this.clickRegionLabel = '(Clicks on ' + (
+      _answer.clickedRegions.length > 0 ?
+        '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaResponseImageClickInput', downgradeComponent({
+    component: ResponseImageClickInput
+  }) as angular.IDirectiveFactory);

@@ -22,6 +22,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { InteractiveImageClickInput } from './directives/oppia-interactive-image-click-input.component';
+import { ResponseImageClickInput } from './directives/oppia-response-image-click-input.component';
+import { ShortResponseImageClickInput } from './directives/oppia-short-response-image-click-input.component';
 
 @NgModule({
   imports: [
@@ -30,12 +32,18 @@ import { InteractiveImageClickInput } from './directives/oppia-interactive-image
   ],
   declarations: [
     InteractiveImageClickInput,
+    ResponseImageClickInput,
+    ShortResponseImageClickInput
   ],
   entryComponents: [
     InteractiveImageClickInput,
+    ResponseImageClickInput,
+    ShortResponseImageClickInput
   ],
   exports: [
     InteractiveImageClickInput,
+    ResponseImageClickInput,
+    ShortResponseImageClickInput
   ],
 })
 

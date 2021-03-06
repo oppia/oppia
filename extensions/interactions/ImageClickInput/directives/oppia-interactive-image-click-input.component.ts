@@ -199,14 +199,15 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       image.getBoundingClientRect().left -
       image.parentElement.getBoundingClientRect().left);
     const topDelta = (
-      image.getBoundingClientRect().left -
-      image.getBoundingClientRect().top);
-    return {
+      image.getBoundingClientRect().top -
+      image.parentElement.getBoundingClientRect().top);
+    const returnValue = {
       left: regionArea[0][0] * image.width + leftDelta,
       top: regionArea[0][1] * image.height + topDelta,
       width: (regionArea[1][0] - regionArea[0][0]) * image.width,
       height: (regionArea[1][1] - regionArea[0][1]) * image.height
     };
+    return returnValue;
   }
 
   getRegionDisplay(label: string): 'none' | 'inline' {
