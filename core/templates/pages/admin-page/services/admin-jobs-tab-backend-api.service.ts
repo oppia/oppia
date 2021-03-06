@@ -78,4 +78,3 @@ export class AdminJobsTabBackendApiService {
 
 angular.module('oppia').factory('AdminJobsTabBackendApiService',
   downgradeInjectable(AdminJobsTabBackendApiService));
-
