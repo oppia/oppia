@@ -332,7 +332,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
-    'suggestion-modal-for-exploration-player.service.ts',
     'summary-list-header.component.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
