@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,26 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ThreadMessageSummaryObjectFactory.
+ * @fileoverview Unit tests for thread-message-summary.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { ThreadMessageSummary } from
+  'domain/feedback_message/thread-message-summary.model';
 
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
-
-describe('Thread message summary object factory', () => {
-  let threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
-
-  beforeEach(() => {
-    threadMessageSummaryObjectFactory = TestBed.get(
-      ThreadMessageSummaryObjectFactory);
-  });
-
+fdescribe('Thread message summary', () => {
   describe('.createNew', () => {
     it('should create new thread message summary from arguments.', () => {
       let threadMessageSummary =
-        threadMessageSummaryObjectFactory.createNew(
+        ThreadMessageSummary.createNew(
           'author', 'message content');
 
       expect(threadMessageSummary.authorUsername).toEqual('author');
@@ -43,14 +34,14 @@ describe('Thread message summary object factory', () => {
   describe('.hasText', () => {
     it('should be true when text is nonempty string', () => {
       let threadMessageSummary =
-        threadMessageSummaryObjectFactory.createNew('author', 'nonempty!');
+        ThreadMessageSummary.createNew('author', 'nonempty!');
 
       expect(threadMessageSummary.hasText()).toBe(true);
     });
 
     it('should be false when text is empty string', () => {
       let threadMessageSummary =
-        threadMessageSummaryObjectFactory.createNew('author', '');
+        ThreadMessageSummary.createNew('author', '');
 
       expect(threadMessageSummary.hasText()).toBe(false);
     });

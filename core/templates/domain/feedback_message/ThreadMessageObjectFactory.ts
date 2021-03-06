@@ -20,8 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+import { ThreadMessageSummary } from
+  'domain/feedback_message/thread-message-summary.model';
 
 export interface ThreadMessageBackendDict {
   'author_username': string;
@@ -75,9 +75,7 @@ export class ThreadMessage {
 
 @Injectable({providedIn: 'root'})
 export class ThreadMessageObjectFactory {
-  constructor(
-    private threadMessageSummaryObjectFactory:
-      ThreadMessageSummaryObjectFactory) {}
+  constructor() {}
 
   createFromBackendDict(
       threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
@@ -88,7 +86,7 @@ export class ThreadMessageObjectFactory {
       threadMessageBackendDict.message_id, threadMessageBackendDict.text,
       threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,
-      this.threadMessageSummaryObjectFactory.createNew(
+      ThreadMessageSummary.createNew(
         threadMessageBackendDict.author_username,
         threadMessageBackendDict.text));
   }

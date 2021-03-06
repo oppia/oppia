@@ -485,8 +485,6 @@ import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
