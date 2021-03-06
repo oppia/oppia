@@ -1,10 +1,10 @@
 <learner-dashboard-icons ng-if="showLearnerDashboardIconsIfPossible() && userIsLoggedIn"
-                         activity-type="ACTIVITY_TYPE_EXPLORATION"
-                         activity-id="getExplorationId()"
-                         activity-title="getExplorationTitle()"
-                         container-is-narrow="isContainerNarrow()"
-                         activity-active="explorationIsCurrentlyHoveredOver"
-                         add-to-playlist-icon-is-shown="!isOwnedByCurrentUser()">
+                         [activity-type]="ACTIVITY_TYPE_EXPLORATION"
+                         [activity-id]="getExplorationId()"
+                         [activity-title]="getExplorationTitle()"
+                         [is-container-narrow]="isContainerNarrow()"
+                         [activity-active]="explorationIsCurrentlyHoveredOver"
+                         [is-add-to-playlist-icon-shown]="!isOwnedByCurrentUser()">
 </learner-dashboard-icons>
 
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"

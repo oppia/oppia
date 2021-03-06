@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,58 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing learner dashboard icons.
+ * @fileoverview Component for showing learner dashboard icons.
  */
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import constants from 'assets/constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { AlertsService } from 'services/alerts.service';
+import { LearnerDashboardIdsBackendApiService } from
+  'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import { LearnerPlaylistService } from
+  'domain/learner_dashboard/learner-playlist-backend-api.service';
+
+@Component({
+  selector: 'learner-dashboard-icons',
+  templateUrl: './learner-dashboard-icons.component.html',
+})
+export class LearnerDashboardIconsComponent {
+  activityIsCurrentlyHoveredOver: boolean = true;
+  playlistTooltipIsEnabled: boolean = false;
+
+  @Input() activityType: string;
+  @Input() activityId: string;
+  @Input() activityTitle: string;
+  @Input() activityActive: string;
+  @Input() isContainerNarrow: boolean;
+  @Input() isAddToPlaylistIconShown: boolean;
+
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private alertsService: AlertsService,
+    private learnerDashboardIdsBackendApiService:
+    LearnerDashboardIdsBackendApiService,
+    private learnerPlaylistService: LearnerPlaylistService
+
+  ) {}
+
+  enablePlaylistTooltip() {
+    this.playlistTooltipIsEnabled = true;
+  };
+
+  disablePlaylistTooltip() {
+    this.playlistTooltipIsEnabled = false;
+  };
+
+}
+
+
 
 angular.module('oppia').directive('learnerDashboardIcons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -33,7 +80,7 @@ angular.module('oppia').directive('learnerDashboardIcons', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/domain/learner_dashboard/' +
-        'learner-dashboard-icons.directive.html'),
+        'learner-dashboard-icons.component.html'),
       controller: [
         '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION',
@@ -42,15 +89,7 @@ angular.module('oppia').directive('learnerDashboardIcons', [
             $scope, LearnerDashboardIdsBackendApiService,
             LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,
             ACTIVITY_TYPE_EXPLORATION) {
-          $scope.activityIsCurrentlyHoveredOver = true;
-          $scope.playlistTooltipIsEnabled = false;
-          $scope.enablePlaylistTooltip = function() {
-            $scope.playlistTooltipIsEnabled = true;
-          };
 
-          $scope.disablePlaylistTooltip = function() {
-            $scope.playlistTooltipIsEnabled = false;
-          };
 
           $scope.$watch('activityActive', function(value) {
             $scope.activityIsCurrentlyHoveredOver = $scope.activityActive;

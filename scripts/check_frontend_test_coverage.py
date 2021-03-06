@@ -138,7 +138,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'language-util.service.ts',
     'learner-answer-info-card.directive.ts',
     'learner-answer-info.service.ts',
-    'learner-dashboard-icons.directive.ts',
+    'learner-dashboard-icons.component.ts',
     'learner-local-nav.directive.ts',
     'learner-view-info.directive.ts',
     'learner-view-rating.service.ts',

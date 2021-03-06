@@ -60,6 +60,7 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -107,7 +108,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    LearnerPlaylistModalComponent
   ],
 
   entryComponents: [
@@ -123,7 +125,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
-    ThumbnailDisplayComponent
+    ThumbnailDisplayComponent,
+    LearnerPlaylistModalComponent
   ],
 
   exports: [

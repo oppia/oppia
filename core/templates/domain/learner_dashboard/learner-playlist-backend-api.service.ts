@@ -52,7 +52,7 @@ export class LearnerPlaylistService {
   constructor(
     private alertsService: AlertsService,
     private http: HttpClient,
-    private nbgModal: NgbModal,
+    private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
@@ -96,7 +96,7 @@ export class LearnerPlaylistService {
   removeFromLearnerPlaylist(
       activityId:string, activityTitle:string, activityType:string,
       learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
-    const modelRef = this.nbgModal.open(
+    const modelRef = this.ngbModal.open(
       LearnerPlaylistModalComponent, {backdrop: true});
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
