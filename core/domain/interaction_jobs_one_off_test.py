@@ -552,7 +552,7 @@ class MultipleChoiceInteractionLtOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(MultipleChoiceInteractionLtOneOffJobTests, self).setUp()
+        super(MultipleChoiceinteractionLtOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -587,19 +587,19 @@ class MultipleChoiceInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         state1.update_next_content_id_index(2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start MultipleChoiceInteractionLimitOneOffJob job
+        # Start MultipleInputInteractionLtOneOffJob job
         # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLtOneOffJob.
+            .MultipleItemInteractionLtOneOffJob.
             create_new())
-        interaction_jobs_one_off.MultipleChoiceInteractionLtOneOffJob.enqueue(
+        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLtOneOffJob.get_output(job_id))
+            .MultipleItemInteractionLtOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
@@ -629,15 +629,15 @@ class MultipleChoiceInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLtOneOffJob.
+            .MultipleItemInteractionLtOneOffJob.
             create_new())
-        interaction_jobs_one_off.MultipleChoiceInteractionLtOneOffJob.enqueue(
+        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .MultipleChoiceInteractionLtOneOffJob.get_output(job_id))
+            .MultipleItemInteractionLtOneOffJob.get_output(job_id))
         expected_output = 30
         self.assertEqual(actual_output, expected_output)
 
@@ -673,7 +673,7 @@ class MultipleChoiceInteractionLtOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, interaction_jobs_one_off.
-            MultipleChoiceInteractionLtOneOffJob)
+            MultipleItemInteractionLtOneOffJob)
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -899,7 +899,7 @@ class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ItemSelectionInteractionLtOneOffJobTests, self).setUp()
+        super(ItemSelectioninteractionLtOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -907,8 +907,8 @@ class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks (exp, state) pairs are produced only for
-        interactions whose choices length is less than 30.
+        """Checks output pairs are produced only for
+        interactions having choices length less than 30.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -923,60 +923,68 @@ class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
                 'html': '<p>Oppia</p>',
                 'content_id': 'ca_choices_0'
             }, {
-                'html': '<p>Oppia Contribute</p>',
+                'html': '<p>Oppia contribute</p>',
                 'content_id': 'ca_choices_1'
             }]},
-            'minAllowableSelectionCount': {'value': 0},
-            'maxAllowableSelectionCount': {'value': 1}
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
-        state1.update_interaction_id('ItemSelectionInput')
+        state1.update_interaction_id('ItemChoiceInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start ItemSelectionInteractionLimitOneOff job on sample exploration.
+        # Start MultipleItemInputInteractionLtOneOffJob job
+        # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLtOneOffJob.create_new())
-        interaction_jobs_one_off.ItemSelectionInteractionLtOneOffJob.enqueue(
+            .MultipleItemInteractionLtOneOffJob.
+            create_new())
+        interaction_jobs_one_off.MultipleInputInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLtOneOffJob.get_output(job_id))
+            .MultipleInputInteractionLtOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, state1)
 
         customization_args_dict2 = {
             'choices': {'value': [{
-                'html': '<p>This is value1 for ItemSelection</p>',
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
                 'content_id': 'ca_choices_0'
             }, {
-                'html': '<p>This is value2 for ItemSelection</p>',
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
                 'content_id': 'ca_choices_1'
+            }, {
+                'html': '<p>This is value3 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_2'
+            }, {
+                'html': '<p>This is value4 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_3'
             }]},
-            'minAllowableSelectionCount': {'value': 0},
-            'maxAllowableSelectionCount': {'value': 1}
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         state2.update_interaction_id('ItemSelectionInput')
         state2.update_interaction_customization_args(customization_args_dict2)
-        state2.update_next_content_id_index(2)
+        state2.update_next_content_id_index(4)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        # Start MultipleItemInteractionLimitOneOffJob job
+        # on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLtOneOffJob.create_new())
-        interaction_jobs_one_off.ItemSelectionInteractionLtOneOffJob.enqueue(
+            .MultipleItemInteractionLtOneOffJob.
+            create_new())
+        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .ItemSelectionInteractionLtOneOffJob.get_output(job_id))
+            .MultipleItemInteractionLtOneOffJob.get_output(job_id))
         expected_output = 30
         self.assertEqual(actual_output, expected_output)
 
@@ -994,14 +1002,13 @@ class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
 
         customization_args_dict = {
             'choices': {'value': [{
-                'html': '<p>This is value1 for ItemSelection</p>',
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
                 'content_id': 'ca_choices_0'
             }, {
-                'html': '<p>This is value2 for ItemSelection</p>',
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
                 'content_id': 'ca_choices_1'
             }]},
-            'minAllowableSelectionCount': {'value': 0},
-            'maxAllowableSelectionCount': {'value': 1}
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         state1.update_interaction_customization_args(customization_args_dict)
@@ -1013,7 +1020,7 @@ class ItemSelectionInteractionLtOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, interaction_jobs_one_off.
-            ItemSelectionInteractionLtOneOffJob)
+            MultipleItemInteractionLtOneOffJob)
 
 
 class InteractionCustomizationArgsValidationOneOffJobTests(

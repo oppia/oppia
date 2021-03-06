@@ -113,10 +113,10 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class MultipleChoiceInteractionLtOneOffJob(
+class MultipleItemInteractionLtOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
-    Multiple selection interaction whose choice length is less than 30.
+    Multiple selection interaction or whose choice length is less than 30.
     """
 
     @classmethod
@@ -130,7 +130,8 @@ class MultipleChoiceInteractionLtOneOffJob(
 
         exploration = exp_fetchers.get_exploration_from_model(item)
         for state in exploration.states.items():
-            if state.interaction.id == 'MultipleChoiceInput':
+            if state.interaction.id == 'MultipleChoiceInput'
+                    or state.interaction.id == 'ItemSelectionInput':
                 choices = state.interaction.customization_args['choices']
                 for choice in choices.value:
                     choice_length = len(choice)
@@ -184,40 +185,6 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class ItemSelectionInteractionLtOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of all (exploration, state) pairs that use the
-    Item selection interaction whose choice length is less than 30.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        for state in exploration.states.items():
-            if state.interaction.id == 'ItemSelectionInput':
-                choices = state.interaction.customization_args['choices']
-                for choice in choices.value:
-                    choice_length = len(choice)
-                    if choice_length > 30:
-                        yield ('LONGER_THAN_30', (item.id, choice_length))
-                    else:
-                        yield ('SUCCESS', item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == 'SUCCESS':
-            yield (key, values)
-        else:
-            yield (key, 30)
 
 
 class InteractionCustomizationArgsValidationOneOffJob(
