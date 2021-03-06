@@ -195,8 +195,12 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const image = images[0];
     const labeledRegion = this.imageAndRegions.labeledRegions[index];
     const regionArea = labeledRegion.region.area;
-    const leftDelta = image.offsetLeft - image.parentElement.offsetLeft;
-    const topDelta = image.offsetTop - image.parentElement.offsetTop;
+    const leftDelta = (
+      image.getBoundingClientRect().left -
+      image.parentElement.getBoundingClientRect().left);
+    const topDelta = (
+      image.getBoundingClientRect().left -
+      image.getBoundingClientRect().top);
     return {
       left: regionArea[0][0] * image.width + leftDelta,
       top: regionArea[0][1] * image.height + topDelta,
@@ -223,7 +227,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   getDotLocation(): ImagePoint {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
-    const image = images[0];
+    const image: HTMLImageElement = images[0];
     var dotLocation = {
       left: null,
       top: null
@@ -231,12 +235,12 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     if (this.lastAnswer) {
       dotLocation.left =
         this.lastAnswer.clickPosition[0] * image.width +
-        image.offsetLeft -
-        image.parentElement.offsetLeft - 5;
+        image.getBoundingClientRect().left -
+        image.parentElement.getBoundingClientRect().left - 5;
       dotLocation.top =
         this.lastAnswer.clickPosition[1] * image.height +
-        image.offsetTop -
-        image.parentElement.offsetTop - 5;
+        image.getBoundingClientRect().top -
+        image.parentElement.getBoundingClientRect().top - 5;
     }
     return dotLocation;
   }
@@ -247,11 +251,11 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     }
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
-    const image = images[0];
+    const image: HTMLImageElement = images[0];
     this.mouseX =
-      (event.pageX - image.offsetLeft) / image.width;
+      (event.pageX - image.getBoundingClientRect().left) / image.width;
     this.mouseY =
-      (event.pageY - image.offsetTop) / image.height;
+      (event.pageY - image.getBoundingClientRect().top) / image.height;
     this.currentlyHoveredRegions = [];
     this.updateCurrentlyHoveredRegions();
   }
