@@ -312,7 +312,10 @@ def create_messages(
 
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id))):
+            user_services.is_user_registered(author_id)) and
+            # TODO(#12079): Figure out a better way to avoid sending feedback
+            # thread emails for contributor dashboard suggestions.
+            (len(text) > 0 or old_statuses[index] != new_statuses[index])):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
