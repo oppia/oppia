@@ -442,7 +442,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   afterEach(async function() {
-    await users.logout();
     await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

@@ -563,7 +563,7 @@ describe('Core exploration functionality', function() {
   });
 
   afterEach(async function() {
-    await users.logout();
     await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

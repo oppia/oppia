@@ -63,10 +63,10 @@ describe('Classroom page functionality', function() {
 
     await libraryPage.selectCategories(['Algorithms']);
     await libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
+    await users.logout();
   });
 
   afterEach(async function() {
-    await users.logout();
     await general.checkForConsoleErrors([]);
   });
 });

@@ -230,8 +230,8 @@ describe('Topic editor functionality', function() {
     });
 
   afterEach(async function() {
-    await users.logout();
     await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });
 
@@ -432,8 +432,8 @@ describe('Chapter editor functionality', function() {
   });
 
   afterEach(async function() {
-    await users.logout();
     await general.checkForConsoleErrors(allowedErrors);
+    await users.logout();
     while (allowedErrors.length !== 0) {
       allowedErrors.pop();
     }

@@ -54,8 +54,8 @@ describe('Feature Gating Flow', function() {
   });
 
   afterEach(async function() {
-    await users.logout();
     await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 
   afterAll(async function() {
