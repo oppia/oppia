@@ -656,7 +656,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['TextInputValidationService', TextInputValidationService],
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadMessageObjectFactory', ThreadMessageObjectFactory],
-  ['ThreadMessageSummaryObjectFactory', ThreadMessageSummaryObjectFactory],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicObjectFactory', TopicObjectFactory],

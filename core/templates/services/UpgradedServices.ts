@@ -667,8 +667,6 @@ export class UpgradedServices {
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
-    upgradedServices['ThreadMessageSummaryObjectFactory'] =
-      new ThreadMessageSummaryObjectFactory();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
@@ -716,8 +714,7 @@ export class UpgradedServices {
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+      new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(
         upgradedServices['FractionObjectFactory'],
@@ -843,8 +840,7 @@ export class UpgradedServices {
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ThreadMessageObjectFactory'] =
-      new ThreadMessageObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+      new ThreadMessageObjectFactory();
     upgradedServices['TopicCreationBackendApiService'] =
         new TopicCreationBackendApiService(
           upgradedServices['HttpClient']);
@@ -960,8 +956,7 @@ export class UpgradedServices {
     upgradedServices['StoryObjectFactory'] =
       new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
-      new SuggestionThreadObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+      new SuggestionThreadObjectFactory();
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(

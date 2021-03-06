@@ -755,7 +755,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static textInputTokenizer: TextInputTokenizer;
   static textInputValidationService: TextInputValidationService;
   static threadMessageObjectFactory: ThreadMessageObjectFactory;
-  static threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
   static threadStatusDisplayService: ThreadStatusDisplayService;
   static topicCreationBackendApiService: TopicCreationBackendApiService;
   static topicObjectFactory: TopicObjectFactory;
@@ -1048,7 +1047,6 @@ private textInputRulesService: TextInputRulesService,
 private textInputTokenizer: TextInputTokenizer,
 private textInputValidationService: TextInputValidationService,
 private threadMessageObjectFactory: ThreadMessageObjectFactory,
-private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory,
 private threadStatusDisplayService: ThreadStatusDisplayService,
 private topicCreationBackendApiService: TopicCreationBackendApiService,
 private topicObjectFactory: TopicObjectFactory,
