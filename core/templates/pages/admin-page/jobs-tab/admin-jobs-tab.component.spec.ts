@@ -43,6 +43,13 @@ interface FakeWindowRefDict {
   }
 }
 
+interface RequestData {
+  action: string,
+  'job_type'?: string,
+  'computation_type'?: string,
+  'job_id'?: string,
+}
+
 describe('Admin Jobs Tab Component', () => {
   let componentInstance: AdminJobsTabComponent;
   let fixture: ComponentFixture<AdminJobsTabComponent>;
@@ -95,7 +102,7 @@ describe('Admin Jobs Tab Component', () => {
       };
     }
 
-    private post(url: string, requestData: object): FakeThen {
+    private post(url: string, requestData: RequestData): FakeThen {
       return {
         then: (
             successCallback: (responseData?: object) => void,
