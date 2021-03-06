@@ -675,7 +675,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
             self, interaction_jobs_one_off.
             MultipleItemInteractionLtOneOffJob)
 
-    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+    def test_exp_state_pairs_are_produced_only_for_item_interactions(self):
         """Checks output pairs are produced only for
         item selection interactions having choices length less than 30.
         """
@@ -757,7 +757,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         expected_output = 30
         self.assertEqual(actual_output, expected_output)
 
-    def test_no_action_is_performed_for_deleted_exploration(self):
+    def test_no_action_is_performed_for_deleted_item_exploration(self):
         """Test that no action is performed on deleted explorations."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
