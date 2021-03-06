@@ -57,6 +57,7 @@ describe('Learner dashboard functionality', function() {
   var createDummyExplorationOnDesktop = async function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
+    await creatorDashboardPage.clickCreateExplorationButton();
     await waitFor.pageToFullyLoad();
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorMainTab.setStateName('First');
