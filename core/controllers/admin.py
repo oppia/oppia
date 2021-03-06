@@ -1066,3 +1066,44 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
         })
+
+
+class VerifyUserModelsDeletedHandler(base.BaseHandler):
+    """Handler for getting whether any models exist for specific user ID."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        user_id = self.request.get('user_id', None)
+        if user_id is None:
+            raise self.InvalidInputException('Missing user_id param')
+        user_is_deleted = wipeout_service.verify_user_deleted(
+            user_id, include_delete_at_end_models=True)
+        self.render_json({'related_models_exist': not user_is_deleted})
+
+
+class DeleteUserHandler(base.BaseHandler):
+    """Handler for deleting a user with specific ID."""
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        user_id = self.request.get('user_id', None)
+        username = self.request.get('username', None)
+        if user_id is None:
+            raise self.InvalidInputException('Missing user_id param')
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+        user_id_from_username = (
+            user_services.get_user_id_from_username(username))
+        if user_id_from_username is None:
+            raise self.InvalidInputException(
+                'The username doesn\'t belong to any user'
+            )
+        if user_id_from_username != user_id:
+            raise self.InvalidInputException(
+                'The user ID retrieved from the username and '
+                'the user ID provided by admin differ.'
+            )
+        wipeout_service.pre_delete_user(user_id)
+        self.render_json({'success': True})
