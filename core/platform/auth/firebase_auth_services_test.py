@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import datetime
+import itertools
 import json
 import logging
 
@@ -79,7 +80,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         'generate_sign_in_with_email_link',
         'get_user_by_email',
         'get_user_by_phone_number',
-        'import_users',
         'list_users',
         'revoke_refresh_tokens',
         'set_custom_user_claims',
@@ -89,6 +89,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._users_by_uid = {}
         self._session_cookie_duration_by_id_token = collections.Counter()
         self._swap_stack = None
+        self._test = None
 
     def install(self, test):
         """Installs a new instance of the stub on the given test class.
@@ -98,6 +99,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         Args:
             test: test_utils.TestBase. The test to install the stub on.
         """
+        self._test = test
+
         with contextlib2.ExitStack() as swap_stack:
             swap_stack.enter_context(test.swap_to_always_return(
                 firebase_admin, 'initialize_app', value=object()))
@@ -109,6 +112,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth,
                 'verify_session_cookie', self._verify_session_cookie))
+            swap_stack.enter_context(test.swap(
+                firebase_admin.auth, 'import_users', self._import_users))
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth, 'verify_id_token', self._verify_id_token))
             swap_stack.enter_context(test.swap(
@@ -162,6 +167,135 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._set_user_fragile(uid, email, disabled, custom_claims)
         return self._encode_user_claims(self._get_user(uid))
 
+    def mock_initialize_app_error(self):
+        """Returns a context in which `initialize_app` raises an exception."""
+        return self._test.swap_to_always_raise(
+            firebase_admin, 'initialize_app',
+            error=firebase_exceptions.UnknownError('could not init'))
+
+    def mock_delete_app_error(self):
+        """Returns a context in which `delete_app` raises an exception."""
+        return self._test.swap_to_always_raise(
+            firebase_admin, 'delete_app',
+            error=firebase_exceptions.UnknownError('could not delete app'))
+
+    def mock_import_users_error(
+            self, call_error_sequence=(False,), user_error_sequence=(False,)):
+        """Returns a context in which `import_users` raises an exception.
+
+        Example:
+            with mock_import_users_error(call_error_sequence=(False, True)):
+                import_users() # OK
+                import_users() # Raises!
+                import_users() # OK
+                import_users() # Raises!
+                import_users() # OK
+
+        Args:
+            call_error_sequence: tuple(bool). Enumerates which successive calls
+                will raise an exception. The pattern is cycled.
+            user_error_sequence: tuple(bool). Enumerates which individual users
+                will cause an error. The pattern is cycled.
+
+        Returns:
+            Context manager. The context manager with the mocked implementation.
+        """
+        call_error_sequence = itertools.cycle(call_error_sequence)
+        user_error_sequence = itertools.cycle(user_error_sequence)
+        def mock_import_users(user_records):
+            """Mock function that fails according to the given input values."""
+            if python_utils.NEXT(call_error_sequence):
+                raise firebase_exceptions.DataLossError('Failed to connect')
+
+            total_records = len(user_records)
+
+            kept_records, error_indices = [], []
+            for i, (record, error) in enumerate(
+                    python_utils.ZIP(user_records, user_error_sequence)):
+                if error:
+                    error_indices.append(i)
+                else:
+                    kept_records.append(record)
+
+            if kept_records:
+                self._import_users(kept_records)
+
+            return self._create_user_import_result_fragile(
+                total_records, error_indices=error_indices)
+
+        return self._test.swap(
+            firebase_admin.auth, 'import_users', mock_import_users)
+
+    def assert_firebase_user_exists(self, uid):
+        """Asserts that an account with the given id exists.
+
+        NOTE: This method can only be called after the instance has been
+        installed to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self._test.assertIn(
+            uid, self._users_by_uid,
+            msg='Firebase account not found: uid=%r' % uid)
+
+    def assert_firebase_user_does_not_exist(self, uid):
+        """Asserts that an account with the given id does not exist.
+
+        NOTE: This method can only be called after the instance has been
+        installed to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self._test.assertNotIn(
+            uid, self._users_by_uid,
+            msg='Unexpected Firebase account exists: uid=%r' % uid)
+
+    def assert_multi_firebase_users_exist(self, uids):
+        """Asserts that every account with the given ids exist.
+
+        NOTE: This method can only be called after the instance has been
+        installed to a test case!
+
+        Args:
+            uids: list(str). The IDs of the users to confirm.
+        """
+        not_found = [uid for uid in uids if uid not in self._users_by_uid]
+        self._test.assertEqual(
+            not_found, [],
+            msg='Firebase accounts not found: uids=%r' % (not_found,))
+
+    def assert_multi_firebase_users_do_not_exist(self, uids):
+        """Asserts that every account with the given ids do not exist.
+
+        NOTE: This method can only be called after the instance has been
+        installed to a test case!
+
+        Args:
+            uids: list(str). The IDs of the users to confirm.
+        """
+        found = [uid for uid in uids if uid in self._users_by_uid]
+        self._test.assertEqual(
+            found, [],
+            msg='Unexpected Firebase accounts exists: uids=%r' % (found,))
+
+    def _import_users(self, user_records):
+        """Adds the given user records to the stub's storage.
+
+        Args:
+            user_records: list(firebase_admin.auth.ImportUserRecord). The users
+                to add.
+
+        Returns:
+            firebase_admin.auth.UserImportResult. Object with details about the
+            operation.
+        """
+        for record in user_records:
+            self._set_user_fragile(
+                record.uid, record.email, record.disabled, record.custom_claims)
+        return self._create_user_import_result_fragile(len(user_records))
+
     def _create_session_cookie(self, id_token, max_age):
         """Creates a new session cookie which expires after given duration.
 
@@ -211,6 +345,30 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             dict(str: *). Claims for the user corresponding to the ID token.
         """
         return self._decode_user_claims(token)
+
+    def _create_user_import_result_fragile(self, total, error_indices=None):
+        """Creates a new UserImportResult instance with the given values.
+
+        FRAGILE! The dict keys used by the UserImportResult constructor are an
+        implementation detail that may break in future versions of the SDK.
+
+        Args:
+            total: int. The total number of records initially requested.
+            error_indices: list(int)|None. The indicies of the records which
+                have failed. If None, then the result will not contain any
+                errors.
+
+        Returns:
+            firebase_admin.auth.UserImportResult. A UserImportResult with the
+            given results.
+        """
+        if error_indices is None:
+            error_indices = []
+        return firebase_admin.auth.UserImportResult({
+            'error': [
+                {'index': i, 'message': 'FirebaseError'} for i in error_indices
+            ],
+        }, total)
 
     def _set_user_fragile(self, uid, email, disabled, custom_claims):
         """Sets the given properties for the corresponding user.
