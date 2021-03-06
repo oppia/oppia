@@ -33,8 +33,6 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 class GaeAuthServicesTests(test_utils.GenericTestBase):
 
-    ENABLE_AUTH_SERVICES_STUB = False
-
     def test_establish_auth_session_does_nothing(self):
         request = webapp2.Request.blank('/')
         response = webapp2.Response()

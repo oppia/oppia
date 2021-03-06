@@ -472,8 +472,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     """Test base for Firebase-specific tests with helpful default behavior."""
 
-    ENABLE_AUTH_SERVICES_STUB = False
-
     AUTH_ID = 'aid'
     EMAIL = 'foo@bar.com'
 

@@ -42,7 +42,6 @@ auth_models, user_models = (
 class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
 
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
-    ENABLE_AUTH_SERVICES_STUB = False
 
     def count_one_off_jobs_in_queue(self):
         """Returns the number of one off jobs in the taskqueue."""
@@ -133,7 +132,6 @@ class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
 class PopulateFirebaseAccountsOneOffJobTests(test_utils.GenericTestBase):
 
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
-    ENABLE_AUTH_SERVICES_STUB = False
 
     def setUp(self):
         super(PopulateFirebaseAccountsOneOffJobTests, self).setUp()

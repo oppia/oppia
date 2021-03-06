@@ -60,10 +60,180 @@ class Platform(python_utils.OBJECT):
             'import_models() method is not overwritten in derived classes')
 
 
+class AuthServices(python_utils.OBJECT):
+    """An interface to auth services which forwards calls to an implementation.
+
+    NOTE: This class makes it possible for tests to swap out function
+    implementations from the auth services API without damaging any modules.
+    """
+
+    def __init__(self, impl):
+        self._impl = impl
+
+    def establish_auth_session(self, request, response):
+        """Sets login cookies to maintain a user's sign-in session.
+
+        Args:
+            request: webapp2.Request. Unused because os.environ handles
+                sessions.
+            response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        self._impl.establish_auth_session(request, response)
+
+    def destroy_auth_session(self, response):
+        """Clears login cookies from the given response headers.
+
+        Args:
+            response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        self._impl.destroy_auth_session(response)
+
+    def get_auth_claims_from_request(self, request):
+        """Authenticates the request and returns claims about its authorizer.
+
+        This stub obtains authorization information from os.environ. To make the
+        operation more authentic, this method also creates a new "external"
+        association for the user to simulate a genuine "provided" value.
+
+        Args:
+            request: webapp2.Request. The HTTP request to authenticate.
+                Unused because auth-details are extracted from environment
+                variables.
+
+        Returns:
+            AuthClaims|None. Claims about the currently signed in user. If no
+            user is signed in, then returns None.
+        """
+        return self._impl.get_auth_claims_from_request(request)
+
+    def mark_user_for_deletion(self, user_id):
+        """Marks the user, and all of their auth associations, as deleted.
+
+        Since the stub does not use models, this operation actually deletes the
+        user's association. The "external" associations, however, are not
+        deleted yet.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
+        self._impl.mark_user_for_deletion(user_id)
+
+    def delete_external_auth_associations(self, user_id):
+        """Deletes all associations that refer to the user outside of Oppia.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
+        self._impl.delete_external_auth_associations(user_id)
+
+    def verify_external_auth_associations_are_deleted(self, user_id):
+        """Returns true if and only if we have successfully verified that all
+        external associations have been deleted.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                checked.
+
+        Returns:
+            bool. True if and only if we have successfully verified that all
+            external associations have been deleted.
+        """
+        return (
+            self._impl.verify_external_auth_associations_are_deleted(user_id))
+
+    def get_auth_id_from_user_id(self, user_id):
+        """Returns the auth ID associated with the given user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            str|None. The auth ID associated with the given user ID, or None if
+            no association exists.
+        """
+        return self._impl.get_auth_id_from_user_id(user_id)
+
+    def get_user_id_from_auth_id(self, auth_id):
+        """Returns the user ID associated with the given auth ID.
+
+        Args:
+            auth_id: str. The auth ID.
+
+        Returns:
+            str|None. The user ID associated with the given auth ID, or None if
+            no association exists.
+        """
+        return self._impl.get_user_id_from_auth_id(auth_id)
+
+    def get_multi_user_ids_from_auth_ids(self, auth_ids):
+        """Returns the user IDs associated with the given auth IDs.
+
+        Args:
+            auth_ids: list(str). The auth IDs.
+
+        Returns:
+            list(str|None). The user IDs associated with each of the given auth
+            IDs, or None for associations which don't exist.
+        """
+        return self._impl.get_multi_user_ids_from_auth_ids(auth_ids)
+
+    def get_multi_auth_ids_from_user_ids(self, user_ids):
+        """Returns the auth IDs associated with the given user IDs.
+
+        Args:
+            user_ids: list(str). The user IDs.
+
+        Returns:
+            list(str|None). The auth IDs associated with each of the given user
+            IDs, or None for associations which don't exist.
+        """
+        return self._impl.get_multi_auth_ids_from_user_ids(user_ids)
+
+    def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
+        """Commits the association between auth ID and user ID.
+
+        This method also adds the user to the "external" set of associations.
+
+        Args:
+            auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association
+                to commit.
+
+        Raises:
+            Exception. The IDs are already associated with a value.
+        """
+        self._impl.associate_auth_id_with_user_id(auth_id_user_id_pair)
+
+    def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
+        """Commits the associations between auth IDs and user IDs.
+
+        This method also adds the users to the "external" set of associations.
+
+        Args:
+            auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+                associations to commit.
+
+        Raises:
+            Exception. One or more auth associations already exist.
+        """
+        self._impl.associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs)
+
+
 class _Gae(Platform):
     """Provides platform-specific imports related to
     GAE (Google App Engine).
     """
+
+    def __init__(self):
+        # NOTE: We can't initialize this value yet, because if we do it would
+        # cause a circular import when gae_auth_services or
+        # firebase_auth_services tries to import from this module.
+        # Instead, we lazily instantiate it in the import_auth_services()
+        # function.
+        self._auth_services_impl = None
 
     @classmethod
     def import_models(cls, model_names):
@@ -189,15 +359,16 @@ class _Gae(Platform):
             if '__' not in name and name != 'base_model']
         return cls.get_storage_model_classes(model_names)
 
-    @classmethod
-    def import_auth_services(cls):
-        """Imports and returns gae_auth_services module.
+    def import_auth_services(self):
+        """Imports and returns the auth services implementation.
 
         Returns:
-            module. The gae_auth_services module.
+            AuthServices. An auth services implementation.
         """
-        from core.platform.auth import gae_auth_services
-        return gae_auth_services
+        if self._auth_services_impl is None:
+            from core.platform.auth import gae_auth_services
+            self._auth_services_impl = AuthServices(gae_auth_services)
+        return self._auth_services_impl
 
     @classmethod
     def import_transaction_services(cls):
@@ -310,7 +481,7 @@ class Registry(python_utils.OBJECT):
 
     # Maps platform names to the corresponding module registry classes.
     _PLATFORM_MAPPING = {
-        _Gae.NAME: _Gae,
+        _Gae.NAME: _Gae(),
     }
 
     @classmethod

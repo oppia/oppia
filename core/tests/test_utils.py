@@ -738,8 +738,7 @@ class AuthServicesStub(python_utils.OBJECT):
             raise Exception(
                 'auth_id=%r is already associated with user_id=%r' % (
                     auth_id, self._user_id_by_auth_id[auth_id]))
-        auth_models.UserAuthDetailsModel(
-            id=user_id, firebase_auth_id=auth_id).put()
+        auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id).put()
         self._external_user_id_associations.add(user_id)
         self._user_id_by_auth_id[auth_id] = user_id
 
@@ -761,8 +760,7 @@ class AuthServicesStub(python_utils.OBJECT):
         if collisions:
             raise Exception('already associated: %s' % collisions)
         datastore_services.put_multi(
-            [auth_models.UserAuthDetailsModel(
-                id=user_id, firebase_auth_id=auth_id)
+            [auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id)
              for auth_id, user_id in auth_id_user_id_pairs])
         self._external_user_id_associations.add(
             u for _, u in auth_id_user_id_pairs)
@@ -1700,6 +1698,7 @@ tags: []
         memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
+            stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
                 self._es_stub.mock_create_index))
@@ -1718,14 +1717,9 @@ tags: []
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'search',
                 self._es_stub.mock_search))
-
-            if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
-                stack.callback(AuthServicesStub.install_stub(self))
-
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
-
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
