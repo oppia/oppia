@@ -124,7 +124,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-property-editor.directive.ts',
     'graph-viz.directive.ts',
     'hint-and-solution-buttons.directive.ts',
-    'hint-and-solution-modal.service.ts',
     'hint-editor.directive.ts',
     'html-editor.directive.ts',
     'html-escaper.service.ts',
