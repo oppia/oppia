@@ -179,6 +179,30 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             'User %s tried to release ownership of exploration %s but was '
             'refused permission.' % (self.viewer_id, self.exp_id))
 
+    def test_activity_should_have_atlest_one_owner(self):
+        self.activity_rights.community_owned = False
+        self.activity_rights.owner_ids = []
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Activity should have atleast one owner.'):
+            self.activity_rights.validate()
+
+    def test_has_any_role_for_existing_user_returns_true(self):
+        self.activity_rights.owner_ids = ['123456', '789213']
+        self.activity_rights.editor_ids = []
+        self.activity_rights.viewer_ids = []
+
+        self.assertTrue(self.activity_rights.has_any_role('123456'))
+
+    def test_has_any_role_for_not_existing_user_returns_false(self):
+        self.activity_rights.owner_ids = ['123456', '789213']
+        self.activity_rights.editor_ids = []
+        self.activity_rights.viewer_ids = []
+
+        self.assertFalse(
+            self.activity_rights.has_any_role('not_existing_user'))
+
 
 class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 

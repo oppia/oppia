@@ -40,6 +40,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 import feconf
+import python_utils
 import utils
 
 
@@ -233,6 +234,12 @@ class ExplorationRightsHandler(EditorHandler):
                 raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
 
+            exp_rights = rights_manager.get_exploration_rights(
+                exploration_id)
+            if exp_rights.has_any_role(new_member_id):
+                raise self.InvalidInputException(
+                    'User already has some rights in exploration')
+
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
@@ -261,6 +268,26 @@ class ExplorationRightsHandler(EditorHandler):
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict()
         })
+
+    @acl_decorators.can_modify_exploration_roles
+    def delete(self, exploration_id):
+        """Deletes a user with existing rights."""
+
+        username = self.request.get('username')
+
+        if not isinstance(username, python_utils.BASESTRING):
+            raise self.InvalidInputException('Invalid Useranme.')
+
+        member_id = user_services.get_user_id_from_username(username)
+        if member_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        try:
+            rights_manager.deassign_role_for_exploration(
+                self.user, exploration_id, member_id)
+            self.render_json({})
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
 
 class ExplorationStatusHandler(EditorHandler):

@@ -126,6 +126,10 @@ class ActivityRights(python_utils.OBJECT):
                 'A user cannot be both a voice artist and a viewer: %s' %
                 voice_artist_viewer)
 
+        if not self.community_owned and len(self.owner_ids) == 0:
+            raise utils.ValidationError(
+                'Activity should have atleast one owner.')
+
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
 
@@ -230,6 +234,18 @@ class ActivityRights(python_utils.OBJECT):
             bool. Whether the activity is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
+
+    def has_any_role(self, user_id):
+        """Checks whether the user is assigned to any role in the activity.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            bool. Whether the user is assigned to any role in the activity.
+        """
+        return user_id in (self.owner_ids + self.editor_ids + (
+            self.voice_artist_ids + self.viewer_ids))
 
 
 class ExplorationRightsChange(change_domain.BaseChange):
