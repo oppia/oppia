@@ -116,7 +116,8 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class MultipleItemInteractionLtOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
-    Multiple selection interaction or whose choice length is less than 30.
+    Multiple choice interaction or Item selection Interaction whose 
+    choice length is less than 30.
     """
 
     @classmethod
@@ -129,24 +130,22 @@ class MultipleItemInteractionLtOneOffJob(
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        a = 'MultipleChoiceInput'
-        b = 'ItemSelectionInput'
+        interactions_to_check = ('MultipleChoiceInput', 'ItemSelectionInput')
         for state in exploration.states.items():
-            if state.interaction.id == a or state.interaction.id == b:
+            if state.interaction.id in interactions_to_check:
                 choices = state.interaction.customization_args['choices']
                 for choice in choices.value:
                     choice_length = len(choice)
                     if choice_length > 30:
-                        yield ('LONGER_THAN_30', 30)
-                    else:
-                        yield ('SUCCESS', item.id)
+                        yield ('LONGER_THAN_30', (item.id, choice_length))
+        yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
         if key == 'SUCCESS':
-            yield (key, values)
+            yield (key, len(values))
         else:
-            yield (key, 30)
+            yield (key, values)
 
 
 class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
