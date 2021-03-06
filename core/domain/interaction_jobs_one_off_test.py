@@ -600,7 +600,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        self.assertEqual(actual_output, [])
+        self.assertEqual(actual_output, state1)
 
         customization_args_dict2 = {
             'choices': {'value': [{
