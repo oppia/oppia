@@ -74,10 +74,10 @@ class AuthServices(python_utils.OBJECT):
         """Sets login cookies to maintain a user's sign-in session.
 
         Args:
-            request: webapp2.Request. Unused because os.environ handles
-                sessions.
-            response: webapp2.Response. Unused because os.environ handles
-                sessions.
+            request: webapp2.Request. The request with the authorization to
+                begin a new session.
+            response: webapp2.Response. The response to establish the new
+                session upon.
         """
         self._impl.establish_auth_session(request, response)
 
@@ -85,22 +85,16 @@ class AuthServices(python_utils.OBJECT):
         """Clears login cookies from the given response headers.
 
         Args:
-            response: webapp2.Response. Unused because os.environ handles
-                sessions.
+            response: webapp2.Response. The response with the session to
+                destroy.
         """
         self._impl.destroy_auth_session(response)
 
     def get_auth_claims_from_request(self, request):
         """Authenticates the request and returns claims about its authorizer.
 
-        This stub obtains authorization information from os.environ. To make the
-        operation more authentic, this method also creates a new "external"
-        association for the user to simulate a genuine "provided" value.
-
         Args:
             request: webapp2.Request. The HTTP request to authenticate.
-                Unused because auth-details are extracted from environment
-                variables.
 
         Returns:
             AuthClaims|None. Claims about the currently signed in user. If no
@@ -110,10 +104,6 @@ class AuthServices(python_utils.OBJECT):
 
     def mark_user_for_deletion(self, user_id):
         """Marks the user, and all of their auth associations, as deleted.
-
-        Since the stub does not use models, this operation actually deletes the
-        user's association. The "external" associations, however, are not
-        deleted yet.
 
         Args:
             user_id: str. The unique ID of the user whose associations should be
@@ -196,8 +186,6 @@ class AuthServices(python_utils.OBJECT):
     def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID.
 
-        This method also adds the user to the "external" set of associations.
-
         Args:
             auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association
                 to commit.
@@ -209,8 +197,6 @@ class AuthServices(python_utils.OBJECT):
 
     def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs.
-
-        This method also adds the users to the "external" set of associations.
 
         Args:
             auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
