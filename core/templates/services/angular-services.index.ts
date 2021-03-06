@@ -341,6 +341,7 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { QuestionValidationService } from './question-validation.service';
+import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -697,5 +698,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['baseInteractionValidationService', baseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
-  ['QuestionValidationService', QuestionValidationService]
+  ['QuestionValidationService', QuestionValidationService],
+  ['CollectionEditorStateService', CollectionEditorStateService],
 ];
