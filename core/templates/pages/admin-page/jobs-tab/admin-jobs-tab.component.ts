@@ -16,21 +16,15 @@
  * @fileoverview Component for the jobs tab in the admin panel.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from '../services/admin-data.service';
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
-
-interface AdminJobOutputResponse {
-  output: string[]
-}
+import { AdminJobOutputResponse, AdminJobsTabBackendApiService } from '../services/admin-jobs-tab-backend-api.service';
 
 @Component({
   selector: 'oppia-admin-jobs-tab',
@@ -49,20 +43,15 @@ export class AdminJobsTabComponent {
   AUDIT_JOB_SPECS: JobStatusSummary[] = [];
   RECENT_JOB_DATA: Job[] = [];
   constructor(
-    private httpClient: HttpClient,
+    private adminJobsTabBackendApiService: AdminJobsTabBackendApiService,
     private adminDataService: AdminDataService,
-    private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
   ) { }
 
   showJobOutput(
       jobId: string
   ): void {
-    let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
-      AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
-        jobId: jobId
-      });
-    this.httpClient.get(adminJobOutputUrl).toPromise()
+    this.adminJobsTabBackendApiService.getAdminJobOutput(jobId)
       .then((adminJobOutputResponse: AdminJobOutputResponse) => {
         this.showingJobOutput = true;
         this.jobOutput = adminJobOutputResponse.output || [];
@@ -79,10 +68,7 @@ export class AdminJobsTabComponent {
   startNewJob(
       jobType: string) : void {
     this.setStatusMessage.emit('Starting new job...');
-    this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'start_new_job',
-      job_type: jobType
-    }).toPromise().then(() => {
+    this.adminJobsTabBackendApiService.startNewJob(jobType).then(() => {
       this.setStatusMessage.emit('Job started successfully.');
       this.windowRef._window().location.reload();
     }, (errorResponse) => {
@@ -96,35 +82,30 @@ export class AdminJobsTabComponent {
       computationType: string): void {
     this.setStatusMessage.emit('Starting computation');
 
-    this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'start_computation',
-      computation_type: computationType
-    }).toPromise().then(()=> {
-      this.setStatusMessage.emit('Computation started successfully.');
-      this.windowRef._window().location.reload();
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.error
-      );
-    });
+    this.adminJobsTabBackendApiService.startComputation(computationType)
+      .then(()=> {
+        this.setStatusMessage.emit('Computation started successfully.');
+        this.windowRef._window().location.reload();
+      }, (errorResponse) => {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.error
+        );
+      });
   }
 
   stopComputation(
       computationType: string
   ): void {
     this.setStatusMessage.emit('Stopping computation...');
-
-    this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'stop_computation',
-      computation_type: computationType
-    }).toPromise().then(() => {
-      this.setStatusMessage.emit('Abort signal sent to computation.');
-      this.windowRef._window().location.reload();
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.error
-      );
-    });
+    this.adminJobsTabBackendApiService.stopComputation(computationType)
+      .then(() => {
+        this.setStatusMessage.emit('Abort signal sent to computation.');
+        this.windowRef._window().location.reload();
+      }, (errorResponse) => {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.error
+        );
+      });
   }
 
   cancelJob(
@@ -132,11 +113,7 @@ export class AdminJobsTabComponent {
       jobType: string): void {
     this.setStatusMessage.emit('Cancelling job...');
 
-    this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'cancel_job',
-      job_id: jobId,
-      job_type: jobType
-    }).toPromise().then(() => {
+    this.adminJobsTabBackendApiService.cancelJob(jobId, jobType).then(() => {
       this.setStatusMessage.emit('Abort signal sent to job.');
       this.windowRef._window().location.reload();
     }, (errorResponse) => {

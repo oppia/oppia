@@ -17,7 +17,6 @@
  *
  */
 
-import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
@@ -26,7 +25,9 @@ import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
 import { InterpolationValuesType, UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { AdminPageConstants } from '../admin-page.constants';
 import { AdminDataService } from '../services/admin-data.service';
+import { AdminJobsTabBackendApiService } from '../services/admin-jobs-tab-backend-api.service';
 import { AdminJobsTabComponent } from './admin-jobs-tab.component';
 
 
@@ -34,10 +35,6 @@ interface FakeThen {
   then: (
         successCallback: (responseData?: object) => void,
         errorCallback: (errorData?: object) => void) => void
-}
-
-interface FakePromise {
-  toPromise: () => FakeThen
 }
 
 interface FakeWindowRefDict {
@@ -49,6 +46,7 @@ interface FakeWindowRefDict {
 describe('Admin Jobs Tab Component', () => {
   let componentInstance: AdminJobsTabComponent;
   let fixture: ComponentFixture<AdminJobsTabComponent>;
+  let urlInterpolationService: UrlInterpolationService;
   let mockJobId: string = 'testJobId';
   let mockComputationData: ComputationData = new ComputationData(
     123, true, 'idle', 123, true, 123, '0', 'testComputation'
@@ -78,59 +76,89 @@ describe('Admin Jobs Tab Component', () => {
     featureFlags: [],
   };
 
-  class MockHttpClient {
-    get(url: string): FakePromise {
+  class MockAdminJobTabBackendApiService {
+    private get(url: string): FakeThen {
       return {
-        toPromise: () => {
-          return {
-            then: (
-                successCallback: (responseData?: object) => void,
-                errorCallback: (errorData?: object) => void) => {
-              if (url === 'success') {
-                successCallback({
-                  output: [1, 2, 3]
-                });
-                return;
-              }
-              errorCallback({
-                error: 'test error'
-              });
-            }
-          };
+        then: (
+            successCallback: (responseData?: object) => void,
+            errorCallback: (errorData?: object) => void) => {
+          if (url === 'success') {
+            successCallback({
+              output: [1, 2, 3]
+            });
+            return;
+          }
+          errorCallback({
+            error: 'test error'
+          });
         }
       };
     }
 
-    post(url: string, requestData: object): FakePromise {
+    private post(url: string, requestData: object): FakeThen {
       return {
-        toPromise: () => {
-          return {
-            then: (
-                successCallback: (responseData?: object) => void,
-                errorCallback: (errorData?: object) => void
-            ) => {
-              if ('job_type' in requestData) {
-                if (requestData.job_type === 'error') {
-                  errorCallback({
-                    error: 'test error'
-                  });
-                  return;
-                }
-              } else if ('computation_type' in requestData) {
-                if (requestData.computation_type === 'error') {
-                  errorCallback({
-                    error: 'test error'
-                  });
-                  return;
-                }
-              }
-              successCallback();
+        then: (
+            successCallback: (responseData?: object) => void,
+            errorCallback: (errorData?: object) => void
+        ) => {
+          if ('job_type' in requestData) {
+            if (requestData.job_type === 'error') {
+              errorCallback({
+                error: 'test error'
+              });
+              return;
             }
-          };
+          } else if ('computation_type' in requestData) {
+            if (requestData.computation_type === 'error') {
+              errorCallback({
+                error: 'test error'
+              });
+              return;
+            }
+          }
+          successCallback();
         }
       };
     }
+
+    getAdminJobOutput(jobId: string): FakeThen {
+      let adminJobOutputUrl = urlInterpolationService.interpolateUrl(
+        AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
+          jobId: jobId
+        });
+      return this.get(adminJobOutputUrl);
+    }
+
+    startNewJob(jobType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'start_new_job',
+        job_type: jobType
+      });
+    }
+
+    startComputation(computationType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'start_computation',
+        computation_type: computationType
+      });
+    }
+
+    stopComputation(computationType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'stop_computation',
+        computation_type: computationType
+      });
+    }
+
+    cancelJob(jobId: string, jobType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'cancel_job',
+        job_id: jobId,
+        job_type: jobType
+      });
+    }
   }
+
 
   class MockAdminDataService {
     getDataAsync(): FakeThen {
@@ -177,12 +205,12 @@ describe('Admin Jobs Tab Component', () => {
           useClass: MockWindowRef
         },
         {
-          provide: HttpClient,
-          useClass: MockHttpClient
-        },
-        {
           provide: AdminDataService,
           useClass: MockAdminDataService
+        },
+        {
+          provide: AdminJobsTabBackendApiService,
+          useClass: MockAdminJobTabBackendApiService
         },
         {
           provide: UrlInterpolationService,
@@ -195,6 +223,7 @@ describe('Admin Jobs Tab Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AdminJobsTabComponent);
     componentInstance = fixture.componentInstance;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     fixture.detectChanges();
   });
 
