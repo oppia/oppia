@@ -23,12 +23,11 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service.ts';
+import { ContextService } from 'services/context.service';
 
 @Component({
-  selector: 'outcome-feedback-editor',
+  selector: 'oppia-outcome-feedback-editor',
   templateUrl: './outcome-feedback-editor.component.html',
-  styleUrls: []
 })
 export class OutcomeFeedbackEditorComponent implements OnInit {
   @Input() outcome:string;
@@ -49,5 +48,5 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
   }
 }
 angular.module('oppia').directive(
-  'outcomeFeedbackEditorComponent', downgradeComponent(
+  'oppiaOutcomeFeedbackEditor', downgradeComponent(
     {component: OutcomeFeedbackEditorComponent}));
