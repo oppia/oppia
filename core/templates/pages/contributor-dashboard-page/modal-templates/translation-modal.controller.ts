@@ -138,7 +138,7 @@ angular.module('oppia').controller('TranslationModalController', [
             textWrapperLength, attribute.length - textWrapperLength);
         }
       });
-      return attributes.filter(attribute => attribute !== null);
+      return attributes.filter(attribute => attribute);
     };
 
     $scope.findAvailableElements = function(
