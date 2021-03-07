@@ -76,6 +76,7 @@ describe('Admin Page', function() {
 
     await adminPage.stopOneOffJob('ExplorationValidityJobManager');
     await adminPage.expectNumberOfRunningOneOffJobs(0);
+    await users.logout();
   });
 
   afterEach(async function() {

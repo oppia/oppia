@@ -146,8 +146,8 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    await users.createUser('user1@embedding.com', 'user1Embedding');
-    await users.login('user1@embedding.com', true);
+    await users.createAndLoginAdminUser(
+      'user1@embedding.com', 'user1Embedding');
 
     // Create exploration.
     // Version 1 is creation of the exploration.
@@ -276,8 +276,7 @@ describe('Embedding', function() {
         await browser.switchTo().defaultContent();
       };
 
-      await users.createUser('embedder2@example.com', 'Embedder2');
-      await users.login('embedder2@example.com', true);
+      await users.createAndLoginAdminUser('embedder2@example.com', 'Embedder2');
 
       // Create an exploration.
       await workflow.createExploration();

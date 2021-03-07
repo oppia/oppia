@@ -59,6 +59,7 @@ describe('Topic editor functionality', function() {
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
+    await users.logout();
   });
 
   beforeEach(async function() {
@@ -294,6 +295,7 @@ describe('Chapter editor functionality', function() {
       Constants.TEST_SVG_PATH);
     await general.closeCurrentTabAndSwitchTo(handle);
     dummySkills = await createDummySkills(2);
+    await users.logout();
   });
 
   beforeEach(async function() {
@@ -431,12 +433,9 @@ describe('Chapter editor functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors(allowedErrors);
+    await users.logout();
     while (allowedErrors.length !== 0) {
       allowedErrors.pop();
     }
-  });
-
-  afterAll(async function() {
-    await users.logout();
   });
 });

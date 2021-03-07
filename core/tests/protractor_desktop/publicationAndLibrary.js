@@ -244,6 +244,7 @@ describe('Permissions for private explorations', function() {
       await workflow.triggerTitleOnBlurEvent();
       expect(await workflow.canAddRolesToUsers()).toBe(true);
       expect(await workflow.checkForAddTitleWarning()).toBe(false);
+      await users.logout();
     }
   );
 

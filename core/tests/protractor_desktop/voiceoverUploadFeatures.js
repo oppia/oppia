@@ -64,9 +64,11 @@ describe('Voiceover upload features', function() {
     await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorPage.saveChanges(
       'Created exploration for voiceover upload.');
+    await users.logout();
   });
 
   beforeEach(async function() {
+    await users.login(TEST_EMAIL);
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     await explorationEditorPage.navigateToTranslationTab();
@@ -160,5 +162,6 @@ describe('Voiceover upload features', function() {
       '(Bad Request)', {status_code: 400,
         error: 'Audio files must be under 300 seconds in length.' +
        ' The uploaded file is 301.87 seconds long.'}]);
+    await users.logout();
   });
 });

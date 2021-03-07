@@ -82,8 +82,8 @@ describe('Voiceover player', function() {
     await explorationPlayerPage.expectAudioToBePlaying();
   });
 
-  afterEach(async function() {
-    await users.logout();
+  afterAll(async function() {
     await general.checkForConsoleErrors(['The play()']);
+    await users.logout();
   });
 });

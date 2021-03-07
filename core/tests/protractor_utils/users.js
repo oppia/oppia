@@ -23,7 +23,7 @@ var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
-var login = async function(
+var _login = async function(
     email, isSuperAdmin = false, manualNavigation = true) {
   // Use of element and action is not possible because the login page
   // is non-angular.
@@ -70,6 +70,10 @@ var login = async function(
   }
 };
 
+var login = async function(email, manualNavigation = true) {
+  await _login(email, false, manualNavigation);
+};
+
 var logout = async function() {
   // Use of action is not possible because logout page is non-angular.
   var driver = browser.driver;
@@ -104,7 +108,7 @@ var _completeSignup = async function(username, manualNavigation = true) {
 };
 
 var completeLoginFlowFromStoryViewerPage = async function(email, username) {
-  await login(email, false, false);
+  await _login(email, false, false);
   await _completeSignup(username, false);
 };
 
@@ -119,7 +123,7 @@ var createAndLoginUser = async function(email, username) {
 };
 
 var createModerator = async function(email, username) {
-  await login(email, true);
+  await _login(email, true);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.updateRole(username, 'moderator');
@@ -132,7 +136,7 @@ var createAdmin = async function(email, username) {
 };
 
 var createAndLoginAdminUser = async function(email, username) {
-  await login(email, true);
+  await _login(email, true);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.updateRole(username, 'admin');
@@ -144,7 +148,7 @@ var createAdminMobile = async function(email, username) {
 };
 
 var createAndLoginAdminUserMobile = async function(email, username) {
-  await login(email, true);
+  await _login(email, true);
   await _completeSignup(username);
 };
 

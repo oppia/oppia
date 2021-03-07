@@ -48,6 +48,7 @@ describe('Skill Editor functionality', function() {
     var url = await browser.getCurrentUrl();
     skillId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
+    await users.logout();
   });
 
   beforeEach(async function() {

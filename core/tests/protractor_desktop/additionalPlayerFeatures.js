@@ -113,6 +113,7 @@ describe('Full exploration editor', function() {
     await libraryPage.get();
     await libraryPage.clickExplorationObjective();
     await explorationPlayerPage.reportExploration();
+    await users.logout();
   });
 
   it('should prevent going back when help card is shown', async function() {
