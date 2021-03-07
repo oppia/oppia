@@ -32,7 +32,7 @@ import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { OutcomeObjectFactory } from
@@ -89,7 +89,7 @@ describe('Exploration Warnings Service', function() {
       'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value('Fraction', Fraction);
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));

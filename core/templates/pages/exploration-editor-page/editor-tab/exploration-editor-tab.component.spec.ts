@@ -26,7 +26,7 @@ import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { OutcomeObjectFactory } from
@@ -109,7 +109,7 @@ describe('Exploration editor tab component', function() {
       'EditabilityService', TestBed.get(EditabilityService));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
-    $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
+    $provide.value('Fraction', Fraction);
     $provide.value('HintObjectFactory', hintObjectFactory);
     $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
     $provide.value(

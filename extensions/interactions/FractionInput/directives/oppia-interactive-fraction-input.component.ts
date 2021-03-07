@@ -20,7 +20,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
 import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
@@ -57,7 +57,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
-    private fractionObjectFactory: FractionObjectFactory,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService
   ) {
@@ -139,7 +138,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   submitAnswer(): void {
     const answer: string = this.answer;
     try {
-      const fraction = this.fractionObjectFactory.fromRawInputString(
+      const fraction = Fraction.fromRawInputString(
         answer);
       if (this.requireSimplestForm &&
         !fraction.isEqualTo(fraction.convertToSimplestForm())

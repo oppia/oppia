@@ -17,7 +17,7 @@
  */
 
 angular.module('oppia').directive('fractionEditor', [
-  'FractionObjectFactory', function(FractionObjectFactory) {
+  'Fraction', function(Fraction) {
     return {
       restrict: 'E',
       scope: {},
@@ -43,7 +43,7 @@ angular.module('oppia').directive('fractionEditor', [
           try {
             var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
             if (!INTERMEDIATE_REGEX.test(value)) {
-              ctrl.value = FractionObjectFactory.fromRawInputString(value);
+              ctrl.value = Fraction.fromRawInputString(value);
             }
             errorMessage = '';
             return true;
@@ -55,7 +55,7 @@ angular.module('oppia').directive('fractionEditor', [
 
         ctrl.$onInit = function() {
           if (ctrl.value !== null) {
-            var defaultFraction = FractionObjectFactory.fromDict(ctrl.value);
+            var defaultFraction = Fraction.fromDict(ctrl.value);
             fractionString = defaultFraction.toString();
           }
           ctrl.localValue = {
