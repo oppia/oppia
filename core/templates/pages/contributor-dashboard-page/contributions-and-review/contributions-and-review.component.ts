@@ -231,7 +231,10 @@ angular.module('oppia').component('contributionsAndReview', {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
-
+        var details = ctrl.contributions[initialSuggestionId].details;
+        var subheading = (
+          details.topic_name + ' / ' + details.story_title +
+          ' / ' + details.chapter_title);
         $uibModal.open({
           templateUrl: _templateUrl,
           backdrop: 'static',
@@ -245,6 +248,9 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             reviewable: function() {
               return reviewable;
+            },
+            subheading: function() {
+              return subheading;
             }
           },
           controller: 'TranslationSuggestionReviewModalController'
