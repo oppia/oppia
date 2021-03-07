@@ -17,15 +17,15 @@
  */
 
 describe('PositiveInt', function() {
-    var ctrl = null;
+  var ctrl = null;
 
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.inject(function($componentController) {
-        ctrl = $componentController('positiveIntEditor');
-        ctrl.$onInit();
-    }));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($componentController) {
+    ctrl = $componentController('positiveIntEditor');
+    ctrl.$onInit();
+  }));
 
-    it('should initialize the value', function() {
-        expect(ctrl.value).toEqual(1);
-    });
+  it('should initialize the value', function() {
+    expect(ctrl.value).toEqual(1);
+  });
 });
