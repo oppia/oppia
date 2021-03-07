@@ -45,7 +45,6 @@ import webapp2
 import webtest
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for play exploration decorator."""
 
@@ -123,7 +122,6 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for play collection decorator."""
 
@@ -212,7 +210,6 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class EditCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_edit_collection decorator."""
 
@@ -322,7 +319,6 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_create_exploration decorator."""
 
@@ -371,7 +367,6 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_create_collection decorator."""
 
@@ -429,7 +424,6 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class AccessCreatorDashboardTests(test_utils.GenericTestBase):
     """Tests for can_access_creator_dashboard decorator."""
 
@@ -466,7 +460,6 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
         self.assertEqual(response['success'], True)
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_comment_on_feedback_thread decorator."""
 
@@ -581,7 +574,6 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class CreateFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_create_feedback_thread decorator."""
 
@@ -664,7 +656,6 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ViewFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_view_feedback_thread decorator."""
 
@@ -751,7 +742,6 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ManageEmailDashboardTests(test_utils.GenericTestBase):
     """Tests for can_manage_email_dashboard decorator."""
 
@@ -801,7 +791,6 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class RateExplorationTests(test_utils.GenericTestBase):
     """Tests for can_rate_exploration decorator."""
 
@@ -837,7 +826,6 @@ class RateExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class AccessModeratorPageTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
@@ -873,7 +861,6 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class FlagExplorationTests(test_utils.GenericTestBase):
     """Tests for can_flag_exploration decorator."""
 
@@ -909,7 +896,6 @@ class FlagExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class SubscriptionToUsersTests(test_utils.GenericTestBase):
     """Tests for can_subscribe_to_users decorator."""
 
@@ -943,7 +929,6 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
     username = 'user'
@@ -980,7 +965,6 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class VoiceoverExplorationTests(test_utils.GenericTestBase):
     """Tests for can_voiceover_exploration decorator."""
 
@@ -1115,7 +1099,6 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class EditExplorationTests(test_utils.GenericTestBase):
     """Tests for can_edit_exploration decorator."""
 
@@ -1203,7 +1186,6 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ManageOwnAccountTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_own_account."""
 
@@ -1243,7 +1225,6 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class UploadExplorationTests(test_utils.GenericTestBase):
     """Tests for can_upload_exploration decorator."""
 
@@ -1288,7 +1269,6 @@ class UploadExplorationTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class DeleteExplorationTests(test_utils.GenericTestBase):
     """Tests for can_delete_exploration decorator."""
 
@@ -1371,7 +1351,6 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
     """Tests for can_suggest_changes_to_exploration decorator."""
 
@@ -1413,7 +1392,6 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
     """Tests for can_suggest_changes decorator."""
 
@@ -1453,7 +1431,6 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
     """Tests for can_resubmit_suggestion decorator."""
 
@@ -1518,7 +1495,6 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     """Tests for get_decorator_for_accepting_suggestion decorator."""
 
@@ -1604,7 +1580,6 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class PublishExplorationTests(test_utils.GenericTestBase):
     """Tests for can_publish_exploration decorator."""
 
@@ -1679,7 +1654,6 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.private_exp_id)
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ModifyExplorationRolesTests(test_utils.GenericTestBase):
     """Tests for can_modify_exploration_roles decorator."""
 
@@ -1729,7 +1703,6 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class CollectionPublishStatusTests(test_utils.GenericTestBase):
     """Tests can_publish_collection and can_unpublish_collection decorators."""
 
@@ -1846,7 +1819,6 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_learner_dashboard."""
 
@@ -1885,7 +1857,6 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class EditTopicDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_topic."""
 
@@ -1959,7 +1930,6 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class EditStoryDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_story."""
 
@@ -2045,7 +2015,6 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class AddStoryToTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_add_new_story_to_topic."""
 
@@ -2145,7 +2114,6 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class StoryViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_story_viewer_page."""
 
@@ -2541,7 +2509,6 @@ class TopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class CreateSkillTests(test_utils.GenericTestBase):
     """Tests for decorator can_create_skill."""
 
@@ -2596,7 +2563,6 @@ class CreateSkillTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_question_skill_status."""
 
@@ -2662,7 +2628,6 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class CreateTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_create_topic."""
 
@@ -2716,7 +2681,6 @@ class CreateTopicTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ManageRightsForTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_rights_for_topic."""
 
@@ -2775,7 +2739,6 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_change_topic_publication_status."""
 
@@ -2851,7 +2814,6 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class PerformCronTaskTests(test_utils.GenericTestBase):
     """Tests for decorator can_perform_cron_tasks."""
 
@@ -2896,7 +2858,6 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class EditSkillDecoratorTests(test_utils.GenericTestBase):
     """Tests permissions for accessing the skill editor."""
 
@@ -2971,7 +2932,6 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class EditQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_question."""
 
@@ -3055,7 +3015,6 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_play_question."""
 
@@ -3088,7 +3047,6 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
             self.assertEqual(response['question_id'], self.question_id)
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class PlayEntityDecoratorTests(test_utils.GenericTestBase):
     """Test the decorator can_play_entity."""
 
@@ -3178,7 +3136,6 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
                 'fake_entity_type', 'fake_entity_id'), expected_status_int=404)
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class EditEntityDecoratorTests(test_utils.GenericTestBase):
     username = 'banneduser'
     user_email = 'user@example.com'
@@ -3318,7 +3275,6 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 'invalid_entity_type', 'q_id'), expected_status_int=404)
 
 
-# TODO(#10110): Add tests to verify the learner role has correct permissions.
 class SaveExplorationTests(test_utils.GenericTestBase):
     """Tests for can_save_exploration decorator."""
 
