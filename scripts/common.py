@@ -944,7 +944,7 @@ def managed_elasticsearch_dev_server():
     if os.path.exists(ES_PATH_DATA_DIR):
         shutil.rmtree(ES_PATH_DATA_DIR)
 
-    es_args = ['%s/bin/elasticsearch' % ES_PATH, '-s'] # -s is the silent flag.
+    es_args = ['%s/bin/elasticsearch' % ES_PATH, '-q'] # -q is the quiet flag.
     # Override the default path to ElasticSearch config files.
     es_env = {'ES_PATH_CONF': ES_PATH_CONFIG_DIR}
     with managed_process(es_args, env=es_env, shell=True) as proc:
