@@ -304,14 +304,15 @@ describe('Admin backend api service', () => {
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
-    req.flush('Internal Server Error', {
-      status: 500,
-      statusText: 'Internal Server Error'
+    req.flush({
+      error: 'Some error in the backend.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
     });
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
   }
   ));
 
@@ -373,408 +374,464 @@ describe('Admin backend api service', () => {
   ));
 
   // Test cases for Admin Roles Tab.
-  it('should get the data of user given the username',
-    fakeAsync(() => {
-      let filterCriterion = 'username';
-      let role = null;
-      let username = 'validUser';
-      let result = {
-        validUser: 'ADMIN'
-      };
-      abas.viewUsersRoleAsync(filterCriterion, role, username)
-        .then(successHandler, failHandler);
+  it('should get the data of user given the username' +
+    'when calling viewUsersRoleAsync', fakeAsync(() => {
+    let filterCriterion = 'username';
+    let role = null;
+    let username = 'validUser';
+    let result = {
+      validUser: 'ADMIN'
+    };
+    abas.viewUsersRoleAsync(filterCriterion, role, username)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/adminrolehandler' +
-        '?filter_criterion=username&role=null&username=validUser');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/adminrolehandler' +
+      '?filter_criterion=username&role=null&username=validUser');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush(
-        { validUser: 'ADMIN'},
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
+    req.flush(
+      { validUser: 'ADMIN'},
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(result);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should get the data of user given the role',
-    fakeAsync(() => {
-      let filterCriterion = 'role';
-      let role = 'ADMIN';
-      let username = null;
-      let result = {
-        validUser: 'ADMIN'
-      };
-      abas.viewUsersRoleAsync(filterCriterion, role, username)
-        .then(successHandler, failHandler);
+  it('should get the data of user given the role' +
+    'when calling viewUsersRoleAsync', fakeAsync(() => {
+    let filterCriterion = 'role';
+    let role = 'ADMIN';
+    let username = null;
+    let result = {
+      validUser: 'ADMIN'
+    };
+    abas.viewUsersRoleAsync(filterCriterion, role, username)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/adminrolehandler' +
-        '?filter_criterion=role&role=ADMIN&username=null');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/adminrolehandler' +
+      '?filter_criterion=role&role=ADMIN&username=null');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush(
-        { validUser: 'ADMIN'},
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
+    req.flush(
+      { validUser: 'ADMIN'},
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(result);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should fail to get the data of user when user does not exists',
-    fakeAsync(() => {
-      let filterCriterion = 'username';
-      let role = null;
-      let username = 'InvalidUser';
-      abas.viewUsersRoleAsync(filterCriterion, role, username)
-        .then(successHandler, failHandler);
+  it('should fail to get the data of user when user does' +
+    'not exists when calling viewUsersRoleAsync', fakeAsync(() => {
+    let filterCriterion = 'username';
+    let role = null;
+    let username = 'InvalidUser';
+    abas.viewUsersRoleAsync(filterCriterion, role, username)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/adminrolehandler' +
-        '?filter_criterion=username&role=null&username=InvalidUser');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/adminrolehandler' +
+      '?filter_criterion=username&role=null&username=InvalidUser');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush({
-        error: 'User with given username does not exist'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
+    req.flush({
+      error: 'User with given username does not exist'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'User with given username does not exist');
-    }
-    ));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist');
+  }
+  ));
 
-  it('should update the role of the user',
-    fakeAsync(() => {
-      let topicId = null;
-      let newRole = 'ADMIN';
-      let username = 'validUser';
-      let payload = {
-        role: newRole,
-        username: username,
-        topic_id: topicId
-      };
-      abas.updateUserRoleAsync(newRole, username, topicId)
-        .then(successHandler, failHandler);
+  it('should update the role of the user given the name' +
+    'when calling updateUserRoleAsync', fakeAsync(() => {
+    let topicId = null;
+    let newRole = 'ADMIN';
+    let username = 'validUser';
+    let payload = {
+      role: newRole,
+      username: username,
+      topic_id: topicId
+    };
+    abas.updateUserRoleAsync(newRole, username, topicId)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/adminrolehandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
+    let req = httpTestingController.expectOne('/adminrolehandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
 
-      req.flush(
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should fail to update the role of user when user does not exists',
-    fakeAsync(() => {
-      let topicId = null;
-      let newRole = 'ADMIN';
-      let username = 'InvalidUser';
-      let payload = {
-        role: newRole,
-        username: username,
-        topic_id: topicId
-      };
-      abas.updateUserRoleAsync(newRole, username, topicId)
-        .then(successHandler, failHandler);
+  it('should fail to update the role of user when user does' +
+    'not exists when calling updateUserRoleAsync', fakeAsync(() => {
+    let topicId = null;
+    let newRole = 'ADMIN';
+    let username = 'InvalidUser';
+    let payload = {
+      role: newRole,
+      username: username,
+      topic_id: topicId
+    };
+    abas.updateUserRoleAsync(newRole, username, topicId)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/adminrolehandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
+    let req = httpTestingController.expectOne('/adminrolehandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
 
-      req.flush(
-        { error: 'User with given username does not exist'},
-        { status: 500, statusText: 'Internal Server Error'});
-      flushMicrotasks();
+    req.flush(
+      { error: 'User with given username does not exist'},
+      { status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist');
+  }
+  ));
 
-  it('should add contribution rights to the user',
-    fakeAsync(() => {
-      let category = 'voiceover';
-      let languageCode = 'en';
-      let username = 'validUser';
-      let payload = {
-        category: category,
-        username: username,
-        language_code: languageCode
-      };
-      abas.addContributionReviewerAsync(
-        category, username, languageCode
-      ).then(successHandler, failHandler);
+  it('should add contribution rights to the user given the' +
+    'name when calling addContributionReviewerAsync', fakeAsync(() => {
+    let category = 'voiceover';
+    let languageCode = 'en';
+    let username = 'validUser';
+    let payload = {
+      category: category,
+      username: username,
+      language_code: languageCode
+    };
+    abas.addContributionReviewerAsync(
+      category, username, languageCode
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/addcontributionrightshandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
+    let req = httpTestingController.expectOne(
+      '/addcontributionrightshandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
 
-      req.flush(
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should fail to add contribution rights to the user',
-    fakeAsync(() => {
-      let category = 'voiceover';
-      let languageCode = 'en';
-      let username = 'InvalidUser';
-      let payload = {
-        category: category,
-        username: username,
-        language_code: languageCode
-      };
-      abas.addContributionReviewerAsync(
-        category, username, languageCode
-      ).then(successHandler, failHandler);
+  it('should fail to add contribution rights to the user when user does' +
+    'not exists when calling addContributionReviewerAsync', fakeAsync(() => {
+    let category = 'voiceover';
+    let languageCode = 'en';
+    let username = 'InvalidUser';
+    let payload = {
+      category: category,
+      username: username,
+      language_code: languageCode
+    };
+    abas.addContributionReviewerAsync(
+      category, username, languageCode
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/addcontributionrightshandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
-      req.flush(
-        { error: 'User with given username does not exist'},
-        { status: 500, statusText: 'Internal Server Error'});
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/addcontributionrightshandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      { error: 'User with given username does not exist'},
+      { status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist');
+  }
+  ));
 
-  it('should get the data of contribution rights given the role',
-    fakeAsync(() => {
-      let category = 'voiceover';
-      let languageCode = 'en';
-      let result = ['validUsername'];
-      abas.viewContributionReviewersAsync(
-        category, languageCode
-      ).then(successHandler, failHandler);
+  it('should get the data of contribution rights given the role' +
+    'when calling viewContributionReviewersAsync', fakeAsync(() => {
+    let category = 'voiceover';
+    let languageCode = 'en';
+    let result = ['validUsername'];
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/getcontributorusershandler' +
-        '?category=voiceover&language_code=en');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/getcontributorusershandler' +
+      '?category=voiceover&language_code=en');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush(
-        ['validUsername'],
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
+    req.flush(
+      ['validUsername'],
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(result);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should fail to get the data of contribution rights',
-    fakeAsync(() => {
-      let category = 'InvalidCategory';
-      let languageCode = 'en';
-      abas.viewContributionReviewersAsync(
-        category, languageCode
-      ).then(successHandler, failHandler);
+  it('should fail to get the data of contribution rights when category does' +
+  'not exists when calling viewContributionReviewersAsync', fakeAsync(() => {
+    let category = 'InvalidCategory';
+    let languageCode = 'en';
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/getcontributorusershandler' +
-        '?category=InvalidCategory&language_code=en');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/getcontributorusershandler' +
+      '?category=InvalidCategory&language_code=en');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush({
-        error: 'Invalid Category'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
+    req.flush({
+      error: 'Invalid Category'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Invalid Category');
-    }
-    ));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Invalid Category');
+  }
+  ));
 
-  it('should get the data of contribution rights given the username',
-    fakeAsync(() => {
-      let username = 'validUsername';
-      let result = {
-        can_review_questions: false,
-        can_review_translation_for_language_codes: ['en'],
-        can_review_voiceover_for_language_codes: [],
-        can_submit_questions: false
-      };
-      abas.contributionReviewerRightsAsync(username)
-        .then(successHandler, failHandler);
+  it('should get the data of contribution rights given the' +
+    'username when calling contributionReviewerRightsAsync', fakeAsync(() => {
+    let username = 'validUsername';
+    let result = {
+      can_review_questions: false,
+      can_review_translation_for_language_codes: ['en'],
+      can_review_voiceover_for_language_codes: [],
+      can_submit_questions: false
+    };
+    abas.contributionReviewerRightsAsync(username)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/contributionrightsdatahandler' +
-        '?username=validUsername');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/contributionrightsdatahandler' +
+      '?username=validUsername');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush({
-        can_review_questions: false,
-        can_review_translation_for_language_codes: ['en'],
-        can_review_voiceover_for_language_codes: [],
-        can_submit_questions: false
-      }, {
-        status: 200, statusText: 'Success.'
-      });
-      flushMicrotasks();
+    req.flush({
+      can_review_questions: false,
+      can_review_translation_for_language_codes: ['en'],
+      can_review_voiceover_for_language_codes: [],
+      can_submit_questions: false
+    }, {
+      status: 200, statusText: 'Success.'
+    });
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(result);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should fail to get the data of contribution rights',
-    fakeAsync(() => {
-      let username = 'InvalidUsername';
-      abas.contributionReviewerRightsAsync(username)
-        .then(successHandler, failHandler);
+  it('should fail to get the data of contribution rights when username does' +
+  'not exists when calling contributionReviewerRightsAsync', fakeAsync(() => {
+    let username = 'InvalidUsername';
+    abas.contributionReviewerRightsAsync(username)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/contributionrightsdatahandler' +
-        '?username=InvalidUsername');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/contributionrightsdatahandler' +
+      '?username=InvalidUsername');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush({
-        error: 'User with given username does not exist.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
+    req.flush({
+      error: 'User with given username does not exist.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'User with given username does not exist.');
-    }
-    ));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist.');
+  }
+  ));
 
-  it('should remove all contribution rights given the username',
-    fakeAsync(() => {
-      let category = 'voiceover';
-      let languageCode = null;
-      let username = 'validUser';
-      let method = 'all';
-      let payload = {
-        username: username,
-        removal_type: method,
-        category: category,
-        language_code: languageCode
-      };
-      abas.removeContributionReviewerAsync(
-        username, method, category, languageCode
-      ).then(successHandler, failHandler);
+  it('should remove all contribution rights given the username' +
+    'when calling emoveContributionReviewerAsync', fakeAsync(() => {
+    let category = 'voiceover';
+    let languageCode = null;
+    let username = 'validUser';
+    let method = 'all';
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/removecontributionrightshandler');
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(payload);
-      req.flush(
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/removecontributionrightshandler');
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should remove specific contribution rights given thes username',
-    fakeAsync(() => {
-      let category = 'voiceover';
-      let languageCode = 'en';
-      let username = 'validUser';
-      let method = 'specific';
-      let payload = {
-        username: username,
-        removal_type: method,
-        category: category,
-        language_code: languageCode
-      };
-      abas.removeContributionReviewerAsync(
-        username, method, category, languageCode
-      ).then(successHandler, failHandler);
+  it('should fail to remove all contribution rights when user does' +
+    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
+    let category = 'voiceover';
+    let languageCode = null;
+    let username = 'InvalidUser';
+    let method = 'all';
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/removecontributionrightshandler');
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(payload);
-      req.flush(
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/removecontributionrightshandler');
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    req.flush({
+      error: 'User with given username does not exist.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
 
-  it('should fail to remove contribution rights',
-    fakeAsync(() => {
-      let category = 'voiceover';
-      let languageCode = null;
-      let username = 'InvalidUser';
-      let method = 'all';
-      let payload = {
-        username: username,
-        removal_type: method,
-        category: category,
-        language_code: languageCode
-      };
-      abas.removeContributionReviewerAsync(
-        username, method, category, languageCode
-      ).then(successHandler, failHandler);
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist.');
+  }
+  ));
 
-      let req = httpTestingController.expectOne(
-        '/removecontributionrightshandler');
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(payload);
+  it('should remove specific contribution rights given the' +
+    'username when calling removeContributionReviewerAsync', fakeAsync(() => {
+    let category = 'voiceover';
+    let languageCode = 'en';
+    let username = 'validUser';
+    let method = 'specific';
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
 
-      req.flush({
-        error: 'User with given username does not exist.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/removecontributionrightshandler');
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'User with given username does not exist.');
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to remove specific contribution rights when username does' +
+    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
+    let category = 'voiceover';
+    let languageCode = 'en';
+    let username = 'validUser';
+    let method = 'specific';
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/removecontributionrightshandler');
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({
+      error: 'User with given username does not exist.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist.');
+  }
+  ));
 
   // Test cases for Admin Misc Tab.
-  it('should flush the memory cache',
-    fakeAsync(() => {
-      abas.flushMemoryCacheAsync()
-        .then(successHandler, failHandler);
+  it('should flush the memory cache when calling' +
+    'flushMemoryCacheAsync', fakeAsync(() => {
+    abas.flushMemoryCacheAsync()
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/memorycacheadminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/memorycacheadminhandler');
+    expect(req.request.method).toEqual('POST');
+    req.flush(200);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should clear search index',
+  it('should fail to flush the memory cache when calling' +
+    'flushMemoryCacheAsync', fakeAsync(() => {
+    abas.flushMemoryCacheAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/memorycacheadminhandler');
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      error: 'Failed to flush memory cache.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to flush memory cache.');
+  }
+  ));
+
+  it('should clear search index when calling clearSearchIndexAsync',
     fakeAsync(() => {
       abas.clearSearchIndexAsync()
         .then(successHandler, failHandler);
@@ -790,159 +847,269 @@ describe('Admin backend api service', () => {
     }
     ));
 
-  it('should regenerate topic related oppurtunities if id is incorrect',
+  it('should fail to clear search index when calling clearSearchIndexAsync',
     fakeAsync(() => {
-      let topicId = 'topic_1';
-      abas.regenerateOpportunitiesRelatedToTopicAsync(
-        topicId
-      ).then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
-
-  it('should upload topic similarities',
-    fakeAsync(() => {
-      let data = 'topic_similarities.csv';
-      abas.uploadTopicSimilaritiesAsync(data)
+      abas.clearSearchIndexAsync()
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/adminhandler');
       expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
-
-  it('should send dummy mail to admin',
-    fakeAsync(() => {
-      abas.sendDummyMailToAdminAsync()
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/senddummymailtoadminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
-
-  it('should get data of memory cache profile',
-    fakeAsync(() => {
-      abas.getMemoryCacheProfileAsync()
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/memorycacheadminhandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(200);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
-
-  it('should fail to get data of memory cache profile',
-    fakeAsync(() => {
-      abas.getMemoryCacheProfileAsync()
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/memorycacheadminhandler');
-      expect(req.request.method).toEqual('GET');
       req.flush({
-        error: 'Failed to get data.'
+        error: 'Failed to clear search index.'
       }, {
         status: 500, statusText: 'Internal Server Error'
       });
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+      expect(failHandler).toHaveBeenCalledWith('Failed to clear search index.');
     }
     ));
 
-  it('should update the username of oppia account',
-    fakeAsync(() => {
-      let oldUsername = 'old name';
-      let newUsername = 'new name';
-      abas.updateUserNameAsync(oldUsername, newUsername)
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/updateusernamehandler');
-      expect(req.request.method).toEqual('PUT');
-      req.flush(200);
-      flushMicrotasks();
+  it('should regenerate topic related oppurtunities when' +
+    'calling regenerateOpportunitiesRelatedToTopicAsync', fakeAsync(() => {
+    let action = 'regenerate_topic_related_opportunities';
+    let topicId = 'topic_1';
+    let payload = {
+      action: action,
+      topic_id: topicId
+    };
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    abas.regenerateOpportunitiesRelatedToTopicAsync(
+      topicId
+    ).then(successHandler, failHandler);
 
-  it('should fail to update the username of oppia account',
-    fakeAsync(() => {
-      let oldUsername = 'Invalid name';
-      let newUsername = 'Invalid name';
-      abas.updateUserNameAsync(oldUsername, newUsername)
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/updateusernamehandler');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({
-        error: 'Failed to update username.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Failed to update username.');
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should get the data of number of pending delete requests',
-    fakeAsync(() => {
-      abas.getNumberOfPendingDeletionRequestAsync()
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/numberofdeletionrequestshandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(200);
-      flushMicrotasks();
+  it('should fail to regenerate topic related oppurtunities when' +
+    'calling regenerateOpportunitiesRelatedToTopicAsync', fakeAsync(() => {
+    let action = 'regenerate_topic_related_opportunities';
+    let topicId = 'InvalidId';
+    let payload = {
+      action: action,
+      topic_id: topicId
+    };
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    abas.regenerateOpportunitiesRelatedToTopicAsync(
+      topicId
+    ).then(successHandler, failHandler);
 
-  it('should fail get the data of number of pending delete requests',
-    fakeAsync(() => {
-      abas.getNumberOfPendingDeletionRequestAsync()
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/numberofdeletionrequestshandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Failed to get data.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-    }
-    ));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }
+  ));
+
+  it('should upload topic similarities when calling' +
+    'uploadTopicSimilaritiesAsync', fakeAsync(() => {
+    let action = 'upload_topic_similarities';
+    let data = 'topic_similarities.csv';
+    let payload = {
+      action: action,
+      data: data
+    };
+
+    abas.uploadTopicSimilaritiesAsync(data)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to upload topic similarities when calling' +
+    'uploadTopicSimilaritiesAsync', fakeAsync(() => {
+    let action = 'upload_topic_similarities';
+    let data = 'topic_similarities.csv';
+    let payload = {
+      action: action,
+      data: data
+    };
+
+    abas.uploadTopicSimilaritiesAsync(data)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Failed to upload data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to upload data.');
+  }
+  ));
+
+  it('should send dummy mail to admin when calling' +
+    'sendDummyMailToAdminAsync', fakeAsync(() => {
+    abas.sendDummyMailToAdminAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/senddummymailtoadminhandler');
+    expect(req.request.method).toEqual('POST');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to send dummy mail to admin when calling' +
+  'sendDummyMailToAdminAsync', fakeAsync(() => {
+    abas.sendDummyMailToAdminAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/senddummymailtoadminhandler');
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      error: 'Failed to send dummy mail.'
+    }, {
+      status: 400, statusText: 'Bad Request'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to send dummy mail.');
+  }
+  ));
+
+  it('should get the data of memory cache profile when' +
+    'calling getMemoryCacheProfileAsync', fakeAsync(() => {
+    abas.getMemoryCacheProfileAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/memorycacheadminhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to get the data of memory cache profile' +
+    'when calling getMemoryCacheProfileAsync', fakeAsync(() => {
+    abas.getMemoryCacheProfileAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/memorycacheadminhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }
+  ));
+
+  it('should update the username of oppia account given' +
+    'the name when calling updateUserNameAsync', fakeAsync(() => {
+    let oldUsername = 'old name';
+    let newUsername = 'new name';
+    abas.updateUserNameAsync(oldUsername, newUsername)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/updateusernamehandler');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to update the username of oppia account when username' +
+    'does not exist when calling updateUserNameAsync', fakeAsync(() => {
+    let oldUsername = 'Invalid name';
+    let newUsername = 'Invalid name';
+    abas.updateUserNameAsync(oldUsername, newUsername)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/updateusernamehandler');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({
+      error: 'Failed to update username.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to update username.');
+  }
+  ));
+
+  it('should get the data of number of pending delete requests' +
+    'when calling getNumberOfPendingDeletionRequestAsync', fakeAsync(() => {
+    abas.getNumberOfPendingDeletionRequestAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/numberofdeletionrequestshandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to get the data of number of pending deleter requests' +
+  'when calling getNumberOfPendingDeletionRequestAsync', fakeAsync(() => {
+    abas.getNumberOfPendingDeletionRequestAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/numberofdeletionrequestshandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }
+  ));
 });

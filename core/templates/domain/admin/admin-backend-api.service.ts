@@ -171,13 +171,15 @@ export class AdminBackendApiService {
 
   private _postAdminActionAsync(
       handlerUrl:string, payload?:Object, action?:string): Promise<void> {
-    return this.http.post<void>(
-      handlerUrl, { action, ...payload }).toPromise()
-      .then(response => {
-        return response;
-      }, errorResonse => {
-        return errorResonse.error.error;
-      });
+    return new Promise((resolve, reject) => {
+      this.http.post<void>(
+        handlerUrl, { action, ...payload }).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResonse => {
+          reject(errorResonse.error.error);
+        });
+    });
   }
 
   // Admin Jobs Tab Services.

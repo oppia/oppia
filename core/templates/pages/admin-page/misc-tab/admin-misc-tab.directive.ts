@@ -64,10 +64,12 @@ angular.module('oppia').directive('adminMiscTab', [
             .then(() => {
               ctrl.setStatusMessage('Index successfully cleared.');
               AdminTaskManagerService.finishTask();
+              $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse);
               AdminTaskManagerService.finishTask();
+              $rootScope.$apply();
             });
         };
 
@@ -87,7 +89,7 @@ angular.module('oppia').directive('adminMiscTab', [
             $rootScope.$apply();
           }, errorResponse => {
             ctrl.regenerationMessage = (
-              'Server error: ' + errorResponse.error.error);
+              'Server error: ' + errorResponse);
             $rootScope.$apply();
           });
         };
@@ -106,7 +108,7 @@ angular.module('oppia').directive('adminMiscTab', [
                 $rootScope.$apply();
               }, errorResponse => {
                 ctrl.setStatusMessage(
-                  'Server error: ' + errorResponse.error.error);
+                  'Server error: ' + errorResponse);
                 $rootScope.$apply();
               });
           };
@@ -126,9 +128,11 @@ angular.module('oppia').directive('adminMiscTab', [
           AdminBackendApiService.sendDummyMailToAdminAsync()
             .then(() => {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
+              $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorResponse);
+              $rootScope.$apply();
             });
         };
 
@@ -136,9 +140,11 @@ angular.module('oppia').directive('adminMiscTab', [
           AdminBackendApiService.flushMemoryCacheAsync()
             .then(() => {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
+              $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorResponse);
+              $rootScope.$apply();
             });
         };
 
@@ -152,9 +158,11 @@ angular.module('oppia').directive('adminMiscTab', [
               };
               ctrl.memoryCacheDataFetched = true;
               ctrl.setStatusMessage('Success!');
+              $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorResponse);
+              $rootScope.$apply();
             });
         };
 
@@ -167,9 +175,11 @@ angular.module('oppia').directive('adminMiscTab', [
                 ctrl.setStatusMessage(
                   'Successfully renamed ' + ctrl.oldUsername + ' to ' +
                     ctrl.newUsername + '!');
+                $rootScope.$apply();
               }, errorResponse => {
                 ctrl.setStatusMessage(
-                  'Server error: ' + errorResponse.error.error);
+                  'Server error: ' + errorResponse);
+                $rootScope.$apply();
               }
             );
         };
@@ -178,15 +188,15 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.setStatusMessage(
             'Getting the number of users that are being deleted...');
           AdminBackendApiService.getNumberOfPendingDeletionRequestAsync()
-            .then(
-              pendingDeletionRequests => {
+            .then(pendingDeletionRequests => {
+              ctrl.setStatusMessage(
+                'The number of users that are being deleted is: ' +
+              pendingDeletionRequests.number_of_pending_deletion_models);
+              $rootScope.$apply();
+              }, errorResponse => {
                 ctrl.setStatusMessage(
-                  'The number of users that are being deleted is: ' +
-                pendingDeletionRequests.number_of_pending_deletion_models);
-              },
-              errorResponse => {
-                ctrl.setStatusMessage(
-                  'Server error: ' + errorResponse.error.error);
+                  'Server error: ' + errorResponse);
+                $rootScope.$apply();
               }
             );
         };

@@ -62,8 +62,8 @@ angular.module('oppia').directive('adminRolesTab', [
 
         var handleErrorResponse = function(errorResponse) {
           ctrl.setStatusMessage(
-            'Server error: ' + errorResponse.error.error);
-          $rootScope.$applyAsync();
+            'Server error: ' + errorResponse);
+          $rootScope.$apply();
         };
 
         var getLanguageDescriptions = function(languageCodes) {
@@ -103,7 +103,7 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.resultRolesVisible = true;
               ctrl.setStatusMessage('Success.');
             }
-            $rootScope.$applyAsync();
+            $rootScope.$apply();
             refreshFormData();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
@@ -123,7 +123,7 @@ angular.module('oppia').directive('adminRolesTab', [
               'Role of ' + formResponse.username + ' successfully updated to ' +
               formResponse.newRole);
             refreshFormData();
-            $rootScope.$applyAsync();
+            $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
@@ -142,7 +142,7 @@ angular.module('oppia').directive('adminRolesTab', [
               'Successfully added "' + formResponse.username + '" as ' +
               formResponse.category + ' reviewer.');
             refreshFormData();
-            $rootScope.$applyAsync();
+            $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
@@ -161,6 +161,7 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
+              $rootScope.$apply();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
@@ -180,7 +181,7 @@ angular.module('oppia').directive('adminRolesTab', [
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
-              $rootScope.$applyAsync();
+              $rootScope.$apply();
             }, handleErrorResponse);
           }
           AdminTaskManagerService.finishTask();
@@ -198,7 +199,7 @@ angular.module('oppia').directive('adminRolesTab', [
           ).then(() => {
             ctrl.setStatusMessage('Success.');
             refreshFormData();
-            $rootScope.$applyAsync();
+            $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
