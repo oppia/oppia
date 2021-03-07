@@ -154,14 +154,12 @@ describe('Topic and Story viewer functionality', function() {
   });
 
   it('should play through story and save progress on login.', async function() {
-    await users.login('creator@storyViewer.com');
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await users.logout();
 
     await topicAndStoryViewerPage.login(
       'newStoryViewer@storyviewer.com', 'newStoryViewer');

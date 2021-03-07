@@ -260,7 +260,6 @@ describe('Admin page contribution rights form', function() {
     await users.createAndLoginAdminUser(
       'adminToAssignTranslationReviewer@adminTab.com',
       'assignTranslationReviewer');
-    await adminPage.get();
     await adminPage.assignTranslationReviewer(
       translationReviewerUsername, HINDI_LANGUAGE);
     await adminPage.expectUserToBeTranslationReviewer(
@@ -277,7 +276,6 @@ describe('Admin page contribution rights form', function() {
   it('should allow admin to add voiceover reviewer', async function() {
     await users.createAndLoginAdminUser(
       'adminToAssignVoiceoverReviewer@adminTab.com', 'assignVoiceoverReviewer');
-    await adminPage.get();
     await adminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
     await adminPage.expectUserToBeVoiceoverReviewer(
@@ -294,7 +292,6 @@ describe('Admin page contribution rights form', function() {
   it('should allow admin to add question reviewer', async function() {
     await users.createAndLoginAdminUser(
       'adminToAssignQuestionReviewer@adminTab.com', 'assignQuestionReviewer');
-    await adminPage.get();
     await adminPage.assignQuestionReviewer(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
     await users.logout();
@@ -308,7 +305,6 @@ describe('Admin page contribution rights form', function() {
   it('should allow admin to add question contributor', async function() {
     await users.createAndLoginAdminUser(
       'adminToAddQuestionContributor@adminTab.com', 'addQuestionContributor');
-    await adminPage.get();
     await adminPage.assignQuestionContributor(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
 
