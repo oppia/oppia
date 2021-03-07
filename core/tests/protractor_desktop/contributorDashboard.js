@@ -237,7 +237,6 @@ describe('Admin page contribution rights form', function() {
   var voiceoverReviewerEmail = 'voiceartist@contributor.com';
   var questionReviewerUsername = 'questionreviewer';
   var questionReviewerEmail = 'questionreviewer@contributor.com';
-  var ADMIN_EMAIL = 'adminToAssignReviewer@adminTab.com';
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
@@ -247,7 +246,8 @@ describe('Admin page contribution rights form', function() {
       translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
-    await users.createAndLoginAdminUser(ADMIN_EMAIL, 'assignReviewer');
+    await users.createAndLoginAdminUser(
+      'primaryAdmin@adminTab.com', 'primaryAdmin');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {
@@ -256,11 +256,10 @@ describe('Admin page contribution rights form', function() {
     await users.logout();
   });
 
-  beforeEach(async function() {
-    await users.login(ADMIN_EMAIL);
-  });
-
   it('should allow admin to add translation reviewer', async function() {
+    await users.createAndLoginAdminUser(
+      'adminToAssignTranslationReviewer@adminTab.com',
+      'assignTranslationReviewer');
     await adminPage.get();
     await adminPage.assignTranslationReviewer(
       translationReviewerUsername, HINDI_LANGUAGE);
@@ -276,6 +275,8 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add voiceover reviewer', async function() {
+    await users.createAndLoginAdminUser(
+      'adminToAssignVoiceoverReviewer@adminTab.com', 'assignVoiceoverReviewer');
     await adminPage.get();
     await adminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
@@ -291,6 +292,8 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add question reviewer', async function() {
+    await users.createAndLoginAdminUser(
+      'adminToAssignQuestionReviewer@adminTab.com', 'assignQuestionReviewer');
     await adminPage.get();
     await adminPage.assignQuestionReviewer(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
@@ -303,6 +306,8 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add question contributor', async function() {
+    await users.createAndLoginAdminUser(
+      'adminToAddQuestionContributor@adminTab.com', 'addQuestionContributor');
     await adminPage.get();
     await adminPage.assignQuestionContributor(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);

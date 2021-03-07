@@ -49,11 +49,6 @@ describe('Classroom page functionality', function() {
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
-    await users.logout();
-  });
-
-  beforeEach(async function() {
-    await users.login('creator@classroomPage.com');
   });
 
   it('should add a new published topic to the Math classroom',
