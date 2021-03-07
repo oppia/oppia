@@ -20,9 +20,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/state-directives/answer-group-editor/' +
-  'summary-list-header.directive.ts');
-require(
   'components/review-material-editor/review-material-editor.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');

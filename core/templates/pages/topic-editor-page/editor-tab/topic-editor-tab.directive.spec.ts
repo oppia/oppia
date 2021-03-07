@@ -25,9 +25,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {
-  importAllAngularServices();
-
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   var $scope = null;
   var $uibModalInstance = null;
@@ -63,7 +62,6 @@ describe('Topic editor tab directive', function() {
       return mockTasdReinitializedEventEmitter;
     }
   };
-
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');

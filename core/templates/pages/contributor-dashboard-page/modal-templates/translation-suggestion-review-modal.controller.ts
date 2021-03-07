@@ -27,19 +27,22 @@ angular.module('oppia').controller(
     '$http', '$scope', '$uibModalInstance', 'AlertsService',
     'ContributionAndReviewService', 'SiteAnalyticsService',
     'ThreadMessageObjectFactory', 'UrlInterpolationService',
-    'initialSuggestionId', 'reviewable', 'suggestionIdToSuggestion',
-    'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+    'initialSuggestionId', 'reviewable', 'subheading',
+    'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION',
+
     function(
         $http, $scope, $uibModalInstance, AlertsService,
         ContributionAndReviewService, SiteAnalyticsService,
         ThreadMessageObjectFactory, UrlInterpolationService,
-        initialSuggestionId, reviewable, suggestionIdToSuggestion,
+        initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
       $scope.activeSuggestion = suggestionIdToSuggestion[
         $scope.activeSuggestionId];
+      $scope.subheading = subheading;
       delete suggestionIdToSuggestion[initialSuggestionId];
       var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 
