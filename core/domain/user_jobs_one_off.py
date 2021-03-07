@@ -779,7 +779,6 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         model.draft_change_list = None
         model.draft_change_list_last_updated = None
         model.draft_change_list_exp_version = None
-        model.update_timestamps()
         model.put()
 
         yield ('SUCCESS - Discarded draft', 1)

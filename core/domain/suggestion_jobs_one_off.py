@@ -385,8 +385,7 @@ class ContentSuggestionFormatUpdateOneOffJob(
             yield ('Failed assertion', '%s %s' % (item.id, e))
 
         if changes_made:
-            item.update_timestamps(update_last_updated_time=False)
-            item.put()
+            item.put_for_bot()
             yield ('SUCCESS - Updated suggestion', item.id)
 
     @staticmethod
