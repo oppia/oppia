@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,200 +18,202 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
-require('domain/collection/collection-rights-backend-api.service.ts');
-require('domain/collection/editable-collection-backend-api.service.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('services/alerts.service.ts');
-
-require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
-
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionRights } from 'domain/collection/collection-rights.model';
 import { Collection } from 'domain/collection/collection.model';
+import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { AlertsService } from 'services/alerts.service';
 
-angular.module('oppia').factory('CollectionEditorStateService', [
-  '$rootScope', 'AlertsService',
-  'CollectionRightsBackendApiService',
-  'EditableCollectionBackendApiService', 'UndoRedoService',
-  function(
-      $rootScope, AlertsService,
-      CollectionRightsBackendApiService,
-      EditableCollectionBackendApiService, UndoRedoService) {
-    var _collection = Collection.createEmptyCollection();
-    var _collectionRights = (
-      CollectionRights.createEmptyCollectionRights());
-    var _collectionIsInitialized = false;
-    var _collectionIsLoading = false;
-    var _collectionIsBeingSaved = false;
-    var _collectionInitializedEventEmitter = new EventEmitter();
+@Injectable({
+  providedIn: 'root'
+})
+export class CollectionEditorStateService {
+  private _collection: Collection = Collection.createEmptyCollection();
+  private _collectionRights: CollectionRights =
+  CollectionRights.createEmptyCollectionRights();
+  private _collectionIsInitialized: boolean = false;
+  private _collectionIsLoading: boolean = false;
+  private _collectionIsBeingSaved: boolean = false;
+  private _collectionInitializedEventEmitter: EventEmitter<void> = (
+  new EventEmitter());
 
-    var _setCollection = function(collection) {
-      _collection.copyFromCollection(collection);
-      if (_collectionIsInitialized) {
-        _collectionInitializedEventEmitter.emit();
-      } else {
-        _collectionInitializedEventEmitter.emit();
-        _collectionIsInitialized = true;
-      }
-    };
-    var _updateCollection = function(newCollectionObject) {
-      _setCollection(newCollectionObject);
-    };
-    var _setCollectionRights = function(collectionRights) {
-      _collectionRights.copyFromCollectionRights(collectionRights);
-    };
+  constructor(
+    private alertsService: AlertsService,
+    private collectionRightsBackendApiService:
+    CollectionRightsBackendApiService,
+    private editableCollectionBackendApiService:
+    EditableCollectionBackendApiService,
+    private undoRedoService: UndoRedoService
+  ) { }
 
-    return {
-      /**
-       * Loads, or reloads, the collection stored by this service given a
-       * specified collection ID. See setCollection() for more information on
-       * additional behavior of this function.
-       */
-      loadCollection: function(collectionId) {
-        _collectionIsLoading = true;
-        EditableCollectionBackendApiService.fetchCollectionAsync(
-          collectionId).then(
-          function(newCollectionObject) {
-            _updateCollection(newCollectionObject);
-            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          },
-          function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when loading the collection.');
-            _collectionIsLoading = false;
-          });
-        CollectionRightsBackendApiService.fetchCollectionRightsAsync(
-          collectionId).then(function(newBackendCollectionRightsObject) {
-          _setCollectionRights(newBackendCollectionRightsObject);
-          _collectionIsLoading = false;
-          // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        }, function(error) {
-          AlertsService.addWarning(
-            error ||
-            'There was an error when loading the collection rights.');
-          _collectionIsLoading = false;
-        });
-      },
-
-      /**
-       * Returns whether this service is currently attempting to load the
-       * collection maintained by this service.
-       */
-      isLoadingCollection: function() {
-        return _collectionIsLoading;
-      },
-
-      /**
-       * Returns whether a collection has yet been loaded using either
-       * loadCollection() or setCollection().
-       */
-      hasLoadedCollection: function() {
-        return _collectionIsInitialized;
-      },
-
-      /**
-       * Returns the current collection to be shared among the collection
-       * editor. Please note any changes to this collection will be propogated
-       * to all bindings to it. This collection object will be retained for the
-       * lifetime of the editor. This function never returns null, though it may
-       * return an empty collection object if the collection has not yet been
-       * loaded for this editor instance.
-       */
-      getCollection: function() {
-        return _collection;
-      },
-
-      /**
-       * Returns the current collection rights to be shared among the collection
-       * editor. Please note any changes to this collection rights will be
-       * propogated to all bindings to it. This collection rights object will
-       * be retained for the lifetime of the editor. This function never returns
-       * null, though it may return an empty collection rights object if the
-       * collection rights has not yet been loaded for this editor instance.
-       */
-      getCollectionRights: function() {
-        return _collectionRights;
-      },
-
-      /**
-       * Sets the collection stored within this service, propogating changes to
-       * all bindings to the collection returned by getCollection(). The first
-       * time this is called it will fire a global event based on the
-       * _collectionInitializedEventEmitter. All subsequent
-       * calls will similarly fire a event based on
-       * _collectionInitializedEventEmitter
-       */
-      setCollection: function(collection) {
-        _setCollection(collection);
-      },
-
-      /**
-       * Sets the collection rights stored within this service, propogating
-       * changes to all bindings to the collection returned by
-       * getCollectionRights(). The first time this is called it will fire a
-       * global event based on the EVENT_COLLECTION_INITIALIZED constant. All
-       * subsequent calls will similarly fire a EVENT_COLLECTION_REINITIALIZED
-       * event.
-       */
-      setCollectionRights: function(collectionRights) {
-        _setCollectionRights(collectionRights);
-      },
-
-      /**
-       * Attempts to save the current collection given a commit message. This
-       * function cannot be called until after a collection has been initialized
-       * in this service. Returns false if a save is not performed due to no
-       * changes pending, or true if otherwise. This function, upon success,
-       * will clear the UndoRedoService of pending changes. This function also
-       * shares behavior with setCollection(), when it succeeds.
-       */
-      saveCollection: function(commitMessage, successCallback) {
-        if (!_collectionIsInitialized) {
-          AlertsService.fatalWarning(
-            'Cannot save a collection before one is loaded.');
-        }
-
-        // Don't attempt to save the collection if there are no changes pending.
-        if (!UndoRedoService.hasChanges()) {
-          return false;
-        }
-        _collectionIsBeingSaved = true;
-        EditableCollectionBackendApiService.updateCollectionAsync(
-          _collection.getId(), _collection.getVersion(),
-          commitMessage, UndoRedoService.getCommittableChangeList()).then(
-          function(collectionObject) {
-            _updateCollection(collectionObject);
-            UndoRedoService.clearChanges();
-            _collectionIsBeingSaved = false;
-            if (successCallback) {
-              successCallback();
-            }
-            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          }, function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when saving the collection.');
-            _collectionIsBeingSaved = false;
-          });
-        return true;
-      },
-
-      /**
-       * Returns whether this service is currently attempting to save the
-       * collection maintained by this service.
-       */
-      isSavingCollection: function() {
-        return _collectionIsBeingSaved;
-      },
-
-      get onCollectionInitialized() {
-        return _collectionInitializedEventEmitter;
-      }
-    };
+  private _setCollection(collection: Collection) {
+    this._collection.copyFromCollection(collection);
+    if (this._collectionIsInitialized) {
+      this._collectionInitializedEventEmitter.emit();
+    } else {
+      this._collectionInitializedEventEmitter.emit();
+      this._collectionIsInitialized = true;
+    }
   }
-]);
+
+  private _updateCollection(newCollectionObject: Collection): void {
+    this._setCollection(newCollectionObject);
+  }
+
+  private _setCollectionRights(collectionRights: CollectionRights): void {
+    this._collectionRights.copyFromCollectionRights(collectionRights);
+  }
+
+  /**
+   * Loads, or reloads, the collection stored by this service given a
+   * specified collection ID. See setCollection() for more information on
+   * additional behavior of this function.
+   */
+  loadCollection(collectionId: string, successCallback: () => void): void {
+    this._collectionIsLoading = true;
+    this.editableCollectionBackendApiService.fetchCollectionAsync(
+      collectionId).then(
+      (newCollectionObject) => {
+        this._updateCollection(newCollectionObject);
+        successCallback();
+      },
+      (error) => {
+        this.alertsService.addWarning(
+          error || 'There was an error when loading the collection.');
+        this._collectionIsLoading = false;
+      });
+    this.collectionRightsBackendApiService.fetchCollectionRightsAsync(
+      collectionId).then((newBackendCollectionRightsObject) => {
+      this._setCollectionRights(newBackendCollectionRightsObject);
+      this._collectionIsLoading = false;
+      // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+      // once the controller is migrated to angular.
+      // $rootScope.$applyAsync();
+      successCallback();
+    }, (error) => {
+      this.alertsService.addWarning(
+        error ||
+          'There was an error when loading the collection rights.');
+      this._collectionIsLoading = false;
+    });
+  }
+
+  /**
+   * Returns whether this service is currently attempting to load the
+   * collection maintained by this service.
+   */
+  isLoadingCollection(): boolean {
+    return this._collectionIsLoading;
+  }
+
+  /**
+   * Returns whether a collection has yet been loaded using either
+   * loadCollection() or setCollection().
+   */
+  hasLoadedCollection(): boolean {
+    return this._collectionIsInitialized;
+  }
+
+  /**
+   * Returns the current collection to be shared among the collection
+   * editor. Please note any changes to this collection will be propogated
+   * to all bindings to it. This collection object will be retained for the
+   * lifetime of the editor. This function never returns null, though it may
+   * return an empty collection object if the collection has not yet been
+   * loaded for this editor instance.
+   */
+  getCollection(): Collection {
+    return this._collection;
+  }
+
+  /**
+   * Returns the current collection rights to be shared among the collection
+   * editor. Please note any changes to this collection rights will be
+   * propogated to all bindings to it. This collection rights object will
+   * be retained for the lifetime of the editor. This function never returns
+   * null, though it may return an empty collection rights object if the
+   * collection rights has not yet been loaded for this editor instance.
+   */
+  getCollectionRights(): CollectionRights {
+    return this._collectionRights;
+  }
+
+  /**
+   * Sets the collection stored within this service, propogating changes to
+   * all bindings to the collection returned by getCollection(). The first
+   * time this is called it will fire a global event based on the
+   * _collectionInitializedEventEmitter. All subsequent
+   * calls will similarly fire a event based on
+   * _collectionInitializedEventEmitter
+   */
+  setCollection(collection: Collection): void {
+    this._setCollection(collection);
+  }
+
+  /**
+   * Sets the collection rights stored within this service, propogating
+   * changes to all bindings to the collection returned by
+   * getCollectionRights(). The first time this is called it will fire a
+   * global event based on the EVENT_COLLECTION_INITIALIZED constant. All
+   * subsequent calls will similarly fire a EVENT_COLLECTION_REINITIALIZED
+   * event.
+   */
+  setCollectionRights(collectionRights: CollectionRights): void {
+    this._setCollectionRights(collectionRights);
+  }
+
+  /**
+   * Attempts to save the current collection given a commit message. This
+   * function cannot be called until after a collection has been initialized
+   * in this service. Returns false if a save is not performed due to no
+   * changes pending, or true if otherwise. This function, upon success,
+   * will clear the UndoRedoService of pending changes. This function also
+   * shares behavior with setCollection(), when it succeeds.
+   */
+  saveCollection(commitMessage: string, successCallback: () => void): boolean {
+    if (!this._collectionIsInitialized) {
+      this.alertsService.fatalWarning(
+        'Cannot save a collection before one is loaded.');
+    }
+
+    // Don't attempt to save the collection if there are no changes pending.
+    if (!this.undoRedoService.hasChanges()) {
+      return false;
+    }
+    this._collectionIsBeingSaved = true;
+    this.editableCollectionBackendApiService.updateCollectionAsync(
+      this._collection.getId(), this._collection.getVersion(),
+      commitMessage, this.undoRedoService.getCommittableChangeList()).then(
+      (collectionObject) => {
+        this._updateCollection(collectionObject);
+        this.undoRedoService.clearChanges();
+        this._collectionIsBeingSaved = false;
+        if (successCallback) {
+          successCallback();
+        }
+      }, (error) => {
+        this.alertsService.addWarning(
+          error || 'There was an error when saving the collection.');
+        this._collectionIsBeingSaved = false;
+      });
+    return true;
+  }
+
+  /**
+   * Returns whether this service is currently attempting to save the
+   * collection maintained by this service.
+   */
+  isSavingCollection(): boolean {
+    return this._collectionIsBeingSaved;
+  }
+
+  get onCollectionInitialized(): EventEmitter<void> {
+    return this._collectionInitializedEventEmitter;
+  }
+}
+
+angular.module('oppia').factory('CollectionEditorStateService',
+  downgradeInjectable(CollectionEditorStateService));
