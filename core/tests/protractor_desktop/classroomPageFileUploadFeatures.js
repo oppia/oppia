@@ -51,6 +51,10 @@ describe('Classroom page functionality', function() {
       });
   });
 
+  afterAll(async function() {
+    await users.logout();
+  });
+
   it('should add a new published topic to the Math classroom',
     async function() {
       var handle = await browser.getWindowHandle();
@@ -103,7 +107,6 @@ describe('Classroom page functionality', function() {
       await topicEditorPage.publishTopic();
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(1);
-      await users.logout();
     });
 
   afterEach(async function() {

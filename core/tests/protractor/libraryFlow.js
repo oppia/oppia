@@ -116,8 +116,7 @@ describe('Rating', function() {
 
   var addRating = async function(
       userEmail, userName, explorationName, ratingValue) {
-    await users.createUser(userEmail, userName);
-    await users.login(userEmail);
+    await users.createAndLoginUser(userEmail, userName);
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_RATINGTEST);
     await libraryPage.playExploration(EXPLORATION_RATINGTEST);

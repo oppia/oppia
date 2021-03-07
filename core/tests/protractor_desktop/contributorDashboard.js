@@ -227,7 +227,7 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-fdescribe('Admin page contribution rights form', function() {
+describe('Admin page contribution rights form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var contributorDashboardPage = null;

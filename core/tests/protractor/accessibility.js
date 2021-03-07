@@ -67,10 +67,11 @@ describe('screenreader and keyboard user accessibility features', function() {
     // Should create a user and login.
     await users.createAndLoginAdminUser(
       'user11@accessibility.com', 'user11accessibility');
+    libraryPage = new LibraryPage.LibraryPage();
   });
 
-  beforeAll(function() {
-    libraryPage = new LibraryPage.LibraryPage();
+  afterAll(async function() {
+    await users.logout();
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {

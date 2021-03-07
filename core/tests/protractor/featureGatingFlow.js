@@ -57,17 +57,20 @@ describe('Feature Gating Flow', function() {
 
     await adminPage.removeAllRulesOfFeature(dummy);
     await adminPage.saveChangeOfFeature(dummy);
+
     await users.logout();
   });
 
   it('should not show indicators gated by dummy feature when disabled',
     async() => {
-    await users.createAndLoginAdminUser(
-      'admin2@featureGatingFlow.com', 'featuregating2');
-      await adminPage.getFeaturesTab();
+      await users.createAndLoginAdminUser(
+        'admin2@featureGatingFlow.com', 'featuregating2');
 
+      await adminPage.getFeaturesTab();
       expect(await agDummyFeatureIndicator.isPresent()).toBe(false);
       expect(await ajsDummyFeatureIndicator.isPresent()).toBe(false);
+
+      await users.logout();
     }
   );
 
@@ -80,24 +83,26 @@ describe('Feature Gating Flow', function() {
     const dummy = await adminPage.getDummyFeatureElement();
 
     expect(await dummy.isPresent()).toBe(true);
+    await users.logout();
   });
 
   it('should show indicators after enabling dummy_feature', async() => {
     await users.createAndLoginAdminUser(
       'admin4@featureGatingFlow.com', 'featuregating4');
-
     await adminPage.getFeaturesTab();
     const dummy = await adminPage.getDummyFeatureElement();
     await adminPage.enableFeatureForDev(dummy);
 
     await users.logout();
+
     await users.createAndLoginAdminUser(
       'admin5@featureGatingFlow.com', 'featuregating5');
-
     await adminPage.getFeaturesTab();
 
     expect(await agDummyFeatureIndicator.isPresent()).toBe(true);
     expect(await agDummyHandlerIndicator.isPresent()).toBe(true);
     expect(await ajsDummyFeatureIndicator.isPresent()).toBe(true);
+
+    await users.logout();
   });
 });
