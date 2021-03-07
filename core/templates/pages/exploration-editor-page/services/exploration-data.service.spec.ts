@@ -371,7 +371,7 @@ describe('Exploration data service', function() {
       req.flush(sampleDataResults);
       spyOn(eebas, 'updateExploration').and.callFake(
         () => {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject();
           });
         }

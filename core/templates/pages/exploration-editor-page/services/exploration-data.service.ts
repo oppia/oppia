@@ -141,7 +141,7 @@ export class ExplorationDataService {
       // changes applied. This makes a force-refresh necessary when changes
       // are discarded, otherwise the exploration-with-draft-changes
       // (which is cached here) will be reused.
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, _reject) => {
         this.editableExplorationBackendApiService.fetchApplyDraftExploration(
           this.explorationId).then((response) => {
           this.loggerService.info('Retrieved exploration data.');

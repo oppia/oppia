@@ -49,7 +49,7 @@ class MockContentTranslationLanguageService {
       {value: 'en', displayed: 'English'}
     ];
   }
-  setCurrentContentLanguageCode(languageCode: string) {}
+  setCurrentContentLanguageCode(_languageCode: string) {}
 }
 
 describe('Content language selector component', () => {

@@ -30,8 +30,8 @@ export class ExplorationEmbedButtonModalComponent implements OnInit {
   @Input() serverName: string;
 
   constructor(
-    private activeModal: NgbActiveModal,
-    private siteAnalyticsService: SiteAnalyticsService) {}
+    private _activeModal: NgbActiveModal,
+    private _siteAnalyticsService: SiteAnalyticsService) {}
 
   ngOnInit(): void {
     this.siteAnalyticsService.registerOpenEmbedInfoEvent(this.explorationId);

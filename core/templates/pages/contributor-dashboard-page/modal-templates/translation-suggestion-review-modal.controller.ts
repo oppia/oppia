@@ -94,7 +94,7 @@ angular.module('oppia').controller(
 
       init();
 
-      $scope.showNextItemToReview = function(suggestionId) {
+      $scope.showNextItemToReview = function(_suggestionId) {
         resolvedSuggestionIds.push($scope.activeSuggestionId);
         var unusedSuggestionId = null;
         if ($scope.lastSuggestionToReview) {

@@ -38,8 +38,8 @@ interface ToastrActionConfig {
 }
 
 interface ToastrAction {
-  (message: string, config?: ToastrActionConfig): void;
-  (message: string, heading: string, config?: ToastrActionConfig): void;
+  (_message: string, _config?: ToastrActionConfig): void;
+  (_message: string, _heading: string, _config?: ToastrActionConfig): void;
 }
 
 interface Toastr {

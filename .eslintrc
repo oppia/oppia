@@ -256,13 +256,7 @@
       "off"
     ],
     "no-unused-vars": [
-      "error",
-      {
-        "vars": "all",
-        "varsIgnorePattern": ".+",
-        "args": "all",
-        "argsIgnorePattern": "^unused|^_"
-      }
+      "off"
     ],
     "one-var": [
       "off"
@@ -372,7 +366,10 @@
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
-        "args": "none"
+        "vars": "all",
+        "varsIgnorePattern": ".+",
+        "args": "all",
+        "argsIgnorePattern": "^unused|^_"
       }
     ],
     "@typescript-eslint/explicit-module-boundary-types": ["error"],

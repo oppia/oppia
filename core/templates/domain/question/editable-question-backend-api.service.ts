@@ -100,7 +100,7 @@ export class EditableQuestionBackendApiService {
       successCallback: (value: FetchQuestionResponse) => void,
       errorCallback: (reason?: string) => void):
         Promise<FetchQuestionBackendResponse> {
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, _reject) => {
       const questionDataUrl = this.urlInterpolationService.interpolateUrl(
         QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
           question_id: questionId

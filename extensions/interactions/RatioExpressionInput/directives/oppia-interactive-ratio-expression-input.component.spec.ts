@@ -33,7 +33,7 @@ describe('RatioExpressionInputInteractive', function() {
   };
   let mockRatioExpressionInputRulesService = {};
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(unuseIinteractionId, attrs) {
+    getValuesFromAttributes: function(_interactionId, attrs) {
       return attrs;
     }
   };

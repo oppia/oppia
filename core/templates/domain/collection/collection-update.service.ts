@@ -155,7 +155,7 @@ export class CollectionUpdateService {
         // Apply.
         let explorationId = this._getExplorationIdFromChangeDict(changeDict);
         collection.deleteCollectionNode(explorationId);
-      }, (changeDict, collection) => {
+      }, (_changeDict, collection) => {
         // Undo.
         collection.addCollectionNode(oldCollectionNode);
       });
@@ -176,7 +176,7 @@ export class CollectionUpdateService {
         // ---- Apply ----
         let title = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setTitle(title);
-      }, (changeDict, collection) => {
+      }, (_changeDict, collection) => {
         // ---- Undo ----
         collection.setTitle(oldTitle);
       });
@@ -197,7 +197,7 @@ export class CollectionUpdateService {
         // Apply.
         const newCategory = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setCategory(newCategory);
-      }, (changeDict, collection) => {
+      }, (_changeDict, collection) => {
         // Undo.
         collection.setCategory(oldCategory);
       });
@@ -215,7 +215,7 @@ export class CollectionUpdateService {
         // Apply.
         let objective = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setObjective(objective);
-      }, (changeDict, collection) => {
+      }, (_changeDict, collection) => {
         // Undo.
         collection.setObjective(oldObjective);
       });
@@ -235,7 +235,7 @@ export class CollectionUpdateService {
         // Apply.
         let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setLanguageCode(languageCode);
-      }, (changeDict, collection) => {
+      }, (_changeDict, collection) => {
         // Undo.
         collection.setLanguageCode(oldLanguageCode);
       });
@@ -253,7 +253,7 @@ export class CollectionUpdateService {
         // Apply.
         let tags = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setTags(tags);
-      }, (changeDict, collection) => {
+      }, (_changeDict, collection) => {
         // Undo.
         collection.setTags(oldTags);
       });

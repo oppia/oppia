@@ -240,11 +240,11 @@ angular.module('oppia').component('learnerDashboardPage', {
           'ui-floating': 'auto',
           delay: ctrl.checkMobileView() ?
             DRAG_DELAY_MOBILE_MSEC : DRAG_DELAY_DESKTOP_MSEC,
-          start: function(e, ui) {
+          start: function(_e, ui) {
             ui.placeholder.height(ui.item.height());
             $scope.$apply();
           },
-          sort: function(e, ui) {
+          sort: function(_e, ui) {
             // Making top : 0px to avoid irregular change in position.
             ui.helper.css(
               // This throws "Unnecessarily quoted property 'top' found". We
@@ -253,7 +253,7 @@ angular.module('oppia').component('learnerDashboardPage', {
               /* eslint-disable-next-line quote-props */
               {'top': '0 px'});
           },
-          update: function(e, ui) {
+          update: function(_e, ui) {
             var insertExpInLearnerPlaylistUrl = (
               UrlInterpolationService.interpolateUrl((
                 '/learnerplaylistactivityhandler/<activityType>/' +
@@ -268,7 +268,7 @@ angular.module('oppia').component('learnerDashboardPage', {
             });
             $scope.$apply();
           },
-          stop: function(e, ui) {
+          stop: function(_e, _ui) {
             $scope.$apply();
           },
           axis: 'y'

@@ -35,7 +35,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function($injector, _$controller) {
     contributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
@@ -117,8 +117,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         'registerContributorDashboardAcceptSuggestion');
       spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, commitMessage,
-            successCallback, errorCallback) => {
+            _targetId, _suggestionId, _action, _reviewMessage, _commitMessage,
+            successCallback, _errorCallback) => {
           successCallback();
         });
 
@@ -162,7 +162,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
       spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, commitMessage,
+            _targetId, _suggestionId, _action, _reviewMessage, _commitMessage,
             callback) => {
           callback();
         });
@@ -210,8 +210,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
         'registerContributorDashboardAcceptSuggestion');
       spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, commitMessage,
-            successCallback, errorCallback) => {
+            _targetId, _suggestionId, _action, _reviewMessage, _commitMessage,
+            _successCallback, errorCallback) => {
           let dummyErrorResponse = {
             data: { error: 'Error!' }
           };

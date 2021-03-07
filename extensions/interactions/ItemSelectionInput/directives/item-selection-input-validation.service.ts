@@ -123,7 +123,7 @@ export class ItemSelectionInputValidationService {
         answerGroups, stateName));
 
     var seenChoices = customizationArgs.choices.value;
-    var handledAnswers = seenChoices.map((item) => {
+    var handledAnswers = seenChoices.map((_item) => {
       return false;
     });
 

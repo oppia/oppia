@@ -1,6 +1,7 @@
 // Code - https://github.com/jiggzson/nerdamer/blob/master/nerdamer.core.js
 
 declare namespace nerdamer {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Expression {
     // Returns all variables in the given Expression.
     variables: () => string[];

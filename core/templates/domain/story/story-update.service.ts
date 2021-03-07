@@ -147,7 +147,7 @@ export class StoryUpdateService {
         // ---- Apply ----
         let title = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setTitle(title);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setTitle(oldTitle);
       });
@@ -167,7 +167,7 @@ export class StoryUpdateService {
         let newUrlFragment = (
           this._getNewPropertyValueFromChangeDict(changeDict));
         story.setUrlFragment(newUrlFragment);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setUrlFragment(oldUrlFragment);
       });
@@ -187,7 +187,7 @@ export class StoryUpdateService {
         let thumbnailFilename = (
           this._getNewPropertyValueFromChangeDict(changeDict));
         story.setThumbnailFilename(thumbnailFilename);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setThumbnailFilename(oldThumbnailFilename);
       });
@@ -207,7 +207,7 @@ export class StoryUpdateService {
         let thumbnailBgColor = (
           this._getNewPropertyValueFromChangeDict(changeDict));
         story.setThumbnailBgColor(thumbnailBgColor);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setThumbnailBgColor(oldThumbnailBgColor);
       });
@@ -226,7 +226,7 @@ export class StoryUpdateService {
         // ---- Apply ----
         let description = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setDescription(description);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setDescription(oldDescription);
       });
@@ -244,7 +244,7 @@ export class StoryUpdateService {
         // ---- Apply ----
         let notes = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setNotes(notes);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setNotes(oldNotes);
       });
@@ -263,7 +263,7 @@ export class StoryUpdateService {
         // ---- Apply ----
         let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
         story.setLanguageCode(languageCode);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setLanguageCode(oldLanguageCode);
       });
@@ -283,7 +283,7 @@ export class StoryUpdateService {
         let metaTagContent = (
           this._getNewPropertyValueFromChangeDict(changeDict));
         story.setMetaTagContent(metaTagContent);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.setMetaTagContent(oldMetaTagContent);
       });
@@ -299,10 +299,10 @@ export class StoryUpdateService {
     this._applyStoryContentsPropertyChange(
       story, StoryDomainConstants.INITIAL_NODE_ID, oldInitialNodeId,
       newInitialNodeId,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().setInitialNodeId(newInitialNodeId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().setInitialNodeId(oldInitialNodeId);
       });
@@ -317,7 +317,7 @@ export class StoryUpdateService {
     this._applyChange(story, StoryDomainConstants.CMD_ADD_STORY_NODE, {
       node_id: nextNodeId,
       title: nodeTitle
-    }, (changeDict, story) => {
+    }, (_changeDict, story) => {
       // ---- Apply ----
       story.getStoryContents().addNode(nodeTitle);
       this._storyEditorStateService.setExpIdsChanged();
@@ -335,11 +335,11 @@ export class StoryUpdateService {
   deleteStoryNode(story: Story, nodeId: string): void {
     this._applyChange(story, StoryDomainConstants.CMD_DELETE_STORY_NODE, {
       node_id: nodeId
-    }, (changeDict, story) => {
+    }, (_changeDict, story) => {
       // ---- Apply ----
       story.getStoryContents().deleteNode(nodeId);
       this._storyEditorStateService.setExpIdsChanged();
-    }, (changeDict, story) => {
+    }, (_changeDict, _story) => {
       // ---- Undo ----
       throw new Error('A deleted story node cannot be restored.');
     });
@@ -359,10 +359,10 @@ export class StoryUpdateService {
         node_id: nodeId,
         old_value: false,
         new_value: true
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
       });
@@ -382,10 +382,10 @@ export class StoryUpdateService {
         node_id: nodeId,
         old_value: true,
         new_value: false
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
       });
@@ -402,10 +402,10 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_OUTLINE, nodeId,
       oldOutline, newOutline,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().setNodeOutline(nodeId, newOutline);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().setNodeOutline(
           nodeId, oldOutline);
@@ -423,10 +423,10 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_TITLE, nodeId,
       oldTitle, newTitle,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().setNodeTitle(nodeId, newTitle);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().setNodeTitle(nodeId, oldTitle);
       });
@@ -444,10 +444,10 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
       oldDescription, newDescription,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().setNodeDescription(nodeId, newDescription);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().setNodeDescription(nodeId, oldDescription);
       });
@@ -465,10 +465,10 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
       nodeId, oldThumbnailFilename, newThumbnailFilename,
-      (changeDict, story) => {
+      (_changeDict, _story) => {
         // ---- Apply ----
         storyNode.setThumbnailFilename(newThumbnailFilename);
-      }, (changeDict, story) => {
+      }, (_changeDict, _story) => {
         // ---- Undo ----
         storyNode.setThumbnailFilename(oldThumbnailFilename);
       });
@@ -486,10 +486,10 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
       nodeId, oldThumbnailBgColor, newThumbnailBgColor,
-      (changeDict, story) => {
+      (_changeDict, _story) => {
         // ---- Apply ----
         storyNode.setThumbnailBgColor(newThumbnailBgColor);
-      }, (changeDict, story) => {
+      }, (_changeDict, _story) => {
         // ---- Undo ----
         storyNode.setThumbnailBgColor(oldThumbnailBgColor);
       });
@@ -507,12 +507,12 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_EXPLORATION_ID,
       nodeId, oldExplorationId, newExplorationId,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().setNodeExplorationId(
           nodeId, newExplorationId);
         this._storyEditorStateService.setExpIdsChanged();
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().setNodeExplorationId(
           nodeId, oldExplorationId);
@@ -535,11 +535,11 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       nodeId, oldDestinationNodeIds, newDestinationNodeIds,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().addDestinationNodeIdToNode(
           nodeId, destinationNodeId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().removeDestinationNodeIdFromNode(
           nodeId, destinationNodeId);
@@ -565,12 +565,12 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       nodeId, oldDestinationNodeIds, newDestinationNodeIds,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().removeDestinationNodeIdFromNode(
           nodeId, destinationNodeId);
         this._storyEditorStateService.setExpIdsChanged();
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().addDestinationNodeIdToNode(
           nodeId, destinationNodeId);
@@ -584,10 +584,10 @@ export class StoryUpdateService {
   rearrangeNodeInStory(story: Story, fromIndex: number, toIndex: number): void {
     this._applyStoryContentsPropertyChange(
       story, StoryDomainConstants.NODE, fromIndex, toIndex,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
       });
@@ -607,11 +607,11 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       nodeId, oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().addPrerequisiteSkillIdToNode(
           nodeId, skillId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().removePrerequisiteSkillIdFromNode(
           nodeId, skillId);
@@ -638,11 +638,11 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       nodeId, oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().removePrerequisiteSkillIdFromNode(
           nodeId, skillId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().addPrerequisiteSkillIdToNode(
           nodeId, skillId);
@@ -664,11 +664,11 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
       nodeId, oldAcquiredSkillIds, newAcquiredSkillIds,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().addAcquiredSkillIdToNode(
           nodeId, skillId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().removeAcquiredSkillIdFromNode(
           nodeId, skillId);
@@ -695,11 +695,11 @@ export class StoryUpdateService {
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
       nodeId, oldAcquiredSkillIds, newAcquiredSkillIds,
-      (changeDict, story) => {
+      (_changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().removeAcquiredSkillIdFromNode(
           nodeId, skillId);
-      }, (changeDict, story) => {
+      }, (_changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().addAcquiredSkillIdToNode(
           nodeId, skillId);
