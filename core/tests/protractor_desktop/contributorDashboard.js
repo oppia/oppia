@@ -227,7 +227,7 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-describe('Admin page contribution rights form', function() {
+fdescribe('Admin page contribution rights form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var contributorDashboardPage = null;
@@ -247,7 +247,7 @@ describe('Admin page contribution rights form', function() {
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
     await users.createAndLoginAdminUser(
-      'primaryAdmin@adminTab.com', 'primaryAdmin');
+      'primaryAdmin@adminTab.com', 'primary');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {

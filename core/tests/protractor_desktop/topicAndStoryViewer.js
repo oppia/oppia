@@ -174,7 +174,8 @@ describe('Topic and Story viewer functionality', function() {
   it(
     'should check for topic description, stories and revision cards',
     async function() {
-      await users.login('creator@storyViewer.com');
+      await users.createAndLoginAdminUser(
+        'creator1@storyViewer.com', 'creatorStoryViewer1');
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.expectTopicInformationToBe('Description');
       await topicViewerPage.expectStoryCountToBe(1);
