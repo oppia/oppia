@@ -22,6 +22,7 @@ import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
@@ -272,6 +273,42 @@ describe('Content translation manager service', () => {
     ctms.init('en');
     ctms.displayTranslations('fr');
     expect(onStateCardContentUpdate).toHaveBeenCalled();
+  });
+
+  it('should return default content HTML if translation is invalid', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, 'fr', content);
+    expect(translatedHtml).toEqual('<p>en content</p>');
+  });
+
+  it('should return valid translated content HTML', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: false
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, 'fr', content);
+    expect(translatedHtml).toEqual('<p>fr content</p>');
   });
 
   describe('with custom INTERACTION_SPECS cases', () => {
