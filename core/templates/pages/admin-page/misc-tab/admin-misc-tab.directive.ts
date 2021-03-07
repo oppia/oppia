@@ -201,6 +201,46 @@ angular.module('oppia').directive('adminMiscTab', [
             );
         };
 
+        ctrl.getModelsRelatedToUser = function() {
+          ctrl.setStatusMessage('Getting the models related to user...');
+          $http.get(VERIFY_USER_MODELS_DELETED_HANDLER_URL, {
+            params: { user_id: ctrl.userIdToGet }
+          }).then(
+            function(response) {
+              if (response.data.related_models_exist) {
+                ctrl.setStatusMessage(
+                  'Some related models exist, see logs ' +
+                  'to find out the exact models'
+                );
+              } else {
+                ctrl.setStatusMessage('No related models exist');
+              }
+            },
+            function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
+        ctrl.deleteUser = function() {
+          ctrl.setStatusMessage('Starting the deletion of the user...');
+          $http['delete'](DELETE_USER_HANDLER_URL, {
+            params: {
+              user_id: ctrl.userIdToDelete,
+              username: ctrl.usernameToDelete
+            }
+          }).then(
+            function() {
+              ctrl.setStatusMessage('The deletion process was started.');
+            },
+            function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
