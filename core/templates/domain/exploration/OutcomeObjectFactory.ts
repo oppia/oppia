@@ -33,8 +33,8 @@ export interface OutcomeBackendDict {
   'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
   'param_changes': readonly ParamChangeBackendDict[];
-  'refresher_exploration_id': string;
-  'missing_prerequisite_skill_id': string;
+  'refresher_exploration_id': string | null;
+  'missing_prerequisite_skill_id': string | null;
 }
 
 export class Outcome {
@@ -42,12 +42,13 @@ export class Outcome {
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
   paramChanges: readonly ParamChangeBackendDict[];
-  refresherExplorationId: string;
-  missingPrerequisiteSkillId: string;
+  refresherExplorationId: string | null;
+  missingPrerequisiteSkillId: string | null;
   constructor(
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
       paramChanges: readonly ParamChangeBackendDict[],
-      refresherExplorationId: string, missingPrerequisiteSkillId: string) {
+      refresherExplorationId: string | null,
+      missingPrerequisiteSkillId: string | null) {
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;

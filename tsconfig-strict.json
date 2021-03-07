@@ -34,6 +34,8 @@
   "files": [
     "core/templates/domain/admin/computation-data.model.ts",
     "core/templates/domain/admin/computation-data.model.spec.ts",
+    "core/templates/domain/classifier/answer-classification-result.model.ts",
+    "core/templates/domain/classifier/answer-classification-result.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
