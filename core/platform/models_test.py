@@ -19,8 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import inspect
+
 from constants import constants
 from core.platform import models
+from core.platform.auth import gae_auth_services
 from core.tests import test_utils
 import feconf
 
@@ -244,8 +247,39 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_auth_services(self):
         """Tests import auth services function."""
-        self.assertIsInstance(
-            self.registry_instance.import_auth_services(), models.AuthServices)
+        auth_services = self.registry_instance.import_auth_services()
+        self.assertIsInstance(auth_services, models.AuthServices)
+
+        expected_module = gae_auth_services
+        expected_func_names = [
+            'establish_auth_session',
+            'destroy_auth_session',
+            'get_auth_claims_from_request',
+            'mark_user_for_deletion',
+            'delete_external_auth_associations',
+            'verify_external_auth_associations_are_deleted',
+            'get_auth_id_from_user_id',
+            'get_user_id_from_auth_id',
+            'get_multi_user_ids_from_auth_ids',
+            'get_multi_auth_ids_from_user_ids',
+            'associate_auth_id_with_user_id',
+            'associate_multi_auth_ids_with_user_ids',
+        ]
+
+        for expected_func_name in expected_func_names:
+            call_counter = test_utils.CallCounter(lambda *_: None)
+
+            with self.swap(expected_module, expected_func_name, call_counter):
+                instance_method = getattr(auth_services, expected_func_name)
+                arg_names, _, _, _ = inspect.getargspec(instance_method)
+                self.assertEqual(arg_names[0], 'self')
+                fake_args = [None] * (len(arg_names) - 1)
+                instance_method(*fake_args)
+
+            self.assertEqual(
+                call_counter.times_called, 1,
+                msg='%s.%s was not called' % (
+                    expected_module.__name__, expected_func_name))
 
     def test_import_app_identity_services(self):
         """Tests import app identity services function."""
