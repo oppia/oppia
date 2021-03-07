@@ -193,11 +193,11 @@ angular.module('oppia').directive('adminMiscTab', [
                 'The number of users that are being deleted is: ' +
               pendingDeletionRequests.number_of_pending_deletion_models);
               $rootScope.$apply();
-              }, errorResponse => {
-                ctrl.setStatusMessage(
-                  'Server error: ' + errorResponse);
-                $rootScope.$apply();
-              }
+            }, errorResponse => {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse);
+              $rootScope.$apply();
+            }
             );
         };
 
