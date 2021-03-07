@@ -57,6 +57,48 @@ import utils
 ])
 
 
+class RemoveDeprecatedExplorationModelFieldsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets skill_tags, default_skin, skin_customization fields
+    in ExplorationModels to None in order to remove it from the datastore.
+    Job is necessary only for March 2021 release and can be removed after.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveDeprecatedExplorationModelFieldsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        removed_deprecated_field = False
+        for deprecated_field in [
+                'skill_tags', 'default_skin', 'skin_customizations']:
+            if deprecated_field in exp_model._properties:  # pylint: disable=protected-access
+                del exp_model._properties[deprecated_field]  # pylint: disable=protected-access
+                removed_deprecated_field = True
+
+            if deprecated_field in exp_model._values:  # pylint: disable=protected-access
+                del exp_model._values[deprecated_field]  # pylint: disable=protected-access
+                removed_deprecated_field = True
+
+        if removed_deprecated_field:
+            exp_model.update_timestamps(update_last_updated_time=False)
+            exp_models.ExplorationModel.put_multi([exp_model])
+            yield ('SUCCESS_REMOVED - ExplorationModel', exp_model.id)
+        else:
+            yield ('SUCCESS_ALREADY_REMOVED - ExplorationModel', exp_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
 class RegenerateStringPropertyIndexOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for regenerating the index of models changed to use an
