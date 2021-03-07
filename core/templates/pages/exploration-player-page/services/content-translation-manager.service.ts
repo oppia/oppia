@@ -90,6 +90,20 @@ export class ContentTranslationManagerService {
     this.onStateCardContentUpdateEmitter.emit();
   }
 
+  getTranslatedHtml(
+      writtenTranslations: WrittenTranslations,
+      languageCode: string,
+      content: SubtitledHtml
+  ): string {
+    const writtenTranslation = writtenTranslations.translationsMapping[
+      content.contentId][languageCode];
+    if (!this._isValidTranslation(writtenTranslation)) {
+      return content.html;
+    } else {
+      return writtenTranslation.getHtml();
+    }
+  }
+
   _swapContent(
       writtenTranslations: WrittenTranslations,
       languageCode: string,
