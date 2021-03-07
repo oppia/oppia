@@ -32,6 +32,9 @@ export const AdminPageConstants = {
   ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL:
     '/numberofdeletionrequestshandler',
   ADMIN_SEND_DUMMY_MAIL_HANDLER_URL: '/senddummymailtoadminhandler',
+  ADMIN_VERIFY_USER_MODELS_DELETED_HANDLER_URL:
+    '/verifyusermodelsdeletedhandler',
+  ADMIN_DELETE_USER_HANDLER_URL: '/deleteuserhandler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#activities',

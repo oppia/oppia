@@ -764,7 +764,7 @@ describe('Admin backend api service', () => {
     'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
     let category = 'voiceover';
     let languageCode = 'en';
-    let username = 'validUser';
+    let username = 'InvalidUser';
     let method = 'specific';
     let payload = {
       username: username,
@@ -1110,6 +1110,102 @@ describe('Admin backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }
+  ));
+
+  it('should get the data of models related to the user given the' +
+    'userId when calling getModelsRelatedToUserAsync', fakeAsync(() => {
+    let userId = 'validId';
+    let result = {
+      related_models_exist: true
+    };
+    abas.getModelsRelatedToUserAsync(userId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/verifyusermodelsdeletedhandler' +
+      '?user_id=validId');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      related_models_exist: true
+    }, {
+      status: 200, statusText: 'Success.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      result.related_models_exist);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to get the data of models related to the user given the' +
+    'userId when calling getModelsRelatedToUserAsync', fakeAsync(() => {
+    let userId = 'InvalidId';
+    abas.getModelsRelatedToUserAsync(userId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/verifyusermodelsdeletedhandler' +
+      '?user_id=InvalidId');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      error: 'User does not exist.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('User does not exist.');
+  }
+  ));
+
+  it('should delete the user account given the userId and' +
+    'username when calling deleteUserAsync', fakeAsync(() => {
+    let userId = 'validId';
+    let username = 'validUsername';
+
+    abas.deleteUserAsync(userId, username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/deleteuserhandler' +
+      '?user_id=validId&username=validUsername');
+    expect(req.request.method).toEqual('DELETE');
+
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to delete the user account given the userId and' +
+    'username when calling deleteUserAsync', fakeAsync(() => {
+    let userId = 'InvalidId';
+    let username = 'InvalidUsername';
+
+    abas.deleteUserAsync(userId, username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/deleteuserhandler' +
+      '?user_id=InvalidId&username=InvalidUsername');
+    expect(req.request.method).toEqual('DELETE');
+
+    req.flush({
+      error: 'User does not exist.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('User does not exist.');
   }
   ));
 });

@@ -46,11 +46,11 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 
-interface UserRoles {
+interface UserRolesBackendResponse {
   [role: string]: string;
 }
 
-interface RoleGraphData {
+interface RoleGraphDataBackendResponse {
   nodes: {
     [role: string]: string;
   };
@@ -60,33 +60,37 @@ interface RoleGraphData {
   }[];
 }
 
-interface ConfigProperties {
+interface ConfigPropertiesBackendResponse {
   [property: string]: Object;
 }
 
-interface JobOutput {
+interface JobOutputBackendResponse {
   output: string[];
 }
 
-interface ViewContributionObject {
+interface ViewContributionBackendResponse {
   usernames: string[];
 }
 
-interface ContributionRightsObject {
+interface ContributionRightsBackendResponse {
   'can_review_questions': boolean,
   'can_review_translation_for_language_codes': string[],
   'can_review_voiceover_for_language_codes': string[],
   'can_submit_questions': boolean
 }
 
-interface MemoryCacheProfile {
+interface MemoryCacheProfileBackendResponse {
   'peak_allocation': string,
   'total_allocation': string,
   'total_keys_stored': string
 }
 
-interface PendingDeletionRequest {
+interface PendingDeletionRequestBackendResponse {
   'number_of_pending_deletion_models': string
+}
+
+interface ModelsRelatedToUserBackendResponse {
+  'related_models_exist': boolean
 }
 
 export interface AdminPageDataBackendDict {
@@ -96,10 +100,10 @@ export interface AdminPageDataBackendDict {
   'one_off_job_status_summaries': JobStatusSummaryBackendDict[];
   'human_readable_current_time': string;
   'audit_job_status_summaries': JobStatusSummaryBackendDict[];
-  'updatable_roles': UserRoles;
-  'role_graph_data': RoleGraphData;
-  'config_properties': ConfigProperties;
-  'viewable_roles': UserRoles;
+  'updatable_roles': UserRolesBackendResponse;
+  'role_graph_data': RoleGraphDataBackendResponse;
+  'config_properties': ConfigPropertiesBackendResponse;
+  'viewable_roles': UserRolesBackendResponse;
   'unfinished_job_data': JobDataBackendDict[];
   'recent_job_data': JobDataBackendDict[];
   'continuous_computations_data': ComputationDataBackendDict[];
@@ -114,10 +118,10 @@ export interface AdminPageData {
   oneOffJobStatusSummaries: JobStatusSummary[];
   humanReadableCurrentTime: string;
   auditJobStatusSummaries: JobStatusSummary[];
-  updatableRoles: UserRoles;
-  roleGraphData: RoleGraphData;
-  configProperties: ConfigProperties;
-  viewableRoles: UserRoles;
+  updatableRoles: UserRolesBackendResponse;
+  roleGraphData: RoleGraphDataBackendResponse;
+  configProperties: ConfigPropertiesBackendResponse;
+  viewableRoles: UserRolesBackendResponse;
   unfinishedJobData: Job[];
   recentJobData: Job[];
   continuousComputationsData: ComputationData[];
@@ -169,7 +173,7 @@ export class AdminBackendApiService {
     });
   }
 
-  private _postAdminActionAsync(
+  private _postRequestAsync(
       handlerUrl:string, payload?:Object, action?:string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
@@ -188,7 +192,7 @@ export class AdminBackendApiService {
     let payload = {
       job_type: jobType
     };
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
@@ -198,7 +202,7 @@ export class AdminBackendApiService {
       job_id: jobId,
       job_type: jobType
     };
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
@@ -207,7 +211,7 @@ export class AdminBackendApiService {
     let payload = {
       computation_type: computationType
     };
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
@@ -216,7 +220,7 @@ export class AdminBackendApiService {
     let payload = {
       computation_type: computationType
     };
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
@@ -226,7 +230,7 @@ export class AdminBackendApiService {
         jobId: jobId
       });
     return new Promise((resolve, reject) => {
-      this.http.get<JobOutput>(
+      this.http.get<JobOutputBackendResponse>(
         adminJobOutputUrl).toPromise().then(response => {
         resolve(Array.isArray(response.output) ? response.output.sort() : []);
       }, errorResponse => {
@@ -238,9 +242,9 @@ export class AdminBackendApiService {
   // Admin Roles Tab Services.
   async viewUsersRoleAsync(
       filterCriterion: string, role: string, username: string
-  ): Promise<UserRoles> {
+  ): Promise<UserRolesBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<UserRoles>(
+      this.http.get<UserRolesBackendResponse>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           params: {
             filter_criterion: filterCriterion,
@@ -294,9 +298,9 @@ export class AdminBackendApiService {
 
   async viewContributionReviewersAsync(
       category: string, languageCode: string
-  ): Promise<ViewContributionObject> {
+  ): Promise<ViewContributionBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<ViewContributionObject>(
+      this.http.get<ViewContributionBackendResponse>(
         AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
           params: {
             category: category,
@@ -312,9 +316,9 @@ export class AdminBackendApiService {
   }
 
   async contributionReviewerRightsAsync(
-      username: string): Promise<ContributionRightsObject> {
+      username: string): Promise<ContributionRightsBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<ContributionRightsObject>(
+      this.http.get<ContributionRightsBackendResponse>(
         AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
           params: {
             username: username
@@ -350,12 +354,12 @@ export class AdminBackendApiService {
 
   // Admin Misc Tab Services.
   async flushMemoryCacheAsync(): Promise<void> {
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL);
   }
 
   async clearSearchIndexAsync(): Promise<void> {
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
@@ -365,7 +369,7 @@ export class AdminBackendApiService {
     let payload = {
       topic_id: topicId
     };
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
@@ -374,18 +378,19 @@ export class AdminBackendApiService {
     let payload = {
       data: data
     };
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
   async sendDummyMailToAdminAsync(): Promise<void> {
-    return this._postAdminActionAsync(
+    return this._postRequestAsync (
       AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL);
   }
 
-  async getMemoryCacheProfileAsync(): Promise<MemoryCacheProfile> {
+  async getMemoryCacheProfileAsync(
+  ): Promise<MemoryCacheProfileBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<MemoryCacheProfile>(
+      this.http.get<MemoryCacheProfileBackendResponse>(
         AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
       ).toPromise().then(response => {
         resolve(response);
@@ -412,10 +417,44 @@ export class AdminBackendApiService {
   }
 
   async getNumberOfPendingDeletionRequestAsync(
-  ): Promise<PendingDeletionRequest> {
+  ): Promise<PendingDeletionRequestBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<PendingDeletionRequest>(
+      this.http.get<PendingDeletionRequestBackendResponse>(
         AdminPageConstants.ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {}
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async getModelsRelatedToUserAsync(userId: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.http.get<ModelsRelatedToUserBackendResponse>(
+        AdminPageConstants.ADMIN_VERIFY_USER_MODELS_DELETED_HANDLER_URL, {
+          params: {
+            user_id: userId
+          }
+        }
+      ).toPromise().then(response => {
+        resolve(response.related_models_exist);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deleteUserAsync(userId: string, username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // eslint-disable-next-line dot-notation
+      this.http.delete<void>(
+        AdminPageConstants.ADMIN_DELETE_USER_HANDLER_URL, {
+          params: {
+            user_id: userId,
+            username: username
+          }
+        }
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {

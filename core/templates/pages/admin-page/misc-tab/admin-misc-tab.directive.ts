@@ -203,11 +203,9 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.getModelsRelatedToUser = function() {
           ctrl.setStatusMessage('Getting the models related to user...');
-          $http.get(VERIFY_USER_MODELS_DELETED_HANDLER_URL, {
-            params: { user_id: ctrl.userIdToGet }
-          }).then(
-            function(response) {
-              if (response.data.related_models_exist) {
+          AdminBackendApiService.getModelsRelatedToUserAsync(ctrl.userIdToGet)
+            .then(isModal => {
+              if (isModal) {
                 ctrl.setStatusMessage(
                   'Some related models exist, see logs ' +
                   'to find out the exact models'
@@ -215,30 +213,28 @@ angular.module('oppia').directive('adminMiscTab', [
               } else {
                 ctrl.setStatusMessage('No related models exist');
               }
-            },
-            function(errorResponse) {
+              $rootScope.$apply();
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse);
+              $rootScope.$apply();
             }
-          );
+            );
         };
 
         ctrl.deleteUser = function() {
           ctrl.setStatusMessage('Starting the deletion of the user...');
-          $http['delete'](DELETE_USER_HANDLER_URL, {
-            params: {
-              user_id: ctrl.userIdToDelete,
-              username: ctrl.usernameToDelete
-            }
-          }).then(
-            function() {
+          AdminBackendApiService.deleteUserAsync(
+            ctrl.userIdToDelete, ctrl.usernameToDelete)
+            .then(() => {
               ctrl.setStatusMessage('The deletion process was started.');
-            },
-            function(errorResponse) {
+              $rootScope.$apply();
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse);
+              $rootScope.$apply();
             }
-          );
+            );
         };
 
         ctrl.submitQuery = function() {
