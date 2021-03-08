@@ -29,7 +29,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { WindowDimensionsService } from
+import { WindowDimensionsService } from 
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -59,7 +59,7 @@ class MockI18nLanguageCodeService {
   }
 }
 
-describe('About Page', () => {
+fdescribe('About Page', () => {
   const siteAnalyticsService = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
@@ -176,7 +176,7 @@ describe('About Page', () => {
         preferred_site_language_code: null,
         username: 'tester',
         email: 'test@test.com',
-        user_is_logged_in: true
+        user_is_logged_in: false
       };
       spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
         UserInfo.createFromBackendDict(UserInfoObject))
@@ -185,7 +185,7 @@ describe('About Page', () => {
       component.ngOnInit();
       flushMicrotasks();
 
-      expect(component.userIsLoggedIn).toBe(true);
+      expect(component.userIsLoggedIn).toBe(false);
     }));
 
   it('should activate Visit Classroom button when clicked', function() {
