@@ -27,27 +27,15 @@ angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService',
     'ContributionAndReviewService', 'SiteAnalyticsService',
-<<<<<<< HEAD
     'UrlInterpolationService',
-    'initialSuggestionId', 'reviewable', 'suggestionIdToSuggestion',
-    'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+    'initialSuggestionId', 'reviewable', 'subheading',
+    'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION',
     function(
         $http, $scope, $uibModalInstance, AlertsService,
         ContributionAndReviewService, SiteAnalyticsService,
         UrlInterpolationService,
-        initialSuggestionId, reviewable, suggestionIdToSuggestion,
-=======
-    'ThreadMessageObjectFactory', 'UrlInterpolationService',
-    'initialSuggestionId', 'reviewable', 'subheading',
-    'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
-    'ACTION_REJECT_SUGGESTION',
-
-    function(
-        $http, $scope, $uibModalInstance, AlertsService,
-        ContributionAndReviewService, SiteAnalyticsService,
-        ThreadMessageObjectFactory, UrlInterpolationService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
->>>>>>> upstream/develop
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
