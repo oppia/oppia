@@ -26,7 +26,7 @@ import { forkJoin } from 'rxjs';
 import { AppConstants } from 'app.constants';
 import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { ThreadMessage, ThreadMessageBackendDict, ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
-import { SuggestionBackendDict } from 'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { SuggestionThread, SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants.ts';
