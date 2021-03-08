@@ -47,9 +47,7 @@ var ProfilePage = function() {
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
-    await waitFor.visibilityOf(
-      currUserProfilePhoto,
-      'Current User Profile Photo Taking too Long To Display');
+    expect(await otherUserProfilePhoto.isPresent()).toBe(true);
   };
 
   this.expectUserToHaveBio = async function(expectedText) {
