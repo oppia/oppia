@@ -60,6 +60,8 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
+import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -102,13 +104,15 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
-    StorySummaryTileDirective,
     SocialButtonsComponent,
+    StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    ThreadTableComponent,
     ThumbnailDisplayComponent,
     TranslatePipe,
+    TruncatePipe,
   ],
 
   entryComponents: [
@@ -125,6 +129,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
+    ThreadTableComponent,
     ThumbnailDisplayComponent,
   ],
 
