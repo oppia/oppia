@@ -41,11 +41,15 @@ var ProfilePage = function() {
   };
 
   this.expectCurrUserToHaveProfilePhoto = async function() {
-    expect(await currUserProfilePhoto.isPresent()).toBe(true);
+    await waitFor.visibilityOf(
+      currUserProfilePhoto,
+      'Current User Profile Photo Taking too Long To Display');
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
-    expect(await otherUserProfilePhoto.isPresent()).toBe(true);
+    await waitFor.visibilityOf(
+      currUserProfilePhoto,
+      'Current User Profile Photo Taking too Long To Display');
   };
 
   this.expectUserToHaveBio = async function(expectedText) {
@@ -65,10 +69,7 @@ var ProfilePage = function() {
     expect(numInterests).toEqual(expectedInterests.length);
 
     var interestTexts = await interests.map(async function(interestElem) {
-      await waitFor.visibilityOf(
-        interestElem,
-        'interestElem is taking too Long to appear');
-      expect(await interestElem.getText()).toMatch(expectedInterests);
+      return await interestElem.getText();
     });
     interestTexts.forEach(function(interestText) {
       expect(expectedInterests.includes(interestText)).toBe(true);
@@ -91,19 +92,21 @@ var ProfilePage = function() {
     if (explorationCardsCount === 0) {
       throw new Error('There is no exploration card on this profile');
     }
-    expect(explorationCardsCount).toBeGreaterThan(0);
+    await waitFor.visibilityOf(
+      explorationCardsCount,
+      'exploration Cards is not present or Taking Time To Display');
+    expect(await explorationCardsCount).toBeGreaterThan(0);
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
         var cardTitle = card.element(cardTitleCss);
-        var title = await allExplorationCardElements.map(async function(cardTitle) {
-          await waitFor.visibilityOf(
+        await waitFor.visibilityOf(
             cardTitle,
             'cardTitle is not present or taking Too Long to Dispaly');
-          expect(await cardTitle.getText()).toMatch(explorationName);
-        });
+        var title = await cardTitle.getText();
+        return title === explorationName;
       });
 
     if (await explorationsCardByName.length === 0) {
