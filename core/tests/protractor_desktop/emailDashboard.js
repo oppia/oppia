@@ -48,15 +48,17 @@ describe('Email Dashboard', function() {
     await action.clear('Email dashboard input 3', inputElement);
     await action.sendKeys('Email dashboard input 3', inputElement, 1);
     await action.click('Submit Query button', submitButton);
-
-    // Wait 20 seconds for the job to complete.
-    await browser.sleep(20000);
     var checkStatusButton = element(
       by.css('.protractor-check-status-button-0'));
+    while (true) {
+      await browser.sleep(1000);
+      await action.click('Check Status Button', checkStatusButton);
+      var statusElement = element(by.css('.protractor-test-status-0'));
+      if (await statusElement.getText() === 'completed') {
+        break;
+      }
+    }
     var numberOfUsers = element(by.css('.protractor-test-number-of-users-0'));
-    await action.click('Check Status Button', checkStatusButton);
-    var statusText = element(by.css('.protractor-test-status-0'));
-    await waitFor.textToBePresentInElement(statusText, 'completed');
     expect(await numberOfUsers.getText()).toBe('1');
   });
 

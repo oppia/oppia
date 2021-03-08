@@ -95,7 +95,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
         self._validate(kwargs)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.user_id, **kwargs)
+            self.user_id, kwargs)
 
         # Start MR job in background.
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()

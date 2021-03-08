@@ -21,22 +21,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 
+from constants import constants
 import feconf
 import python_utils
 import utils
 
+__attribute_names__ = [
+    predicate['backend_attr'] for predicate in (
+        constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
-UserQueryParams = collections.namedtuple(
-    'UserQueryParams',
-    [
-        'inactive_in_last_n_days',
-        'has_not_logged_in_for_n_days',
-        'created_at_least_n_exps',
-        'created_fewer_than_n_exps',
-        'edited_at_least_n_exps',
-        'edited_fewer_than_n_exps'
-    ]
-)
+USER_QUERY_PARAMS = collections.namedtuple(
+    'USER_QUERY_PARAMS', __attribute_names__)
 
 
 class UserQuery(python_utils.OBJECT):
@@ -50,7 +45,7 @@ class UserQuery(python_utils.OBJECT):
 
         Args:
             query_id: str. The id of the query.
-            query_params: UserQueryParams. The params of this query.
+            query_params: USER_QUERY_PARAMS. The params of this query.
             submitter_id: str. The ID of the user that submitted the query.
             query_status: str. The status of the query. Can only contain values
                 from feconf.ALLOWED_USER_QUERY_STATUSES.
@@ -74,7 +69,7 @@ class UserQuery(python_utils.OBJECT):
 
         Raises:
             ValidationError. Expected ID to be a string.
-            ValidationError. Expected params to be of type UserQueryParams.
+            ValidationError. Expected params to be of type USER_QUERY_PARAMS.
             ValidationError. Expected objective to be a string.
             ValidationError. Expected submitter ID to be a valid user ID.
             ValidationError. Expected status to be a string.
@@ -135,7 +130,7 @@ class UserQuery(python_utils.OBJECT):
 
         Args:
             query_id: str. The id of the query.
-            query_params: UserQueryParams. The params of this query.
+            query_params: USER_QUERY_PARAMS. The params of this query.
             submitter_id: str. The ID of the user that submitted the query.
 
         Returns:
