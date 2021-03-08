@@ -1457,7 +1457,12 @@ class AppEngineTestBase(TestBase):
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
 
-    TODO(#12135): Break this enormous class into small, focused pieces.
+    Unless a class is testing for "platform"-specific behavior (e.g., testing
+    third-party library code or database model implementations), always inherit
+    from this base class. Otherwise, inherit from unittest.TestCase (preferred)
+    or AppEngineTestBase if Google App Engine services/behavior is needed.
+
+    TODO(#12135): Split this enormous test base into smaller, focused pieces.
     """
 
     # NOTE: For tests that do not/can not use the default super-admin, authors
