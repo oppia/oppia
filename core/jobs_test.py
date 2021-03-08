@@ -898,7 +898,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             # this by directly calling on_incoming_event(), because using
             # StartExplorationEventHandler.record() would just put the event
             # in the task queue, which we don't want to flush yet.
-            stats_models.StartExplorationEventLogEntryModel.create(  
+            stats_models.StartExplorationEventLogEntryModel.create(
                 self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id',
                 {}, feconf.PLAY_TYPE_NORMAL)
             StartExplorationEventCounter.on_incoming_event(
