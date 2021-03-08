@@ -30,6 +30,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import taskqueue_services
@@ -251,6 +252,169 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
             'skill_tags', migrated_exploration_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
             'skill_tags', migrated_exploration_model._properties)  # pylint: disable=protected-access
+
+
+class MockExplorationRightsModelWithDeprecatedFields(
+        exp_models.ExplorationRightsModel):
+    """Mock ExplorationRightsModel to be able to set translator_ids,
+    all_viewer_ids
+    """
+
+    translator_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
+
+    all_viewer_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Override this to escape recursion, which will otherwise occur
+        when super() is used in a mocked class.
+        """
+
+        base_models.VersionedModel._trusted_commit( # pylint: disable=protected-access
+            self, committer_id, commit_type, commit_message, commit_cmds)
+
+
+class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    EXP_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            .create_new()
+        )
+        (
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            .enqueue(job_id))
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    # This test for two deprecated fields is merged into one test because
+    # running two different tests resulted in failures. The failures were
+    # caused because the map() function of
+    # RemoveDeprecatedExplorationRightsModelFieldsOneOffJob was called one time
+    # each by the test but the field was removed in only one test and rest
+    # one test was failing.
+    def test_one_exp_rights_models_with_deprecated_field(self):
+        with self.swap(
+            exp_models,
+            'ExplorationRightsModel',
+            MockExplorationRightsModelWithDeprecatedFields
+        ):
+            exp_models.ExplorationRightsModel(
+                id=self.EXP_ID_1,
+                owner_ids=[self.USER_ID_1],
+                editor_ids=[self.USER_ID_1],
+                voice_artist_ids=[self.USER_ID_1],
+                viewer_ids=[self.USER_ID_2],
+                community_owned=False,
+                status='public',
+                viewable_if_private=False,
+                first_published_msec=0.1,
+                translator_ids=[self.USER_ID_1],
+                all_viewer_ids=[],
+            ).save(
+                self.USER_ID_COMMITTER, 'Created new exploration right',
+                [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+            exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
+                self.EXP_ID_1)
+
+            self.assertIsNotNone(exp_rights_model.translator_ids)
+            self.assertIsNotNone(exp_rights_model.all_viewer_ids)
+
+            self.assertIn('translator_ids', exp_rights_model._values) # pylint: disable=protected-access
+            self.assertIn('translator_ids', exp_rights_model._properties) # pylint: disable=protected-access
+
+            self.assertIn('all_viewer_ids', exp_rights_model._values) # pylint: disable=protected-access
+            self.assertIn('all_viewer_ids', exp_rights_model._properties) # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - ExplorationRightsModel', 1]], output)
+
+            migrated_exp_rights_model = (
+                exp_models.ExplorationRightsModel.get_by_id(self.EXP_ID_1))
+
+            self.assertNotIn(
+                'translator_ids', migrated_exp_rights_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'translator_ids', migrated_exp_rights_model._properties)  # pylint: disable=protected-access
+
+            self.assertNotIn(
+                'all_viewer_ids', migrated_exp_rights_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'all_viewer_ids', migrated_exp_rights_model._properties)  # pylint: disable=protected-access
+
+            # Run job twice.
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', 1]],
+                output)
+
+    def test_one_exp_rights_model_without_deprecated_fields(self):
+        exp_models.ExplorationRightsModel(
+            id=self.EXP_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status='public',
+            viewable_if_private=False,
+            first_published_msec=0.1,
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+        exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXP_ID_1)
+
+        self.assertNotIn(
+            'translator_ids', exp_rights_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'translator_ids', exp_rights_model._properties)  # pylint: disable=protected-access
+
+        self.assertNotIn(
+            'all_viewer_ids', exp_rights_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'all_viewer_ids', exp_rights_model._properties)  # pylint: disable=protected-access
+
+        # Fields were never there to begin with, so already removed.
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', 1]], output)
+
+        migrated_exploration_model = (
+            exp_models.ExplorationRightsModel.get_by_id(self.EXP_ID_1))
+
+        self.assertNotIn(
+            'translator_ids', migrated_exploration_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'translator_ids', migrated_exploration_model._properties)  # pylint: disable=protected-access
+
+        self.assertNotIn(
+            'all_viewer_ids', migrated_exploration_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'all_viewer_ids', migrated_exploration_model._properties)  # pylint: disable=protected-access
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
