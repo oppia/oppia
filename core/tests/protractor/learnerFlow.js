@@ -54,7 +54,8 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktopAsAdmin = async function(expectWelcomeModal) {
+  var createDummyExplorationOnDesktopAsAdmin = async function(
+    expectWelcomeModal) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
