@@ -1455,7 +1455,10 @@ class AppEngineTestBase(TestBase):
 
 
 class GenericTestBase(AppEngineTestBase):
-    """Base test class with common/generic helper methods."""
+    """Base test class with common/generic helper methods.
+
+    TODO(#12135): Break this enormous class into small, focused pieces.
+    """
 
     # NOTE: For tests that do not/can not use the default super-admin, authors
     # can override the following class-level constant.
