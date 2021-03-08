@@ -26,7 +26,7 @@ import { PromoBarBackendApiService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
-  selector: 'promo-bar',
+  selector: 'oppia-promo-bar',
   templateUrl: './promo-bar.component.html'
 })
 export class PromoBarComponent implements OnInit {
@@ -66,7 +66,7 @@ export class PromoBarComponent implements OnInit {
 
   isSessionStorageAvailable(): boolean {
     // This is to ensure sessionStorage is accessible.
-    var testKey = 'Oppia';
+    let testKey = 'Oppia';
     try {
       this.windowRef.nativeWindow.sessionStorage.setItem(testKey, testKey);
       this.windowRef.nativeWindow.sessionStorage.removeItem(testKey);
@@ -83,5 +83,5 @@ export class PromoBarComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'promoBar', downgradeComponent(
+  'oppiaPromoBar', downgradeComponent(
     {component: PromoBarComponent}));
