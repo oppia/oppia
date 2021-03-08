@@ -19,13 +19,13 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { LoaderService } from 'services/loader.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from
-  'services/contextual/window-ref.service.ts';
+  'services/contextual/window-ref.service';
 import constants from 'assets/constants';
 
 @Component({
@@ -80,7 +80,7 @@ export class AboutPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userIsLoggedIn = null;
+    this.userIsLoggedIn = false;
     this.loginUrl = '/_ah/login';
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {

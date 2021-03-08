@@ -22,12 +22,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AboutPageComponent } from './about-page.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
@@ -152,7 +152,7 @@ describe('About Page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
 
-    expect(component.userIsLoggedIn).toBe(null);
+    expect(component.userIsLoggedIn).toBe(false);
     expect(component.classroomUrl).toBe('/learn/math');
     expect(component.loginUrl).toBe('/_ah/login');
   });
