@@ -64,6 +64,23 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
 
+    def test_reconstitute(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'id', title='A Title',
+            category='A Category', objective='An Objective')
+        exp_services.save_new_exploration('id', exploration)
+        exp_model = exp_models.ExplorationModel.get_by_id('id')
+        snapshot_dict = exp_model.compute_snapshot()
+        snapshot_dict['skill_tags'] = ['tag1', 'tag2']
+        snapshot_dict['default_skin'] = 'conversation_v1'
+        snapshot_dict['skin_customizations'] = {}
+        snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(
+            snapshot_dict)
+        exp_model = exp_models.ExplorationModel(**snapshot_dict)
+        snapshot_dict = exp_model.compute_snapshot()
+        for field in ['skill_tags', 'default_skin', 'skin_customization']:
+            self.assertNotIn(field, snapshot_dict)
+
 
 class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationContextModel class."""
