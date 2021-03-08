@@ -1245,9 +1245,22 @@ class TestBase(unittest.TestCase):
 
 
 class AppEngineTestBase(TestBase):
-    """Minimal base class for tests requiring App Engine services."""
+    """Minimal base class for tests that need Google App Engine functionality.
 
-    # Environment values our tests assume to have.
+    This class is primarily intended for unit tests in core.platform, where we
+    write adapters around our third-party dependencies. Generally, our unit
+    tests depend on stub implementations of these adapters to protect us from
+    platform-specific behavior. Such stubs are installed in the
+    GenericTestBase.run() method, and most of the unit tests in our code base
+    do, and should, inherit from `GenericTestBase` to stay platform-agnostic.
+
+    The platform layer itself, however, should _not_ mock out platform-specific
+    behavior. Those unit tests need to interact with a real implementation. This
+    base class provides the bare-minimum functionality and stubs necessary to do
+    this.
+    """
+
+    # Environment values that our tests depend on.
     AUTH_DOMAIN = 'example.com'
     HTTP_HOST = 'localhost'
     SERVER_NAME = 'localhost'
@@ -1256,10 +1269,10 @@ class AppEngineTestBase(TestBase):
 
     def __init__(self, *args, **kwargs):
         super(AppEngineTestBase, self).__init__(*args, **kwargs)
-        # Defined outside of setUp() because we want to swap it in during tests,
-        # while minimizing the swap's scope. We accomplish this by using a
-        # context manager over run().
-        self._taskqueue_services_stub = TaskqueueServicesStub(self)
+        # Defined outside of setUp() because we access it from methods, but can
+        # only install it during the run() method. Defining it in __init__
+        # satisfies pylint's attribute-defined-outside-init warning.
+        self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def setUp(self):
         super(AppEngineTestBase, self).setUp()
@@ -1272,7 +1285,7 @@ class AppEngineTestBase(TestBase):
             server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
             default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
 
-        # Declare any relevant App Engine service stubs here.
+        # Google App Engine service stubs.
         self.testbed.init_app_identity_stub()
         self.testbed.init_blobstore_stub()
         self.testbed.init_files_stub()
@@ -1305,8 +1318,8 @@ class AppEngineTestBase(TestBase):
         Reference URL:
         https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
 
-        AppEngineTestBase's override of run() wraps super().run() in swap
-        contexts to mock out the cache and taskqueue services.
+        AppEngineTestBase's override of run() wraps super().run() in "swap"
+        contexts which stub out the platform taskqueue services.
 
         Args:
             result: TestResult | None. Holds onto the results of each test. If
@@ -1315,7 +1328,7 @@ class AppEngineTestBase(TestBase):
         """
         taskqueue_services_swap = self.swap(
             platform_taskqueue_services, 'create_http_task',
-            self._taskqueue_services_stub.create_http_task)
+            self._platform_taskqueue_services_stub.create_http_task)
         with taskqueue_services_swap:
             super(AppEngineTestBase, self).run(result=result)
 
@@ -1335,7 +1348,7 @@ class AppEngineTestBase(TestBase):
             int. The total number of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self._taskqueue_services_stub.count_jobs_in_taskqueue(
+        return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
     def process_and_flush_pending_tasks(self, queue_name=None):
@@ -1347,7 +1360,7 @@ class AppEngineTestBase(TestBase):
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        self._taskqueue_services_stub.process_and_flush_tasks(
+        self._platform_taskqueue_services_stub.process_and_flush_tasks(
             queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):
@@ -1363,7 +1376,7 @@ class AppEngineTestBase(TestBase):
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self._taskqueue_services_stub.get_pending_tasks(
+        return self._platform_taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
 
     def count_jobs_in_mapreduce_taskqueue(self, queue_name):
