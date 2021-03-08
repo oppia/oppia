@@ -286,7 +286,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-concept-card-editor.directive.ts',
     'skill-creation.service.ts',
     'skill-description-editor.directive.ts',
-    'skill-editor-navbar-breadcrumb.directive.ts',
+    'skill-editor-navbar-breadcrumb.component.ts',
     'skill-editor-navbar.directive.ts',
     'skill-editor-state.service.ts',
     'skill-mastery.component.ts',

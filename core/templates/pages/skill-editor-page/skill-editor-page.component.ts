@@ -28,8 +28,6 @@ require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts');
 require(
-  'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
-require(
   'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
