@@ -1247,17 +1247,17 @@ class TestBase(unittest.TestCase):
 class AppEngineTestBase(TestBase):
     """Minimal base class for tests that need Google App Engine functionality.
 
-    This class is primarily intended for unit tests in core.platform, where we
-    write adapters around our third-party dependencies. Generally, our unit
-    tests depend on stub implementations of these adapters to protect us from
+    This class is primarily designed for unit tests in core.platform, where we
+    write adapters around Oppia's third-party dependencies. Generally, our unit
+    tests depend on stub implementations of these adapters to protect them from
     platform-specific behavior. Such stubs are installed in the
-    GenericTestBase.run() method, and most of the unit tests in our code base
-    do, and should, inherit from `GenericTestBase` to stay platform-agnostic.
+    GenericTestBase.run() method.
 
-    The platform layer itself, however, should _not_ mock out platform-specific
-    behavior. Those unit tests need to interact with a real implementation. This
-    base class provides the bare-minimum functionality and stubs necessary to do
-    this.
+    Most of the unit tests in our code base do, and should, inherit from
+    `GenericTestBase` to stay platform-agnostic. The platform layer itself,
+    however, can _not_ mock out platform-specific behavior. Those unit tests
+    need to interact with a real implementation. This base class provides the
+    bare-minimum functionality and stubs necessary to do so.
     """
 
     # Environment values that our tests depend on.
@@ -1300,10 +1300,10 @@ class AppEngineTestBase(TestBase):
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self._taskqueue_stub = (
+        self._testbed_taskqueue_stub = (
             self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
 
-        # Set up the app to be tested.
+        # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app)
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
         self.mail_testapp = webtest.TestApp(main_mail.app)
@@ -1326,15 +1326,15 @@ class AppEngineTestBase(TestBase):
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
-        taskqueue_services_swap = self.swap(
+        platform_taskqueue_services_swap = self.swap(
             platform_taskqueue_services, 'create_http_task',
             self._platform_taskqueue_services_stub.create_http_task)
-        with taskqueue_services_swap:
+        with platform_taskqueue_services_swap:
             super(AppEngineTestBase, self).run(result=result)
 
     def _get_all_queue_names(self):
         """Returns a list of all queue names."""
-        return [q['name'] for q in self._taskqueue_stub.GetQueues()]
+        return [q['name'] for q in self._testbed_taskqueue_stub.GetQueues()]
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
@@ -1380,18 +1380,19 @@ class AppEngineTestBase(TestBase):
             queue_name=queue_name)
 
     def count_jobs_in_mapreduce_taskqueue(self, queue_name):
-        """Counts the jobs in the given mapreduce taskqueue."""
+        """Counts the jobs in the given MapReduce taskqueue."""
         return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
 
     def get_pending_mapreduce_tasks(self, queue_name=None):
-        """Returns the jobs in the given mapreduce taskqueue. If queue_name is
+        """Returns the jobs in the given MapReduce taskqueue. If queue_name is
         None, defaults to returning the jobs in all available queues.
         """
         queue_names = None if queue_name is None else [queue_name]
-        return self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        return self._testbed_taskqueue_stub.get_filtered_tasks(
+            queue_names=queue_names)
 
     def _execute_mapreduce_tasks(self, tasks):
-        """Execute mapreduce queued tasks.
+        """Execute MapReduce queued tasks.
 
         Args:
             tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
@@ -1401,7 +1402,7 @@ class AppEngineTestBase(TestBase):
             if task.url == '/_ah/queue/deferred':
                 deferred.run(task.payload)
             else:
-                # All other tasks are expected to be for mapreduce or taskqueue.
+                # All other tasks will be for MapReduce or taskqueue.
                 params = task.payload or ''
                 headers = {
                     'Content-Length': python_utils.convert_to_bytes(len(params))
@@ -1416,11 +1417,12 @@ class AppEngineTestBase(TestBase):
                 response = app.post(
                     task.url, params=params, headers=headers,
                     expect_errors=True)
+
                 if response.status_code != 200:
                     raise RuntimeError('MapReduce task failed: %r' % task)
 
     def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
-        """Runs and flushes pending mapreduce tasks. If queue_name is None, does
+        """Runs and flushes pending MapReduce tasks. If queue_name is None, does
         so for all queues; otherwise, this only runs and flushes tasks for the
         specified queue.
 
@@ -1431,21 +1433,24 @@ class AppEngineTestBase(TestBase):
             self._get_all_queue_names() if queue_name is None else [queue_name])
 
         get_enqueued_tasks = lambda: list(
-            self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names))
+            self._testbed_taskqueue_stub.get_filtered_tasks(
+                queue_names=queue_names))
 
-        # Loop until get_enqueued_tasks() returns an empty list.
+        # Loops until get_enqueued_tasks() returns an empty list.
         for tasks in iter(get_enqueued_tasks, []):
-            for queue in queue_names:
-                self._taskqueue_stub.FlushQueue(queue)
+            for queue_name in queue_names:
+                self._testbed_taskqueue_stub.FlushQueue(queue_name)
             self._execute_mapreduce_tasks(tasks)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
-        """"Runs but not flushes mapreduce pending tasks."""
+        """"Runs, but does not flush, the pending MapReduce tasks."""
         queue_names = self._get_all_queue_names()
+        tasks = self._testbed_taskqueue_stub.get_filtered_tasks(
+            queue_names=queue_names)
 
-        tasks = self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-        for queue in queue_names:
-            self._taskqueue_stub.FlushQueue(queue)
+        for queue_name in queue_names:
+            self._testbed_taskqueue_stub.FlushQueue(queue_name)
+
         self._execute_mapreduce_tasks(tasks)
 
 
