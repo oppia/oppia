@@ -1128,30 +1128,6 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_terminate_signal=True,
             manager_should_have_sent_kill_signal=False)
 
-    def test_manually_kills_named_processes(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-
-            # Spawn a new process unrelated to any existing one. This is set up
-            # to be killed by regular_proc, below.
-            orphan_proc = psutil.Popen(['sleep', '10000'], shell=False)
-            orphan_proc_pid = orphan_proc.pid
-
-            stack.enter_context(self._swap_popen())
-            regular_proc = stack.enter_context(
-                common.managed_process(
-                    ['a'], timeout_secs=10, proc_name_to_kill='10000'))
-            regular_proc_pid = regular_proc.pid
-
-        self.assert_proc_was_managed_as_expected(
-            logs, orphan_proc_pid,
-            manager_should_have_sent_terminate_signal=False,
-            manager_should_have_sent_kill_signal=True)
-        self.assert_proc_was_managed_as_expected(
-            logs, regular_proc_pid,
-            manager_should_have_sent_terminate_signal=True,
-            manager_should_have_sent_kill_signal=False)
-
     def test_managed_firebase_emulator(self):
         with contextlib2.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())
@@ -1178,10 +1154,13 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls = stack.enter_context(self._swap_popen())
             stack.enter_context(common.managed_elasticsearch_dev_server())
 
-        self.assertIn(
-            '%s/bin/elasticsearch' % common.ES_PATH,
-            popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(
+            popen_calls[0].program_args,
+            '%s/bin/elasticsearch -q' % common.ES_PATH)
+        self.assertEqual(popen_calls[0].kwargs, {
+            'shell': True,
+            'env': {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR},
+        })
 
     def test_start_server_removes_elasticsearch_data(self):
         check_function_calls = {
