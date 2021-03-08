@@ -54,11 +54,7 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
   };
 
-<<<<<<< HEAD
-  var createDummyExplorationOnDesktop = async function(expectWelcomeModal) {
-=======
-  var createDummyExplorationOnDesktopAsAdmin = async function() {
->>>>>>> upstream/develop
+  var createDummyExplorationOnDesktopAsAdmin = async function(expectWelcomeModal) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
@@ -196,12 +192,8 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-<<<<<<< HEAD
       // expectWelcomeModal: true.
-      await createDummyExplorationOnDesktop(true);
-=======
-      await createDummyExplorationOnDesktopAsAdmin();
->>>>>>> upstream/develop
+      await createDummyExplorationOnDesktopAsAdmin(true);
       // Create a second exploration named 'Test Exploration'.
       // expectWelcomeModal: false.
       await workflow.createAndPublishExploration(
@@ -312,12 +304,8 @@ describe('Learner dashboard functionality', function() {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-<<<<<<< HEAD
       // expectWelcomeModal: true.
-      await createDummyExplorationOnDesktop(true);
-=======
-      await createDummyExplorationOnDesktopAsAdmin();
->>>>>>> upstream/develop
+      await createDummyExplorationOnDesktopAsAdmin(true);
       // Create a second exploration named 'Collection Exploration'.
       // expectWelcomeModal: true.
       await workflow.createAndPublishExploration(
