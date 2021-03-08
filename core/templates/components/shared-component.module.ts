@@ -60,6 +60,7 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { RichTextComponentsModule } from 'interactions/../rich_text_components/rich-text-components.module';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -82,6 +83,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BrowserModule,
     NgbTooltipModule,
     FormsModule,
+    RichTextComponentsModule,
     ...firebaseAuthModules,
   ],
 
@@ -131,6 +133,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
+    RichTextComponentsModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,

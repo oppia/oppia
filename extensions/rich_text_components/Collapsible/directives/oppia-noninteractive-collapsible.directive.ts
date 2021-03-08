@@ -20,28 +20,31 @@
  * followed by the name of the arg.
  */
 
-require('directives/angular-html-bind.directive.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-require('services/html-escaper.service.ts');
+@Component({
+  selector: 'oppia-noninteractive-collapsible',
+  templateUrl: './collapsible.directive.html',
+  styleUrls: []
+})
+export class NoninteractiveCollapsible implements OnInit {
+  @Input() headingWithValue: string;
+  @Input() contentWithValue: string;
+  heading: string = '';
+  content: string = '';
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
-angular.module('oppia').directive('oppiaNoninteractiveCollapsible', [
-  'HtmlEscaperService',
-  function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./collapsible.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.heading = HtmlEscaperService.escapedJsonToObj(
-            $attrs.headingWithValue);
-          ctrl.content = HtmlEscaperService.escapedJsonToObj(
-            $attrs.contentWithValue);
-        };
-      }]
-    };
+  ngOnInit(): void {
+    this.heading = this.htmlEscaperService.escapedJsonToObj(
+      this.headingWithValue) as string;
+    this.content = this.htmlEscaperService.escapedJsonToObj(
+      this.contentWithValue) as string;
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaNoninteractiveCollapsible', downgradeComponent({
+    component: NoninteractiveCollapsible
+  }) as angular.IDirectiveFactory);
