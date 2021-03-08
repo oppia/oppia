@@ -63,6 +63,8 @@ angular.module('oppia').directive('adminRolesTab', [
         var handleErrorResponse = function(errorResponse) {
           ctrl.setStatusMessage(
             'Server error: ' + errorResponse);
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the directive is migrated to angular.
           $rootScope.$apply();
         };
 
@@ -103,6 +105,8 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.resultRolesVisible = true;
               ctrl.setStatusMessage('Success.');
             }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
             $rootScope.$apply();
             refreshFormData();
           }, handleErrorResponse);
@@ -123,6 +127,8 @@ angular.module('oppia').directive('adminRolesTab', [
               'Role of ' + formResponse.username + ' successfully updated to ' +
               formResponse.newRole);
             refreshFormData();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
@@ -142,6 +148,8 @@ angular.module('oppia').directive('adminRolesTab', [
               'Successfully added "' + formResponse.username + '" as ' +
               formResponse.category + ' reviewer.');
             refreshFormData();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
@@ -161,6 +169,8 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, handleErrorResponse);
           } else {
@@ -181,6 +191,8 @@ angular.module('oppia').directive('adminRolesTab', [
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, handleErrorResponse);
           }
@@ -199,6 +211,8 @@ angular.module('oppia').directive('adminRolesTab', [
           ).then(() => {
             ctrl.setStatusMessage('Success.');
             refreshFormData();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();

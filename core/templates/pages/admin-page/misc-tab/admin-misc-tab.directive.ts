@@ -15,6 +15,7 @@
 /**
  * @fileoverview Directive for the miscellaneous tab in the admin panel.
  */
+
 require('domain/admin/admin-backend-api.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
@@ -64,11 +65,15 @@ angular.module('oppia').directive('adminMiscTab', [
             .then(() => {
               ctrl.setStatusMessage('Index successfully cleared.');
               AdminTaskManagerService.finishTask();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse);
               AdminTaskManagerService.finishTask();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -86,10 +91,14 @@ angular.module('oppia').directive('adminMiscTab', [
             ctrl.regenerationMessage = (
               'No. of opportunities model created: ' +
               response);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           }, errorResponse => {
             ctrl.regenerationMessage = (
               'Server error: ' + errorResponse);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           });
         };
@@ -105,10 +114,14 @@ angular.module('oppia').directive('adminMiscTab', [
               .then(() => {
                 ctrl.setStatusMessage(
                   'Topic similarities uploaded successfully.');
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
                 $rootScope.$apply();
               }, errorResponse => {
                 ctrl.setStatusMessage(
                   'Server error: ' + errorResponse);
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
                 $rootScope.$apply();
               });
           };
@@ -128,10 +141,14 @@ angular.module('oppia').directive('adminMiscTab', [
           AdminBackendApiService.sendDummyMailToAdminAsync()
             .then(() => {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -140,10 +157,14 @@ angular.module('oppia').directive('adminMiscTab', [
           AdminBackendApiService.flushMemoryCacheAsync()
             .then(() => {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -158,10 +179,14 @@ angular.module('oppia').directive('adminMiscTab', [
               };
               ctrl.memoryCacheDataFetched = true;
               ctrl.setStatusMessage('Success!');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -175,10 +200,14 @@ angular.module('oppia').directive('adminMiscTab', [
                 ctrl.setStatusMessage(
                   'Successfully renamed ' + ctrl.oldUsername + ' to ' +
                     ctrl.newUsername + '!');
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
                 $rootScope.$apply();
               }, errorResponse => {
                 ctrl.setStatusMessage(
                   'Server error: ' + errorResponse);
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
                 $rootScope.$apply();
               }
             );
@@ -192,10 +221,14 @@ angular.module('oppia').directive('adminMiscTab', [
               ctrl.setStatusMessage(
                 'The number of users that are being deleted is: ' +
               pendingDeletionRequests.number_of_pending_deletion_models);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }
             );
@@ -213,10 +246,14 @@ angular.module('oppia').directive('adminMiscTab', [
               } else {
                 ctrl.setStatusMessage('No related models exist');
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }
             );
@@ -228,10 +265,14 @@ angular.module('oppia').directive('adminMiscTab', [
             ctrl.userIdToDelete, ctrl.usernameToDelete)
             .then(() => {
               ctrl.setStatusMessage('The deletion process was started.');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }
             );
