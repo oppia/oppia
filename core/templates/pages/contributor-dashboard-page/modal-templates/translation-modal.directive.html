@@ -43,7 +43,11 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success oppia-go-back-button"
+          ng-disabled="!previousTranslationAvailable"
+          ng-click="returnToPreviousTranslation()">Go Back
+  </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
           ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
           ng-click="suggestTranslatedText()">
@@ -87,12 +91,12 @@
     width: 40%;
   }
   .oppia-translation-editor-section {
-    padding: 20px 0px;
+    padding: 20px 0;
     word-wrap: break-word;
   }
   .oppia-text-to-translate-container {
     border: 1px solid #ccc;
-    margin: 15px 0px;
+    margin: 15px 0;
     padding: 20px;
   }
   .oppia-skip-button {
@@ -104,6 +108,10 @@
     right: 20px;
     top: 12px;
   }
+  .oppia-go-back-button {
+    min-width: 150px;
+  }
+
   .oppia-upload-translated-text-button {
     min-width: 200px;
   }

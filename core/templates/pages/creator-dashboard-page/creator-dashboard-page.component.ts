@@ -24,10 +24,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.component.ts');
-
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
