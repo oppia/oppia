@@ -60,6 +60,8 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
+import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 
@@ -102,14 +104,16 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
-    StorySummaryTileDirective,
     SocialButtonsComponent,
+    StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
+    TruncatePipe,
   ],
 
   entryComponents: [
@@ -126,6 +130,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
   ],
 
