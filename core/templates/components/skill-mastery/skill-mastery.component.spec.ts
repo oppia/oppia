@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillMasteryViewerComponent
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillMasteryViewerComponent } from './skill-mastery.component';
 import { SkillMasteryListConstants } from
@@ -38,11 +38,11 @@ describe('SkillMasteryViewerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SkillMasteryViewerComponent ],
-      providers: [ SkillMasteryBackendApiService ],
-      imports: [ HttpClientTestingModule ]
+      declarations: [SkillMasteryViewerComponent],
+      providers: [SkillMasteryBackendApiService],
+      imports: [HttpClientTestingModule]
     })
-    .compileComponents();
+      .compileComponents();
     skillMasteryBackendApiService = TestBed.get(SkillMasteryBackendApiService);
   }));
 
@@ -58,7 +58,7 @@ describe('SkillMasteryViewerComponent', () => {
       .and.returnValue(Promise.resolve(mockSkillMastery));
     component.ngOnInit();
     expect(skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync).
-    toHaveBeenCalledWith(['skillId1']);
+      toHaveBeenCalledWith(['skillId1']);
   });
 
   it('should get skill mastery percentage', () => {
