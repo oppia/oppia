@@ -17,6 +17,7 @@
  */
 
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
