@@ -29,7 +29,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { WindowDimensionsService } from 
+import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -59,7 +59,7 @@ class MockI18nLanguageCodeService {
   }
 }
 
-fdescribe('About Page', () => {
+describe('About Page', () => {
   const siteAnalyticsService = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
