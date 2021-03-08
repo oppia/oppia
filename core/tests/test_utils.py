@@ -1438,8 +1438,8 @@ class AppEngineTestBase(TestBase):
 
         # Loops until get_enqueued_tasks() returns an empty list.
         for tasks in iter(get_enqueued_tasks, []):
-            for queue_name in queue_names:
-                self._testbed_taskqueue_stub.FlushQueue(queue_name)
+            for queue in queue_names:
+                self._testbed_taskqueue_stub.FlushQueue(queue)
             self._execute_mapreduce_tasks(tasks)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
@@ -1448,8 +1448,8 @@ class AppEngineTestBase(TestBase):
         tasks = self._testbed_taskqueue_stub.get_filtered_tasks(
             queue_names=queue_names)
 
-        for queue_name in queue_names:
-            self._testbed_taskqueue_stub.FlushQueue(queue_name)
+        for queue in queue_names:
+            self._testbed_taskqueue_stub.FlushQueue(queue)
 
         self._execute_mapreduce_tasks(tasks)
 
