@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { LearnerViewInfoBackendApiService } from './learner-view-info-backend-api.service';
 
-fdescribe('Learner View Info Backend Api Service', () => {
+describe('Learner View Info Backend Api Service', () => {
   let lvibas: LearnerViewInfoBackendApiService;
   let httpTestingController: HttpTestingController;
   let successHandler = jasmine.createSpy('success');
