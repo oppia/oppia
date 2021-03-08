@@ -27,6 +27,7 @@ import subprocess
 import sys
 import time
 
+from constants import constants
 import feconf
 import python_utils
 from scripts import build
@@ -537,7 +538,8 @@ def run_tests(args):
 
     with contextlib2.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server())
-        stack.enter_context(common.managed_firebase_auth_emulator())
+        if constants.EMULATOR_MODE:
+            stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
         python_utils.PRINT('Waiting for servers to come up...')
