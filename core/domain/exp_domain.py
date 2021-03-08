@@ -2599,11 +2599,10 @@ class Exploration(python_utils.OBJECT):
 
                         types_of_inputs.add(type_of_input)
 
-                        if type_of_input != TYPE_INVALID_EXPRESSION:
-                            rule_spec['inputs']['x'] = rule_input
-                            if type_of_input == TYPE_VALID_MATH_EQUATION:
-                                rule_spec['inputs']['y'] = 'both'
-                            rule_spec['rule_type'] = 'MatchesExactlyWith'
+                        rule_spec['inputs']['x'] = rule_input
+                        if type_of_input == TYPE_VALID_MATH_EQUATION:
+                            rule_spec['inputs']['y'] = 'both'
+                        rule_spec['rule_type'] = 'MatchesExactlyWith'
 
                     new_answer_groups.append(new_answer_group)
 
