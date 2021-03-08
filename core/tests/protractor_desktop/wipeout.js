@@ -46,6 +46,8 @@ describe('When account is deleted it', function() {
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
+    await users.logout();
+
     await users.login('user1@delete.com');
     await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
     expect(await browser.getCurrentUrl()).toEqual(
@@ -66,6 +68,7 @@ describe('When account is deleted it', function() {
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
+
     await users.login('voiceArtist@oppia.com');
     // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
@@ -91,6 +94,7 @@ describe('When account is deleted it', function() {
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
+
     await users.login('user@check.com');
     // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);
@@ -111,6 +115,7 @@ describe('When account is deleted it', function() {
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
+
     await users.login('secondOwner@check.com');
     // Set expectWelcomeModal: true.
     await general.openEditor(explorationId, true);

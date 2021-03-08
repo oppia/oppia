@@ -79,6 +79,7 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_LANGUAGE,
       false
     );
+    await users.logout();
 
     await users.login('user2@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
