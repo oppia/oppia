@@ -58,6 +58,7 @@ import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
+import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
@@ -104,10 +105,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    ThumbnailDisplayComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    ThumbnailDisplayComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TranslatePipe,
   ],
 
   entryComponents: [
@@ -123,7 +125,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
-    ThumbnailDisplayComponent
+    ThumbnailDisplayComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
   ],
 
   exports: [
@@ -137,10 +140,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    ThumbnailDisplayComponent,
+    SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    ThumbnailDisplayComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
-    SummaryListHeaderComponent
   ],
 })
 
