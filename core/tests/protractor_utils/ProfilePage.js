@@ -103,8 +103,8 @@ var ProfilePage = function() {
       async function(card) {
         var cardTitle = card.element(cardTitleCss);
         await waitFor.visibilityOf(
-            cardTitle,
-            'cardTitle is not present or taking Too Long to Dispaly');
+          cardTitle,
+          'cardTitle is not present or taking Too Long to Dispaly');
         var title = await cardTitle.getText();
         return title === explorationName;
       });
