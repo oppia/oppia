@@ -86,7 +86,6 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the response editor ' +
      'after the interaction is created', async function() {
-
     // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
@@ -129,7 +128,6 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the response editor ' +
      'during set the interaction', async function() {
-
     // Set expectWelcomeModal: false.
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
@@ -173,15 +171,14 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the default response editor',
     async function() {
-
-    // Set expectWelcomeModal: false.
-    await workflow.createExploration(false);
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle(explorationTitle);
-    await explorationEditorSettingsTab.setCategory('Algorithm');
-    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorPage.navigateToMainTab();
+      // Set expectWelcomeModal: false.
+      await workflow.createExploration(false);
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle(explorationTitle);
+      await explorationEditorSettingsTab.setCategory('Algorithm');
+      await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+      await explorationEditorSettingsTab.setLanguage('English');
+      await explorationEditorPage.navigateToMainTab();
 
 
 
@@ -211,7 +208,6 @@ describe('Enable correctness feedback and set correctness', function() {
     });
 
   it('should show Learn Again button correctly', async function() {
-
     // Set expectWelcomeModal: false.
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
