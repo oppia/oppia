@@ -44,7 +44,7 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
 
     def test_translate_text_with_valid_input_returns_expected_output(self):
         self.emulator.add_expected_response(
-            ('en', 'es', 'hello world'), 'hola mundo')
+            'en', 'es', 'hello world', 'hola mundo')
         translated_text = self.emulator.translate_text(
             'hello world', 'en', 'es')
         self.assertEqual('hola mundo', translated_text)

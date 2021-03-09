@@ -35,35 +35,39 @@ class TranslateEmulator(python_utils.OBJECT):
         """Initializes the emulator with no expected responses."""
         self.expected_responses = {}
 
-    def translate_text(self, text, source_language, target_language):
-        """Responds with the saved expected response for a given input. If no
-        response exists for the given input, responds with an empty string.
+    def translate_text(self, text, source_language_code, target_language_code):
+        """Returns the saved expected response for a given input. If no
+        response exists for the given input, returns an empty string.
 
         Args:
             text: str. The text to be translated.
-            source_language: str. A valid ISO 639-1 language code.
-            target_language: str. A valid ISO 639-1 language code.
+            source_language_code: str. A valid ISO 639-1 language code.
+            target_language_code: str. A valid ISO 639-1 language code.
 
         Returns:
             str. The translated text.
         """
-        if not utils.is_valid_language_code(source_language):
-            raise ValueError('invalid language code: %s' % source_language)
-        if not utils.is_valid_language_code(target_language):
-            raise ValueError('invalid language code: %s' % target_language)
+        if not utils.is_valid_language_code(source_language_code):
+            raise ValueError('Invalid language code: %s' % source_language_code)
+        if not utils.is_valid_language_code(target_language_code):
+            raise ValueError('Invalid language code: %s' % target_language_code)
 
         response = ''
-        key = (source_language, target_language, text)
+        key = (source_language_code, target_language_code, text)
         if key in self.expected_responses:
             response = self.expected_responses.get(key)
         return response
 
-    def add_expected_response(self, inputs, response):
+    def add_expected_response(
+            self, source_language_code, target_language_code, source_text,
+            response):
         """Adds an expected response for a given set of inputs.
 
         Args:
-            inputs: tuple(str, str, str). A tuple of inputs (source language
-                code, target language code, source text).
+            source_language_code: str. A valid ISO 639-1 language code.
+            target_language_code: str. A valid ISO 639-1 language code.
+            source_text: str. The text to translate.
             response: str. The expected response for the given inputs.
         """
+        inputs = (source_language_code, target_language_code, source_text)
         self.expected_responses.update({inputs: response})
