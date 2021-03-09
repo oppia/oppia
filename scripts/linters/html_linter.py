@@ -345,7 +345,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         error_messages = []
         full_error_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
-        proc_args = htmllint_cmd_args + self.all_filepaths
+        proc_args = htmllint_cmd_args + self.html_filepaths
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
