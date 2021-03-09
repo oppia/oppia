@@ -379,17 +379,19 @@
       <div ng-if="!$ctrl.activeThread">
         <div ng-if="$ctrl.mySuggestionsList.length > 0">
           <h2>Suggestions created</h2>
-          <thread-table threads="$ctrl.mySuggestionsList"
-                        on-click-row="$ctrl.setActiveThread">
-          </thread-table>
+          <oppia-thread-table ng-if="$ctrl.mySuggestionsList"
+                              [threads]="$ctrl.mySuggestionsList"
+                              (row-click)="$ctrl.setActiveThread($event)">
+          </oppia-thread-table>
           <br>
         </div>
 
         <div ng-if="$ctrl.suggestionsToReviewList.length > 0">
           <h2>Suggestions to review</h2>
-          <thread-table threads="$ctrl.suggestionsToReviewList"
-                        on-click-row="$ctrl.setActiveThread">
-          </thread-table>
+          <oppia-thread-table ng-if="$ctrl.suggestionsToReviewList"
+                              [threads]="$ctrl.suggestionsToReviewList"
+                              (row-click)="$ctrl.setActiveThread($event)">
+          </oppia-thread-table>
           <br>
         </div>
       </div>
@@ -624,7 +626,7 @@
 
   .oppia-dashboard-list-view-item {
     background: #fff;
-    margin: 20px 7.5px 0px 7.5px;
+    margin: 20px 7.5px 0 7.5px;
     padding: 10px 20px;
   }
   .oppia-dashboard-table {
