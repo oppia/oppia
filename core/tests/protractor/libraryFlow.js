@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for library flow.
  */
 
+var action = require('../protractor_utils/action.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
@@ -82,7 +83,8 @@ describe('Library pages tour', function() {
     // exploration has to be rated by the user.
     await rateExploration();
     await libraryPage.get();
-    await element(by.css('.protractor-test-library-top-rated')).click();
+    var topRatedButton = element(by.css('.protractor-test-library-top-rated'));
+    await action.click('Top Rated Button', topRatedButton);
     await waitFor.pageToFullyLoad();
     expect(await browser.getCurrentUrl()).toContain(
       'community-library/top-rated');
