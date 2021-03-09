@@ -21,9 +21,8 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { PromoBarBackendApiService } from
-  'services/promo-bar-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 
 @Component({
   selector: 'oppia-promo-bar',
