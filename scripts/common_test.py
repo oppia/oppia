@@ -1156,7 +1156,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s/bin/elasticsearch -s' % common.ES_PATH)
+            '%s/bin/elasticsearch -q' % common.ES_PATH)
         self.assertEqual(popen_calls[0].kwargs, {
             'shell': True,
             'env': {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR},
