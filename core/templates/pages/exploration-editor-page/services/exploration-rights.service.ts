@@ -114,6 +114,34 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
+      removeRole: function(memberUsername) {
+        var that = this;
+        var requestUrl = (
+          '/createhandler/rights/' + ExplorationDataService.explorationId);
+
+        return $http({
+          method: 'DELETE',
+          url: requestUrl,
+          params: {
+            username: memberUsername
+          }
+        }).then(function(response) {
+          var data = response.data;
+          AlertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
+        });
+      },
+      checkUserAlreadyHasRoles: function(username) {
+        var allUsernames = this.ownerNames;
+        allUsernames = allUsernames.concat(this.editorNames);
+        allUsernames = allUsernames.concat(this.voiceArtistNames);
+        allUsernames = allUsernames.concat(this.viewerNames);
+        return allUsernames.indexOf(username) > -1;
+      },
       publish: function() {
         var that = this;
         var requestUrl = (

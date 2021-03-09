@@ -274,7 +274,6 @@ class ExplorationRightsHandler(EditorHandler):
         """Deletes a user with existing rights."""
 
         username = self.request.get('username')
-
         if not isinstance(username, python_utils.BASESTRING):
             raise self.InvalidInputException('Invalid Useranme.')
 
@@ -285,7 +284,10 @@ class ExplorationRightsHandler(EditorHandler):
         try:
             rights_manager.deassign_role_for_exploration(
                 self.user, exploration_id, member_id)
-            self.render_json({})
+            self.render_json({
+                'rights': rights_manager.get_exploration_rights(
+                    exploration_id).to_dict()
+            })
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

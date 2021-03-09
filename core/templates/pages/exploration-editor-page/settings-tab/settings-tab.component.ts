@@ -32,6 +32,10 @@ require(
   'param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/settings-tab/templates/' +
+  'remove-role-confirmation-modal.controller.ts'
+);
+require(
+  'pages/exploration-editor-page/settings-tab/templates/' +
   'moderator-unpublish-exploration-modal.controller.ts');
 require(
   'pages/exploration-editor-page/settings-tab/templates/' +
@@ -103,9 +107,9 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
     'RouterService', 'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService', 'WindowDimensionsService',
-    'WindowRef', 'ALL_CATEGORIES',
-    'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
+    'UserExplorationPermissionsService', 'UserService',
+    'WindowDimensionsService', 'WindowRef',
+    'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
         $http, $rootScope, $uibModal, AlertsService, ChangeListService,
         EditabilityService, EditableExplorationBackendApiService,
@@ -118,9 +122,9 @@ angular.module('oppia').component('settingsTab', {
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
         RouterService, UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService, WindowDimensionsService,
-        WindowRef, ALL_CATEGORIES,
-        EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
+        UserExplorationPermissionsService, UserService,
+        WindowDimensionsService, WindowRef,
+        ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
       var ctrl = this;
       var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
       var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -257,6 +261,24 @@ angular.module('oppia').component('settingsTab', {
           newMemberUsername, newMemberRole);
       };
 
+      ctrl.removeRole = function(memberUsername, memberRole) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'remove-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => memberUsername,
+            role: () => memberRole
+          },
+          controller: 'RemoveRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.removeRole(memberUsername);
+        });
+      };
+
       ctrl.toggleViewabilityIfPrivate = function() {
         ExplorationRightsService.setViewability(
           !ExplorationRightsService.viewableIfPrivate());
@@ -371,6 +393,31 @@ angular.module('oppia').component('settingsTab', {
         return ExplorationTitleService.savedMemento.length > 0;
       };
 
+      ctrl.onRolesFormUsernameBlur = function() {
+        if (ctrl.newMemberUsername.length <= 0) {
+          ctrl.rolesSaveButtonEnabled = false;
+          ctrl.errorMessage = '';
+          return;
+        }
+
+        if (ExplorationTitleService.savedMemento.length <= 0) {
+          ctrl.rolesSaveButtonEnabled = false;
+          ctrl.errorMessage = 'Please provide a title before inviting.';
+          return;
+        }
+
+        if (ExplorationRightsService.checkUserAlreadyHasRoles(
+          ctrl.newMemberUsername)) {
+          ctrl.rolesSaveButtonEnabled = false;
+          ctrl.errorMessage =
+          'Given user already has some rights in exploration.';
+          return;
+        }
+
+        ctrl.rolesSaveButtonEnabled = true;
+        ctrl.errorMessage = '';
+      };
+
       ctrl.toggleCards = function(card) {
         if (!WindowDimensionsService.isWindowNarrow()) {
           return;
@@ -409,6 +456,8 @@ angular.module('oppia').component('settingsTab', {
           });
         }
         ctrl.isRolesFormOpen = false;
+        ctrl.rolesSaveButtonEnabled = false;
+        ctrl.errorMessage = '';
         ctrl.basicSettingIsShown = !WindowDimensionsService.isWindowNarrow();
         ctrl.advancedFeaturesIsShown = (
           !WindowDimensionsService.isWindowNarrow());
@@ -423,6 +472,10 @@ angular.module('oppia').component('settingsTab', {
         ctrl.canReleaseOwnership = false;
         ctrl.canUnpublish = false;
         ctrl.explorationId = ExplorationDataService.explorationId;
+        ctrl.loggedinUser = null;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.loggedinUser = userInfo.getUsername();
+        });
 
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
