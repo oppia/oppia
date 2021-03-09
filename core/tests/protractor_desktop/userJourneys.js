@@ -241,8 +241,8 @@ describe('Site language', function() {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
-    // Set expectWelcomeModal: true.
-    await general.openEditor(firstExplorationId, true);
+    // Set expectWelcomeModal: false.
+    await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
     var placeholder = await element(by.css('.protractor-test-float-form-input'))
