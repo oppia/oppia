@@ -902,3 +902,31 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the number of ratio terms used by each state of an
+    exploration.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        i=0
+        for state_name, state in exploration.states.items():
+            interaction = state.interaction
+            if interaction.id == 'RatioExpressionInput':
+                if interaction.customization_args['numberOfTerms'].value > 10:
+                    exp_and_state_key = '%s %s' % (
+                        item.id, state_name.encode('utf-8'))
+                    yield (python_utils.UNICODE(interaction.customization_args['numberOfTerms'].value), exp_and_state_key)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

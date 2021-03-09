@@ -3312,3 +3312,155 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
             '%s-1' % self.VALID_EXP_ID)
         self.assertEqual(
             snapshot_content_model.content['states_schema_version'], 1)
+
+class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(HintsAuditOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_number_of_ratio_terms_tabulated_are_correct_in_single_exp(self):
+        """Checks that correct number of ratio terms are shown when
+        there is single exploration.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        id1 = 'RatioExpressionInput'
+        id2 = 'RatioExpressionInput'
+        carg1 = 
+        state1.update_interaction_id(id1)
+        state2.update_interaction_id(id2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start HintsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
+        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
+        expected_output = [
+            '[u\'1\', [u\'exp_id0 State2\']]',
+            '[u\'2\', [u\'exp_id0 State1\']]'
+        ]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_number_of_hints_tabulated_are_correct_in_multiple_exps(self):
+        """Checks that correct number of hints are tabulated when
+        there are multiple explorations.
+        """
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration1.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration1.states['State1']
+        state2 = exploration1.states['State2']
+
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>')
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>')
+            ),
+        ]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
+
+        state1.update_interaction_hints(hint_list1)
+
+        state2.update_interaction_hints(hint_list2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title='title', category='category')
+
+        exploration2.add_states(['State1', 'State2'])
+
+        state1 = exploration2.states['State1']
+
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+        ]
+
+        state1.update_interaction_hints(hint_list1)
+
+        exp_services.save_new_exploration(self.albert_id, exploration2)
+
+        # Start HintsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
+        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
+
+        actual_output_dict = {}
+
+        for item in [ast.literal_eval(value) for value in actual_output]:
+            actual_output_dict[item[0]] = set(item[1])
+
+        expected_output_dict = {
+            '1': set(['exp_id0 State2', 'exp_id1 State1']),
+            '2': set(['exp_id0 State1'])
+        }
+
+        self.assertEqual(actual_output_dict, expected_output_dict)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>'
+                )
+            )
+        ]
+
+        state1.update_interaction_hints(hint_list)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(self, exp_jobs_one_off.HintsAuditOneOffJob)
