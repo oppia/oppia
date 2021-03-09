@@ -138,7 +138,9 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env. '
+         'This flag is required for tests run on CircleCI, since CircleCI '
+         'sometimes flakes whe parallelism is used.',
     action='store_true')
 
 _PARSER.add_argument(
