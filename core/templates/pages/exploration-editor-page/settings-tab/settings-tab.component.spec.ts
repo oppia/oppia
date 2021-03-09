@@ -415,6 +415,17 @@ describe('Settings Tab Component', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
+    it('should open remove role confirmation modal with $uibModal',
+      function() {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.resolve()});
+
+        ctrl.removeRole('newUser', 'owner');
+        $scope.$apply();
+
+        expect($uibModal.open).toHaveBeenCalled();
+      });
+
     it('should save moderator changes to backend when closing preview summary' +
     ' tile modal', function() {
       spyOn($uibModal, 'open').and.returnValue({

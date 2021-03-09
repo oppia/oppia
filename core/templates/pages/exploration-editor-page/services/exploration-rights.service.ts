@@ -119,9 +119,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
         var requestUrl = (
           '/createhandler/rights/' + ExplorationDataService.explorationId);
 
-        return $http({
-          method: 'DELETE',
-          url: requestUrl,
+        return $http['delete'](requestUrl, {
           params: {
             username: memberUsername
           }

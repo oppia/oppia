@@ -218,6 +218,52 @@ describe('Exploration rights service', function() {
     $httpBackend.flush();
   });
 
+  it('should remove existing user', function() {
+    var sampleDataResultsCopy = angular.copy(sampleDataResults);
+    sampleDataResultsCopy.rights.viewer_names.push('newUser');
+
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expectDELETE(
+      '/createhandler/rights/12345?username=newUser').respond(
+      200, sampleDataResultsCopy);
+
+    ers.removeRole('newUser').then(successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ers.viewerNames).toEqual(
+      sampleDataResultsCopy.rights.viewer_names);
+  });
+
+  it('should check user already has roles', function() {
+    var sampleDataResultsCopy = angular.copy(sampleDataResults);
+    sampleDataResultsCopy.rights.owner_names.push('newOwner');
+    sampleDataResultsCopy.rights.viewer_names.push('newViewer');
+    sampleDataResultsCopy.rights.editor_names.push('newEditor');
+    sampleDataResultsCopy.rights.voice_artist_names.push('newVoiceArtist');
+
+    ers.init(
+      sampleDataResultsCopy.rights.owner_names,
+      sampleDataResultsCopy.rights.editor_names,
+      sampleDataResultsCopy.rights.voice_artist_names,
+      sampleDataResultsCopy.rights.viewer_names,
+      sampleDataResultsCopy.rights.status,
+      sampleDataResultsCopy.rights.cloned_from,
+      sampleDataResultsCopy.rights.community_owned,
+      sampleDataResultsCopy.rights.viewable_if_private
+    );
+
+    expect(ers.checkUserAlreadyHasRoles('newOwner')).toBeTruthy();
+    expect(ers.checkUserAlreadyHasRoles('newViewer')).toBeTruthy();
+    expect(ers.checkUserAlreadyHasRoles('newEditor')).toBeTruthy();
+    expect(ers.checkUserAlreadyHasRoles('newVoiceArtist')).toBeTruthy();
+    expect(ers.checkUserAlreadyHasRoles('notInAllUsersList')).toBeFalsy();
+  });
+
   it('should reject handler when saving a new member fails', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
