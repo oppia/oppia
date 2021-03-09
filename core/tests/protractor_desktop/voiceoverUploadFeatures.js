@@ -122,7 +122,6 @@ describe('Voiceover upload features', function() {
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-      await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();
@@ -144,7 +143,6 @@ describe('Voiceover upload features', function() {
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-      await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();
