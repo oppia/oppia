@@ -176,6 +176,7 @@ describe('Full exploration editor', function() {
       'Parent Exploration 1',
       'Algebra',
       'This is the topmost parent exploration.',
+      'English',
       true
     );
     var parentId1 = await general.getExplorationIdFromEditor();
@@ -185,6 +186,7 @@ describe('Full exploration editor', function() {
       'Algebra',
       'This is the second parent exploration to which refresher ' +
       'exploration redirects.',
+      'English',
       false
     );
     var parentId2 = await general.getExplorationIdFromEditor();
@@ -193,6 +195,7 @@ describe('Full exploration editor', function() {
       'Refresher Exploration',
       'Algebra',
       'This is the most basic refresher exploration',
+      'English',
       false
     );
 
