@@ -108,6 +108,7 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.import.ts',
+    playbook: commonPrefix + '/pages/participation-playbook/playbook.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -459,6 +460,19 @@ module.exports = {
         '/pages/notifications-dashboard-page/' +
         'notifications-dashboard-page.mainpage.html'
       ),
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['playbook'],
+      filename: 'playbook.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'The Oppia library is full of user-created lessons ' +
+        'called \'explorations\'. Read about how to participate in the ' +
+        'community and begin creating explorations.'
+      },
+      template: commonPrefix + '/pages/participation-playbook/playbook.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
