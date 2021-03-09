@@ -12,7 +12,7 @@
               <mat-card class="list-view-item">
                 <h2><label class="oppia-topic-name-text">{{ topic.key }}</label></h2>
               </mat-card>
-              <div *ngFor="let subtopic of topic.value | keyvalue" class="list-view-item ">
+              <div *ngFor="let subtopic of topic.value | keyvalue" class="list-view-item">
                 <div *ngIf="!checkIfEmpty(subtopic.value)">
                   <mat-card class="list-view-item">
                     <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
