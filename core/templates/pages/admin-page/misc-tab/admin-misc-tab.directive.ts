@@ -25,11 +25,11 @@ require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$rootScope', '$window', 'AdminBackendApiService',
+  '$rootScope', '$sce', '$window', 'AdminBackendApiService',
   'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $rootScope, $window, AdminBackendApiService,
+      $rootScope, $sce, $window, AdminBackendApiService,
       AdminTaskManagerService, UrlInterpolationService,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
@@ -47,8 +47,22 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
+        const explorationStatsRegenerationUtilityCsvRows = [
+          [
+            'Exploration ID',
+            'No. of valid Exploration Stats',
+            'No. of valid State Stats',
+            'Missing Exploration Stats',
+            'Missing State Stats',
+            'Errors'
+          ]
+        ];
 
         ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
+
+        ctrl.resetExplorationStatsRegenerationUtilityCsvRows = function() {
+          explorationStatsRegenerationUtilityCsvRows.length = 1;
+        };
 
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -101,6 +115,68 @@ angular.module('oppia').directive('adminMiscTab', [
             // once the directive is migrated to angular.
             $rootScope.$apply();
           });
+        };
+
+        const populateExplorationStatsRegenerationCsvResult = function(expIds) {
+          if (expIds.length === 0) {
+            let csvContent = explorationStatsRegenerationUtilityCsvRows.map(
+              row => row.join(',')).join('\n');
+            ctrl.csvUri = $sce.trustAsResourceUrl(
+              window.URL.createObjectURL(
+                new Blob([csvContent], { type: 'text/csv' })));
+            ctrl.csvFilename = (
+              `missing-exp-stats-output-${(new Date()).getTime()}.csv`);
+            ctrl.missingExplorationStatsRegenerationMessage = (
+              'Process complete. Please download the CSV output.');
+            return;
+          }
+          let expIdToRegenerate = expIds.pop();
+          ctrl.missingExplorationStatsRegenerationMessage = (
+            `Regenerating stats for Exploration id ${expIdToRegenerate}` +
+            '. Please wait.');
+          AdminBackendApiService
+            .populateExplorationStatsRegenerationCsvResultAsync(
+              expIdToRegenerate
+            ).then(response => {
+              explorationStatsRegenerationUtilityCsvRows.push([
+                expIdToRegenerate,
+                response.num_valid_exp_stats,
+                response.num_valid_state_stats,
+                `"${response.missing_exp_stats.join(', ') || 'NA'}"`,
+                `"${response.missing_state_stats.join(', ') || 'NA'}"`,
+                'NA'
+              ]);
+              populateExplorationStatsRegenerationCsvResult(expIds);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
+              explorationStatsRegenerationUtilityCsvRows.push([
+                expIdToRegenerate,
+                'NA',
+                'NA',
+                'NA',
+                'NA',
+                errorResponse]);
+              populateExplorationStatsRegenerationCsvResult(expIds);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            });
+        };
+
+        ctrl.regenerateMissingExplorationStats = function() {
+          ctrl.csvUri = null;
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (!$window.confirm(irreversibleActionMessage)) {
+            return;
+          }
+          let expIds = (
+            ctrl.explorationIdsForRegeneratingMissingStats.replaceAll(
+              ' ', '').split(','));
+          populateExplorationStatsRegenerationCsvResult(expIds);
         };
 
         ctrl.uploadTopicSimilaritiesFile = function() {
@@ -309,6 +385,8 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.regenerationMessage = null;
           ctrl.oldUsername = null;
           ctrl.newUsername = null;
+          ctrl.explorationIdForRegeneratingMissingStats = null;
+          ctrl.missingExplorationStatsRegenerationMessage = null;
         };
       }]
     };
