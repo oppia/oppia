@@ -380,7 +380,6 @@
     "I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_1": "Any owner of a private exploration can publish it at any time. However, low-quality explorations may be unpublished by the moderators, with feedback on how to improve them.",
     "I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_2": "Explorations are meant to be continuously improved, and explorations that haven't been edited for a long time may be considered \"orphaned\". In this case, ownership may be handed to the Oppia community at large (at moderator discretion), so that the exploration can continue to be improved.",
     "I18N_PLAYBOOK_TAB_PARTICIPATION_PLAYBOOK": "Participation Playbook",
-    "I18N_PLAYBOOK_TAB_TEACH_WITH_OPPIA": "Teach with Oppia",
     "I18N_PLAYER_AUDIO_EXPAND_TEXT": "Listen to the lesson",
     "I18N_PLAYER_AUDIO_LANGUAGE": "Language",
     "I18N_PLAYER_AUDIO_LOADING_AUDIO": "Loading audio...",
