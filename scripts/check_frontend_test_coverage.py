@@ -134,7 +134,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'input-response-pair.directive.ts',
     'int-editor.directive.ts',
     'item-selection-input-validation.service.ts',
-    'language-util.service.ts',
     'learner-answer-info-card.directive.ts',
     'learner-answer-info.service.ts',
     'learner-dashboard-icons.directive.ts',
