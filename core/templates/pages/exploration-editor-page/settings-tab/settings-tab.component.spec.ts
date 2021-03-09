@@ -252,7 +252,6 @@ describe('Settings Tab Component', () => {
       ctrl.saveExplorationTitle();
 
       expect(explorationTitleService.saveDisplayedValue).toHaveBeenCalled();
-      expect(ctrl.isTitlePresent()).toBe(true);
     });
 
     it('should save exploration category', () => {
@@ -569,6 +568,68 @@ describe('Settings Tab Component', () => {
       expect(ctrl.areParametersUsed()).toBe(false);
       explorationDataService.data.param_changes.push(paramChangeBackendDict);
       expect(ctrl.areParametersUsed()).toBe(true);
+    });
+
+    describe('on calling onRolesFormUsernameBlur', function() {
+      it('should disable save button when newMemberUsername is empty', () => {
+        ctrl.rolesSaveButtonEnabled = true;
+        explorationTitleService.init('New title');
+        ctrl.saveExplorationTitle();
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue(false);
+
+        ctrl.newMemberUsername = '';
+
+        ctrl.onRolesFormUsernameBlur();
+
+        expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+      });
+
+      it('should disable save button when exploration title is empty', () => {
+        ctrl.newMemberUsername = 'newUser';
+        ctrl.rolesSaveButtonEnabled = true;
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue(false);
+
+        explorationTitleService.init('');
+        ctrl.saveExplorationTitle();
+
+        ctrl.onRolesFormUsernameBlur();
+
+        expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+        expect(ctrl.errorMessage).toBe(
+          'Please provide a title before inviting.');
+      });
+
+      it('should disable save button when adding multiple role to user', () => {
+        ctrl.newMemberUsername = 'newUser';
+        ctrl.rolesSaveButtonEnabled = true;
+        explorationTitleService.init('Exploration title');
+        ctrl.saveExplorationTitle();
+
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue(true);
+
+        ctrl.onRolesFormUsernameBlur();
+
+        expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+        expect(ctrl.errorMessage).toBe(
+          'Given user already has some rights in exploration.');
+      });
+
+      it('should enable save button when tile and username are valid', () => {
+        ctrl.newMemberUsername = 'newUser';
+        ctrl.rolesSaveButtonEnabled = true;
+        explorationTitleService.init('Exploration title');
+        ctrl.saveExplorationTitle();
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue(false);
+
+        ctrl.onRolesFormUsernameBlur();
+
+        expect(ctrl.rolesSaveButtonEnabled).toBe(true);
+        expect(ctrl.errorMessage).toBe('');
+      });
     });
 
     it('should toggle exploration visibility', () => {

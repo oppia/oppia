@@ -1655,13 +1655,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             exploration.states['State 3'], 'TextInput')
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
-        response = self.delete_json(
+        self.delete_json(
             rights_url, params={
                 'member_role': rights_domain.ROLE_OWNER,
                 'username': self.OWNER_USERNAME
-            }, expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Activity should have atleast one owner.')
+            }, expected_status_int=500)
         self.logout()
 
     def test_for_deassign_viewer_role_from_exploration(self):

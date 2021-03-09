@@ -395,10 +395,6 @@ angular.module('oppia').component('settingsTab', {
         ctrl.isRolesFormOpen = false;
       };
 
-      ctrl.isTitlePresent = function() {
-        return ExplorationTitleService.savedMemento.length > 0;
-      };
-
       ctrl.onRolesFormUsernameBlur = function() {
         if (ctrl.newMemberUsername.length <= 0) {
           ctrl.rolesSaveButtonEnabled = false;
