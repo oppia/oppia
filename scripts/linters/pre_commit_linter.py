@@ -86,6 +86,9 @@ SHARDS = {
         'core/templates/',
         'extensions/',
         'core/tests/',
+        'core/storage/',
+        'core/controllers/',
+        'core/platform',
     ],
     'other': None,
 }
