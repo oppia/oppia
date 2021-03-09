@@ -80,6 +80,7 @@ describe('Settings Tab Component', () => {
   let explorationWarningsService = null;
   let userEmailPreferencesService = null;
   let userExplorationPermissionsService = null;
+  let userService = null;
   let windowRef = null;
   let routerService = null;
 
@@ -174,12 +175,16 @@ describe('Settings Tab Component', () => {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
         'UserEmailPreferencesService');
+      userService = $injector.get('UserService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+        getUsername: () => 'username1'
+      }));
 
       explorationCategoryService.init('Astrology');
 
@@ -224,6 +229,7 @@ describe('Settings Tab Component', () => {
 
         expect(ctrl.stateNames).toEqual(['Introduction']);
         expect(ctrl.hasPageLoaded).toBe(true);
+        expect(ctrl.loggedinUser).toBe('username1');
       });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
@@ -350,6 +356,41 @@ describe('Settings Tab Component', () => {
         expect(alertsService.clearWarnings).toHaveBeenCalled();
         expect(windowRef.nativeWindow.location).toBe('');
       });
+
+    it('should open a modal when removeRole is called', function() {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      ctrl.removeRole('username', 'editor');
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should remove role when resolving remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      spyOn(explorationRightsService, 'removeRole').and
+        .returnValue($q.resolve());
+
+      ctrl.removeRole('username', 'editor');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeRole).toHaveBeenCalled();
+    });
+
+    it('should not remove role when rejecting remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      spyOn(explorationRightsService, 'removeRole');
+
+      ctrl.removeRole('username', 'editor');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeRole).not.toHaveBeenCalled();
+    });
 
     it('should transfer exploration ownership when closing transfer ownership' +
     ' modal', () => {
