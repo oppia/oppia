@@ -2,9 +2,10 @@
   <div ng-if="!$ctrl.activeThread">
     <div ng-if="$ctrl.threadData.suggestionThreads.length > 0">
       <h2>Suggestions from Learners</h2>
-      <thread-table threads="$ctrl.threadData.suggestionThreads"
-                    on-click-row="$ctrl.setActiveThread">
-      </thread-table>
+      <oppia-thread-table ng-if="$ctrl.threadData.suggestionThreads"
+                          [threads]="$ctrl.threadData.suggestionThreads"
+                          (row-click)="$ctrl.setActiveThread($event)">
+      </oppia-thread-table>
       <br>
     </div>
 
@@ -22,9 +23,10 @@
       <em>No feedback has been given for this exploration yet.</em>
     </div>
 
-    <thread-table threads="$ctrl.threadData.feedbackThreads"
-                  on-click-row="$ctrl.setActiveThread">
-    </thread-table>
+    <oppia-thread-table ng-if="$ctrl.threadData.feedbackThreads"
+                        [threads]="$ctrl.threadData.feedbackThreads"
+                        (row-click)="$ctrl.setActiveThread($event)">
+    </oppia-thread-table>
 
     <em ng-if="!$ctrl.userIsLoggedIn">To create a new feedback thread, please log in.</em>
   </div>
