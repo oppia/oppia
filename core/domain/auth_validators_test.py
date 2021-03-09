@@ -37,9 +37,7 @@ datastore_services = models.Registry.import_datastore_services()
 class AuthValidatorTestBase(test_utils.AuditJobsTestBase):
     """Base class with helper methods for testing the auth_validators jobs."""
 
-    def setUp(self):
-        with self.swap_to_always_return(self, 'signup_superadmin_user'):
-            super(AuthValidatorTestBase, self).setUp()
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
 
     def create_user_auth_models(
             self, auth_provider_id, auth_id=None, full_user=True):
