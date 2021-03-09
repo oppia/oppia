@@ -18,9 +18,7 @@
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 
-require(
-  'components/state-directives/answer-group-editor/' +
-  'summary-list-header.directive.ts');
+
 require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
   'misconception-editor.directive.ts');

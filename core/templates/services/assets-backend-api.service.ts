@@ -54,19 +54,19 @@ export class AssetsBackendApiService {
       private csrfTokenService: CsrfTokenService,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
-    if (!AssetsBackendApiService.DEV_MODE &&
-        !AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME) {
-      throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+    let urlPrefix = '/assetsdevhandler';
+    if (!AssetsBackendApiService.EMULATOR_MODE) {
+      urlPrefix = (
+        'https://storage.googleapis.com/' +
+        AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME
+      );
     }
-    const urlPrefix = AssetsBackendApiService.DEV_MODE ? '/assetsdevhandler' : (
-      'https://storage.googleapis.com/' +
-      AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME);
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }
 
-  static get DEV_MODE(): boolean {
-    return AppConstants.DEV_MODE;
+  static get EMULATOR_MODE(): boolean {
+    return AppConstants.EMULATOR_MODE;
   }
   static get GCS_RESOURCE_BUCKET_NAME(): string {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
