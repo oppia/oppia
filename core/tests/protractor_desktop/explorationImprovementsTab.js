@@ -56,6 +56,7 @@ describe('Improvements tab', function() {
     await workflow.createExploration();
 
     await explorationEditorImprovementsTab.expectToBeHidden();
+    await users.logout();
   });
 
   it('should be present after revisiting a published exploration', async() => {
@@ -75,6 +76,7 @@ describe('Improvements tab', function() {
     // After revisiting the exploration editor, the button should be visible.
     await explorationEditorPage.navigateToImprovementsTab();
     await explorationEditorImprovementsTab.expectHealthyExploration();
+    await users.logout();
   });
 
   // TODO(#7327): Add tests for generating and resolving NeedsGuidingResponses
