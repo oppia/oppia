@@ -43,7 +43,7 @@ var ProfilePage = function() {
   this.expectCurrUserToHaveProfilePhoto = async function() {
     await waitFor.visibilityOf(
       currUserProfilePhoto,
-      'Current User Profile Photo Taking too Long To Display');
+      'Current user profile photo taking too long to display');
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
@@ -53,7 +53,7 @@ var ProfilePage = function() {
   this.expectUserToHaveBio = async function(expectedText) {
     await waitFor.visibilityOf(
       bio,
-      'Bio is Taking too Long to appear');
+      'Bio is taking too long to appear');
     expect(await bio.getText()).toMatch(expectedText);
   };
 
@@ -67,6 +67,9 @@ var ProfilePage = function() {
     expect(numInterests).toEqual(expectedInterests.length);
 
     var interestTexts = await interests.map(async function(interestElem) {
+      await waitFor.visibilityOf(
+        interestElem,
+        'Interestelm is taking too long to appear');
       return await interestElem.getText();
     });
     interestTexts.forEach(function(interestText) {
@@ -77,7 +80,7 @@ var ProfilePage = function() {
   this.expectUserToHaveInterestPlaceholder = async function(expectedText) {
     await waitFor.visibilityOf(
       interestPlaceholder,
-      'Interest Place Holder is not present or Taking Time To Display');
+      'Interest place holder is taking too long to appear');
     expect(await interestPlaceholder.getText()).toMatch(expectedText);
   };
 
@@ -92,7 +95,7 @@ var ProfilePage = function() {
     }
     await waitFor.visibilityOf(
       explorationCardsCount,
-      'exploration Cards is not present or Taking Time To Display');
+      'Exploration cards is not present or taking time to display');
     expect(await explorationCardsCount).toBeGreaterThan(0);
   };
 
@@ -102,7 +105,7 @@ var ProfilePage = function() {
         var cardTitle = card.element(cardTitleCss);
         await waitFor.visibilityOf(
           cardTitle,
-          'cardTitle is not present or taking Too Long to Dispaly');
+          'Cardtitle is not present or taking Too long to dispaly');
         var title = await cardTitle.getText();
         return title === explorationName;
       });
@@ -117,7 +120,7 @@ var ProfilePage = function() {
   this.expectToHaveCreatedExplorationStat = async function(expectedStat) {
     await waitFor.visibilityOf(
       createdExplorationStat,
-      'Create Exploration State is Taking Too Long to appear');
+      'Create exploration state is taking too long to appear');
     expect(await createdExplorationStat.getText()).toMatch(expectedStat);
   };
 };
