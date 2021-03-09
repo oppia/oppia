@@ -16,6 +16,8 @@
  * @fileoverview Component for the Oppia moderator page.
  */
 
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
@@ -28,10 +30,10 @@ angular.module('oppia').component('moderatorPage', {
   template: require('./moderator-page.component.html'),
   controller: [
     '$http', 'AlertsService', 'DateTimeFormatService', 'LoaderService',
-    'ThreadMessageObjectFactory', 'ENTITY_TYPE',
+    'ENTITY_TYPE',
     function(
         $http, AlertsService, DateTimeFormatService, LoaderService,
-        ThreadMessageObjectFactory, ENTITY_TYPE) {
+        ENTITY_TYPE) {
       var ctrl = this;
       ctrl.getDatetimeAsString = function(millisSinceEpoch) {
         return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
@@ -122,7 +124,7 @@ angular.module('oppia').component('moderatorPage', {
 
         $http.get('/recent_feedback_messages').then(function(response) {
           ctrl.allFeedbackMessages = response.data.results.map(
-            d => ThreadMessageObjectFactory.createFromBackendDict(d));
+            d => ThreadMessage.createFromBackendDict(d));
         });
 
         $http.get('/moderatorhandler/featured').then(function(response) {

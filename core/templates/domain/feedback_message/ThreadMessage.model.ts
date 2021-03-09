@@ -13,15 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of thread message
+ * @fileoverview Model for creating new frontend instances of thread message
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+import { ThreadMessageSummary } from 'domain/feedback_message/ThreadMessageSummary.model';
 
 export interface ThreadMessageBackendDict {
   'author_username': string;
@@ -71,15 +67,8 @@ export class ThreadMessage {
   hasSubjectUpdate(): boolean {
     return this.updatedSubject !== null;
   }
-}
 
-@Injectable({providedIn: 'root'})
-export class ThreadMessageObjectFactory {
-  constructor(
-    private threadMessageSummaryObjectFactory:
-      ThreadMessageSummaryObjectFactory) {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
       threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
@@ -88,12 +77,8 @@ export class ThreadMessageObjectFactory {
       threadMessageBackendDict.message_id, threadMessageBackendDict.text,
       threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,
-      this.threadMessageSummaryObjectFactory.createNew(
+      new ThreadMessageSummary(
         threadMessageBackendDict.author_username,
         threadMessageBackendDict.text));
   }
 }
-
-angular.module('oppia').factory(
-  'ThreadMessageObjectFactory',
-  downgradeInjectable(ThreadMessageObjectFactory));
