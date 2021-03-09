@@ -39,10 +39,10 @@ describe('CollectionLocalNavComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CollectionLocalNavComponent ],
+      declarations: [CollectionLocalNavComponent],
       imports: [HttpClientTestingModule]
     })
-    .compileComponents();
+      .compileComponents();
 
     rocbs = TestBed.get(ReadOnlyCollectionBackendApiService);
     urlService = TestBed.get(UrlService);
