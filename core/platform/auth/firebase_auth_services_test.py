@@ -26,6 +26,7 @@ import json
 import logging
 
 from core.domain import auth_domain
+from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
@@ -472,8 +473,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     """Test base for Firebase-specific tests with helpful default behavior."""
 
-    ENABLE_AUTH_SERVICES_STUB = False
-
     AUTH_ID = 'aid'
     EMAIL = 'foo@bar.com'
 
@@ -899,8 +898,8 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
     def setUp(self):
         super(DeleteAuthAssociationsTests, self).setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
-        self.signup(self.EMAIL, self.USERNAME)
-        self.user_id = self.get_user_id_from_email(self.EMAIL)
+        user_settings = user_services.create_new_user(self.AUTH_ID, self.EMAIL)
+        self.user_id = user_settings.user_id
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.user_id))
 
