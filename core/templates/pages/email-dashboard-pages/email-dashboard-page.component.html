@@ -49,7 +49,7 @@
           <td><[q.submitterUsername]></td>
           <td class="protractor-test-status-{{ $index }}"><[q.status]></td>
           <td class="protractor-test-number-of-users-{{ $index }}"><[q.numQualifiedUsers]></td>
-          <td><button ng-click="$ctrl.recheckStatus($index)" class="protractor-check-status-button-{{ $index }}">Re-check status</button></td>
+          <td><button ng-click="$ctrl.recheckStatus($index)" class="protractor-test-check-status-button-{{ $index }}">Re-check status</button></td>
           <td ng-if="$ctrl.showLinkToResultPage(q.submitterUsername, q.status)">
             <a ng-href="/emaildashboardresult/<[q.id]>">
               <button class="btn btn-link">Result</button>
