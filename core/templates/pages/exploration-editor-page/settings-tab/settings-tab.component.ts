@@ -415,8 +415,8 @@ angular.module('oppia').component('settingsTab', {
         if (ExplorationRightsService.checkUserAlreadyHasRoles(
           ctrl.newMemberUsername)) {
           ctrl.rolesSaveButtonEnabled = false;
-          ctrl.errorMessage =
-          'Given user already has some rights in exploration.';
+          ctrl.errorMessage = (
+            'Given user already has some rights in exploration.');
           return;
         }
 

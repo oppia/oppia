@@ -22,35 +22,25 @@ require(
 describe('Remove Role Confirm Or Cancel Modal Controller ', function() {
   var $scope = null;
   var $uibModalInstance = null;
+  var testUsername = 'testUsername';
+  var testRole = 'testRoleEditor';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
     $scope = $rootScope.$new();
-    $controller('ConfirmOrCancelModalController', {
+    $controller('RemoveRoleConfirmationModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
+      username: testUsername,
+      role: testRole
     });
   }));
 
-  it('should close modal with the correct value', function() {
-    var message = 'closing';
-    $scope.confirm(message);
-    expect($uibModalInstance.close).toHaveBeenCalledWith(message);
-  });
-
-  it('should dismiss modal', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
-
-  it('should dismiss modal with the correct value', function() {
-    var message = 'cancelling';
-    $scope.cancel(message);
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith(message);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.username).toBe(testUsername);
+      expect($scope.role).toEqual(testRole);
+    });
 });
