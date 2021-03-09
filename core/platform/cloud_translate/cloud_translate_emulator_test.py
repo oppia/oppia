@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for cloud_translate_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -31,13 +32,13 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
 
     def test_translate_text_with_invalid_source_language_raises_error(self):
         with self.assertRaisesRegexp(
-            ValueError, 'invalid language code: invalid'):
+            ValueError, 'Invalid language code: invalid'):
             self.emulator.translate_text(
                 'hello world', 'invalid', 'es')
 
     def test_translate_text_with_invalid_target_language_raises_error(self):
         with self.assertRaisesRegexp(
-            ValueError, 'invalid language code: invalid'):
+            ValueError, 'Invalid language code: invalid'):
             self.emulator.translate_text(
                 'hello world', 'en', 'invalid')
 
