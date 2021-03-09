@@ -472,7 +472,8 @@ module.exports = {
         'called \'explorations\'. Read about how to participate in the ' +
         'community and begin creating explorations.'
       },
-      template: commonPrefix + '/pages/participation-playbook/playbook.mainpage.html',
+      template:
+        commonPrefix + '/pages/participation-playbook/playbook.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
