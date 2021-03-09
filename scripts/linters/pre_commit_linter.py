@@ -469,8 +469,6 @@ def _get_all_filepaths(input_path, input_filenames, input_shard):
             in general_purpose_linter.EXCLUDED_PATHS
         )
     ]
-    print(len(all_filepaths))
-    sys.exit(0)
     return all_filepaths
 
 
