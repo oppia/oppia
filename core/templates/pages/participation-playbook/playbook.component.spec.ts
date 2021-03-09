@@ -131,43 +131,6 @@ describe('Teach Page', function() {
     fixture.detectChanges();
   });
 
-  it('should click on teach tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('teach');
-
-    component.onTabClick('teach');
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(component.activeTabName).toBe('teach');
-  });
-
-  it('should click on participation tab', (() => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('teach');
-
-    component.onTabClick('participation');
-    expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-    expect(component.activeTabName).toBe('participation');
-  }));
-
-  it('should activate teach tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#teach';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(component.activeTabName).toBe('teach');
-  });
-
-  it('should activate participation tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#participation';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-    expect(component.activeTabName).toBe('participation');
-  });
-
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
