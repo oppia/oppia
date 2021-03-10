@@ -114,7 +114,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      removeRole: function(memberUsername) {
+      removeRoleAsync: function(memberUsername) {
         var that = this;
         var requestUrl = (
           '/createhandler/rights/' + ExplorationDataService.explorationId);

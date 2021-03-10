@@ -1581,7 +1581,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.logout()
 
     def test_for_deassign_editor_role(self):
-        # Create several users.
         self.signup(
             self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
 

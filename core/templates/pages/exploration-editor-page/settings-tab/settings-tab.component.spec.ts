@@ -369,27 +369,27 @@ describe('Settings Tab Component', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
-      spyOn(explorationRightsService, 'removeRole').and
+      spyOn(explorationRightsService, 'removeRoleAsync').and
         .returnValue($q.resolve());
 
       ctrl.removeRole('username', 'editor');
       $scope.$apply();
 
       expect(
-        explorationRightsService.removeRole).toHaveBeenCalled();
+        explorationRightsService.removeRoleAsync).toHaveBeenCalled();
     });
 
     it('should not remove role when rejecting remove-role-modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
-      spyOn(explorationRightsService, 'removeRole');
+      spyOn(explorationRightsService, 'removeRoleAsync');
 
       ctrl.removeRole('username', 'editor');
       $scope.$apply();
 
       expect(
-        explorationRightsService.removeRole).not.toHaveBeenCalled();
+        explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
     });
 
     it('should transfer exploration ownership when closing transfer ownership' +
@@ -455,17 +455,6 @@ describe('Settings Tab Component', () => {
 
       expect($uibModal.open).toHaveBeenCalled();
     });
-
-    it('should open remove role confirmation modal with $uibModal',
-      function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()});
-
-        ctrl.removeRole('newUser', 'owner');
-        $scope.$apply();
-
-        expect($uibModal.open).toHaveBeenCalled();
-      });
 
     it('should save moderator changes to backend when closing preview summary' +
     ' tile modal', () => {

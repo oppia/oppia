@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for moderator unpusblish exploration modal.
+ * @fileoverview Controller for Remove role confirm or cancel modal.
  */
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-rights.service.ts');
 
 angular.module('oppia').controller(
   'RemoveRoleConfirmationModalController', [

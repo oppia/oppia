@@ -229,7 +229,7 @@ describe('Exploration rights service', function() {
       '/createhandler/rights/12345?username=newUser').respond(
       200, sampleDataResultsCopy);
 
-    ers.removeRole('newUser').then(successHandler, failHandler);
+    ers.removeRoleAsync('newUser').then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalled();

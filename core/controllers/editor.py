@@ -271,19 +271,23 @@ class ExplorationRightsHandler(EditorHandler):
 
     @acl_decorators.can_modify_exploration_roles
     def delete(self, exploration_id):
-        """Deletes a user with existing rights."""
-
+        """Deletes user roles from the exploration."""
         username = self.request.get('username')
         if not isinstance(username, python_utils.BASESTRING):
-            raise self.InvalidInputException('Invalid Useranme.')
+            raise self.InvalidInputException('Invalid Username.')
 
-        member_id = user_services.get_user_id_from_username(username)
-        if member_id is None:
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
             raise self.InvalidInputException(
                 'Sorry, we could not find the specified user.')
         try:
+            if self.user.user_id == user_id:
+                logging.error('Sorry, users cannot remove their own roles.')
+                raise Exception(
+                    'InvalidInputException:'
+                    'Sorry, users cannot remove their own roles.')
             rights_manager.deassign_role_for_exploration(
-                self.user, exploration_id, member_id)
+                self.user, exploration_id, user_id)
             self.render_json({
                 'rights': rights_manager.get_exploration_rights(
                     exploration_id).to_dict()

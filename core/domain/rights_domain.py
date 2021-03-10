@@ -239,7 +239,7 @@ class ActivityRights(python_utils.OBJECT):
         """Checks whether the user is assigned to any role in the activity.
 
         Args:
-            user_id: str. The id of the user.
+            user_id: str. The ID of the user.
 
         Returns:
             bool. Whether the user is assigned to any role in the activity.

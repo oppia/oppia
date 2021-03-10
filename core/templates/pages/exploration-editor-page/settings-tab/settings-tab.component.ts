@@ -32,8 +32,7 @@ require(
   'param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/settings-tab/templates/' +
-  'remove-role-confirmation-modal.controller.ts'
-);
+  'remove-role-confirmation-modal.controller.ts');
 require(
   'pages/exploration-editor-page/settings-tab/templates/' +
   'moderator-unpublish-exploration-modal.controller.ts');
@@ -275,7 +274,7 @@ angular.module('oppia').component('settingsTab', {
           },
           controller: 'RemoveRoleConfirmationModalController'
         }).result.then(function() {
-          ExplorationRightsService.removeRole(memberUsername);
+          ExplorationRightsService.removeRoleAsync(memberUsername);
         });
       };
 

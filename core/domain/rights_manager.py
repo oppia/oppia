@@ -862,10 +862,6 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
                 committer_id, removed_user_id, activity_id))
         raise Exception(
             'UnauthorizedUserException: Could not deassign role.')
-    if committer_id == removed_user_id:
-        logging.error('User cannot remove himself.')
-        raise Exception(
-            'InvalidInputException: Could not deassign himself.')
     if activity_rights.is_owner(removed_user_id):
         old_role = rights_domain.ROLE_OWNER
         activity_rights.owner_ids.remove(removed_user_id)
