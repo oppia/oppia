@@ -138,7 +138,11 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env. '
+         'This flag is required for tests to run on CircleCI, since CircleCI '
+         'sometimes flakes when parallelism is used. It is not required in the '
+         'local dev environment. See https://discuss.circleci.com/t/'
+         'build-fails-with-error-spawn-enomem/30537/10',
     action='store_true')
 
 _PARSER.add_argument(

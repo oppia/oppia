@@ -39,4 +39,6 @@ sudo apt-get install python-yaml
 # error. See the Troubleshooting page for details:
 #    https://github.com/oppia/oppia/wiki/Troubleshooting
 sudo apt-get install python-matplotlib
-sudo pip install --upgrade pip
+# TODO(#11547): Pip 21 doesn't support Python 2, so we need to stay on pip 20
+# until we migrate to Python 3.
+sudo pip install --upgrade pip==20.2.4
