@@ -184,9 +184,9 @@ var PositiveIntEditor = function(elem) {
   return {
     setValue: async function(value) {
       await action.clear(
-        "Positive Int Editor Input", elem.element(by.tagName('input')));
+        'Positive Int Editor Input', elem.element(by.tagName('input')));
       await action.sendKeys(
-        "Positive Int Editor Input", elem.element(by.tagName('input')), value);
+        'Positive Int Editor Input', elem.element(by.tagName('input')), value);
     },
     expectValueToBe: async function(expectedValue) {
       await waitFor.visibilityOf(
