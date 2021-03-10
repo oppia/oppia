@@ -108,10 +108,10 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.import.ts',
-    playbook: commonPrefix + '/pages/participation-playbook/playbook.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
+    playbook: commonPrefix + '/pages/participation-playbook/playbook.import.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.import.ts',
@@ -464,6 +464,16 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['pending_account_deletion'],
+      filename: 'pending-account-deletion-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/pending-account-deletion-page/' +
+          'pending-account-deletion-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['playbook'],
       filename: 'playbook.mainpage.html',
       meta: {
@@ -474,16 +484,6 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/participation-playbook/playbook.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['pending_account_deletion'],
-      filename: 'pending-account-deletion-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-          commonPrefix + '/pages/pending-account-deletion-page/' +
-          'pending-account-deletion-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
