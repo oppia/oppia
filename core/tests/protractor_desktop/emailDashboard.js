@@ -16,20 +16,22 @@
  * @fileoverview End-to-end tests for email dashboard page.
  */
 
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 const { browser } = require('protractor');
 var action = require('../protractor_utils/action.js');
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+
 describe('Email Dashboard', function() {
-  EMAIL_DASHBOARD_URL = '/emaildashboard';
+  var EMAIL_DASHBOARD_URL = '/emaildashboard';
   var preferencesPage = null;
 
   beforeAll(async function() {
     preferencesPage = new PreferencesPage.PreferencesPage();
-    await users.createUser('userA@test.com', 'userA');
-    await users.login('userA@test.com');
+    await users.createUser('userA@emaildashboard.com', 'userA');
+    await users.login('userA@emaildashboard.com');
     await preferencesPage.get();
     await waitFor.pageToFullyLoad();
     await preferencesPage.toggleEmailUpdatesCheckbox();
@@ -46,23 +48,27 @@ describe('Email Dashboard', function() {
     var submitButton = element(by.css('.protractor-test-submit-query-button'));
 
     await action.clear('Email dashboard input 3', inputElement);
-    await action.sendKeys('Email dashboard input 3', inputElement, 1);
+    await action.sendKeys('Email dashboard input 3', inputElement, '1');
     await action.click('Submit Query button', submitButton);
     var checkStatusButton = element(
-      by.css('.protractor-check-status-button-0'));
+      by.css('.protractor-test-check-status-button-0'));
     while (true) {
       await browser.sleep(1000);
       await action.click('Check Status Button', checkStatusButton);
       var statusElement = element(by.css('.protractor-test-status-0'));
+      await waitFor.visibilityOf(statusElement, 'Status Text not displayed');
       if (await statusElement.getText() === 'completed') {
         break;
       }
     }
     var numberOfUsers = element(by.css('.protractor-test-number-of-users-0'));
+    await waitFor.visibilityOf(
+      numberOfUsers, 'Number of qualified users not displayed');
     expect(await numberOfUsers.getText()).toBe('1');
   });
 
   afterEach(async function() {
+    await general.checkForConsoleErrors([]);
     await users.logout();
   });
 });
