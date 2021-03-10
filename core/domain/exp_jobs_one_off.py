@@ -918,7 +918,6 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        i=0
         for state_name, state in exploration.states.items():
             interaction = state.interaction
             if interaction.id == 'RatioExpressionInput':

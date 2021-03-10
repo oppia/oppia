@@ -3323,7 +3323,7 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(HintsAuditOneOffJobTests, self).setUp()
+        super(RatioTermsAuditOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -3344,25 +3344,47 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         state2 = exploration.states['State2']
         id1 = 'RatioExpressionInput'
         id2 = 'RatioExpressionInput'
-        carg1 = 
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 5
+            }
+        }
+        carg2 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 12
+            }
+        }
         state1.update_interaction_id(id1)
         state2.update_interaction_id(id2)
+        state1.update_interaction_customization_args(carg1)
+        state2.update_interaction_customization_args(carg2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start HintsAuditOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
-        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
+        # Start RatioTermsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.RatioTermsAuditOneOffJob.create_new()
+        exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(job_id)
         expected_output = [
-            '[u\'1\', [u\'exp_id0 State2\']]',
-            '[u\'2\', [u\'exp_id0 State1\']]'
+            '[u\'12\', [u\'exp_id0 State2\']]'
         ]
         self.assertEqual(actual_output, expected_output)
 
-    def test_number_of_hints_tabulated_are_correct_in_multiple_exps(self):
-        """Checks that correct number of hints are tabulated when
+    def test_number_of_ratio_terms_tabulated_are_correct_in_multiple_exps(self):
+        """Checks that correct number of ratio terms are shown when
         there are multiple explorations.
         """
 
@@ -3373,29 +3395,34 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration1.states['State1']
         state2 = exploration1.states['State2']
-
-        hint_list1 = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint1', '<p>Hello, this is html1 for state1</p>')
-            ),
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint2', '<p>Hello, this is html2 for state1</p>')
-            ),
-        ]
-        hint_list2 = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint1', '<p>Hello, this is html1 for state2</p>'
-                )
-            )
-        ]
-
-        state1.update_interaction_hints(hint_list1)
-
-        state2.update_interaction_hints(hint_list2)
-
+        id1 = 'RatioExpressionInput'
+        id2 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 5
+            }
+        }
+        carg2 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 12
+            }
+        }
+        state1.update_interaction_id(id1)
+        state2.update_interaction_id(id2)
+        state1.update_interaction_customization_args(carg1)
+        state2.update_interaction_customization_args(carg2)
         exp_services.save_new_exploration(self.albert_id, exploration1)
 
         exploration2 = exp_domain.Exploration.create_default_exploration(
@@ -3404,25 +3431,29 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         exploration2.add_states(['State1', 'State2'])
 
         state1 = exploration2.states['State1']
-
-        hint_list1 = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint1', '<p>Hello, this is html1 for state1</p>'
-                )
-            ),
-        ]
-
-        state1.update_interaction_hints(hint_list1)
+        id1 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 11
+            }
+        }
+        state1.update_interaction_id(id1)
+        state1.update_interaction_customization_args(carg1)
 
         exp_services.save_new_exploration(self.albert_id, exploration2)
 
-        # Start HintsAuditOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
-        exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
+        # Start RatioTermsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.RatioTermsAuditOneOffJob.create_new()
+        exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(job_id)
 
         actual_output_dict = {}
 
@@ -3430,8 +3461,8 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
             actual_output_dict[item[0]] = set(item[1])
 
         expected_output_dict = {
-            '1': set(['exp_id0 State2', 'exp_id1 State1']),
-            '2': set(['exp_id0 State1'])
+            '12': set(['exp_id0 State2']),
+            '11': set(['exp_id1 State1'])
         }
 
         self.assertEqual(actual_output_dict, expected_output_dict)
@@ -3446,21 +3477,21 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration.states['State1']
 
-        hint_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint1', '<p>Hello, this is html1 for state1</p>'
-                )
-            ),
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint2', '<p>Hello, this is html2 for state1</p>'
-                )
-            )
-        ]
-
-        state1.update_interaction_hints(hint_list)
+        id1 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 11
+            }
+        }
+        state1.update_interaction_id(id1)
+        state1.update_interaction_customization_args(carg1)
         exp_services.save_new_exploration(self.albert_id, exploration)
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
-        run_job_for_deleted_exp(self, exp_jobs_one_off.HintsAuditOneOffJob)
+        run_job_for_deleted_exp(self, exp_jobs_one_off.RatioTermsAuditOneOffJob)
