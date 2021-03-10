@@ -20,6 +20,7 @@
 // NOTE: all editors for objects that are used as parameters in a rule must
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
+var action = require('/core/tests/protractor_utils/action.js');
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
@@ -182,11 +183,15 @@ var ParameterNameEditor = function(elem) {
 var PositiveIntEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(value);
+      await action.clear(
+        "Positive Int Editor Input", elem.element(by.tagName('input')));
+      await action.sendKeys(
+        "Positive Int Editor Input", elem.element(by.tagName('input')), value);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      await waitFor.visibilityOf(
+        elem, `"${elem.getTagName()}" takes too long to be visible`);
+      var value = elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
     }
   };

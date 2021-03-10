@@ -62,9 +62,13 @@ describe('Ratio expression input rules service', () => {
     expect(reirs.HasSpecificTermEqualTo(
       answer, {x: 1, y: 4})).toBeFalse();
     expect(reirs.HasSpecificTermEqualTo(
-      answer, {x: 2, y: 2})).toBeFalse();
+      answer, {x: 1, y: 6})).toBeFalse();
     expect(reirs.HasSpecificTermEqualTo(
-      answer, {x: 4, y: 4})).toBeFalse();
+      answer, {x: 2, y: 4})).toBeTrue();
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 3, y: 6})).toBeTrue();
+    expect(reirs.HasSpecificTermEqualTo(
+      answer, {x: 4, y: 6})).toBeFalse();
   });
 
   it('should have a correct IsEquivalent rule', () => {

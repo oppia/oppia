@@ -236,7 +236,7 @@ describe('RatioExpressionInputValidationService', () => {
     let invalidHasSpecificTermEqualTo = rof.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
-        x: 5, y: 1
+        x: 4, y: 1
       }
     }, 'RatioExpressionInput');
     answerGroups[0].rules = [invalidHasSpecificTermEqualTo];
@@ -295,5 +295,43 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: ('The number of terms in a ratio should be greater than 1.')
     }]);
+  });
+
+  it('should not throw warnings on HasSpecificTermEqualTo when term number ' +
+      'equals the expected number of terms', () => {
+    let validHasSpecificTermEqualTo = rof.createFromBackendDict({
+      rule_type: 'HasSpecificTermEqualTo',
+      inputs: {
+        x: 3, y: 1
+      }
+    }, 'RatioExpressionInput');
+    answerGroups[0].rules = [validHasSpecificTermEqualTo];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should not throw warnings on HasSpecificTermEqualTo when expected ' +
+      'number of terms is set to 0', () => {
+    let validHasSpecificTermEqualTo = rof.createFromBackendDict({
+      rule_type: 'HasSpecificTermEqualTo',
+      inputs: {
+        x: 3, y: 1
+      }
+    }, 'RatioExpressionInput');
+    answerGroups[0].rules = [validHasSpecificTermEqualTo];
+    customizationArgs = {
+      placeholder: {
+        value: new SubtitledUnicode('', '')
+      },
+      numberOfTerms: {
+        value: 0
+      }
+    };
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
   });
 });
