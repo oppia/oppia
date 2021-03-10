@@ -74,10 +74,10 @@ describe('Exploration Html Formatter Service', () => {
         value: [new SubtitledHtml('sampleChoice', '')]
       }
     };
-    var expectedHtmlTag = '<oppia-response-sample-id ' +
-      'answer="&amp;quot;' + answer + '&amp;quot;" ' +
-      'choices="[&amp;quot;sampleChoice' +
-      '&amp;quot;]"></oppia-response-sample-id>';
+    var expectedHtmlTag = '<oppia-response-sample-id answer="&amp;quot;' +
+      answer + '&amp;quot;" choices="[{&amp;quot;_html&amp;quot;:&amp;' +
+      'quot;sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;' +
+      'quot;&amp;quot;}]"></oppia-response-sample-id>';
     expect(ehfs.getAnswerHtml(
       answer, interactionId, interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);

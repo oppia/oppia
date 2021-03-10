@@ -95,10 +95,10 @@ angular.module('oppia').directive('stateContentEditor', [
             EditorFirstTimeEventsService.registerFirstSaveContentEvent();
             var savedContent = StateContentService.savedMemento;
             var contentHasChanged = (
-              savedContent.getHtml() !==
-              StateContentService.displayed.getHtml());
+              savedContent.html !==
+              StateContentService.displayed.html);
             if (contentHasChanged) {
-              var contentId = StateContentService.displayed.getContentId();
+              var contentId = StateContentService.displayed.contentId;
               $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                 [contentId]);
             }
@@ -120,7 +120,7 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.contentId = null;
             $scope.StateContentService = StateContentService;
             if (StateContentService.displayed) {
-              $scope.contentId = StateContentService.displayed.getContentId();
+              $scope.contentId = StateContentService.displayed.contentId;
             }
 
             $scope.contentEditorIsOpen = false;

@@ -34,6 +34,7 @@ from extensions.objects.models import objects
 from extensions.rich_text_components import components
 import feconf
 import python_utils
+import utils
 
 
 def escape_html(unescaped_html_data):
@@ -846,11 +847,11 @@ def add_dimensions_to_image_tags(exp_id, html_string):
             filename = json.loads(unescape_html(image['filepath-with-value']))
             image['filepath-with-value'] = escape_html(json.dumps(
                 get_filename_with_dimensions(filename, exp_id)))
-        except Exception as e:
-            logging.error(
+        except Exception:
+            logging.exception(
                 'Exploration %s failed to load image: %s' %
-                (exp_id, image['filepath-with-value'].encode('utf-8')))
-            raise e
+                (exp_id, image['filepath-with-value']))
+            python_utils.reraise_exception()
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
@@ -870,7 +871,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     filepath = 'image/%s' % old_filename
     try:
-        content = fs.get(filepath.encode('utf-8'))
+        content = fs.get(filepath)
         height, width = image_services.get_image_dimensions(content)
     except IOError:
         height = 120
@@ -936,7 +937,7 @@ def validate_math_content_attribute_in_html(html_string):
             components.Math.validate({
                 'math_content-with-value': math_content_dict
             })
-        except Exception as e:
+        except utils.ValidationError as e:
             error_list.append({
                 'invalid_tag': python_utils.UNICODE(math_tag),
                 'error': python_utils.UNICODE(e)
@@ -1115,6 +1116,16 @@ def add_math_content_to_math_rte_components(html_string):
         html_string.encode(encoding='utf-8'), 'html.parser')
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('raw_latex-with-value'):
+            # There was a case in prod where the attr value was empty. This was
+            # dealt with manually in an earlier migration (states schema v34),
+            # but we are not sure how it arose. We can't migrate those snapshots
+            # manually, hence the addition of the logic here. After all
+            # snapshots are migrated to states schema v42 (or above), this
+            # 'if' branch will no longer be needed.
+            if not math_tag['raw_latex-with-value']:
+                math_tag.decompose()
+                continue
+
             try:
                 # The raw_latex attribute value should be enclosed in
                 # double quotes(&amp;quot;) and should be a valid unicode
@@ -1124,10 +1135,12 @@ def add_math_content_to_math_rte_components(html_string):
                 normalized_raw_latex = (
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
-                error_message = (
+                logging.exception(
                     'Invalid raw_latex string found in the math tag : %s' % (
-                        python_utils.UNICODE(e)))
-                raise Exception(error_message)
+                        python_utils.UNICODE(e)
+                    )
+                )
+                python_utils.reraise_exception()
             math_content_dict = {
                 'raw_latex': normalized_raw_latex,
                 'svg_filename': ''
@@ -1145,8 +1158,9 @@ def add_math_content_to_math_rte_components(html_string):
         elif math_tag.has_attr('math_content-with-value'):
             pass
         else:
-            raise Exception(
-                'Invalid math tag with no proper attribute found.')
+            # Invalid math tag with no proper attribute found.
+            math_tag.decompose()
+
     # We need to replace the <br/> tags (if any) with  <br> because for passing
     # the textangular migration tests we need to have only <br> tags.
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')

@@ -45,9 +45,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
@@ -71,6 +68,8 @@ import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { BottomNavbarStatusService } from
   'services/bottom-navbar-status.service';
+import { PreventPageUnloadEventService } from
+  'services/prevent-page-unload-event.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
@@ -169,9 +168,6 @@ import { ExpressionSyntaxTreeService } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExternalSaveService } from 'services/external-save.service.ts';
-import { ExtractImageFilenamesFromStateService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -200,8 +196,6 @@ import { ImageClickInputRulesService } from
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import { ImagePreloaderService } from
-  'pages/exploration-player-page/services/image-preloader.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionAttributesExtractorService } from
   'interactions/interaction-attributes-extractor.service';
@@ -331,6 +325,8 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PopulateRuleContentIdsService } from
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -343,12 +339,11 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
-import { QuestionSummaryForOneSkillObjectFactory }
-  from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
-import { QuestionSummaryObjectFactory } from
-  'domain/question/QuestionSummaryObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { RatioExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
@@ -380,7 +375,7 @@ import { SetInputRulesService } from
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -478,8 +473,6 @@ import { SubtopicPageObjectFactory } from
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { SuggestionsService } from 'services/suggestions.service';
@@ -563,8 +556,6 @@ export class UpgradedServices {
     upgradedServices['AlgebraicExpressionInputRulesService'] =
       new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
-    upgradedServices['AnswerGroupsCacheService'] =
-      new AnswerGroupsCacheService();
     upgradedServices['AnswerStatsObjectFactory'] =
       new AnswerStatsObjectFactory();
     upgradedServices['AppService'] = new AppService();
@@ -645,10 +636,10 @@ export class UpgradedServices {
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
-    upgradedServices['QuestionSummaryObjectFactory'] =
-      new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
+    upgradedServices['RatioExpressionInputRulesService'] =
+      new RatioExpressionInputRulesService();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
@@ -817,9 +808,6 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
-    upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =
-      new QuestionSummaryForOneSkillObjectFactory(
-        upgradedServices['QuestionSummaryObjectFactory']);
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['baseInteractionValidationService']);
@@ -853,8 +841,6 @@ export class UpgradedServices {
       new StoryContentsObjectFactory();
     upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory(
       upgradedServices['ShortSkillSummaryObjectFactory']);
-    upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
-      upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -888,6 +874,8 @@ export class UpgradedServices {
     upgradedServices['BottomNavbarStatusService'] = (
       new BottomNavbarStatusService(
         upgradedServices['WindowDimensionsService']));
+    upgradedServices['PreventPageUnloadEventService'] =
+        new PreventPageUnloadEventService(upgradedServices['WindowRef']);
     upgradedServices['CodeReplPredictionService'] =
       new CodeReplPredictionService(
         upgradedServices['CountVectorizerService'],
@@ -916,9 +904,6 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
-    upgradedServices['ExtractImageFilenamesFromStateService'] =
-      new ExtractImageFilenamesFromStateService(
-        upgradedServices['HtmlEscaperService']);
     upgradedServices['FocusManagerService'] = new FocusManagerService(
       upgradedServices['DeviceInfoService'],
       upgradedServices['IdGenerationService']);
@@ -978,7 +963,6 @@ export class UpgradedServices {
       new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory(
-        upgradedServices['SuggestionObjectFactory'],
         upgradedServices['ThreadMessageSummaryObjectFactory']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
@@ -995,7 +979,8 @@ export class UpgradedServices {
 
     // Topological level: 3.
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
-      upgradedServices['HttpClient']);
+      upgradedServices['HttpClient'],
+      upgradedServices['UrlInterpolationService']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['AssetsBackendApiService'] =
@@ -1065,7 +1050,6 @@ export class UpgradedServices {
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['FeedbackThreadObjectFactory'],
-        upgradedServices['SuggestionObjectFactory'],
         upgradedServices['SuggestionThreadObjectFactory'],
         upgradedServices['SuggestionsService'],
         upgradedServices['LoggerService']);
@@ -1272,6 +1256,9 @@ export class UpgradedServices {
       upgradedServices['LoggerService'],
       upgradedServices['UrlService'],
       upgradedServices['BrowserCheckerService']);
+    upgradedServices['PopulateRuleContentIdsService'] =
+      new PopulateRuleContentIdsService(
+        upgradedServices['GenerateContentIdService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
@@ -1315,11 +1302,6 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
-    upgradedServices['ImagePreloaderService'] = new ImagePreloaderService(
-      upgradedServices['AssetsBackendApiService'],
-      upgradedServices['ComputeGraphService'],
-      upgradedServices['ContextService'],
-      upgradedServices['ExtractImageFilenamesFromStateService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],

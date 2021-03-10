@@ -29,7 +29,7 @@ FLAKE_CHECK_AND_REPORT_URL = (
     '/check-flake-and-report')
 PASS_REPORT_URL = (
     'https://oppia-e2e-test-results-logger.herokuapp.com'
-    '/check-flake-and-report')
+    '/report-pass')
 REPORT_API_KEY = '7Ccp062JVjv9LUYwnLMqcm5Eu5gYqqhpl3zQmcO3cDQ'
 
 CI_INFO = {
@@ -37,18 +37,19 @@ CI_INFO = {
         'env': {
             'identifier': 'CIRCLECI',
             'user_info': 'CIRCLE_USERNAME',
-            'build_url': 'CIRCLE_BUILD_URL',
-            'build_id': None
-        }
+            'branch': 'CIRCLE_BRANCH',
+            'build_url_template_vars': ['CIRCLE_BUILD_URL']
+        },
+        'build_url_template': '%s',
     },
     'githubActions': {
         'env': {
             'identifier': 'GITHUB_ACTIONS',
             'user_info': 'GITHUB_ACTOR',
-            'build_url': None,
-            'build_id': 'GITHUB_ACTION'
+            'branch': 'GITHUB_REF',
+            'build_url_template_vars': ['GITHUB_REPOSITORY', 'GITHUB_RUN_ID'],
         },
-        'build_url_template': 'https://github.com/oppia/oppia/runs/%s'
+        'build_url_template': 'https://github.com/%s/actions/runs/%s',
     }
 }
 
@@ -89,16 +90,21 @@ def _get_build_info():
         if not os.getenv(ci_env['identifier']):
             continue
 
-        if os.getenv(ci_env['build_url']) is not None:
-            build_url = os.getenv(ci_env['build_url'])
-        else:
-            build_url = info['build_url_template'] % os.getenv(
-                ci_env['build_id'])
+        template_values = []
+        for template_var in ci_env['build_url_template_vars']:
+            value = os.getenv(template_var)
+            if value is None:
+                raise RuntimeError(
+                    'Expected environment variable %s missing' %
+                    template_var)
+            template_values.append(value)
+        build_url = info['build_url_template'] % tuple(template_values)
         timestamp = datetime.datetime.utcnow().isoformat() + '+00:00'
 
         build_info['username'] = os.getenv(ci_env['user_info'])
         build_info['build_url'] = build_url
         build_info['timestamp'] = timestamp
+        build_info['branch'] = os.getenv(ci_env['branch'])
 
         return build_info
 
@@ -121,7 +127,10 @@ def report_pass(suite_name):
         _print_color_message((
             'Failed to contact E2E test logging server at %s.'
             'Please report to E2E team in case server is down.'
-            'Exception: %s') % (FLAKE_CHECK_AND_REPORT_URL, e))
+            'Exception: %s') % (PASS_REPORT_URL, e))
+    _print_color_message(
+        'Reported pass to E2E logging server at {}.'.format(
+            PASS_REPORT_URL))
 
 
 def is_test_output_flaky(output_lines, suite_name):
@@ -163,6 +172,8 @@ def is_test_output_flaky(output_lines, suite_name):
             'Logs from test result logging server:\n %s' % log_str)
 
     flaky = report['result'] if 'result' in report else False
+    _print_color_message(
+        'E2E logging server says test flaky: {}.'.format(flaky))
     if flaky:
         flake = report['flake']
         _print_color_message('Flake Detected:')

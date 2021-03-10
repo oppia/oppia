@@ -29,17 +29,20 @@ describe('Profile menu flow', function() {
   beforeAll(async function() {
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     var VISITOR_USERNAME = 'desktopAndMobileVisitor';
-    await users.createAdmin(
-      'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
-    await users.createAndLoginUser(
+    await users.createUser(
       'desktopAndMobileVisitor@profileMenuFlow.com', VISITOR_USERNAME);
   });
 
-  it('should land on the learner dashboard after successful login',
-    async function() {
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner-dashboard');
-    });
+  it('should visit the topics and skills dashboard from the profile ' +
+    'dropdown menu when user is admin', async function() {
+    await users.createAndLoginAdminUser(
+      'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
+    await learnerDashboardPage.get();
+    await general.navigateToTopicsAndSkillsDashboardPage();
+    await waitFor.pageToFullyLoad();
+    expect(await browser.getCurrentUrl()).toEqual(
+      'http://localhost:9001/topics-and-skills-dashboard');
+  });
 
   describe('profile dropdown menu', function() {
     beforeEach(async function() {
@@ -47,6 +50,12 @@ describe('Profile menu flow', function() {
       await learnerDashboardPage.get();
       await general.openProfileDropdown();
     });
+
+    it('should land on the learner dashboard after successful login',
+      async function() {
+        expect(await browser.getCurrentUrl()).toEqual(
+          'http://localhost:9001/learner-dashboard');
+      });
 
     it('should visit the profile page from the profile dropdown menu',
       async function() {
@@ -91,18 +100,6 @@ describe('Profile menu flow', function() {
       var links = element.all(by.css(
         '.protractor-test-topics-and-skills-dashboard-link'));
       expect(await links.count()).toEqual(0);
-    });
-
-    it('should visit the topics and skills dashboard from the profile ' +
-      'dropdown menu when user is admin', async function() {
-      await users.logout();
-
-      await users.login('desktopAndMobileAdm@profileMenuFlow.com');
-      await learnerDashboardPage.get();
-      await general.navigateToTopicsAndSkillsDashboardPage();
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/topics-and-skills-dashboard');
     });
 
     it('should visit the notifications page from the profile dropdown menu',

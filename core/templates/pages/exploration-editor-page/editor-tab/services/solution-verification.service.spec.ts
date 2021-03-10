@@ -114,7 +114,10 @@ describe('Solution Verification Service', () => {
             },
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: ['abc']}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
+              }}
             }],
           }],
           customization_args: {

@@ -35,9 +35,6 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { StateEditorRefreshService } from
@@ -85,7 +82,10 @@ describe('Teach Oppia Modal Controller', function() {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Equals',
-          inputs: { x: ['Correct Answer'] }
+          inputs: { x: {
+            contentId: 'rule_input',
+            normalizedStrSet: ['Correct Answer']
+          }}
         }],
         outcome: {
           dest: 'outcome 1',
@@ -140,8 +140,6 @@ describe('Teach Oppia Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', angularNameService);
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));

@@ -45,30 +45,6 @@ import isort  # isort:skip  pylint: disable=wrong-import-order, wrong-import-pos
 import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
-class StringMessageStream(python_utils.OBJECT):
-    """Save and return output stream."""
-
-    def __init__(self):
-        """Constructs a StringMessageStream object."""
-        self.messages = []
-
-    def write(self, message):
-        """Writes the given message to messages list.
-
-        Args:
-            message: str. The message to be written.
-        """
-        self.messages.append(message)
-
-    def read(self):
-        """Returns the output messages as a list.
-
-        Returns:
-            list(str). The list of output messages.
-        """
-        return self.messages
-
-
 class PythonLintChecksManager(python_utils.OBJECT):
     """Manages all the Python linting functions."""
 
@@ -92,39 +68,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.py_filepaths
-
-    def check_non_test_files(self):
-        """This function is used to check that function with test_only in their
-        names are in test files.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Function definition'
-        error_messages = []
-        files_to_check = self.py_filepaths
-        failed = False
-        for filepath in files_to_check:
-            if filepath.endswith('_test.py'):
-                continue
-            for line_num, line in enumerate(self.file_cache.readlines(
-                    filepath)):
-                line = line.strip()
-                words = line.split()
-                if len(words) < 2:
-                    continue
-                ind1 = words[0].startswith('def')
-                ind2 = words[1].startswith('test_only')
-                if ind1 and ind2:
-                    error_message = (
-                        '%s --> Line %s: Please do not use \'test_only\' '
-                        'in the non-test file.' % (filepath, line_num + 1))
-                    error_messages.append(error_message)
-                    failed = True
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
 
     def check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
@@ -251,7 +194,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
 
         linter_stdout.append(
             self.check_that_all_jobs_are_listed_in_the_job_registry_file())
-        linter_stdout.append(self.check_non_test_files())
         return linter_stdout
 
 
@@ -272,39 +214,29 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return self.files_to_lint
 
     @staticmethod
-    def get_trimmed_error_output(lint_messages):
+    def get_trimmed_error_output(lint_message):
         """Remove extra bits from pylint error messages.
 
         Args:
-            lint_messages: list(str). Messages returned by the python linter.
+            lint_message: str. Message returned by the python linter.
 
         Returns:
             str. A string with the trimmed error messages.
         """
-        trimmed_error_messages = []
         # Remove newlines and coverage report from the end of message.
         # we need to remove last five items from the list because starting from
         # end we have three lines with empty string(''), fourth line
         # contains the coverage report i.e.
         # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
         # and one line with dashes(---).
-        newlines_present = lint_messages[-1] == '\n' and (
-            lint_messages[-2] == '\n' and lint_messages[-4] == '\n')
-        coverage_present = re.search(
-            r'previous run: \d+.\d+/\d+,', lint_messages[-3])
-        dashes_present = re.search(r'-+', lint_messages[-5])
-        if newlines_present and coverage_present and dashes_present:
-            lint_messages = lint_messages[:-5]
-        for message in lint_messages:
-            # Every pylint message has a message id inside the brackets
-            # we are removing them here.
-            if message.endswith(')'):
-                # Replace message-id with empty string('').
-                trimmed_error_messages.append(
-                    re.sub(r'\((\w+-*)+\)$', '', message))
-            else:
-                trimmed_error_messages.append(message)
-        return '\n'.join(trimmed_error_messages) + '\n'
+        trimmed_lint_message = re.sub(
+            r'\n*-*\n*Your code has been rated.*\n*', '\n', lint_message)
+
+        # Every pylint message has a message id inside the brackets
+        # we are removing them here.
+        trimmed_lint_message = re.sub(r'\(\S*\)\n', '\n', trimmed_lint_message)
+
+        return trimmed_lint_message
 
     def lint_py_files(self):
         """Prints a list of lint errors in the given list of Python files.
@@ -336,19 +268,18 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             current_files_to_lint = files_to_lint[
                 current_batch_start_index: current_batch_end_index]
 
-            # This line invokes Pylint and redirect its output
-            # to the StringMessageStream.
-            pylint_report = StringMessageStream()
+            pylint_report = python_utils.string_io()
             pylinter = lint.Run(
                 current_files_to_lint + [config_pylint],
                 reporter=text.TextReporter(pylint_report),
                 exit=False).linter
 
             if pylinter.msg_status != 0:
-                for message in pylint_report.read():
-                    full_error_messages.append(message)
+                lint_message = pylint_report.getvalue()
+                full_error_messages.append(lint_message)
+
                 pylint_error_messages = (
-                    self.get_trimmed_error_output(pylint_report.read()))
+                    self.get_trimmed_error_output(lint_message))
                 error_messages.append(pylint_error_messages)
                 errors_found = True
 
@@ -410,21 +341,19 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             current_files_to_lint = files_to_lint_for_python3_compatibility[
                 current_batch_start_index: current_batch_end_index]
 
-            # This line invokes Pylint and redirect its output
-            # to the StringMessageStream.
-            pylint_report = StringMessageStream()
+            pylint_report = python_utils.string_io()
             pylinter_for_python3 = lint.Run(
                 current_files_to_lint + ['--py3k'],
                 reporter=text.TextReporter(pylint_report),
                 exit=False).linter
 
             if pylinter_for_python3.msg_status != 0:
+                lint_message = pylint_report.getvalue()
                 pylint_error_messages = (
-                    self.get_trimmed_error_output(pylint_report.read()))
+                    self.get_trimmed_error_output(lint_message))
                 error_messages.append(pylint_error_messages)
                 full_error_messages.append('Messages for Python 3 support:')
-                for message in pylint_report.read():
-                    full_error_messages.append(message)
+                full_error_messages.append(lint_message)
                 any_errors = True
 
             current_batch_start_index = current_batch_end_index

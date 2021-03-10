@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import types
 
 from constants import constants
@@ -174,40 +175,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # OK, update_timestamps called before put.
         model.put()
 
-    def test_put_async(self):
-        model = base_models.BaseModel()
-        self.assertIsNone(model.created_on)
-        self.assertIsNone(model.last_updated)
-
-        # Field last_updated will get updated anyway because it is None.
-        model.update_timestamps(update_last_updated_time=False)
-        future = model.put_async()
-        future.get_result()
-        model_id = model.id
-        self.assertIsNotNone(
-            base_models.BaseModel.get_by_id(model_id).created_on)
-        self.assertIsNotNone(
-            base_models.BaseModel.get_by_id(model_id).last_updated)
-        last_updated = model.last_updated
-
-        # Field last_updated won't get updated because update_last_updated_time
-        # is set to False and last_updated already has some value.
-        model.update_timestamps(update_last_updated_time=False)
-        future = model.put_async()
-        future.get_result()
-        self.assertEqual(
-            base_models.BaseModel.get_by_id(model_id).last_updated,
-            last_updated)
-
-        # Field last_updated will get updated because update_last_updated_time
-        # is set to True (by default).
-        model.update_timestamps()
-        future = model.put_async()
-        future.get_result()
-        self.assertNotEqual(
-            base_models.BaseModel.get_by_id(model_id).last_updated,
-            last_updated)
-
     def test_put_multi(self):
         models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
         for model in models_1:
@@ -242,51 +209,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         models_3 = base_models.BaseModel.get_multi(model_ids)
         base_models.BaseModel.update_timestamps_multi(models_3)
         base_models.BaseModel.put_multi(models_3)
-        for model_id, last_updated in python_utils.ZIP(
-                model_ids, last_updated_values):
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertNotEqual(model.last_updated, last_updated)
-
-    def test_put_multi_async(self):
-        models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
-        for model in models_1:
-            self.assertIsNone(model.created_on)
-            self.assertIsNone(model.last_updated)
-
-        # Field last_updated will get updated anyway because it is None.
-        base_models.BaseModel.update_timestamps_multi(
-            models_1, update_last_updated_time=False)
-        futures = base_models.BaseModel.put_multi_async(models_1)
-        for future in futures:
-            future.get_result()
-        model_ids = [model.id for model in models_1]
-        last_updated_values = []
-        for model_id in model_ids:
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertIsNotNone(model.created_on)
-            self.assertIsNotNone(model.last_updated)
-            last_updated_values.append(model.last_updated)
-
-        # Field last_updated won't get updated because update_last_updated_time
-        # is set to False and last_updated already has some value.
-        models_2 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.update_timestamps_multi(
-            models_1, update_last_updated_time=False)
-        futures = base_models.BaseModel.put_multi_async(models_2)
-        for future in futures:
-            future.get_result()
-        for model_id, last_updated in python_utils.ZIP(
-                model_ids, last_updated_values):
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertEqual(model.last_updated, last_updated)
-
-        # Field last_updated will get updated because update_last_updated_time
-        # is set to True (by default).
-        models_3 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.update_timestamps_multi(models_1)
-        futures = base_models.BaseModel.put_multi_async(models_3)
-        for future in futures:
-            future.get_result()
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)
@@ -355,6 +277,93 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         base_models.BaseModel.get_new_id(u'¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
+
+
+class TestBaseHumanMaintainedModel(base_models.BaseHumanMaintainedModel):
+    """Model that inherits the BaseHumanMaintainedModel for testing."""
+
+    pass
+
+
+class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
+    """Test the generic base human maintained model."""
+
+    MODEL_ID = 'model1'
+
+    def setUp(self):
+        super(BaseHumanMaintainedModelTests, self).setUp()
+        self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
+        def mock_put(self):
+            self._last_updated_timestamp_is_fresh = True
+            self.last_updated_by_human = datetime.datetime.utcnow()
+
+            # These if conditions can be removed once the auto_now property
+            # is set True to these attributes.
+            if self.created_on is None:
+                self.created_on = datetime.datetime.utcnow()
+
+            if self.last_updated is None:
+                self.last_updated = datetime.datetime.utcnow()
+
+            super(base_models.BaseHumanMaintainedModel, self).put()
+
+        with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
+            self.model_instance.put()
+
+    def test_put(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError, 'Use put_for_human or put_for_bot instead'):
+            self.model_instance.put()
+
+    def test_put_for_human(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.update_timestamps()
+        self.model_instance.put_for_human()
+
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_for_bot(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.update_timestamps()
+        self.model_instance.put_for_bot()
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_multi(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Use put_multi_for_human or put_multi_for_bot instead'):
+            TestBaseHumanMaintainedModel.put_multi([])
+
+    def test_put_multi_for_human(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_for_human(
+            [self.model_instance])
+
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_multi_for_bot(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_for_bot(
+            [self.model_instance])
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
 
 
 class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):

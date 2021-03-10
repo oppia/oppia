@@ -39,14 +39,8 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
-from core.platform import models
 import feconf
 import utils
-
-app_identity_services = models.Registry.import_app_identity_services()
-current_user_services = models.Registry.import_current_user_services()
-(stats_models, user_models) = models.Registry.import_models(
-    [models.NAMES.statistics, models.NAMES.user])
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -127,10 +121,10 @@ class ExplorationHandler(EditorHandler):
         commit_message = self.payload.get('commit_message')
 
         if (commit_message is not None and
-                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_list_dict = self.payload.get('change_list')
 
@@ -564,7 +558,7 @@ class FetchIssuesHandler(EditorHandler):
                 unresolved_issues.append(issue)
         exp_issues.unresolved_issues = unresolved_issues
         exp_issues_dict = exp_issues.to_dict()
-        self.render_json(exp_issues_dict['unresolved_issues'])
+        self.render_json(exp_issues_dict)
 
 
 class FetchPlaythroughHandler(EditorHandler):
@@ -720,14 +714,13 @@ class EditorAutosaveHandler(ExplorationHandler):
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
 
-        exp_user_data = user_models.ExplorationUserDataModel.get(
+        exp_user_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id)
-        draft_change_list_id = exp_user_data.draft_change_list_id
         # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
         self.render_json({
-            'draft_change_list_id': draft_change_list_id,
+            'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 

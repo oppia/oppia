@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for skill preview tab controller.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -25,6 +27,10 @@ describe('Skill preview tab', function() {
   var $scope = null;
   var ctrl = null;
   var UrlService = null;
+  var SkillEditorStateService = null;
+  var $rootScope = null;
+  var mockOnSkillChangeEmitter = new EventEmitter();
+
   var questionDict1 = {
     question_state_data: {
       content: {
@@ -133,8 +139,9 @@ describe('Skill preview tab', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
     UrlService = $injector.get('UrlService');
+    SkillEditorStateService = $injector.get('SkillEditorStateService');
     var skillId = 'df432fe';
     $scope = $rootScope.$new();
     var MockQuestionBackendApiService = {
@@ -156,6 +163,17 @@ describe('Skill preview tab', function() {
     expect(ctrl.ALLOWED_QUESTION_INTERACTIONS).toEqual([
       'All', 'Text Input', 'Multiple Choice', 'Numeric Input',
       'Item Selection']);
+  });
+
+  it('should trigger a digest loop when onSkillChange is emitted', () => {
+    spyOnProperty(SkillEditorStateService, 'onSkillChange').and.returnValue(
+      mockOnSkillChangeEmitter);
+    spyOn(SkillEditorStateService, 'loadSkill').and.stub();
+    spyOn($rootScope, '$applyAsync').and.callThrough();
+
+    ctrl.$onInit();
+    mockOnSkillChangeEmitter.emit();
+    expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
 
   it('should initialize the question card', function() {

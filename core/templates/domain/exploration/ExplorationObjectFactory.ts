@@ -48,14 +48,19 @@ import { UrlInterpolationService } from
 import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { ExplorationChange } from './exploration-draft.model';
 
 export interface ExplorationBackendDict {
+  'draft_changes': ExplorationChange[];
+  'is_version_of_draft_valid': boolean;
   'init_state_name': string;
   'param_changes': ParamChangeBackendDict[];
   'param_specs': ParamSpecsBackendDict;
   'states': StateObjectsBackendDict;
   'title': string;
   'language_code': string;
+  'draft_change_list_id'?: number;
+  'version'?: string;
 }
 
 export class Exploration {
@@ -180,7 +185,7 @@ export class Exploration {
   }
 
   getUninterpolatedContentHtml(stateName: string): string {
-    return this.getState(stateName).content.getHtml();
+    return this.getState(stateName).content.html;
   }
 
   getVoiceovers(stateName: string): BindableVoiceovers {
@@ -190,7 +195,7 @@ export class Exploration {
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.getContentId();
+    let contentId = state.content.contentId;
     return recordedVoiceovers.getBindableVoiceovers(
       contentId);
   }
@@ -203,7 +208,7 @@ export class Exploration {
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.getContentId();
+    let contentId = state.content.contentId;
     const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
     return voiceovers || null;
   }
@@ -218,6 +223,17 @@ export class Exploration {
 
   getAllVoiceoverLanguageCodes(): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
+  }
+
+  getDisplayableWrittenTranslationLanguageCodes(): string[] {
+    const allLanguageCodes = (
+      this.states.getAllWrittenTranslationLanguageCodes());
+
+    const displayableLanguageCodes = allLanguageCodes.filter(
+      languageCode => this.states.areWrittenTranslationsDisplayable(
+        languageCode));
+
+    return displayableLanguageCodes;
   }
 }
 

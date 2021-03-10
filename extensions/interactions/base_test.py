@@ -46,8 +46,13 @@ INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
 INTERACTIONS_THAT_USE_COMPONENTS = [
-    'AlgebraicExpressionInput', 'MathEquationInput', 'NumericExpressionInput',
-    'RatioExpressionInput']
+    'AlgebraicExpressionInput',
+    'Continue',
+    'FractionInput',
+    'MathEquationInput',
+    'NumericExpressionInput',
+    'RatioExpressionInput'
+]
 
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', python_utils.BASESTRING),
@@ -307,7 +312,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 input_variables_to_html_type_mapping_dict = (
                     collections.defaultdict(set))
                 for value in input_variables_with_html_type:
-                    if 'Html' in value[1]:
+                    if 'Html' in value[1] and 'HtmlContentId' not in value[1]:
                         input_variables_to_html_type_mapping_dict[
                             value[1]].add(value[0])
 
@@ -372,6 +377,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * A python file called {InteractionName}.py.
             #    * An __init__.py file used to import the Python file.
             #    * A TypeScript file called {InteractionName}.ts.
+            #    * If migrated to Angular2+, a module.ts file called
+            #       {InteractionName}-interactions.module.ts
             #    * A directory name 'directives' containing TS and HTML files
             #      for directives
             #    * A directory named 'static' containing at least a .png file.
@@ -385,6 +392,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir, 'protractor.js')))
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%s-interactions.module.ts' % hyphenated_interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass

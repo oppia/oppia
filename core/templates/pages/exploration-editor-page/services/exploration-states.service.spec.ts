@@ -128,6 +128,7 @@ describe('ExplorationStatesService', function() {
             content: {},
             default_outcome: {},
             feedback_1: {},
+            rule_input: {}
           },
         },
         param_changes: [],
@@ -135,7 +136,10 @@ describe('ExplorationStatesService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'hola'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['hola']
+              }}
             }],
             outcome: {
               dest: 'Me Llamo',
@@ -173,6 +177,7 @@ describe('ExplorationStatesService', function() {
             content: {},
             default_outcome: {},
             feedback_1: {},
+            rule_input: {}
           },
         },
         classifier_model_id: 0,

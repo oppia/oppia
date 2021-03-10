@@ -30,9 +30,6 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
 require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.component.ts');
-require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
 require('services/alerts.service.ts');
@@ -98,7 +95,7 @@ angular.module('oppia').component('feedbackTab', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/feedback-tab/templates/' +
             'create-feedback-thread-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'CreateFeedbackThreadModalController'
         }).result.then(
           result => ThreadDataBackendApiService.createNewThreadAsync(

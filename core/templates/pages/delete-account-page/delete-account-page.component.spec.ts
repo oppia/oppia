@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for delete account page.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -62,7 +63,7 @@ describe('Delete account page', function() {
     windowMock.location = '';
   });
 
-  it('should delete account when closing the modal', function() {
+  it('should delete account when closing the modal', fakeAsync(() => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
@@ -70,9 +71,10 @@ describe('Delete account page', function() {
     $httpBackend.expectDELETE('/delete-account-handler').respond(null);
     ctrl.deleteAccount();
     $httpBackend.flush();
+    tick(200);
 
     expect(windowMock.location).toMatch('pending-account-deletion');
-  });
+  }));
 
   it('should not delete account when dismissing the modal', function() {
     spyOn($uibModal, 'open').and.returnValue({

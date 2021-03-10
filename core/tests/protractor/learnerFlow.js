@@ -54,9 +54,10 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktop = async function() {
+  var createDummyExplorationOnDesktopAsAdmin = async function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
+    await creatorDashboardPage.clickCreateExplorationButton();
     await waitFor.pageToFullyLoad();
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorMainTab.setStateName('First');
@@ -109,11 +110,10 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and plays the correct exploration',
+  it('should visit the exploration player and play the correct exploration',
     async function() {
-      await users.createUser(
+      await users.createAndLoginAdminUser(
         'expCreator@learnerDashboard.com', 'expCreator');
-      await users.login('expCreator@learnerDashboard.com', true);
       // Create or load an exploration named 'Exploration Player Test'.
       if (browser.isMobile) {
         await adminPage.reloadExploration('exploration_player_test.yaml');
@@ -126,7 +126,7 @@ describe('Learner dashboard functionality', function() {
         );
       }
       await users.logout();
-      var PLAYER_USERNAME = 'expPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'expPlayerDM';
       await users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
@@ -134,12 +134,11 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playExploration('Exploration Player Test');
     });
 
-  it('should visit the collection player and plays the correct collection',
+  it('should visit the collection player and play the correct collection',
     async function() {
-      await users.createUser(
+      await users.createAndLoginAdminUser(
         'expOfCollectionCreator@learnerDashboard.com',
         'expOfCollectionCreator');
-      await users.login('expOfCollectionCreator@learnerDashboard.com', true);
       // Create or load a collection named
       // 'Introduction to Collections in Oppia'.
       if (browser.isMobile) {
@@ -169,7 +168,7 @@ describe('Learner dashboard functionality', function() {
         await collectionEditorPage.saveChanges();
       }
       await users.logout();
-      var PLAYER_USERNAME = 'collectionPlayerDesktopAndMobile';
+      var PLAYER_USERNAME = 'collectionPlayerDM';
       await users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       await libraryPage.get();
@@ -178,9 +177,8 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('should display incomplete and completed explorations', async function() {
-    await users.createUser(
+    await users.createAndLoginAdminUser(
       'originalCreator@learnerDashboard.com', 'originalCreator');
-    await users.login('originalCreator@learnerDashboard.com', true);
     // Create or load explorations.
     if (browser.isMobile) {
       await adminPage.reloadExploration('learner_flow_test.yaml');
@@ -188,7 +186,7 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-      await createDummyExplorationOnDesktop();
+      await createDummyExplorationOnDesktopAsAdmin();
       // Create a second exploration named 'Test Exploration'.
       await workflow.createAndPublishExploration(
         'Test Exploration',
@@ -289,15 +287,14 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should display incomplete and completed collections', async function() {
-    await users.createUser(
+    await users.createAndLoginAdminUser(
       'explorationCreator@learnerDashboard.com', 'explorationCreator');
-    await users.login('explorationCreator@learnerDashboard.com', true);
     // Create or load a collection.
     if (browser.isMobile) {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-      await createDummyExplorationOnDesktop();
+      await createDummyExplorationOnDesktopAsAdmin();
       // Create a second exploration named 'Collection Exploration'.
       await workflow.createAndPublishExploration(
         'Collection Exploration',

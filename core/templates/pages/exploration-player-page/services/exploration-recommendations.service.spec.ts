@@ -133,7 +133,8 @@ describe('Exploration Recommendations Service', () => {
       );
 
       spyOn(
-        expRecsBackendApiService, 'getRecommendedSummaryDicts').and.callFake(
+        expRecsBackendApiService,
+        'getRecommendedSummaryDictsAsync').and.callFake(
         (_, includeSystemRecommendations: string) => {
           return Promise.resolve(
             includeSystemRecommendations === 'true' ?

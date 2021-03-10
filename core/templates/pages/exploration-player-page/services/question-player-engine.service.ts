@@ -73,7 +73,7 @@ export class QuestionPlayerEngineService {
   private makeQuestion(
       newState: State, envs: Record<string, string>[]): string {
     return this.expressionInterpolationService.processHtml(
-      newState.content.getHtml(), envs);
+      newState.content.html, envs);
   }
 
   private getRandomSuffix(): string {
@@ -125,7 +125,8 @@ export class QuestionPlayerEngineService {
     var initialCard =
       this.stateCardObjectFactory.createNewCard(
         null, questionHtml, interactionHtml, interaction,
-        initialState.recordedVoiceovers, initialState.content.getContentId());
+        initialState.recordedVoiceovers,
+        initialState.writtenTranslations, initialState.content.contentId);
     successCallback(initialCard, nextFocusLabel);
   }
 
@@ -257,8 +258,8 @@ export class QuestionPlayerEngineService {
       answer: answerString
     };
     var feedbackHtml =
-      this.makeFeedback(outcome.feedback.getHtml(), [oldParams]);
-    var feedbackContentId = outcome.feedback.getContentId();
+      this.makeFeedback(outcome.feedback.html, [oldParams]);
+    var feedbackContentId = outcome.feedback.contentId;
     var feedbackAudioTranslations = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
@@ -313,7 +314,8 @@ export class QuestionPlayerEngineService {
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
-        this.getNextStateData().content.getContentId()
+        this.getNextStateData().writtenTranslations,
+        this.getNextStateData().content.contentId
       );
     } else if (!onSameCard) {
       this.contextService.removeCustomEntityContext();

@@ -26,7 +26,7 @@ import { InteractiveMapRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class InteractiveMapRulesService {
-  static RADIUS_OF_EARTH_KM = 6371.0;
+  static RADIUS_OF_EARTH_KM: number = 6371.0;
   static degreesToRadians(angle: number): number {
     return angle / 180 * Math.PI;
   }
