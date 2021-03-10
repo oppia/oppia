@@ -121,13 +121,17 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ['No files to check'], self.linter_stdout)
 
     def test_main_with_non_other_shard(self):
-        def mock_get_filepaths_from_path(unused_path):
-            return [VALID_PY_FILEPATH]
+        def mock_get_filepaths_from_path(path):
+            if path == pre_commit_linter.SHARDS['1'][0]:
+                return [VALID_PY_FILEPATH]
+            return []
 
         get_filenames_from_path_swap = self.swap_with_checks(
             pre_commit_linter, '_get_filepaths_from_path',
             mock_get_filepaths_from_path, expected_args=[
-                ('core/templates/',)])
+                (prefix,)
+                for prefix in pre_commit_linter.SHARDS['1']
+            ])
 
         with self.print_swap, self.sys_swap:
             with self.install_swap:
@@ -146,7 +150,9 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         get_filenames_from_path_swap = self.swap_with_checks(
             pre_commit_linter, '_get_filepaths_from_path',
             mock_get_filepaths_from_path, expected_args=[
-                ('core/templates/',)])
+                (prefix,)
+                for prefix in pre_commit_linter.SHARDS['1']
+            ])
         install_swap = self.swap(
             install_third_party_libs, 'main',
             mock_install_third_party_main)
@@ -166,11 +172,15 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             else:
                 return []
 
+        filenames_from_path_expected_args = [(os.getcwd(),)] + [
+            (prefix,)
+            for prefix in pre_commit_linter.SHARDS['1']
+        ]
+
         get_filenames_from_path_swap = self.swap_with_checks(
             pre_commit_linter, '_get_filepaths_from_path',
-            mock_get_filepaths_from_path, expected_args=[
-                (os.getcwd(),),
-                ('core/templates/',)])
+            mock_get_filepaths_from_path,
+            expected_args=filenames_from_path_expected_args)
 
         with self.print_swap, self.sys_swap:
             with self.install_swap:
