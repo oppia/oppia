@@ -34,7 +34,8 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
     'Continue',
-    'FractionInput'
+    'FractionInput',
+    'GraphInput'
   ];
 
   constructor(

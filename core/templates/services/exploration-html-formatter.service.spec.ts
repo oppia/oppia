@@ -54,12 +54,28 @@ describe('Exploration Html Formatter Service', () => {
       .toBe(expectedHtmlTag);
   });
 
+  it('should correctly set [last-answer] for MigratedInteractions when it' +
+  ' is in editor mode', () => {
+    var interactionId = 'GraphInput';
+    let custArgs = {
+      placeholder: {value: new SubtitledUnicode('enter here', '')},
+      rows: {value: 1}
+    };
+    var expectedHtmlTag = '<oppia-interactive-graph-input ' +
+      'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
+      'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
+      'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
+      '</oppia-interactive-graph-input>';
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null))
+      .toBe(expectedHtmlTag);
+  });
+
   it('should correctly set interaction HTML when it is in player mode',
     () => {
       var interactionId = 'TextInput';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-text-input ' +
-        'last-answer="null" label-for-focus-target="' + focusLabel + '">' +
+        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
         '</oppia-interactive-text-input>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel)

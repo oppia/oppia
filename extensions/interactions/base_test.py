@@ -49,6 +49,7 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'AlgebraicExpressionInput',
     'Continue',
     'FractionInput',
+    'GraphInput',
     'MathEquationInput',
     'NumericExpressionInput',
     'RatioExpressionInput'
