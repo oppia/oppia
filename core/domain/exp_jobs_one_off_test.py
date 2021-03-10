@@ -3462,7 +3462,7 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output_dict = {}
 
         for item in [ast.literal_eval(value) for value in actual_output]:
-            if  item[0] != 'SUCCESS':
+            if item[0] != 'SUCCESS':
                 actual_output_dict[item[0]] = set(item[1])
             else:
                 actual_output_dict['SUCCESS'] = item[1]
