@@ -51,8 +51,11 @@ export class PromoBarComponent implements OnInit {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
-    return angular.fromJson(
-      this.windowRef.nativeWindow.sessionStorage.promoIsDismissed);
+    let promoIsDismissed =
+      this.windowRef.nativeWindow.sessionStorage.promoIsDismissed;
+    if (typeof (promoIsDismissed) !== 'undefined') {
+      return JSON.parse(promoIsDismissed);
+    }
   }
 
   setPromoDismissed(promoIsDismissed: boolean): boolean {
@@ -60,12 +63,12 @@ export class PromoBarComponent implements OnInit {
       return false;
     }
     this.windowRef.nativeWindow.sessionStorage.promoIsDismissed =
-      angular.toJson(promoIsDismissed);
+      JSON.stringify(promoIsDismissed);
   }
 
   isSessionStorageAvailable(): boolean {
     // This is to ensure sessionStorage is accessible.
-    let testKey = 'Oppia';
+    const testKey = 'Oppia';
     try {
       this.windowRef.nativeWindow.sessionStorage.setItem(testKey, testKey);
       this.windowRef.nativeWindow.sessionStorage.removeItem(testKey);
