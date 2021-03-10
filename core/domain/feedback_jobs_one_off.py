@@ -19,7 +19,6 @@ from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_services
-from core.domain import prod_validators
 from core.platform import models
 
 (exp_models, feedback_models,) = models.Registry.import_models([
@@ -150,7 +149,7 @@ class CleanUpGeneralFeedbackThreadModelOneOffJob(
         if item.deleted:
             return
         target_model = (
-            prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
+            feedback_services.TARGET_TYPE_TO_TARGET_MODEL[
                 item.entity_type].get_by_id(item.entity_id))
         if target_model is None or target_model.deleted:
             yield ('Deleted GeneralFeedbackThreadModel', item.id)

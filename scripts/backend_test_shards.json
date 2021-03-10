@@ -111,7 +111,8 @@
     "4": [
         "core.domain.prod_validators_test",
         "core.domain.skill_jobs_one_off_test",
-        "core.domain.email_validators_test"
+        "core.domain.email_validators_test",
+        "core.domain.exploration_validators_test"
     ],
     "5": [
         "core.domain.suggestion_validators_test",
