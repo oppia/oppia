@@ -273,28 +273,19 @@ class ExplorationRightsHandler(EditorHandler):
     def delete(self, exploration_id):
         """Deletes user roles from the exploration."""
         username = self.request.get('username')
-        if not isinstance(username, python_utils.BASESTRING):
-            raise self.InvalidInputException('Invalid Username.')
-
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'Sorry, we could not find the specified user.')
-        try:
-            if self.user.user_id == user_id:
-                logging.error('Sorry, users cannot remove their own roles.')
-                raise Exception(
-                    'InvalidInputException:'
-                    'Sorry, users cannot remove their own roles.')
-            rights_manager.deassign_role_for_exploration(
-                self.user, exploration_id, user_id)
-            self.render_json({
-                'rights': rights_manager.get_exploration_rights(
-                    exploration_id).to_dict()
-            })
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
+        if self.user.user_id == user_id:
+            raise self.InvalidInputException(
+                'Sorry, users cannot remove their own roles.')
+        rights_manager.deassign_role_for_exploration(
+            self.user, exploration_id, user_id)
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                exploration_id).to_dict()
+        })
 
 class ExplorationStatusHandler(EditorHandler):
     """Handles publishing of an exploration."""

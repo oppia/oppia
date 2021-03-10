@@ -1654,11 +1654,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             exploration.states['State 3'], 'TextInput')
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
-        self.delete_json(
+        response = self.delete_json(
             rights_url, params={
                 'member_role': rights_domain.ROLE_OWNER,
                 'username': self.OWNER_USERNAME
-            }, expected_status_int=500)
+            }, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, users cannot remove their own roles.')
         self.logout()
 
     def test_for_deassign_viewer_role_from_exploration(self):
@@ -1713,6 +1715,18 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
             expected_status_int=404)
         self.logout()
+
+    def test_for_checking_username_is_valid(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        response = self.delete_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, we could not find the specified user.')
+        self.logout()
+
 
     def test_transfering_ownership_to_the_community(self):
         """Test exploration rights handler for transfering ownership to the
