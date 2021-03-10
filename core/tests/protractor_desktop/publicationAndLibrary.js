@@ -98,19 +98,14 @@ describe('Library index page', function() {
     await users.logout();
 
     await users.login('varda@publicationAndLibrary.com');
-    // Set expectWelcomeModal: true.
-    await workflow.createAndPublishExploration(
-      EXPLORATION_VINGILOT,
-      CATEGORY_BUSINESS,
-      'seek the aid of the Valar',
-      LANGUAGE_DEUTSCH,
-      true
-    );
+
     await libraryPage.get();
+    await libraryPage.selectLanguages([LANGUAGE_DEUTSCH]);
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
     // Set expectWelcomeModal: true.
     await general.moveToEditor(true);
+
     // Moderators can edit explorations.
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
@@ -308,8 +303,8 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('eve@privileges.com');
-    // Set expectWelcomeModal: true.
-    await general.openEditor(explorationId, true);
+    // Set expectWelcomeModal: false.
+    await general.openEditor(explorationId, false);
     await general.expect404Error();
     await users.logout();
   });
@@ -346,8 +341,8 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('guestUser@oppia.tests');
-    // Set expectWelcomeModal: true.
-    await general.openEditor(explorationId, true);
+    // Set expectWelcomeModal: false.
+    await general.openEditor(explorationId, false);
     await general.expect404Error();
     await users.logout();
   });
