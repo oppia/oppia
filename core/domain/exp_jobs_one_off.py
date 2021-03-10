@@ -921,14 +921,19 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration = exp_fetchers.get_exploration_from_model(item)
         for state_name, state in exploration.states.items():
             interaction = state.interaction
+            exp_and_state_key = '%s %s' % (
+                item.id, state_name.encode('utf-8'))
             if interaction.id == 'RatioExpressionInput':
                 if interaction.customization_args['numberOfTerms'].value > 10:
-                    exp_and_state_key = '%s %s' % (
-                        item.id, state_name.encode('utf-8'))
                     yield (python_utils.UNICODE(
                         interaction.customization_args['numberOfTerms'].value),
                            exp_and_state_key)
 
+        yield ('SUCCESS', 1)
+
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)

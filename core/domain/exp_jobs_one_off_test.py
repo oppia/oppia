@@ -3381,6 +3381,7 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(
             job_id)
         expected_output = [
+            '[u\'SUCCESS\', 1]',
             '[u\'12\', [u\'exp_id0 State2\']]'
         ]
         self.assertEqual(actual_output, expected_output)
@@ -3461,11 +3462,15 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output_dict = {}
 
         for item in [ast.literal_eval(value) for value in actual_output]:
-            actual_output_dict[item[0]] = set(item[1])
+            if  item[0] != 'SUCCESS':
+                actual_output_dict[item[0]] = set(item[1])
+            else:
+                actual_output_dict['SUCCESS'] = item[1]
 
         expected_output_dict = {
             '12': set(['exp_id0 State2']),
-            '11': set(['exp_id1 State1'])
+            '11': set(['exp_id1 State1']),
+            'SUCCESS': 2
         }
 
         self.assertEqual(actual_output_dict, expected_output_dict)
