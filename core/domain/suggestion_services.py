@@ -761,7 +761,7 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
         get_html_representing_suggestion(suggestion))
     return suggestion_registry.ReviewableSuggestionEmailInfo(
         suggestion.suggestion_type, suggestion.language_code, plain_text,
-        suggestion.last_updated
+        suggestion.last_updated_by_human
     )
 
 
@@ -816,8 +816,13 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                 # suggestions.
                 elif question_suggestion.author_id != (
                         user_contribution_rights.id):
-                    heapq.heappush(suggestions_waiting_longest_heap, (
-                        question_suggestion.last_updated, question_suggestion))
+                    heapq.heappush(
+                        suggestions_waiting_longest_heap,
+                        (
+                            question_suggestion.last_updated_by_human,
+                            question_suggestion
+                        )
+                    )
 
         if user_contribution_rights.can_review_translation_for_language_codes:
             for language_code in (
@@ -847,15 +852,19 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                         # If the review submission date for the translation
                         # suggestion is more recent than the most recent
                         # submission date so far, we can exit early.
-                        if translation_suggestion.last_updated > (
+                        if translation_suggestion.last_updated_by_human > (
                                 most_recent_review_submission):
                             break
                     # Reviewers can never review their own suggestions.
                     if translation_suggestion.author_id != (
                             user_contribution_rights.id):
-                        heapq.heappush(suggestions_waiting_longest_heap, (
-                            translation_suggestion.last_updated,
-                            translation_suggestion))
+                        heapq.heappush(
+                            suggestions_waiting_longest_heap,
+                            (
+                                translation_suggestion.last_updated_by_human,
+                                translation_suggestion
+                            )
+                        )
 
         # Get the key information from each suggestion that will be used to
         # email reviewers.
