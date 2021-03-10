@@ -2646,6 +2646,7 @@ class Exploration(python_utils.OBJECT):
                     for group in new_answer_groups:
                         new_rule_specs = []
                         for rule_spec in group['rule_specs']:
+                            rule_spec['rule_type'] = 'Equals'
                             new_rule_specs.append(rule_spec)
                         group['rule_specs'] = new_rule_specs
 
