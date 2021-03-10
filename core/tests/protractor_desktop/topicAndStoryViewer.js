@@ -54,28 +54,21 @@ describe('Topic and Story viewer functionality', function() {
       objective: 'The goal is to check story viewer functionality.',
       language: 'English'
     };
+    
+    var exitTutorial = false;
     for (var i = 1; i <= 3; i++) {
       if (i === 1) {
-        // Set expectWelcomeModal: true.
-        await workflow.createAndPublishTwoCardExploration(
-          `Exploration TASV1 - ${i}`,
-          EXPLORATION.category,
-          EXPLORATION.objective,
-          EXPLORATION.language,
-          true,
-          true
-        );
-      } else {
-        // Set expectWelcomeModal: false.
-        await workflow.createAndPublishTwoCardExploration(
-          `Exploration TASV1 - ${i}`,
-          EXPLORATION.category,
-          EXPLORATION.objective,
-          EXPLORATION.language,
-          false,
-          true
-        );
+        exitTutorial = true;
       }
+
+      await workflow.createAndPublishTwoCardExploration(
+        `Exploration TASV1 - ${i}`,
+        EXPLORATION.category,
+        EXPLORATION.objective,
+        EXPLORATION.language,
+        exitTutorial,
+        true
+      );
       dummyExplorationIds.push(await general.getExplorationIdFromEditor());
     }
   };
