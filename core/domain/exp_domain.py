@@ -173,7 +173,7 @@ def clean_math_expression(math_expression):
             r'(%s(\2))\1' % trig_fn, math_expression)
 
     # Adding parens to trig functions that don't have
-    # any. For eg. 'cosA' -> 'cos(A)', 'cos A' -> 'cos(A)'
+    # any. For eg. 'cosA' -> 'cos(A)', 'cos A' -> 'cos(A)'.
     for trig_fn in trig_fns:
         math_expression = re.sub(
             r'%s\s?(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
@@ -193,7 +193,7 @@ def clean_math_expression(math_expression):
             invalid_trig_fn, valid_trig_fn)
 
     # Replacing comma used in place of a decimal point with a decimal point.
-    if re.match('\d+,\d+', math_expression):
+    if re.match(r'\d+,\d+', math_expression):
         math_expression = math_expression.replace(',', '.')
 
     # Replacing \cdot with *.
