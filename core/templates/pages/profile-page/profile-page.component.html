@@ -40,7 +40,7 @@
     </div>
 
     <div class="oppia-profile-user-stat-container-large-screen">
-      <div ng-repeat="stat in $ctrl.userDisplayedStatistics" class="oppia-profile-user-stat">
+      <div ng-repeat="stat in $ctrl.userDisplayedStatistics" class="oppia-profile-user-stat oppia-popover">
         <div popover-placement="right" ng-attr-uib-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
           <span class="oppia-stats-value-text protractor-test-profile-<[stat.title | lowercase]>-stat"><strong><[stat.value || 0]></strong></span>
           <span><[stat.title]></span>
@@ -71,7 +71,7 @@
 
     <hr class="oppia-profile-stat-container-line-small-screen">
     <div class="oppia-profile-user-stat-container-small-screen">
-      <div ng-repeat="stat in $ctrl.userDisplayedStatistics" class="oppia-profile-user-stat">
+      <div ng-repeat="stat in $ctrl.userDisplayedStatistics" class="oppia-profile-user-stat oppia-popover">
         <div popover-placement="right" ng-attr-uib-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
           <span class="oppia-stats-value-text"><strong><[stat.value || 0]></strong></span>
           <span><[stat.title]></span>
@@ -144,5 +144,8 @@
   }
   .oppia-profile-container .oppia-user-bio-text {
     white-space: pre-wrap;
+  }
+  .oppia-popover {
+    cursor: pointer;
   }
 </style>
