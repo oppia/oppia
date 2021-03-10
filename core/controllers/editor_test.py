@@ -1727,7 +1727,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
 
-
     def test_transfering_ownership_to_the_community(self):
         """Test exploration rights handler for transfering ownership to the
         community.

@@ -40,7 +40,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 import feconf
-import python_utils
 import utils
 
 
@@ -286,6 +285,7 @@ class ExplorationRightsHandler(EditorHandler):
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict()
         })
+
 
 class ExplorationStatusHandler(EditorHandler):
     """Handles publishing of an exploration."""
