@@ -54,7 +54,7 @@ describe('Topic and Story viewer functionality', function() {
       objective: 'The goal is to check story viewer functionality.',
       language: 'English'
     };
-    
+
     var exitTutorial = false;
     for (var i = 1; i <= 3; i++) {
       if (i === 1) {
