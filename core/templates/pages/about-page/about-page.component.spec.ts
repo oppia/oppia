@@ -188,6 +188,28 @@ describe('About Page', () => {
       expect(component.userIsLoggedIn).toBe(false);
     }));
 
+  it('should check that user is logged in', fakeAsync(() => {
+    const UserInfoObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject))
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
+
   it('should activate Visit Classroom button when clicked', function() {
     spyOn(
       siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
@@ -217,28 +239,6 @@ describe('About Page', () => {
     component.onClickCreateLessonButton();
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
-      .toHaveBeenCalledWith();
-  });
-
-  it('should activate Guide For Teacher button when clicked', function() {
-    spyOn(
-      siteAnalyticsService, 'registerClickGuideForTeacherButtonEvent')
-      .and.callThrough();
-
-    component.onClickGuideForTeacherButton();
-
-    expect(siteAnalyticsService.registerClickGuideForTeacherButtonEvent)
-      .toHaveBeenCalledWith();
-  });
-
-  it('should activate Tip For Parent button when clicked', function() {
-    spyOn(
-      siteAnalyticsService, 'registerClickTipforParentsButtonEvent')
-      .and.callThrough();
-
-    component.onClickTipForParentsButton();
-
-    expect(siteAnalyticsService.registerClickTipforParentsButtonEvent)
       .toHaveBeenCalledWith();
   });
 });

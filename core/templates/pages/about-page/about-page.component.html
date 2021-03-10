@@ -1,5 +1,5 @@
 <div class="about-page">
-  <div class="oppia-about-page-section-one" ng-style="{'background-image': '<[$ctrl.getCommunityBackgroundUrl()]>'}">
+  <div class="oppia-about-page-section-one">
     <div class="oppia-about-section-one-image oppia-about-page-section-one-right">
       <picture class="oppia-about-study-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/about/study.webp')">
@@ -56,9 +56,9 @@
       <div class="oppia-about-section-three-image-1 oppia-about-section-three-right">
         <div class="oppia-about-section-three-image">
           <picture class="oppia-about-graph-image">
-            <source type="image/webp" [srcset]="getStaticImageUrl('/about/graph.webp')">
-            <source type="image/png" [srcset]="getStaticImageUrl('/about/graph.png')">
-            <img [src]="getStaticImageUrl('/about/g8.png')" alt="outcome image">
+            <source type="image/webp" [srcset]="getStaticImageUrl('/about/analysis_graph.webp')">
+            <source type="image/png" [srcset]="getStaticImageUrl('/about/analysis_graph.png')">
+            <img [src]="getStaticImageUrl('/about/analysis_graph.png')" alt="outcome image">
           </picture>
         </div>
       </div>
@@ -73,9 +73,9 @@
       <h2 class="oppia-about-learn-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM' | translate"></h2>
       <div class="oppia-about-section-four-right">
         <picture class="oppia-about-lesson-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl('/about/lesson.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/about/lesson.png')">
-          <img [src]="getStaticImageUrl('/about/testing_18_1.png')" class="oppia-about-lesson-image" alt="lesson image">
+          <source type="image/webp" [srcset]="getStaticImageUrl('/about/fraction_lesson.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/about/fraction_lesson.png')">
+          <img [src]="getStaticImageUrl('/about/fraction_lesson.png')" class="oppia-about-lesson-image" alt="lesson image">
         </picture>
       </div>
       <div class="oppia-about-section-four-left">
@@ -97,9 +97,9 @@
       <h2 class="oppia-about-explore-lesson-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS' | translate"></h2>
       <div class="oppia-about-section-five-right">
         <picture class="oppia-about-library-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl('/about/library.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/about/library.png')">
-          <img [src]="getStaticImageUrl('/about/lesson_18_9.png')" alt="library image">
+          <source type="image/webp" [srcset]="getStaticImageUrl('/about/library_layout.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/about/library_layout.png')">
+          <img [src]="getStaticImageUrl('/about/library_layout.png')" alt="library image">
         </picture>
       </div>
       <div class="oppia-about-section-five-left">
@@ -142,24 +142,6 @@
   </div>
   <div class="oppia-about-page-section-seven">
     <h2 class="oppia-get-started-title oppia-about-page-title" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_SEVEN_TITLE' | translate"></h2>
-    <!--The pages "Guide For Teachers" and "Tips For Parents And Guardians" targeting these buttons are not yet created.
-      Pages can be linked here when created-->
-    <!--<div class="oppia-about-classroom-button-container-one">
-      <form action="<[$ctrl.classroomUrl]>">
-        <button type="submit" (click)="onClickGuideForTeacherButton()"
-                class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_ACTION_GUIDE_FOR_TEACHERS' | translate">
-        </button>
-      </form>
-    </div>
-    <div class="oppia-about-classroom-button-container-two">
-      <form action="<[$ctrl.classroomUrl]>">
-        <button type="submit" (click)="onClickTipForParentsButton()"
-                class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
-        </button>
-      </form>
-    </div>-->
     <div class="oppia-about-classroom-button-container-three">
       <form action="<[$ctrl.classroomUrl]>">
         <button type="submit" (click)="onClickVisitClassroomButton()"
@@ -173,7 +155,7 @@
 
 <style>
   .oppia-about-page-section-one {
-    background-image: url(/assets/images/about/background1.png);
+    background-color: #F4F4F4;
     clear: both;
     height: 60vh;
     margin: 0 auto;
@@ -331,7 +313,7 @@
     padding-left: 4vw;
   }
   .oppia-about-page-section-three .oppia-about-outcome-title {
-    color: #ffffff;
+    color: #fff;
     margin: 0;
     width: 30vw;
   }
@@ -339,7 +321,7 @@
     display: none;
   }
   .oppia-about-page-section-three .oppia-about-outcome-content {
-    color: #eaf3f3;
+    color: #fff;
     padding-top: 4vh;
     width: 35vw;
   }
@@ -526,7 +508,7 @@
   .about-page .oppia-about-button {
     background-color: #015c53;
     border-radius: 0;
-    color: #ffffff;
+    color: #fff;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 16px;
     font-weight: 500;
@@ -545,12 +527,20 @@
   .about-page .oppia-about-bottom-button:focus,
   .about-page .oppia-about-bottom-button:active {
     background-color: #05beb2;
-    color: #ffffff;
+    color: #fff;
   }
   .oppia-about-page-section-seven .oppia-about-button {
     width: 510px;
   }
 
+  @media (max-width: 1440px) and (min-width: 1280px) {
+    .oppia-about-page-section-one .oppia-about-page-section-one-left {
+      padding-left: 2vw;
+    }
+    .oppia-about-page-section-two .oppia-about-icons {
+      padding: 0 4vw;
+    }
+  }
   @media (max-width: 1280px) {
     .oppia-about-page-section-one,
     .oppia-about-page-section-two {

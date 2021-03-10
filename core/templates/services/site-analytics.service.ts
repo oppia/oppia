@@ -110,11 +110,6 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'GoToDonationSite', 'click', donationSiteName);
   }
-  registerClickGuideForTeacherButtonEvent(): void {
-    this._sendEventToGoogleAnalytics(
-      'GuideTeachersButton', 'click',
-      this.windowRef.nativeWindow.location.pathname);
-  }
   registerCreateLessonButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
       'CreateLessonButton', 'click',
