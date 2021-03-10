@@ -830,7 +830,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if node.doc:
             docstring = node.doc.splitlines()
             # Check for space after """ in docstring.
-            # The first check below helps avoiding empty docstring situation.
             if len(docstring[0]) > 0 and docstring[0][0] == b' ':
                 self.add_message('space-after-triple-quote', node=node)
             # Check if single line docstring span two lines.
