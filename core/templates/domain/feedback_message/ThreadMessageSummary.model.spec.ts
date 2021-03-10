@@ -13,44 +13,33 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ThreadMessageSummaryObjectFactory.
+ * @fileoverview Unit tests for ThreadMessageSummary model.
  */
 
-import { TestBed } from '@angular/core/testing';
 
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+import { ThreadMessageSummary } from 'domain/feedback_message/ThreadMessageSummary.model';
 
 describe('Thread message summary object factory', () => {
-  let threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
+  it('should create new thread message summary from arguments.', () => {
+    let threadMessageSummary =
+       new ThreadMessageSummary(
+         'author', 'message content');
 
-  beforeEach(() => {
-    threadMessageSummaryObjectFactory = TestBed.get(
-      ThreadMessageSummaryObjectFactory);
-  });
-
-  describe('.createNew', () => {
-    it('should create new thread message summary from arguments.', () => {
-      let threadMessageSummary =
-        threadMessageSummaryObjectFactory.createNew(
-          'author', 'message content');
-
-      expect(threadMessageSummary.authorUsername).toEqual('author');
-      expect(threadMessageSummary.text).toEqual('message content');
-    });
+    expect(threadMessageSummary.authorUsername).toEqual('author');
+    expect(threadMessageSummary.text).toEqual('message content');
   });
 
   describe('.hasText', () => {
     it('should be true when text is nonempty string', () => {
       let threadMessageSummary =
-        threadMessageSummaryObjectFactory.createNew('author', 'nonempty!');
+       new ThreadMessageSummary('author', 'nonempty!');
 
       expect(threadMessageSummary.hasText()).toBe(true);
     });
 
     it('should be false when text is empty string', () => {
       let threadMessageSummary =
-        threadMessageSummaryObjectFactory.createNew('author', '');
+       new ThreadMessageSummary('author', '');
 
       expect(threadMessageSummary.hasText()).toBe(false);
     });

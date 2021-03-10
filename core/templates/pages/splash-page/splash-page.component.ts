@@ -126,7 +126,6 @@ export class SplashPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.userIsLoggedIn = null;
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
@@ -139,6 +138,10 @@ export class SplashPageComponent implements OnInit {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
+    });
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     });
   }
 }

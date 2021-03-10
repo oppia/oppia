@@ -67,7 +67,7 @@ describe('ExplorationFeedback', function() {
     await users.createUser(
       'user6@ExplorationFeedback.com',
       'learnerFeedback');
-    await users.createAndLoginAdminUser(
+    await users.createAdmin(
       'user7@ExplorationFeedback.com',
       'superUserExplorationFeedback');
   });
