@@ -165,7 +165,7 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
         suggestion_model.score_category, suggestion_model.language_code,
-        suggestion_model.last_updated)
+        suggestion_model.last_updated_by_human)
 
 
 def get_suggestion_by_id(suggestion_id):

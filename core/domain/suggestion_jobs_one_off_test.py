@@ -1738,7 +1738,7 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=change_cmd,
             score_category='score_category'
-        ).put()
+        ).put_depending_on_id(self.author_id)
 
     def _run_job_and_verify_output(self, expected_output):
         """Runs the ContentSuggestionFormatUpdateOneOffJob and
@@ -1794,7 +1794,7 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=change_cmd,
             score_category='score_category'
-        ).put()
+        ).put_depending_on_id(self.author_id)
 
         self._run_job_and_verify_output([])
         retrieved_suggestion_model = (
@@ -1844,7 +1844,9 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
         new_suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(
-            new_suggestion.last_updated, old_suggestion.last_updated)
+            new_suggestion.last_updated_by_human,
+            old_suggestion.last_updated_by_human
+        )
 
         retrieved_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -1881,7 +1883,9 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
         new_suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(
-            new_suggestion.last_updated, old_suggestion.last_updated)
+            new_suggestion.last_updated_by_human,
+            old_suggestion.last_updated_by_human
+        )
 
         retrieved_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -1925,7 +1929,9 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
         new_suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(
-            new_suggestion.last_updated, old_suggestion.last_updated)
+            new_suggestion.last_updated_by_human,
+            old_suggestion.last_updated_by_human
+        )
 
         retrieved_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(
