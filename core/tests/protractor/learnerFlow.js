@@ -21,6 +21,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
+var action = require('../protractor_utils/action.js')
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
@@ -50,7 +51,7 @@ describe('Learner dashboard functionality', function() {
   var clickContinueButton = async function() {
     await waitFor.elementToBeClickable(
       continueButton, 'Could not click continue button');
-    await continueButton.click();
+    await action.click('Continue Button',continueButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -216,7 +217,7 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave exploration.
-    await oppiaLogo.click();
+    await action.click('Oppia Logo',oppiaLogo);
     await general.acceptAlert();
 
     // Go to 'Test Exploration'.
@@ -224,7 +225,7 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.findExploration('Test Exploration');
     await libraryPage.playExploration('Test Exploration');
     await waitFor.pageToFullyLoad();
-    await oppiaLogo.click();
+    await action.click('Oppia Logo',oppiaLogo);
     await waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
@@ -340,7 +341,7 @@ describe('Learner dashboard functionality', function() {
     // Click first exploration in collection.
     await waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');
-    await firstExploration.click();
+    await action.click('First Exploration Button',firstExploration);
     await waitFor.pageToFullyLoad();
     // Leave this collection incomplete.
     if (browser.isMobile) {
@@ -350,7 +351,7 @@ describe('Learner dashboard functionality', function() {
         by.css('.protractor-test-play-exploration-button'));
       await waitFor.elementToBeClickable(
         playExploration, 'Could not click play exploration button');
-      await playExploration.click();
+      await action.click('Play Exploration Button',playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
     } else {
@@ -358,7 +359,7 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave collection.
-    await oppiaLogo.click();
+    await action.click('Oppia Logo',oppiaLogo);
     await general.acceptAlert();
 
     // Learner Dashboard should display
@@ -379,14 +380,14 @@ describe('Learner dashboard functionality', function() {
     // Click first exploration in collection.
     await waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');
-    await firstExploration.click();
+    await action.click('First Exploration Button',firstExploration);
     await waitFor.pageToFullyLoad();
     if (browser.isMobile) {
       var playExploration = element(
         by.css('.protractor-test-play-exploration-button'));
       await waitFor.elementToBeClickable(
         playExploration, 'Could not click play exploration button');
-      await playExploration.click();
+      await action.click('Play Exploration Button',playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
       await waitFor.pageToFullyLoad();
@@ -427,7 +428,7 @@ describe('Learner dashboard functionality', function() {
       await waitFor.pageToFullyLoad();
       // Click on 'Collections' tab.
       var collectionsTab = element(by.css('.protractor-test-collections-tab'));
-      await collectionsTab.click();
+      await action.click('Collections Tab Button',collectionsTab);
       await creatorDashboardPage.navigateToCollectionEditor();
       await collectionEditorPage.searchForAndAddExistingExploration(
         'Collection Exploration');
