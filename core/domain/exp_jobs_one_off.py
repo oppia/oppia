@@ -927,7 +927,7 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         item.id, state_name.encode('utf-8'))
                     yield (python_utils.UNICODE(
                         interaction.customization_args['numberOfTerms'].value),
-                        exp_and_state_key)
+                           exp_and_state_key)
 
     @staticmethod
     def reduce(key, values):
