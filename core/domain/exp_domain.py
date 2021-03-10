@@ -173,10 +173,10 @@ def clean_math_expression(math_expression):
             r'(%s(\2))\1' % trig_fn, math_expression)
 
     # Adding parens to trig functions that don't have
-    # any. For eg. 'cosA' -> 'cos(A)'.
+    # any. For eg. 'cosA' -> 'cos(A)', 'cos A' -> 'cos(A)'
     for trig_fn in trig_fns:
         math_expression = re.sub(
-            r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
+            r'%s\s?(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
 
     # The pylatexenc lib outputs the unicode values of special characters like
     # sqrt and pi, which is why they need to be replaced with their
@@ -191,6 +191,13 @@ def clean_math_expression(math_expression):
     for invalid_trig_fn, valid_trig_fn in inverse_trig_fns_mapping.items():
         math_expression = math_expression.replace(
             invalid_trig_fn, valid_trig_fn)
+
+    # Replacing comma used in place of a decimal point with a decimal point.
+    if re.match('\d+,\d+', math_expression):
+        math_expression = math_expression.replace(',', '.')
+
+    # Replacing \cdot with *.
+    math_expression = re.sub(r'\\cdot', '*', math_expression)
 
     return math_expression
 
@@ -2634,46 +2641,53 @@ class Exploration(python_utils.OBJECT):
                             group['rule_specs'] = new_rule_specs
                     else:
                         new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
+                else:
+                    new_interaction_id = 'TextInput'
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
 
-                    # Removing answer groups that have no rule specs left after
-                    # the filtration done above.
-                    new_answer_groups = [
-                        answer_group for answer_group in new_answer_groups if (
-                            len(answer_group['rule_specs']) != 0)]
+                # Removing answer groups that have no rule specs left after
+                # the filtration done above.
+                new_answer_groups = [
+                    answer_group for answer_group in new_answer_groups if (
+                        len(answer_group['rule_specs']) != 0)]
 
-                    # Removing feedback keys, from voiceovers_mapping and
-                    # translations_mapping, that correspond to the rules that
-                    # got deleted.
-                    old_answer_groups_feedback_keys = [
-                        answer_group['outcome'][
-                            'feedback']['content_id'] for answer_group in (
-                                state_dict['interaction']['answer_groups'])]
-                    new_answer_groups_feedback_keys = [
-                        answer_group['outcome'][
-                            'feedback']['content_id'] for answer_group in (
-                                new_answer_groups)]
-                    content_ids_to_delete = set(
-                        old_answer_groups_feedback_keys) - set(
-                            new_answer_groups_feedback_keys)
-                    for content_id in content_ids_to_delete:
-                        if content_id in state_dict['recorded_voiceovers'][
-                                'voiceovers_mapping']:
-                            del state_dict['recorded_voiceovers'][
-                                'voiceovers_mapping'][content_id]
-                        if content_id in state_dict['written_translations'][
-                                'translations_mapping']:
-                            del state_dict['written_translations'][
-                                'translations_mapping'][content_id]
+                # Removing feedback keys, from voiceovers_mapping and
+                # translations_mapping, that correspond to the rules that
+                # got deleted.
+                old_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            state_dict['interaction']['answer_groups'])]
+                new_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            new_answer_groups)]
+                content_ids_to_delete = set(
+                    old_answer_groups_feedback_keys) - set(
+                        new_answer_groups_feedback_keys)
+                for content_id in content_ids_to_delete:
+                    if content_id in state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping']:
+                        del state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping'][content_id]
+                    if content_id in state_dict['written_translations'][
+                            'translations_mapping']:
+                        del state_dict['written_translations'][
+                            'translations_mapping'][content_id]
 
-                    state_dict['interaction']['id'] = new_interaction_id
-                    state_dict['interaction']['answer_groups'] = (
-                        new_answer_groups)
-                    if state_dict['interaction']['solution']:
-                        correct_answer = state_dict['interaction'][
-                            'solution']['correct_answer']['ascii']
-                        correct_answer = clean_math_expression(correct_answer)
-                        state_dict['interaction'][
-                            'solution']['correct_answer'] = correct_answer
+                state_dict['interaction']['id'] = new_interaction_id
+                state_dict['interaction']['answer_groups'] = (
+                    new_answer_groups)
+                if state_dict['interaction']['solution']:
+                    correct_answer = state_dict['interaction'][
+                        'solution']['correct_answer']['ascii']
+                    correct_answer = clean_math_expression(correct_answer)
+                    state_dict['interaction'][
+                        'solution']['correct_answer'] = correct_answer
 
         return states_dict
 
