@@ -70,8 +70,8 @@ describe('When account is deleted it', function() {
     await users.logout();
 
     await users.login('voiceArtist@oppia.com');
-    // Set expectWelcomeModal: true.
-    await general.openEditor(explorationId, true);
+    // Set expectWelcomeModal: false.
+    await general.openEditor(explorationId, false);
     await general.expect404Error();
     expectedConsoleErrors = [
       'Failed to load resource: the server responded with a status of 404'];
