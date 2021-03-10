@@ -69,7 +69,7 @@ var ProfilePage = function() {
     var interestTexts = await interests.map(async function(interestElem) {
       await waitFor.visibilityOf(
         interestElem,
-        'Interestelm is taking too long to appear');
+        'InterestElm is taking too long to appear');
       return await interestElem.getText();
     });
     interestTexts.forEach(function(interestText) {
@@ -90,11 +90,8 @@ var ProfilePage = function() {
 
   this.expectToHaveExplorationCards = async function() {
     var explorationCardsCount = await allExplorationCardElements.count();
-    if (explorationCardsCount === 0) {
-      throw new Error('There is no exploration card on this profile');
-    }
     await waitFor.visibilityOf(
-      explorationCardsCount,
+      allExplorationCardElements.first(),
       'Exploration cards is not present or taking time to display');
     expect(await explorationCardsCount).toBeGreaterThan(0);
   };
@@ -105,7 +102,7 @@ var ProfilePage = function() {
         var cardTitle = card.element(cardTitleCss);
         await waitFor.visibilityOf(
           cardTitle,
-          'Cardtitle is not present or taking Too long to dispaly');
+          'CardTitle is not present or taking too long to display');
         var title = await cardTitle.getText();
         return title === explorationName;
       });
