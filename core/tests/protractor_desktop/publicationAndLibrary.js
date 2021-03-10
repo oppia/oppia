@@ -98,6 +98,14 @@ describe('Library index page', function() {
     await users.logout();
 
     await users.login('varda@publicationAndLibrary.com');
+    // Set expectWelcomeModal: true.
+    await workflow.createAndPublishExploration(
+      EXPLORATION_VINGILOT,
+      CATEGORY_BUSINESS,
+      'seek the aid of the Valar',
+      LANGUAGE_DEUTSCH,
+      true
+    );
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
