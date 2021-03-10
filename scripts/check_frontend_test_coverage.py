@@ -31,7 +31,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # manually.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
-# @marianazangrossi first.
+# @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
@@ -122,9 +122,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-input-validation.service.ts',
     'graph-layout.service.ts',
     'graph-property-editor.directive.ts',
-    'graph-viz.directive.ts',
+    'graph-viz.component.ts',
     'hint-and-solution-buttons.directive.ts',
-    'hint-and-solution-modal.service.ts',
     'hint-editor.directive.ts',
     'html-editor.directive.ts',
     'html-escaper.service.ts',
@@ -167,7 +166,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-drag-and-drop-sort-input.directive.ts',
     'oppia-interactive-end-exploration.directive.ts',
     'oppia-interactive-fraction-input.component.ts',
-    'oppia-interactive-graph-input.directive.ts',
+    'oppia-interactive-graph-input.component.ts',
     'oppia-interactive-image-click-input.directive.ts',
     'oppia-interactive-interactive-map.directive.ts',
     'oppia-interactive-item-selection-input.directive.ts',
@@ -191,7 +190,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-response-drag-and-drop-sort-input.directive.ts',
     'oppia-response-end-exploration.directive.ts',
     'oppia-response-fraction-input.component.ts',
-    'oppia-response-graph-input.directive.ts',
+    'oppia-response-graph-input.component.ts',
     'oppia-response-image-click-input.directive.ts',
     'oppia-response-interactive-map.directive.ts',
     'oppia-response-item-selection-input.directive.ts',
@@ -209,7 +208,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-drag-and-drop-sort-input.directive.ts',
     'oppia-short-response-end-exploration.directive.ts',
     'oppia-short-response-fraction-input.component.ts',
-    'oppia-short-response-graph-input.directive.ts',
+    'oppia-short-response-graph-input.component.ts',
     'oppia-short-response-image-click-input.directive.ts',
     'oppia-short-response-interactive-map.directive.ts',
     'oppia-short-response-item-selection-input.directive.ts',
@@ -287,7 +286,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-concept-card-editor.directive.ts',
     'skill-creation.service.ts',
     'skill-description-editor.directive.ts',
-    'skill-editor-navbar-breadcrumb.directive.ts',
+    'skill-editor-navbar-breadcrumb.component.ts',
     'skill-editor-navbar.directive.ts',
     'skill-editor-state.service.ts',
     'skill-mastery.component.ts',
@@ -332,8 +331,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
-    'suggestion-modal-for-exploration-player.service.ts',
-    'summary-list-header.directive.ts',
+    'summary-list-header.component.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
     'teacher.ts',
@@ -451,7 +449,7 @@ def check_not_fully_covered_filenames_list_is_sorted():
 
 
 def check_coverage_changes():
-    """Checks if the blacklist for not fully covered files needs to be changed
+    """Checks if the denylist for not fully covered files needs to be changed
     by:
     - File renaming
     - File deletion
@@ -465,7 +463,7 @@ def check_coverage_changes():
             ' file does not exist.'.format(LCOV_FILE_PATH))
 
     stanzas = get_stanzas_from_lcov_file()
-    remaining_blacklisted_files = list(NOT_FULLY_COVERED_FILENAMES)
+    remaining_denylisted_files = list(NOT_FULLY_COVERED_FILENAMES)
     errors = ''
 
     for stanza in stanzas:
@@ -473,7 +471,7 @@ def check_coverage_changes():
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
 
-        if file_name not in remaining_blacklisted_files:
+        if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be not completely tested.'
@@ -482,7 +480,7 @@ def check_coverage_changes():
             if total_lines == covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be fully covered!'
-                    ' Before removing it manually from the blacklist'
+                    ' Before removing it manually from the denylist'
                     ' in the file'
                     ' scripts/check_frontend_test_coverage.py, please'
                     ' make sure you\'ve followed the unit tests rules'
@@ -490,15 +488,15 @@ def check_coverage_changes():
                     ' https://github.com/oppia/oppia/wiki/Frontend'
                     '-unit-tests-guide#rules\n'.format(file_name))
 
-            remaining_blacklisted_files.remove(file_name)
+            remaining_denylisted_files.remove(file_name)
 
-    if remaining_blacklisted_files:
-        for test_name in remaining_blacklisted_files:
+    if remaining_denylisted_files:
+        for test_name in remaining_denylisted_files:
             errors += (
                 '\033[1m{}\033[0m is in the frontend test coverage'
-                ' blacklist but it doesn\'t exist anymore. If you have'
+                ' denylist but it doesn\'t exist anymore. If you have'
                 ' renamed it, please make sure to remove the old file'
-                ' name and add the new file name in the blacklist in'
+                ' name and add the new file name in the denylist in'
                 ' the file scripts/check_frontend_test_coverage.py.\n'
                 .format(test_name))
 
@@ -523,6 +521,7 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when check_frontend_coverage.py is used as a script.
+# it will only be called when check_frontend_test_coverage.py
+# is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()
