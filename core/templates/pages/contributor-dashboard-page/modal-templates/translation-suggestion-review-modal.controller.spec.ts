@@ -47,6 +47,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   describe('when reviewing suggestion', function() {
     const reviewable = true;
+    const subheading = 'subheading_title';
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
       target_id: '1',
@@ -84,6 +85,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
         reviewable: reviewable,
         suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
       });
@@ -93,6 +95,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       function() {
         expect($scope.activeSuggestionId).toBe('suggestion_1');
         expect($scope.activeSuggestion).toEqual(suggestion1);
+        expect($scope.subheading).toBe('subheading_title');
         expect($scope.reviewable).toBe(reviewable);
         expect($scope.reviewMessage).toBe('');
       });
@@ -246,6 +249,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   describe('when viewing suggestion', function() {
     const reviewable = false;
     let $httpBackend = null;
+    const subheading = 'subheading_title';
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -287,6 +291,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
         reviewable: reviewable,
         suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
       });
@@ -297,6 +302,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         expect($scope.activeSuggestionId).toBe('suggestion_1');
         expect($scope.activeSuggestion).toEqual(suggestion1);
         expect($scope.reviewable).toBe(reviewable);
+        expect($scope.subheading).toBe('subheading_title');
 
         var messages = [{
           author_username: '',

@@ -2052,6 +2052,8 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 
 class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.ProfilePictureAuditOneOffJob.create_new()
@@ -2067,14 +2069,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         return eval_output
 
     def setUp(self):
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(ProfilePictureAuditOneOffJobTests, self).setUp()
+        super(ProfilePictureAuditOneOffJobTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.generate_initial_profile_picture(self.owner_id)
@@ -2189,6 +2184,8 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
 class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
@@ -2208,16 +2205,6 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
             if item[0] == 'FAILURE':
                 item[1] = sorted(item[1])
         return eval_output
-
-    def setUp(self):
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(UniqueHashedNormalizedUsernameAuditJobTests, self).setUp()
 
     def test_audit_user_with_username_is_successful(self):
         model = user_models.UserSettingsModel(id='id', email='email@email.com')

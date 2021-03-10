@@ -31,9 +31,7 @@ import webapp2
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
-class GaeAuthServicesTests(test_utils.GenericTestBase):
-
-    ENABLE_AUTH_SERVICES_STUB = False
+class GaeAuthServicesTests(test_utils.AppEngineTestBase):
 
     def test_establish_auth_session_does_nothing(self):
         request = webapp2.Request.blank('/')
@@ -62,11 +60,15 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
         request = webapp2.Request.blank('/')
         email = 'user@test.com'
 
-        with self.login_context('user@test.com'):
-            claims = gae_auth_services.get_auth_claims_from_request(request)
+        # Google App Engine uses environment variables to emulate user sessions.
+        self.testbed.setup_env(overwrite=True, user_email=email, user_id='gid')
+
+        claims = gae_auth_services.get_auth_claims_from_request(request)
+
+        self.testbed.setup_env(overwrite=True, user_email='', user_id='')
 
         self.assertIsNotNone(claims)
-        self.assertEqual(claims.auth_id, self.get_auth_id_from_email(email))
+        self.assertEqual(claims.auth_id, 'gid')
         self.assertEqual(claims.email, email)
         self.assertFalse(claims.role_is_super_admin)
 
@@ -74,11 +76,17 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
         request = webapp2.Request.blank('/')
         email = 'admin@test.com'
 
-        with self.login_context(email, is_super_admin=True):
-            claims = gae_auth_services.get_auth_claims_from_request(request)
+        # Google App Engine uses environment variables to emulate user sessions.
+        self.testbed.setup_env(
+            overwrite=True, user_email=email, user_id='gid', user_is_admin='1')
+
+        claims = gae_auth_services.get_auth_claims_from_request(request)
+
+        self.testbed.setup_env(
+            overwrite=True, user_email='', user_id='', user_is_admin='0')
 
         self.assertIsNotNone(claims)
-        self.assertEqual(claims.auth_id, self.get_auth_id_from_email(email))
+        self.assertEqual(claims.auth_id, 'gid')
         self.assertEqual(claims.email, email)
         self.assertTrue(claims.role_is_super_admin)
 
