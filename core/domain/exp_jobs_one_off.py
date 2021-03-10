@@ -128,8 +128,9 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
                 removed_deprecated_field = True
 
         if removed_deprecated_field:
-            exp_rights_model.update_timestamps(update_last_updated_time=False)
-            exp_models.ExplorationRightsModel.put_multi([exp_rights_model])
+            exp_models.ExplorationRightsModel.put_multi_for_bot(
+                [exp_rights_model]
+            )
             yield (
                 'SUCCESS_REMOVED - ExplorationRightsModel', exp_rights_model.id)
         else:
