@@ -3313,6 +3313,7 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             snapshot_content_model.content['states_schema_version'], 1)
 
+
 class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -3377,7 +3378,8 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(job_id)
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(
+            job_id)
         expected_output = [
             '[u\'12\', [u\'exp_id0 State2\']]'
         ]
@@ -3453,7 +3455,8 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(job_id)
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(
+            job_id)
 
         actual_output_dict = {}
 
