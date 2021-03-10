@@ -91,13 +91,16 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
-def get_multiple_explorations_by_version(exp_id, version_numbers):
+def get_multiple_explorations_by_version(
+        exp_id, version_numbers, run_conversion=True):
     """Returns a list of Exploration domain objects corresponding to the
     specified versions.
 
     Args:
         exp_id: str. ID of the exploration.
         version_numbers: list(int). List of version numbers.
+        run_conversion: bool. When True, updates each Exploration version to
+            the latest states_schema_version if necessary.
 
     Returns:
         list(Exploration). List of Exploration domain objects.
@@ -112,7 +115,9 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
     error_versions = []
     for index, exploration_model in enumerate(exploration_models):
         try:
-            explorations.append(get_exploration_from_model(exploration_model))
+            explorations.append(
+                get_exploration_from_model(
+                    exploration_model, run_conversion=run_conversion))
         except utils.ExplorationConversionError:
             error_versions.append(version_numbers[index])
 
