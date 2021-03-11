@@ -1,29 +1,29 @@
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text oppia-long-text-card">
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text oppia-long-text-card">
   <div class="container ml-0">
     <h3>Reload a single exploration</h3>
-    <div ng-repeat="exploration in $ctrl.DEMO_EXPLORATIONS"
+    <div *ngFor="let exploration of DEMO_EXPLORATIONS"
          class="row oppia-reload-exploration-row protractor-test-reload-exploration-row">
       <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
-        <[exploration[1]]>
+        {{ exploration[1] }}
       </span>
       <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
         <button type="button"
                 class="btn btn-secondary protractor-test-reload-exploration-button float-right"
-                ng-click="$ctrl.reloadExploration(exploration[0])">
+                (click)="reloadExploration(exploration[0])">
         Reload
         </button>
       </span>
     </div>
     <button type="button"
             class="btn btn-secondary protractor-test-reload-all-explorations-button"
-            ng-click="$ctrl.reloadAllExplorations()"
-            ng-disable="$ctrl.reloadingAllExplorationPossible">
+            (click)="reloadAllExplorations()"
+            [disabled]="reloadingAllExplorationPossible">
       Reload All Explorations
     </button>
   </div>
-</md-card>
+</mat-card>
 
-<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <div class="container">
     <h3>Generate dummy explorations</h3>
     <p>
@@ -32,49 +32,49 @@
     <span class="row">
       <label for="label-target-explorations-to-generate">Number of explorations to generate</label>
       <input class="form-control form-inline oppia-form-inline"
-             ng-model="$ctrl.numDummyExpsToGenerate"
+             [(ngModel)]="numDummyExpsToGenerate"
              placeholder="Explorations to generate" type="number" min="0"
              id="label-target-explorations-to-generate">
       <label for="label-target-explorations-to-publish">Number of explorations to publish</label>
-      <em ng-show="$ctrl.numDummyExpsToGenerate"
+      <em [hidden]="!numDummyExpsToGenerate"
           class="oppia-publish-exploration-text">
-        (Publish <[$ctrl.numDummyExpsToPublish]> out of <[$ctrl.numDummyExpsToGenerate]> explorations)
+        (Publish {{ numDummyExpsToPublish }} out of {{ numDummyExpsToGenerate }} explorations)
       </em>
       <input class="form-control form-inline"
-             ng-model="$ctrl.numDummyExpsToPublish"
+             [(ngModel)]="numDummyExpsToPublish"
              placeholder="Explorations to Publish"
-             ng-disabled="!$ctrl.numDummyExpsToGenerate" type="number" min="0"
+             [disabled]="!numDummyExpsToGenerate" type="number" min="0"
              id="label-target-explorations-to-publish">
       <button type="button"
               class="btn btn-primary oppia-generate-exploration-text"
-              ng-click="$ctrl.generateDummyExplorations()"
-              ng-disabled="!$ctrl.numDummyExpsToGenerate">
+              (click)="generateDummyExplorations()"
+              [disabled]="!numDummyExpsToGenerate">
         Generate Explorations
       </button>
     </span>
   </div>
-</md-card>
+</mat-card>
 
-<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <div class="container ml-0">
     <h3>Reload a single collection</h3>
-    <div ng-repeat="collection in $ctrl.DEMO_COLLECTIONS"
+    <div *ngFor="let collection of DEMO_COLLECTIONS"
          class="row oppia-reload-collection-row protractor-test-reload-collection-row">
       <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
-        <[collection[1]]>
+        {{ collection[1] }}
       </span>
       <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
         <button type="button"
                 class="btn btn-secondary protractor-test-reload-collection-button float-right"
-                ng-click="$ctrl.reloadCollection(collection[0])">
+                (click)="reloadCollection(collection[0])">
           Reload
         </button>
       </span>
     </div>
   </div>
-</md-card>
+</mat-card>
 
-<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <div class="container ml-0">
     <h3>Load dummy new structures data (only admins)</h3>
     <div class="row">
@@ -87,15 +87,15 @@
       <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
         <button type="button"
                 class="btn btn-secondary float-right"
-                ng-click="$ctrl.loadNewStructuresData()">
+                (click)="loadNewStructuresData()">
           Load Data
         </button>
       </span>
     </div>
   </div>
-</md-card>
+</mat-card>
 
-<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <div class="container ml-0">
     <h3>Generate dummy skill with questions (only admins)</h3>
     <div class="row">
@@ -105,13 +105,13 @@
       <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
         <button type="button"
                 class="btn btn-secondary float-right"
-                ng-click="$ctrl.generateNewSkillData()">
+                (click)="generateNewSkillData()">
           Generate Data
         </button>
       </span>
     </div>
   </div>
-</md-card>
+</mat-card>
 
 <style>
   admin-dev-mode-activities-tab .oppia-admin-page-card .row {

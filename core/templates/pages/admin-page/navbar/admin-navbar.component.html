@@ -48,11 +48,11 @@
     <div class="navbar-header protractor-test-navbar-header float-left">
       <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/community-library">
         <picture>
-          <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.webp')]>">
-          <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>">
-          <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>"
+          <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+          <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
                class="oppia-logo"
-               ng-class="'oppia-logo-wide'"
+               ngClass="'oppia-logo-wide'"
                alt="Oppia Logo">
         </picture>
         Return to Oppia Library Page
@@ -63,13 +63,13 @@
         </li>
       </ul>
     </div>
-    <div ng-cloak class="navbar-header float-right">
+    <div class="navbar-header float-right">
       <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
         <li>
-          <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown" uib-dropdown ng-class="{'open' : $ctrl.dropdownMenuisActive}">
+          <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown" uib-dropdown ngClass="{'open' : dropdownMenuisActive}">
             <li uib-dropdown-toggle class="nav-item oppia-clickable-navbar-element"
-                ng-mouseover="$ctrl.activateDropdownMenu()"
-                ng-mouseleave="$ctrl.deactivateDropdownMenu()">
+                ng-mouseover="activateDropdownMenu()"
+                ng-mouseleave="deactivateDropdownMenu()">
               <a class="nav-link oppia-navbar-tab"
                  uib-tooltip="Menu"
                  tooltip-placement="bottom">
@@ -78,14 +78,14 @@
             </li>
             <li>
               <ul class="uib-dropdown-menu dropdown-menu oppia-admin-page-dropdown-menu"
-                  ng-mouseover="$ctrl.activateDropdownMenu()"
-                  ng-mouseleave="$ctrl.deactivateDropdownMenu()"
-                  ng-show="$ctrl.dropdownMenuisActive"
+                  ng-mouseover="activateDropdownMenu()"
+                  ng-mouseleave="deactivateDropdownMenu()"
+                  *ngIf="dropdownMenuisActive"
                   role="menu">
-                <li ng-repeat="(tabName, url) in $ctrl.ADMIN_TAB_URLS">
+                <li *ngFor="let tab of ADMIN_TAB_URLS | keyvalue">
                   <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab"
-                     ng-href="<[url]>">
-                    <[tabName]>
+                     [href]="tab.value">
+                    {{ tab.key }}
                   </a>
                 </li>
               </ul>
@@ -96,8 +96,8 @@
           <ul class="nav oppia-navbar-tabs-admin oppia-hide-in-small-width-screens">
             <li class="nav-item oppia-clickable-navbar-element float-right">
               <a class="nav-link oppia-navbar-tab"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.ACTIVITIES]>"
-                 ng-class="{active: $ctrl.isActivitiesTabOpen()}"
+                 [href]="ADMIN_TAB_URLS.ACTIVITIES"
+                 ngClass="{active: isActivitiesTabOpen()}"
                  uib-tooltip="Activities"
                  tooltip-placement="bottom">
                 Activities
@@ -105,8 +105,8 @@
             </li>
             <li class="nav-item oppia-clickable-navbar-element float-right">
               <a class="nav-link oppia-navbar-tab"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.JOBS]>"
-                 ng-class="{active: $ctrl.isJobsTabOpen()}"
+                 [href]="ADMIN_TAB_URLS.JOBS"
+                 ngClass="{active: isJobsTabOpen()}"
                  uib-tooltip="Jobs"
                  tooltip-placement="bottom">
                 Jobs
@@ -114,8 +114,8 @@
             </li>
             <li class="nav-item oppia-clickable-navbar-element float-right">
               <a class="nav-link oppia-navbar-tab protractor-test-admin-config-tab"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.CONFIG]>"
-                 ng-class="{active: $ctrl.isConfigTabOpen()}"
+                 [href]="ADMIN_TAB_URLS.CONFIG"
+                 ngClass="{active: isConfigTabOpen()}"
                  uib-tooltip="Config"
                  tooltip-placement="bottom">
                 Config
@@ -123,8 +123,8 @@
             </li>
             <li class="nav-item oppia-clickable-navbar-element float-right">
               <a class="nav-link oppia-navbar-tab protractor-test-admin-features-tab"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.FEATURES]>"
-                 ng-class="{active: $ctrl.isFeaturesTabOpen()}"
+                 [href]="ADMIN_TAB_URLS.FEATURES"
+                 ngClass="{active: isFeaturesTabOpen()}"
                  uib-tooltip="Features"
                  tooltip-placement="bottom">
                 Features
@@ -132,8 +132,8 @@
             </li>
             <li class="nav-item oppia-clickable-navbar-element float-right">
               <a class="nav-link oppia-navbar-tab protractor-test-admin-roles-tab"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.ROLES]>"
-                 ng-class="{active: $ctrl.isRolesTabOpen()}"
+                 [href]="ADMIN_TAB_URLS.ROLES"
+                 ngClass="{active: isRolesTabOpen()}"
                  uib-tooltip="Roles"
                  tooltip-placement="bottom">
                 Roles
@@ -141,8 +141,8 @@
             </li>
             <li class="nav-item oppia-clickable-navbar-element float-right">
               <a class="nav-link oppia-navbar-tab"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.MISC]>"
-                 ng-class="{active: $ctrl.isMiscTabOpen()}"
+                 [href]="ADMIN_TAB_URLS.MISC"
+                 ngClass="{active: isMiscTabOpen()}"
                  uib-tooltip="Miscellaneous"
                  tooltip-placement="bottom">
                 Misc
@@ -152,62 +152,62 @@
         </li>
         <li>
           <ul class="nav oppia-navbar-tabs-admin">
-            <li uib-dropdown class="nav-item uib-dropdown float-right" ng-class="{'open' : $ctrl.profileDropdownIsActive}">
+            <li uib-dropdown class="nav-item uib-dropdown float-right" ngClass="{'open' : profileDropdownIsActive}">
               <a uib-dropdown-toggle class="nav-link uib-dropdown-toggle oppia-navbar-dropdown-toggle"
                  data-toggle="dropdown"
-                 ng-mouseover="$ctrl.activateProfileDropdown()"
-                 ng-mouseleave="$ctrl.deactivateProfileDropdown()">
-                <div class="oppia-navbar-profile-picture-container float-left" ng-cloak>
-                  <div ng-if="$ctrl.profilePictureDataUrl">
+                 ng-mouseover="activateProfileDropdown()"
+                 ng-mouseleave="deactivateProfileDropdown()">
+                <div class="oppia-navbar-profile-picture-container float-left">
+                  <div *ngIf="profilePictureDataUrl">
                     <!--
                       Lighthouse flags <img> elements that don't have alt attributes:
                       If the image acts as decoration and does not provide any useful content, give it an empty alt=""
                       https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
                     -->
-                    <img ng-src="<[$ctrl.profilePictureDataUrl]>"
+                    <img [src]="profilePictureDataUrl"
                          class="dropdown-toggle oppia-navbar-profile-picture rounded-circle"
                          alt="">
                   </div>
-                  <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
+                  <div *ngIf="!profilePictureDataUrl" class="dropdown-toggle">
                     <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
                   </div>
                 </div>
               </a>
-              <ul uib-dropdown-menu class="dropdown-menu uib-dropdown-menu ng-cloak oppia-navbar-dropdown"
+              <ul uib-dropdown-menu class="dropdown-menu uib-dropdown-menu oppia-navbar-dropdown"
                   role="menu"
-                  ng-mouseover="$ctrl.activateProfileDropdown()"
-                  ng-mouseleave="$ctrl.deactivateProfileDropdown()">
+                  ng-mouseover="activateProfileDropdown()"
+                  ng-mouseleave="deactivateProfileDropdown()">
                 <li>
-                  <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                     ng-href="<[$ctrl.profileUrl]>"
+                  <a (click)="onMouseoutProfilePictureOrDropdown($event)"
+                     [href]="profileUrl"
                      class="dropdown-item oppia-dropdown-item-text">
-                    <strong><[$ctrl.username]></strong>
+                    <strong>{{ username }}</strong>
                   </a>
                 </li>
                 <hr class="oppia-top-right-menu-item-separator">
                 <li>
-                  <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                  <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                      href="/creator-dashboard"
                      class="dropdown-item oppia-dropdown-item-text">
                     Creator Dashboard
                   </a>
                 </li>
                 <li>
-                  <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                  <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                      href="/notifications"
                      class="dropdown-item oppia-dropdown-item-text">
                     Notifications
                   </a>
                 </li>
                 <li>
-                  <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                  <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                      href="/preferences"
                      class="dropdown-item oppia-dropdown-item-text">
                     Preferences
                   </a>
                 </li>
-                <li ng-if="$ctrl.isModerator">
-                  <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                <li *ngIf="isModerator">
+                  <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                      href="/moderator"
                      target="_blank"
                      rel="noopener"
@@ -215,8 +215,8 @@
                     Moderator Page
                   </a>
                 </li>
-                <li ng-if="$ctrl.isSuperAdmin">
-                  <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
+                <li *ngIf="isSuperAdmin">
+                  <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                      href="/admin"
                      target="_blank"
                      rel="noopener"
@@ -226,8 +226,8 @@
                 </li>
                 <hr class="oppia-top-right-menu-item-separator">
                 <li>
-                  <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                     ng-href="<[$ctrl.logoutUrl]>"
+                  <a (click)="onMouseoutProfilePictureOrDropdown($event)"
+                     [href]="logoutUrl"
                      class="dropdown-item oppia-dropdown-item-text">
                     Logout
                   </a>
