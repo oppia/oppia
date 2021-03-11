@@ -49,8 +49,6 @@ describe('Learner dashboard functionality', function() {
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var continueButton = element(by.css('.protractor-test-continue-button'));
   var clickContinueButton = async function() {
-    await waitFor.elementToBeClickable(
-      continueButton, 'Could not click continue button');
     await action.click('Continue Button', continueButton);
     await waitFor.pageToFullyLoad();
   };
@@ -339,8 +337,6 @@ describe('Learner dashboard functionality', function() {
       await element.all(
         by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    await waitFor.elementToBeClickable(
-      firstExploration, 'Could not click first exploration in collection');
     await action.click('First Exploration Button', firstExploration);
     await waitFor.pageToFullyLoad();
     // Leave this collection incomplete.
@@ -349,8 +345,6 @@ describe('Learner dashboard functionality', function() {
       // to begin an exploration which is a part of a collection.
       var playExploration = element(
         by.css('.protractor-test-play-exploration-button'));
-      await waitFor.elementToBeClickable(
-        playExploration, 'Could not click play exploration button');
       await action.click('Play Exploration Button', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
@@ -378,15 +372,11 @@ describe('Learner dashboard functionality', function() {
       await element.all(
         by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    await waitFor.elementToBeClickable(
-      firstExploration, 'Could not click first exploration in collection');
     await action.click('First Exploration Button', firstExploration);
     await waitFor.pageToFullyLoad();
     if (browser.isMobile) {
       var playExploration = element(
         by.css('.protractor-test-play-exploration-button'));
-      await waitFor.elementToBeClickable(
-        playExploration, 'Could not click play exploration button');
       await action.click('Play Exploration Button', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
