@@ -3274,22 +3274,22 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(def_node)
 
 
-class ConcatenationCheckerTests(unittest.TestCase):
+class StringConcatenationCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(ConcatenationCheckerTests, self).setUp()
+        super(StringConcatenationCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.ConcatenationChecker)
+            pylint_extensions.StringConcatenationChecker)
         self.checker_test_object.setup_method()
 
-    def test_string_concatenation_present_error(self):
+    def test_string_concatenation_with_string_operands_raises_error(self):
         binop_node1, binop_node2, binop_node3 = astroid.extract_node(
             """
-        'string1' + 'string2' #@
-        a + 'string1' #@
-        'string2' + b #@
-        """)
+            'string1' + 'string2' #@
+            a + 'string1' #@
+            'string2' + b #@
+            """)
 
         str_str_message = testutils.Message(
             msg_id='string-concatenation', args=('\'string1\''),
@@ -3307,13 +3307,68 @@ class ConcatenationCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_binop(binop_node2)
             self.checker_test_object.checker.visit_binop(binop_node3)
 
-    def test_string_concatenation_not_present(self):
+    def test_string_interpolation_does_not_raise_error(self):
         binop_node1, binop_node2 = astroid.extract_node(
             """
-        'string1%s' % (string2) #@
-        '%sstring2' % d #@
-        """)
+            'string1%s' % (string2) #@
+            '%sstring2' % d #@
+            """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(binop_node1)
             self.checker_test_object.checker.visit_binop(binop_node2)
+
+    def test_addition_of_non_string_variables_does_not_raise_error(self):
+        binop_node1 = astroid.extract_node(
+            """
+            a = 2
+            b = 4
+            a + b #@
+            """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(binop_node1)
+
+    def test_addition_of_string_variables_does_not_raise_error(self):
+        binop_node1 = astroid.extract_node(
+            """
+            a = 'string1'
+            b = 'string2'
+            a + b #@
+            """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(binop_node1)
+
+    def test_multiple_string_concatenations_raises_error(self):
+        binop_node1 = astroid.extract_node(
+            """
+            'string1' + 'string2' + 'string3'
+            """)
+
+        binop_node2 = binop_node1.left
+        first_message = testutils.Message(
+            msg_id='string-concatenation', args=('\'string3\''),
+            node=binop_node1)
+        sec_message = testutils.Message(
+            msg_id='string-concatenation', args=('\'string1\''),
+            node=binop_node2)
+
+        with self.checker_test_object.assertAddsMessages(
+            first_message, sec_message):
+            self.checker_test_object.checker.visit_binop(binop_node1)
+            self.checker_test_object.checker.visit_binop(binop_node2)
+
+    def test_string_concatenation_inside_interpolation_raises_error(self):
+        mod_binop_node = astroid.extract_node(
+            """
+            a = 'string2'
+            'string1%s' % (a + 'string3') #@
+            """)
+
+        plus_binop_node = mod_binop_node.right
+        first_message = testutils.Message(
+            msg_id='string-concatenation', args=('\'string3\''),
+            node=plus_binop_node)
+
+        with self.checker_test_object.assertAddsMessages(first_message):
+            self.checker_test_object.checker.visit_binop(mod_binop_node)
+            self.checker_test_object.checker.visit_binop(plus_binop_node)

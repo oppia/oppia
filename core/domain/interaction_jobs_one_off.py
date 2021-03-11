@@ -102,11 +102,10 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         if rule_spec.inputs['x'] >= choices_length:
                             yield (
                                 item.id,
-                                'State name: %s, AnswerGroup: %s,' % (
+                                'State name: %s, AnswerGroup: %s, Rule: %s is '
+                                'invalid.(Indices here are 0-indexed.)' % (
                                     state_name.encode('utf-8'),
-                                    answer_group_index) +
-                                ' Rule: %s is invalid.' % (rule_index) +
-                                '(Indices here are 0-indexed.)')
+                                    answer_group_index, rule_index))
 
     @staticmethod
     def reduce(key, values):

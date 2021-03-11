@@ -132,10 +132,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_COMPONENT_FILEPATH)
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types', INVALID_COMPONENT_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
         compile_all_ts_files_swap = self.swap(
@@ -158,10 +158,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_SCOPE_TRUE_FILEPATH,
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types', INVALID_SCOPE_TRUE_FILEPATH,
                     INVALID_DIRECTIVE_WITH_NO_RETURN_BLOCK)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -187,10 +187,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_SCOPE_FILEPATH)
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types', INVALID_SCOPE_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
         compile_all_ts_files_swap = self.swap(
@@ -213,9 +213,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_SORTED_DEPENDENCIES_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -246,9 +247,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -278,9 +280,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_CONSTANT_AJS_FILEPATH,
                     INVALID_CONSTANT_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -309,9 +312,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_CONSTANT_IN_TS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -337,9 +341,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_CONSTANT_AJS_FILEPATH,
                     INVALID_CONSTANT_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -362,9 +367,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_AS_CONST_CONSTANTS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -387,9 +393,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     VALID_CONSTANT_OUTSIDE_CLASS_AJS_FILEPATH,
                     VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -412,9 +419,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     VALID_APP_CONSTANTS_AJS_FILEPATH,
                     VALID_APP_CONSTANTS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -437,9 +445,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_CONSTANT_IN_TS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -528,9 +537,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_TS_IGNORE_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -565,9 +575,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     VALID_TS_IGNORE_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -593,9 +604,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_TS_EXPECT_ERROR_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -630,9 +642,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     VALID_TS_EXPECT_ERROR_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -654,9 +667,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     INVALID_FORMATTED_COMMENT_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -680,9 +694,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     VALID_UNLISTED_SERVICE_PATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
@@ -719,9 +734,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
+                    '%sscripts/linters/test_files/' %
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, 'true',
+                    'es2017,dom', 'true', 'true', 'es5',
+                    './node_modules/@types',
                     VALID_IGNORED_SERVICE_PATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 

@@ -99,7 +99,7 @@ def _get_build_info():
                     template_var)
             template_values.append(value)
         build_url = info['build_url_template'] % tuple(template_values)
-        timestamp = datetime.datetime.utcnow().isoformat() + '+00:00'
+        timestamp = '%s+00:00' % datetime.datetime.utcnow().isoformat()
 
         build_info['username'] = os.getenv(ci_env['user_info'])
         build_info['build_url'] = build_url

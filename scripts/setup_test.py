@@ -333,9 +333,8 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v%s/node-v%s' % (
-                    common.NODE_VERSION, common.NODE_VERSION) +
-                '-linux-x64.tar.gz',
+                'https://nodejs.org/dist/v%s/node-v%s-linux-x64.tar.gz' % (
+                    common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])

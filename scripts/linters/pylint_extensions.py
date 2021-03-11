@@ -2111,9 +2111,9 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
-class ConcatenationChecker(checkers.BaseChecker):
-    """Custom pylint checker which checks that string
-    concatenation is present or not
+class StringConcatenationChecker(checkers.BaseChecker):
+    """Custom pylint checker which prohibits use of string concatenation and
+     promotes string interpolation instead.
     """
 
     __implements__ = interfaces.IAstroidChecker
@@ -2121,7 +2121,7 @@ class ConcatenationChecker(checkers.BaseChecker):
     name = 'string-concatenation'
     priority = -1
     msgs = {
-        'C0034': (
+        'C0035': (
             'at string %s, use string interpolation (\'string1%%s\' %% string2)'
             ' rather than string concatenation (\'string1\' + \'string2\').',
             'string-concatenation',
@@ -2130,8 +2130,8 @@ class ConcatenationChecker(checkers.BaseChecker):
     }
 
     def visit_binop(self, node):
-        """Custom pylint checker which makes sure that string concatenation
-        is not used.
+        """Called for every '+' operator to prohibit usage of string
+         concatenation.
 
         Args:
             node: astroid.node.BinOp. Node to access module content.
@@ -2139,7 +2139,8 @@ class ConcatenationChecker(checkers.BaseChecker):
         if node.op == b'+':
             for operand in node.get_children():
                 if (isinstance(operand, astroid.nodes.Const) and
-                        ('str' in operand.pytype())):
+                        ('str' in operand.pytype() or
+                         'unicode' in operand.pytype())):
                     self.add_message(
                         'string-concatenation',
                         args=(operand.as_string()),
@@ -2169,4 +2170,4 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
-    linter.register_checker(ConcatenationChecker(linter))
+    linter.register_checker(StringConcatenationChecker(linter))

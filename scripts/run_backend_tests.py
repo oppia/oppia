@@ -354,7 +354,7 @@ def main(args=None):
             python_utils.PRINT('')
             time.sleep(3)
             python_utils.PRINT('Redirecting to its corresponding test file...')
-            all_test_targets = [parsed_args.test_target + '_test']
+            all_test_targets = ['%s_test' % parsed_args.test_target]
     elif parsed_args.test_shard:
         validation_error = _check_shards_match_tests(
             include_load_tests=False)

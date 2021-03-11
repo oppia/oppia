@@ -645,7 +645,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
         external_model_name = cls.EXTERNAL_MODEL_NAME
         if item.id.startswith('rights'):
-            external_model_name = external_model_name + ' rights'
+            external_model_name = '%s rights' % external_model_name
 
         name_split_by_space = external_model_name.split(' ')
         key_to_fetch = ('_').join(name_split_by_space)
