@@ -20,19 +20,109 @@ import { Injectable, Optional } from '@angular/core';
 import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-
 import firebase from 'firebase/app';
 import { md5 } from 'hash-wasm';
+
+import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
+
+abstract class AuthServiceImpl {
+  abstract getRedirectResultAsync(): Promise<string>;
+  abstract signInWithRedirectAsync(): Promise<void>;
+  abstract signOutAsync(): Promise<void>;
+}
+
+class NullAuthServiceImpl extends AuthServiceImpl {
+  private error = new Error('AngularFireAuth is not available');
+
+  async signInWithRedirectAsync(): Promise<void> {
+    throw this.error;
+  }
+
+  async getRedirectResultAsync(): Promise<string> {
+    throw this.error;
+  }
+
+  async signOutAsync(): Promise<void> {
+    throw this.error;
+  }
+}
+
+class DevAuthServiceImpl extends AuthServiceImpl {
+  constructor(private angularFireAuth: AngularFireAuth) {
+    super();
+  }
+
+  async signInWithRedirectAsync(): Promise<void> {
+  }
+
+  async getRedirectResultAsync(): Promise<string> {
+    const email = prompt('Please enter the email address to sign-in with');
+    const password = await md5(email);
+    let creds: firebase.auth.UserCredential;
+    try {
+      creds = await this.angularFireAuth.signInWithEmailAndPassword(
+        email, password);
+    } catch (err) {
+      if (err.code === 'auth/user-not-found') {
+        creds = await this.angularFireAuth.createUserWithEmailAndPassword(
+          email, password);
+      } else {
+        throw err;
+      }
+    }
+    return creds.user.getIdToken();
+  }
+
+  async signOutAsync(): Promise<void> {
+    return this.angularFireAuth.signOut();
+  }
+}
+
+class ProdAuthServiceImpl extends AuthServiceImpl {
+  private provider: firebase.auth.GoogleAuthProvider;
+
+  constructor(private angularFireAuth: AngularFireAuth) {
+    super();
+    this.provider = new firebase.auth.GoogleAuthProvider();
+    // Oppia only needs an email address for account management.
+    this.provider.addScope('email');
+    // Always prompt the user to select an account, even when they only own one.
+    this.provider.setCustomParameters({prompt: 'select_account'});
+  }
+
+  /** Returns a promise that never resolves or rejects. */
+  async signInWithRedirectAsync(): Promise<void> {
+    return this.angularFireAuth.signInWithRedirect(this.provider);
+  }
+
+  async getRedirectResultAsync(): Promise<string> {
+    const creds = await this.angularFireAuth.getRedirectResult();
+    return creds.user.getIdToken();
+  }
+
+  async signOutAsync(): Promise<void> {
+    return this.angularFireAuth.signOut();
+  }
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private authServiceImpl: AuthServiceImpl;
+
   constructor(
       @Optional() private angularFireAuth: AngularFireAuth,
-      private authBackendApiService: AuthBackendApiService) {}
+      private authBackendApiService: AuthBackendApiService) {
+    if (!this.angularFireAuth) {
+      this.authServiceImpl = new NullAuthServiceImpl();
+    } else if (AuthService.firebaseEmulatorIsEnabled) {
+      this.authServiceImpl = new DevAuthServiceImpl(this.angularFireAuth);
+    } else {
+      this.authServiceImpl = new ProdAuthServiceImpl(this.angularFireAuth);
+    }
+  }
 
   static get firebaseAuthIsEnabled(): boolean {
     return AppConstants.FIREBASE_AUTH_ENABLED;
@@ -60,58 +150,20 @@ export class AuthService {
       ['localhost', 9099] : undefined;
   }
 
-  /**
-   * Prompts the user to sign-in with a trusted identity provider, then fulfills
-   * with true if the user is new, otherwise fulfills with false.
-   * Rejects when sign-in failed.
-   */
-  async signInAsync(): Promise<boolean> {
-    if (!this.angularFireAuth) {
-      throw new Error('AngularFireAuth is not available');
-    }
+  async handleRedirectResultAsync(): Promise<void> {
+    const idToken = await this.authServiceImpl.getRedirectResultAsync();
+    return this.authBackendApiService.beginSessionAsync(idToken);
+  }
 
-    const creds = AuthService.firebaseEmulatorIsEnabled ?
-      await this.emulatorSignInAsync() : await this.productionSignInAsync();
-
-    const idToken = await creds.user.getIdToken();
-    await this.authBackendApiService.beginSessionAsync(idToken);
-
-    return creds.additionalUserInfo.isNewUser;
+  async signInWithRedirectAsync(): Promise<void> {
+    return this.authServiceImpl.signInWithRedirectAsync();
   }
 
   async signOutAsync(): Promise<void> {
-    if (!this.angularFireAuth) {
-      throw new Error('AngularFireAuth is not available');
-    }
-
-    await this.angularFireAuth.signOut();
-  }
-
-  /** Assumes that angularFireAuth is not null. */
-  private async emulatorSignInAsync(): Promise<firebase.auth.UserCredential> {
-    const email = prompt('Please enter the email address to sign-in with');
-    const password = await md5(email);
-    try {
-      return await this.angularFireAuth.signInWithEmailAndPassword(
-        email, password);
-    } catch (err) {
-      if (err.code !== 'auth/user-not-found') {
-        throw err;
-      }
-    }
-    return await this.angularFireAuth.createUserWithEmailAndPassword(
-      email, password);
-  }
-
-  /** Assumes that angularFireAuth is not null. */
-  private async productionSignInAsync(): Promise<firebase.auth.UserCredential> {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    // Oppia only needs an email address for account management.
-    provider.addScope('email');
-    // Always prompt the user to select an account, even when they only own one.
-    provider.setCustomParameters({prompt: 'select_account'});
-    await this.angularFireAuth.signInWithRedirect(provider);
-    return await this.angularFireAuth.getRedirectResult();
+    await Promise.all([
+      this.authServiceImpl.signOutAsync(),
+      this.authBackendApiService.endSessionAsync(),
+    ]);
   }
 }
 

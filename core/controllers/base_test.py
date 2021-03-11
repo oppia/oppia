@@ -709,13 +709,25 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
 
 
 class SessionBeginHandlerTests(test_utils.GenericTestBase):
-    """Tests for session handler."""
+    """Tests for session begin handler."""
 
     def test_get(self):
         call_counter = test_utils.CallCounter(lambda *_: None)
 
         with self.swap(auth_services, 'establish_auth_session', call_counter):
             self.get_html_response('/session_begin', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+
+class SessionEndHandlerTests(test_utils.GenericTestBase):
+    """Tests for session end handler."""
+
+    def test_get(self):
+        call_counter = test_utils.CallCounter(lambda *_: None)
+
+        with self.swap(auth_services, 'destroy_auth_session', call_counter):
+            self.get_html_response('/session_end', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
 
@@ -972,6 +984,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         'Error404Handler',
         'LogoutPage',
         'SessionBeginHandler',
+        'SessionEndHandler',
     ])
 
     def test_every_method_has_decorator(self):

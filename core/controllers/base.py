@@ -70,6 +70,14 @@ class SessionBeginHandler(webapp2.RequestHandler):
         auth_services.establish_auth_session(self.request, self.response)
 
 
+class SessionEndHandler(webapp2.RequestHandler):
+    """Class which handles the creation of a new authentication session."""
+
+    def get(self):
+        """Establishes a new auth session."""
+        auth_services.destroy_auth_session(self.response)
+
+
 class LogoutPage(webapp2.RequestHandler):
     """Class which handles the logout URL."""
 
