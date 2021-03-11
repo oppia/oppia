@@ -89,7 +89,6 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCards = async function() {
-    var explorationCardsCount = await allExplorationCardElements.count();
     await waitFor.visibilityOf(
       allExplorationCardElements.first(),
       'Exploration cards is not present or taking time to display');
