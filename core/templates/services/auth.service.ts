@@ -129,9 +129,7 @@ export class AuthService {
   }
 
   static get firebaseEmulatorIsEnabled(): boolean {
-    return (
-      AuthService.firebaseAuthIsEnabled &&
-      AppConstants.FIREBASE_EMULATOR_ENABLED);
+    return AuthService.firebaseAuthIsEnabled && AppConstants.EMULATOR_MODE;
   }
 
   static get firebaseConfig(): FirebaseOptions {
