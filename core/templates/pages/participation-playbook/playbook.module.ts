@@ -58,7 +58,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     }
   ]
 })
-class SplashPageModule {
+class PlaybookPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
@@ -68,7 +68,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(SplashPageModule);
+  return platformRef.bootstrapModule(PlaybookPageModule);
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
