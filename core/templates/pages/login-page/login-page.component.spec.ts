@@ -22,7 +22,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoginPageComponent } from './login-page.component';
 
 class MockWindowRef {
-  constructor(public location: string = '', public searchParams: string = '') {}
+  constructor(
+      public location: string = null, public searchParams: string = '') {}
 
   get nativeWindow() {
     const that = this;
@@ -90,28 +91,12 @@ describe('Login Page', () => {
     component = fixture.componentInstance;
   });
 
-  it('should sign in after 150ms', fakeAsync(() => {
-    component.ngOnInit();
-
-    expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
-
-    tick(100);
-
-    expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
-
-    tick(50);
-
-    expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
-
-    flush();
-  }));
-
   it('should redirect to sign-up after successful redirect', fakeAsync(() => {
     redirectResultPromise = spyOnHandleRedirectResultAsync();
 
     component.ngOnInit();
 
-    expect(windowRef.location).toEqual('');
+    expect(windowRef.location).toBeNull();
 
     redirectResultPromise.resolve();
     flushMicrotasks();
@@ -126,12 +111,27 @@ describe('Login Page', () => {
 
     component.ngOnInit();
 
-    expect(windowRef.location).toEqual('');
+    expect(windowRef.location).toBeNull();
 
-    redirectResultPromise.reject();
+    redirectResultPromise.reject(new Error());
     flushMicrotasks();
 
     expect(windowRef.location).toEqual('/');
+
+    flush();
+  }));
+
+  it('should redirect to auth service when not logged in', fakeAsync(() => {
+    redirectResultPromise = spyOnHandleRedirectResultAsync();
+
+    component.ngOnInit();
+
+    expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
+
+    redirectResultPromise.reject(null);
+    flushMicrotasks();
+
+    expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
 
     flush();
   }));
@@ -142,7 +142,7 @@ describe('Login Page', () => {
 
     component.ngOnInit();
 
-    expect(windowRef.location).toEqual('');
+    expect(windowRef.location).toBeNull();
 
     redirectResultPromise.resolve();
     flushMicrotasks();

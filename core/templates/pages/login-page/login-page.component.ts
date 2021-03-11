@@ -32,7 +32,14 @@ export class LoginPageComponent implements OnInit {
   ngOnInit(): void {
     this.authService.handleRedirectResultAsync().then(
       () => this.redirectToSignUp(),
-      () => this.authService.signInWithRedirectAsync());
+      rejectionReason => {
+        if (rejectionReason === null) {
+          // Null rejections are used to signal that a user is not logged in.
+          this.authService.signInWithRedirectAsync();
+        } else {
+          this.redirectToHomePage();
+        }
+      });
   }
 
   private redirectToSignUp(): void {
@@ -41,6 +48,10 @@ export class LoginPageComponent implements OnInit {
     const returnUrl = searchParams.get('return_url') ?? '/';
     this.windowRef.nativeWindow.location.assign(
       `/signup?return_url=${returnUrl}`);
+  }
+
+  private redirectToHomePage(): void {
+    this.windowRef.nativeWindow.location.assign('/');
   }
 }
 

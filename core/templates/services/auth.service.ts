@@ -27,7 +27,7 @@ import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 abstract class AuthServiceImpl {
-  abstract getRedirectResultAsync(): Promise<string>;
+  abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential>;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
@@ -39,7 +39,7 @@ class NullAuthServiceImpl extends AuthServiceImpl {
     throw this.error;
   }
 
-  async getRedirectResultAsync(): Promise<string> {
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
     throw this.error;
   }
 
@@ -54,11 +54,9 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   }
 
   async signInWithRedirectAsync(): Promise<void> {
-    // Always have getRedirectResultAsync do the heavy lifting.
-    return Promise.reject();
   }
 
-  async getRedirectResultAsync(): Promise<string> {
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
     const email = prompt('Please enter the email address to sign-in with');
     const password = await md5(email);
     let creds: firebase.auth.UserCredential;
@@ -73,7 +71,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
         throw err;
       }
     }
-    return creds.user.getIdToken();
+    return creds;
   }
 
   async signOutAsync(): Promise<void> {
@@ -98,9 +96,8 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
     return this.angularFireAuth.signInWithRedirect(this.provider);
   }
 
-  async getRedirectResultAsync(): Promise<string> {
-    const creds = await this.angularFireAuth.getRedirectResult();
-    return creds.user.getIdToken();
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+    return this.angularFireAuth.getRedirectResult();
   }
 
   async signOutAsync(): Promise<void> {
@@ -151,8 +148,13 @@ export class AuthService {
   }
 
   async handleRedirectResultAsync(): Promise<void> {
-    const idToken = await this.authServiceImpl.getRedirectResultAsync();
-    return this.authBackendApiService.beginSessionAsync(idToken);
+    const creds = await this.authServiceImpl.getRedirectResultAsync();
+    if (creds.user) {
+      const idToken = await creds.user.getIdToken();
+      return this.authBackendApiService.beginSessionAsync(idToken);
+    } else {
+      return Promise.reject(null);
+    }
   }
 
   async signInWithRedirectAsync(): Promise<void> {

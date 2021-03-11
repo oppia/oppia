@@ -173,6 +173,14 @@ describe('Auth service', () => {
       expect(angularFireAuth.signOut).toHaveBeenCalled();
       expect(authBackendApiService.endSessionAsync).toHaveBeenCalled();
     });
+
+    it('should reject with null if user is empty', async() => {
+      this.creds.user = null;
+      angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
+
+      await expectAsync(authService.handleRedirectResultAsync())
+        .toBeRejectedWith(null);
+    });
   });
 
   describe('Emulator mode', function() {
