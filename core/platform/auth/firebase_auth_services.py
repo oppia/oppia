@@ -89,6 +89,22 @@ def grant_super_admin_privileges(user_id):
             firebase_id, '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
 
+def revoke_super_admin_privileges(user_id):
+    """Revokes the user's super-admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to revoke privileges from.
+
+    Returns:
+        bool. Whether the operation succeeded.
+    """
+    firebase_id = get_auth_id_from_user_id(user_id)
+    if firebase_id is None:
+        raise ValueError('user_id=%s has no Firebase account' % user_id)
+    with _firebase_admin_context():
+        firebase_admin.auth.set_custom_user_claims(firebase_id, None)
+
+
 def establish_auth_session(request, response):
     """Sets login cookies to maintain a user's sign-in session.
 

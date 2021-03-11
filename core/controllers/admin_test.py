@@ -1034,15 +1034,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             feature.name)
         self.logout()
 
-    def test_grant_super_admin_privileges_fails_without_user_id(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        response = self.get_json(
-            '/adminsuperadminhandler', {}, expected_status_int=400)
-
-        self.assertEqual(response['error'], 'Missing user_id param')
-
-    def test_grant_super_admin_privileges_makes_firebase_call(self):
+    def test_grant_super_admin_privileges(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         call_counter = test_utils.CallCounter(lambda _: None)
@@ -1052,11 +1044,74 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         with grant_super_admin_privileges_stub:
             response = self.get_json(
-                '/adminsuperadminhandler', {'user_id': 'uid_123'},
+                '/admingrantsuperadminhandler',
+                {'username': self.ADMIN_USERNAME},
                 expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
         self.assertNotIn('error', response)
+
+    def test_grant_super_admin_privileges_fails_without_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/admingrantsuperadminhandler', {}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
+    def test_grant_super_admin_privileges_fails_with_invalid_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/admingrantsuperadminhandler', {'username': 'fakeusername'},
+            expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
+
+    def test_revoke_super_admin_privileges(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        call_counter = test_utils.CallCounter(lambda _: None)
+        revoke_super_admin_privileges_stub = self.swap(
+            firebase_auth_services, 'revoke_super_admin_privileges',
+            call_counter)
+
+        with revoke_super_admin_privileges_stub:
+            response = self.get_json(
+                '/adminrevokesuperadminhandler', {'username': self.ADMIN_USERNAME},
+                expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertNotIn('error', response)
+
+    def test_revoke_super_admin_privileges_fails_without_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/adminrevokesuperadminhandler', {}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
+    def test_revoke_super_admin_privileges_fails_with_invalid_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/adminrevokesuperadminhandler', {'username': 'fakeusername'},
+            expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
+
+    def test_revoke_super_admin_privileges_fails_for_default_admin(self):
+        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'test')
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.get_json(
+            '/adminrevokesuperadminhandler', {'username': 'test'},
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Cannot revoke privileges from the default super admin account')
 
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):

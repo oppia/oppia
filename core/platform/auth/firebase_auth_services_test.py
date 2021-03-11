@@ -488,16 +488,16 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             return None
 
 
-class GrantSuperAdminPrivilegesTests(test_utils.AppEngineTestBase):
+class SuperAdminPrivilegesTests(test_utils.AppEngineTestBase):
 
     def setUp(self):
-        super(GrantSuperAdminPrivilegesTests, self).setUp()
+        super(SuperAdminPrivilegesTests, self).setUp()
         self.firebase_sdk_stub = FirebaseAdminSdkStub()
         self.firebase_sdk_stub.install(self)
 
     def tearDown(self):
         self.firebase_sdk_stub.uninstall()
-        super(GrantSuperAdminPrivilegesTests, self).tearDown()
+        super(SuperAdminPrivilegesTests, self).tearDown()
 
     def test_updates_user_successfully(self):
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id='aid').put()
@@ -511,12 +511,20 @@ class GrantSuperAdminPrivilegesTests(test_utils.AppEngineTestBase):
             self.firebase_sdk_stub._get_user('aid').custom_claims,
             {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN})
 
+        firebase_auth_services.revoke_super_admin_privileges('uid')
+
+        self.assertIsNone(self.firebase_sdk_stub._get_user('aid').custom_claims)
+
     def test_raises_error_when_user_does_not_exist(self):
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id=None).put()
 
         self.assertRaisesRegexp(
             ValueError, 'user_id=uid has no Firebase account',
             lambda: firebase_auth_services.grant_super_admin_privileges('uid'))
+
+        self.assertRaisesRegexp(
+            ValueError, 'user_id=uid has no Firebase account',
+            lambda: firebase_auth_services.revoke_super_admin_privileges('uid'))
 
 
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):

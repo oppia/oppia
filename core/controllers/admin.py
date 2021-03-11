@@ -729,18 +729,46 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminSuperAdminHandler(base.BaseHandler):
+class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
     """Handler for promoting a user to super-admin."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        user_id = self.request.get('user_id', None)
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
-            raise self.InvalidInputException('Missing user_id param')
+            raise self.InvalidInputException('No such user exists')
 
         firebase_auth_services.grant_super_admin_privileges(user_id)
+        self.render_json(self.values)
+
+
+class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
+    """Handler for promoting a user to super-admin."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if user_settings is None:
+            raise self.InvalidInputException('No such user exists')
+
+        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.InvalidInputException(
+                'Cannot revoke privileges from the default super admin account')
+
+        firebase_auth_services.revoke_super_admin_privileges(
+            user_settings.user_id)
         self.render_json(self.values)
 
 

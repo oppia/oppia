@@ -213,9 +213,6 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        if self.user_id:
-            print('!!!!!!!!!! ' + self.user_id)
-
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
