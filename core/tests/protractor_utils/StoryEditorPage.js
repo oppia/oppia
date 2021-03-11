@@ -315,6 +315,9 @@ var StoryEditorPage = function() {
       closeSaveModalButton,
       'Commit message modal takes too long to disappear.');
     await waitFor.pageToFullyLoad();
+    // Wait for the "Save Draft" button to be reset.
+    await waitFor.textToBePresentInElement(
+      saveStoryButton, 'Save Draft', 'Story could not be saved.');
   };
 
   this.expectSaveStoryDisabled = async function() {
