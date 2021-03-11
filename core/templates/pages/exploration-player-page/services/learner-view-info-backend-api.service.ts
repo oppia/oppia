@@ -28,7 +28,7 @@ export class LearnerViewInfoBackendApiService {
         private http: HttpClient
   ) {}
 
-  async fetchLearnerInfo(
+  fetchLearnerInfo(
       stringifiedExpIds: string,
       includePrivateExplorations: string): Promise<Object> {
     return this.http.get(AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
