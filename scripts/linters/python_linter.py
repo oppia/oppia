@@ -24,6 +24,7 @@ import inspect
 import os
 import re
 import sys
+import time
 
 import python_utils
 
@@ -269,10 +270,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 current_batch_start_index: current_batch_end_index]
 
             pylint_report = python_utils.string_io()
+            start_time = time.time()
             pylinter = lint.Run(
                 current_files_to_lint + [config_pylint],
                 reporter=text.TextReporter(pylint_report),
                 exit=False).linter
+            print('Pylint execution time: ', time.time() - start_time)
 
             if pylinter.msg_status != 0:
                 lint_message = pylint_report.getvalue()
@@ -282,7 +285,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     self.get_trimmed_error_output(lint_message))
                 error_messages.append(pylint_error_messages)
                 errors_found = True
-
+            start_time = time.time()
             with linter_utils.redirect_stdout(stdout):
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
@@ -290,6 +293,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     config_file=config_pycodestyle)
                 pycodestyle_report = style_guide.check_files(
                     paths=current_files_to_lint)
+            print('StyleGuide execution time: ', time.time() - start_time)
 
             if pycodestyle_report.get_count() != 0:
                 error_message = stdout.getvalue()
@@ -342,10 +346,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 current_batch_start_index: current_batch_end_index]
 
             pylint_report = python_utils.string_io()
+            start_time = time.time()
             pylinter_for_python3 = lint.Run(
                 current_files_to_lint + ['--py3k'],
                 reporter=text.TextReporter(pylint_report),
                 exit=False).linter
+            print('3Pylint execution time: ', time.time() - start_time)
 
             if pylinter_for_python3.msg_status != 0:
                 lint_message = pylint_report.getvalue()
@@ -375,6 +381,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         failed = False
         stdout = python_utils.string_io()
         with linter_utils.redirect_stdout(stdout):
+            start_time = time.time()
             for filepath in files_to_check:
                 # This line prints the error message along with file path
                 # and returns True if it finds an error else returns False
@@ -384,6 +391,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                         filepath, check=True, show_diff=(
                             True)).incorrectly_sorted):
                     failed = True
+            print('SortImports execution time: ', time.time() - start_time)
 
             if failed:
                 error_message = stdout.getvalue()
