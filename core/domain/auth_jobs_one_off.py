@@ -43,6 +43,7 @@ FAILURE_KEY = 'FAILURE: Failed to create Firebase accounts'
 SUCCESS_KEY = 'SUCCESS: Created Firebase accounts'
 WARNING_KEY = 'WARNING: No action needed'
 
+SUPER_ADMIN_ACK = 'INFO: Super admin created'
 SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
 
 POPULATED_KEY = 'ALREADY_DONE'
@@ -124,20 +125,25 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if auth_id is not None:
             yield (POPULATED_KEY, 1)
         else:
+            user_is_super_admin = (user.email == feconf.ADMIN_EMAIL_ADDRESS)
+            if user_is_super_admin:
+                yield (SUPER_ADMIN_ACK, user.id)
             # Split up users into different shards to help speed up the job.
             sharding_key = (
                 ID_HASHING_FUNCTION(user.id) %
                 PopulateFirebaseAccountsOneOffJob.NUM_SHARDS)
             yield (
-                sharding_key, (_strip_uid_prefix(user.id), user.id, user.email))
+                sharding_key, (
+                    _strip_uid_prefix(user.id), user.id, user.email,
+                    user_is_super_admin))
 
     @staticmethod
     def reduce(key, values):
         if key == POPULATED_KEY:
             yield (AUDIT_KEY, len(values))
             return
-        elif key == SYSTEM_COMMITTER_ACK:
-            yield (SYSTEM_COMMITTER_ACK, values)
+        elif key in (SUPER_ADMIN_ACK, SYSTEM_COMMITTER_ACK):
+            yield (key, values)
             return
 
         try:
@@ -153,8 +159,10 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_fields = sorted(ast.literal_eval(v) for v in values)
         user_records = [
             firebase_auth.ImportUserRecord(
-                uid=auth_id, email=email, email_verified=True)
-            for auth_id, _, email in user_fields
+                uid=auth_id, email=email, email_verified=True, custom_claims=(
+                    '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
+                    if user_is_super_admin else None))
+            for auth_id, _, email, user_is_super_admin in user_fields
         ]
 
         # The Firebase Admin SDK places a hard-limit on the number of users that

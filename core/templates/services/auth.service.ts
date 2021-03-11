@@ -54,6 +54,8 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   }
 
   async signInWithRedirectAsync(): Promise<void> {
+    // Always have getRedirectResultAsync do the heavy lifting.
+    return Promise.reject();
   }
 
   async getRedirectResultAsync(): Promise<string> {

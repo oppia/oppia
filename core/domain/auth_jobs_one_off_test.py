@@ -172,10 +172,11 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
             ast.literal_eval(o) for o in
             auth_jobs.PopulateFirebaseAccountsOneOffJob.get_output(job_id))
 
-    def create_oppia_user(self, deleted=False):
+    def create_oppia_user(self, email=None, deleted=False):
         """Returns an (auth_id, user_id) pair for a new user.
 
         Args:
+            email: str. The email address of the user.
             deleted: bool. Value for the user's deleted property.
 
         Returns:
@@ -183,8 +184,10 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         """
         auth_id = 'aid%d' % python_utils.NEXT(self._auth_id_generator)
         user_id = 'uid_%s' % auth_id
+        if email is None:
+            email = 'email_%s@test.com' % auth_id
         user_models.UserSettingsModel(
-            id=user_id, email=('email_%s@test.com' % auth_id), deleted=deleted,
+            id=user_id, email=email, deleted=deleted,
             role=feconf.ROLE_ID_EXPLORATION_EDITOR,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
         ).put()
@@ -427,6 +430,25 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['INFO: Pre-existing Firebase accounts', 10],
+        ])
+
+    def test_super_admin_is_created(self):
+        auth_assoc = self.create_oppia_user(email=feconf.ADMIN_EMAIL_ADDRESS)
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['SUCCESS: Created Firebase accounts', 1],
+            ['INFO: Super admin created', [auth_assoc.user_id]],
+        ])
+
+        self.assert_auth_mapping_exists(auth_assoc)
+        self.sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
+
+        user = self.sdk_stub._get_user(auth_assoc.auth_id)
+        self.assertEqual(
+            user.custom_claims, {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN})
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['INFO: Pre-existing Firebase accounts', 1],
         ])
 
     def test_system_comitter_is_ignored(self):

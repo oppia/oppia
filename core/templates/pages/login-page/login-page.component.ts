@@ -30,9 +30,9 @@ export class LoginPageComponent implements OnInit {
   constructor(private authService: AuthService, private windowRef: WindowRef) {}
 
   ngOnInit(): void {
-    this.authService.handleRedirectResultAsync()
-      .then(() => this.redirectToSignUp(), () => this.redirectToHomePage());
-    setTimeout(() => this.authService.signInWithRedirectAsync(), 150);
+    this.authService.handleRedirectResultAsync().then(
+      () => this.redirectToSignUp(),
+      () => this.authService.signInWithRedirectAsync());
   }
 
   private redirectToSignUp(): void {
@@ -41,10 +41,6 @@ export class LoginPageComponent implements OnInit {
     const returnUrl = searchParams.get('return_url') ?? '/';
     this.windowRef.nativeWindow.location.assign(
       `/signup?return_url=${returnUrl}`);
-  }
-
-  private redirectToHomePage(): void {
-    this.windowRef.nativeWindow.location.assign('/');
   }
 }
 
