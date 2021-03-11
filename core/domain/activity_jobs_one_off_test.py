@@ -2193,6 +2193,12 @@ class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJobTests(
             ast.literal_eval(stringified_item) for stringified_item in results]
 
     def _compare_last_updated_fields(self, original_model, migrated_model):
+        """Compare if the last updated fields were se correctly.
+
+        Args:
+            original_model: BaseModel. The original model.
+            migrated_model: BaseModel. The model after the migration.
+        """
         self.assertEqual(
             original_model.last_updated,
             migrated_model.last_updated_by_human)
