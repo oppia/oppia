@@ -1799,7 +1799,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
         exp_id, exp_versions)
 
     exp_list = exp_fetchers.get_multiple_explorations_by_version(
-        exp_id, exp_versions)
+        exp_id, exp_versions, run_conversion=False)
 
     if all(exp_stats is None for exp_stats in exp_stats_list):
         for index, version in enumerate(exp_versions):

@@ -115,6 +115,17 @@ def get_multiple_explorations_by_version(
     error_versions = []
     for index, exploration_model in enumerate(exploration_models):
         try:
+            if (not run_conversion and
+                    exploration_model.states_schema_version !=
+                    feconf.CURRENT_STATE_SCHEMA_VERSION):
+                raise Exception(
+                    'Exploration(id=%s, version=%s, states_schema_version=%s) '
+                    'does not match the latest schema version %s' % (
+                        exp_id,
+                        version_numbers[index],
+                        exploration_model.states_schema_version,
+                        feconf.CURRENT_STATE_SCHEMA_VERSION
+                    ))
             explorations.append(
                 get_exploration_from_model(
                     exploration_model, run_conversion=run_conversion))
