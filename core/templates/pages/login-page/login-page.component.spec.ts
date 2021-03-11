@@ -116,7 +116,7 @@ describe('Login Page', () => {
     redirectResultPromise.resolve();
     flushMicrotasks();
 
-    expect(windowRef.location).toEqual('/signup');
+    expect(windowRef.location).toEqual('/signup?return_url=/');
 
     flush();
   }));
