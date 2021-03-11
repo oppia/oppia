@@ -173,10 +173,10 @@ def clean_math_expression(math_expression):
             r'(%s(\2))\1' % trig_fn, math_expression)
 
     # Adding parens to trig functions that don't have
-    # any. For eg. 'cosA' -> 'cos(A)', 'cos A' -> 'cos(A)'.
+    # any. For eg. 'cosA' -> 'cos(A)'.
     for trig_fn in trig_fns:
         math_expression = re.sub(
-            r'%s\s?(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
+            r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
 
     # The pylatexenc lib outputs the unicode values of special characters like
     # sqrt and pi, which is why they need to be replaced with their
