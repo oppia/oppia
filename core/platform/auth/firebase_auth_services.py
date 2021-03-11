@@ -100,7 +100,7 @@ def establish_auth_session(request, response):
         overwrite=True,
         # Toggles https vs http. The production server uses https, but the local
         # developement server uses http.
-        secure=(not constants.DEV_MODE),
+        secure=(not constants.EMULATOR_MODE),
         # Using the HttpOnly flag when generating a cookie helps mitigate the
         # risk of client side script accessing the protected cookie (if the
         # browser supports it).
