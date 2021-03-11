@@ -3,9 +3,10 @@
        class="h-100"
        ng-attr-title="Edit solution">
     <div class="oppia-readonly-rule-tile"
-         ng-class="{'oppia-editable-section': true}">
+         ng-class="{'oppia-editable-section': $ctrl.isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
-        <div class="oppia-click-to-start-editing"
+        <div ng-if="$ctrl.isEditable"
+             class="oppia-click-to-start-editing"
              ng-click="$ctrl.onOpenSolutionEditor()">
           <i class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Solution">&#xE254;
