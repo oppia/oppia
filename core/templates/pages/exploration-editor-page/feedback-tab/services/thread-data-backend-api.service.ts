@@ -25,11 +25,11 @@ import { forkJoin } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
 import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { ThreadMessage, ThreadMessageBackendDict, ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
-import { SuggestionBackendDict } from 'domain/suggestion/SuggestionObjectFactory';
+import { ThreadMessage, ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.model';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { SuggestionThread, SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants.ts';
+import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { SuggestionsService } from 'services/suggestions.service';
@@ -76,7 +76,6 @@ export class ThreadDataBackendApiService {
     private http: HttpClient,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
-    private threadMessageObjectFactory: ThreadMessageObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -195,7 +194,7 @@ export class ThreadDataBackendApiService {
       .then((response: ThreadMessages) => {
         let threadMessageBackendDicts = response.messages;
         thread.setMessages(threadMessageBackendDicts.map(
-          m => this.threadMessageObjectFactory.createFromBackendDict(m)));
+          m => ThreadMessage.createFromBackendDict(m)));
         return thread.getMessages();
       });
   }
@@ -264,7 +263,7 @@ export class ThreadDataBackendApiService {
       thread.status = newStatus;
       let threadMessageBackendDicts = response.messages;
       thread.setMessages(threadMessageBackendDicts.map(
-        m => this.threadMessageObjectFactory.createFromBackendDict(m)));
+        m => ThreadMessage.createFromBackendDict(m)));
       return thread.messages;
     });
   }

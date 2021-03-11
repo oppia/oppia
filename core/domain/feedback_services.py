@@ -33,15 +33,32 @@ from core.platform import models
 import feconf
 import python_utils
 
-(feedback_models, email_models, suggestion_models) = (
-    models.Registry.import_models(
-        [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+(
+    email_models, expl_models, feedback_models,
+    question_models, skill_models, suggestion_models,
+    topic_models
+) = models.Registry.import_models([
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.suggestion,
+    models.NAMES.topic
+])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
+
+TARGET_TYPE_TO_TARGET_MODEL = {
+    feconf.ENTITY_TYPE_EXPLORATION: (
+        expl_models.ExplorationModel),
+    feconf.ENTITY_TYPE_QUESTION: (
+        question_models.QuestionModel),
+    feconf.ENTITY_TYPE_SKILL: (
+        skill_models.SkillModel),
+    feconf.ENTITY_TYPE_TOPIC: (
+        topic_models.TopicModel)
+}
 
 
 def get_exp_id_from_thread_id(thread_id):
@@ -312,7 +329,10 @@ def create_messages(
 
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id))):
+            user_services.is_user_registered(author_id)) and
+            # TODO(#12079): Figure out a better way to avoid sending feedback
+            # thread emails for contributor dashboard suggestions.
+            (len(text) > 0 or old_statuses[index] != new_statuses[index])):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
@@ -819,7 +839,8 @@ def enqueue_feedback_message_batch_email_task(user_id):
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
 
-def enqueue_feedback_message_instant_email_task(user_id, reference):
+def enqueue_feedback_message_instant_email_task_transactional(
+        user_id, reference):
     """Adds a 'send feedback email' (instant) task into the task queue.
 
     Args:
@@ -835,7 +856,8 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
         feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
 
 
-def _enqueue_feedback_thread_status_change_email_task(
+@transaction_services.run_in_transaction_wrapper
+def _enqueue_feedback_thread_status_change_email_task_transactional(
         user_id, reference, old_status, new_status):
     """Adds a task for sending email when a feedback thread status is changed.
 
@@ -878,7 +900,8 @@ def get_feedback_message_references(user_id):
     ]
 
 
-def _add_feedback_message_reference(user_id, reference):
+@transaction_services.run_in_transaction_wrapper
+def _add_feedback_message_reference_transactional(user_id, reference):
     """Adds a new message to the feedback message buffer that is used to
     generate the next notification email to the given user.
 
@@ -1044,9 +1067,8 @@ def _send_batch_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            transaction_services.run_in_transaction(
-                _add_feedback_message_reference, recipient_id,
-                feedback_message_reference)
+            _add_feedback_message_reference_transactional(
+                recipient_id, feedback_message_reference)
 
 
 def _send_instant_emails(
@@ -1069,9 +1091,8 @@ def _send_instant_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            transaction_services.run_in_transaction(
-                enqueue_feedback_message_instant_email_task, recipient_id,
-                feedback_message_reference)
+            enqueue_feedback_message_instant_email_task_transactional(
+                recipient_id, feedback_message_reference)
 
 
 def _send_feedback_thread_status_change_emails(
@@ -1095,9 +1116,9 @@ def _send_feedback_thread_status_change_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            transaction_services.run_in_transaction(
-                _enqueue_feedback_thread_status_change_email_task, recipient_id,
-                feedback_message_reference, old_status, new_status)
+            _enqueue_feedback_thread_status_change_email_task_transactional(
+                recipient_id, feedback_message_reference, old_status,
+                new_status)
 
 
 def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):

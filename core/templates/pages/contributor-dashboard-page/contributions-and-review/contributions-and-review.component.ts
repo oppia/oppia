@@ -207,13 +207,18 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             skillDifficulty: function() {
               return skillDifficulty;
+            },
+            suggestionId: function() {
+              return suggestionId;
             }
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
           ContributionAndReviewService.resolveSuggestiontoSkill(
             targetId, suggestionId, result.action, result.reviewMessage,
-            result.skillDifficulty, resolveSuggestionSuccess);
+            result.skillDifficulty, resolveSuggestionSuccess, () => {
+              AlertsService.addInfoMessage('Failed to submit suggestion.');
+            });
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -226,7 +231,10 @@ angular.module('oppia').component('contributionsAndReview', {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
-
+        var details = ctrl.contributions[initialSuggestionId].details;
+        var subheading = (
+          details.topic_name + ' / ' + details.story_title +
+          ' / ' + details.chapter_title);
         $uibModal.open({
           templateUrl: _templateUrl,
           backdrop: 'static',
@@ -240,6 +248,9 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             reviewable: function() {
               return reviewable;
+            },
+            subheading: function() {
+              return subheading;
             }
           },
           controller: 'TranslationSuggestionReviewModalController'

@@ -25,6 +25,7 @@ var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('./SkillEditorPage');
 
 var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
@@ -94,6 +95,7 @@ var createExplorationAndStartTutorial = async function() {
     await action.click('Create Exploration Button', createExplorationButton);
   }
 
+  await waitFor.pageToFullyLoad();
   await waitFor.visibilityOf(
     stateNameText, 'State name text takes too long to appear.');
 };
@@ -342,6 +344,32 @@ var submitImage = async function(
   return await waitFor.pageToFullyLoad();
 };
 
+var createQuestion = async function() {
+  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await skillEditorPage.moveToQuestionsTab();
+  await skillEditorPage.clickCreateQuestionButton();
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('Question 1'));
+  await explorationEditorMainTab.setInteraction(
+    'TextInput', 'Placeholder', 5);
+  await explorationEditorMainTab.addResponse(
+    'TextInput', await forms.toRichText('Correct Answer'), null, false,
+    'FuzzyEquals', ['correct']);
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+  await responseEditor.markAsCorrect();
+  await (
+    await explorationEditorMainTab.getResponseEditor('default')
+  ).setFeedback(await forms.toRichText('Try again'));
+  await explorationEditorMainTab.addHint('Hint 1');
+  await explorationEditorMainTab.addSolution('TextInput', {
+    correctAnswer: 'correct',
+    explanation: 'It is correct'
+  });
+  await skillEditorPage.saveQuestion();
+};
+
 exports.getImageSource = getImageSource;
 exports.submitImage = submitImage;
 exports.uploadImage = uploadImage;
@@ -369,3 +397,4 @@ exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
+exports.createQuestion = createQuestion;

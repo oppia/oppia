@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "downlevelIteration": true,
-    "lib": ["es2017", "dom", "webworker"],
+    "lib": ["es2017", "dom"],
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
@@ -36,8 +36,5 @@
     "core/tests/karma.conf.ts"
   ],
   "include": ["core", "extensions", "typings"],
-  "exclude": [
-    "core/tests",
-    "core/templates/google-analytics.initializer.ts"
-  ]
+  "exclude": ["core/tests"]
 }

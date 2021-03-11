@@ -49,16 +49,20 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { FocusOnDirective } from '../directives/focus-on.directive';
+import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -78,8 +82,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
-    NgbModalModule,
     BrowserModule,
     NgbTooltipModule,
     FormsModule,
@@ -95,6 +97,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    FocusOnDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -102,11 +105,15 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
-    StorySummaryTileDirective,
     SocialButtonsComponent,
+    StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    SummaryListHeaderComponent,
+    TakeBreakModalComponent,
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
     TranslatePipe,
-    TakeBreakModalComponent
+    TruncatePipe,
   ],
 
   entryComponents: [
@@ -120,7 +127,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    SummaryListHeaderComponent,
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
   ],
 
   exports: [
@@ -131,11 +141,14 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    FocusOnDirective,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    ThumbnailDisplayComponent,
+    TranslatePipe,
   ],
 })
 

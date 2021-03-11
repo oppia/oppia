@@ -100,17 +100,6 @@ class ExplorationModel(base_models.VersionedModel):
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
 
-    # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
-    # caused GAE to raise an error on fetching a specific version of the
-    # exploration model.
-    # TODO(sll): Fix this error and remove this property.
-    skill_tags = datastore_services.StringProperty(repeated=True, indexed=True)
-    # DEPRECATED in v2.0.1. Do not use.
-    # TODO(sll): Remove this property from the model.
-    default_skin = datastore_services.StringProperty(default='conversation_v1')
-    # DEPRECATED in v2.5.4. Do not use.
-    skin_customizations = datastore_services.JsonProperty(indexed=False)
-
     @staticmethod
     def get_deletion_policy():
         """Model doesn't contain any data directly corresponding to a user."""
@@ -139,10 +128,7 @@ class ExplorationModel(base_models.VersionedModel):
             'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -173,9 +159,6 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when explorations
-        # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, exp_rights.status, exp_rights.community_owned
@@ -224,6 +207,53 @@ class ExplorationModel(base_models.VersionedModel):
             ExplorationCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
+
+    @staticmethod
+    def convert_to_valid_dict(snapshot_dict):
+        """Replace invalid fields and values in the ExplorationModel dict.
+        Some old ExplorationModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the ExplorationModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+
+        if 'skill_tags' in snapshot_dict:
+            del snapshot_dict['skill_tags']
+        if 'default_skin' in snapshot_dict:
+            del snapshot_dict['default_skin']
+        if 'skin_customizations' in snapshot_dict:
+            del snapshot_dict['skin_customizations']
+
+        return snapshot_dict
+
+    def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+        Some old ExplorationSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+            with the snapshot.
+        """
+
+        self.populate(
+            **ExplorationModel.convert_to_valid_dict(snapshot_dict))
+        return self
 
 
 class ExplorationContextModel(base_models.BaseModel):
@@ -338,9 +368,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -374,9 +401,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # DEPRECATED in v2.8.3., so translator_ids are not exported.
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -447,10 +472,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             dict. The content of the model. Only valid fields and values are
             present.
         """
-        # The all_viewer_ids field was previously used in some versions of the
-        # model, we need to remove it.
-        if 'all_viewer_ids' in model_dict:
-            del model_dict['all_viewer_ids']
 
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
@@ -463,6 +484,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
             model_dict['translator_ids'] = []
+
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+        if 'translator_ids' in model_dict:
+            del model_dict['translator_ids']
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.
