@@ -37,7 +37,7 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   }
 };
 
-var login = async function(email) {
+var login = async function(email, manualNavigation = true) {
   // Use of element and action is not possible because the login page
   // is non-angular.
   // The full url is also necessary.
@@ -68,7 +68,19 @@ var logout = async function() {
 
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
-var _completeSignup = async function(username) {
+var _completeSignup = async function(username, manualNavigation = true) {
+  // The manualNavigation argument is used to determine whether to navigate to
+  // the sign-up URL using browser.get() or not. If false, the calling method
+  // should handle navigation to the sign-up page.
+  if (manualNavigation) {
+    // This is required since there is a redirect which can be considered
+    // as a client side navigation and the tests fail since Angular is
+    // not found due to the navigation interfering with protractor's
+    // bootstrapping.
+    await browser.waitForAngularEnabled(false);
+    await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
+    await browser.waitForAngularEnabled(true);
+  }
   await waitFor.pageToFullyLoad();
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
@@ -82,8 +94,8 @@ var _completeSignup = async function(username) {
 
 var completeLoginFlowFromStoryViewerPage = async function(email, username) {
   await _createFirebaseAccount(email);
-  await login(email);
-  await _completeSignup(username);
+  await login(email, false);
+  await _completeSignup(username, false);
 };
 
 var createUser = async function(email, username) {

@@ -129,8 +129,8 @@ class HomePageTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/notifications', expected_status_int=302)
         # This should redirect to the login page.
-        self.assertIn('signup', response.headers['location'])
-        self.assertIn('notifications', response.headers['location'])
+        self.assertIn('/login?', response.headers['location'])
+        self.assertIn('/notifications', response.headers['location'])
 
         self.login('reader@example.com')
         self.get_html_response(
