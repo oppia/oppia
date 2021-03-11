@@ -72,6 +72,23 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 transaction_services = models.Registry.import_transaction_services()
 
 
+def grant_super_admin_privileges(user_id):
+    """Grants the user with super-admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to promote to super admin.
+
+    Returns:
+        bool. Whether the operation succeeded.
+    """
+    firebase_id = get_auth_id_from_user_id(user_id)
+    if firebase_id is None:
+        raise ValueError('user_id=%s has no Firebase account' % user_id)
+    with _firebase_admin_context():
+        firebase_admin.auth.set_custom_user_claims(
+            firebase_id, '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN)
+
+
 def establish_auth_session(request, response):
     """Sets login cookies to maintain a user's sign-in session.
 

@@ -48,6 +48,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -1032,6 +1033,30 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         platform_parameter_registry.Registry.parameter_registry.pop(
             feature.name)
         self.logout()
+
+    def test_grant_super_admin_privileges_fails_without_user_id(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/adminsuperadminhandler', {}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing user_id param')
+
+    def test_grant_super_admin_privileges_makes_firebase_call(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        call_counter = test_utils.CallCounter(lambda _: None)
+        grant_super_admin_privileges_stub = self.swap(
+            firebase_auth_services, 'grant_super_admin_privileges',
+            call_counter)
+
+        with grant_super_admin_privileges_stub:
+            response = self.get_json(
+                '/adminsuperadminhandler', {'user_id': 'uid_123'},
+                expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertNotIn('error', response)
 
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):

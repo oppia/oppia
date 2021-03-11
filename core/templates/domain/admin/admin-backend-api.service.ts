@@ -488,6 +488,14 @@ export class AdminBackendApiService {
     });
   }
 
+  async grantSuperAdminPrivilegesAsync(userId: string): Promise<void> {
+    return this.http.get<void>(
+      AdminPageConstants.ADMIN_GRANT_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
+        params: {user_id: userId},
+      }
+    ).toPromise();
+  }
+
   async getModelsRelatedToUserAsync(userId: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.http.get<ModelsRelatedToUserBackendResponse>(

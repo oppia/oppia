@@ -221,6 +221,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
+        r'/adminsuperadminhandler', admin.AdminSuperAdminHandler),
+    get_redirect_route(
         r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(

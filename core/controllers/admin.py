@@ -53,6 +53,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
+from core.platform.auth import firebase_auth_services
 import feconf
 import python_utils
 import utils
@@ -726,6 +727,21 @@ class AdminRoleHandler(base.BaseHandler):
                 topic_domain.ROLE_MANAGER, topic_id)
 
         self.render_json({})
+
+
+class AdminSuperAdminHandler(base.BaseHandler):
+    """Handler for promoting a user to super-admin."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        user_id = self.request.get('user_id', None)
+        if user_id is None:
+            raise self.InvalidInputException('Missing user_id param')
+
+        firebase_auth_services.grant_super_admin_privileges(user_id)
+        self.render_json(self.values)
 
 
 class AdminJobOutputHandler(base.BaseHandler):

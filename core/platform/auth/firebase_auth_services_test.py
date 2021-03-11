@@ -83,7 +83,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         'get_user_by_phone_number',
         'list_users',
         'revoke_refresh_tokens',
-        'set_custom_user_claims',
     ]
 
     def __init__(self):
@@ -123,6 +122,9 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 firebase_admin.auth, 'delete_user', self._delete_user))
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth, 'update_user', self._update_user))
+            swap_stack.enter_context(test.swap(
+                firebase_admin.auth, 'set_custom_user_claims',
+                self._set_custom_user_claims))
 
             for function_name in self._UNIMPLEMENTED_SDK_FUNCTION_NAMES:
                 swap_stack.enter_context(test.swap_to_always_raise(
@@ -426,6 +428,22 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._set_user_fragile(uid, email, disabled, custom_claims)
         return uid
 
+    def _set_custom_user_claims(self, uid, custom_claims):
+        """Updates the custom claims of the given user.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+            custom_claims: str|None. A string-encoded JSON with string keys and
+                values, e.g. '{"role":"admin"}', or None.
+
+        Returns:
+            str. The uid of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        return self._update_user(uid, custom_claims=custom_claims)
+
     def _delete_user(self, uid):
         """Removes user from storage if found, otherwise raises an error.
 
@@ -468,6 +486,37 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             return json.loads(encoded_claims)
         except ValueError:
             return None
+
+
+class GrantSuperAdminPrivilegesTests(test_utils.AppEngineTestBase):
+
+    def setUp(self):
+        super(GrantSuperAdminPrivilegesTests, self).setUp()
+        self.firebase_sdk_stub = FirebaseAdminSdkStub()
+        self.firebase_sdk_stub.install(self)
+
+    def tearDown(self):
+        self.firebase_sdk_stub.uninstall()
+        super(GrantSuperAdminPrivilegesTests, self).tearDown()
+
+    def test_updates_user_successfully(self):
+        auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id='aid').put()
+        self.firebase_sdk_stub.create_user('aid')
+
+        self.assertIsNone(self.firebase_sdk_stub._get_user('aid').custom_claims)
+
+        firebase_auth_services.grant_super_admin_privileges('uid')
+
+        self.assertEqual(
+            self.firebase_sdk_stub._get_user('aid').custom_claims,
+            {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN})
+
+    def test_raises_error_when_user_does_not_exist(self):
+        auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id=None).put()
+
+        self.assertRaisesRegexp(
+            ValueError, 'user_id=uid has no Firebase account',
+            lambda: firebase_auth_services.grant_super_admin_privileges('uid'))
 
 
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
