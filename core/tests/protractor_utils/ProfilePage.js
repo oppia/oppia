@@ -69,7 +69,7 @@ var ProfilePage = function() {
     var interestTexts = await interests.map(async function(interestElem) {
       await waitFor.visibilityOf(
         interestElem,
-        'InterestElm is taking too long to appear');
+        'InterestElem is taking too long to appear');
       return await interestElem.getText();
     });
     interestTexts.forEach(function(interestText) {
@@ -93,7 +93,6 @@ var ProfilePage = function() {
     await waitFor.visibilityOf(
       allExplorationCardElements.first(),
       'Exploration cards is not present or taking time to display');
-    expect(await explorationCardsCount).toBeGreaterThan(0);
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
