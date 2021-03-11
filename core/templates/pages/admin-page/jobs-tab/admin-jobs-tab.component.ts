@@ -19,12 +19,10 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminDataService } from '../services/admin-data.service';
-import { AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
-import { AdminJobOutputResponse, AdminJobsTabBackendApiService } from '../services/admin-jobs-tab-backend-api.service';
 
 @Component({
   selector: 'oppia-admin-jobs-tab',
@@ -43,19 +41,17 @@ export class AdminJobsTabComponent {
   AUDIT_JOB_SPECS: JobStatusSummary[] = [];
   RECENT_JOB_DATA: Job[] = [];
   constructor(
-    private adminJobsTabBackendApiService: AdminJobsTabBackendApiService,
-    private adminDataService: AdminDataService,
+    private adminBackendApiService: AdminBackendApiService,
     private windowRef: WindowRef,
   ) { }
 
   showJobOutput(
       jobId: string
   ): void {
-    this.adminJobsTabBackendApiService.getAdminJobOutput(jobId)
-      .then((adminJobOutputResponse: AdminJobOutputResponse) => {
+    this.adminBackendApiService.fetchJobOutputAsync(jobId)
+      .then((jobOutput: string[]) => {
         this.showingJobOutput = true;
-        this.jobOutput = adminJobOutputResponse.output || [];
-        this.jobOutput.sort();
+        this.jobOutput = jobOutput;
         document.querySelector('#job-output')
           .scrollIntoView();
       }, (errorResponse) => {
@@ -68,7 +64,7 @@ export class AdminJobsTabComponent {
   startNewJob(
       jobType: string) : void {
     this.setStatusMessage.emit('Starting new job...');
-    this.adminJobsTabBackendApiService.startNewJob(jobType).then(() => {
+    this.adminBackendApiService.startNewJobAsync(jobType).then(() => {
       this.setStatusMessage.emit('Job started successfully.');
       this.windowRef._window().location.reload();
     }, (errorResponse) => {
@@ -82,7 +78,7 @@ export class AdminJobsTabComponent {
       computationType: string): void {
     this.setStatusMessage.emit('Starting computation');
 
-    this.adminJobsTabBackendApiService.startComputation(computationType)
+    this.adminBackendApiService.startComputationAsync(computationType)
       .then(()=> {
         this.setStatusMessage.emit('Computation started successfully.');
         this.windowRef._window().location.reload();
@@ -97,7 +93,7 @@ export class AdminJobsTabComponent {
       computationType: string
   ): void {
     this.setStatusMessage.emit('Stopping computation...');
-    this.adminJobsTabBackendApiService.stopComputation(computationType)
+    this.adminBackendApiService.stopComputationAsync(computationType)
       .then(() => {
         this.setStatusMessage.emit('Abort signal sent to computation.');
         this.windowRef._window().location.reload();
@@ -113,7 +109,7 @@ export class AdminJobsTabComponent {
       jobType: string): void {
     this.setStatusMessage.emit('Cancelling job...');
 
-    this.adminJobsTabBackendApiService.cancelJob(jobId, jobType).then(() => {
+    this.adminBackendApiService.cancelJobAsync(jobId, jobType).then(() => {
       this.setStatusMessage.emit('Abort signal sent to job.');
       this.windowRef._window().location.reload();
     }, (errorResponse) => {
@@ -123,7 +119,7 @@ export class AdminJobsTabComponent {
   }
 
   ngOnInit(): void {
-    this.adminDataService.getDataAsync()
+    this.adminBackendApiService.getDataAsync()
       .then((adminDataObject: AdminPageData) => {
         this.HUMAN_READABLE_CURRENT_TIME = (
           adminDataObject.humanReadableCurrentTime

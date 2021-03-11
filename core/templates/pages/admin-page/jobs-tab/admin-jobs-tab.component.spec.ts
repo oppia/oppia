@@ -19,15 +19,13 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
-import { AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
 import { InterpolationValuesType, UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminPageConstants } from '../admin-page.constants';
-import { AdminDataService } from '../services/admin-data.service';
-import { AdminJobsTabBackendApiService } from '../services/admin-jobs-tab-backend-api.service';
 import { AdminJobsTabComponent } from './admin-jobs-tab.component';
 
 
@@ -83,21 +81,21 @@ describe('Admin Jobs Tab Component', () => {
     featureFlags: [],
   };
 
-  class MockAdminJobTabBackendApiService {
+  class MockAdminBackendApiService {
     private get(url: string): FakeThen {
       return {
         then: (
             successCallback: (responseData?: object) => void,
             errorCallback: (errorData?: object) => void) => {
           if (url === 'success') {
-            successCallback({
-              output: [1, 2, 3]
-            });
+            successCallback(['1', '2', '3']);
             return;
           }
-          errorCallback({
-            error: 'test error'
-          });
+          if (errorCallback) {
+            errorCallback({
+              error: 'test error'
+            });
+          }
         }
       };
     }
@@ -110,16 +108,20 @@ describe('Admin Jobs Tab Component', () => {
         ) => {
           if ('job_type' in requestData) {
             if (requestData.job_type === 'error') {
-              errorCallback({
-                error: 'test error'
-              });
+              if (errorCallback) {
+                errorCallback({
+                  error: 'test error'
+                });
+              }
               return;
             }
           } else if ('computation_type' in requestData) {
             if (requestData.computation_type === 'error') {
-              errorCallback({
-                error: 'test error'
-              });
+              if (errorCallback) {
+                errorCallback({
+                  error: 'test error'
+                });
+              }
               return;
             }
           }
@@ -128,7 +130,7 @@ describe('Admin Jobs Tab Component', () => {
       };
     }
 
-    getAdminJobOutput(jobId: string): FakeThen {
+    fetchJobOutputAsync(jobId: string): FakeThen {
       let adminJobOutputUrl = urlInterpolationService.interpolateUrl(
         AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
           jobId: jobId
@@ -136,44 +138,41 @@ describe('Admin Jobs Tab Component', () => {
       return this.get(adminJobOutputUrl);
     }
 
-    startNewJob(jobType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'start_new_job',
-        job_type: jobType
-      });
-    }
-
-    startComputation(computationType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'start_computation',
-        computation_type: computationType
-      });
-    }
-
-    stopComputation(computationType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'stop_computation',
-        computation_type: computationType
-      });
-    }
-
-    cancelJob(jobId: string, jobType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'cancel_job',
-        job_id: jobId,
-        job_type: jobType
-      });
-    }
-  }
-
-
-  class MockAdminDataService {
     getDataAsync(): FakeThen {
       return {
         then: (callback: (adminDataObject: AdminPageData) => void) => {
           callback(mockAdminPageData);
         }
       };
+    }
+
+    startNewJobAsync(jobType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'start_new_job',
+        job_type: jobType
+      });
+    }
+
+    startComputationAsync(computationType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'start_computation',
+        computation_type: computationType
+      });
+    }
+
+    stopComputationAsync(computationType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'stop_computation',
+        computation_type: computationType
+      });
+    }
+
+    cancelJobAsync(jobId: string, jobType: string): FakeThen {
+      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'cancel_job',
+        job_id: jobId,
+        job_type: jobType
+      });
     }
   }
 
@@ -212,12 +211,8 @@ describe('Admin Jobs Tab Component', () => {
           useClass: MockWindowRef
         },
         {
-          provide: AdminDataService,
-          useClass: MockAdminDataService
-        },
-        {
-          provide: AdminJobsTabBackendApiService,
-          useClass: MockAdminJobTabBackendApiService
+          provide: AdminBackendApiService,
+          useClass: MockAdminBackendApiService
         },
         {
           provide: UrlInterpolationService,
@@ -265,7 +260,7 @@ describe('Admin Jobs Tab Component', () => {
 
     componentInstance.showJobOutput(mockJobId);
     expect(componentInstance.showingJobOutput).toBeTrue();
-    expect(componentInstance.jobOutput).toEqual([1, 2, 3]);
+    expect(componentInstance.jobOutput).toEqual(['1', '2', '3']);
     expect(element.scrollIntoView).toHaveBeenCalled();
   });
 

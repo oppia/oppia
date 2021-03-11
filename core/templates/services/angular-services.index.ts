@@ -211,7 +211,6 @@ import { TextInputPredictionService } from 'interactions/TextInput/text-input-pr
 import { baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
-import { AdminJobsTabBackendApiService } from 'pages/admin-page/services/admin-jobs-tab-backend-api.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
@@ -344,7 +343,6 @@ import { CollectionEditorStateService } from 'pages/collection-editor-page/servi
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],
-  ['AdminJobsTabBackendApiService', AdminJobsTabBackendApiService],
   ['AdminRouterService', AdminRouterService],
   ['AdminTaskManagerService', AdminTaskManagerService],
   ['AlertsService', AlertsService],
