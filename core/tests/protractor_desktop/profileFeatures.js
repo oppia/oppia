@@ -16,7 +16,7 @@
  * @fileoverview End-to-end tests for user profile features.
  */
 
-var DEFAULT_BIO = 'This user has not supplied a bio yet.';
+var DEFAULT_BIO = 'Let us know about yourself..';
 var PLACEHOLDER_INTEREST_TEXT = 'none specified';
 
 var forms = require('../protractor_utils/forms.js');
