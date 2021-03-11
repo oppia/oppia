@@ -5,23 +5,8 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
-          <navbar-breadcrumb>
-            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-              <li>
-                <span class="oppia-navbar-breadcrumb-separator"></span>
-                Login
-              </li>
-            </ul>
-          </navbar-breadcrumb>
-          <content>
-            <login-page>
-              <loading-message message="'Signing in'"></loading-message>
-            </login-page>
-          </content>
-        </base-content>
-      </div>
+      <login-page></login-page>
+      <loading-message message="'Signing in'"></loading-message>
     </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>

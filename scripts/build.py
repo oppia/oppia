@@ -200,12 +200,15 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
             content = content.replace(
                 file_path, prod_file_prefix + file_path)
 
-    # The version: default line is required to run jobs on a local server (
-    # both in prod & non-prod env). This line is not required when app.yaml
-    # is generated during deployment. So, we remove this if the build process
-    # is being run from the deploy script.
     if deploy_mode:
+        # The version: default line is required to run jobs on a local server (
+        # both in prod & non-prod env). This line is not required when app.yaml
+        # is generated during deployment. So, we remove this if the build
+        # process is being run from the deploy script.
         content = content.replace('version: default', '')
+        # The FIREBASE_AUTH_EMULATOR_HOST environment variable is only needed to
+        # test locally, and MUST NOT be included in the deployed file.
+        content = re.sub('  FIREBASE_AUTH_EMULATOR_HOST: ".*"\n', '', content)
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with python_utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:
