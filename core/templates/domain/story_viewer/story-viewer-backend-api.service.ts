@@ -61,12 +61,12 @@ export class StoryViewerBackendApiService {
 
   private _storyDataEventEmitter = new EventEmitter<StoryDataDict>();
 
-  _fetchStoryData(
+  async _fetchStoryDataAsync(
       topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string,
       successCallback: (value: StoryPlaythrough) => void,
-      errorCallback: (reason: string) => void): void {
+      errorCallback: (reason: string) => void): Promise<void> {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
         topic_url_fragment: topicUrlFragment,
@@ -87,11 +87,11 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  _recordChapterCompletion(
+  async _recordChapterCompletionAsync(
       topicUrlFragment: string, classroomUrlFragment: string,
       storyUrlFragment: string, nodeId: string,
       successCallback: (value: StoryChapterCompletionResponse) => void,
-      errorCallback: (reason: string) => void): void {
+      errorCallback: (reason: string) => void): Promise<void> {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
         topic_url_fragment: topicUrlFragment,
@@ -118,7 +118,7 @@ export class StoryViewerBackendApiService {
       classroomUrlFragment: string,
       storyUrlFragment: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
-      this._fetchStoryData(
+      this._fetchStoryDataAsync(
         topicUrlFragment, classroomUrlFragment, storyUrlFragment,
         resolve, reject);
     });
@@ -130,7 +130,7 @@ export class StoryViewerBackendApiService {
       storyUrlFragment: string,
       nodeId: string): Promise<StoryChapterCompletionResponse> {
     return new Promise((resolve, reject) => {
-      this._recordChapterCompletion(
+      this._recordChapterCompletionAsync(
         topicUrlFragment, classroomUrlFragment, storyUrlFragment,
         nodeId, resolve, reject);
     });

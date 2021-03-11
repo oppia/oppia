@@ -35,11 +35,11 @@ interface TopicCreationResponse {
 export class TopicCreationBackendApiService {
   constructor(private http: HttpClient) { }
 
-  _createTopic(
+  async _createTopicAsync(
       successCallback: (value: TopicCreationResponse) => void,
       errorCallback:(reason: string) => void,
       topic: NewlyCreatedTopic, imagesData: ImageData[],
-      bgColor: string): void {
+      bgColor: string): Promise<void> {
     let postData = {
       name: topic.name,
       description: topic.description,
@@ -67,11 +67,11 @@ export class TopicCreationBackendApiService {
       });
   }
 
-  createTopic(
+  async createTopicAsync(
       topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): Promise<TopicCreationResponse> {
     return new Promise((resolve, reject) => {
-      this._createTopic(resolve, reject, topic, imagesData, bgColor);
+      this._createTopicAsync(resolve, reject, topic, imagesData, bgColor);
     });
   }
 }
