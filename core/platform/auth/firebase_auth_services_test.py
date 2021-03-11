@@ -473,6 +473,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     """Test base for Firebase-specific tests with helpful default behavior."""
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     AUTH_ID = 'aid'
     EMAIL = 'foo@bar.com'
 
@@ -900,8 +902,6 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
         user_settings = user_services.create_new_user(self.AUTH_ID, self.EMAIL)
         self.user_id = user_settings.user_id
-        firebase_auth_services.associate_auth_id_with_user_id(
-            auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.user_id))
 
     def delete_external_auth_associations(self):
         """Runs delete_external_auth_associations on the test user."""

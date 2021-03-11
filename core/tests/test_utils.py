@@ -1309,6 +1309,8 @@ class AppEngineTestBase(TestBase):
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
     def tearDown(self):
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
         super(AppEngineTestBase, self).tearDown()
 
@@ -1946,11 +1948,6 @@ tags: []
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
-
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        super(GenericTestBase, self).tearDown()
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
