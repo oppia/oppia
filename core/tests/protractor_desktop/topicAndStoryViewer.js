@@ -161,7 +161,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
 
-    await topicAndStoryViewerPage.login(
+    await users.createAndLoginUser(
       'newStoryViewer@storyviewer.com', 'newStoryViewer');
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
