@@ -34,6 +34,7 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -43,11 +44,13 @@ require(
   'state-solution.service');
 
 angular.module('oppia').directive('solutionEditor', [
+  'EditabilityService',
   'ExplorationHtmlFormatterService',
   'StateCustomizationArgsService',
   'StateInteractionIdService',
   'UrlInterpolationService',
   function(
+      EditabilityService,
       ExplorationHtmlFormatterService,
       StateCustomizationArgsService,
       StateInteractionIdService,
@@ -78,6 +81,7 @@ angular.module('oppia').directive('solutionEditor', [
           };
           ctrl.$onInit = function() {
             ctrl.StateSolutionService = StateSolutionService;
+            ctrl.isEditable = EditabilityService.isEditable();
 
             ctrl.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
