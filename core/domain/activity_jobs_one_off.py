@@ -714,8 +714,9 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
 class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that fills the last_updated_by_human for all the models that newly
-    inherit from BaseHumanMaintainedModel. Needed only for the March 2021
-    release.
+    inherit from BaseHumanMaintainedModel.
+
+    Needed only for the March 2021 release.
     """
 
     @classmethod

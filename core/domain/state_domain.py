@@ -2887,6 +2887,8 @@ class State(python_utils.OBJECT):
 
         new_content_id_list = [
             hint.hint_content.content_id for hint in self.interaction.hints]
+
+        print(old_content_id_list, new_content_id_list)
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 

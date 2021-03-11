@@ -2166,3 +2166,82 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
                 collection_models.CollectionCommitLogEntryModel.get_by_id(
                     commit.id).commit_message),
             375)
+
+
+class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off
+            .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob
+            .create_new()
+        )
+        (
+            activity_jobs_one_off
+            .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob
+            .enqueue(job_id)
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+        results = (
+            activity_jobs_one_off
+            .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob
+            .get_output(job_id)
+        )
+        return [
+            ast.literal_eval(stringified_item) for stringified_item in results]
+
+    def _compare_last_updated_fields(self, original_model, migrated_model):
+        self.assertEqual(
+            original_model.last_updated,
+            migrated_model.last_updated_by_human)
+        self.assertNotEqual(
+            original_model.last_updated,
+            migrated_model.last_updated)
+
+    def test_migrate_one_model_is_successful(self):
+        original_question_model = question_models.QuestionModel(
+            id='q_id',
+            question_state_data={},
+            question_state_data_schema_version=1,
+            language_code='en',
+            linked_skill_ids=[],
+            inapplicable_skill_misconception_ids=[]
+        )
+        original_question_model.put_for_bot()
+
+        output = self._run_one_off_job()
+        # There are some internal config models thus the number is not 1 but 3.
+        self.assertEqual(output, [['SUCCESS', 3]])
+
+        migrated_question_model = question_models.QuestionModel.get('q_id')
+        self._compare_last_updated_fields(
+            original_question_model, migrated_question_model)
+
+    def test_migrate_multiple_models_is_successful(self):
+        original_question_model = question_models.QuestionModel(
+            id='q_id',
+            question_state_data={},
+            question_state_data_schema_version=1,
+            language_code='en',
+            linked_skill_ids=[],
+            inapplicable_skill_misconception_ids=[]
+        )
+        original_question_model.put_for_bot()
+        original_config_model = config_models.ConfigPropertyModel(
+            id='c_id',
+            value={}
+        )
+        original_config_model.put_for_bot()
+
+        output = self._run_one_off_job()
+        # There are some internal config models thus the number is not 2 but 4.
+        self.assertEqual(output, [['SUCCESS', 4]])
+
+        migrated_question_model = question_models.QuestionModel.get('q_id')
+        migrated_config_model = config_models.ConfigPropertyModel.get('c_id')
+        self._compare_last_updated_fields(
+            original_question_model, migrated_question_model)
+        self._compare_last_updated_fields(
+            original_config_model, migrated_config_model)
