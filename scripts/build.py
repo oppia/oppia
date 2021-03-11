@@ -121,6 +121,7 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
+    'webpack_bundles/login-page.mainpage.html',
     'webpack_bundles/privacy-page.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',

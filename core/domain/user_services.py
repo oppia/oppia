@@ -2620,4 +2620,4 @@ def create_login_url(target_url):
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    return current_user_services.create_login_url(target_url)
+    return '/login?return_url=%s' % target_url
