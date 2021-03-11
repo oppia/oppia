@@ -36,8 +36,11 @@ export class LoginPageComponent implements OnInit {
   }
 
   private redirectToSignUp(): void {
-    const searchParams = this.windowRef.nativeWindow.location.search;
-    this.windowRef.nativeWindow.location.assign(`/signup${searchParams}`);
+    const searchParams = (
+      new URLSearchParams(this.windowRef.nativeWindow.location.search));
+    const returnUrl = searchParams.get('return_url') ?? '/';
+    this.windowRef.nativeWindow.location.assign(
+      `/signup?return_url=${returnUrl}`);
   }
 
   private redirectToHomePage(): void {
