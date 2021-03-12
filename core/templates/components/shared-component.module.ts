@@ -66,6 +66,7 @@ import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -87,6 +88,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CommonModule,
     BrowserModule,
     MaterialModule,
+    DynamicContentModule,
     NgbTooltipModule,
     FormsModule,
     ...firebaseAuthModules,
@@ -142,6 +144,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   exports: [
     // Modules.
+    DynamicContentModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
