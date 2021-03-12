@@ -34,7 +34,6 @@ from core.domain import subscription_services
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 datastore_services = models.Registry.import_datastore_services()
@@ -111,7 +110,6 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
     versioned_exp_interaction_ids_mapping = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
-    error_versions = []
     for index, exploration_model in enumerate(exploration_models):
         if (exploration_model.states_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):

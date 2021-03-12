@@ -995,3 +995,86 @@ title: Old Title
         self.assertEqual(sorted(exploration.states[
             'Introduction'].written_translations.translations_mapping.keys()), [
                 'content_1', 'feedback_1', 'feedback_3'])
+
+        answer_groups_5 = [{
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': '1,23'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }, {
+                'inputs': {
+                    'x': '4*5!'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }, {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        states_dict['Introduction']['interaction']['answer_groups'] = (
+            answer_groups_5)
+
+        self.save_new_exp_with_states_schema_v34(
+            'exp_id_5', 'owner_id', states_dict)
+
+        # Ensure the exploration was converted.
+        exploration = exp_fetchers.get_exploration_by_id('exp_id_5')
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        answer_groups = exploration.states[
+            'Introduction'].interaction.answer_groups
+
+        self.assertEqual(
+            exploration.states['Introduction'].interaction.id, 'TextInput')
+        self.assertEqual(len(answer_groups), 2)
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].rule_type, 'Equals')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {
+                'x': {
+                    'contentId': 'rule_input_5',
+                    'normalizedStrSet': ['1.23', '4*5!']
+                }
+            })
+        self.assertEqual(sorted(exploration.states[
+            'Introduction'].recorded_voiceovers.voiceovers_mapping.keys()), [
+                'ca_placeholder_4', 'content_1', 'feedback_1', 'feedback_2',
+                'feedback_3', 'rule_input_5', 'rule_input_6'])
+        self.assertEqual(sorted(exploration.states[
+            'Introduction'].written_translations.translations_mapping.keys()), [
+                'ca_placeholder_4', 'content_1', 'feedback_1', 'feedback_2',
+                'feedback_3', 'rule_input_5', 'rule_input_6'])

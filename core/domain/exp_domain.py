@@ -491,9 +491,9 @@ class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
         object.
 
         Args:
+            version: int. The version of the exploration.
             state_interaction_ids_dict: dict. A dict where each key-value pair
                 represents, respectively, a state name and an interaction id.
-            version: int. The version of the exploration.
         """
         self.version = version
         self.state_interaction_ids_dict = state_interaction_ids_dict
