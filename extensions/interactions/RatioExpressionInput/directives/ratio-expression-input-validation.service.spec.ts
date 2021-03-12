@@ -240,7 +240,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     }, 'RatioExpressionInput');
     answerGroups[0].rules = [invalidHasSpecificTermEqualTo];
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -252,7 +252,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch non-integer value for # terms', () => {
     customizationArgs.numberOfTerms.value = 1.5;
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -264,7 +264,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch undefined value for # terms', () => {
     customizationArgs.numberOfTerms.value = undefined;
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -276,7 +276,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch negative value for # terms', () => {
     customizationArgs.numberOfTerms.value = -1;
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -288,7 +288,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch integral value 1 for # terms', () => {
     customizationArgs.numberOfTerms.value = 1;
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -306,7 +306,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     }, 'RatioExpressionInput');
     answerGroups[0].rules = [validHasSpecificTermEqualTo];
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
@@ -329,7 +329,7 @@ describe('RatioExpressionInputValidationService', () => {
         value: 0
       }
     };
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
