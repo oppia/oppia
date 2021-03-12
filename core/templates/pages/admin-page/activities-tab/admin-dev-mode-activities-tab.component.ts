@@ -26,6 +26,7 @@ import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 
 @Component({
   selector: 'admin-dev-mode-activities-tab',
@@ -42,6 +43,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   DEMO_EXPLORATIONS: string[][];
 
   constructor(
+    private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
     private windowRef: WindowRef,
@@ -60,16 +62,15 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage.emit('Processing...');
 
     this.adminTaskManagerService.startTask();
-    this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'reload_exploration',
-      exploration_id: String(explorationId)
-    }).toPromise().then(function() {
-      this.setStatusMessage.emit('Data reloaded successfully.');
-      this.adminTaskManagerService.finishTask();
-    }, function(errorResponse) {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.data.error);
-      this.adminTaskManagerService.finishTask();
+
+    this.adminBackendApiService.reloadExplorationAsync(
+      explorationId).then(function() {
+        this.setStatusMessage.emit('Data reloaded successfully.');
+        this.adminTaskManagerService.finishTask();
+      }, function(errorResponse) {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.data.error);
+        this.adminTaskManagerService.finishTask();
     });
   }
 
@@ -109,13 +110,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     for (var i = 0; i < this.demoExplorationIds.length; ++i) {
       var explorationId = this.demoExplorationIds[i];
 
-      this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'reload_exploration',
-        exploration_id: explorationId
-      }).toPromise().then(function() {
-        ++numSucceeded;
-        ++numTried;
-        this.printResult(numSucceeded, numFailed, numTried);
+      this.adminBackendApiService.reloadExplorationAsync(
+        explorationId).then(function() {
+          ++numSucceeded;
+          ++numTried;
+          this.printResult(numSucceeded, numFailed, numTried);
       }, function() {
         ++numFailed;
         ++numTried;
@@ -133,13 +132,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     }
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-    this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_explorations',
-      num_dummy_exps_to_generate: this.numDummyExpsToGenerate,
-      num_dummy_exps_to_publish: this.numDummyExpsToPublish
-    }).toPromise().then(function() {
-      this.setStatusMessage.emit(
-        'Dummy explorations generated successfully.');
+    this.adminBackendApiService.generateDummyExplorationsAsync(
+      this.numDummyExpsToGenerate, this.numDummyExpsToPublish).then(function() {
+        this.setStatusMessage.emit(
+          'Dummy explorations generated successfully.');
     }, function(errorResponse) {
       this.setStatusMessage.emit(
         'Server error: ' + errorResponse.data.error);
@@ -150,9 +146,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   loadNewStructuresData(): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-    this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_new_structures_data'
-    }).toPromise().then(function() {
+
+    this.adminBackendApiService.generateDummyNewStructuresDataAsync()
+    .then(function() {
       this.setStatusMessage.emit(
         'Dummy new structures data generated successfully.');
     }, function(errorResponse) {
@@ -165,9 +161,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   generateNewSkillData(): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-    this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_new_skill_data'
-    }).toPromise().then(function() {
+
+    this.adminBackendApiService.generateDummyNewSkillDataAsync()
+    .then(function() {
       this.setStatusMessage.emit(
         'Dummy new skill and questions generated successfully.');
     }, function(errorResponse) {
@@ -189,10 +185,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage.emit('Processing...');
 
     this.adminTaskManagerService.startTask();
-    this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'reload_collection',
-      collection_id: String(collectionId)
-    }).toPromise().then(function() {
+
+    this.adminBackendApiService.reloadCollectionAsync(collectionId)
+    .then(function() {
       this.setStatusMessage.emit('Data reloaded successfully.');
     }, function(errorResponse) {
       this.setStatusMessage.emit(
