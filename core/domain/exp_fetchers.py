@@ -113,33 +113,25 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
         exp_id, version_numbers)
     error_versions = []
     for index, exploration_model in enumerate(exploration_models):
-        try:
-            if (exploration_model.states_schema_version !=
-                    feconf.CURRENT_STATE_SCHEMA_VERSION):
-                raise Exception(
-                    'Exploration(id=%s, version=%s, states_schema_version=%s) '
-                    'does not match the latest schema version %s' % (
-                        exp_id,
-                        version_numbers[index],
-                        exploration_model.states_schema_version,
-                        feconf.CURRENT_STATE_SCHEMA_VERSION
-                    ))
-            states_to_interaction_id_mapping = {}
-            for state_name in exploration_model.states:
-                states_to_interaction_id_mapping[state_name] = (
-                    exploration_model.states[state_name]['interaction']['id'])
-            versioned_exp_interaction_ids_mapping.append(
-                exp_domain.VersionedExplorationInteractionIdsMapping(
-                    exploration_model.version,
-                    states_to_interaction_id_mapping))
-        except utils.ExplorationConversionError:
-            error_versions.append(version_numbers[index])
+        if (exploration_model.states_schema_version !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            raise Exception(
+                'Exploration(id=%s, version=%s, states_schema_version=%s) '
+                'does not match the latest schema version %s' % (
+                    exp_id,
+                    version_numbers[index],
+                    exploration_model.states_schema_version,
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ))
+        states_to_interaction_id_mapping = {}
+        for state_name in exploration_model.states:
+            states_to_interaction_id_mapping[state_name] = (
+                exploration_model.states[state_name]['interaction']['id'])
+        versioned_exp_interaction_ids_mapping.append(
+            exp_domain.VersionedExplorationInteractionIdsMapping(
+                exploration_model.version,
+                states_to_interaction_id_mapping))
 
-    if error_versions:
-        raise Exception(
-            'Exploration %s, versions [%s] could not be converted to latest '
-            'schema version.'
-            % (exp_id, ', '.join(python_utils.MAP(str, error_versions))))
     return versioned_exp_interaction_ids_mapping
 
 

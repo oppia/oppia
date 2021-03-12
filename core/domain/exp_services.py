@@ -1807,7 +1807,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
         for index, version in enumerate(exp_versions):
             exp_stats_for_version = (
                 stats_services.get_stats_for_new_exploration(
-                    exp_id, version, exp_list[index].states.keys()))
+                    exp_id, version,
+                    exp_list[index].state_interaction_ids_dict.keys()))
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 

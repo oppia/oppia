@@ -1103,8 +1103,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                'Exploration exp_id_1, versions [1] could not be converted to '
-                'latest schema version.')):
+                'Exploration(id=exp_id_1, version=1, states_schema_version=3) '
+                'does not match the latest schema version %s'
+                % feconf.CURRENT_STATE_SCHEMA_VERSION)):
             (
                 exp_fetchers
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
