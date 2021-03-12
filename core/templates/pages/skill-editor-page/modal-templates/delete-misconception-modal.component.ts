@@ -18,7 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModalComponent } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
@@ -27,7 +27,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
   templateUrl: './delete-misconception-modal.component.html',
   styleUrls: []
 }) export class DeleteMisconceptionModalComponent
-  extends ConfirmOrCancelModalComponent implements OnInit {
+  extends ConfirmOrCancelModal implements OnInit {
   skill: Skill;
   index: number;
 

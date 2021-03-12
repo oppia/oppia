@@ -15,9 +15,9 @@
 /**
  * @fileoverview Unit tests for ConfirmOrCancelModalController.
  */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModalComponent } from './confirm-or-cancel-modal.component';
+import { ConfirmOrCancelModal } from './confirm-or-cancel-modal.component';
 
 
 class MockActiveModal {
@@ -31,44 +31,33 @@ class MockActiveModal {
 }
 
 describe('Confirm Or Cancel Modal Component', () => {
-  let component: ConfirmOrCancelModalComponent;
-  let fixture: ComponentFixture<ConfirmOrCancelModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
+  let confirmOrCancelModal: ConfirmOrCancelModal;
+  let modalInstance: NgbActiveModal;
   let dismissSpy: jasmine.Spy;
   let closeSpy: jasmine.Spy;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [ConfirmOrCancelModalComponent],
-      providers: [
-        {
-          provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
-    }).compileComponents();
-    fixture = TestBed.createComponent(ConfirmOrCancelModalComponent);
-    component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    modalInstance = new NgbActiveModal();
+    confirmOrCancelModal = new ConfirmOrCancelModal(modalInstance);
 
-    dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-    closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+    dismissSpy = spyOn(modalInstance, 'dismiss').and.callThrough();
+    closeSpy = spyOn(modalInstance, 'close').and.callThrough();
   });
 
   it('should close modal with the correct value', function() {
     var message = 'closing';
-    component.confirm(message);
+    confirmOrCancelModal.confirm<string>(message);
     expect(closeSpy).toHaveBeenCalledWith(message);
   });
 
   it('should dismiss modal', function() {
-    component.cancel();
+    confirmOrCancelModal.cancel<string>();
     expect(dismissSpy).toHaveBeenCalledWith('cancel');
   });
 
   it('should dismiss modal with the correct value', function() {
     var message = 'canceling';
-    component.cancel(message);
+    confirmOrCancelModal.cancel<string>(message);
     expect(dismissSpy).toHaveBeenCalledWith(message);
   });
 });
