@@ -70,6 +70,7 @@ from firebase_admin import exceptions as firebase_exceptions
 auth_models, user_models = models.Registry.import_models(
     [models.NAMES.auth, models.NAMES.user])
 
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -467,46 +468,50 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
 
 def destroy_firebase_accounts():
     """Destroys all external Firebase users and their corresponding models."""
-    def _yield_every_firebase_user():
+    def _yield_firebase_user_batches():
         """Yields every external Firebase account."""
-        page = firebase_admin.auth.list_users()
+        page = firebase_admin.auth.list_users(max_results=1000)
         while page is not None:
-            for user in page.users:
-                yield user
+            yield list(page.users)
             page = page.get_next_page()
 
     with _firebase_admin_context():
-        for user in _yield_every_firebase_user():
-            # Delete the external account.
-            firebase_admin.auth.delete_user(user.uid)
+        for user_batch in _yield_firebase_user_batches():
+            firebase_auth_ids = [user.uid for user in user_batch]
+            emails = [user.email for user in user_batch]
 
-            # Get Firebase ID -> User ID association model.
-            assoc_by_auth_id_model = (
-                auth_models.UserIdByFirebaseAuthIdModel.get(
-                    user.uid, strict=False))
+            # First, delete the external Firebase accounts.
+            firebase_admin.auth.delete_users(firebase_auth_ids)
 
-            # Get User ID -> Firebase ID association model.
-            if assoc_by_auth_id_model is not None:
-                assoc_by_user_id_model = auth_models.UserAuthDetailsModel.get(
-                    assoc_by_auth_id_model.user_id, strict=False)
-            elif user.email is not None:
-                user_settings_model = user_models.UserSettingsModel.query(
-                    user_models.UserSettingsModel.email == user.email).get()
-                assoc_by_user_id_model = (
-                    None if user_settings_model is None else
-                    auth_models.UserAuthDetailsModel.get(
-                        user_settings_model.id, strict=False))
-            else:
-                assoc_by_user_id_model = None
+            # Next, find all association models in our database.
+            assoc_by_auth_id_models = (
+                auth_models.UserIdByFirebaseAuthIdModel.get_multi(
+                    firebase_auth_ids, include_deleted=True))
 
-            # Wipe the association models.
-            if assoc_by_auth_id_model is not None:
-                assoc_by_auth_id_model.delete()
-            if assoc_by_user_id_model is not None:
+            user_ids = [None if model is None else model.user_id
+                        for model in assoc_by_auth_id_models]
+            emails_to_look_up = [emails[i] for i, user_id in enumerate(user_ids)
+                                 if user_id is None]
+
+            user_ids_to_clear = {uid for uid in user_ids if uid is not None}
+
+            if emails_to_look_up:
+                user_settings_models = user_models.UserSettingsModel.query(
+                    user_models.UserSettingsModel.email.IN(emails_to_look_up))
+                user_ids_to_clear.update(m.id for m in user_settings_models)
+
+            # Finally, delete the auth association models we've discovered.
+            auth_models.UserIdByFirebaseAuthIdModel.delete_multi(
+                assoc_by_auth_id_models, force_deletion=True)
+
+            assoc_by_user_id_models = (
+                auth_models.UserAuthDetailsModel.get_multi(user_ids))
+            for assoc_by_user_id_model in assoc_by_user_id_models:
                 assoc_by_user_id_model.firebase_auth_id = None
-                assoc_by_user_id_model.update_timestamps(
-                    update_last_updated_time=False)
-                assoc_by_user_id_model.put()
+
+            auth_models.UserAuthDetailsModel.update_timestamps_multi(
+                assoc_by_user_id_models)
+            auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
 
 
 @contextlib.contextmanager
