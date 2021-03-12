@@ -30,6 +30,7 @@ import logging
 
 from core.domain import caching_services
 from core.domain import exp_domain
+from core.domain import state_domain
 from core.domain import subscription_services
 from core.platform import models
 import feconf
@@ -112,7 +113,26 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
     error_versions = []
     for index, exploration_model in enumerate(exploration_models):
         try:
-            explorations.append(get_exploration_from_model(exploration_model))
+            if (exploration_model.states_schema_version !=
+                    feconf.CURRENT_STATE_SCHEMA_VERSION):
+                raise Exception(
+                    'Exploration(id=%s, version=%s, states_schema_version=%s) '
+                    'does not match the latest schema version %s' % (
+                        exp_id,
+                        version_numbers[index],
+                        exploration_model.states_schema_version,
+                        feconf.CURRENT_STATE_SCHEMA_VERSION
+                    ))
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id, init_state_name=exploration_model.init_state_name)
+            exploration.version = exploration_model.version
+            exploration.states = {}
+            for state_name in exploration_model.states:
+                state = state_domain.State.create_default_state(state_name)
+                state.interaction.id = (
+                    exploration_model.states[state_name]['interaction']['id'])
+                exploration.states[state_name] = state
+            explorations.append(exploration)
         except utils.ExplorationConversionError:
             error_versions.append(version_numbers[index])
 
