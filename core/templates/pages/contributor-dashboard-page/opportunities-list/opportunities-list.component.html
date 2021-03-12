@@ -1,10 +1,10 @@
-<div class="oppia-opportunities-list">
+<!-- <div class="oppia-opportunities-list">
   <div ng-repeat="opportunity in $ctrl.visibleOpportunities track by $index">
-    <opportunities-list-item opportunity="opportunity"
-                             on-click-action-button="$ctrl.onClickActionButton"
-                             progress-bar-required="$ctrl.progressBarRequired"
-                             label-required="$ctrl.labelRequired"
-                             opportunity-heading-truncation-length="$ctrl.opportunityHeadingTruncationLength">
+    <opportunities-list-item [opportunity]="opportunity"
+                             [click-action-button]="$ctrl.onClickActionButton"
+                             [progress-bar-required]="$ctrl.progressBarRequired"
+                             [label-required]="$ctrl.labelRequired"
+                             [opportunity-heading-truncation-length]="$ctrl.opportunityHeadingTruncationLength">
     </opportunities-list-item>
   </div>
   <div ng-show="$ctrl.loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
@@ -177,4 +177,93 @@
     -o-animation: fadein 0.5s linear 1 normal forwards; /* Opera < 12.1 */
     animation: fadein 0.5s linear 1 normal forwards;
   }
+</style> -->
+
+<div class="oppia-opportunities-list">
+  <div *ngFor="let opportunity of visibleOpportunities">
+    <opportunities-list-item [opportunity]="opportunity"
+                             [clickActionButton]="clickActionButton"
+                             [progressBarRequired]="progressBarRequired"
+                             [labelRequired]="labelRequired"
+                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength">
+    </opportunities-list-item>
+  </div>
+  <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
+    <opportunities-list-item></opportunities-list-item>
+    <opportunities-list-item></opportunities-list-item>
+  </div>
+  <div class="oppia-opportunity-pagination-contaniner" *ngIf="visibleOpportunities.length > 0">
+    <button type="button"
+            class="oppia-pagination-button"
+            (click)="gotoPage(activePageNumber - 1)"
+            [disabled]="activePageNumber == 1">
+      <span class="material-icons">navigate_before</span>Previous
+    </button>
+    <button type="button"
+            class="oppia-pagination-button"
+            (click)="gotoPage(activePageNumber + 1)"
+            [disabled]="loadingOpportunityData || activePageNumber >= lastPageNumber">
+      Next<span class="material-icons">navigate_next</span>
+    </button>
+  </div>
+  <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
+    <div class="oppia-end-availability-line"></div>
+    <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message">No opportunity available!</div>
+    <div class="oppia-end-availability-line"></div>
+  </div>
+</div>
+
+<style>
+  .oppia-opportunity-availablity-message {
+    color: #ababab;
+    font-style: italic;
+    overflow: hidden;
+    padding: 0 2%;
+    white-space: nowrap;
+  }
+  .oppia-end-availability {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .oppia-end-availability-line {
+    border: 1px solid #ababab;
+    width: 35%;
+  }
+  .oppia-opportunities-list {
+    margin: auto;
+    max-width: 1200px;
+    overflow: auto;
+    width: 80%;
+  }
+  .oppia-opportunity-pagination-contaniner {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    width: 100%;
+  }
+  .oppia-pagination-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #009688;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 40px;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .oppia-pagination-button:hover {
+    border: 2px solid #009688;
+    border-radius: 5px;
+  }
+  .oppia-pagination-button[disabled] {
+    color: #a9e5df;
+  }
+  .oppia-pagination-button[disabled]:hover {
+    border: none;
+  }
+
 </style>

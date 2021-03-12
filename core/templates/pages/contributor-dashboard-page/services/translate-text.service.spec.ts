@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,104 +16,115 @@
  * @fileoverview Tests for translate-text service.
  */
 
-require(
-  'pages/contributor-dashboard-page/services/translate-text.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('TranslateTextService', function() {
-  let TranslateTextService;
-  let $httpBackend;
+import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service.ts';
 
-  beforeEach(angular.mock.module('oppia'));
+describe('TranslateTextService', () => {
+  let translateTextService;
+  let httpTestingController;
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    TranslateTextService = $injector.get('TranslateTextService');
-    $httpBackend = $injector.get('$httpBackend');
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    translateTextService = TestBed.inject(TranslateTextService);
   });
 
-  describe('getTextToTranslate', function() {
-    it('should return all texts per state', function() {
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  describe('getTextToTranslate', () => {
+    it('should return all texts per state', fakeAsync(() => {
       let textAndAvailability;
-      $httpBackend.expect(
-        'GET', '/gettranslatabletexthandler?exp_id=1&language_code=en')
-        .respond({
-          state_names_to_content_id_mapping: {
-            stateName1: {contentId1: 'text1', contentId2: 'text2'},
-            stateName2: {contentId3: 'text3'}
-          },
-          version: 1
-        });
-      TranslateTextService.init('1', 'en', () => {});
-      $httpBackend.flush();
+      const sampleStateWiseContentMapping = {
+        stateName1: {contentId1: 'text1', contentId2: 'text2'},
+        stateName2: {contentId3: 'text3'}
+      };
+      translateTextService.init('1', 'en', () => {});
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1
+      });
+      flushMicrotasks();
 
       const expectedTextAndAvailability1 = {
         text: 'text2',
         more: true
       };
-      textAndAvailability = TranslateTextService.getTextToTranslate();
+      textAndAvailability = translateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
 
       const expectedTextAndAvailability2 = {
         text: 'text1',
         more: true
       };
-      textAndAvailability = TranslateTextService.getTextToTranslate();
+      textAndAvailability = translateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
 
       const expectedTextAndAvailability3 = {
         text: 'text3',
         more: false
       };
-      textAndAvailability = TranslateTextService.getTextToTranslate();
+      textAndAvailability = translateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
-    });
+    }));
 
-    it('should return no more available for states with no texts', function() {
-      const expectedTextAndAvailability = {
-        text: 'text1',
-        more: false
-      };
-      $httpBackend.expect(
-        'GET', '/gettranslatabletexthandler?exp_id=1&language_code=en')
-        .respond({
-          state_names_to_content_id_mapping: {
-            stateName1: {contentId1: 'text1'},
-            stateName2: {contentId2: ''}
-          },
+    it('should return no more available for states with no texts',
+      fakeAsync(() => {
+        const expectedTextAndAvailability = {
+          text: 'text1',
+          more: false
+        };
+        const sampleStateWiseContentMapping = {
+          stateName1: {contentId1: 'text1'},
+          stateName2: {contentId2: ''}
+        };
+        translateTextService.init('1', 'en', () => {});
+        const req = httpTestingController.expectOne(
+          '/gettranslatabletexthandler?exp_id=1&language_code=en');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          state_names_to_content_id_mapping: sampleStateWiseContentMapping,
           version: 1
         });
-      TranslateTextService.init('1', 'en', () => {});
-      $httpBackend.flush();
+        flushMicrotasks();
 
-      const textAndAvailability = TranslateTextService.getTextToTranslate();
+        const textAndAvailability = translateTextService.getTextToTranslate();
 
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability);
-    });
+        expect(textAndAvailability).toEqual(expectedTextAndAvailability);
+      }));
 
-    it('should return {null, False} for completely empty states', function() {
-      const expectedTextAndAvailability = {
-        text: null,
-        more: false
-      };
-      $httpBackend.expect(
-        'GET', '/gettranslatabletexthandler?exp_id=1&language_code=en')
-        .respond({
-          state_names_to_content_id_mapping: {
-            stateName1: {contentId1: ''},
-            stateName2: {contentId2: ''}
-          },
+    it('should return {null, False} for completely empty states',
+      fakeAsync(() => {
+        const expectedTextAndAvailability = {
+          text: null,
+          more: false
+        };
+        const sampleStateWiseContentMapping = {
+          stateName1: {contentId1: ''},
+          stateName2: {contentId2: ''}
+        };
+        translateTextService.init('1', 'en', () => {});
+        const req = httpTestingController.expectOne(
+          '/gettranslatabletexthandler?exp_id=1&language_code=en');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          state_names_to_content_id_mapping: sampleStateWiseContentMapping,
           version: 1
         });
-      TranslateTextService.init('1', 'en', () => {});
-      $httpBackend.flush();
+        flushMicrotasks();
 
-      const textAndAvailability = TranslateTextService.getTextToTranslate();
+        const textAndAvailability = translateTextService.getTextToTranslate();
 
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability);
-    });
+        expect(textAndAvailability).toEqual(expectedTextAndAvailability);
+      }));
   });
 });

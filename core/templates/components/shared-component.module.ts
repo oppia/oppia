@@ -60,6 +60,9 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { AngularHtmlBindWrapperDirective } from './angular-html-bind/angular-html-bind-wrapper.directive';
+import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -90,6 +93,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   ],
 
   declarations: [
+    AngularHtmlBindWrapperDirective,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
@@ -99,6 +103,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     LoadingDotsComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
@@ -107,7 +112,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    TranslatePipe,
+    WrapTextWithEllipsisPipe,
   ],
 
   entryComponents: [
@@ -123,7 +129,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
-    ThumbnailDisplayComponent
+    ThumbnailDisplayComponent,
   ],
 
   exports: [
@@ -132,15 +138,19 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     // Components, directives, and pipes.
+    AngularHtmlBindWrapperDirective,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    LazyLoadingComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     ThumbnailDisplayComponent,
     TakeBreakModalComponent,
     TranslatePipe,
-    SummaryListHeaderComponent
+    SummaryListHeaderComponent,
+    WrapTextWithEllipsisPipe,
   ],
 })
 

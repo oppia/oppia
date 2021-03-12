@@ -1,3 +1,138 @@
+// // Copyright 2021 The Oppia Authors. All Rights Reserved.
+// //
+// // Licensed under the Apache License, Version 2.0 (the "License");
+// // you may not use this file except in compliance with the License.
+// // You may obtain a copy of the License at
+// //
+// //      http://www.apache.org/licenses/LICENSE-2.0
+// //
+// // Unless required by applicable law or agreed to in writing, software
+// // distributed under the License is distributed on an "AS-IS" BASIS,
+// // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// // See the License for the specific language governing permissions and
+// // limitations under the License.
+
+// /**
+//  * @fileoverview Component for the translation opportunities.
+//  */
+
+// require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+// require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+// require(
+//   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+// require('directives/angular-html-bind.directive.ts');
+// require('directives/mathjax-bind.directive.ts');
+// require(
+//   'pages/contributor-dashboard-page/login-required-message/' +
+//   'login-required-message.component.ts');
+// require(
+//   'pages/contributor-dashboard-page/modal-templates/' +
+//   'translation-modal.controller.ts');
+// require(
+//   'pages/contributor-dashboard-page/opportunities-list/' +
+//   'opportunities-list.component.ts');
+
+// require(
+//   'pages/contributor-dashboard-page/services/' +
+//   'contribution-opportunities.service.ts');
+// require('pages/contributor-dashboard-page/services/translate-text.service.ts');
+// require('services/site-analytics.service.ts');
+
+// angular.module('oppia').component('translationOpportunities', {
+//   template: require('./translation-opportunities.component.html'),
+//   controller: [
+//     '$rootScope', '$uibModal', 'ContributionOpportunitiesService',
+//     'SiteAnalyticsService', 'TranslationLanguageService',
+//     'UrlInterpolationService', 'UserService',
+//     function(
+//         $rootScope, $uibModal, ContributionOpportunitiesService,
+//         SiteAnalyticsService, TranslationLanguageService,
+//         UrlInterpolationService, UserService) {
+//       var ctrl = this;
+//       var allOpportunities = {};
+//       var userIsLoggedIn = false;
+
+//       var getOpportunitySummary = function(expId) {
+//         return allOpportunities[expId];
+//       };
+
+//       var getPresentableOpportunitiesData = function({opportunities, more}) {
+//         let opportunitiesDicts = [];
+//         for (var index in opportunities) {
+//           var opportunity = opportunities[index];
+//           var subheading = opportunity.getOpportunitySubheading();
+//           var heading = opportunity.getOpportunityHeading();
+//           var languageCode = (
+//             TranslationLanguageService.getActiveLanguageCode());
+//           var progressPercentage = (
+//             opportunity.getTranslationProgressPercentage(languageCode));
+//           var opportunityDict = {
+//             id: opportunity.getExplorationId(),
+//             heading: heading,
+//             subheading: subheading,
+//             progressPercentage: progressPercentage.toFixed(2),
+//             actionButtonTitle: 'Translate'
+//           };
+//           allOpportunities[opportunityDict.id] = opportunityDict;
+//           opportunitiesDicts.push(opportunityDict);
+//         }
+//         return {opportunitiesDicts, more};
+//       };
+
+//       ctrl.onClickButton = function(expId) {
+//         if (!userIsLoggedIn) {
+//           ContributionOpportunitiesService.showRequiresLoginModal();
+//           return;
+//         }
+//         SiteAnalyticsService.registerContributorDashboardSuggestEvent(
+//           'Translation');
+//         var opportunity = getOpportunitySummary(expId);
+//         $uibModal.open({
+//           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+//             '/pages/contributor-dashboard-page/modal-templates/' +
+//             'translation-modal.directive.html'),
+//           backdrop: 'static',
+//           size: 'lg',
+//           resolve: {
+//             opportunity: function() {
+//               return opportunity;
+//             }
+//           },
+//           controller: 'TranslationModalController'
+//         }).result.then(function() {
+//         }, function() {
+//           // Note to developers:
+//           // This callback is triggered when the Cancel button is clicked.
+//           // No further action is needed.
+//         });
+//       };
+
+//       ctrl.$onInit = function() {
+//         UserService.getUserInfoAsync().then(function(userInfo) {
+//           userIsLoggedIn = userInfo.isLoggedIn();
+//           // TODO(#8521): Remove the use of $rootScope.$apply()
+//           // once the controller is migrated to angular.
+//           $rootScope.$applyAsync();
+//         });
+//       };
+
+//       ctrl.loadMoreOpportunities = function() {
+//         return ContributionOpportunitiesService
+//           .getMoreTranslationOpportunitiesAsync(
+//             TranslationLanguageService.getActiveLanguageCode()).then(
+//             getPresentableOpportunitiesData);
+//       };
+
+//       ctrl.loadOpportunities = function() {
+//         return ContributionOpportunitiesService
+//           .getTranslationOpportunitiesAsync(
+//             TranslationLanguageService.getActiveLanguageCode()).then(
+//             getPresentableOpportunitiesData);
+//       };
+//     }
+//   ]
+// });
+
 // Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,119 +151,111 @@
  * @fileoverview Component for the translation opportunities.
  */
 
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/angular-html-bind.directive.ts');
-require('directives/mathjax-bind.directive.ts');
-require(
-  'pages/contributor-dashboard-page/login-required-message/' +
-  'login-required-message.component.ts');
-require(
-  'pages/contributor-dashboard-page/modal-templates/' +
-  'translation-modal.controller.ts');
-require(
-  'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.component.ts');
+import { Component, Injector } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { ContextService } from 'services/context.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
+import { TranslationModalContent, TranslationOpportunityDict } from '../modal-templates/translation-modal.component';
+import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-opportunities.service.ts');
-require('pages/contributor-dashboard-page/services/translate-text.service.ts');
-require('services/site-analytics.service.ts');
+@Component({
+  selector: 'translation-opportunities',
+  templateUrl: './translation-opportunities.component.html',
+})
+export class TranslationOpportunitiesComponent {
+  allOpportunities: {[id: string]: TranslationOpportunityDict} = {};
+  userIsLoggedIn = false;
+  constructor(
+    private readonly contextService: ContextService,
+    private readonly contributionOpportunitiesService:
+      ContributionOpportunitiesService,
+    private readonly modalService: NgbModal,
+    private readonly siteAnalyticsService: SiteAnalyticsService,
+    private readonly translationLanguageService: TranslationLanguageService,
+    private readonly urlInterpolationService: UrlInterpolationService,
+    private readonly userService: UserService,
+    private readonly injector: Injector
+  ) {}
 
-angular.module('oppia').component('translationOpportunities', {
-  template: require('./translation-opportunities.component.html'),
-  controller: [
-    '$rootScope', '$uibModal', 'ContributionOpportunitiesService',
-    'SiteAnalyticsService', 'TranslationLanguageService',
-    'UrlInterpolationService', 'UserService',
-    function(
-        $rootScope, $uibModal, ContributionOpportunitiesService,
-        SiteAnalyticsService, TranslationLanguageService,
-        UrlInterpolationService, UserService) {
-      var ctrl = this;
-      var allOpportunities = {};
-      var userIsLoggedIn = false;
+  getOpportunitySummary(expId: string): TranslationOpportunityDict {
+    return this.allOpportunities[expId];
+  }
 
-      var getOpportunitySummary = function(expId) {
-        return allOpportunities[expId];
+  getPresentableOpportunitiesData(
+      {opportunities, more}: ExplorationOpportunitiesDict): {
+    opportunitiesDicts: TranslationOpportunityDict[];
+    more: boolean;
+  } {
+    const opportunitiesDicts: TranslationOpportunityDict[] = [];
+    for (let index in opportunities) {
+      const opportunity = opportunities[index];
+      const subheading = opportunity.getOpportunitySubheading();
+      const heading = opportunity.getOpportunityHeading();
+      const languageCode = (
+        this.translationLanguageService.getActiveLanguageCode());
+      const progressPercentage = (
+        opportunity.getTranslationProgressPercentage(languageCode));
+      const opportunityDict: TranslationOpportunityDict = {
+        id: opportunity.getExplorationId(),
+        heading: heading,
+        subheading: subheading,
+        progressPercentage: progressPercentage.toFixed(2),
+        actionButtonTitle: 'Translate'
       };
-
-      var getPresentableOpportunitiesData = function({opportunities, more}) {
-        let opportunitiesDicts = [];
-        for (var index in opportunities) {
-          var opportunity = opportunities[index];
-          var subheading = opportunity.getOpportunitySubheading();
-          var heading = opportunity.getOpportunityHeading();
-          var languageCode = (
-            TranslationLanguageService.getActiveLanguageCode());
-          var progressPercentage = (
-            opportunity.getTranslationProgressPercentage(languageCode));
-          var opportunityDict = {
-            id: opportunity.getExplorationId(),
-            heading: heading,
-            subheading: subheading,
-            progressPercentage: progressPercentage.toFixed(2),
-            actionButtonTitle: 'Translate'
-          };
-          allOpportunities[opportunityDict.id] = opportunityDict;
-          opportunitiesDicts.push(opportunityDict);
-        }
-        return {opportunitiesDicts, more};
-      };
-
-      ctrl.onClickButton = function(expId) {
-        if (!userIsLoggedIn) {
-          ContributionOpportunitiesService.showRequiresLoginModal();
-          return;
-        }
-        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
-          'Translation');
-        var opportunity = getOpportunitySummary(expId);
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/contributor-dashboard-page/modal-templates/' +
-            'translation-modal.directive.html'),
-          backdrop: 'static',
-          size: 'lg',
-          resolve: {
-            opportunity: function() {
-              return opportunity;
-            }
-          },
-          controller: 'TranslationModalController'
-        }).result.then(function() {
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      ctrl.$onInit = function() {
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          userIsLoggedIn = userInfo.isLoggedIn();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-      };
-
-      ctrl.loadMoreOpportunities = function() {
-        return ContributionOpportunitiesService
-          .getMoreTranslationOpportunitiesAsync(
-            TranslationLanguageService.getActiveLanguageCode()).then(
-            getPresentableOpportunitiesData);
-      };
-
-      ctrl.loadOpportunities = function() {
-        return ContributionOpportunitiesService
-          .getTranslationOpportunitiesAsync(
-            TranslationLanguageService.getActiveLanguageCode()).then(
-            getPresentableOpportunitiesData);
-      };
+      this.allOpportunities[opportunityDict.id] = opportunityDict;
+      opportunitiesDicts.push(opportunityDict);
     }
-  ]
-});
+    return {opportunitiesDicts, more};
+  }
+
+  onClickButton(expId: string): void {
+    if (!this.userIsLoggedIn) {
+      this.contributionOpportunitiesService.showRequiresLoginModal();
+      return;
+    }
+    this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
+      'Translation');
+    const opportunity = this.getOpportunitySummary(expId);
+    const modalRef = this.modalService.open(
+      TranslationModalContent, {
+        size: 'lg',
+        backdrop: 'static',
+        injector: this.injector
+      });
+    modalRef.componentInstance.opportunity = opportunity;
+  }
+
+  ngOnInit(): void {
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });
+  }
+
+  loadMoreOpportunities(): Promise<{
+    opportunitiesDicts: TranslationOpportunityDict[];
+    more: boolean;
+  }> {
+    return this.contributionOpportunitiesService
+      .getMoreTranslationOpportunitiesAsync(
+        this.translationLanguageService.getActiveLanguageCode())
+      .then(this.getPresentableOpportunitiesData.bind(this));
+  }
+
+  loadOpportunities(): Promise<{
+    opportunitiesDicts: TranslationOpportunityDict[];
+    more: boolean;
+  }> {
+    return this.contributionOpportunitiesService
+      .getTranslationOpportunitiesAsync(
+        this.translationLanguageService.getActiveLanguageCode())
+      .then(this.getPresentableOpportunitiesData.bind(this));
+  }
+}
+
+angular.module('oppia').directive(
+  'translationOpportunities', downgradeComponent(
+    {component: TranslationOpportunitiesComponent}));

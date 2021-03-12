@@ -38,21 +38,30 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    NgbModalModule
   ],
   declarations: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
+    OpportunitiesListItemComponent,
+    OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
+    TranslationOpportunitiesComponent,
+    TranslationModalContent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
+    OpportunitiesListItemComponent,
+    OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
+    TranslationOpportunitiesComponent,
+    TranslationModalContent
   ],
   providers: [
     {
@@ -75,6 +84,12 @@ class ContributorDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
+import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
+import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
+import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
+import { TranslationModalContent } from './modal-templates/translation-modal.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
