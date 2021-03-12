@@ -30,6 +30,7 @@ import logging
 
 from core.domain import caching_services
 from core.domain import exp_domain
+from core.domain import state_domain
 from core.domain import subscription_services
 from core.platform import models
 import feconf
@@ -91,16 +92,13 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
-def get_multiple_explorations_by_version(
-        exp_id, version_numbers, run_conversion=True):
+def get_multiple_explorations_by_version(exp_id, version_numbers):
     """Returns a list of Exploration domain objects corresponding to the
     specified versions.
 
     Args:
         exp_id: str. ID of the exploration.
         version_numbers: list(int). List of version numbers.
-        run_conversion: bool. When True, updates each Exploration version to
-            the latest states_schema_version if necessary.
 
     Returns:
         list(Exploration). List of Exploration domain objects.
@@ -115,8 +113,7 @@ def get_multiple_explorations_by_version(
     error_versions = []
     for index, exploration_model in enumerate(exploration_models):
         try:
-            if (not run_conversion and
-                    exploration_model.states_schema_version !=
+            if (exploration_model.states_schema_version !=
                     feconf.CURRENT_STATE_SCHEMA_VERSION):
                 raise Exception(
                     'Exploration(id=%s, version=%s, states_schema_version=%s) '
@@ -126,9 +123,16 @@ def get_multiple_explorations_by_version(
                         exploration_model.states_schema_version,
                         feconf.CURRENT_STATE_SCHEMA_VERSION
                     ))
-            explorations.append(
-                get_exploration_from_model(
-                    exploration_model, run_conversion=run_conversion))
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id, init_state_name=exploration_model.init_state_name)
+            exploration.version = exploration_model.version
+            exploration.states = {}
+            for state_name in exploration_model.states:
+                state = state_domain.State.create_default_state(state_name)
+                state.interaction.id = (
+                    exploration_model.states[state_name]['interaction']['id'])
+                exploration.states[state_name] = state
+            explorations.append(exploration)
         except utils.ExplorationConversionError:
             error_versions.append(version_numbers[index])
 
