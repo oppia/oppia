@@ -78,6 +78,7 @@ describe('Auth service', () => {
     expect(AuthService.firebaseConfig).toEqual({
       apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
       authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
+      databaseURL: AppConstants.FIREBASE_CONFIG_DATABASE_URL,
       projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
       storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
       messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
