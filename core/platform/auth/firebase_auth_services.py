@@ -509,7 +509,8 @@ def destroy_firebase_accounts():
                 [m for m in assoc_by_auth_id_models if m is not None])
 
             assoc_by_user_id_models = [
-                m for m in auth_models.UserAuthDetailsModel.get_multi(user_ids)
+                m for m in auth_models.UserAuthDetailsModel.get_multi(
+                    user_ids_to_clear)
                 if m is not None
             ]
             for assoc_by_user_id_model in assoc_by_user_id_models:
