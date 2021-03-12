@@ -20,16 +20,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from './confirm-or-cancel-modal.component';
 
 
-class MockActiveModal {
-  dismiss(value): void {
-    return;
-  }
-
-  close(value): void {
-    return;
-  }
-}
-
 describe('Confirm Or Cancel Modal Component', () => {
   let confirmOrCancelModal: ConfirmOrCancelModal;
   let modalInstance: NgbActiveModal;
