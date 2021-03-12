@@ -31,5 +31,5 @@ require('pages/profile-page/profile-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/OppiaFooterDirective.ts');
+require('pages/OppiaFooterComponent.ts');
 require('pages/profile-page/profile-page.component.ts');
