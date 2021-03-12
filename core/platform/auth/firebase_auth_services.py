@@ -481,7 +481,11 @@ def destroy_firebase_accounts():
             emails = [user.email for user in user_batch]
 
             # First, delete the external Firebase accounts.
-            firebase_admin.auth.delete_users(firebase_auth_ids)
+            result = firebase_admin.auth.delete_users(
+                firebase_auth_ids, force_delete=True)
+            if result.errors:
+                logging.warn('\n'.join(
+                    '%s: %s' % (e.index, e.reason) for e in result.errors))
 
             # Next, find all association models in our database.
             assoc_by_auth_id_models = (
@@ -502,10 +506,12 @@ def destroy_firebase_accounts():
 
             # Finally, delete the auth association models we've discovered.
             auth_models.UserIdByFirebaseAuthIdModel.delete_multi(
-                assoc_by_auth_id_models, force_deletion=True)
+                [m for m in assoc_by_auth_id_models if m is not None])
 
-            assoc_by_user_id_models = (
-                auth_models.UserAuthDetailsModel.get_multi(user_ids))
+            assoc_by_user_id_models = [
+                m for m in auth_models.UserAuthDetailsModel.get_multi(user_ids)
+                if m is not None
+            ]
             for assoc_by_user_id_model in assoc_by_user_id_models:
                 assoc_by_user_id_model.firebase_auth_id = None
 

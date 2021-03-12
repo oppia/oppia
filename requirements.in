@@ -13,7 +13,7 @@ contextlib2==0.6.0.post1
 # then, we must depend on a patched version of firebase-admin==3.2.1 (hosted on
 # the following repository) because that is the last version which supports
 # Python 2, but is missing a feature which we were forced to patch in.
-git+git://github.com/oppia/firebase-admin-python@py2-emulator-support#egg=firebase-admin
+git+git://github.com/oppia/firebase-admin-python@03b0741100f9b521d093c14563310aea8904f851#egg=firebase-admin
 future==0.18.2
 GoogleAppEngineCloudStorageClient==1.9.22.1
 GoogleAppEngineMapReduce==1.9.22.0

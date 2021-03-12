@@ -83,6 +83,7 @@ class CreateInitialSuperAdmin(webapp2.RequestHandler):
 
     def get(self):
         """Seeds the Firebase account server with a single super-admin."""
+        # Only respect this handler when new sign-ups are being prevented.
         if not feconf.PREVENT_NEW_SIGNUPS:
             self.redirect('/')
         try:
