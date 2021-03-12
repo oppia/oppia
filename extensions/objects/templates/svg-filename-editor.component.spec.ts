@@ -734,7 +734,7 @@ describe('SvgFilenameEditor with image save destination as ' +
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
-    $provide.value('ImageLocalStorageService', mockilss);
+    // $provide.value('ImageLocalStorageService', mockilss);
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
     $provide.value('SvgSanitizerService', mockSvgSanitizerService);

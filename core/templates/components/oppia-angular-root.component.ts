@@ -484,6 +484,7 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Component({
   selector: 'oppia-angular-root',
@@ -598,6 +599,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static idGenerationService: IdGenerationService;
   static imageClickInputRulesService: ImageClickInputRulesService;
   static imageClickInputValidationService: ImageClickInputValidationService;
+  static imageLocalStorageService: ImageLocalStorageService;
   static improvementsService: ImprovementsService;
   static interactionAttributesExtractorService:
     InteractionAttributesExtractorService;
@@ -889,6 +891,7 @@ private i18nLanguageCodeService: I18nLanguageCodeService,
 private idGenerationService: IdGenerationService,
 private imageClickInputRulesService: ImageClickInputRulesService,
 private imageClickInputValidationService: ImageClickInputValidationService,
+private imageLocalStorageService: ImageLocalStorageService,
 private improvementsService: ImprovementsService,
 private interactionAttributesExtractorService:
   InteractionAttributesExtractorService,
@@ -1246,6 +1249,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.imageClickInputRulesService);
     OppiaAngularRootComponent.imageClickInputValidationService = (
       this.imageClickInputValidationService);
+    OppiaAngularRootComponent.imageLocalStorageService = (
+      this.imageLocalStorageService);
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.interactionAttributesExtractorService = (
       this.interactionAttributesExtractorService);
