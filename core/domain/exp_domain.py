@@ -481,6 +481,24 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
         }
 
 
+class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
+    """Domain object representing the mapping of state names to interaction ids
+    in an exploration.
+    """
+
+    def __init__(self, version, state_interaction_ids_dict):
+        """Initialises an VersionedExplorationInteractionIdsMapping domain
+        object.
+
+        Args:
+            state_interaction_ids_dict: dict. A dict where each key-value pair
+                represents, respectively, a state name and an interaction id.
+            version: int. The version of the exploration.
+        """
+        self.version = version
+        self.state_interaction_ids_dict = state_interaction_ids_dict
+
+
 class Exploration(python_utils.OBJECT):
     """Domain object for an Oppia exploration."""
 

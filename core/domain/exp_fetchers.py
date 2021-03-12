@@ -30,7 +30,6 @@ import logging
 
 from core.domain import caching_services
 from core.domain import exp_domain
-from core.domain import state_domain
 from core.domain import subscription_services
 from core.platform import models
 import feconf
@@ -92,22 +91,24 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
-def get_multiple_explorations_by_version(exp_id, version_numbers):
-    """Returns a list of Exploration domain objects corresponding to the
-    specified versions.
+def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+        exp_id, version_numbers):
+    """Returns a list of VersionedExplorationInteractionIdsMapping domain
+    objects corresponding to the specified versions.
 
     Args:
         exp_id: str. ID of the exploration.
         version_numbers: list(int). List of version numbers.
 
     Returns:
-        list(Exploration). List of Exploration domain objects.
+        list(VersionedExplorationInteractionIdsMapping). List of Exploration
+        domain objects.
 
     Raises:
         Exception. One or more of the given versions of the exploration could
             not be converted to the latest schema version.
     """
-    explorations = []
+    versioned_exp_interaction_ids_mapping = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
     error_versions = []
@@ -123,16 +124,14 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
                         exploration_model.states_schema_version,
                         feconf.CURRENT_STATE_SCHEMA_VERSION
                     ))
-            exploration = exp_domain.Exploration.create_default_exploration(
-                exp_id, init_state_name=exploration_model.init_state_name)
-            exploration.version = exploration_model.version
-            exploration.states = {}
+            states_to_interaction_id_mapping = {}
             for state_name in exploration_model.states:
-                state = state_domain.State.create_default_state(state_name)
-                state.interaction.id = (
+                states_to_interaction_id_mapping[state_name] = (
                     exploration_model.states[state_name]['interaction']['id'])
-                exploration.states[state_name] = state
-            explorations.append(exploration)
+            versioned_exp_interaction_ids_mapping.append(
+                exp_domain.VersionedExplorationInteractionIdsMapping(
+                    exploration_model.version,
+                    states_to_interaction_id_mapping))
         except utils.ExplorationConversionError:
             error_versions.append(version_numbers[index])
 
@@ -141,7 +140,7 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
             'Exploration %s, versions [%s] could not be converted to latest '
             'schema version.'
             % (exp_id, ', '.join(python_utils.MAP(str, error_versions))))
-    return explorations
+    return versioned_exp_interaction_ids_mapping
 
 
 def get_exploration_from_model(exploration_model, run_conversion=True):

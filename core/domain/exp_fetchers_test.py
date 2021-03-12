@@ -86,8 +86,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
         with self.assertRaisesRegexp(
             ValueError, 'The given entity_id fake_exp_id is invalid'):
-            exp_fetchers.get_multiple_explorations_by_version(
-                'fake_exp_id', [1, 2, 3])
+            (
+                exp_fetchers
+                .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+                    'fake_exp_id', [1, 2, 3]))
 
     def test_retrieval_of_multiple_exploration_versions(self):
         # Update exploration to version 2.
@@ -109,8 +111,11 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         exploration_latest = exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
         latest_version = exploration_latest.version
 
-        explorations = exp_fetchers.get_multiple_explorations_by_version(
-            self.EXP_1_ID, list(python_utils.RANGE(1, latest_version + 1)))
+        explorations = (
+            exp_fetchers
+            .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+                self.EXP_1_ID, list(python_utils.RANGE(1, latest_version + 1)))
+        )
 
         self.assertEqual(len(explorations), 3)
         self.assertEqual(explorations[0].version, 1)
@@ -138,14 +143,18 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             ValueError,
             'Requested version number 4 cannot be higher than the current '
             'version number 3.'):
-            exp_fetchers.get_multiple_explorations_by_version(
-                self.EXP_1_ID, [1, 2, 3, 4])
+            (
+                exp_fetchers
+                .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+                    self.EXP_1_ID, [1, 2, 3, 4]))
 
         with self.assertRaisesRegexp(
             ValueError,
             'At least one version number is invalid'):
-            exp_fetchers.get_multiple_explorations_by_version(
-                self.EXP_1_ID, [1, 2, 2.5, 3])
+            (
+                exp_fetchers
+                .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+                    self.EXP_1_ID, [1, 2, 2.5, 3]))
 
     def test_retrieval_of_multiple_explorations(self):
         exps = {}

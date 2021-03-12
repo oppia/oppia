@@ -515,7 +515,8 @@ def get_exploration_stats_by_id(exp_id, exp_version):
     return exploration_stats
 
 
-def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
+def get_multiple_exploration_stats_by_version(
+        exp_id, version_numbers):
     """Returns a list of ExplorationStats domain objects corresponding to the
     specified versions.
 

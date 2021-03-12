@@ -1057,7 +1057,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             explorations['exp_id_2'].objective, 'objective 2')
 
-    def test_cannot_get_multiple_explorations_by_version_with_invalid_handler(
+    def test_cannot_get_interaction_ids_mapping_by_version_with_invalid_handler(
             self):
         rights_manager.create_new_exploration_rights(
             'exp_id_1', self.owner_id)
@@ -1105,7 +1105,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             re.escape(
                 'Exploration exp_id_1, versions [1] could not be converted to '
                 'latest schema version.')):
-            exp_fetchers.get_multiple_explorations_by_version('exp_id_1', [1])
+            (
+                exp_fetchers
+                .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+                    'exp_id_1', [1]))
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
