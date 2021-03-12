@@ -43,11 +43,9 @@ export class AdminJobsTabComponent {
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private windowRef: WindowRef,
-  ) { }
+  ) {}
 
-  showJobOutput(
-      jobId: string
-  ): void {
+  showJobOutput(jobId: string): void {
     this.adminBackendApiService.fetchJobOutputAsync(jobId)
       .then((jobOutput: string[]) => {
         this.showingJobOutput = true;

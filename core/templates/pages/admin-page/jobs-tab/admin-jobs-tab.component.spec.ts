@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for AdminJobsTabComponent
- *
+ * @fileoverview Unit tests for AdminJobsTabComponent
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
+
 import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
@@ -252,8 +252,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should work as expected when showJobOutput is called', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     let element: HTMLElement = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(element);
     spyOn(element, 'scrollIntoView');
@@ -264,9 +264,9 @@ describe('Admin Jobs Tab Component', () => {
     expect(element.scrollIntoView).toHaveBeenCalled();
   });
 
-  it('should except error when showJobOuput is called', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+  it('should expect error when showJobOuput is called', () => {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.showJobOutput('error');
     expect(componentInstance.setStatusMessage.emit)
@@ -274,8 +274,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should work as expected when startNewJob is called', () =>{
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.startNewJob('testJob');
     expect(componentInstance.setStatusMessage.emit)
@@ -283,8 +283,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should expect error when startNewJob is called', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.startNewJob('error');
     expect(componentInstance.setStatusMessage.emit)
@@ -292,8 +292,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should start computation', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .startComputation('testComputation');
@@ -302,8 +302,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should expect error when startCompuation is called', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .startComputation('error');
@@ -312,8 +312,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should stop computation', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
 
     componentInstance
@@ -323,8 +323,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should expect error when stopComputation is called', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .stopComputation('error');
@@ -333,8 +333,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should cancel job', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .cancelJob('jobId', 'jobType');
@@ -343,8 +343,8 @@ describe('Admin Jobs Tab Component', () => {
   });
 
   it('should expect error when cancelJob is called', () => {
-    componentInstance =
-    (componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .cancelJob('error', 'error');
