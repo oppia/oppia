@@ -600,14 +600,42 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
 class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
 
+    def set_up_models(self, user_id=None, gae_id=None, firebase_auth_id=None):
+        """Creates user and auth models to emulate a real admin account.
+
+        Args:
+            user_id: str|None. The Oppia ID of the user. If None, no models are
+                created.
+            gae_id: str|None. The GAE ID of the user. If None, no GAE auth
+                associations are created.
+            firebase_auth_id: str|None. The Firebase account ID of the user. If
+                None, no Firebase associations are created.
+        """
+        if user_id is None:
+            return
+        user_models.UserSettingsModel(
+            id=user_id, email=feconf.ADMIN_EMAIL_ADDRESS).put()
+        auth_models.UserAuthDetailsModel(
+            id=user_id, gae_id=gae_id, firebase_auth_id=firebase_auth_id).put()
+        if gae_id is not None:
+            auth_models.UserIdentifiersModel(id=gae_id, user_id=user_id).put()
+        if firebase_auth_id is not None:
+            auth_models.UserIdByFirebaseAuthIdModel(
+                id=firebase_auth_id, user_id=user_id).put()
+
     def test_fails_when_no_admin_exists(self):
         self.assertRaisesRegexp(
             Exception, 'testadmin@example.com is not a registered account',
             firebase_auth_services.create_initial_super_admin)
 
-    def test_creates_firebase_account_if_none_exists(self):
-        user_models.UserSettingsModel(
-            id='abc', email=feconf.ADMIN_EMAIL_ADDRESS).put()
+    def test_creates_firebase_account_and_models_if_none_exists(self):
+        self.set_up_models(user_id='abc')
+
+        self.assertIsNone(
+            firebase_auth_services.get_auth_id_from_user_id('abc'))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('abc'))
+        self.firebase_sdk_stub.assert_firebase_user_does_not_exist('abc')
 
         firebase_auth_services.create_initial_super_admin()
 
@@ -615,14 +643,18 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_auth_id_from_user_id('abc'), 'abc')
         self.assertEqual(
             firebase_auth_services.get_user_id_from_auth_id('abc'), 'abc')
+        self.assertEqual(
+            self.firebase_sdk_stub.get_user('abc').custom_claims,
+            {'role': 'super_admin'})
 
-        self.firebase_sdk_stub.assert_firebase_user_exists('abc')
-        user = self.firebase_sdk_stub.get_user('abc')
-        self.assertEqual(user.custom_claims, {'role': 'super_admin'})
+    def test_assigns_firebase_auth_id_to_user_id_with_uid_prefix_stripped(self):
+        self.set_up_models(user_id='uid_abc')
 
-    def test_strips_uid_from_user_id_if_creating_new_account(self):
-        user_models.UserSettingsModel(
-            id='uid_abc', email=feconf.ADMIN_EMAIL_ADDRESS).put()
+        self.assertIsNone(
+            firebase_auth_services.get_auth_id_from_user_id('uid_abc'))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('abc'))
+        self.firebase_sdk_stub.assert_firebase_user_does_not_exist('abc')
 
         firebase_auth_services.create_initial_super_admin()
 
@@ -630,18 +662,19 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_auth_id_from_user_id('uid_abc'), 'abc')
         self.assertEqual(
             firebase_auth_services.get_user_id_from_auth_id('abc'), 'uid_abc')
-
-        self.firebase_sdk_stub.assert_firebase_user_exists('abc')
-        user = self.firebase_sdk_stub.get_user('abc')
-        self.assertEqual(user.custom_claims, {'role': 'super_admin'})
+        self.assertEqual(
+            self.firebase_sdk_stub.get_user('abc').custom_claims,
+            {'role': 'super_admin'})
 
     def test_updates_existing_firebase_account(self):
-        user_models.UserSettingsModel(
-            id='abc', email=feconf.ADMIN_EMAIL_ADDRESS).put()
+        self.set_up_models(user_id='abc')
         self.firebase_sdk_stub.create_user('abc', role_is_super_admin=False)
 
-        user = self.firebase_sdk_stub.get_user('abc')
-        self.assertIsNone(user.custom_claims)
+        self.assertIsNone(
+            firebase_auth_services.get_auth_id_from_user_id('abc'))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('abc'))
+        self.assertIsNone(self.firebase_sdk_stub.get_user('abc').custom_claims)
 
         firebase_auth_services.create_initial_super_admin()
 
@@ -649,24 +682,47 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_auth_id_from_user_id('abc'), 'abc')
         self.assertEqual(
             firebase_auth_services.get_user_id_from_auth_id('abc'), 'abc')
+        self.assertEqual(
+            self.firebase_sdk_stub.get_user('abc').custom_claims,
+            {'role': 'super_admin'})
 
-        self.firebase_sdk_stub.assert_firebase_user_exists('abc')
-        user = self.firebase_sdk_stub.get_user('abc')
-        self.assertEqual(user.custom_claims, {'role': 'super_admin'})
+    def test_creates_firebase_assoc_if_missing(self):
+        self.set_up_models(user_id='uid_abc', gae_id='jkl')
+
+        self.assertIsNone(
+            firebase_auth_services.get_auth_id_from_user_id('uid_abc'))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('abc'))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('jkl'))
+
+        firebase_auth_services.create_initial_super_admin()
+
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id('uid_abc'), 'abc')
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('abc'), 'uid_abc')
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('jkl'))
 
     def test_reuses_existing_firebase_id_if_association_exists(self):
-        user_models.UserSettingsModel(
-            id='abc', email=feconf.ADMIN_EMAIL_ADDRESS).put()
-        firebase_auth_services.associate_auth_id_with_user_id(
-            auth_domain.AuthIdUserIdPair('xyz', 'abc'))
+        self.set_up_models(user_id='abc', firebase_auth_id='xyz')
 
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id('abc'), 'xyz')
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('xyz'), 'abc')
         self.firebase_sdk_stub.assert_firebase_user_does_not_exist('xyz')
 
         firebase_auth_services.create_initial_super_admin()
 
-        self.firebase_sdk_stub.assert_firebase_user_exists('xyz')
-        user = self.firebase_sdk_stub.get_user('xyz')
-        self.assertEqual(user.custom_claims, {'role': 'super_admin'})
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id('abc'), 'xyz')
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('xyz'), 'abc')
+        self.assertEqual(
+            self.firebase_sdk_stub.get_user('xyz').custom_claims,
+            {'role': 'super_admin'})
 
 
 class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):

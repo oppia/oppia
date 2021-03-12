@@ -108,15 +108,15 @@ def revoke_super_admin_privileges(user_id):
 
 def create_initial_super_admin():
     """Creates the initial super-admin account on the Firebase server."""
-    user_settings = user_models.UserSettingsModel.query(
+    user_settings_model = user_models.UserSettingsModel.query(
         user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
     ).get()
 
-    if user_settings is None:
+    if user_settings_model is None:
         raise Exception(
             '%s is not a registered account' % feconf.ADMIN_EMAIL_ADDRESS)
 
-    user_id = user_settings.id
+    user_id = user_settings_model.id
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
         assoc_exists = False
@@ -467,8 +467,8 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
 
 def destroy_firebase_accounts():
     """Destroys all external Firebase users and their corresponding models."""
-    def _all_firebase_users():
-        """Yields every Firebase account from the servers."""
+    def _yield_every_firebase_user():
+        """Yields every external Firebase account."""
         page = firebase_admin.auth.list_users()
         while page is not None:
             for user in page.users:
@@ -476,18 +476,30 @@ def destroy_firebase_accounts():
             page = page.get_next_page()
 
     with _firebase_admin_context():
-        for user in _all_firebase_users():
+        for user in _yield_every_firebase_user():
+            # Delete the external account.
             firebase_admin.auth.delete_user(user.uid)
 
+            # Get Firebase ID -> User ID association model.
             assoc_by_auth_id_model = (
                 auth_models.UserIdByFirebaseAuthIdModel.get(
                     user.uid, strict=False))
 
-            assoc_by_user_id_model = (
-                None if assoc_by_auth_id_model is None else
-                auth_models.UserAuthDetailsModel.get(
-                    assoc_by_auth_id_model.user_id, strict=False))
+            # Get User ID -> Firebase ID association model.
+            if assoc_by_auth_id_model is not None:
+                assoc_by_user_id_model = auth_models.UserAuthDetailsModel.get(
+                    assoc_by_auth_id_model.user_id, strict=False)
+            elif user.email is not None:
+                user_settings_model = user_models.UserSettingsModel.query(
+                    user_models.UserSettingsModel.email == user.email).get()
+                assoc_by_user_id_model = (
+                    None if user_settings_model is None else
+                    auth_models.UserAuthDetailsModel.get(
+                        user_settings_model.id, strict=False))
+            else:
+                assoc_by_user_id_model = None
 
+            # Wipe the association models.
             if assoc_by_auth_id_model is not None:
                 assoc_by_auth_id_model.delete()
             if assoc_by_user_id_model is not None:
