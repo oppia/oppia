@@ -63,6 +63,7 @@ describe('Collections', function() {
       'First Exploration',
       'Languages',
       'First Test Exploration.',
+      'English',
       true
     );
     firstExplorationId = await general.getExplorationIdFromEditor();
@@ -71,6 +72,7 @@ describe('Collections', function() {
       'Second Exploration',
       'Languages',
       'Second Test Exploration.',
+      'English',
       false
     );
     secondExplorationId = await general.getExplorationIdFromEditor();
@@ -79,6 +81,7 @@ describe('Collections', function() {
       'Third Exploration',
       'Languages',
       'Third Test Exploration.',
+      'English',
       false
     );
     thirdExplorationId = await general.getExplorationIdFromEditor();
@@ -87,6 +90,7 @@ describe('Collections', function() {
       'Fourth Exploration',
       'Languages',
       'Fourth Test Exploration.',
+      'English',
       false
     );
     fourthExplorationId = await general.getExplorationIdFromEditor();
@@ -96,6 +100,7 @@ describe('Collections', function() {
       'The Lazy Magician for CollectionSuiteTest',
       'Algorithms',
       'discover the binary search algorithm',
+      'English',
       false
     );
     // Set expectWelcomeModal: false.
@@ -103,6 +108,7 @@ describe('Collections', function() {
       'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
       'discover the Root Linear Coefficient Theorem',
+      'English',
       false
     );
     // Set expectWelcomeModal: false.
@@ -110,6 +116,7 @@ describe('Collections', function() {
       'Test Exploration for CollectionSuiteTest',
       'Languages',
       'discover the Protractor Testing',
+      'English',
       false
     );
     await users.logout();
