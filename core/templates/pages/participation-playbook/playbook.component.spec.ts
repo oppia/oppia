@@ -126,7 +126,7 @@ describe('Playbook Page', () => {
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: windowRef 
+          useValue: windowRef
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
