@@ -40,6 +40,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import main
@@ -732,6 +733,41 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
 
 
+class CreateInitialSuperAdminTests(test_utils.GenericTestBase):
+    """Tests for create initial super admin handler."""
+
+    def test_get(self):
+        call_counter = test_utils.CallCounter(lambda *_: None)
+
+        create_initial_super_admin_swap = self.swap(
+            firebase_auth_services, 'create_initial_super_admin', call_counter)
+
+        with create_initial_super_admin_swap:
+            self.get_html_response('/seed_firebase', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_get_with_error(self):
+        def always_raise():
+            """Always raises an exception."""
+            raise Exception()
+
+        call_counter = test_utils.CallCounter(lambda *_: always_raise())
+
+        create_initial_super_admin_swap = self.swap(
+            firebase_auth_services, 'create_initial_super_admin', call_counter)
+
+        captured_logging_context = self.capture_logging(min_level=logging.ERROR)
+
+        with create_initial_super_admin_swap, captured_logging_context as logs:
+            self.get_html_response('/seed_firebase', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assert_matches_regexps(logs, [
+            'Failed to initialize Firebase admin account'
+        ])
+
+
 class LogoutPageTests(test_utils.GenericTestBase):
     """Tests for logout handler."""
 
@@ -985,6 +1021,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         'LogoutPage',
         'SessionBeginHandler',
         'SessionEndHandler',
+        'CreateInitialSuperAdmin',
     ])
 
     def test_every_method_has_decorator(self):

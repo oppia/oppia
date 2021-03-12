@@ -235,3 +235,8 @@ def grant_super_admin_privileges(user_id):
 def revoke_super_admin_privileges(user_id):
     """Revokes super admin privileges from the given user."""
     platform_auth_services.revoke_super_admin_privileges(user_id)
+
+
+def create_initial_super_admin():
+    """Creates the initial super-admin account on the Firebase server."""
+    platform_auth_services.create_initial_super_admin()

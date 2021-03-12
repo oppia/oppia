@@ -78,6 +78,19 @@ class SessionEndHandler(webapp2.RequestHandler):
         auth_services.destroy_auth_session(self.response)
 
 
+class CreateInitialSuperAdmin(webapp2.RequestHandler):
+    """Handler to create an initial Firebase admin account if necessary."""
+
+    def get(self):
+        """Seeds the Firebase account server with a single super-admin."""
+        try:
+            auth_services.create_initial_super_admin()
+        except Exception:
+            logging.exception('Failed to initialize Firebase admin account')
+        finally:
+            self.redirect('/')
+
+
 class LogoutPage(webapp2.RequestHandler):
     """Class which handles the logout URL."""
 

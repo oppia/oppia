@@ -67,7 +67,8 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 
-auth_models, = models.Registry.import_models([models.NAMES.auth])
+auth_models, user_models = models.Registry.import_models(
+    [models.NAMES.auth, models.NAMES.user])
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -103,6 +104,44 @@ def revoke_super_admin_privileges(user_id):
         raise ValueError('user_id=%s has no Firebase account' % user_id)
     with _firebase_admin_context():
         firebase_admin.auth.set_custom_user_claims(firebase_id, None)
+
+
+def create_initial_super_admin():
+    """Creates the initial super-admin account on the Firebase server."""
+    user_settings = user_models.UserSettingsModel.query(
+        user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
+    ).get()
+
+    if user_settings is None:
+        raise Exception(
+            '%s is not a registered account' % feconf.ADMIN_EMAIL_ADDRESS)
+
+    user_id = user_settings.id
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
+        assoc_exists = False
+        auth_id = user_id[4:] if user_id.startswith('uid_') else user_id
+    else:
+        assoc_exists = True
+
+    super_admin_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
+
+    with _firebase_admin_context():
+        try:
+            firebase_admin.auth.get_user(auth_id)
+        except firebase_admin.auth.UserNotFoundError:
+            firebase_admin.auth.import_users([
+                firebase_admin.auth.ImportUserRecord(
+                    auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
+                    custom_claims=super_admin_claims)
+            ])
+        else:
+            firebase_admin.auth.set_custom_user_claims(
+                auth_id, super_admin_claims)
+
+    if not assoc_exists:
+        associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair(auth_id, user_id))
 
 
 def establish_auth_session(request, response):
