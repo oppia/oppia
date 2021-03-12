@@ -21,8 +21,6 @@ require(
 require('directives/focus-on.directive.ts');
 require('pages/admin-page/navbar/admin-navbar.component.ts');
 require(
-  'pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.ts');
-require(
   'pages/admin-page/activities-tab/' +
   'admin-prod-mode-activities-tab.component.ts');
 require('pages/admin-page/config-tab/admin-config-tab.directive.ts');

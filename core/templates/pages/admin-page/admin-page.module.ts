@@ -27,7 +27,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { AdminFeaturesTabComponent } from
   'pages/admin-page/features-tab/admin-features-tab.component';
 import { AdminNavbarComponent } from './navbar/admin-navbar.component';
-import { AdminDevModeActivitiesTab } from './activities-tab/admin-dev-mode-activities-tab.component';
+import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
 //AdminJobsTab - done by ashutoh
 //AdminConfigTab - done by radesh
 //AdminRolesTab
@@ -51,14 +51,14 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
     AdminNavbarComponent,
-    AdminDevModeActivitiesTab,
+    AdminDevModeActivitiesTabComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
     AdminNavbarComponent,
-    AdminDevModeActivitiesTab
+    AdminDevModeActivitiesTabComponent
   ],
   providers: [
     {

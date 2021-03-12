@@ -18,18 +18,13 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { AppConstants } from 'app.constants';
-
-// require('domain/utilities/url-interpolation.service.ts');
-// require('pages/admin-page/services/admin-router.service.ts');
-// require('services/user.service.ts');
-
-// require('pages/admin-page/admin-page.constants.ajs.ts');
 
 // angular.module('oppia').directive('adminNavbar', [
 //   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
@@ -134,12 +129,13 @@ export class AdminNavbarComponent implements OnInit {
   ADMIN_TAB_URLS = AdminPageConstants.ADMIN_TAB_URLS;
   logoutUrl = AppConstants.LOGOUT_URL;
   profileDropdownIsActive = false;
-  dropdownMenuisActive = false;
+  dropdownMenuIsActive = false;
 
   constructor(
     private adminRouterService: AdminRouterService,
     private urlInterpolationService: UrlInterpolationService,
-    private userService: UserService
+    private userService: UserService,
+    private domSanitizer: DomSanitizer
   ) {}
 
   getStaticImageUrl(imagePath: string) {
@@ -179,24 +175,24 @@ export class AdminNavbarComponent implements OnInit {
   };
 
   activateDropdownMenu() {
-    return this.dropdownMenuisActive = true;
+    return this.dropdownMenuIsActive = true;
   };
 
   deactivateDropdownMenu() {
-    return this.dropdownMenuisActive = false;
+    return this.dropdownMenuIsActive = false;
   };
 
+  sanitizeImageUrl(imageUrl: string): SafeUrl {
+    return this.domSanitizer.bypassSecurityTrustUrl(imageUrl);
+  }
+
   async getProfileImageDataAsync(): Promise<void> {
-    var dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    console.info("DATA URL", dataUrl);
+    let dataUrl = await this.userService.getProfileImageDataUrlAsync();
     this.profilePictureDataUrl = dataUrl;
   }
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
-
-    console.log(userInfo)
-
     this.username = userInfo.getUsername();
     this.isModerator = userInfo.isModerator();
     this.isSuperAdmin = userInfo.isSuperAdmin();
@@ -209,9 +205,8 @@ export class AdminNavbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("1 ", this.profilePictureDataUrl)
+    console.log(this.logoutUrl)
     this.getProfileImageDataAsync();
-    console.log("2 ", this.profilePictureDataUrl)
     this.getUserInfoAsync();
   }
 

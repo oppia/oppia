@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the activities tab in the admin panel when Oppia
+ * @fileoverview Component for the activities tab in the admin panel when Oppia
  * is in developer mode.
  */
 
@@ -25,215 +25,21 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
-require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/admin-page/services/admin-data.service.ts');
-require('pages/admin-page/services/admin-task-manager.service.ts');
-
-require('pages/admin-page/admin-page.constants.ajs.ts');
-
-// angular.module('oppia').directive('adminDevModeActivitiesTab', [
-//   '$http', '$rootScope', '$window', 'AdminDataService',
-//   'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
-//   function(
-//       $http, $rootScope, $window, AdminDataService,
-//       AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL) {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       bindToController: {
-//         setStatusMessage: '='
-//       },
-//       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-//         '/pages/admin-page/activities-tab/' +
-//         'admin-dev-mode-activities-tab.directive.html'),
-//       controllerAs: '$ctrl',
-//       controller: [function() {
-//         var ctrl = this;
-//         var demoExplorationIds = [];
-
-//         ctrl.reloadExploration = function(explorationId) {
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-//           if (!$window.confirm('This action is irreversible. Are you sure?')) {
-//             return;
-//           }
-
-//           ctrl.setStatusMessage('Processing...');
-
-//           AdminTaskManagerService.startTask();
-//           $http.post(ADMIN_HANDLER_URL, {
-//             action: 'reload_exploration',
-//             exploration_id: String(explorationId)
-//           }).then(function() {
-//             ctrl.setStatusMessage('Data reloaded successfully.');
-//             AdminTaskManagerService.finishTask();
-//           }, function(errorResponse) {
-//             ctrl.setStatusMessage(
-//               'Server error: ' + errorResponse.data.error);
-//             AdminTaskManagerService.finishTask();
-//           });
-//         };
-
-//         ctrl.reloadAllExplorations = function() {
-//           if (!ctrl.reloadingAllExplorationPossible) {
-//             return;
-//           }
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-//           if (!$window.confirm('This action is irreversible. Are you sure?')) {
-//             return;
-//           }
-
-//           ctrl.setStatusMessage('Processing...');
-//           AdminTaskManagerService.startTask();
-
-//           var numSucceeded = 0;
-//           var numFailed = 0;
-//           var numTried = 0;
-//           var printResult = function() {
-//             if (numTried < demoExplorationIds.length) {
-//               ctrl.setStatusMessage(
-//                 'Processing...' + numTried + '/' +
-//                 demoExplorationIds.length);
-//               return;
-//             }
-//             ctrl.setStatusMessage(
-//               'Reloaded ' + demoExplorationIds.length +
-//               ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
-//               ' failed.');
-//             AdminTaskManagerService.finishTask();
-//           };
-
-//           for (var i = 0; i < demoExplorationIds.length; ++i) {
-//             var explorationId = demoExplorationIds[i];
-
-//             $http.post(ADMIN_HANDLER_URL, {
-//               action: 'reload_exploration',
-//               exploration_id: explorationId
-//             }).then(function() {
-//               ++numSucceeded;
-//               ++numTried;
-//               printResult();
-//             }, function() {
-//               ++numFailed;
-//               ++numTried;
-//               printResult();
-//             });
-//           }
-//         };
-//         ctrl.generateDummyExplorations = function() {
-//           // Generate dummy explorations with random title.
-//           if (ctrl.numDummyExpsToPublish > ctrl.numDummyExpsToGenerate) {
-//             ctrl.setStatusMessage(
-//               'Publish count should be less than or equal to generate count');
-//             return;
-//           }
-//           AdminTaskManagerService.startTask();
-//           ctrl.setStatusMessage('Processing...');
-//           $http.post(ADMIN_HANDLER_URL, {
-//             action: 'generate_dummy_explorations',
-//             num_dummy_exps_to_generate: ctrl.numDummyExpsToGenerate,
-//             num_dummy_exps_to_publish: ctrl.numDummyExpsToPublish
-//           }).then(function() {
-//             ctrl.setStatusMessage(
-//               'Dummy explorations generated successfully.');
-//           }, function(errorResponse) {
-//             ctrl.setStatusMessage(
-//               'Server error: ' + errorResponse.data.error);
-//           });
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         ctrl.loadNewStructuresData = function() {
-//           AdminTaskManagerService.startTask();
-//           ctrl.setStatusMessage('Processing...');
-//           $http.post(ADMIN_HANDLER_URL, {
-//             action: 'generate_dummy_new_structures_data'
-//           }).then(function() {
-//             ctrl.setStatusMessage(
-//               'Dummy new structures data generated successfully.');
-//           }, function(errorResponse) {
-//             ctrl.setStatusMessage(
-//               'Server error: ' + errorResponse.data.error);
-//           });
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         ctrl.generateNewSkillData = function() {
-//           AdminTaskManagerService.startTask();
-//           ctrl.setStatusMessage('Processing...');
-//           $http.post(ADMIN_HANDLER_URL, {
-//             action: 'generate_dummy_new_skill_data'
-//           }).then(function() {
-//             ctrl.setStatusMessage(
-//               'Dummy new skill and questions generated successfully.');
-//           }, function(errorResponse) {
-//             ctrl.setStatusMessage(
-//               'Server error: ' + errorResponse.data.error);
-//           });
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         ctrl.reloadCollection = function(collectionId) {
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-//           if (!$window.confirm('This action is irreversible. Are you sure?')) {
-//             return;
-//           }
-
-//           ctrl.setStatusMessage('Processing...');
-
-//           AdminTaskManagerService.startTask();
-//           $http.post(ADMIN_HANDLER_URL, {
-//             action: 'reload_collection',
-//             collection_id: String(collectionId)
-//           }).then(function() {
-//             ctrl.setStatusMessage('Data reloaded successfully.');
-//           }, function(errorResponse) {
-//             ctrl.setStatusMessage(
-//               'Server error: ' + errorResponse.data.error);
-//           });
-//           AdminTaskManagerService.finishTask();
-//         };
-//         ctrl.$onInit = function() {
-//           ctrl.numDummyExpsToPublish = 0;
-//           ctrl.numDummyExpsToGenerate = 0;
-//           ctrl.DEMO_COLLECTIONS = {};
-//           ctrl.DEMO_EXPLORATIONS = {};
-//           ctrl.reloadingAllExplorationPossible = false;
-//           AdminDataService.getDataAsync().then(function(adminDataObject) {
-//             ctrl.DEMO_EXPLORATIONS = adminDataObject.demoExplorations;
-//             ctrl.DEMO_COLLECTIONS = adminDataObject.demoCollections;
-//             demoExplorationIds = adminDataObject.demoExplorationIds;
-//             ctrl.reloadingAllExplorationPossible = true;
-//             // TODO(#8521): Remove the use of $rootScope.$apply()
-//             // once the directive is migrated to angular.
-//             $rootScope.$apply();
-//           });
-//         };
-//       }]
-//     };
-//   }
-// ]);
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'admin-dev-mode-activities-tab',
   templateUrl: './admin-dev-mode-activities-tab.component.html',
   styleUrls: []
 })
-export class AdminDevModeActivitiesTab implements OnInit {
+export class AdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
   reloadingAllExplorationPossible: boolean;
-  demoExplorationIds = [];
+  demoExplorationIds: string[] = [];
   numDummyExpsToPublish: number;
   numDummyExpsToGenerate: number;
-  DEMO_COLLECTIONS = {};
-  DEMO_EXPLORATIONS = {};
+  DEMO_COLLECTIONS: string[][];
+  DEMO_EXPLORATIONS: string[][];
 
   constructor(
     private adminDataService: AdminDataService,
@@ -391,8 +197,10 @@ export class AdminDevModeActivitiesTab implements OnInit {
     this.adminTaskManagerService.finishTask();
   };
 
-  async reloadAllExplorationPossible() {
+  async getDataAsync() {
     const adminDataObject = await this.adminDataService.getDataAsync();
+
+    console.log(adminDataObject)
 
     this.DEMO_EXPLORATIONS = adminDataObject.demoExplorations;
     this.DEMO_COLLECTIONS = adminDataObject.demoCollections;
@@ -403,9 +211,11 @@ export class AdminDevModeActivitiesTab implements OnInit {
   ngOnInit() {
     this.numDummyExpsToPublish = 0;
     this.numDummyExpsToGenerate = 0;
-
     this.reloadingAllExplorationPossible = false;
-
-    this.reloadAllExplorationPossible();
+    this.getDataAsync();
   }
 }
+
+angular.module('oppia').directive(
+  'adminDevModeActivitiesTab', downgradeComponent(
+    {component: AdminDevModeActivitiesTabComponent}));
