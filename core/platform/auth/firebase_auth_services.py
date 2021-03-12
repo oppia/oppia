@@ -465,6 +465,38 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
         auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
 
 
+def destroy_firebase_accounts():
+    """Destroys all external Firebase users and their corresponding models."""
+    def _all_firebase_users():
+        """Yields every Firebase account from the servers."""
+        page = firebase_admin.auth.list_users()
+        while page is not None:
+            for user in page.users():
+                yield user
+            page = page.get_next_page()
+
+    with _firebase_admin_context():
+        for user in _all_firebase_users():
+            firebase_admin.auth.delete_user(user.uid)
+
+            assoc_by_auth_id_model = (
+                auth_models.UserIdByFirebaseAuthIdModel.get(
+                    user.uid, strict=False))
+
+            assoc_by_user_id_model = (
+                None if assoc_by_auth_id_model is None else
+                auth_models.UserAuthDetailsModel.get(
+                    assoc_by_auth_id_model.user_id, strict=False))
+
+            if assoc_by_auth_id_model is not None:
+                assoc_by_auth_id_model.delete()
+            if assoc_by_user_id_model is not None:
+                assoc_by_user_id_model.firebase_auth_id = None
+                assoc_by_user_id_model.update_timestamps(
+                    update_last_updated_time=False)
+                assoc_by_user_id_model.put()
+
+
 @contextlib.contextmanager
 def _firebase_admin_context():
     """Returns a context for calling the Firebase Admin SDK.

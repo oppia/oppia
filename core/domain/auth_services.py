@@ -240,3 +240,8 @@ def revoke_super_admin_privileges(user_id):
 def create_initial_super_admin():
     """Creates the initial super-admin account on the Firebase server."""
     platform_auth_services.create_initial_super_admin()
+
+
+def destroy_firebase_accounts():
+    """Destroys all external Firebase users and their corresponding models."""
+    platform_auth_services.destroy_firebase_accounts()

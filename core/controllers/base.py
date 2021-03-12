@@ -84,6 +84,7 @@ class CreateInitialSuperAdmin(webapp2.RequestHandler):
     def get(self):
         """Seeds the Firebase account server with a single super-admin."""
         try:
+            auth_services.destroy_firebase_accounts()
             auth_services.create_initial_super_admin()
         except Exception:
             logging.exception('Failed to initialize Firebase admin account')
