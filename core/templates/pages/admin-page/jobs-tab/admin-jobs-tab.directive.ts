@@ -50,6 +50,8 @@ angular.module('oppia').directive('adminJobsTab', [
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -61,10 +63,14 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Job started successfully.');
               window.location.reload();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -76,10 +82,14 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to job.');
               window.location.reload();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -91,10 +101,14 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Computation started successfully.');
               window.location.reload();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
@@ -106,10 +120,14 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to computation.');
               window.location.reload();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             }, function(errorMessage) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorMessage);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         };
