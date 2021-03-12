@@ -22,7 +22,7 @@ import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-footer',
-  templateUrl: './oppia-footer.component.html'
+  templateUrl: './oppia_footer_directive.html'
 })
 export class OppiaFooterComponent {
  siteFeedbackFormUrl:string = AppConstants.SITE_FEEDBACK_FORM_URL;
