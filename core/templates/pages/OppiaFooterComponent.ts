@@ -16,19 +16,18 @@
  * @fileoverview Directive for the footer.
  */
 
- import { Component } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { AppConstants } from 'app.constants';
- 
- @Component({
-   selector: 'oppia-footer',
-   templateUrl: './oppia-footer.component.html',
- })
- export class OppiaFooterComponent {
-   siteFeedbackFormUrl:string = AppConstants.SITE_FEEDBACK_FORM_URL;
- }
- 
- angular.module('oppia').directive(
-   'oppiaFooter', downgradeComponent(
-     {component: OppiaFooterComponent}));
- 
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+
+@Component({
+  selector: 'oppia-footer',
+  templateUrl: './oppia-footer.component.html',
+})
+export class OppiaFooterComponent {
+ siteFeedbackFormUrl:string = AppConstants.SITE_FEEDBACK_FORM_URL;
+}
+
+angular.module('oppia').directive(
+  'oppiaFooter', downgradeComponent(
+    {component: OppiaFooterComponent}));
