@@ -471,7 +471,7 @@ def destroy_firebase_accounts():
         """Yields every Firebase account from the servers."""
         page = firebase_admin.auth.list_users()
         while page is not None:
-            for user in page.users():
+            for user in page.users:
                 yield user
             page = page.get_next_page()
 
