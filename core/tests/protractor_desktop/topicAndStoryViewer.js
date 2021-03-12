@@ -34,6 +34,7 @@ var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+const { exit } = require('yargs');
 
 describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
@@ -59,8 +60,9 @@ describe('Topic and Story viewer functionality', function() {
     for (var i = 1; i <= 3; i++) {
       if (i === 1) {
         exitTutorial = true;
+      } else {
+        exitTutorial = false;
       }
-
       await workflow.createAndPublishTwoCardExploration(
         `Exploration TASV1 - ${i}`,
         EXPLORATION.category,
