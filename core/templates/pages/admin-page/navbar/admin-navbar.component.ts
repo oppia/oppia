@@ -193,6 +193,7 @@ export class AdminNavbarComponent implements OnInit {
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
+    console.log("Inside userInfo ", userInfo)
     this.username = userInfo.getUsername();
     this.isModerator = userInfo.isModerator();
     this.isSuperAdmin = userInfo.isSuperAdmin();
@@ -205,7 +206,7 @@ export class AdminNavbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.logoutUrl)
+    console.log("INSIDE ngOnInit")
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
   }
