@@ -527,6 +527,7 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { QuestionValidationService } from './question-validation.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -801,6 +802,10 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
+    upgradedServices['QuestionValidationService'] =
+    new QuestionValidationService(
+      upgradedServices['StateEditorService']
+    );
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['baseInteractionValidationService']);
