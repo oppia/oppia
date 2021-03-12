@@ -83,6 +83,8 @@ class CreateInitialSuperAdmin(webapp2.RequestHandler):
 
     def get(self):
         """Seeds the Firebase account server with a single super-admin."""
+        if not feconf.PREVENT_NEW_SIGNUPS:
+            self.redirect('/')
         try:
             auth_services.destroy_firebase_accounts()
             auth_services.create_initial_super_admin()
@@ -198,6 +200,8 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = auth_claims.email
                 if 'signup?' in self.request.uri:
+                    if feconf.PREVENT_NEW_SIGNUPS:
+                        raise Exception('New sign-ups are temporarily disabled')
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
