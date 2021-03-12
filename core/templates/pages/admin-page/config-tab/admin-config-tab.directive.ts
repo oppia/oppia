@@ -17,15 +17,15 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/admin-page/services/admin-config-tab-backend-api.service');
+require('domain/admin/admin-backend-api.service');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 angular.module('oppia').directive('adminConfigTab', [
-  '$rootScope', '$window', 'AdminConfigTabBackendApiService',
+  '$rootScope', '$window', 'AdminBackendApiService',
   'AdminDataService', 'AdminTaskManagerService', 'UrlInterpolationService',
   function(
-      $rootScope, $window, AdminConfigTabBackendApiService,
+      $rootScope, $window, AdminBackendApiService,
       AdminDataService, AdminTaskManagerService, UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -56,14 +56,20 @@ angular.module('oppia').directive('adminConfigTab', [
             return;
           }
 
-          AdminConfigTabBackendApiService.revertConfigProperty(
+          AdminBackendApiService.revertConfigPropertyAsync(
             configPropertyId
-          ).then(function() {
+          ).then(() => {
             ctrl.setStatusMessage('Config property reverted successfully.');
             ctrl.reloadConfigProperties();
-          }, function(errorResponse) {
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
+          }, errorResponse => {
             ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
           });
         };
 
@@ -84,15 +90,21 @@ angular.module('oppia').directive('adminConfigTab', [
               ctrl.configProperties[property].value);
           }
 
-          AdminConfigTabBackendApiService.saveConfigProperties(
+          AdminBackendApiService.saveConfigPropertiesAsync(
             newConfigPropertyValues
-          ).then(function() {
+          ).then(() => {
             ctrl.setStatusMessage('Data saved successfully.');
             AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
+          }, errorResponse => {
             ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse);
             AdminTaskManagerService.finishTask();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
           });
         };
         ctrl.$onInit = function() {
