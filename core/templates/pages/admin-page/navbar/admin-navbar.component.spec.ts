@@ -23,7 +23,7 @@ import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
 import { AdminNavbarComponent } from './admin-navbar.component';
 
-fdescribe('Admin Navbar component', () => {
+describe('Admin Navbar component', () => {
   let component: AdminNavbarComponent;
   let userService = null;
   let adminRouterService = null;
@@ -53,13 +53,11 @@ fdescribe('Admin Navbar component', () => {
       .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo);
-    console.log("before", component.profilePictureDataUrl);
+
     component.ngOnInit();
-    console.log("after", component.profilePictureDataUrl);
   }));
 
   it('should initialize component properties correctly', () => {
-    console.log("test", component.profilePictureDataUrl);
     expect(component.profilePictureDataUrl).toBe(userProfileImage);
     expect(component.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');

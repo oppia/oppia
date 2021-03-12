@@ -48,11 +48,12 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     private http: HttpClient
   ) {}
 
-  reloadExploration(explorationId) {
+  reloadExploration(explorationId: string): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm('This action is irreversible. Are you sure?')) {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible. Are you sure?')) {
       return;
     }
 
@@ -70,9 +71,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         'Server error: ' + errorResponse.data.error);
       this.adminTaskManagerService.finishTask();
     });
-  };
+  }
 
-  printResult(numSucceeded, numFailed, numTried) {
+  printResult(numSucceeded: number, numFailed: number, numTried: number): void {
     if (numTried < this.demoExplorationIds.length) {
       this.setStatusMessage.emit(
         'Processing...' + numTried + '/' +
@@ -84,16 +85,17 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
       ' failed.');
     this.adminTaskManagerService.finishTask();
-  };
+  }
 
-  reloadAllExplorations() {
+  reloadAllExplorations(): void {
     if (!this.reloadingAllExplorationPossible) {
       return;
     }
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm('This action is irreversible. Are you sure?')) {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible. Are you sure?')) {
       return;
     }
 
@@ -120,8 +122,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         this.printResult(numSucceeded, numFailed, numTried);
       });
     }
-  };
-  generateDummyExplorations() {
+  }
+
+  generateDummyExplorations(): void {
     // Generate dummy explorations with random title.
     if (this.numDummyExpsToPublish > this.numDummyExpsToGenerate) {
       this.setStatusMessage.emit(
@@ -142,9 +145,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         'Server error: ' + errorResponse.data.error);
     });
     this.adminTaskManagerService.finishTask();
-  };
+  }
 
-  loadNewStructuresData() {
+  loadNewStructuresData(): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
     this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
@@ -157,9 +160,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         'Server error: ' + errorResponse.data.error);
     });
     this.adminTaskManagerService.finishTask();
-  };
+  }
 
-  generateNewSkillData() {
+  generateNewSkillData(): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
     this.http.post(AdminPageConstants.ADMIN_HANDLER_URL, {
@@ -172,13 +175,14 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         'Server error: ' + errorResponse.data.error);
     });
     this.adminTaskManagerService.finishTask();
-  };
+  }
 
-  reloadCollection(collectionId) {
+  reloadCollection(collectionId: string): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm('This action is irreversible. Are you sure?')) {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible. Are you sure?')) {
       return;
     }
 
@@ -195,12 +199,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         'Server error: ' + errorResponse.data.error);
     });
     this.adminTaskManagerService.finishTask();
-  };
+  }
 
-  async getDataAsync() {
+  async getDataAsync(): Promise<void> {
     const adminDataObject = await this.adminDataService.getDataAsync();
-
-    console.log(adminDataObject)
 
     this.DEMO_EXPLORATIONS = adminDataObject.demoExplorations;
     this.DEMO_COLLECTIONS = adminDataObject.demoCollections;
@@ -208,7 +210,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.reloadingAllExplorationPossible = true;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.numDummyExpsToPublish = 0;
     this.numDummyExpsToGenerate = 0;
     this.reloadingAllExplorationPossible = false;
