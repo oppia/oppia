@@ -29,7 +29,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -414,7 +414,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -458,7 +458,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
             abbreviated_name='topic-two', url_fragment='topic-two',
@@ -561,8 +561,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_get_all_topic_assignments_for_skill(self):
-        topic_id = topic_services.get_new_topic_id()
-        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-three', url_fragment='topic-three',
@@ -604,8 +604,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_assignments[1].subtopic_id, 1)
 
     def test_remove_skill_from_all_topics(self):
-        topic_id = topic_services.get_new_topic_id()
-        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-five', url_fragment='topic-five',
@@ -637,8 +637,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic_assignments_dict), 0)
 
     def test_successfully_replace_skill_id_in_all_topics(self):
-        topic_id = topic_services.get_new_topic_id()
-        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-five', url_fragment='topic-five',
@@ -674,7 +674,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic_assignments_dict), 2)
 
     def test_failure_replace_skill_id_in_all_topics(self):
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-five', url_fragment='topic-five',

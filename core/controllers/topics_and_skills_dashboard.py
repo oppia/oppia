@@ -58,7 +58,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
@@ -67,10 +67,10 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             summary.to_dict() for summary in skill_summaries]
 
         skill_ids_assigned_to_some_topic = (
-            topic_services.get_all_skill_ids_assigned_to_some_topic())
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
         merged_skill_ids = (
             skill_services.get_merged_skill_ids())
-        topic_rights_dict = topic_services.get_all_topic_rights()
+        topic_rights_dict = topic_fetchers.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
             if topic_rights_dict[topic_summary['id']]:
                 topic_rights = topic_rights_dict[topic_summary['id']]
@@ -262,7 +262,7 @@ class NewTopicHandler(base.BaseHandler):
         except:
             raise self.InvalidInputException(
                 'Invalid topic name, received %s.' % name)
-        new_topic_id = topic_services.get_new_topic_id()
+        new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description)
         topic_services.save_new_topic(self.user_id, topic)

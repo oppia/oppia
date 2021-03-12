@@ -24,7 +24,6 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -54,7 +53,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Description')
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic1')
         subtopic.skill_ids = [self.skill_id]
@@ -184,7 +183,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='TopicName1',
             abbreviated_name='topicname', url_fragment='topic-one',
@@ -226,7 +225,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Addition')
         subtopic.skill_ids = [skill_id]
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Maths',
             abbreviated_name='maths', url_fragment='maths',
@@ -237,7 +236,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Chemistry')
         subtopic.skill_ids = [skill_id]
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Science',
             abbreviated_name='science', url_fragment='science',
@@ -325,7 +324,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         # Check that admins can delete a skill.
         skill_has_topics_swap = self.swap(
-            topic_services,
+            topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [])
         with skill_has_topics_swap:
@@ -340,7 +339,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         skill_has_questions_swap = self.swap(
             skill_services, 'skill_has_associated_questions', lambda x: True)
         skill_has_topics_swap = self.swap(
-            topic_services,
+            topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [])
         with skill_has_questions_swap, skill_has_topics_swap:
@@ -351,7 +350,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         # Check DELETE removes skill from the topic and returns 200 when the
         # skill still has associated topics.
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Topic1',
             abbreviated_name='topic-one', url_fragment='topic-one',

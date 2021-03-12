@@ -264,7 +264,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_dummy_new_structures_data'
             }, csrf_token=csrf_token)
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 2)
         for summary in topic_summaries:
             if summary.name == 'Dummy Topic 1':
@@ -1259,7 +1259,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, username)
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, user_id, name='Name',
             abbreviated_name='abbrev', url_fragment='url-fragment',

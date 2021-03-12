@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import base_model_validators
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.platform import models
 import python_utils
 
@@ -310,7 +309,7 @@ class TopicSummaryModelValidator(
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return topic_services.get_topic_summary_from_model(item)
+        return topic_fetchers.get_topic_summary_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

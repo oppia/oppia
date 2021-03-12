@@ -23,7 +23,7 @@ from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.platform import models
 from core.tests import test_utils
 
@@ -46,7 +46,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubtopicPageServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))

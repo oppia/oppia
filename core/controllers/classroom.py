@@ -22,7 +22,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
 from core.domain import config_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 import feconf
 
 
@@ -54,8 +54,8 @@ class ClassroomDataHandler(base.BaseHandler):
             classroom_url_fragment)
 
         topic_ids = classroom.topic_ids
-        topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
-        topic_rights = topic_services.get_multi_topic_rights(topic_ids)
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
+        topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts = []
         for index, summary in enumerate(topic_summaries):
             if summary is not None:

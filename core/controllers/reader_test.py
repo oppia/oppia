@@ -36,6 +36,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import taskqueue_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -198,7 +199,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
     def test_get_exploration_pretests(self):
         story_id = story_services.get_new_story_id()
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[],
