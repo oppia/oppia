@@ -18,9 +18,6 @@
  */
 
 import { Component, Output, OnInit, EventEmitter } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
@@ -46,8 +43,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private windowRef: WindowRef,
-    private http: HttpClient
+    private windowRef: WindowRef
   ) {}
 
   reloadExploration(explorationId: string): void {
@@ -64,13 +60,14 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
 
     this.adminBackendApiService.reloadExplorationAsync(
-      explorationId).then(function() {
-        this.setStatusMessage.emit('Data reloaded successfully.');
-        this.adminTaskManagerService.finishTask();
-      }, function(errorResponse) {
-        this.setStatusMessage.emit(
-          'Server error: ' + errorResponse.data.error);
-        this.adminTaskManagerService.finishTask();
+      explorationId
+    ).then(function() {
+      this.setStatusMessage.emit('Data reloaded successfully.');
+      this.adminTaskManagerService.finishTask();
+    }, function(errorResponse) {
+      this.setStatusMessage.emit(
+        'Server error: ' + errorResponse.data.error);
+      this.adminTaskManagerService.finishTask();
     });
   }
 
@@ -111,10 +108,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       var explorationId = this.demoExplorationIds[i];
 
       this.adminBackendApiService.reloadExplorationAsync(
-        explorationId).then(function() {
-          ++numSucceeded;
-          ++numTried;
-          this.printResult(numSucceeded, numFailed, numTried);
+        explorationId
+      ).then(function() {
+        ++numSucceeded;
+        ++numTried;
+        this.printResult(numSucceeded, numFailed, numTried);
       }, function() {
         ++numFailed;
         ++numTried;
@@ -133,9 +131,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
     this.adminBackendApiService.generateDummyExplorationsAsync(
-      this.numDummyExpsToGenerate, this.numDummyExpsToPublish).then(function() {
-        this.setStatusMessage.emit(
-          'Dummy explorations generated successfully.');
+      this.numDummyExpsToGenerate, this.numDummyExpsToPublish
+    ).then(function() {
+      this.setStatusMessage.emit(
+        'Dummy explorations generated successfully.');
     }, function(errorResponse) {
       this.setStatusMessage.emit(
         'Server error: ' + errorResponse.data.error);
@@ -148,13 +147,13 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage.emit('Processing...');
 
     this.adminBackendApiService.generateDummyNewStructuresDataAsync()
-    .then(function() {
-      this.setStatusMessage.emit(
-        'Dummy new structures data generated successfully.');
-    }, function(errorResponse) {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.data.error);
-    });
+      .then(function() {
+        this.setStatusMessage.emit(
+          'Dummy new structures data generated successfully.');
+      }, function(errorResponse) {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.data.error);
+      });
     this.adminTaskManagerService.finishTask();
   }
 
@@ -163,13 +162,13 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage.emit('Processing...');
 
     this.adminBackendApiService.generateDummyNewSkillDataAsync()
-    .then(function() {
-      this.setStatusMessage.emit(
-        'Dummy new skill and questions generated successfully.');
-    }, function(errorResponse) {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.data.error);
-    });
+      .then(function() {
+        this.setStatusMessage.emit(
+          'Dummy new skill and questions generated successfully.');
+      }, function(errorResponse) {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.data.error);
+      });
     this.adminTaskManagerService.finishTask();
   }
 
@@ -187,12 +186,12 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
 
     this.adminBackendApiService.reloadCollectionAsync(collectionId)
-    .then(function() {
-      this.setStatusMessage.emit('Data reloaded successfully.');
-    }, function(errorResponse) {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.data.error);
-    });
+      .then(function() {
+        this.setStatusMessage.emit('Data reloaded successfully.');
+      }, function(errorResponse) {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.data.error);
+      });
     this.adminTaskManagerService.finishTask();
   }
 
