@@ -25,6 +25,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_services
 from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -53,7 +54,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.platform.auth import firebase_auth_services
 import feconf
 import python_utils
 import utils
@@ -744,7 +744,7 @@ class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException('No such user exists')
 
-        firebase_auth_services.grant_super_admin_privileges(user_id)
+        auth_services.grant_super_admin_privileges(user_id)
         self.render_json(self.values)
 
 
@@ -767,7 +767,7 @@ class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Cannot revoke privileges from the default super admin account')
 
-        firebase_auth_services.revoke_super_admin_privileges(
+        auth_services.revoke_super_admin_privileges(
             user_settings.user_id)
         self.render_json(self.values)
 

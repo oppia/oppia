@@ -1205,8 +1205,8 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should grant super admin privileges to user', fakeAsync(() => {
-    abas.grantSuperAdminPrivilegesAsync('abc')
+  it('should revoke super admin privileges to user', fakeAsync(() => {
+    abas.revokeSuperAdminPrivilegesAsync('abc')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/adminrevokesuperadminhandler?username=abc');

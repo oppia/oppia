@@ -117,7 +117,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth, 'verify_id_token', self._verify_id_token))
             swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'get_user', self._get_user))
+                firebase_admin.auth, 'get_user', self.get_user))
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth, 'delete_user', self._delete_user))
             swap_stack.enter_context(test.swap(
@@ -168,7 +168,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN}
             if role_is_super_admin else None)
         self._set_user_fragile(uid, email, disabled, custom_claims)
-        return self._encode_user_claims(self._get_user(uid))
+        return self._encode_user_claims(self.get_user(uid))
 
     def mock_initialize_app_error(self):
         """Returns a context in which `initialize_app` raises an exception."""
@@ -391,7 +391,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             'customAttributes': custom_claims,
         })
 
-    def _get_user(self, uid):
+    def get_user(self, uid):
         """Returns the user with given ID if found, otherwise raises an error.
 
         Args:
@@ -503,17 +503,17 @@ class SuperAdminPrivilegesTests(test_utils.AppEngineTestBase):
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id='aid').put()
         self.firebase_sdk_stub.create_user('aid')
 
-        self.assertIsNone(self.firebase_sdk_stub._get_user('aid').custom_claims)
+        self.assertIsNone(self.firebase_sdk_stub.get_user('aid').custom_claims)
 
         firebase_auth_services.grant_super_admin_privileges('uid')
 
         self.assertEqual(
-            self.firebase_sdk_stub._get_user('aid').custom_claims,
+            self.firebase_sdk_stub.get_user('aid').custom_claims,
             {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN})
 
         firebase_auth_services.revoke_super_admin_privileges('uid')
 
-        self.assertIsNone(self.firebase_sdk_stub._get_user('aid').custom_claims)
+        self.assertIsNone(self.firebase_sdk_stub.get_user('aid').custom_claims)
 
     def test_raises_error_when_user_does_not_exist(self):
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id=None).put()

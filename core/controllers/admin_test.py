@@ -1045,7 +1045,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with grant_super_admin_privileges_stub:
             response = self.get_json(
                 '/admingrantsuperadminhandler',
-                {'username': self.ADMIN_USERNAME},
+                params={'username': self.ADMIN_USERNAME},
                 expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -1055,7 +1055,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            '/admingrantsuperadminhandler', {}, expected_status_int=400)
+            '/admingrantsuperadminhandler', params={}, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')
 
@@ -1063,7 +1063,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            '/admingrantsuperadminhandler', {'username': 'fakeusername'},
+            '/admingrantsuperadminhandler', params={'username': 'fakeusername'},
             expected_status_int=400)
 
         self.assertEqual(response['error'], 'No such user exists')
@@ -1078,7 +1078,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         with revoke_super_admin_privileges_stub:
             response = self.get_json(
-                '/adminrevokesuperadminhandler', {'username': self.ADMIN_USERNAME},
+                '/adminrevokesuperadminhandler',
+                params={'username': self.ADMIN_USERNAME},
                 expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -1088,7 +1089,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            '/adminrevokesuperadminhandler', {}, expected_status_int=400)
+            '/adminrevokesuperadminhandler', params={}, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')
 
@@ -1096,8 +1097,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            '/adminrevokesuperadminhandler', {'username': 'fakeusername'},
-            expected_status_int=400)
+            '/adminrevokesuperadminhandler',
+            params={'username': 'fakeusername'}, expected_status_int=400)
 
         self.assertEqual(response['error'], 'No such user exists')
 
@@ -1106,7 +1107,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         response = self.get_json(
-            '/adminrevokesuperadminhandler', {'username': 'test'},
+            '/adminrevokesuperadminhandler', params={'username': 'test'},
             expected_status_int=400)
 
         self.assertEqual(

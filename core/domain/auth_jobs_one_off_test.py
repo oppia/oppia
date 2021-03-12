@@ -443,7 +443,7 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         self.assert_auth_mapping_exists(auth_assoc)
         self.sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
 
-        user = self.sdk_stub._get_user(auth_assoc.auth_id)
+        user = self.sdk_stub.get_user(auth_assoc.auth_id)
         self.assertEqual(
             user.custom_claims, {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN})
 

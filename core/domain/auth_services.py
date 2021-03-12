@@ -225,3 +225,13 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
     """
     platform_auth_services.associate_multi_auth_ids_with_user_ids(
         auth_id_user_id_pairs)
+
+
+def grant_super_admin_privileges(user_id):
+    """Grants super admin privileges to the given user."""
+    platform_auth_services.grant_super_admin_privileges(user_id)
+
+
+def revoke_super_admin_privileges(user_id):
+    """Revokes super admin privileges from the given user."""
+    platform_auth_services.revoke_super_admin_privileges(user_id)
