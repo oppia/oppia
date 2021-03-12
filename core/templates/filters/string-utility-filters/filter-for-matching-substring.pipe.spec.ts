@@ -27,7 +27,7 @@ describe('Testing FilterForMatchingSubstringPipe', () => {
   it('should have all expected pipes', () => {
     expect(pipe).not.toEqual(null);
   });
-  
+
   it('should get items that contain input', () => {
     let list = ['cat', 'dog', 'caterpillar'];
     expect(pipe.transform(list, 'cat')).toEqual(['cat', 'caterpillar']);
