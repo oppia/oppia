@@ -1,3 +1,0 @@
-[0312/133405.084:ERROR:registration_protocol_win.cc(130)] TransactNamedPipe: The pipe has been ended. (0x6D)
-[0312/133405.095:ERROR:file_io_win.cc(194)] LockFileEx: Incorrect function. (0x1)
-[0312/133405.099:ERROR:file_io_win.cc(194)] LockFileEx: Incorrect function. (0x1)
