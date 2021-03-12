@@ -138,6 +138,7 @@ export class AuthService {
       projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
       storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
       messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+      measurementId: AppConstants.FIREBASE_CONFIG_MEASUREMENT_ID,
       appId: AppConstants.FIREBASE_CONFIG_APP_ID,
     } as const;
   }
