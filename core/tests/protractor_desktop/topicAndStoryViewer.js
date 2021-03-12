@@ -34,7 +34,6 @@ var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
-const { exit } = require('yargs');
 
 describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
