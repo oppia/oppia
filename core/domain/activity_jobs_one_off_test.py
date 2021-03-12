@@ -2251,3 +2251,90 @@ class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJobTests(
             original_question_model, migrated_question_model)
         self._compare_last_updated_fields(
             original_config_model, migrated_config_model)
+
+
+class ExplorationModelsFillLastHumanUpdatedOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off
+            .ExplorationModelsFillLastHumanUpdatedOneOffJob.create_new()
+        )
+        (
+            activity_jobs_one_off
+            .ExplorationModelsFillLastHumanUpdatedOneOffJob.enqueue(job_id)
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+        results = (
+            activity_jobs_one_off
+            .ExplorationModelsFillLastHumanUpdatedOneOffJob.get_output(job_id)
+        )
+        return [
+            ast.literal_eval(stringified_item) for stringified_item in results]
+
+    def _compare_last_updated_fields(self, original_model, migrated_model):
+        """Compare if the last updated fields were se correctly.
+
+        Args:
+            original_model: BaseModel. The original model.
+            migrated_model: BaseModel. The model after the migration.
+        """
+        self.assertEqual(
+            original_model.last_updated,
+            migrated_model.last_updated_by_human)
+        self.assertNotEqual(
+            original_model.last_updated,
+            migrated_model.last_updated)
+
+    def test_migrate_one_model_is_successful(self):
+        original_exp_snapshot_model = (
+            exp_models.ExplorationSnapshotMetadataModel(
+                id='snap_id',
+                committer_id='user_id',
+                commit_type='create'
+            )
+        )
+        original_exp_snapshot_model.put_for_bot()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+        migrated_exp_snapshot_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get('snap_id'))
+        self._compare_last_updated_fields(
+            original_exp_snapshot_model, migrated_exp_snapshot_model)
+
+    def test_migrate_multiple_models_is_successful(self):
+        original_exp_snapshot_model = (
+            exp_models.ExplorationSnapshotMetadataModel(
+                id='snap_id',
+                committer_id='user_id',
+                commit_type='create'
+            )
+        )
+        original_exp_snapshot_model.put_for_bot()
+        original_exp_commit_model = (
+            exp_models.ExplorationCommitLogEntryModel(
+                id='commit_id',
+                user_id='user_id',
+                commit_type='create',
+                commit_cmds={},
+                exploration_id='exp_id',
+                post_commit_status='private'
+            )
+        )
+        original_exp_commit_model.put_for_bot()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 2]])
+
+        migrated_exp_snapshot_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get('snap_id'))
+        migrated_exp_commit_model = (
+            exp_models.ExplorationCommitLogEntryModel.get('commit_id'))
+        self._compare_last_updated_fields(
+            original_exp_snapshot_model, migrated_exp_snapshot_model)
+        self._compare_last_updated_fields(
+            original_exp_commit_model, migrated_exp_commit_model)

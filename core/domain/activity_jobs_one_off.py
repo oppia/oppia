@@ -723,7 +723,7 @@ class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob(
     def enqueue(cls, job_id, additional_job_params=None):
         super(
             BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob, cls
-        ).enqueue(job_id, shard_count=16)
+        ).enqueue(job_id, shard_count=4)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -737,8 +737,6 @@ class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob(
             config_models.PlatformParameterSnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionSnapshotMetadataModel,
-            exp_models.ExplorationRightsSnapshotMetadataModel,
-            exp_models.ExplorationSnapshotMetadataModel,
             skill_models.SkillSnapshotMetadataModel,
             story_models.StorySnapshotMetadataModel,
             subtopic_models.SubtopicPageSnapshotMetadataModel,
@@ -747,7 +745,6 @@ class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob(
             question_models.QuestionSnapshotMetadataModel,
             # BaseCommitLogEntryModel models.
             collection_models.CollectionCommitLogEntryModel,
-            exp_models.ExplorationCommitLogEntryModel,
             skill_models.SkillCommitLogEntryModel,
             story_models.StoryCommitLogEntryModel,
             subtopic_models.SubtopicPageCommitLogEntryModel,
@@ -758,14 +755,41 @@ class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob(
             collection_models.CollectionRightsModel,
             config_models.ConfigPropertyModel,
             config_models.PlatformParameterModel,
-            exp_models.ExplorationModel,
-            exp_models.ExplorationRightsModel,
             question_models.QuestionModel,
             skill_models.SkillModel,
             story_models.StoryModel,
             subtopic_models.SubtopicPageModel,
             topic_models.TopicModel,
             topic_models.TopicRightsModel,
+        ]
+
+    @staticmethod
+    def map(item):
+        item.last_updated_by_human = item.last_updated
+        item.put_for_bot()
+        yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class ExplorationModelsFillLastHumanUpdatedOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that fills the last_updated_by_human for all the models that newly
+    inherit from BaseHumanMaintainedModel.
+
+    Needed only for the March 2021 release.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            exp_models.ExplorationModel,
+            exp_models.ExplorationRightsModel,
         ]
 
     @staticmethod
