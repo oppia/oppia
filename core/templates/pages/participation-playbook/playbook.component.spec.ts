@@ -102,7 +102,7 @@ class MockSiteAnalyticsService {
 let component: PlaybookPageComponent;
 let fixture: ComponentFixture<PlaybookPageComponent>;
 
-describe('Teach Page', function() {
+describe('Playbook Page', () => {
   let windowRef: MockWindowRef;
   let siteAnalyticsService = null;
 
@@ -115,10 +115,19 @@ describe('Teach Page', function() {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
         },
-        { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
-        { provide: TranslateService, useClass: MockTranslateService },
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
         UrlInterpolationService,
-        { provide: WindowRef, useValue: windowRef }
+        {
+          provide: WindowRef,
+          useValue: windowRef 
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
