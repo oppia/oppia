@@ -16,7 +16,7 @@
  * @fileoverview Directive for the library footer.
  */
 
-require('pages/OppiaFooterComponent.ts');
+require('pages/oppia-footer.component.ts');
 
 require('pages/library-page/library-page.constants.ajs.ts');
 
