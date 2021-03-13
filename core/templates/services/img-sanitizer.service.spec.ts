@@ -19,14 +19,17 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { DomSanitizer } from '@angular/platform-browser';
-import { SvgSanitizerService } from './svg-sanitizer.service';
+import { ImgSanitizerService } from './img-sanitizer.service';
 
 
-describe('SvgSanitizerService', () => {
-  let svgSanitizerService: SvgSanitizerService;
+describe('ImgSanitizerService', () => {
+  let imgSanitizerService: ImgSanitizerService;
   let domParser: DOMParser = new DOMParser();
   class MockDomSanitizer {
     bypassSecurityTrustResourceUrl(str: string): string {
+      return str;
+    }
+    bypassSecurityTrustUrl(str: string): string {
       return str;
     }
   }
@@ -76,17 +79,17 @@ describe('SvgSanitizerService', () => {
         }
       ]
     });
-    svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    imgSanitizerService = TestBed.inject(ImgSanitizerService);
   });
 
   it('should check for invalid base64 images', () => {
-    expect(svgSanitizerService.isValidBase64Svg(invalidBase64data)).toBe(false);
+    expect(imgSanitizerService.isValidBase64Svg(invalidBase64data)).toBe(false);
   });
 
   it(
     'should return null when malicious SVG is requested as SafeResourceUrl',
     () => {
-      expect(svgSanitizerService.getTrustedSvgResourceUrl(maliciousSvg)).toBe(
+      expect(imgSanitizerService.getTrustedSvgResourceUrl(maliciousSvg)).toBe(
         null);
     });
 
@@ -94,7 +97,7 @@ describe('SvgSanitizerService', () => {
     'should return SafeResourceUrl when a safe SVG is requested as' +
     'SafeResourceUrl',
     () => {
-      expect(svgSanitizerService.getTrustedSvgResourceUrl(safeSvg)).toBe(
+      expect(imgSanitizerService.getTrustedSvgResourceUrl(safeSvg)).toBe(
         safeSvg);
     });
 
@@ -110,7 +113,7 @@ describe('SvgSanitizerService', () => {
       '"/></g></svg>'
     );
     let cleanedSvgString = (
-      svgSanitizerService.cleanMathExpressionSvgString(svgString));
+      imgSanitizerService.cleanMathExpressionSvgString(svgString));
     let expectedCleanSvgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.429e' +
       'x" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vertical-a' +
@@ -135,7 +138,7 @@ describe('SvgSanitizerService', () => {
       '" data-custom="datacustom"/></g></svg>'
     );
     var cleanedSvgString = (
-      svgSanitizerService.cleanMathExpressionSvgString(svgString));
+      imgSanitizerService.cleanMathExpressionSvgString(svgString));
     var expectedCleanSvgString = (
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.429e' +
       'x" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vertical-a' +
@@ -160,7 +163,7 @@ describe('SvgSanitizerService', () => {
       'g></svg>'
     );
     let cleanedSvgString = (
-      svgSanitizerService.cleanMathExpressionSvgString(svgString));
+      imgSanitizerService.cleanMathExpressionSvgString(svgString));
     let expectedCleanSvgString = (
       '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
       'focusable="false" style="vertical-align: -0.241ex;" xmlns="http://ww' +
@@ -184,7 +187,7 @@ describe('SvgSanitizerService', () => {
       '0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></g></svg>'
     );
     let dimensions = (
-      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
+      imgSanitizerService.extractDimensionsFromMathExpressionSvgString(
         svgString));
     let expectedDimension = {
       height: '1d429',
@@ -205,7 +208,7 @@ describe('SvgSanitizerService', () => {
       'H489Q504 153 504 145284 52 289Z"/></g></svg>'
     );
     var dimensions = (
-      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
+      imgSanitizerService.extractDimensionsFromMathExpressionSvgString(
         svgString));
     var expectedDimension = {
       height: '1d429',
@@ -229,7 +232,7 @@ describe('SvgSanitizerService', () => {
         'g><circel></circel></svg>'
       ))));
     var invalidSvgTagsAndAttrs = (
-      svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
+      imgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
     var expectedInvalidSvgTagsAndAttrs = {
       tags: ['circel'],
       attrs: ['svg:widdth']
@@ -338,12 +341,24 @@ describe('SvgSanitizerService', () => {
         expected: [0, 9]
       }];
     testCases.forEach((testCase, index) => {
-      const testCaseResult = svgSanitizerService.getInvalidSvgTagsAndAttrs(
+      const testCaseResult = imgSanitizerService.getInvalidSvgTagsAndAttrs(
         domParser.parseFromString(testCase.payload, 'image/svg+xml'));
       expect(testCaseResult.attrs.length).toEqual(
         testCase.expected[0], 'Attributes - Case:' + testCase.title);
       expect(testCaseResult.tags.length).toEqual(
         testCase.expected[1], 'Tags - Case:' + testCase.title);
     });
+  });
+
+  it('should get url for PNG images', () => {
+    const pngImageData = 'data:image/png;base64,dbqjkbdcjo2383u8==';
+    expect(imgSanitizerService.getTrustedPngResourceUrl(pngImageData))
+      .toEqual(pngImageData);
+  });
+
+  it('should return null for invalid PNG images', () => {
+    const pngImageData = 'data:image/png;base64, Invalid PNG image';
+    expect(imgSanitizerService.getTrustedPngResourceUrl(pngImageData))
+      .toEqual(null);
   });
 });

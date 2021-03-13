@@ -23,17 +23,17 @@ require(
   'components/forms/custom-forms-directives/' +
   'thumbnail-display.component.ts');
 
-require('services/svg-sanitizer.service.ts');
+require('services/img-sanitizer.service.ts');
 
 angular.module('oppia').controller('EditThumbnailModalController', [
   '$controller', '$scope', '$timeout', '$uibModalInstance',
-  'SvgSanitizerService', 'allowedBgColors', 'aspectRatio',
+  'ImgSanitizerService', 'allowedBgColors', 'aspectRatio',
   'dimensions', 'getPreviewDescription', 'getPreviewDescriptionBgColor',
   'getPreviewFooter', 'getPreviewTitle', 'openInUploadMode',
   'tempBgColor', 'uploadedImage', 'uploadedImageMimeType',
   function(
       $controller, $scope, $timeout, $uibModalInstance,
-      SvgSanitizerService, allowedBgColors, aspectRatio,
+      ImgSanitizerService, allowedBgColors, aspectRatio,
       dimensions, getPreviewDescription, getPreviewDescriptionBgColor,
       getPreviewFooter, getPreviewTitle, openInUploadMode,
       tempBgColor, uploadedImage, uploadedImageMimeType) {
@@ -102,7 +102,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
             };
             img.src = imgSrc;
             $scope.invalidTagsAndAttributes = (
-              SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+              ImgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
                 imgSrc));
             var tags = $scope.invalidTagsAndAttributes.tags;
             var attrs = $scope.invalidTagsAndAttributes.attrs;

@@ -27,7 +27,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
-require('services/svg-sanitizer.service.ts');
+require('services/img-sanitizer.service.ts');
 
 import { fabric } from 'fabric';
 import Picker from 'vanilla-picker';
@@ -41,7 +41,7 @@ angular.module('oppia').component('svgFilenameEditor', {
     '$http', '$q', '$sce', '$scope', 'AlertsService',
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
-    'ImageUploadHelperService', 'SvgSanitizerService',
+    'ImageUploadHelperService', 'ImgSanitizerService',
     'UrlInterpolationService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     'MAX_SVG_DIAGRAM_HEIGHT', 'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT',
     'MIN_SVG_DIAGRAM_WIDTH',
@@ -49,7 +49,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
-        ImageUploadHelperService, SvgSanitizerService,
+        ImageUploadHelperService, ImgSanitizerService,
         UrlInterpolationService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE,
         MAX_SVG_DIAGRAM_HEIGHT, MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT,
         MIN_SVG_DIAGRAM_WIDTH) {
@@ -335,7 +335,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           'data:image/svg+xml;base64,' +
           btoa(unescape(encodeURIComponent(svgString))));
         var invalidTagsAndAttr = (
-          SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
+          ImgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
         if (invalidTagsAndAttr.tags.length !== 0) {
           var errorText = (
             'Invalid tags in svg:' + invalidTagsAndAttr.tags.join());
