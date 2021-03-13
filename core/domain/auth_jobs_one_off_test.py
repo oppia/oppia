@@ -142,11 +142,6 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         self.sdk_stub.install(self)
         self.exit_stack.callback(self.sdk_stub.uninstall)
 
-        # Forces all users to produce the same hash value during unit tests to
-        # prevent them from being sharded and complicating the testing logic.
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            auth_jobs, 'ID_HASHING_FUNCTION', value=1))
-
     def tearDown(self):
         self.exit_stack.close()
         super(PopulateFirebaseAccountsOneOffJobTests, self).tearDown()

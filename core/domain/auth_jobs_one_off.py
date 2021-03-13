@@ -34,8 +34,6 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 
-ID_HASHING_FUNCTION = hash
-
 MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL = 1000
 
 AUDIT_KEY = 'INFO: Pre-existing Firebase accounts'
@@ -102,8 +100,6 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     sign up with Firebase will have an entirely different ID.
     """
 
-    NUM_SHARDS = 50 # Arbitrary value.
-
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]
@@ -128,12 +124,8 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_is_super_admin = (user.email == feconf.ADMIN_EMAIL_ADDRESS)
             if user_is_super_admin:
                 yield (SUPER_ADMIN_ACK, user.id)
-            # Split up users into different shards to help speed up the job.
-            sharding_key = (
-                ID_HASHING_FUNCTION(user.id) %
-                PopulateFirebaseAccountsOneOffJob.NUM_SHARDS)
             yield (
-                sharding_key, (
+                None, (
                     _strip_uid_prefix(user.id), user.id, user.email,
                     user_is_super_admin))
 
