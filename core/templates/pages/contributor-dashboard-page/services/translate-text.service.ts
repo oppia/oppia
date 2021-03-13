@@ -32,7 +32,7 @@ export class TranslateTextService {
   constructor(
     private translatableTextBackedApiService:
     TranslateTextBackendApiService) {}
-
+  STARTING_INDEX = -1;
   stateWiseContents: StateNamesToContentIdMapping = null;
   stateWiseContentIds: {[key: string]: string[]} = {};
   activeStateName: string = null;
@@ -40,6 +40,7 @@ export class TranslateTextService {
   stateNamesList: string[] = [];
   activeExpId: string = null;
   activeExpVersion: string = null;
+  activeIndex = this.STARTING_INDEX;
 
   private getNextContentId(): string {
     return this.stateWiseContentIds[this.activeStateName].pop();
