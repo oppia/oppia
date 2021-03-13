@@ -21,7 +21,7 @@ require(
   'oppia-noninteractive-collapsible.directive.ts');
 require(
   'rich_text_components/Image/directives/' +
-  'oppia-noninteractive-image.directive.ts');
+  'oppia-noninteractive-image.component.ts');
 require(
   'rich_text_components/Link/directives/' +
   'oppia-noninteractive-link.directive.ts');

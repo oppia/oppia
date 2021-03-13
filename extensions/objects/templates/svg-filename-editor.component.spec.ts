@@ -19,6 +19,7 @@
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 var initializeMockDocument = function(svgFilenameCtrl) {
   var mockDocument = document.createElement('div');
@@ -602,6 +603,7 @@ describe('SvgFilenameEditor', function() {
 
 describe('SvgFilenameEditor initialized with value attribute',
   function() {
+    importAllAngularServices();
     var svgFilenameCtrl = null;
     var $httpBackend = null;
     var contextService = null;

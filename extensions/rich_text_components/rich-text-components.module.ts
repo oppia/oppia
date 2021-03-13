@@ -21,9 +21,11 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { MatButtonModule } from '@angular/material/button';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.directive';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
 
 
 @NgModule({
@@ -31,16 +33,20 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
     CommonModule,
     BrowserModule,
     DynamicContentModule,
-    NgbAccordionModule
+    NgbAccordionModule,
+    MatButtonModule
   ],
   declarations: [
-    NoninteractiveCollapsible
+    NoninteractiveCollapsible,
+    NoninteractiveImage
   ],
   entryComponents: [
-    NoninteractiveCollapsible
+    NoninteractiveCollapsible,
+    NoninteractiveImage
   ],
   exports: [
-    NoninteractiveCollapsible
+    NoninteractiveCollapsible,
+    NoninteractiveImage
   ],
 })
 
