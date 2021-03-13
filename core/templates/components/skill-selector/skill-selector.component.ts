@@ -16,14 +16,14 @@
  * @fileoverview Controller for the skill-selector component.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { ShortSkillSummary } from 'core/templates/domain/skill/ShortSkillSummaryObjectFactory';
+import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
+import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import cloneDeep from 'lodash/cloneDeep';
+import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 interface SubTopicFilterDict {
   [topicName: string] : { subTopicName: string; checked: boolean }[]
@@ -43,7 +43,7 @@ export class SkillSelectorComponent implements OnInit {
   @Input() categorizedSkills: CategorizedSkills;
   @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() allowSkillsFromOtherTopics: boolean;
-  @Output() selectedSkillIdChanged: EventEmitter<string> = new EventEmitter();
+  @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills: CategorizedSkills = null;
   selectedSkill: string = null;
   skillFilterText: string = '';
@@ -90,7 +90,7 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   setSelectedSkillId(): void {
-    this.selectedSkillIdChanged.emit(this.selectedSkill);
+    this.selectedSkillIdChange.emit(this.selectedSkill);
   }
 
   // The folowing function is called when the subtopic filter changes.
