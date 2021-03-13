@@ -130,11 +130,14 @@ angular.module('oppia').controller('TranslationModalController', [
       // Mathematical equations are also wrapped by <p> elements.
       // Hence, math elements should be allowed to be copied.
       // It is related to issue 11683.
-      const paragraphChildrenElements: Array<HTMLElement> = $event.target.localName === 'p' ? Array.from($event.target.children) : [];
-      const triedTextCopy = $event.target.localName === 'p' && !(paragraphChildrenElements
-        .some(child => child.localName === 'oppia-noninteractive-math'));
+      const paragraphChildrenElements: HTMLElement[] = (
+        $event.target.localName === 'p') ? Array.from(
+          $event.target.children) : [];
+      const triedTextCopy = $event.target.localName === 'p' && !(
+        paragraphChildrenElements.some(
+          child => child.localName === 'oppia-noninteractive-math'));
       return new TranslationError(triedTextCopy, false, false, false);
-    }
+    };
 
     $scope.copyContent = function($event) {
       if ($scope.isCopyModeActive()) {
@@ -177,8 +180,9 @@ angular.module('oppia').controller('TranslationModalController', [
           originalElements, function(originalElement) {
             return translatedElements.some(
               translatedElement => (
-                translatedElement === originalElement && originalElement !== ''));
-          });;
+                translatedElement === originalElement
+                && originalElement !== ''));
+          });
       return states;
     };
 
@@ -189,31 +193,39 @@ angular.module('oppia').controller('TranslationModalController', [
         rawText, 'alt-with-value');
       const foundImageDescriptions = $scope.findImgAttributes(
         rawText, 'caption-with-value');
-      
+
       return {
         foundImageFilePaths,
         foundImageAltTxts,
         foundImageDescriptions
       };
-    }
+    };
 
-    $scope.validateImages = function(textToTranslate, translatedText): TranslationError {
+    $scope.validateImages = function(textToTranslate,
+      translatedText): TranslationError {
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
 
       const copiedImgStates = $scope.findAvailableElements(
-        originalElements.foundImageFilePaths, translatedElements.foundImageFilePaths, true);
+        originalElements.foundImageFilePaths,
+        translatedElements.foundImageFilePaths, true);
       const duplicateImgAltTextStates = $scope.findAvailableElements(
-        originalElements.foundImageAltTxts, translatedElements.foundImageAltTxts, false);
+        originalElements.foundImageAltTxts,
+        translatedElements.foundImageAltTxts, false);
       const duplicateImgDescriptionStates = $scope.findAvailableElements(
-        originalElements.foundImageDescriptions, translatedElements.foundImageDescriptions, false);
+        originalElements.foundImageDescriptions,
+        translatedElements.foundImageDescriptions, false);
 
       const hasUncopiedImgs = copiedImgStates.some(state => state === false);
-      const hasDuplicateAltTexts = duplicateImgAltTextStates.some(state => state === true);
-      const hasDuplicateDescriptions = duplicateImgDescriptionStates.some(state => state === true);
+      const hasDuplicateAltTexts = duplicateImgAltTextStates.some(
+        state => state === true);
+      const hasDuplicateDescriptions = duplicateImgDescriptionStates.some(
+        state => state === true);
 
-      return new TranslationError(false, hasUncopiedImgs, hasDuplicateAltTexts, hasDuplicateDescriptions);
-    }
+      return new TranslationError(
+        false, hasUncopiedImgs, hasDuplicateAltTexts,
+        hasDuplicateDescriptions);
+    };
 
     $scope.returnToPreviousTranslation = function() {
       var textAndAvailability = (
@@ -229,8 +241,9 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.textToTranslate);
       const translatedElements = angular.element(
         $scope.activeWrittenTranslation.html);
-      
-      let translationValidators = $scope.validateImages(originalElements, translatedElements);
+
+      let translationValidators = $scope.validateImages(
+        originalElements, translatedElements);
 
       if (translationValidators.hasUncopiedImgs) {
         $scope.hasImgCopyError = true;
