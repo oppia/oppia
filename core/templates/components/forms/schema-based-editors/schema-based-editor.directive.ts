@@ -70,7 +70,7 @@ angular.module('oppia').directive('schemaBasedEditor', [
     };
   }]);
 
-import { Directive, ElementRef, Injector, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Directive, ElementRef, Injector, Input, Output, EventEmitter } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 import { Schema } from 'services/schema-default-value.service';
 
