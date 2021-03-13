@@ -186,8 +186,7 @@ export class ImgSanitizerService {
   }
 
   getTrustedPngResourceUrl(base64ImageData: string): SafeUrl | null {
-    console.log("Is valid? ", this.isValidBase64Png(base64ImageData))
-    if(this.isValidBase64Png(base64ImageData)) {
+    if (this.isValidBase64Png(base64ImageData)) {
       return this.sanitizer.bypassSecurityTrustUrl(base64ImageData);
     }
     return null;

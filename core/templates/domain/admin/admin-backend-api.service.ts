@@ -544,8 +544,8 @@ export class AdminBackendApiService {
 
   // Admin Dev Mode Activities Tab Services
   async generateDummyExplorationsAsync(
-    numDummyExpsToGenerate: number,
-    numDummyExpsToPublish: number): Promise<void> {
+      numDummyExpsToGenerate: number,
+      numDummyExpsToPublish: number): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_explorations',
       num_dummy_exps_to_generate: numDummyExpsToGenerate,
@@ -554,7 +554,7 @@ export class AdminBackendApiService {
   }
 
   async reloadExplorationAsync(explorationId: string): Promise<void> {
-    return  this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',
       exploration_id: String(explorationId)
     });
@@ -569,14 +569,14 @@ export class AdminBackendApiService {
   async generateDummyNewSkillDataAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_skill_data'
-    })
+    });
   }
 
   async reloadCollectionAsync(collectionId: string): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
       collection_id: String(collectionId)
-    })
+    });
   }
 }
 

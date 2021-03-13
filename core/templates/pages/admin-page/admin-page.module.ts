@@ -28,10 +28,6 @@ import { AdminFeaturesTabComponent } from
   'pages/admin-page/features-tab/admin-features-tab.component';
 import { AdminNavbarComponent } from './navbar/admin-navbar.component';
 import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
-//AdminJobsTab - done by ashutoh
-//AdminConfigTab - done by radesh
-//AdminRolesTab
-//ADminMiscTab
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { OppiaAdminProdModeActivitiesTabComponent } from
