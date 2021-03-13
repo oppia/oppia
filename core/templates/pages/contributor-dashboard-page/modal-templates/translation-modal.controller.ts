@@ -202,7 +202,7 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.validateImages = function(
-      textToTranslate, translatedText): TranslationError {
+        textToTranslate, translatedText): TranslationError {
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
 
