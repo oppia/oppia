@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview AngularHtmlBind Directive wrapper upgrade tests
+ * @fileoverview AngularHtmlBind Directive wrapper tests.
  */
 
 import { destroyPlatform } from '@angular/core';
