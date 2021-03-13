@@ -33,15 +33,32 @@ from core.platform import models
 import feconf
 import python_utils
 
-(feedback_models, email_models, suggestion_models) = (
-    models.Registry.import_models(
-        [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+(
+    email_models, expl_models, feedback_models,
+    question_models, skill_models, suggestion_models,
+    topic_models
+) = models.Registry.import_models([
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.suggestion,
+    models.NAMES.topic
+])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
+
+TARGET_TYPE_TO_TARGET_MODEL = {
+    feconf.ENTITY_TYPE_EXPLORATION: (
+        expl_models.ExplorationModel),
+    feconf.ENTITY_TYPE_QUESTION: (
+        question_models.QuestionModel),
+    feconf.ENTITY_TYPE_SKILL: (
+        skill_models.SkillModel),
+    feconf.ENTITY_TYPE_TOPIC: (
+        topic_models.TopicModel)
+}
 
 
 def get_exp_id_from_thread_id(thread_id):
