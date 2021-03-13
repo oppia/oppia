@@ -1,33 +1,3 @@
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Grant super-admin privileges to Firebase account</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.grantSuperAdminPrivileges()">
-      <div class="form-group row">
-        <label>Username:</label>
-        <input type="text" ng-model="$ctrl.usernameToGrant" required="true">
-      </div>
-      <div class="form-group row">
-        <input type="submit" value="Grant">
-      </div>
-    </form>
-  </div>
-</md-card>
-
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Revoke super-admin privileges from Firebase account</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.revokeSuperAdminPrivileges()">
-      <div class="form-group row">
-        <label>Username:</label>
-        <input type="text" ng-model="$ctrl.usernameToRevoke" required="true">
-      </div>
-      <div class="form-group row">
-        <input type="submit" value="Revoke">
-      </div>
-    </form>
-  </div>
-</md-card>
-
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Topic Similarities</h3>
   <div class="oppia-topic-similarities-container">
@@ -212,6 +182,36 @@
       </div>
     </form>
     <pre ng-if="$ctrl.missingExplorationStatsRegenerationMessage"><[$ctrl.missingExplorationStatsRegenerationMessage]></pre>
+  </div>
+</md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Grant super-admin privileges to Firebase account</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.grantSuperAdminPrivileges()">
+      <div class="form-group row">
+        <label>Username:</label>
+        <input type="text" ng-model="$ctrl.usernameToGrant" required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Grant">
+      </div>
+    </form>
+  </div>
+</md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Revoke super-admin privileges from Firebase account</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.revokeSuperAdminPrivileges()">
+      <div class="form-group row">
+        <label>Username:</label>
+        <input type="text" ng-model="$ctrl.usernameToRevoke" required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Revoke">
+      </div>
+    </form>
   </div>
 </md-card>
 
