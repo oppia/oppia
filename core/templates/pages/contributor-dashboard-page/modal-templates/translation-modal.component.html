@@ -45,7 +45,15 @@
   </div>
 </div>
 <div class="modal-footer">
+<<<<<<< HEAD:core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.html
   <button class="btn btn-default" (click)="close()">Cancel</button>
+=======
+  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success oppia-go-back-button"
+          ng-disabled="!previousTranslationAvailable"
+          ng-click="returnToPreviousTranslation()">Go Back
+  </button>
+>>>>>>> upstream/develop:core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.directive.html
   <button class="btn btn-success oppia-upload-translated-text-button"
           [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
           (click)="suggestTranslatedText()">
@@ -106,6 +114,10 @@
     right: 20px;
     top: 12px;
   }
+  .oppia-go-back-button {
+    min-width: 150px;
+  }
+
   .oppia-upload-translated-text-button {
     min-width: 200px;
   }

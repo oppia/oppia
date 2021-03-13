@@ -50,6 +50,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -80,7 +81,7 @@ class AdminHandler(base.BaseHandler):
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
         for job in unfinished_job_data:
@@ -243,6 +244,20 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
+            elif self.payload.get('action') == (
+                    'regenerate_missing_exploration_stats'):
+                exp_id = self.payload.get('exp_id')
+                (
+                    exp_stats, state_stats,
+                    num_valid_exp_stats, num_valid_state_stats
+                ) = exp_services.regenerate_missing_stats_for_exploration(
+                    exp_id)
+                result = {
+                    'missing_exp_stats': exp_stats,
+                    'missing_state_stats': state_stats,
+                    'num_valid_exp_stats': num_valid_exp_stats,
+                    'num_valid_state_stats': num_valid_state_stats
+                }
             elif self.payload.get('action') == 'update_feature_flag_rules':
                 feature_name = self.payload.get('feature_name')
                 new_rule_dicts = self.payload.get('new_rules')
@@ -399,8 +414,8 @@ class AdminHandler(base.BaseHandler):
             if self.user.role != feconf.ROLE_ID_ADMIN:
                 raise Exception(
                     'User does not have enough rights to generate data.')
-            topic_id_1 = topic_services.get_new_topic_id()
-            topic_id_2 = topic_services.get_new_topic_id()
+            topic_id_1 = topic_fetchers.get_new_topic_id()
+            topic_id_2 = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()

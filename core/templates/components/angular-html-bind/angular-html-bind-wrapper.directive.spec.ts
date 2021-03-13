@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
+=======
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+>>>>>>> upstream/develop
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +16,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview AngularHtmlBind Directive wrapper tests.
+ */
+
 import { destroyPlatform } from '@angular/core';
 import { waitForAsync } from '@angular/core/testing';
 import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
-
-/**
- * @fileoverview AngularHtmlBind Directive wrapper upgrade tests
- */
 
 describe('Angular Html Bind Wrapper Directive', () => {
   describe('Upgraded component', () => {
