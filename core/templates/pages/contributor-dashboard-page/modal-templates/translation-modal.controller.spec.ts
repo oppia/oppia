@@ -273,6 +273,12 @@ describe('Translation Modal Controller', function() {
       mockEvent.target);
   });
 
+  it('should return null when clicking on a disabled back button',
+    function() {
+      $scope.returnToPreviousTranslation();
+      expect($scope.textToTranslate).toBe(null);
+    });
+
   it('should close modal when there is not more text to be translated',
     function() {
       $httpBackend.flush();

@@ -99,6 +99,7 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.heading = opportunity.heading;
     $scope.loadingData = true;
     $scope.moreAvailable = false;
+    $scope.previousTranslationAvailable = false;
     $scope.textToTranslate = '';
     $scope.hasImgCopyError = false;
     $scope.triedToCopyText = false;
@@ -214,6 +215,13 @@ angular.module('oppia').controller('TranslationModalController', [
       return new TranslationError(false, hasUncopiedImgs, hasDuplicateAltTexts, hasDuplicateDescriptions);
     }
 
+    $scope.returnToPreviousTranslation = function() {
+      var textAndAvailability = (
+        TranslateTextService.getPreviousTextToTranslate());
+      $scope.textToTranslate = textAndAvailability.text;
+      $scope.previousTranslationAvailable = textAndAvailability.more;
+    };
+
     $scope.suggestTranslatedText = function() {
       $scope.hasImgCopyError = false;
       $scope.hasImgTextError = false;
@@ -249,12 +257,12 @@ angular.module('oppia').controller('TranslationModalController', [
                 $scope.textToTranslate = textAndAvailability.text;
                 $scope.moreAvailable = textAndAvailability.more;
               }
+              $scope.previousTranslationAvailable = true;
               $scope.activeWrittenTranslation.html = '';
               $scope.uploadingTranslation = false;
             }, () => {
               $uibModalInstance.close();
-            }
-          );
+            });
         }
         if (!$scope.moreAvailable) {
           $uibModalInstance.close();

@@ -353,7 +353,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_skips_deleted_topic(self):
