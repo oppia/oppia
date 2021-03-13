@@ -922,7 +922,7 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for state_name, state in exploration.states.items():
             interaction = state.interaction
             exp_and_state_key = '%s %s' % (
-                item.id, state_name.encode('utf-8'))
+                item.id, state_name)
             if interaction.id == 'RatioExpressionInput':
                 if interaction.customization_args['numberOfTerms'].value > 10:
                     yield (python_utils.UNICODE(
