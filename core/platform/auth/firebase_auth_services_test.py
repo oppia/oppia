@@ -1011,6 +1011,13 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
         self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
 
+    def test_disable_association_gives_up_when_auth_assocs_do_not_exist(self):
+        with self.capture_logging() as logs:
+            firebase_auth_services.mark_user_for_deletion('uid')
+
+        self.assert_matches_regexps(logs, [
+            r'\[WIPEOUT\] User with user_id=uid has no Firebase account'
+        ])
 
 class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
 

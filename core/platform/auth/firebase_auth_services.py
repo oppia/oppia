@@ -74,77 +74,6 @@ datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-def grant_super_admin_privileges(user_id):
-    """Grants the user with super-admin privileges.
-
-    Args:
-        user_id: str. The Oppia user ID to promote to super admin.
-
-    Returns:
-        bool. Whether the operation succeeded.
-    """
-    firebase_id = get_auth_id_from_user_id(user_id)
-    if firebase_id is None:
-        raise ValueError('user_id=%s has no Firebase account' % user_id)
-    with _firebase_admin_context():
-        firebase_admin.auth.set_custom_user_claims(
-            firebase_id, '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN)
-
-
-def revoke_super_admin_privileges(user_id):
-    """Revokes the user's super-admin privileges.
-
-    Args:
-        user_id: str. The Oppia user ID to revoke privileges from.
-
-    Returns:
-        bool. Whether the operation succeeded.
-    """
-    firebase_id = get_auth_id_from_user_id(user_id)
-    if firebase_id is None:
-        raise ValueError('user_id=%s has no Firebase account' % user_id)
-    with _firebase_admin_context():
-        firebase_admin.auth.set_custom_user_claims(firebase_id, None)
-
-
-def create_initial_super_admin():
-    """Creates the initial super-admin account on the Firebase server."""
-    user_settings_model = user_models.UserSettingsModel.query(
-        user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
-    ).get()
-
-    if user_settings_model is None:
-        raise Exception(
-            '%s is not a registered account' % feconf.ADMIN_EMAIL_ADDRESS)
-
-    user_id = user_settings_model.id
-    auth_id = get_auth_id_from_user_id(user_id)
-    if auth_id is None:
-        assoc_exists = False
-        auth_id = user_id[4:] if user_id.startswith('uid_') else user_id
-    else:
-        assoc_exists = True
-
-    super_admin_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
-
-    with _firebase_admin_context():
-        try:
-            firebase_admin.auth.get_user(auth_id)
-        except firebase_admin.auth.UserNotFoundError:
-            firebase_admin.auth.import_users([
-                firebase_admin.auth.ImportUserRecord(
-                    auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
-                    custom_claims=super_admin_claims)
-            ])
-        else:
-            firebase_admin.auth.set_custom_user_claims(
-                auth_id, super_admin_claims)
-
-    if not assoc_exists:
-        associate_auth_id_with_user_id(
-            auth_domain.AuthIdUserIdPair(auth_id, user_id))
-
-
 def establish_auth_session(request, response):
     """Sets login cookies to maintain a user's sign-in session.
 
@@ -231,6 +160,10 @@ def mark_user_for_deletion(user_id):
         assoc_by_auth_id_model.deleted = True
         assoc_by_auth_id_model.update_timestamps()
         assoc_by_auth_id_model.put()
+    else:
+        logging.warn(
+            '[WIPEOUT] User with user_id=%s has no Firebase account' % user_id)
+        return
 
     try:
         with _firebase_admin_context():
@@ -256,7 +189,10 @@ def delete_external_auth_associations(user_id):
         return
     try:
         with _firebase_admin_context():
-            firebase_auth.delete_user(auth_id)
+            try:
+                firebase_auth.delete_user(auth_id)
+            except firebase_auth.UserNotFoundError:
+                logging.exception('[WIPEOUT] Firebase account already deleted')
     except (firebase_exceptions.FirebaseError, ValueError):
         # NOTE: logging.exception appends the stack trace automatically. The
         # errors are not re-raised because wipeout_services, the user of this
@@ -464,6 +400,77 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
         auth_models.UserAuthDetailsModel.update_timestamps_multi(
             assoc_by_user_id_models)
         auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
+
+
+def grant_super_admin_privileges(user_id):
+    """Grants the user with super-admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to promote to super admin.
+
+    Returns:
+        bool. Whether the operation succeeded.
+    """
+    firebase_id = get_auth_id_from_user_id(user_id)
+    if firebase_id is None:
+        raise ValueError('user_id=%s has no Firebase account' % user_id)
+    with _firebase_admin_context():
+        firebase_admin.auth.set_custom_user_claims(
+            firebase_id, '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN)
+
+
+def revoke_super_admin_privileges(user_id):
+    """Revokes the user's super-admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to revoke privileges from.
+
+    Returns:
+        bool. Whether the operation succeeded.
+    """
+    firebase_id = get_auth_id_from_user_id(user_id)
+    if firebase_id is None:
+        raise ValueError('user_id=%s has no Firebase account' % user_id)
+    with _firebase_admin_context():
+        firebase_admin.auth.set_custom_user_claims(firebase_id, None)
+
+
+def create_initial_super_admin():
+    """Creates the initial super-admin account on the Firebase server."""
+    user_settings_model = user_models.UserSettingsModel.query(
+        user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
+    ).get()
+
+    if user_settings_model is None:
+        raise Exception(
+            '%s is not a registered account' % feconf.ADMIN_EMAIL_ADDRESS)
+
+    user_id = user_settings_model.id
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
+        assoc_exists = False
+        auth_id = user_id[4:] if user_id.startswith('uid_') else user_id
+    else:
+        assoc_exists = True
+
+    super_admin_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
+
+    with _firebase_admin_context():
+        try:
+            firebase_admin.auth.get_user(auth_id)
+        except firebase_admin.auth.UserNotFoundError:
+            firebase_admin.auth.import_users([
+                firebase_admin.auth.ImportUserRecord(
+                    auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
+                    custom_claims=super_admin_claims)
+            ])
+        else:
+            firebase_admin.auth.set_custom_user_claims(
+                auth_id, super_admin_claims)
+
+    if not assoc_exists:
+        associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair(auth_id, user_id))
 
 
 def destroy_firebase_accounts():
