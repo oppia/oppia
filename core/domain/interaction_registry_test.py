@@ -73,7 +73,6 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         response.mustcontain(no=['dependency_html.html'])
 
     def test_dependencies_loaded_in_exploration_editor(self):
-
         exp_services.load_demo('0')
 
         # Ensure that dependencies are added in the exploration editor page.

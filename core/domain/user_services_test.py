@@ -127,7 +127,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username('pid_' + 'b' * 32))
 
     def test_get_usernames_for_pseudonymous_ids(self):
-
         # Handle usernames that exists.
         self.assertEqual(
             ['User_Aaaaaaaa', 'User_Bbbbbbbb'],

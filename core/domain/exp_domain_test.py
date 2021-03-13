@@ -10789,7 +10789,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 },
                 'param_changes': [],
             }
-
         self.assertEqual(exploration.to_player_dict(), {
             'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'title': exp_title,
@@ -10832,7 +10831,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 
     def test_all_html_strings_are_collected(self):
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
         exploration.add_states(['state1', 'state2', 'state3', 'state4'])

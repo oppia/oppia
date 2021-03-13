@@ -184,7 +184,6 @@ class RatingServicesTests(test_utils.GenericTestBase):
                 self.USER_ID_1, 'invalid_id', 3)
 
     def test_rating_assignation_with_no_exploration_summary_ratings(self):
-
         def _mock_get_exploration_summary_by_id(exp_id):
             """Assign None to exploration summary ratings."""
             exp_summary_model = exp_models.ExpSummaryModel.get(exp_id)

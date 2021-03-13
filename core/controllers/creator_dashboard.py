@@ -134,7 +134,6 @@ class CreatorDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
-
         self.render_template('creator-dashboard-page.mainpage.html')
 
 

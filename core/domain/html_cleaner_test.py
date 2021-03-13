@@ -31,7 +31,6 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.longMessage = True
 
     def test_whitelisted_tags(self):
-
         self.assertTrue(
             html_cleaner.filter_a('a', 'href', 'http://www.oppia.com'))
 

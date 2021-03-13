@@ -181,7 +181,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'CONSTANT_FILE_PATH', self.mock_constant_file_path)
 
     def test_cleanup_when_no_subprocess(self):
-
         def mock_kill_process_based_on_regex(unused_regex):
             return
 
@@ -227,7 +226,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.cleanup()
 
     def test_cleanup_when_subprocesses_exist(self):
-
         def mock_kill_process_based_on_regex(unused_regex):
             mock_kill_process_based_on_regex.called_times += 1
             return True
@@ -261,7 +259,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_kill_process_based_on_regex.called_times, len(mock_processes))
 
     def test_cleanup_when_port_fails_to_close(self):
-
         def mock_kill_process_based_on_regex(unused_regex):
             return
 
@@ -313,7 +310,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         run_e2e_tests.cleanup()
 
     def test_cleanup_on_windows(self):
-
         def mock_is_windows_os():
             return True
 
@@ -525,7 +521,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.run_webdriver_manager(['start', '--detach'])
 
     def test_setup_and_install_dependencies_without_skip(self):
-
         def mock_install_third_party_libs_main():
             return
 
@@ -537,7 +532,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.setup_and_install_dependencies(False)
 
     def test_setup_and_install_dependencies_with_skip(self):
-
         def mock_install_third_party_libs_main(unused_args):
             return
 
@@ -569,7 +563,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_dev_mode_with_exception_raised(self):
-
         def mock_check_call(commands):
             raise subprocess.CalledProcessError(
                 returncode=2, cmd=commands, output='ERROR')
@@ -660,7 +653,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                             True, source_maps=True)
 
     def test_tweak_webdriver_manager_on_x64_machine(self):
-
         def mock_is_windows():
             return True
         def mock_inplace_replace(
@@ -850,7 +842,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 run_e2e_tests.main(args=[])
 
     def test_start_tests_when_no_other_instance_running(self):
-
         mock_process = MockProcessClass()
 
         def mock_is_oppia_server_already_running(*unused_args):
@@ -976,7 +967,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.main(args=[])
 
     def test_work_with_non_ascii_chars(self):
-
         mock_process = MockProcessClass()
 
         def mock_is_oppia_server_already_running(*unused_args):
@@ -1087,7 +1077,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.assertEqual(lines, ['sample', u'✓', 'output'])
 
     def test_rerun_when_tests_fail(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1147,7 +1136,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_do_not_rerun_when_tests_fail(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1206,7 +1194,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_rerun_when_tests_flake(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1266,7 +1253,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_no_reruns_off_ci(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1320,7 +1306,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_start_tests_skip_build(self):
-
         mock_process = MockProcessClass()
 
         def mock_is_oppia_server_already_running(*unused_args):
@@ -1493,7 +1478,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.get_chrome_driver_version()
 
     def test_start_tests_in_debug_mode(self):
-
         mock_process = MockProcessClass()
 
         def mock_is_oppia_server_already_running(*unused_args):
@@ -1618,7 +1602,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.main(args=['--debug_mode'])
 
     def test_start_tests_in_with_chromedriver_flag(self):
-
         mock_process = MockProcessClass()
 
         def mock_is_oppia_server_already_running(*unused_args):

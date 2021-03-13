@@ -2311,7 +2311,6 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_error_on_passing_invalid_exploration_version(self):
-
         with self.login_context(self.MODERATOR_EMAIL):
             csrf_token = self.get_new_csrf_token()
             self.post_json(

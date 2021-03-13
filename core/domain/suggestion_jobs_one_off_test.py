@@ -948,7 +948,6 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
     def test_job_acts_only_on_suggestion_edit_state_content(self):
-
         change1 = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {

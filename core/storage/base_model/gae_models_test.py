@@ -676,7 +676,6 @@ class VersionedModelTests(test_utils.GenericTestBase):
             model1.revert(model1, feconf.SYSTEM_COMMITTER_ID, '', 1)
 
     def test_get_snapshots_metadata_with_invalid_model_raises_error(self):
-
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
@@ -753,7 +752,6 @@ class TestBaseModel(base_models.BaseModel):
 class BaseModelTests(test_utils.GenericTestBase):
 
     def test_create_raises_error_when_many_id_collisions_occur(self):
-
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             TestBaseModel, 'get_by_id', types.MethodType(

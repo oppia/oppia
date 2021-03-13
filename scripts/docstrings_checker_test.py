@@ -204,7 +204,6 @@ def func(test_var_one, test_var_two): #@
         self.assertEqual(func_result, [])
 
     def test_possible_exc_types_with_inference_error(self):
-
         @contextlib.contextmanager
         def swap(obj, attr, newvalue):
             """Swap an object's attribute value within the context of a

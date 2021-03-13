@@ -2136,7 +2136,7 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
         line_number = node.fromlineno
         while True:
             line = linecache.getline(node.root().file, line_number).strip()
-            if line.endswith((':')):
+            if line.startswith(('def')):
                 break
             else:
                 line_number += 1

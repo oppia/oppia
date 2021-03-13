@@ -31,7 +31,6 @@ import requests
 class CheckIfOnCITests(test_utils.GenericTestBase):
 
     def test_returns_true_when_on_ci(self):
-
         def mock_getenv(variable):
             return variable == 'CIRCLECI'
 
@@ -46,7 +45,6 @@ class CheckIfOnCITests(test_utils.GenericTestBase):
         self.assertTrue(on_ci)
 
     def test_returns_false_when_off_ci(self):
-
         def mock_getenv(unused_variable):
             return False
 
@@ -78,7 +76,6 @@ class ReportPassTests(test_utils.GenericTestBase):
         self.example_date = datetime.datetime(2020, 1, 1, 0, 0, 0, 1)
 
     def test_successful_report(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'CIRCLECI': 1,
@@ -119,7 +116,6 @@ class ReportPassTests(test_utils.GenericTestBase):
             flake_checker.report_pass('suiteName')
 
     def test_successful_report_construct_url(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'GITHUB_ACTIONS': 1,
@@ -161,7 +157,6 @@ class ReportPassTests(test_utils.GenericTestBase):
             flake_checker.report_pass('suiteName')
 
     def test_unsuccessful_report(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'CIRCLECI': 1,
@@ -202,7 +197,6 @@ class ReportPassTests(test_utils.GenericTestBase):
             flake_checker.report_pass('suiteName')
 
     def test_unknown_build_environment(self):
-
         def mock_getenv(variable):
             environment_vars = dict()
             return environment_vars.get(variable)
@@ -219,7 +213,6 @@ class ReportPassTests(test_utils.GenericTestBase):
                 flake_checker.report_pass('suiteName')
 
     def test_missing_environment_variable(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'CIRCLECI': 1,
@@ -266,7 +259,6 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
         self.example_date = datetime.datetime(2020, 1, 1, 0, 0, 0, 1)
 
     def test_successful_report(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'CIRCLECI': 1,
@@ -319,7 +311,6 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             self.assertTrue(flaky)
 
     def test_successful_report_construct_url(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'GITHUB_ACTIONS': 1,
@@ -373,7 +364,6 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             self.assertTrue(flaky)
 
     def test_unsuccessful_report_exception(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'CIRCLECI': 1,
@@ -417,7 +407,6 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             self.assertFalse(flaky)
 
     def test_unsuccessful_report_not_ok(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'CIRCLECI': 1,
@@ -461,7 +450,6 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             self.assertFalse(flaky)
 
     def test_unsuccessful_report_bad_payload(self):
-
         def mock_getenv(variable):
             environment_vars = {
                 'CIRCLECI': 1,

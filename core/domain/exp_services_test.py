@@ -3290,7 +3290,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             snapshots_metadata[2]['created_on_ms'])
 
     def test_versioning_with_add_and_delete_states(self):
-
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
 
@@ -4051,7 +4050,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
     def test_get_non_private_exploration_summaries(self):
-
         actual_summaries = exp_services.get_non_private_exploration_summaries()
 
         expected_summaries = {

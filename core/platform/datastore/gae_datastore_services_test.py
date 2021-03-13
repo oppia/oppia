@@ -43,7 +43,6 @@ class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_fetch_multiple_entities_by_ids_and_models(self):
-
         # Save a few explorations.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.owner_id, title='Bridges in England',

@@ -865,7 +865,6 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertFalse(os.path.isfile('some_file.txt'))
 
     def test_minify_third_party_libs(self):
-
         def _mock_safe_delete_file(unused_filepath):
             """Mocks build.safe_delete_file()."""
             pass

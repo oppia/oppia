@@ -545,7 +545,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_install_elasticsearch_unrecognized_os(self):
-
         def mock_is_mac_os():
             return False
         def mock_is_linux_os():
