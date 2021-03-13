@@ -64,7 +64,6 @@
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/translate.service.ts @srijanreddy98 @darksun27
 /core/templates/services/translations-backend-api.service.ts @srijanreddy98 @darksun27
-/core/templates/services/translate-text-backend-api.service.ts @srijanreddy98 @darksun27
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek
@@ -108,7 +107,7 @@
 /core/domain/voiceover_services*.py @sagangwee
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
-
+/core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.ts @sagangwee
 
 # Core documentation
 # TODO(#11811): For the following 5 files, as well as about-page.constants.ts,
