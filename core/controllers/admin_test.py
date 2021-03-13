@@ -46,6 +46,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -263,7 +264,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_dummy_new_structures_data'
             }, csrf_token=csrf_token)
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 2)
         for summary in topic_summaries:
             if summary.name == 'Dummy Topic 1':
@@ -382,6 +383,34 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         new_creation_time = all_opportunity_models[0].created_on
 
         self.assertLess(old_creation_time, new_creation_time)
+
+    def test_regenerate_missing_exploration_stats_action(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.save_new_default_exploration('ID', 'owner_id')
+
+        self.assertEqual(
+            exp_services.regenerate_missing_stats_for_exploration('ID'), (
+                [], [], 1, 1))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'regenerate_missing_exploration_stats',
+                'exp_id': 'ID'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'missing_exp_stats': [],
+                'missing_state_stats': [],
+                'num_valid_exp_stats': 1,
+                'num_valid_state_stats': 1
+            })
 
     def test_admin_topics_csv_download_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1230,7 +1259,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, username)
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, user_id, name='Name',
             abbreviated_name='abbrev', url_fragment='url-fragment',
@@ -2382,3 +2411,82 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json('/numberofdeletionrequestshandler')
         self.assertEqual(response['number_of_pending_deletion_models'], 2)
+
+
+class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
+    """Tests VerifyUserModelsDeletedHandler."""
+
+    def setUp(self):
+        super(VerifyUserModelsDeletedHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+    def test_get_without_user_id_raises_error(self):
+        self.get_json(
+            '/verifyusermodelsdeletedhandler', expected_status_int=400)
+
+    def test_get_with_nonexistent_user_id_returns_true(self):
+        response = self.get_json(
+            '/verifyusermodelsdeletedhandler', params={'user_id': 'aaa'})
+        self.assertFalse(response['related_models_exist'])
+
+    def test_get_with_existing_user_id_returns_true(self):
+        response = self.get_json(
+            '/verifyusermodelsdeletedhandler',
+            params={'user_id': self.admin_user_id}
+        )
+        self.assertTrue(response['related_models_exist'])
+
+
+class DeleteUserHandlerTest(test_utils.GenericTestBase):
+    """Tests DeleteUserHandler."""
+
+    def setUp(self):
+        super(DeleteUserHandlerTest, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+    def test_delete_without_user_id_raises_error(self):
+        self.delete_json(
+            '/deleteuserhandler',
+            params={'username': 'someusername'},
+            expected_status_int=400)
+
+    def test_delete_without_username_raises_error(self):
+        self.delete_json(
+            '/deleteuserhandler',
+            params={'user_id': 'aa'},
+            expected_status_int=400)
+
+    def test_delete_with_wrong_username_raises_error(self):
+        self.delete_json(
+            '/deleteuserhandler',
+            params={
+                'username': 'someusername',
+                'user_id': 'aa'
+            },
+            expected_status_int=400)
+
+    def test_delete_with_differing_user_id_and_username_raises_error(self):
+        self.delete_json(
+            '/deleteuserhandler',
+            params={
+                'username': self.NEW_USER_USERNAME,
+                'user_id': self.admin_user_id
+            },
+            expected_status_int=400)
+
+    def test_delete_with_correct_user_id_andusername_returns_true(self):
+        response = self.delete_json(
+            '/deleteuserhandler',
+            params={
+                'username': self.NEW_USER_USERNAME,
+                'user_id': self.new_user_id
+            })
+        self.assertTrue(response['success'])
+        self.assertIsNotNone(
+            wipeout_service.get_pending_deletion_request(self.new_user_id))

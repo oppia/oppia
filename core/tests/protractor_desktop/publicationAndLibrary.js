@@ -20,6 +20,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -94,6 +95,7 @@ describe('Library index page', function() {
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
     await general.moveToEditor();
     // Moderators can edit explorations.
+    await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
     await explorationEditorPage.saveChanges('change language');
@@ -244,6 +246,7 @@ describe('Permissions for private explorations', function() {
       await workflow.triggerTitleOnBlurEvent();
       expect(await workflow.canAddRolesToUsers()).toBe(true);
       expect(await workflow.checkForAddTitleWarning()).toBe(false);
+      await users.logout();
     }
   );
 
