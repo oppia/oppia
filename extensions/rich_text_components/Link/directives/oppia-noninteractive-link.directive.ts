@@ -20,55 +20,62 @@
  * followed by the name of the arg.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { ContextService } from 'services/context.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+
+@Component({
+  selector: 'oppia-noninteractive-link',
+  templateUrl: './link.directive.html',
+  styleUrls: []
+})
+export class NoninteractiveLink implements OnInit {
+  @Input() urlWithValue: string;
+  @Input() textWithValue: string;
+  url: string;
+  text: string = '';
+  showUrlInTooltip: boolean = false;
+  tabIndexVal: number = 0;
+  constructor(
+    private contextService: ContextService,
+    private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    let untrustedUrl = encodeURI(this.htmlEscaperService.escapedJsonToObj(
+      this.urlWithValue) as string);
+    if (untrustedUrl.indexOf('http://') !== 0 &&
+      untrustedUrl.indexOf('https://') !== 0) {
+      untrustedUrl = 'https://' + untrustedUrl;
+    }
+    this.url = untrustedUrl;
+    this.text = this.url;
+    if (this.textWithValue) {
+      // This is done for backward-compatibility; some old explorations
+      // have content parts that don't include a 'text' attribute on
+      // their links.
+      this.text = (
+        this.htmlEscaperService.escapedJsonToObj(this.textWithValue) as string);
+      // Note that this second 'if' condition is needed because a link
+      // may have an empty 'text' value.
+      if (this.text) {
+        this.showUrlInTooltip = true;
+      } else {
+        this.text = this.url;
+      }
+    }
+
+    // This following check disbales the link in Editor being caught
+    // by tabbing while in Exploration Editor mode.
+    if (this.contextService.isInExplorationEditorMode()) {
+      this.tabIndexVal = -1;
+    }
+  }
+}
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaNoninteractiveLink', [
-  'HtmlEscaperService',
-  function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./link.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$attrs', 'ContextService',
-        function($attrs, ContextService) {
-          var ctrl = this;
-          ctrl.$onInit = function() {
-            var untrustedUrl = encodeURI(HtmlEscaperService.escapedJsonToObj(
-              $attrs.urlWithValue));
-            if (untrustedUrl.indexOf('http://') !== 0 &&
-                untrustedUrl.indexOf('https://') !== 0) {
-              untrustedUrl = 'https://' + untrustedUrl;
-            }
-            ctrl.url = untrustedUrl;
-
-            ctrl.showUrlInTooltip = false;
-            ctrl.text = ctrl.url;
-            if ($attrs.textWithValue) {
-              // This is done for backward-compatibility; some old explorations
-              // have content parts that don't include a 'text' attribute on
-              // their links.
-              ctrl.text =
-                HtmlEscaperService.escapedJsonToObj($attrs.textWithValue);
-              // Note that this second 'if' condition is needed because a link
-              // may have an empty 'text' value.
-              if (ctrl.text) {
-                ctrl.showUrlInTooltip = true;
-              } else {
-                ctrl.text = ctrl.url;
-              }
-            }
-
-            // This following check disbales the link in Editor being caught
-            // by tabbing while in Exploration Editor mode.
-            if (ContextService.isInExplorationEditorMode()) {
-              ctrl.tabIndexVal = -1;
-            }
-          };
-        }]
-    };
-  }
-]);
+angular.module('oppia').directive('oppiaNoninteractiveLink',
+  downgradeComponent({
+    component: NoninteractiveLink
+  }));

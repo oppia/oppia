@@ -22,10 +22,11 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
-import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.directive';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
+import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.directive';
 
 
 @NgModule({
@@ -33,20 +34,24 @@ import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-ima
     CommonModule,
     BrowserModule,
     DynamicContentModule,
+    MatButtonModule,
     NgbAccordionModule,
-    MatButtonModule
+    NgbTooltipModule
   ],
   declarations: [
     NoninteractiveCollapsible,
-    NoninteractiveImage
+    NoninteractiveImage,
+    NoninteractiveLink
   ],
   entryComponents: [
     NoninteractiveCollapsible,
-    NoninteractiveImage
+    NoninteractiveImage,
+    NoninteractiveLink
   ],
   exports: [
     NoninteractiveCollapsible,
-    NoninteractiveImage
+    NoninteractiveImage,
+    NoninteractiveLink
   ],
 })
 
