@@ -243,5 +243,9 @@ def create_initial_super_admin():
 
 
 def destroy_firebase_accounts():
-    """Destroys all external Firebase users and their corresponding models."""
-    platform_auth_services.destroy_firebase_accounts()
+    """Destroys all external Firebase users and their corresponding models.
+
+    Returns:
+        bool. Whether more Firebase accounts need to be deleted.
+    """
+    return platform_auth_services.destroy_firebase_accounts()

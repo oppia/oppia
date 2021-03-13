@@ -474,51 +474,61 @@ def create_initial_super_admin():
 
 
 def destroy_firebase_accounts():
-    """Destroys all external Firebase users and their corresponding models."""
+    """Destroys all external Firebase users and their corresponding models.
+
+    Returns:
+        bool. Whether more Firebase accounts need to be deleted.
+    """
     with _firebase_admin_context():
-        for user_batch in _yield_firebase_user_batches():
-            firebase_auth_ids = [user.uid for user in user_batch]
-            emails = [user.email for user in user_batch]
+        page = firebase_admin.auth.list_users(max_results=1000)
+        users = [u for u in page.users if u.email != feconf.ADMIN_EMAIL_ADDRESS]
+        if not users:
+            return False
 
-            # First, delete the external Firebase accounts.
-            result = firebase_admin.auth.delete_users(
-                firebase_auth_ids, force_delete=True)
-            if result.errors:
-                logging.warn('\n'.join(
-                    '%s: %s' % (e.index, e.reason) for e in result.errors))
+        firebase_auth_ids = [user.uid for user in users]
+        emails = [user.email for user in users]
 
-            # Next, find all association models in our database.
-            assoc_by_auth_id_models = (
-                auth_models.UserIdByFirebaseAuthIdModel.get_multi(
-                    firebase_auth_ids, include_deleted=True))
+        # First, delete the external Firebase accounts.
+        result = firebase_admin.auth.delete_users(
+            firebase_auth_ids, force_delete=True)
+        if result.errors:
+            logging.warn('\n'.join(
+                '%s: %s' % (e.index, e.reason) for e in result.errors))
 
-            user_ids = [None if model is None else model.user_id
-                        for model in assoc_by_auth_id_models]
-            emails_to_look_up = [emails[i] for i, user_id in enumerate(user_ids)
-                                 if user_id is None]
+        # Next, find all association models in our database.
+        assoc_by_auth_id_models = (
+            auth_models.UserIdByFirebaseAuthIdModel.get_multi(
+                firebase_auth_ids, include_deleted=True))
 
-            user_ids_to_clear = {uid for uid in user_ids if uid is not None}
+        user_ids = [None if model is None else model.user_id
+                    for model in assoc_by_auth_id_models]
+        emails_to_look_up = [emails[i] for i, user_id in enumerate(user_ids)
+                             if user_id is None]
 
-            if emails_to_look_up:
-                user_settings_models = user_models.UserSettingsModel.query(
-                    user_models.UserSettingsModel.email.IN(emails_to_look_up))
-                user_ids_to_clear.update(m.id for m in user_settings_models)
+        user_ids_to_clear = {uid for uid in user_ids if uid is not None}
 
-            # Finally, delete the auth association models we've discovered.
-            auth_models.UserIdByFirebaseAuthIdModel.delete_multi(
-                [m for m in assoc_by_auth_id_models if m is not None])
+        if emails_to_look_up:
+            user_settings_models = user_models.UserSettingsModel.query(
+                user_models.UserSettingsModel.email.IN(emails_to_look_up))
+            user_ids_to_clear.update(m.id for m in user_settings_models)
 
-            assoc_by_user_id_models = [
-                m for m in auth_models.UserAuthDetailsModel.get_multi(
-                    user_ids_to_clear)
-                if m is not None
-            ]
-            for assoc_by_user_id_model in assoc_by_user_id_models:
-                assoc_by_user_id_model.firebase_auth_id = None
+        # Finally, delete the auth association models we've discovered.
+        auth_models.UserIdByFirebaseAuthIdModel.delete_multi(
+            [m for m in assoc_by_auth_id_models if m is not None])
 
-            auth_models.UserAuthDetailsModel.update_timestamps_multi(
-                assoc_by_user_id_models)
-            auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
+        assoc_by_user_id_models = [
+            m for m in auth_models.UserAuthDetailsModel.get_multi(
+                user_ids_to_clear)
+            if m is not None
+        ]
+        for assoc_by_user_id_model in assoc_by_user_id_models:
+            assoc_by_user_id_model.firebase_auth_id = None
+
+        auth_models.UserAuthDetailsModel.update_timestamps_multi(
+            assoc_by_user_id_models)
+        auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
+
+        return page.has_next_page
 
 
 @contextlib.contextmanager
@@ -629,17 +639,3 @@ def _create_auth_claims(firebase_claims):
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)
-
-
-def _yield_firebase_user_batches():
-    """Yields every external Firebase account in batches, except for the default
-    system admin.
-
-    Yields:
-        list(firebase_admin.ExportedUserRecord). The Firebase accounts.
-    """
-    page = firebase_admin.auth.list_users(max_results=1000)
-    while page is not None:
-        yield [user for user in page.users
-               if user.email != feconf.ADMIN_EMAIL_ADDRESS]
-        page = page.get_next_page()

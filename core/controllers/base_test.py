@@ -779,7 +779,7 @@ class WipeFirebaseHandlerTests(test_utils.GenericTestBase):
     def test_get(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        call_counter = test_utils.CallCounter(lambda *_: None)
+        call_counter = test_utils.CallCounter(lambda *_: False)
 
         destroy_firebase_accounts_swap = self.swap(
             firebase_auth_services, 'destroy_firebase_accounts', call_counter)
@@ -789,6 +789,22 @@ class WipeFirebaseHandlerTests(test_utils.GenericTestBase):
                 '/wipe_firebase', expected_status_int=302)
 
         self.assertEqual(response.headers['Location'], 'http://localhost/')
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_refreshes_if_there_are_more_accounts_to_delete(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        call_counter = test_utils.CallCounter(lambda *_: True)
+
+        destroy_firebase_accounts_swap = self.swap(
+            firebase_auth_services, 'destroy_firebase_accounts', call_counter)
+
+        with destroy_firebase_accounts_swap:
+            response = self.get_html_response(
+                '/wipe_firebase', expected_status_int=302)
+
+        self.assertEqual(
+            response.headers['Location'], 'http://localhost/wipe_firebase')
         self.assertEqual(call_counter.times_called, 1)
 
     def test_get_with_error(self):
@@ -818,7 +834,7 @@ class WipeFirebaseHandlerTests(test_utils.GenericTestBase):
     def test_get_without_super_admin_privileges(self):
         self.login(self.NEW_USER_EMAIL, is_super_admin=False)
 
-        call_counter = test_utils.CallCounter(lambda *_: None)
+        call_counter = test_utils.CallCounter(lambda *_: False)
         destroy_firebase_accounts_swap = self.swap(
             firebase_auth_services, 'destroy_firebase_accounts', call_counter)
 

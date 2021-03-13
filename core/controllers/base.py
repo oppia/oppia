@@ -543,10 +543,12 @@ class WipeFirebaseHandler(BaseHandler):
         if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException('Must be super-admin')
         try:
-            auth_services.destroy_firebase_accounts()
+            if auth_services.destroy_firebase_accounts():
+                self.redirect('/wipe_firebase')
+            else:
+                self.redirect('/')
         except Exception:
             logging.exception('Failed to wipe out every Firebase account')
-        finally:
             self.redirect('/')
 
 
