@@ -16,7 +16,7 @@
  * @fileoverview Component for the item view of an opportunity.
  */
 
- import { Component, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 export class ExplorationOpportunityDict {
