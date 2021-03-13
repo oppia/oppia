@@ -542,7 +542,7 @@ export class AdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
-  // Admin Dev Mode Activities Tab Services
+  // Admin Dev Mode Activities Tab Services.
   async generateDummyExplorationsAsync(
       numDummyExpsToGenerate: number,
       numDummyExpsToPublish: number): Promise<void> {
