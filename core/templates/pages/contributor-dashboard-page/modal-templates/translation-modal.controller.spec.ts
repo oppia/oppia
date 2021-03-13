@@ -323,10 +323,9 @@ describe('Translation Modal Controller', function() {
     translationError.hasDuplicateDescriptions = true;
     translationError.hasDuplicateAltTexts = true;
 
-    expect(translationError.triedToCopyText).toHaveBeenCalledWith(true);
-    expect(translationError.hasUncopiedImgs).toHaveBeenCalledWith(true);
-    expect(translationError.hasDuplicateDescriptions).toHaveBeenCalledWith(
-      true);
-    expect(translationError.hasDuplicateAltTexts).toHaveBeenCalledWith(true);
+    expect(translationError.triedToCopyText).toBe(true);
+    expect(translationError.hasUncopiedImgs).toBe(true);
+    expect(translationError.hasDuplicateDescriptions).toBe(true);
+    expect(translationError.hasDuplicateAltTexts).toBe(true);
   });
 });
