@@ -85,7 +85,7 @@ export class QuestionsListService {
       (this._currentPage + 1) * num >
        this._questionSummariesForOneSkill.length &&
        this._nextCursorForQuestions !== null && fetchMore) {
-      this.questionBackendApiService.fetchQuestionSummaries(
+      this.questionBackendApiService.fetchQuestionSummariesAsync(
         skillId, this._nextCursorForQuestions).then(response => {
         let questionSummaries = response.questionSummaries.map(summary => {
           return (
