@@ -2134,12 +2134,6 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
                 definition in the AST.
         """
         line_number = node.fromlineno
-        while True:
-            line = linecache.getline(node.root().file, line_number).strip()
-            if line.startswith(('def')):
-                break
-            else:
-                line_number += 1
         line_after_function_def = linecache.getline(
             node.root().file, line_number + 1).strip()
         if len(line_after_function_def.strip()) == 0:
