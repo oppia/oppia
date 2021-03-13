@@ -15,53 +15,8 @@
 /**
  * @fileoverview Component for the item view of an opportunity.
  */
-// require(
-//   'components/common-layout-directives/common-elements/' +
-//   'lazy-loading.component.ts');
 
-// require(
-//   'filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-
-// angular.module('oppia').component('opportunitiesListItem', {
-//   bindings: {
-//     opportunity: '<',
-//     onClickActionButton: '<',
-//     labelRequired: '<',
-//     progressBarRequired: '<',
-//     opportunityHeadingTruncationLength: '<'
-//   },
-//   template: require('./opportunities-list-item.component.html'),
-//   controller: [
-//     function() {
-//       var ctrl = this;
-//       ctrl.$onInit = function() {
-//         ctrl.opportunityDataIsLoading = false;
-//         if (ctrl.opportunity && ctrl.labelRequired) {
-//           ctrl.labelText = ctrl.opportunity.labelText;
-//           ctrl.labelStyle = {
-//             'background-color': ctrl.opportunity.labelColor
-//           };
-//         }
-
-//         if (!ctrl.opportunityHeadingTruncationLength) {
-//           ctrl.opportunityHeadingTruncationLength = 40;
-//         }
-//         if (ctrl.opportunity) {
-//           if (ctrl.opportunity.progressPercentage) {
-//             ctrl.progressPercentage = (
-//               ctrl.opportunity.progressPercentage + '%');
-//             ctrl.progressBarStyle = {width: ctrl.progressPercentage};
-//           }
-//         } else {
-//           ctrl.opportunityDataIsLoading = true;
-//         }
-//       };
-//     }
-//   ]
-// });
-
-
-import { Component, Input } from '@angular/core';
+ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 export class ExplorationOpportunityDict {
