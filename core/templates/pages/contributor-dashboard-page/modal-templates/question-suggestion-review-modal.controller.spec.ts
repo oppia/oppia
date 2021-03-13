@@ -32,7 +32,6 @@ describe('Question Suggestion Review Modal Controller', function() {
   let QuestionObjectFactory = null;
   let SiteAnalyticsService = null;
   let SuggestionModalService = null;
-  let UrlInterpolationService = null;
   let acceptSuggestionSpy = null;
   let rejectSuggestionSpy = null;
   let cancelSuggestionSpy = null;
@@ -73,7 +72,6 @@ describe('Question Suggestion Review Modal Controller', function() {
       const $http = $injector.get('$http');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-      UrlInterpolationService = $injector.get('UrlInterpolationService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -148,7 +146,7 @@ describe('Question Suggestion Review Modal Controller', function() {
         },
       });
 
-      suggestion = { status: 'accepted' }
+      suggestion = { status: 'accepted' };
 
       $scope = $rootScope.$new();
       $controller('QuestionSuggestionReviewModalController', {
@@ -324,7 +322,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
 
       $scope = $rootScope.$new();
-      suggestion = { status: 'accepted' }
+      suggestion = { status: 'accepted' };
       $controller('QuestionSuggestionReviewModalController', {
         $http: $http,
         $scope: $scope,
@@ -354,7 +352,6 @@ describe('Question Suggestion Review Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
       $httpBackend = $injector.get('$httpBackend');
-      const $http = $injector.get('$http');
       const skillRubrics = [{
         explanations: ['explanation'],
         difficulty: 'Easy'
@@ -432,7 +429,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
 
       $scope = $rootScope.$new();
-      suggestion = { status: 'rejected' }
+      suggestion = { status: 'rejected' };
       $controller('QuestionSuggestionReviewModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
@@ -450,16 +447,16 @@ describe('Question Suggestion Review Modal Controller', function() {
     }));
 
     it('should should fetch the rejection message', function() {
-        let responseDict = {
-          messages: [
-            { text: 'Question submitted.' },
-            { text: 'This is a rejection.' }
-          ]
-        };
-        $httpBackend.expect('GET', '/threadhandler/123').respond(responseDict);
-        $httpBackend.flush();
-        $rootScope.$digest();
-        expect($scope.reviewMessage).toBe('This is a rejection.');
-      });
+      let responseDict = {
+        messages: [
+          { text: 'Question submitted.' },
+          { text: 'This is a rejection.' }
+        ]
+      };
+      $httpBackend.expect('GET', '/threadhandler/123').respond(responseDict);
+      $httpBackend.flush();
+      $rootScope.$digest();
+      expect($scope.reviewMessage).toBe('This is a rejection.');
+    });
   });
 });

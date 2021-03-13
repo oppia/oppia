@@ -157,6 +157,8 @@ def create_message(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether new message is received via email or
             web.
+        can_send_email: bool. Whether the new message(s) need to be added to the
+            email buffer.
 
     Returns:
         FeedbackMessage. The domain object representing the new message added

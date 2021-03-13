@@ -726,13 +726,12 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         skill_thread_id = feedback_services.create_thread(
             'skill', 'skillid1', None, 'unused subject', 'unused text')
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock_view_feedback_thread/%s' % skill_thread_id)
+            self.get_json('/mock_view_feedback_thread/%s' % skill_thread_id)
 
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/%s' %  self.public_exp_thread_id)
+                '/mock_view_feedback_thread/%s' % self.public_exp_thread_id)
 
     def test_owner_cannot_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)

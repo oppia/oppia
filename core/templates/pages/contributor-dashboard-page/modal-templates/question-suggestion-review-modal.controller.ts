@@ -35,8 +35,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   function(
       $http, $scope, $uibModalInstance, ContributionOpportunitiesService,
       SiteAnalyticsService, SuggestionModalService, UrlInterpolationService,
-      authorName, contentHtml, misconceptionsBySkill, question, questionHeader,
-      reviewable, skillDifficulty, skillRubrics,
+      authorName, contentHtml, misconceptionsBySkill, question,
+      questionHeader, reviewable, skillDifficulty, skillRubrics,
       suggestion, suggestionId, ACTION_ACCEPT_SUGGESTION,
       ACTION_REJECT_SUGGESTION, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
