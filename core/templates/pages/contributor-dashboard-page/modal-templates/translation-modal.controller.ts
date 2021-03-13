@@ -180,8 +180,8 @@ angular.module('oppia').controller('TranslationModalController', [
           originalElements, function(originalElement) {
             return translatedElements.some(
               translatedElement => (
-                translatedElement === originalElement
-                && originalElement !== ''));
+                translatedElement === originalElement &&
+                originalElement !== ''));
           });
       return states;
     };
@@ -201,8 +201,8 @@ angular.module('oppia').controller('TranslationModalController', [
       };
     };
 
-    $scope.validateImages = function(textToTranslate,
-      translatedText): TranslationError {
+    $scope.validateImages = function(
+      textToTranslate, translatedText): TranslationError {
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
 
