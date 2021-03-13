@@ -384,6 +384,8 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.uncategorized_skill_count,
         topic_summary_model.subtopic_count,
         topic_summary_model.total_skill_count,
+        # topic_summary_model.total_chapter_count,
+        10,
         topic_summary_model.thumbnail_filename,
         topic_summary_model.thumbnail_bg_color,
         topic_summary_model.url_fragment,

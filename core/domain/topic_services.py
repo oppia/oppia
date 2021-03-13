@@ -780,7 +780,9 @@ def compute_summary_of_topic(topic):
     """
     canonical_story_count = 0
     additional_story_count = 0
+    chapter_count = 20
     for reference in topic.canonical_story_references:
+        # chapter_count += reference.
         if reference.story_is_published:
             canonical_story_count += 1
     for reference in topic.additional_story_references:
@@ -788,6 +790,7 @@ def compute_summary_of_topic(topic):
             additional_story_count += 1
     topic_model_canonical_story_count = canonical_story_count
     topic_model_additional_story_count = additional_story_count
+    total_model_chapter_count = chapter_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
@@ -800,8 +803,9 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic.thumbnail_filename, topic.thumbnail_bg_color,
-        topic.url_fragment, topic.created_on, topic.last_updated
+        total_skill_count, total_model_chapter_count, topic.thumbnail_filename,
+        topic.thumbnail_bg_color, topic.url_fragment, topic.created_on,
+        topic.last_updated
     )
 
     return topic_summary
