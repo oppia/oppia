@@ -55,11 +55,9 @@
       <h2 class="oppia-about-outcome-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_OUR_OUTCOMES' | translate"></h2>
       <div class="oppia-about-section-three-image-1 oppia-about-section-three-right">
         <div class="oppia-about-section-three-image">
-          <picture class="oppia-about-graph-image">
-            <source type="image/webp" [srcset]="getStaticImageUrl('/about/analysis_graph.webp')">
-            <source type="image/png" [srcset]="getStaticImageUrl('/about/analysis_graph.png')">
-            <img [src]="getStaticImageUrl('/about/analysis_graph.png')" alt="outcome image">
-          </picture>
+          <div class="oppia-about-graph-image">
+            <img [src]="getStaticImageUrl('/about/graph.svg')" alt="graph image">
+          </div>
         </div>
       </div>
       <div class="oppia-about-section-three-left">
@@ -286,7 +284,7 @@
     background-color: #009688;
     clear: both;
     display: flex;
-    height: 60vh;
+    height: 62vh;
     justify-content: center;
     margin: 0 auto;
     max-width: 100%;
@@ -326,6 +324,8 @@
     width: 35vw;
   }
   .oppia-about-page-section-three .oppia-about-graph-image img {
+    background-color: white;
+    height: auto;
     width: 100%;
   }
   .about-page .oppia-about-page-section-four {
@@ -767,7 +767,6 @@
       padding-top: 0;
     }
     .about-page .oppia-about-page-section-four {
-      background-image: url(/assets/images/about/dsk_community_background_flipped.png);
       background-size: 100% 130vh, cover;
       height: 130vh;
       padding-right: 4vw;
@@ -788,7 +787,6 @@
     }
     .about-page .oppia-about-page-section-six {
       background-color: white;
-      background-image: url(/assets/images/about/dsk_community_background.png);
       background-size: 100% 80vh, cover;
       height: 80vh;
       padding-top: 10vh;
