@@ -315,7 +315,7 @@ describe('Translation Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-  it('should get next recommended collection node count', () => {
+  it('should be able to set TranslationError objects', () => {
     let translationError = new TranslationError(false, false, false, false);
 
     translationError.triedToCopyText = true;
