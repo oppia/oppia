@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
-import { StateNamesToContentIdMapping } from 'domain/opportunity/translatable-texts.model';
+import { StateNamesToContentIdMapping, TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
 
 @Injectable({
   providedIn: 'root'
