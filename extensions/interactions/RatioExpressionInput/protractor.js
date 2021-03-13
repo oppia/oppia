@@ -65,6 +65,12 @@ var testSuite = [{
   expectedInteractionDetails: ['placeholder'],
   wrongAnswers: ['2:5'],
   correctAnswers: ['2:4']
+}, {
+  interactionArguments: ['placeholder', 0],
+  ruleArguments: ['HasSpecificTermEqualTo', 3, 2],
+  expectedInteractionDetails: ['placeholder'],
+  wrongAnswers: ['10:10:1'],
+  correctAnswers: ['10:10:2']
 }];
 
 exports.customizeInteraction = customizeInteraction;

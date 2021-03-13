@@ -992,7 +992,7 @@
       "IsGreaterThan": "is greater than {{f|Fraction}}",
       "HasIntegerPartEqualTo": "has integer part equal to {{x|Int}}",
       "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
-      "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
+      "HasDenominatorEqualTo": "has denominator equal to {{x|PositiveInt}}"
     }
   },
   "RatioExpressionInput": {
@@ -1041,7 +1041,8 @@
     "rule_descriptions": {
       "Equals": "is equal to {{x|RatioExpression}}",
       "IsEquivalent": "is equivalent to {{x|RatioExpression}}",
-      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|NonnegativeInt}}"
+      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|PositiveInt}}",
+      "HasSpecificTermEqualTo": "has term {{x|PositiveInt}} equal to {{y|PositiveInt}}"
     }
   }
 }

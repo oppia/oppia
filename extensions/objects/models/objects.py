@@ -336,7 +336,7 @@ class NonnegativeInt(BaseObject):
 
 
 class PositiveInt(BaseObject):
-    """Nonnegative integer class."""
+    """Positive integer class."""
 
     description = 'A positive integer.'
     default_value = 1

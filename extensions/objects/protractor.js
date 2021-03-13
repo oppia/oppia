@@ -20,6 +20,7 @@
 // NOTE: all editors for objects that are used as parameters in a rule must
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
+var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
@@ -179,6 +180,23 @@ var ParameterNameEditor = function(elem) {
   };
 };
 
+var PositiveIntEditor = function(elem) {
+  return {
+    setValue: async function(value) {
+      await action.clear(
+        'Positive Int Editor Input', elem.element(by.tagName('input')));
+      await action.sendKeys(
+        'Positive Int Editor Input', elem.element(by.tagName('input')), value);
+    },
+    expectValueToBe: async function(expectedValue) {
+      await waitFor.visibilityOf(
+        elem, `"${elem.getTagName()}" takes too long to be visible`);
+      var value = elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
+    }
+  };
+};
+
 var RatioExpressionEditor = function(elem) {
   return {
     setValue: async function(value) {
@@ -258,6 +276,7 @@ var OBJECT_EDITORS = {
   NumericExpression: MathEditor,
   ParameterName: ParameterNameEditor,
   PositionOfTerms: ParameterNameEditor,
+  PositiveInt: PositiveIntEditor,
   RatioExpression: RatioExpressionEditor,
   SanitizedUrl: SanitizedUrlEditor,
   TranslatableSetOfNormalizedString: TranslatableSetOfNormalizedStringEditor,
@@ -276,6 +295,7 @@ exports.NonnegativeIntEditor = NonnegativeIntEditor;
 exports.NormalizedStringEditor = NormalizedStringEditor;
 exports.NumberWithUnitsEditor = NumberWithUnitsEditor;
 exports.ParameterNameEditor = ParameterNameEditor;
+exports.PositiveIntEditor = PositiveIntEditor;
 exports.RatioExpressionEditor = RatioExpressionEditor;
 exports.SanitizedUrlEditor = SanitizedUrlEditor;
 exports.SkillSelector = SkillSelector;
