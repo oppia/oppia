@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TranslationModalController.
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TranslationError } from './translation-modal.controller';
 
 describe('Translation Modal Controller', function() {
   let $httpBackend = null;
@@ -313,4 +314,19 @@ describe('Translation Modal Controller', function() {
       $httpBackend.flush();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
+
+  it('should get next recommended collection node count', () => {
+    let translationError = new TranslationError(false, false, false, false);
+
+    translationError.triedToCopyText = true;
+    translationError.hasUncopiedImgs = true;
+    translationError.hasDuplicateDescriptions = true;
+    translationError.hasDuplicateAltTexts = true;
+
+    expect(translationError.triedToCopyText).toHaveBeenCalledWith(true);
+    expect(translationError.hasUncopiedImgs).toHaveBeenCalledWith(true);
+    expect(translationError.hasDuplicateDescriptions).toHaveBeenCalledWith(
+      true);
+    expect(translationError.hasDuplicateAltTexts).toHaveBeenCalledWith(true);
+  });
 });
