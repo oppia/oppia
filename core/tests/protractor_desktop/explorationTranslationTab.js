@@ -50,6 +50,7 @@ describe('Exploration translation and voiceover tab', function() {
     await users.createUser('user@editorTab.com', 'userEditor');
     await users.createAndLoginAdminUser(
       'superUser@translationTab.com', 'superUser');
+    await users.logout();
     await users.login('user@editorTab.com');
     await workflow.createExploration();
 
@@ -90,6 +91,7 @@ describe('Exploration translation and voiceover tab', function() {
       'Run tests using same exploration.');
     await explorationEditorPage.saveChanges('Done!');
     await workflow.addExplorationVoiceArtist('userVoiceArtist');
+    await users.logout();
   });
 
   it('should walkthrough translation tutorial when user clicks next',
@@ -127,6 +129,7 @@ describe('Exploration translation and voiceover tab', function() {
       await browser.refresh();
       await explorationEditorTranslationTab.expectSelectedLanguageToBe(
         'Hindi');
+      await users.logout();
     });
 
   it('should have voiceover as a default mode', async function() {
