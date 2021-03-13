@@ -78,23 +78,6 @@ class SessionEndHandler(webapp2.RequestHandler):
         auth_services.destroy_auth_session(self.response)
 
 
-class CreateInitialSuperAdmin(webapp2.RequestHandler):
-    """Handler to create an initial Firebase admin account if necessary."""
-
-    def get(self):
-        """Seeds the Firebase account server with a single super-admin."""
-        # Only respect this handler when new sign-ups are being prevented.
-        if not feconf.PREVENT_NEW_SIGNUPS:
-            self.redirect('/')
-        try:
-            auth_services.destroy_firebase_accounts()
-            auth_services.create_initial_super_admin()
-        except Exception:
-            logging.exception('Failed to initialize Firebase admin account')
-        finally:
-            self.redirect('/')
-
-
 class LogoutPage(webapp2.RequestHandler):
     """Class which handles the logout URL."""
 
@@ -201,7 +184,7 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = auth_claims.email
                 if 'signup?' in self.request.uri:
-                    if feconf.PREVENT_NEW_SIGNUPS:
+                    if not feconf.ENABLE_USER_CREATION:
                         raise Exception('New sign-ups are temporarily disabled')
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
@@ -535,6 +518,36 @@ class BaseHandler(webapp2.RequestHandler):
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
     TemporaryMaintenanceException = (
         UserFacingExceptions.TemporaryMaintenanceException)
+
+
+class SeedFirebaseHandler(webapp2.RequestHandler):
+    """Handler to create an initial Firebase admin account if necessary."""
+
+    def get(self):
+        """Seeds the Firebase account server with a single super-admin."""
+        try:
+            auth_services.create_initial_super_admin()
+        except Exception:
+            logging.exception('Failed to initialize Firebase admin account')
+        finally:
+            self.redirect('/')
+
+
+class WipeFirebaseHandler(BaseHandler):
+    """Handler to wipe Firebase of all accounts."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def get(self):
+        """Wipes the Firebase account servers except for the super-admin."""
+        if not self.current_user_is_super_admin:
+            raise self.UnauthorizedUserException('Must be super-admin')
+        try:
+            auth_services.destroy_firebase_accounts()
+        except Exception:
+            logging.exception('Failed to wipe out every Firebase account')
+        finally:
+            self.redirect('/')
 
 
 class Error404Handler(BaseHandler):

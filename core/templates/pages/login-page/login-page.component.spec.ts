@@ -62,6 +62,7 @@ describe('Login Page', () => {
   let redirectResultPromise: PendingPromise;
   let authService: jasmine.SpyObj<AuthService>;
   let windowRef: MockWindowRef;
+  let alertSpy: jasmine.Spy;
 
   let component: LoginPageComponent;
   let fixture: ComponentFixture<LoginPageComponent>;
@@ -73,6 +74,7 @@ describe('Login Page', () => {
   };
 
   beforeEach(() => {
+    alertSpy = spyOn(window, 'alert');
     authService = jasmine.createSpyObj<AuthService>('AuthService', {
       handleRedirectResultAsync: Promise.resolve(),
       signInWithRedirectAsync: Promise.resolve(),
@@ -89,6 +91,10 @@ describe('Login Page', () => {
 
     fixture = TestBed.createComponent(LoginPageComponent);
     component = fixture.componentInstance;
+  });
+
+  it('should be enabled by default', () => {
+    expect(LoginPageComponent.isEnabled).toBeTrue();
   });
 
   it('should redirect to sign-up after successful redirect', fakeAsync(() => {
@@ -150,5 +156,19 @@ describe('Login Page', () => {
     expect(windowRef.location).toEqual('/signup?return_url=/admin');
 
     flush();
+  }));
+
+  it('should redirect immediately if login page is disabled', fakeAsync(() => {
+    spyOnProperty(LoginPageComponent, 'isEnabled', 'get')
+      .and.returnValue(false);
+
+    component.ngOnInit();
+    flush();
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Sign-in is temporarily disabled. Please try again later.');
+    expect(windowRef.location).toEqual('/');
+    expect(authService.handleRedirectResultAsync).not.toHaveBeenCalled();
+    expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
   }));
 });

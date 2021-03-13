@@ -1107,7 +1107,8 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
-PREVENT_NEW_SIGNUPS = False
+# TODO(#11462): Delete this after Firebase authentication has been deployed.
+ENABLE_USER_CREATION = True
 
 # The name of the cookie Oppia will place the session cookie into. The name is
 # arbitrary. If it is changed later on, then the cookie will live-on in the

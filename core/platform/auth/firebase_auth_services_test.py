@@ -1019,6 +1019,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             r'\[WIPEOUT\] User with user_id=uid has no Firebase account'
         ])
 
+
 class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
 
     USER_ID = 'uid'

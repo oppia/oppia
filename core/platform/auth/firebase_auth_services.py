@@ -475,13 +475,6 @@ def create_initial_super_admin():
 
 def destroy_firebase_accounts():
     """Destroys all external Firebase users and their corresponding models."""
-    def _yield_firebase_user_batches():
-        """Yields every external Firebase account."""
-        page = firebase_admin.auth.list_users(max_results=1000)
-        while page is not None:
-            yield list(page.users)
-            page = page.get_next_page()
-
     with _firebase_admin_context():
         for user_batch in _yield_firebase_user_batches():
             firebase_auth_ids = [user.uid for user in user_batch]
@@ -636,3 +629,17 @@ def _create_auth_claims(firebase_claims):
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)
+
+
+def _yield_firebase_user_batches():
+    """Yields every external Firebase account in batches, except for the default
+    system admin.
+
+    Yields:
+        list(firebase_admin.ExportedUserRecord). The Firebase accounts.
+    """
+    page = firebase_admin.auth.list_users(max_results=1000)
+    while page is not None:
+        yield [user for user in page.users
+               if user.email != feconf.ADMIN_EMAIL_ADDRESS]
+        page = page.get_next_page()

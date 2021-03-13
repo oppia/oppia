@@ -18,6 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
@@ -29,7 +30,16 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
 export class LoginPageComponent implements OnInit {
   constructor(private authService: AuthService, private windowRef: WindowRef) {}
 
+  static get isEnabled(): boolean {
+    return AppConstants.ENABLE_LOGIN_PAGE;
+  }
+
   ngOnInit(): void {
+    if (!LoginPageComponent.isEnabled) {
+      alert('Sign-in is temporarily disabled. Please try again later.');
+      this.redirectToHomePage();
+      return;
+    }
     this.authService.handleRedirectResultAsync().then(
       () => this.redirectToSignUp(),
       rejectionReason => {
