@@ -26,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -711,6 +712,14 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 response['error'], 'You do not have credentials to view '
                 'exploration feedback.')
         self.logout()
+
+    def test_viewer_can_view_non_exploration_related_feedback(self):
+        self.login(self.viewer_email)
+        skill_thread_id = feedback_services.create_thread(
+            'skill', 'skillid1', None, 'unused subject', 'unused text')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_feedback_thread/%s' % skill_thread_id)
 
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
