@@ -51,7 +51,7 @@ class RatioExpressionInput(base.BaseInteraction):
         'description': (
             'The number of elements that the answer must have.'
             ' If set to 0, a ratio of any length will be accepted.'
-            ' The number of elements should be greater than 10.'),
+            ' The number of elements should not be greater than 10.'),
         'schema': {
             'type': 'int',
             'validators': [{

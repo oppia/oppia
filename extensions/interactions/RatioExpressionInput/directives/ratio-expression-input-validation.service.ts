@@ -71,7 +71,7 @@ export class RatioExpressionInputValidationService {
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'The number of terms in a ratio should not be more than 10.')
+            'The number of terms in a ratio should not be greater than 10.')
         }
       ];
     } else {
