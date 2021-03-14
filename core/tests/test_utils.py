@@ -2675,7 +2675,6 @@ tags: []
             community_owned=exp_rights.community_owned,
             owner_ids=exp_rights.owner_ids, contributor_ids=[],
             contributors_summary={})
-        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
         # Create an ExplorationIssues model to match the behavior of creating
@@ -2725,7 +2724,6 @@ tags: []
             community_owned=exp_rights.community_owned,
             owner_ids=exp_rights.owner_ids, contributor_ids=[],
             contributors_summary={})
-        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
@@ -2771,7 +2769,6 @@ tags: []
             community_owned=exp_rights.community_owned,
             owner_ids=exp_rights.owner_ids, contributor_ids=[],
             contributors_summary={})
-        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
     def publish_exploration(self, owner_id, exploration_id):

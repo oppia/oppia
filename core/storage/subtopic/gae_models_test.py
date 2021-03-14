@@ -93,8 +93,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.subtopic_page_id = 'b'
-        commit.update_timestamps()
-        commit.put()
+        commit.put_depending_on_id('committer_id')
         self.assertTrue(
             subtopic_models.SubtopicPageCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
