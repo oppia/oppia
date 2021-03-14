@@ -50,7 +50,8 @@ angular.module('oppia').directive('skillEditorMainTab', [
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $timeout, $uibModal, FocusManagerService, PageTitleService,
+            $scope, $timeout, $uibModal, FocusManagerService,
+            PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
