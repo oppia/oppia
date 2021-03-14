@@ -27,7 +27,7 @@ from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -627,7 +627,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.owner_id, name='Name',
             description='Description', canonical_story_ids=[],
