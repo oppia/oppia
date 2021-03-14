@@ -78,7 +78,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance.update_timestamps(update_last_updated_time=False)
         self.model_instance.put()
 
         expected_output = [
@@ -89,7 +88,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -106,7 +104,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
             datetime.datetime.utcnow() - datetime.timedelta(hours=20))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
@@ -149,7 +146,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_recipient_email(self):
         self.recipient_model.email = 'invalid@email.com'
-        self.recipient_model.update_timestamps()
         self.recipient_model.put()
         expected_output = [(
             u'[u\'failed validation check for recipient email check of '
@@ -164,7 +160,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_sent_datetime_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for sent datetime check of '
@@ -182,7 +177,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             sender_email='noreply@oppia.org', intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='Email Subject', html_body='Email Body',
             sent_datetime=datetime.datetime.utcnow())
-        model_instance_with_invalid_id.update_timestamps()
         model_instance_with_invalid_id.put()
         expected_output = [(
             u'[u\'fully-validated SentEmailModel\', 1]'
@@ -237,7 +231,6 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -254,7 +247,6 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
             datetime.datetime.utcnow() - datetime.timedelta(hours=20))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
@@ -298,7 +290,6 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_sender_email(self):
         self.sender_model.email = 'invalid@email.com'
-        self.sender_model.update_timestamps()
         self.sender_model.put()
         expected_output = [(
             u'[u\'failed validation check for sender email check of '
@@ -313,7 +304,6 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_sent_datetime_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for sent datetime check of '
@@ -331,7 +321,6 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             intent=feconf.BULK_EMAIL_INTENT_MARKETING,
             subject='Email Subject', html_body='Email Body',
             sent_datetime=datetime.datetime.utcnow())
-        model_instance_with_invalid_id.update_timestamps()
         model_instance_with_invalid_id.put()
         expected_output = [(
             u'[u\'fully-validated BulkEmailModel\', 1]'
@@ -359,7 +348,6 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
         self.model_instance = (
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.user_id, self.thread_id))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -375,7 +363,6 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -436,7 +423,6 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                     email_models.REPLY_TO_ID_LENGTH):
             self.model_instance.reply_to_id = (
                 self.model_instance.reply_to_id + 'invalid')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for reply_to_id length check of '

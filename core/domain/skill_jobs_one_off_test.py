@@ -351,21 +351,18 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
     def test_migration_job_skips_deleted_model(self):
         self.commit_model_instance_1.commit_cmds = self.invalid_commit_cmd
         self.commit_model_instance_1.deleted = True
-        self.commit_model_instance_1.update_timestamps()
-        self.commit_model_instance_1.put()
+        self.commit_model_instance_1.put_for_human()
 
         self.metadata_model_instance_1.commit_cmds = self.invalid_commit_cmd
         self.metadata_model_instance_1.deleted = True
-        self.metadata_model_instance_1.update_timestamps()
-        self.metadata_model_instance_1.put()
+        self.metadata_model_instance_1.put_for_human()
         output = self._run_one_off_job()
 
         self.assertEqual(output, [])
 
     def test_migration_job_updates_invalid_command_of_commit_model(self):
         self.commit_model_instance_1.commit_cmds = self.invalid_commit_cmd
-        self.commit_model_instance_1.update_timestamps()
-        self.commit_model_instance_1.put()
+        self.commit_model_instance_1.put_for_human()
 
         self.assertEqual(
             self.commit_model_instance_0.commit_cmds,
@@ -393,8 +390,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_migration_job_updates_invalid_command_of_metadata_model(self):
         self.metadata_model_instance_1.commit_cmds = self.invalid_commit_cmd
-        self.metadata_model_instance_1.update_timestamps()
-        self.metadata_model_instance_1.put()
+        self.metadata_model_instance_1.put_for_human()
 
         self.assertEqual(
             self.metadata_model_instance_0.commit_cmds,
@@ -496,8 +492,10 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.content_model_instance]
         for model in model_instances:
             model.deleted = True
-            model.update_timestamps()
-            model.put()
+            if isinstance(model, base_models.BaseHumanMaintainedModel):
+                model.put_for_human()
+            else:
+                model.put()
 
         output = self._run_one_off_job()
         self.assertEqual(output, [])
@@ -506,8 +504,7 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             self):
         skill = skill_models.SkillModel.get_by_id(self.SKILL_ID)
         skill.deleted = True
-        skill.update_timestamps(update_last_updated_time=False)
-        base_models.BaseModel.put_multi([skill])
+        base_models.BaseHumanMaintainedModel.put_multi_for_bot([skill])
 
         output = self._run_one_off_job()
         expected_output = [

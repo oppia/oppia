@@ -99,7 +99,7 @@ def link_multiple_skills_for_question(
     _update_linked_skill_ids_of_question(
         user_id, question_id, list(set(new_linked_skill_ids)),
         question.linked_skill_ids)
-    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+    question_models.QuestionSkillLinkModel.put_multi_for_human(
         new_question_skill_link_models)
 
 
@@ -118,8 +118,7 @@ def create_new_question_skill_link(
 
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
-    question_skill_link_model.update_timestamps()
-    question_skill_link_model.put()
+    question_skill_link_model.put_for_human()
 
     if skill_id not in question.linked_skill_ids:
         new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
@@ -150,8 +149,7 @@ def update_question_skill_link_difficulty(
     if question_skill_link_model is None:
         raise Exception('The given question and skill are not linked.')
     question_skill_link_model.skill_difficulty = new_difficulty
-    question_skill_link_model.update_timestamps()
-    question_skill_link_model.put()
+    question_skill_link_model.put_for_human()
 
 
 def _update_linked_skill_ids_of_question(
@@ -430,9 +428,9 @@ def replace_skill_id_for_all_questions(
                 question_skill_link.question_id, new_skill_id,
                 question_skill_link.skill_difficulty)
             )
-    question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
+    question_models.QuestionSkillLinkModel.delete_multi(
         old_question_skill_link_models)
-    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+    question_models.QuestionSkillLinkModel.put_multi_for_human(
         new_question_skill_link_models)
 
     old_questions = question_models.QuestionModel.get_multi(list(question_ids))
@@ -442,7 +440,7 @@ def replace_skill_id_for_all_questions(
         new_question.linked_skill_ids.remove(curr_skill_id)
         new_question.linked_skill_ids.append(new_skill_id)
         new_questions.append(new_question)
-    question_models.QuestionModel.put_multi_questions(new_questions)
+    question_models.QuestionModel.put_multi_for_human(new_questions)
 
 
 def get_displayable_question_skill_link_details(
@@ -689,7 +687,6 @@ def save_question_summary(question_summary):
         interaction_id=question_summary.interaction_id
     )
 
-    question_summary_model.update_timestamps()
     question_summary_model.put()
 
 

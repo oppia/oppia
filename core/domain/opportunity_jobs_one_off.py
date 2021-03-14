@@ -138,7 +138,6 @@ class RenameExplorationOpportunitySummaryModelPropertiesJob(
 
         if assigned_voice_artist_in_language_codes or (
                 need_voice_artist_in_language_codes):
-            opportunity_model.update_timestamps(update_last_updated_time=False)
             opportunity_model.put()
 
     @staticmethod

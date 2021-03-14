@@ -85,7 +85,6 @@ class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
         playthrough = self.create_playthrough()
         # Set created_on to a date which is definitely before GSoC 2018.
         playthrough.created_on = datetime.datetime(2017, 12, 31)
-        playthrough.update_timestamps()
         playthrough.put()
         self.create_exp_issues_with_playthroughs([[playthrough.id]])
 
@@ -125,7 +124,6 @@ class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
             [self.exp.id])
         playthrough = self.create_playthrough()
         playthrough.actions.append({'bad schema key': 'bad schema value'})
-        playthrough.update_timestamps()
         playthrough.put()
         self.create_exp_issues_with_playthroughs([[playthrough.id]])
 

@@ -2101,7 +2101,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.author_id, add_translation_change_dict,
             'test description')
 
-        translation_suggestion.last_updated = submission_datetime
+        translation_suggestion.last_updated_by_human = submission_datetime
         return translation_suggestion
 
     def _create_question_suggestion_with_question_html_and_datetime(
@@ -2135,7 +2135,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.author_id, add_question_change_dict,
             'test description')
 
-        question_suggestion.last_updated = submission_datetime
+        question_suggestion.last_updated_by_human = submission_datetime
         return question_suggestion
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(

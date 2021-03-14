@@ -110,13 +110,11 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
         v1_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
         v1_stats.state_stats_mapping[state_name] = state_stats.to_dict()
-        v1_stats.update_timestamps()
         v1_stats.put()
 
         v2_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         del v2_stats.state_stats_mapping[state_name]
-        v2_stats.update_timestamps()
         v2_stats.put()
 
         self.assertEqual(self.run_one_off_job(), [
@@ -151,13 +149,11 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
         v1_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
         v1_stats.state_stats_mapping[old_state_name] = state_stats.to_dict()
-        v1_stats.update_timestamps()
         v1_stats.put()
 
         v2_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         del v2_stats.state_stats_mapping[new_state_name]
-        v2_stats.update_timestamps()
         v2_stats.put()
 
         self.assertEqual(self.run_one_off_job(), [
@@ -191,13 +187,11 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
         snapshot = exp_models.ExplorationModel.SNAPSHOT_METADATA_CLASS.get(
             exp_models.ExplorationModel.get_snapshot_id(exp.id, 2))
         snapshot.commit_cmds[0]['old_state_name'] = fake_old_state_name
-        snapshot.update_timestamps()
-        snapshot.put()
+        snapshot.put_for_human()
 
         v2_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         del v2_stats.state_stats_mapping[new_state_name]
-        v2_stats.update_timestamps()
         v2_stats.put()
 
         self.assertEqual(self.run_one_off_job(), [
@@ -235,7 +229,6 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
         v2_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         del v2_stats.state_stats_mapping['State 2️⃣']
-        v2_stats.update_timestamps()
         v2_stats.put()
 
         self.assertEqual(self.run_one_off_job(), [
@@ -383,7 +376,6 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
         v1_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.exp1.id, 1))
         del v1_stats.state_stats_mapping[self.exp1.init_state_name]
-        v1_stats.update_timestamps()
         v1_stats.put()
 
         v2_stats = stats_models.ExplorationStatsModel.get(
@@ -1190,7 +1182,6 @@ class StatisticsAuditTests(OneOffJobTestBase):
     def test_statistics_audit_with_negative_start_count(self):
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
         model1.num_starts = -2
-        model1.update_timestamps()
         model1.put()
         job_output = self.run_one_off_job()
         self.assertEqual(
@@ -1202,7 +1193,6 @@ class StatisticsAuditTests(OneOffJobTestBase):
     def test_statistics_audit_with_negative_completion_count(self):
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
         model1.num_completions = -2
-        model1.update_timestamps()
         model1.put()
         job_output = self.run_one_off_job()
         self.assertEqual(
@@ -1215,7 +1205,6 @@ class StatisticsAuditTests(OneOffJobTestBase):
     def test_statistics_audit_with_version_all(self):
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
         model1.version = stats_jobs_continuous.VERSION_ALL
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1228,7 +1217,6 @@ class StatisticsAuditTests(OneOffJobTestBase):
         model1 = stats_models.StateCounterModel.get_or_create(
             'exp_id1', 'state_name')
         model1.first_entry_count = -1
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1271,7 +1259,6 @@ class StatisticsAuditVTwoTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.num_completions_v2 = 3
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1285,7 +1272,6 @@ class StatisticsAuditVTwoTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.num_actual_starts_v2 = 3
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1311,7 +1297,6 @@ class StatisticsAuditVTwoTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1338,7 +1323,6 @@ class StatisticsAuditVTwoTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1387,7 +1371,6 @@ class StatisticsAuditVOneTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.num_completions_v1 = 3
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1401,7 +1384,6 @@ class StatisticsAuditVOneTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.num_actual_starts_v1 = 3
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1427,7 +1409,6 @@ class StatisticsAuditVOneTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1454,7 +1435,6 @@ class StatisticsAuditVOneTests(OneOffJobTestBase):
         model1 = stats_models.ExplorationStatsModel.get_model(
             self.EXP_ID, self.EXP_VERSION)
         model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
-        model1.update_timestamps()
         model1.put()
 
         job_output = self.run_one_off_job()
@@ -1621,7 +1601,6 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         v1_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
         del v1_stats.state_stats_mapping[self.state_name]
-        v1_stats.update_timestamps()
         v1_stats.put()
 
         v2_stats = stats_models.ExplorationStatsModel.get(
@@ -1773,7 +1752,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
 
         stats = stats_models.ExplorationStatsModel.get_model('ID', exp.version)
         stats.deleted = True
-        stats.update_timestamps()
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -1804,7 +1782,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         for stats in stats_models.ExplorationStatsModel.get_multi_versions(
                 'ID', [1, 3]):
             stats.deleted = True
-            stats.update_timestamps()
             stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -1831,7 +1808,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.save_new_default_exploration('ID', 'owner_id')
         stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
         del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
-        stats.update_timestamps()
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -1845,7 +1821,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
         stats.state_stats_mapping['Unknown State'] = (
             stats_domain.StateStats.create_default().to_dict())
-        stats.update_timestamps()
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -1859,7 +1834,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
         stats.state_stats_mapping['END'] = (
             stats_domain.StateStats.create_default().to_dict())
-        stats.update_timestamps()
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -1871,7 +1845,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
         stats = stats_models.ExplorationStatsModel.get_model('ID', 2)
         del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
-        stats.update_timestamps()
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -1896,7 +1869,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         stats = stats_models.ExplorationStatsModel.get_model('ID', 3)
         stats.state_stats_mapping['State ②'] = (
             stats_domain.StateStats.create_default().to_dict())
-        stats.update_timestamps()
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -2111,7 +2083,6 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             },
             playthrough_ids=playthrough_ids, schema_version=1, is_valid=True)
         exp_issues_model.unresolved_issues.append(new_exp_issue.to_dict())
-        exp_issues_model.update_timestamps()
         exp_issues_model.put()
 
     def create_playthrough_model(self, exp_id=EXP_ID, exp_version=1):

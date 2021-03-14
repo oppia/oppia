@@ -479,8 +479,7 @@ class TopicSnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
         expected_output = [
             u'[u\'fully-validated TopicSnapshotMetadataModel\', 3]']
 
@@ -489,8 +488,7 @@ class TopicSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
         expected_output = [
             u'[u\'fully-validated TopicSnapshotMetadataModel\', 3]']
 
@@ -500,8 +498,7 @@ class TopicSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of TopicSnapshotMetadataModel\', '
@@ -571,8 +568,7 @@ class TopicSnapshotMetadataModelValidatorTests(
             topic_models.TopicSnapshotMetadataModel(
                 id='0-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
+        model_with_invalid_version_in_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for topic model '
@@ -593,8 +589,7 @@ class TopicSnapshotMetadataModelValidatorTests(
             'cmd': 'delete_subtopic',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -701,7 +696,6 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -756,7 +750,6 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             topic_models.TopicSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1071,8 +1064,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated TopicRightsSnapshotMetadataModel\', 3]']
@@ -1081,8 +1073,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
         expected_output = [
             u'[u\'fully-validated TopicRightsSnapshotMetadataModel\', 3]']
 
@@ -1092,8 +1083,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of TopicRightsSnapshotMetadataModel\', '
@@ -1163,8 +1153,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             topic_models.TopicRightsSnapshotMetadataModel(
                 id='0-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
+        model_with_invalid_version_in_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for topic rights model '
@@ -1187,8 +1176,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             'cmd': 'publish_topic',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -1306,7 +1294,6 @@ class TopicRightsSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1362,7 +1349,6 @@ class TopicRightsSnapshotContentModelValidatorTests(
             topic_models.TopicRightsSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1476,8 +1462,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_user_id_migration_bot(self):
         self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated TopicCommitLogEntryModel\', 6]'
@@ -1487,8 +1472,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_pseudo_user_id(self):
         self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.update_timestamps(update_last_updated_time=False)
-        self.model_instance_1.put()
+        self.model_instance_1.put_for_bot()
 
         expected_output = [
             u'[u\'fully-validated TopicCommitLogEntryModel\', 6]'
@@ -1499,8 +1483,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of TopicCommitLogEntryModel\', '
@@ -1574,8 +1557,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.topic_id = '0'
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
+        model_with_invalid_version_in_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for topic model '
@@ -1599,8 +1581,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.topic_id = '0'
-        model_with_invalid_id.update_timestamps()
-        model_with_invalid_id.put()
+        model_with_invalid_id.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for model id check of '
@@ -1617,8 +1598,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
@@ -1631,8 +1611,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
@@ -1646,8 +1625,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'public'
         self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
 
         expected_output = [
             (
@@ -1663,8 +1641,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'private'
         self.model_instance_0.post_commit_is_private = False
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
 
         expected_output = [
             (
@@ -1684,8 +1661,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             'cmd': 'delete_subtopic',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
+        self.model_instance_0.put_for_human()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -1806,7 +1782,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1842,7 +1817,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         topic_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.topic_model_last_updated = (
             topic_model.last_updated)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1857,7 +1831,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_canonical_story_count(self):
         self.model_instance_0.canonical_story_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1872,7 +1845,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_additional_story_count(self):
         self.model_instance_0.additional_story_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1887,7 +1859,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_uncategorized_skill_count(self):
         self.model_instance_0.uncategorized_skill_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1908,7 +1879,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_total_skill_count(self):
         self.model_instance_0.total_skill_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1924,7 +1894,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_subtopic_count(self):
         self.model_instance_0.subtopic_count = 10
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1940,7 +1909,6 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_topic_related_property(self):
         self.model_instance_0.name = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (

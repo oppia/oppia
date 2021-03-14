@@ -1657,7 +1657,6 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                 missing_exp_versions.append(exp_version)
 
-        exp_issues_model_cls.update_timestamps_multi(exp_issues_models)
         exp_issues_model_cls.put_multi(exp_issues_models)
 
         if num_exp_issues_wiped:

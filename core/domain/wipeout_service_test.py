@@ -47,17 +47,17 @@ import feconf
 import python_utils
 
 (
-    auth_models, collection_models, config_models,
-    email_models, exp_models, feedback_models,
-    improvements_models, question_models, skill_models,
-    story_models, subtopic_models, suggestion_models,
-    topic_models, user_models
+    auth_models, base_models, collection_models,
+    config_models, email_models, exp_models,
+    feedback_models, improvements_models, question_models,
+    skill_models, story_models, subtopic_models,
+    suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.auth, models.NAMES.base_model, models.NAMES.collection,
+    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -638,8 +638,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
                 '%s-1' % self.CONFIG_1_ID)
         )
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -949,7 +948,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             commit_cmds=[{}],
             post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
             version=1
-        ).put()
+        ).put_for_human()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
@@ -1020,8 +1019,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -1064,7 +1062,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {self.user_1_id: 2}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(
@@ -1091,7 +1088,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(
@@ -1207,7 +1203,7 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
             commit_message='123',
             commit_type='create',
             commit_cmds={}
-        ).put()
+        ).put_for_human()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
@@ -1347,7 +1343,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             commit_cmds=[{}],
             post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
             version=1
-        ).put()
+        ).put_for_human()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
@@ -1409,8 +1405,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -1450,7 +1445,6 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {self.user_1_id: 2}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(
@@ -1475,7 +1469,6 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         old_summary_model.contributor_ids = [self.user_1_id]
         old_summary_model.contributors_summary = {}
-        old_summary_model.update_timestamps()
         old_summary_model.put()
 
         wipeout_service.delete_user(
@@ -1586,7 +1579,7 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
             commit_message='123',
             commit_type='create',
             commit_cmds={}
-        ).put()
+        ).put_for_human()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
@@ -1751,14 +1744,14 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             has_suggestion=True,
             last_nonempty_message_text='Some text',
             last_nonempty_message_author_id=self.user_2_id
-        ).put()
+        ).put_for_human()
         feedback_models.GeneralFeedbackMessageModel(
             id=self.MESSAGE_1_ID,
             thread_id=self.FEEDBACK_1_ID,
             message_id=0,
             author_id=self.user_2_id,
             text='Some text'
-        ).put()
+        ).put_for_human()
         suggestion_models.GeneralSuggestionModel(
             id=self.FEEDBACK_1_ID,
             suggestion_type=(
@@ -1771,7 +1764,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             final_reviewer_id=self.user_2_id,
             change_cmd={},
             score_category=suggestion_models.SCORE_TYPE_CONTENT
-        ).put()
+        ).put_for_human()
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -1813,8 +1806,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                 self.FEEDBACK_1_ID)
         )
         feedback_thread_model.original_author_id = self.user_1_id
-        feedback_thread_model.update_timestamps()
-        feedback_thread_model.put()
+        feedback_thread_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -1850,8 +1842,6 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     last_nonempty_message_author_id=self.user_2_id
                 )
             )
-            feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
-                feedback_thread_models)
         feedback_message_models = []
         for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
             feedback_message_models.append(
@@ -1863,9 +1853,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     text='Some text'
                 )
             )
-            feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
-                feedback_message_models)
-        datastore_services.put_multi(
+        base_models.BaseHumanMaintainedModel.put_multi_for_human(
             feedback_thread_models + feedback_message_models)
 
         wipeout_service.delete_user(
@@ -1963,14 +1951,14 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             has_suggestion=True,
             last_nonempty_message_text='Some text',
             last_nonempty_message_author_id=self.user_1_id
-        ).put()
+        ).put_for_human()
         feedback_models.GeneralFeedbackMessageModel(
             id=self.MESSAGE_1_ID,
             thread_id=self.FEEDBACK_1_ID,
             message_id=0,
             author_id=self.user_1_id,
             text='Some text'
-        ).put()
+        ).put_for_human()
         suggestion_models.GeneralSuggestionModel(
             id=self.FEEDBACK_1_ID,
             suggestion_type=(
@@ -1983,7 +1971,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             final_reviewer_id=self.user_1_id,
             change_cmd={},
             score_category=suggestion_models.SCORE_TYPE_CONTENT
-        ).put()
+        ).put_for_human()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -2006,7 +1994,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             has_suggestion=True,
             last_nonempty_message_text='Some text',
             last_nonempty_message_author_id=self.user_1_id
-        ).put()
+        ).put_for_human()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
@@ -2208,7 +2196,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             commit_cmds=[{}],
             post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
             version=1
-        ).put()
+        ).put_for_human()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
@@ -2260,8 +2248,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -2598,7 +2585,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             commit_cmds=[{}],
             post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
             version=1
-        ).put()
+        ).put_for_human()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
@@ -2638,8 +2625,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -2902,7 +2888,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_cmds=[{}],
             post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
             version=1
-        ).put()
+        ).put_for_human()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
@@ -2942,8 +2928,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -3221,7 +3206,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             commit_cmds=[{}],
             post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
             version=1
-        ).put()
+        ).put_for_human()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
@@ -3263,8 +3248,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -3490,7 +3474,7 @@ class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             commit_message='123',
             commit_type='create',
             commit_cmds={}
-        ).put()
+        ).put_for_human()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
@@ -3774,7 +3758,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             commit_cmds=[{}],
             post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
             version=1
-        ).put()
+        ).put_for_human()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
@@ -3834,8 +3818,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
-        metadata_model.update_timestamps()
-        metadata_model.put()
+        metadata_model.put_for_human()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -3942,7 +3925,7 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
             commit_message='123',
             commit_type='create',
             commit_cmds={}
-        ).put()
+        ).put_for_human()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 

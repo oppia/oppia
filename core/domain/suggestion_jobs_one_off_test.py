@@ -163,8 +163,7 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
 
         # Adding some invalid values in suggestion.
         suggestion_model.language_code = None
-        suggestion_model.update_timestamps(update_last_updated_time=False)
-        suggestion_model.put()
+        suggestion_model.put_for_bot()
 
         expected_output = [
             u'[u\'POST_MIGRATION_VALIDATION_FALIURE\', '
@@ -1208,8 +1207,7 @@ class PopulateContributionStatsOneOffJobTests(
             question_suggestion.suggestion_id
         )
         suggestion_model.deleted = True
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
+        suggestion_model.put_for_human()
 
         self._run_job_and_verify_output(expected_output)
 
@@ -1237,7 +1235,6 @@ class PopulateContributionStatsOneOffJobTests(
                 self.reviewer_1_id)
         )
         user_contribution_rights_model.deleted = True
-        user_contribution_rights_model.update_timestamps()
         user_contribution_rights_model.put()
 
         self._run_job_and_verify_output(expected_output)
@@ -1558,13 +1555,12 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
         suggestion_model.deleted = True
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
+        suggestion_model.put_for_human()
 
         expected_output = [u'[u\'DELETED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
@@ -1586,7 +1582,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=self.reviewer_id,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         expected_output = [u'[u\'UNCHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
@@ -1607,7 +1603,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.0',
@@ -1615,7 +1611,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
-        ).put()
+        ).put_for_human()
 
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
@@ -1636,7 +1632,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.0',
@@ -1644,7 +1640,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_IGNORED
-        ).put()
+        ).put_for_human()
 
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
@@ -1665,7 +1661,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         expected_output = [
             u'[u\'FAILED_NONE_MESSAGE_MODEL\', '
@@ -1688,7 +1684,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=self.edit_state_content_change_dict,
             score_category='score_category'
-        ).put()
+        ).put_for_human()
 
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.0',
@@ -1696,14 +1692,14 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
-        ).put()
+        ).put_for_human()
         feedback_models.GeneralFeedbackMessageModel(
             id=self.EXPLORATION_THREAD_ID + '.1',
             thread_id=self.EXPLORATION_THREAD_ID,
             message_id=1,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
-        ).put()
+        ).put_for_human()
 
         expected_output = [
             u'[u\'FAILED_MULTIPLE_MESSAGE_MODEL\', '
@@ -1742,7 +1738,7 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=change_cmd,
             score_category='score_category'
-        ).put()
+        ).put_depending_on_id(self.author_id)
 
     def _run_job_and_verify_output(self, expected_output):
         """Runs the ContentSuggestionFormatUpdateOneOffJob and
@@ -1798,7 +1794,7 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
             final_reviewer_id=None,
             change_cmd=change_cmd,
             score_category='score_category'
-        ).put()
+        ).put_depending_on_id(self.author_id)
 
         self._run_job_and_verify_output([])
         retrieved_suggestion_model = (
@@ -1848,7 +1844,9 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
         new_suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(
-            new_suggestion.last_updated, old_suggestion.last_updated)
+            new_suggestion.last_updated_by_human,
+            old_suggestion.last_updated_by_human
+        )
 
         retrieved_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -1885,7 +1883,9 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
         new_suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(
-            new_suggestion.last_updated, old_suggestion.last_updated)
+            new_suggestion.last_updated_by_human,
+            old_suggestion.last_updated_by_human
+        )
 
         retrieved_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -1929,7 +1929,9 @@ class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
         new_suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(
-            new_suggestion.last_updated, old_suggestion.last_updated)
+            new_suggestion.last_updated_by_human,
+            old_suggestion.last_updated_by_human
+        )
 
         retrieved_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(

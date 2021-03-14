@@ -164,8 +164,7 @@ class ExplorationModel(base_models.VersionedModel):
             commit_cmds, exp_rights.status, exp_rights.community_owned
         )
         exploration_commit_log.exploration_id = self.id
-        exploration_commit_log.update_timestamps()
-        exploration_commit_log.put()
+        exploration_commit_log.put_depending_on_id(committer_id)
 
     @classmethod
     def delete_multi(
@@ -204,8 +203,6 @@ class ExplorationModel(base_models.VersionedModel):
                 )
                 exploration_commit_log.exploration_id = model.id
                 commit_log_models.append(exploration_commit_log)
-            ExplorationCommitLogEntryModel.update_timestamps_multi(
-                commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
     @staticmethod
@@ -560,7 +557,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put()
+            ).put_depending_on_id(committer_id)
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
@@ -583,8 +580,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.update_timestamps()
-        snapshot_metadata_model.put()
+        snapshot_metadata_model.put_depending_on_id(committer_id)
 
     @classmethod
     def export_data(cls, user_id):
@@ -727,8 +723,9 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
         query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
         if max_age:
+            threshold_datetime = datetime.datetime.utcnow() - max_age
             query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age)
+                cls.last_updated_by_human >= threshold_datetime)
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
 

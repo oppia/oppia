@@ -48,6 +48,7 @@ import webtest
     models.NAMES.exploration, models.NAMES.job,
     models.NAMES.suggestion, models.NAMES.user
 ])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
@@ -83,6 +84,14 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+
+        def mock_pre_put_hook(self):
+            """Operations to perform just before the model is `put`
+            into storage.
+            """
+            if self.created_on is None:
+                self.created_on = datetime.datetime.utcnow()
+        self.mock_pre_put_hook = mock_pre_put_hook
 
     def test_send_mail_to_admin_on_job_success(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -341,9 +350,12 @@ class CronJobTests(test_utils.GenericTestBase):
             last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
             deleted=True
         )
-        completed_activities_model.update_timestamps(
-            update_last_updated_time=False)
-        completed_activities_model.put()
+        with self.swap(
+            user_models.CompletedActivitiesModel,
+            '_pre_put_hook',
+            self.mock_pre_put_hook
+        ):
+            completed_activities_model.put()
 
         with self.testapp_swap:
             self.get_html_response('/cron/models/cleanup')
@@ -378,9 +390,12 @@ class CronJobTests(test_utils.GenericTestBase):
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
             last_updated=datetime.datetime.utcnow() - self.FIVE_WEEKS
         )
-        user_query_model.update_timestamps(update_last_updated_time=False)
-        user_query_model.put()
-
+        with self.swap(
+            user_models.UserQueryModel,
+            '_pre_put_hook',
+            self.mock_pre_put_hook
+        ):
+            user_query_model.put()
         with self.testapp_swap:
             self.get_html_response('/cron/models/cleanup')
 
