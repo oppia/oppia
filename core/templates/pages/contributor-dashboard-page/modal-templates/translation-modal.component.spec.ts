@@ -21,6 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { copy } from 'angular';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { TranslationModalContent, TranslationOpportunityDict } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
@@ -129,6 +130,8 @@ describe('Login Required Modal Content', () => {
     it('should initialize translateTextService', fakeAsync(() => {
       spyOn(translateTextService, 'init').and.callThrough();
       spyOn(translateTextService, 'getTextToTranslate').and.callThrough();
+      spyOn(translateTextService, 'getPreviousTextToTranslate')
+        .and.callThrough();
       component.ngOnInit();
       expect(component.loadingData).toBeTrue();
       expect(translateTextService.init).toHaveBeenCalled();
@@ -151,6 +154,12 @@ describe('Login Required Modal Content', () => {
 
       expect(component.textToTranslate).toBe('text1');
       expect(component.moreAvailable).toBeTrue();
+      component.skipActiveTranslation();
+      component.returnToPreviousTranslation();
+      expect(translateTextService.getPreviousTextToTranslate)
+        .toHaveBeenCalled();
+      expect(component.textToTranslate).toBe('text1');
+      expect(component.moreAvailable).toBeFalse();
     }));
 
     it('should set the schema constant based on the active language', fakeAsync(
