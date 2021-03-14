@@ -92,7 +92,6 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -114,7 +113,6 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
             datetime.datetime.utcnow() - datetime.timedelta(days=1))
         self.model_instance_0.last_logged_in = mock_time
         self.model_instance_0.last_agreed_to_terms = mock_time
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
@@ -131,7 +129,6 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_schema(self):
         self.model_instance_1.email = 'invalid'
-        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [
             (
@@ -147,7 +144,6 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_time_field(self):
         self.model_instance_0.last_created_an_exploration = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -165,7 +161,6 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_first_contribution_msec(self):
         self.model_instance_0.first_contribution_msec = (
             utils.get_current_time_in_millisecs() * 10)
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -209,7 +204,6 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
 
     def test_repeated_normalized_username(self):
         self.model_instance_1.normalized_username = USER_NAME
-        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         sorted_user_ids = sorted([self.user_id, self.admin_id])
         expected_output = [(
@@ -223,10 +217,8 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
 
     def test_normalized_username_not_set(self):
         self.model_instance_0.normalized_username = None
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         self.model_instance_1.normalized_username = None
-        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
 
         expected_output = []
@@ -307,7 +299,6 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -381,7 +372,6 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_exploration(self):
         self.model_instance.exploration_ids.append('0')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for exploration_ids match '
@@ -394,7 +384,6 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_collection(self):
         self.model_instance.collection_ids.append('3')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for collection_ids match '
@@ -410,7 +399,6 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'exp', title='title', category='category')
         exp_services.save_new_exploration(self.owner_id, exp)
         self.model_instance.exploration_ids.append('exp')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -426,7 +414,6 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'col', title='title', category='category')
         collection_services.save_new_collection(self.owner_id, col)
         self.model_instance.collection_ids.append('col')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -512,7 +499,6 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -586,7 +572,6 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_exploration(self):
         self.model_instance.exploration_ids.append('0')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for exploration_ids match '
@@ -599,7 +584,6 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_collection(self):
         self.model_instance.collection_ids.append('3')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for collection_ids match '
@@ -615,7 +599,6 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'exp', title='title', category='category')
         exp_services.save_new_exploration(self.owner_id, exp)
         self.model_instance.exploration_ids.append('exp')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -631,7 +614,6 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'col', title='title', category='category')
         collection_services.save_new_collection(self.owner_id, col)
         self.model_instance.collection_ids.append('col')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -704,7 +686,6 @@ class ExpUserLastPlaythroughModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -763,7 +744,6 @@ class ExpUserLastPlaythroughModelValidatorTests(
 
     def test_complete_exploration_in_exploration_id(self):
         self.model_instance.exploration_id = '1'
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -790,7 +770,6 @@ class ExpUserLastPlaythroughModelValidatorTests(
 
     def test_invalid_version(self):
         self.model_instance.last_played_exp_version = 10
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -804,7 +783,6 @@ class ExpUserLastPlaythroughModelValidatorTests(
 
     def test_invalid_state_name(self):
         self.model_instance.last_played_state_name = 'invalidθ'
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -894,7 +872,6 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -968,7 +945,6 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_completed_exploration(self):
         self.model_instance.exploration_ids.append('0')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for exploration_ids match '
@@ -981,7 +957,6 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_incomplete_exploration(self):
         self.model_instance.exploration_ids.append('1')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for exploration_ids match '
@@ -994,7 +969,6 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_completed_collection(self):
         self.model_instance.collection_ids.append('4')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for collection_ids match '
@@ -1007,7 +981,6 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_common_incomplete_collection(self):
         self.model_instance.collection_ids.append('5')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for collection_ids match '
@@ -1023,7 +996,6 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
             'exp', title='title', category='category')
         exp_services.save_new_exploration(self.owner_id, exp)
         self.model_instance.exploration_ids.append('exp')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -1039,7 +1011,6 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
             'col', title='title', category='category')
         collection_services.save_new_collection(self.owner_id, col)
         self.model_instance.collection_ids.append('col')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -1104,7 +1075,6 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1212,7 +1182,6 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1315,7 +1284,6 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1347,7 +1315,6 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_last_checked(self):
         self.model_instance.last_checked = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -1364,7 +1331,6 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
         subscriber_model = user_models.UserSubscribersModel.get_by_id(
             self.owner_id)
         subscriber_model.subscriber_ids.remove(self.user_id)
-        subscriber_model.update_timestamps()
         subscriber_model.put()
         expected_output = [
             (
@@ -1442,7 +1408,6 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1472,7 +1437,6 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_user_id_in_subscriber_ids(self):
         self.model_instance.subscriber_ids.append(self.owner_id)
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -1494,7 +1458,6 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
         subscription_model = user_models.UserSubscriptionsModel.get_by_id(
             self.user_id)
         subscription_model.creator_ids.remove(self.owner_id)
-        subscription_model.update_timestamps()
         subscription_model.put()
         expected_output = [(
             u'[u\'failed validation check for subscription creator id '
@@ -1543,7 +1506,6 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.model_instance = user_models.UserRecentChangesBatchModel(
             id=self.user_id, job_queued_msec=10)
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         self.job_class = (
             prod_validation_jobs_one_off
@@ -1558,7 +1520,6 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1589,7 +1550,6 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_job_queued_msec(self):
         self.model_instance.job_queued_msec = (
             utils.get_current_time_in_millisecs() * 10)
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for job queued msec check of '
@@ -1635,7 +1595,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = user_models.UserStatsModel(
             id=self.user_id, impact_score=10, total_plays=5, average_ratings=4,
             weekly_creator_stats_list=weekly_creator_stats_list)
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         self.job_class = (
             prod_validation_jobs_one_off.UserStatsModelAuditOneOffJob)
@@ -1649,7 +1608,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1674,7 +1632,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'total_plays': 5
             }
         }]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
@@ -1692,7 +1649,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_schema_version(self):
         self.model_instance.schema_version = (
             feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION + 10)
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for schema version check of '
@@ -1713,7 +1669,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'total_plays': 5
             }
         }]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for weekly creator stats list '
@@ -1734,7 +1689,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'total_plays': 5
             }
         }]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for weekly creator stats '
@@ -1749,7 +1703,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.weekly_creator_stats_list = [{
             self.datetime_key: 'invalid'
         }]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for weekly creator stats list '
@@ -1764,7 +1717,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'invalid': 2
             }
         }]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for weekly creator stats '
@@ -1782,7 +1734,6 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'total_plays': 4
             }
         }]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for weekly creator stats '
@@ -1832,7 +1783,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
             datetime.datetime.utcnow())
         self.model_instance.rating = 4
         self.model_instance.rated_on = datetime.datetime.utcnow()
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         self.job_class = (
             prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob)
@@ -1846,7 +1796,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1864,7 +1813,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
         mock_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         self.model_instance.draft_change_list_last_updated = mock_time
         self.model_instance.rated_on = mock_time
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
@@ -1908,7 +1856,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_null_draft_change_list(self):
         self.model_instance.draft_change_list = None
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             u'[u\'fully-validated ExplorationUserDataModel\', 1]']
@@ -1919,7 +1866,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.draft_change_list = [{
             'cmd': 'invalid'
         }]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for draft change list check '
@@ -1931,7 +1877,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_exp_version(self):
         self.model_instance.draft_change_list_exp_version = 2
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for exp version check '
@@ -1945,7 +1890,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_draft_change_list_last_updated(self):
         self.model_instance.draft_change_list_last_updated = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for draft change list last '
@@ -1959,7 +1903,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_draft_change_list_last_updated_as_none(self):
         self.model_instance.draft_change_list_last_updated = None
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for draft change list last '
@@ -1973,7 +1916,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_rating(self):
         self.model_instance.rating = -1
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for ratings check of '
@@ -1986,7 +1928,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_rated_on(self):
         self.model_instance.rated_on = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for rated on check of '
@@ -1998,7 +1939,6 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_rated_on_as_none(self):
         self.model_instance.rated_on = None
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for rated on check of '
@@ -2064,7 +2004,6 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -2173,7 +2112,6 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_completed_exploration_missing_in_completed_activities(self):
         self.model_instance.completed_explorations.append('2')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for completed exploration check of '
@@ -2186,7 +2124,6 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_completed_exploration_missing_in_collection(self):
         self.model_instance.completed_explorations.append('3')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for completed exploration check '
@@ -2271,7 +2208,6 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -2341,7 +2277,6 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_completed_node_missing_in_story_node_ids(self):
         self.model_instance.completed_node_ids.append('invalid')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for completed node check of '
@@ -2377,7 +2312,6 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         completed_activities_model = (
             user_models.CompletedActivitiesModel.get_by_id(self.user_id))
         completed_activities_model.exploration_ids.remove('1')
-        completed_activities_model.update_timestamps()
         completed_activities_model.put()
         expected_output = [(
             u'[u\'failed validation check for explorations in completed '
@@ -2410,8 +2344,15 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = user_models.UserQueryModel.get_by_id(
             self.user_query_id)
         self.model_instance.user_ids = [self.owner_id, self.user_id]
-        self.model_instance.update_timestamps()
         self.model_instance.put()
+
+        def mock_pre_put_hook(self):
+            """Operations to perform just before the model is `put`
+            into storage.
+            """
+            if self.created_on is None:
+                self.created_on = datetime.datetime.utcnow()
+        self.mock_pre_put_hook = mock_pre_put_hook
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             user_query_services.send_email_to_qualified_users(
@@ -2421,7 +2362,6 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
         self.model_instance.deleted = False
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         self.job_class = (
             prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob)
@@ -2435,7 +2375,6 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -2497,7 +2436,6 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
             self.sent_mail_id)
         bulk_email_model.recipient_ids.append('invalid')
-        bulk_email_model.update_timestamps()
         bulk_email_model.put()
         expected_output = [
             (
@@ -2514,7 +2452,6 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
             self.sent_mail_id)
         bulk_email_model.sender_id = 'invalid'
-        bulk_email_model.update_timestamps()
         bulk_email_model.put()
         expected_output = [
             (
@@ -2544,8 +2481,12 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             self.model_instance.created_on - datetime.timedelta(weeks=5))
         self.model_instance.last_updated = (
             self.model_instance.last_updated - datetime.timedelta(weeks=5))
-        self.model_instance.update_timestamps(update_last_updated_time=False)
-        self.model_instance.put()
+        with self.swap(
+            user_models.UserQueryModel,
+            '_pre_put_hook',
+            self.mock_pre_put_hook
+        ):
+            self.model_instance.put()
         expected_output = [(
             '[u\'failed validation check for entity stale check of '
             'UserQueryModel\', [u\'Entity id %s: '
@@ -2556,7 +2497,6 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_not_marked_as_deleted_when_query_status_set_as_archived(
             self):
         self.model_instance.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             '[u\'failed validation check for entity stale check of '
@@ -2587,7 +2527,6 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         query_model = user_models.UserQueryModel.get_by_id(
             self.user_query_id)
         query_model.user_ids = [self.owner_id, self.user_id]
-        query_model.update_timestamps()
         query_model.put()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -2609,7 +2548,6 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -2672,7 +2610,6 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
             self.sent_mail_id)
         bulk_email_model.recipient_ids.remove(self.user_id)
-        bulk_email_model.update_timestamps()
         bulk_email_model.put()
         expected_output = [
             (
@@ -2722,7 +2659,6 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -2781,7 +2717,6 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_skill_mastery(self):
         self.model_instance.degree_of_mastery = 10
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for skill mastery check '
@@ -2820,7 +2755,6 @@ class UserContributionProficiencyModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -2864,7 +2798,6 @@ class UserContributionProficiencyModelValidatorTests(
 
     def test_invalid_score(self):
         self.model_instance.score = -1
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for score check of '
@@ -2933,7 +2866,6 @@ class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             self.translator_model_instance
             .can_review_voiceover_for_language_codes.append('invalid_lang_code')
         )
-        self.translator_model_instance.update_timestamps()
         self.translator_model_instance.put()
         expected_output = [
             (
@@ -2979,7 +2911,6 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -3021,7 +2952,6 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_user_settings_model_not_marked_deleted_failure(self):
         user_model = user_models.UserSettingsModel.get_by_id(self.user_id)
         user_model.deleted = False
-        user_model.update_timestamps()
         user_model.put()
         expected_output = [
             (
@@ -3036,7 +2966,6 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.pseudonymizable_entity_mappings = {
             models.NAMES.audit: {'some_id': 'id'}
         }
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -3081,7 +3010,6 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -3145,7 +3073,6 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = (
             user_models.PseudonymizedUserModel(
                 id=user_models.PseudonymizedUserModel.get_new_id('')))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -3160,7 +3087,6 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -3241,7 +3167,6 @@ class DeletedUsernameModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
