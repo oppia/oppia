@@ -1,9 +1,11 @@
 <ngb-accordion #acc="ngbAccordion" class="collapsible-rte">
   <ngb-panel id="toggle-1">
     <ng-template ngbPanelHeader let-opened="opened">
-      <div (click)="acc.toggle('toggle-1')">
-        <i class="material-icons float-right md-18" ng-show="$ctrl.isOpen"> {{ opened ? '&#xE15C;' : '&#xE147;' }}</i>
-        <div class="protractor-test-collapsible-heading"> {{ heading }}</div>
+      <div class="panel-title fx-row d-flex justify-content-between" (click)="acc.toggle('toggle-1')">
+        <div class="protractor-test-collapsible-heading fx-main-start fx-cross-center"> {{ heading }}</div>
+        <div class="fx-main-end fx-cross-center">
+          <i class="material-icons md-18"> {{ opened ? '&#xE15C;' : '&#xE147;' }}</i>
+        </div>
       </div>
     </ng-template>
     <ng-template ngbPanelContent>
@@ -17,7 +19,7 @@
 
 <!-- TODO(#7851): This styling is required since ui-bootstrap does not work correctly with bootstrap 4. We need to switch from ui-bootstrap to ng-bootstrap once we have upgraded the collapsible component to Angular 8.-->
 <style>
-  .collapsible-rte .panel {
+  .collapsible-rte /deep/ .card {
     background-color: #fff;
     border: 1px solid transparent;
     border-radius: 4px;
@@ -25,39 +27,40 @@
     box-shadow: 0 1px 1px rgba(0,0,0,.05);
     margin-bottom: 20px;
   }
-  .collapsible-rte .panel-heading {
+  .collapsible-rte /deep/ .card-header {
     border-bottom: 1px solid transparent;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     padding: 10px 15px;
   }
-  .collapsible-rte .panel-group {
+  .collapsible-rte /deep/ .panel-group {
     margin-bottom: 20px;
   }
-  .collapsible-rte .panel-title {
+  .collapsible-rte /deep/ .panel-title {
     color: inherit;
     font-size: 16px;
     margin-bottom: 0;
     margin-top: 0;
+    width: 100%;
   }
-  .collapsible-rte .panel-title>a,
-  .collapsible-rte .panel-title>small,
-  .collapsible-rte .panel-title>.small,
-  .collapsible-rte .panel-title>small>a,
-  .collapsible-rte .panel-title>.small>a {
+  .collapsible-rte /deep/ .panel-title>a,
+  .collapsible-rte /deep/ .panel-title>small,
+  .collapsible-rte /deep/ .panel-title>.small,
+  .collapsible-rte /deep/ .panel-title>small>a,
+  .collapsible-rte /deep/ .panel-title>.small>a {
     color: inherit;
   }
-  .collapsible-rte .panel-group .panel-heading {
+  .collapsible-rte /deep/ .panel-group .card-header {
     border-bottom: 0;
   }
-  .collapsible-rte .panel-group .panel {
+  .collapsible-rte /deep/ .panel-group .card {
     border-radius: 4px;
     margin-bottom: 0;
   }
-  .collapsible-rte .collapse {
+  .collapsible-rte /deep/ .collapse {
     display: none;
   }
-  .collapsible-rte .collapse.in {
+  .collapsible-rte /deep/ .collapse.show {
     display: block;
   }
 </style>
