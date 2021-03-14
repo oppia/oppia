@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -41,7 +42,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryFetchersUnitTests, self).setUp()
         self.STORY_ID = story_services.get_new_story_id()
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
             description='A new topic', canonical_story_ids=[],
