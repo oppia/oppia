@@ -64,51 +64,43 @@ describe('TranslateTextService', () => {
         text: 'text2',
         more: true
       };
-<<<<<<< HEAD
-      textAndAvailability = translateTextService.getTextToTranslate();
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
-=======
->>>>>>> upstream/develop
 
       const expectedTextAndAvailability1 = {
         text: 'text1',
         more: true
       };
-<<<<<<< HEAD
-      textAndAvailability = translateTextService.getTextToTranslate();
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
-=======
->>>>>>> upstream/develop
 
       const expectedTextAndPreviousAvailability1 = {
         text: 'text1',
         more: false
       };
-<<<<<<< HEAD
+
+      // console.log(translateTextService.getTextToTranslate());
       textAndAvailability = translateTextService.getTextToTranslate();
-=======
-
-      textAndAvailability = TranslateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
-
-      textAndAvailability = TranslateTextService.getTextToTranslate();
+      textAndAvailability = translateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
 
-      textAndAvailability = TranslateTextService.getTextToTranslate();
+      textAndAvailability = translateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
 
-      textAndAvailability = TranslateTextService.getPreviousTextToTranslate();
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+      // textAndAvailability = translateTextService.getPreviousTextToTranslate();
+      // expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
 
-      textAndAvailability = TranslateTextService.getPreviousTextToTranslate();
-      expect(textAndAvailability).toEqual(expectedTextAndPreviousAvailability1);
+      // console.log(translateTextService.getTextToTranslate());
 
-      textAndAvailability = TranslateTextService.getTextToTranslate();
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+      // textAndAvailability = translateTextService.getPreviousTextToTranslate();
+      // expect(textAndAvailability).toEqual(expectedTextAndPreviousAvailability1);
+      
+      // console.log(translateTextService.getTextToTranslate());
 
-      textAndAvailability = TranslateTextService.getTextToTranslate();
->>>>>>> upstream/develop
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
+      // textAndAvailability = translateTextService.getTextToTranslate();
+      // expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+
+      // // console.log(translateTextService);
+
+      // textAndAvailability = translateTextService.getTextToTranslate();
+      // expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
     }));
 
     it('should return no more available for states with no texts',
@@ -158,17 +150,12 @@ describe('TranslateTextService', () => {
 
         const textAndAvailability = translateTextService.getTextToTranslate();
 
-<<<<<<< HEAD
         expect(textAndAvailability).toEqual(expectedTextAndAvailability);
+
+        const textAndPreviousAvailability =
+       translateTextService.getPreviousTextToTranslate();
+
+        expect(textAndAvailability).toEqual(textAndPreviousAvailability);
       }));
-=======
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability);
-
-      const textAndPreviousAvailability =
-       TranslateTextService.getPreviousTextToTranslate();
-
-      expect(textAndAvailability).toEqual(textAndPreviousAvailability);
-    });
->>>>>>> upstream/develop
   });
 });

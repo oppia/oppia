@@ -59,6 +59,7 @@ export class TranslationModalContent {
   moreAvailable = false;
   textToTranslate = '';
   languageDescription: string;
+  previousTranslationAvailable: boolean = false;
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
@@ -134,6 +135,13 @@ export class TranslationModalContent {
     this.textToTranslate = textAndAvailability.text;
     this.moreAvailable = textAndAvailability.more;
     this.activeWrittenTranslation.html = '';
+  }
+
+  returnToPreviousTranslation(): void {
+    const textAndAvailability = (
+      this.translateTextService.getPreviousTextToTranslate());
+    this.textToTranslate = textAndAvailability.text;
+    this.previousTranslationAvailable = textAndAvailability.more;
   }
 
   suggestTranslatedText(): void {

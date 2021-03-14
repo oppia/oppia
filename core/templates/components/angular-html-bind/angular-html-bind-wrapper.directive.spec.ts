@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
-=======
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
->>>>>>> upstream/develop
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
