@@ -24,6 +24,7 @@ import datetime
 import itertools
 import json
 import logging
+import operator
 
 from core.domain import auth_domain
 from core.domain import user_services
@@ -32,6 +33,7 @@ from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import python_utils
+import utils
 
 import contextlib2
 import firebase_admin
@@ -74,9 +76,22 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 self.assertEqual(user_record.uid, 'uid')
     """
 
+    _IMPLEMENTED_SDK_FUNCTION_NAMES = [
+        'create_session_cookie',
+        'create_user',
+        'delete_user',
+        'delete_users',
+        'get_user',
+        'get_user_by_email',
+        'import_users',
+        'set_custom_user_claims',
+        'update_user',
+        'verify_id_token',
+        'verify_session_cookie',
+    ]
+
     _UNIMPLEMENTED_SDK_FUNCTION_NAMES = [
         'create_custom_token',
-        'create_user',
         'generate_email_verification_link',
         'generate_password_reset_link',
         'generate_sign_in_with_email_link',
@@ -92,67 +107,62 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._test = None
 
     def install(self, test):
-        """Installs a new instance of the stub on the given test class.
-
-        The stub will emulate an initially-empty Firebase authentication server.
+        """Installs the stub on the given test instance. Idempotent.
 
         Args:
             test: test_utils.TestBase. The test to install the stub on.
         """
+        self.uninstall()
+
         self._test = test
 
         with contextlib2.ExitStack() as swap_stack:
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth,
-                'create_session_cookie', self._create_session_cookie))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth,
-                'verify_session_cookie', self._verify_session_cookie))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'import_users', self._import_users))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'verify_id_token', self._verify_id_token))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'get_user', self.get_user))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'get_user_by_email',
-                self.get_user_by_email))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'delete_user', self._delete_user))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'update_user', self._update_user))
-            swap_stack.enter_context(test.swap(
-                firebase_admin.auth, 'set_custom_user_claims',
-                self._set_custom_user_claims))
+            for name in self._IMPLEMENTED_SDK_FUNCTION_NAMES:
+                swap_stack.enter_context(
+                    test.swap(firebase_admin.auth, name, getattr(self, name)))
 
-            for function_name in self._UNIMPLEMENTED_SDK_FUNCTION_NAMES:
+            for name in self._UNIMPLEMENTED_SDK_FUNCTION_NAMES:
                 swap_stack.enter_context(test.swap_to_always_raise(
-                    firebase_admin.auth, function_name, NotImplementedError))
+                    firebase_admin.auth, name, NotImplementedError))
 
-            # Standard usage of ExitStack: enter a bunch of context managers
-            # from the safety of an ExitStack's context. Once they've all been
-            # opened, pop_all() of them off of the original context so they can
-            # *stay* open. Calling the function returned will exit all of them
-            # in reverse order.
-            # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
+            # Allows us to exit the current context manager without closing the
+            # entered contexts. They will be exited later by the uninstall()
+            # method.
             self._swap_stack = swap_stack.pop_all()
 
     def uninstall(self):
-        """Uninstalls the stub."""
+        """Uninstalls the stub. Idempotent."""
         if self._swap_stack:
             self._swap_stack.close()
             self._swap_stack = None
 
-    def create_user(
-            self, uid, email=None, disabled=False, role_is_super_admin=False):
+    def create_session_cookie(self, id_token, max_age):
+        """Creates a new session cookie which expires after given duration.
+
+        Args:
+            id_token: str. The ID Token to generate the cookie from.
+            max_age: datetime.timedelta. The duration the cookie remains valid.
+
+        Returns:
+            str. A session cookie that can validate the user.
+        """
+        if not id_token:
+            raise firebase_admin.auth.InvalidIdTokenError('missing id_token')
+        if max_age > datetime.timedelta(days=0):
+            self._session_cookie_duration_by_id_token[id_token] = max_age
+        # NOTE: Session cookies are often completely different, in terms of
+        # encoding and security, to ID Tokens. Regardless, for the purposes of
+        # this stub, we treat them the same.
+        session_cookie = id_token
+        return session_cookie
+
+    def create_user(self, uid, email=None, disabled=False):
         """Adds user to storage if new, otherwise raises an error.
 
         Args:
             uid: str. The unique Firebase account ID for the user.
             email: str|None. The email address for the user, or None.
             disabled: bool. Whether the user account is to be disabled.
-            role_is_super_admin: bool. Whether the user account has super admin
-                privilages.
 
         Returns:
             str. An ID token that represents the given user's authorization.
@@ -162,60 +172,172 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             UidAlreadyExistsError. The uid has already been assigned to a user.
         """
         if uid in self._users_by_uid:
-            raise ValueError('uid=%r already exists' % uid)
-        custom_claims = (
-            {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN}
-            if role_is_super_admin else None)
-        self._set_user_fragile(uid, email, disabled, custom_claims)
+            raise firebase_admin.auth.UidAlreadyExistsError(
+                'uid=%r already exists' % uid)
+        self._set_user_fragile(uid, email, disabled, None)
         return self._encode_user_claims(self.get_user(uid))
 
-    def mock_import_users_error(
-            self,
-            batch_error_pattern=(False,), individual_error_pattern=(False,)):
-        """Returns a context in which `import_users` raises an exception.
-
-        Example:
-            with mock_import_users_error(batch_error_pattern=(False, True)):
-                import_users() # OK
-                import_users() # Raises!
-                import_users() # OK
-                import_users() # Raises!
-                import_users() # OK
+    def delete_user(self, uid):
+        """Removes user from storage if found, otherwise raises an error.
 
         Args:
-            batch_error_pattern: tuple(bool). Enumerates which successive calls
-                will raise an exception. The pattern is cycled.
-            individual_error_pattern: tuple(bool). Enumerates which individual
-                users will cause an error. The pattern is cycled.
+            uid: str. The Firebase account ID of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        if uid not in self._users_by_uid:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
+        del self._users_by_uid[uid]
+
+    def delete_users(self, uids, force_delete=False):
+        """Deletes the users identified by the specified user ids.
+
+        Deleting a non-existing user does not generate an error (the method is
+        idempotent). Non-existing users are considered to be successfully
+        deleted and are therefore not reported as errors.
+
+        A maximum of 1000 identifiers may be supplied. If more than 1000
+        identifiers are supplied, this method raises a `ValueError`.
+
+        Args:
+            uids: A list of strings indicating the uids of the users to be
+                deleted. Must have <= 1000 entries.
+            force_delete: Optional parameter that indicates if users should be
+                deleted, even if they're not disabled. Defaults to False.
 
         Returns:
-            Context manager. The context manager with the mocked implementation.
+            BatchDeleteAccountsResponse: Holds the errors encountered, if any.
+
+        Raises:
+            ValueError: If any of the identifiers are invalid or if more than
+                1000 identifiers are specified.
         """
-        batch_error_pattern = itertools.cycle(batch_error_pattern)
-        individual_error_pattern = itertools.cycle(individual_error_pattern)
+        if len(uids) > 1000:
+            raise ValueError('`uids` paramter must have <= 1000 entries.')
+        uids = set(uids)
+        self._users_by_uid = {
+            uid: user
+            for uid, user in self._users_by_uid.items() if uid not in uids
+        }
+        return firebase_admin._user_mgt.BatchDeleteAccountsResponse()
 
-        def mock_import_users(user_records):
-            """Mock function that fails according to the given input values."""
-            if python_utils.NEXT(batch_error_pattern):
-                raise firebase_exceptions.DataLossError('Failed to connect')
+    def get_user(self, uid):
+        """Returns user with given ID if found, otherwise raises an error.
 
-            total_records = len(user_records)
-            kept_records, error_indices = [], []
-            for i, (record, error) in enumerate(
-                    python_utils.ZIP(user_records, individual_error_pattern)):
-                if error:
-                    error_indices.append(i)
-                else:
-                    kept_records.append(record)
+        Args:
+            uid: str. The Firebase account ID of the user.
 
-            if kept_records:
-                self._import_users(kept_records)
+        Returns:
+            UserRecord. The UserRecord object of the user.
 
-            return self._create_user_import_result_fragile(
-                total_records, error_indices=error_indices)
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        if uid not in self._users_by_uid:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
+        return self._users_by_uid[uid]
 
-        return self._test.swap(
-            firebase_admin.auth, 'import_users', mock_import_users)
+    def get_user_by_email(self, email):
+        """Returns user with given email if found, otherwise raises an error.
+
+        Args:
+            email: str. The email address of the user.
+
+        Returns:
+            UserRecord. The UserRecord object of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        matches = (u for u in self._users_by_uid.values() if u.email == email)
+        user = python_utils.NEXT(matches, None)
+        if user is None:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % email)
+        return user
+
+    def import_users(self, records):
+        """Adds the given user records to the stub's storage.
+
+        Args:
+            records: list(firebase_admin.auth.ImportUserRecord). The users to
+                add.
+
+        Returns:
+            firebase_admin.auth.UserImportResult. Object with details about the
+            operation.
+        """
+        for record in records:
+            self._set_user_fragile(
+                record.uid, record.email, record.disabled, record.custom_claims)
+        return self._create_user_import_result_fragile(len(records), {})
+
+    def set_custom_user_claims(self, uid, custom_claims):
+        """Updates the custom claims of the given user.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+            custom_claims: str|None. A string-encoded JSON with string keys and
+                values, e.g. '{"role":"admin"}', or None.
+
+        Returns:
+            str. The uid of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        return self.update_user(uid, custom_claims=custom_claims)
+
+    def update_user(self, uid, email=None, disabled=False, custom_claims=None):
+        """Updates the user in storage if found, otherwise raises an error.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+            email: str|None. The email address for the user, or None.
+            disabled: bool. Whether the user account is to be disabled.
+            custom_claims: str|None. A string-encoded JSON with string keys and
+                values, e.g. '{"role":"admin"}', or None.
+
+        Returns:
+            str. The uid of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        if uid not in self._users_by_uid:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
+        self._set_user_fragile(uid, email, disabled, custom_claims)
+        return uid
+
+    def verify_id_token(self, token):
+        """Returns claims for the corresponding user if the ID token is valid.
+
+        Args:
+            token: str. The ID token.
+
+        Returns:
+            dict(str: *). Claims for the user corresponding to the ID token.
+        """
+        return self._decode_user_claims(token)
+
+    def verify_session_cookie(self, session_cookie):
+        """Returns claims for the corresponding user if the cookie is valid.
+
+        Args:
+            session_cookie: str. The session cookie.
+
+        Returns:
+            dict(str: *). Claims for the user corresponding to the session
+            cookie.
+        """
+        # NOTE: Session cookies are often completely different, in terms of
+        # encoding and security, to ID Tokens. Regardless, for the purposes of
+        # this stub, we treat them the same.
+        id_token = session_cookie
+        if id_token not in self._session_cookie_duration_by_id_token:
+            raise firebase_admin.auth.ExpiredSessionCookieError(
+                'The provided Firebase session cookie is invalid', None)
+        return self._decode_user_claims(id_token)
 
     def assert_is_user(self, uid):
         """Asserts that an account with the given id exists.
@@ -299,197 +421,108 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             found, [],
             msg='Unexpected Firebase accounts exists: uids=%r' % (found,))
 
-    def _import_users(self, user_records):
-        """Adds the given user records to the stub's storage.
+    def mock_delete_users_error(
+            self,
+            batch_error_pattern=(None,), individual_error_pattern=(False,)):
+        """Returns a context in which `delete_users` fails according to the
+        given patterns.
+
+        Example:
+            with mock_delete_users_error(batch_error_pattern=(None, Exception)):
+                delete_users(...) # OK.
+                delete_users(...) # Raises Exception.
+                delete_users(...) # OK.
+                delete_users(...) # Raises Exception.
+                delete_users(...) # OK.
 
         Args:
-            user_records: list(firebase_admin.auth.ImportUserRecord). The users
-                to add.
+            batch_error_pattern: tuple(Exception|None). Enumerates which
+                successive calls will raise an exception. For values of None, no
+                exception is raised. The pattern is cycled. By default, an error
+                will never be raised.
+            individual_error_pattern: tuple(bool). Enumerates which individual
+                users will cause an error. The pattern is cycled. By default, an
+                error will never be raised.
 
         Returns:
-            firebase_admin.auth.UserImportResult. Object with details about the
-            operation.
+            Context manager. The context manager with the mocked implementation.
         """
-        for record in user_records:
-            self._set_user_fragile(
-                record.uid, record.email, record.disabled, record.custom_claims)
-        return self._create_user_import_result_fragile(len(user_records))
+        batch_error_pattern = itertools.cycle(batch_error_pattern)
+        individual_error_pattern = itertools.cycle(individual_error_pattern)
 
-    def _create_session_cookie(self, id_token, max_age):
-        """Creates a new session cookie which expires after given duration.
+        def mock_delete_users(uids, force_delete=False):
+            """Mock function that fails according to the input patterns."""
+            if python_utils.NEXT(batch_error_pattern):
+                raise firebase_exceptions.DataLossError('Failed to connect')
+
+            uids_to_delete, error_indices = [], []
+            for i, (uid, error) in enumerate(
+                    python_utils.ZIP(uids, individual_error_pattern)):
+                if error:
+                    error_indices.append(i)
+                else:
+                    uids_to_delete.append(uid)
+
+            if uids_to_delete:
+                self.delete_users(uids_to_delete, force_delete=force_delete)
+
+            return self._create_delete_users_result_fragile(error_indices)
+
+        return self._test.swap(
+            firebase_admin.auth, 'delete_users', mock_delete_users)
+
+    def mock_import_users_error(
+            self,
+            batch_error_pattern=(None,), individual_error_pattern=(None,)):
+        """Returns a context in which `import_users` fails according to the
+        given patterns.
+
+        Example:
+            with mock_import_users_error(batch_error_pattern=(False, True)):
+                import_users(...) # OK
+                import_users(...) # Raises!
+                import_users(...) # OK
+                import_users(...) # Raises!
+                import_users(...) # OK
 
         Args:
-            id_token: str. The ID Token to generate the cookie from.
-            max_age: datetime.timedelta. The duration the cookie remains valid.
+            batch_error_pattern: tuple(Exception|None). Enumerates which
+                successive calls will raise an exception. For values of None, no
+                exception is raised. The pattern is cycled. By default, an error
+                will never be raised.
+            individual_error_pattern: tuple(str|None). Enumerates which
+                individual users will cause an error. Each value is either the
+                error reason (a string), or None. The pattern is cycled. By
+                default, an error will never be raised.
 
         Returns:
-            str. A session cookie that can validate the user.
+            Context manager. The context manager with the mocked implementation.
         """
-        if not id_token:
-            raise firebase_admin.auth.InvalidIdTokenError('missing id_token')
-        if max_age > datetime.timedelta(days=0):
-            self._session_cookie_duration_by_id_token[id_token] = max_age
-        # NOTE: Session cookies are often completely different, in terms of
-        # encoding and security, to ID Tokens. Regardless, for the purposes of
-        # this stub, we treat them the same.
-        session_cookie = id_token
-        return session_cookie
+        batch_error_pattern = itertools.cycle(batch_error_pattern)
+        individual_error_pattern = itertools.cycle(individual_error_pattern)
 
-    def _verify_session_cookie(self, session_cookie):
-        """Returns claims for the corresponding user if the cookie is valid.
+        def mock_import_users(records):
+            """Mock function that fails according to the input patterns."""
+            error_to_raise = python_utils.NEXT(batch_error_pattern)
+            if error_to_raise is not None:
+                raise error_to_raise
 
-        Args:
-            session_cookie: str. The session cookie.
+            records_to_fail, records_to_import = utils.partition(
+                python_utils.ZIP(individual_error_pattern, records),
+                predicate=(
+                    lambda error_record_pair: error_record_pair[0] is not None),
+                enumerated=True)
 
-        Returns:
-            dict(str: *). Claims for the user corresponding to the session
-            cookie.
-        """
-        # NOTE: Session cookies are often completely different, in terms of
-        # encoding and security, to ID Tokens. Regardless, for the purposes of
-        # this stub, we treat them the same.
-        id_token = session_cookie
-        if id_token not in self._session_cookie_duration_by_id_token:
-            raise firebase_admin.auth.ExpiredSessionCookieError(
-                'The provided Firebase session cookie is invalid', None)
-        return self._decode_user_claims(id_token)
+            errors = {i: reason for i, (reason, _) in records_to_fail}
+            records_to_import = [record for _, (_, record) in records_to_import]
 
-    def _verify_id_token(self, token):
-        """Returns claims for the corresponding user if the ID token is valid.
+            if records_to_import:
+                self.import_users(records_to_import)
 
-        Args:
-            token: str. The ID token.
+            return self._create_user_import_result_fragile(len(records), errors)
 
-        Returns:
-            dict(str: *). Claims for the user corresponding to the ID token.
-        """
-        return self._decode_user_claims(token)
-
-    def _create_user_import_result_fragile(self, total, error_indices=None):
-        """Creates a new UserImportResult instance with the given values.
-
-        FRAGILE! The dict keys used by the UserImportResult constructor are an
-        implementation detail that may break in future versions of the SDK.
-
-        Args:
-            total: int. The total number of records initially requested.
-            error_indices: list(int)|None. The indicies of the records which
-                have failed. If None, then the result will not contain any
-                errors.
-
-        Returns:
-            firebase_admin.auth.UserImportResult. A UserImportResult with the
-            given results.
-        """
-        if error_indices is None:
-            error_indices = []
-        return firebase_admin.auth.UserImportResult({
-            'error': [
-                {'index': i, 'message': 'FirebaseError'} for i in error_indices
-            ],
-        }, total)
-
-    def _set_user_fragile(self, uid, email, disabled, custom_claims):
-        """Sets the given properties for the corresponding user.
-
-        FRAGILE! The dict keys used by the UserRecord constructor are an
-        implementation detail that may break in future versions of the SDK.
-
-        Args:
-            uid: str. The Firebase account ID of the user.
-            email: str. The email address for the user.
-            disabled: bool. Whether the user account is to be disabled.
-            custom_claims: str. A string-encoded JSON with string keys and
-                values, e.g. '{"role":"admin"}'.
-        """
-        self._users_by_uid[uid] = firebase_admin.auth.UserRecord({
-            'localId': uid, 'email': email, 'disabled': disabled,
-            'customAttributes': custom_claims,
-        })
-
-    def get_user(self, uid):
-        """Returns user with given ID if found, otherwise raises an error.
-
-        Args:
-            uid: str. The Firebase account ID of the user.
-
-        Returns:
-            UserRecord. The UserRecord object of the user.
-
-        Raises:
-            UserNotFoundError. The Firebase account has not been created yet.
-        """
-        if uid not in self._users_by_uid:
-            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
-        return self._users_by_uid[uid]
-
-    def get_user_by_email(self, email):
-        """Returns user with given email if found, otherwise raises an error.
-
-        Args:
-            email: str. The email address of the user.
-
-        Returns:
-            UserRecord. The UserRecord object of the user.
-
-        Raises:
-            UserNotFoundError. The Firebase account has not been created yet.
-        """
-        matches = (u for u in self._users_by_uid.values() if u.email == email)
-        user = python_utils.NEXT(matches, None)
-        if user is None:
-            raise firebase_admin.auth.UserNotFoundError('%s not found' % email)
-        return user
-
-    def _update_user(self, uid, email=None, disabled=False, custom_claims=None):
-        """Updates the user in storage if found, otherwise raises an error.
-
-        Args:
-            uid: str. The Firebase account ID of the user.
-            email: str|None. The email address for the user, or None.
-            disabled: bool. Whether the user account is to be disabled.
-            custom_claims: str|None. A string-encoded JSON with string keys and
-                values, e.g. '{"role":"admin"}', or None.
-
-        Returns:
-            str. The uid of the user.
-
-        Raises:
-            UserNotFoundError. The Firebase account has not been created yet.
-        """
-        if uid not in self._users_by_uid:
-            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
-        self._set_user_fragile(uid, email, disabled, custom_claims)
-        return uid
-
-    def _set_custom_user_claims(self, uid, custom_claims):
-        """Updates the custom claims of the given user.
-
-        Args:
-            uid: str. The Firebase account ID of the user.
-            custom_claims: str|None. A string-encoded JSON with string keys and
-                values, e.g. '{"role":"admin"}', or None.
-
-        Returns:
-            str. The uid of the user.
-
-        Raises:
-            UserNotFoundError. The Firebase account has not been created yet.
-        """
-        return self._update_user(uid, custom_claims=custom_claims)
-
-    def _delete_user(self, uid):
-        """Removes user from storage if found, otherwise raises an error.
-
-        Args:
-            uid: str. The Firebase account ID of the user.
-
-        Raises:
-            UserNotFoundError. The Firebase account has not been created yet.
-        """
-        if uid not in self._users_by_uid:
-            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
-        del self._users_by_uid[uid]
+        return self._test.swap(
+            firebase_admin.auth, 'import_users', mock_import_users)
 
     def _encode_user_claims(self, user):
         """Returns encoded claims for the given user.
@@ -520,6 +553,62 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             return json.loads(encoded_claims)
         except ValueError:
             return None
+
+    def _set_user_fragile(self, uid, email, disabled, custom_claims):
+        """Sets the given properties for the corresponding user.
+
+        FRAGILE! The dict keys used by the UserRecord constructor are an
+        implementation detail that may break in future versions of the SDK.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+            email: str. The email address for the user.
+            disabled: bool. Whether the user account is to be disabled.
+            custom_claims: str. A string-encoded JSON with string keys and
+                values, e.g. '{"role":"admin"}'.
+        """
+        self._users_by_uid[uid] = firebase_admin.auth.UserRecord({
+            'localId': uid, 'email': email, 'disabled': disabled,
+            'customAttributes': custom_claims,
+        })
+
+    def _create_delete_users_result_fragile(self, error_indices):
+        """Creates a new BatchDeleteAccountsResponse instance with the given
+        values.
+
+        FRAGILE! The dict keys used by the BatchDeleteAccountsResponse constructor are an
+        implementation detail that may break in future versions of the SDK.
+
+        Args:
+            error_indices: list(int). The indicies of the records which
+                have failed.
+
+        Returns:
+            firebase_admin.auth.BatchDeleteAccountsResponse. The response.
+        """
+        return firebase_admin.auth.UserImportResult({
+            'error': [
+                {'index': i, 'message': error} for i, error in errors.items()
+            ],
+        }, total)
+
+    def _create_user_import_result_fragile(self, total, errors):
+        """Creates a new UserImportResult instance with the given values.
+
+        FRAGILE! The dict keys used by the UserImportResult constructor are an
+        implementation detail that may break in future versions of the SDK.
+
+        Args:
+            total: int. The total number of records initially requested.
+            errors: dict(int: str). A dict mapping indicies to their reason for
+                failing.
+
+        Returns:
+            firebase_admin.auth.UserImportResult. The response
+        """
+        return firebase_admin.auth.UserImportResult({
+            'error': [{'index': i, 'message': e} for i, e in errors.items()],
+        }, total)
 
 
 class EstablishFirebaseConnectionTests(test_utils.TestBase):
@@ -734,7 +823,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
 
     def test_updates_existing_firebase_account(self):
         self.set_up_models(user_id='abc')
-        self.firebase_sdk_stub.create_user('abc', role_is_super_admin=False)
+        self.firebase_sdk_stub.create_user('abc')
 
         self.assertIsNone(
             firebase_auth_services.get_auth_id_from_user_id('abc'))

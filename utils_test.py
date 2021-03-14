@@ -643,3 +643,22 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             [''.join(g) for g in utils.grouper('ABCDEFG', 3, fillvalue='x')],
             ['ABC', 'DEF', 'Gxx'])
+
+    def test_partition(self):
+        is_even = lambda n: (n % 2) == 0
+
+        evens, odds = (
+            utils.partition([10, 8, 1, 5, 6, 4, 3, 7], predicate=is_even))
+
+        self.assertEqual(list(evens), [10, 8, 6, 4])
+        self.assertEqual(list(odds), [1, 5, 3, 7])
+
+    def test_enumerated_partition(self):
+        logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
+        is_error = lambda msg: msg.startswith('ERROR: ')
+
+        errors, others = (
+            utils.partition(logs, predicate=is_error, enumerated=True))
+
+        self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
+        self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])

@@ -1016,3 +1016,49 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
     return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
+
+
+def partition(iterable, predicate=bool, enumerated=False):
+    """Returns two generators which split the iterable based on the predicate.
+
+    NOTE: The predicate is called AT MOST ONCE per item.
+
+    Example:
+        is_even = lambda n: (n % 2) == 0
+        evens, odds = partition([10, 8, 1, 5, 6, 4, 3, 7], is_even)
+        assert list(evens) == [10, 8, 6, 4]
+        assert list(odds) == [1, 5, 3, 7]
+
+
+        logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
+        is_error = lambda msg: msg.startswith('ERROR: ')
+        errors, others = partition(logs, is_error, enumerated=True)
+
+        for i, error in errors:
+            raise Exception('Log index=%d failed for reason: %s' % (i, error))
+        for i, message in others:
+            logging.info('Log index=%d: %s' % (i, message))
+
+    Args:
+        iterable: iterable. Any kind of iterable object.
+        predicate: callable. A function which accepts an item and returns True
+            or False.
+        enumerated: bool. Whether the partitions should include their original
+            indices.
+
+    Returns:
+        tuple(iterable, iterable). Two distinct generators. The first generator
+        will hold values which passed the predicate. The second will hold the
+        values which did not. If enumerated is True, then the generators will
+        yield (index, item) pairs. Otherwise, the generators will yield items by
+        themselves.
+    """
+    if enumerated:
+        iterable = enumerate(iterable)
+        old_predicate = predicate
+        predicate = lambda pair: old_predicate(pair[1])
+    # Creates two distinct generators over the same iterable. Memory-efficient.
+    true_part, false_part = itertools.tee((i, predicate(i)) for i in iterable)
+    return (
+        (i for i, predicate_is_true in true_part if predicate_is_true),
+        (i for i, predicate_is_true in false_part if not predicate_is_true))

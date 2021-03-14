@@ -217,14 +217,14 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
     def test_import_user_error_is_reported(self):
         mock_import_users_error = (
             self.firebase_sdk_stub.mock_import_users_error(
-                batch_error_pattern=(True,))) # Always raise an exception.
+                batch_error_pattern=[Exception('uh-oh!')]))
 
         auth_assoc = self.create_oppia_user()
 
         with mock_import_users_error:
             self.assertItemsEqual(self.run_one_off_job(), [
                 ['ERROR: Failed to create Firebase accounts',
-                 'DataLossError(u\'Failed to connect\',)'],
+                 'Exception(u\'uh-oh!\',)'],
             ])
 
         self.assert_auth_mapping_does_not_exist(auth_assoc)
@@ -247,14 +247,14 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
         mock_import_users_error = (
             self.firebase_sdk_stub.mock_import_users_error(
-                batch_error_pattern=(False, True, False)))
+                batch_error_pattern=[None, Exception('uh-oh!'), None]))
 
         auth_assocs = self.create_multi_oppia_users(9)
 
         with mock_import_users_error:
             self.assertItemsEqual(self.run_one_off_job(), [
                 ['ERROR: Failed to create Firebase accounts',
-                 'DataLossError(u\'Failed to connect\',)'],
+                 'Exception(u\'uh-oh!\',)'],
                 ['SUCCESS: Created Firebase accounts', 6],
             ])
 
@@ -286,18 +286,18 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
         mock_import_users_error = (
             self.firebase_sdk_stub.mock_import_users_error(
-                individual_error_pattern=(False, True, False, False)))
+                individual_error_pattern=[None, 'uh-oh!', None, None]))
 
         auth_assocs = self.create_multi_oppia_users(10)
 
         with mock_import_users_error:
             self.assertItemsEqual(self.run_one_off_job(), [
                 ['ERROR: Failed to create Firebase accounts',
-                 'Import user_id=\'uid_aid_index_1\' failed: FirebaseError'],
+                 'Import user_id=\'uid_aid_index_1\' failed: uh-oh!'],
                 ['ERROR: Failed to create Firebase accounts',
-                 'Import user_id=\'uid_aid_index_5\' failed: FirebaseError'],
+                 'Import user_id=\'uid_aid_index_5\' failed: uh-oh!'],
                 ['ERROR: Failed to create Firebase accounts',
-                 'Import user_id=\'uid_aid_index_9\' failed: FirebaseError'],
+                 'Import user_id=\'uid_aid_index_9\' failed: uh-oh!'],
                 ['SUCCESS: Created Firebase accounts', 7],
             ])
 

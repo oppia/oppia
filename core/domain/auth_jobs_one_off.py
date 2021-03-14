@@ -352,7 +352,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """
         try:
             return (firebase_auth.import_users(user_records), None)
-        except firebase_exceptions.FirebaseError as exception:
+        except Exception as exception:
             return (None, exception)
 
     @classmethod
