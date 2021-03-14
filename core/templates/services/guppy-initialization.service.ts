@@ -57,8 +57,7 @@ export class GuppyInitializationService {
         '\\color{grey}{\\text{\\small{' + placeholderText + '}}}');
 
       // Initialize it with a value for the creator's view.
-      if (guppyDivClassName === 'guppy-div-creator' &&
-        initialValue.length !== 0) {
+      if (initialValue.length !== 0) {
         if (initialValue.indexOf('=') !== -1) {
           let splitByEquals = initialValue.split('=');
           splitByEquals[0] = mathInteractionsService.insertMultiplicationSigns(

@@ -27,6 +27,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 
 // A service that provides a number of utility functions useful to both the
@@ -59,13 +60,15 @@ export class ExplorationHtmlFormatterService {
    *   Otherwise, parentHasLastAnswerProperty should be set to false.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
+   * @param {Solution} savedSolution - The saved solution that the interaction
+   * needs to be prefilled with.
    */
   getInteractionHtml(
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
-      populateWithSolution=false): string {
+      savedSolution: Solution): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
@@ -74,7 +77,10 @@ export class ExplorationHtmlFormatterService {
         element, interactionCustomizationArgs));
     element.attr(
       'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
-    element.attr('populate-with-solution', populateWithSolution);
+    if (savedSolution) {
+      element.attr(
+        'saved-solution', JSON.stringify(savedSolution.correctAnswer));
+    }
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }

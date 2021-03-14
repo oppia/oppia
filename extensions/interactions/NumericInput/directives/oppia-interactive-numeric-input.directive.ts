@@ -20,9 +20,6 @@
  * followed by the name of the arg.
  */
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solution.service.ts');
 require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
 require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
@@ -35,17 +32,15 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        populateWithSolution: '<'
-      },
+      bindToController: {},
       template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'CurrentInteractionService', 'NumericInputRulesService',
-        'NumericInputValidationService', 'StateSolutionService',
+        'NumericInputValidationService',
         function(
             $attrs, CurrentInteractionService, NumericInputRulesService,
-            NumericInputValidationService, StateSolutionService) {
+            NumericInputValidationService) {
           var ctrl = this;
           ctrl.errorString = '';
           var isAnswerValid = function() {
@@ -69,11 +64,10 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
-            if (ctrl.populateWithSolution) {
-              ctrl.answer = StateSolutionService.savedMemento.correctAnswer;
-            } else {
-              ctrl.answer = '';
-            }
+            ctrl.answer = (
+              $attrs.savedSolution !== undefined ?
+              JSON.parse($attrs.savedSolution) : ''
+            );
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
             ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
