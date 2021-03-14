@@ -37,7 +37,7 @@ export class MockNgbModalRef {
   };
 }
 
-fdescribe('Learner playlist Backend Api service ', () => {
+describe('Learner playlist Backend Api service ', () => {
   let learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService;
   let http: HttpTestingController;
   let activityId = '1';
