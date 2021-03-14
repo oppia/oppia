@@ -39,14 +39,13 @@ export class LearnerDashboardIconsComponent implements OnInit {
   @Input() activityType: string;
   @Input() activityId: string;
   @Input() activityTitle: string;
-  // @Input() activityActive: string;
   @Input()
   get activityActive(): boolean {
-    return
-  }
+    return this.activityIsCurrentlyHoveredOver;
+  };
   set activityActive(hoverState: boolean) {
     this.activityIsCurrentlyHoveredOver = hoverState
-  }
+  };
   @Input() isContainerNarrow: boolean;
   @Input() isAddToPlaylistIconShown: boolean;
 
@@ -62,22 +61,22 @@ export class LearnerDashboardIconsComponent implements OnInit {
         (learnerDashboardActivityIds) => {
           this.learnerDashboardActivityIds = learnerDashboardActivityIds;
         }
-      ); 
+      );
   }
 
-  enablePlaylistTooltip() {
+  enablePlaylistTooltip(): void {
     this.playlistTooltipIsEnabled = true;
   }
 
-  disablePlaylistTooltip() {
+  disablePlaylistTooltip(): void {
     this.playlistTooltipIsEnabled = false;
   }
 
-  setHoverState(hoverState) {
+  setHoverState(hoverState: boolean): void {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }
 
-  canActivityBeAddedToLearnerPlaylist(activityId) {
+  canActivityBeAddedToLearnerPlaylist(activityId: string): boolean {
     if (this.learnerDashboardActivityIds) {
       if (this.learnerDashboardActivityIds.includesActivity(
         activityId)) {
@@ -92,7 +91,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     }
   }
 
-  belongsToLearnerPlaylist() {
+  belongsToLearnerPlaylist(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
@@ -109,7 +108,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     }
   }
 
-  belongsToCompletedActivities() {
+  belongsToCompletedActivities(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
@@ -126,7 +125,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     }
   }
 
-  belongsToIncompleteActivities() {
+  belongsToIncompleteActivities(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
@@ -143,7 +142,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     }
   }
 
-  addToLearnerPlaylist(activityId, activityType) {
+  addToLearnerPlaylist(activityId: string, activityType: string): void {
     var isSuccessfullyAdded = (
       this.learnerPlaylistService.addToLearnerPlaylist(
         activityId, activityType));
@@ -161,7 +160,8 @@ export class LearnerDashboardIconsComponent implements OnInit {
     }
   }
 
-  removeFromLearnerPlaylist(activityId, activityTitle, activityType) {
+  removeFromLearnerPlaylist(
+      activityId: string, activityTitle: string, activityType: string): void {
     this.learnerPlaylistService.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType,
       this.learnerDashboardActivityIds);

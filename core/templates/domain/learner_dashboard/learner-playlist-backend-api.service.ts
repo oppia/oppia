@@ -99,8 +99,6 @@ export class LearnerPlaylistService {
     modelRef.componentInstance.activityTitle = activityTitle;
     modelRef.componentInstance.activityType = activityType;
     modelRef.result.then((playlistUrl) => {
-      // eslint-disable-next-line dot-notation
-      this.http.delete<void>(playlistUrl);
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
           activityId);
@@ -108,6 +106,8 @@ export class LearnerPlaylistService {
         learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
           activityId);
       }
+      // eslint-disable-next-line dot-notation
+      this.http.delete<void>(playlistUrl);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

@@ -49,7 +49,7 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
@@ -89,7 +89,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     DynamicContentModule,
     NgbTooltipModule,
     FormsModule,
-    NgbModule,
+    NgbModalModule,
     ...firebaseAuthModules,
   ],
 
