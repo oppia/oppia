@@ -64,6 +64,23 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
 
+    def test_reconstitute(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'id', title='A Title',
+            category='A Category', objective='An Objective')
+        exp_services.save_new_exploration('id', exploration)
+        exp_model = exp_models.ExplorationModel.get_by_id('id')
+        snapshot_dict = exp_model.compute_snapshot()
+        snapshot_dict['skill_tags'] = ['tag1', 'tag2']
+        snapshot_dict['default_skin'] = 'conversation_v1'
+        snapshot_dict['skin_customizations'] = {}
+        snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(
+            snapshot_dict)
+        exp_model = exp_models.ExplorationModel(**snapshot_dict)
+        snapshot_dict = exp_model.compute_snapshot()
+        for field in ['skill_tags', 'default_skin', 'skin_customization']:
+            self.assertNotIn(field, snapshot_dict)
+
 
 class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationContextModel class."""
@@ -310,6 +327,35 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
+    def test_reconstitute_excludes_deprecated_properties(self):
+        exp_models.ExplorationRightsModel(
+            id='id_0',
+            owner_ids=['owner_id'],
+            editor_ids=['editor_id'],
+            voice_artist_ids=['voice_artist_id'],
+            viewer_ids=['viewer_id'],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+        saved_model = exp_models.ExplorationRightsModel.get('id_0')
+
+        snapshot_dict = saved_model.compute_snapshot()
+        snapshot_dict['translator_ids'] = ['owner_id']
+        snapshot_dict['all_viewer_ids'] = []
+
+        snapshot_dict = exp_models.ExplorationRightsModel.convert_to_valid_dict(
+            snapshot_dict)
+
+        exp_rights_model = exp_models.ExplorationRightsModel(**snapshot_dict)
+
+        for field in ['translator_ids', 'all_viewer_ids']:
+            self.assertNotIn(field, exp_rights_model._properties) # pylint: disable=protected-access
+            self.assertNotIn(field, exp_rights_model._values) # pylint: disable=protected-access
+
 
 class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     """Test the revert method on ExplorationRightsModel class."""
@@ -432,31 +478,19 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             new_collection_model.to_dict(exclude=self.excluded_fields)
         )
 
-    def test_revert_to_version_with_translator_ids_field_is_successful(self):
-        broken_dict = dict(**self.original_dict)
-        del broken_dict['voice_artist_ids']
-        broken_dict['translator_ids'] = [self.USER_ID_2]
-
-        snapshot_model = (
-            exp_models.ExplorationRightsSnapshotContentModel
-            .get_by_id(
-                exp_models.ExplorationRightsModel.get_snapshot_id(
-                    self.EXPLORATION_ID_1, 1))
-        )
-        snapshot_model.content = broken_dict
-        snapshot_model.update_timestamps()
-        snapshot_model.put()
+    def test_revert_to_check_deprecated_fields_are_absent(self):
         with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
-        new_collection_model = (
-            exp_models.ExplorationRightsModel.get_by_id(
-                self.EXPLORATION_ID_1))
-        self.assertDictEqual(
-            self.original_dict,
-            new_collection_model.to_dict(exclude=self.excluded_fields)
-        )
+            exp_rights_model = (
+                exp_models.ExplorationRightsModel.get_by_id(
+                    self.EXPLORATION_ID_1))
+
+            snapshot_dict = exp_rights_model.compute_snapshot()
+
+            self.assertNotIn('translator_ids', snapshot_dict)
+            self.assertNotIn('all_viewer_ids', snapshot_dict)
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):

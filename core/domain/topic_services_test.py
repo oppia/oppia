@@ -58,7 +58,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -116,47 +116,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
-
-    def test_get_all_summaries(self):
-        topic_summaries = topic_services.get_all_topic_summaries()
-
-        self.assertEqual(len(topic_summaries), 1)
-        self.assertEqual(topic_summaries[0].name, 'Name')
-        self.assertEqual(topic_summaries[0].canonical_story_count, 0)
-        self.assertEqual(topic_summaries[0].additional_story_count, 0)
-        self.assertEqual(topic_summaries[0].total_skill_count, 2)
-        self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
-        self.assertEqual(topic_summaries[0].subtopic_count, 1)
-
-    def test_get_multi_summaries(self):
-        topic_summaries = topic_services.get_multi_topic_summaries([
-            self.TOPIC_ID, 'invalid_id'])
-
-        self.assertEqual(len(topic_summaries), 2)
-        self.assertEqual(topic_summaries[0].name, 'Name')
-        self.assertEqual(topic_summaries[0].description, 'Description')
-        self.assertEqual(topic_summaries[0].canonical_story_count, 0)
-        self.assertEqual(topic_summaries[0].additional_story_count, 0)
-        self.assertEqual(topic_summaries[0].total_skill_count, 2)
-        self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
-        self.assertEqual(topic_summaries[0].subtopic_count, 1)
-        self.assertIsNone(topic_summaries[1])
-
-    def test_get_multi_rights(self):
-        topic_rights = topic_services.get_multi_topic_rights([
-            self.TOPIC_ID, 'invalid_id'])
-
-        self.assertEqual(len(topic_rights), 2)
-        self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
-        self.assertEqual(topic_rights[0].manager_ids, [])
-        self.assertFalse(topic_rights[0].topic_is_published)
-        self.assertIsNone(topic_rights[1])
-
-    def test_get_new_topic_id(self):
-        new_topic_id = topic_services.get_new_topic_id()
-
-        self.assertEqual(len(new_topic_id), 12)
-        self.assertEqual(topic_models.TopicModel.get_by_id(new_topic_id), None)
 
     def test_get_topic_from_model(self):
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
@@ -220,56 +179,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
-
-    def test_get_topic_summary_from_model(self):
-        topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
-        topic_summary = topic_services.get_topic_summary_from_model(
-            topic_summary_model)
-
-        self.assertEqual(topic_summary.id, self.TOPIC_ID)
-        self.assertEqual(topic_summary.name, 'Name')
-        self.assertEqual(topic_summary.description, 'Description')
-        self.assertEqual(topic_summary.canonical_story_count, 0)
-        self.assertEqual(topic_summary.additional_story_count, 0)
-        self.assertEqual(topic_summary.uncategorized_skill_count, 2)
-        self.assertEqual(topic_summary.total_skill_count, 2)
-        self.assertEqual(topic_summary.subtopic_count, 1)
-        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
-        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
-
-    def test_get_topic_summary_by_id(self):
-        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
-
-        self.assertEqual(topic_summary.id, self.TOPIC_ID)
-        self.assertEqual(topic_summary.name, 'Name')
-        self.assertEqual(topic_summary.description, 'Description')
-        self.assertEqual(topic_summary.canonical_story_count, 0)
-        self.assertEqual(topic_summary.additional_story_count, 0)
-        self.assertEqual(topic_summary.uncategorized_skill_count, 2)
-        self.assertEqual(topic_summary.subtopic_count, 1)
-        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
-        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
-
-    def test_get_all_skill_ids_assigned_to_some_topic(self):
-        change_list = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,
-            'new_subtopic_id': 1,
-            'skill_id': self.skill_id_1
-        })]
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id_admin, self.TOPIC_ID, change_list,
-            'Moved skill to subtopic.')
-        topic_id = topic_services.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, self.user_id, name='Name 2', description='Description',
-            abbreviated_name='random', url_fragment='name-three',
-            canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
-            subtopics=[], next_subtopic_id=1)
-        self.assertEqual(
-            topic_services.get_all_skill_ids_assigned_to_some_topic(),
-            {self.skill_id_1, self.skill_id_2, 'skill_3'})
 
     def test_cannot_create_topic_change_class_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
@@ -550,7 +459,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, True)
         self.assertEqual(
@@ -563,7 +472,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, False)
         self.assertEqual(
@@ -734,7 +643,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated Description.')
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short-name')
         self.assertEqual(topic.url_fragment, 'url-name')
@@ -758,7 +667,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_a, self.TOPIC_ID, changelist, 'Updated Name.')
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.name, 'New Name')
         self.assertEqual(topic.canonical_name, 'new name')
         self.assertEqual(topic.version, 4)
@@ -1102,7 +1011,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID, strict=False))
         self.assertIsNone(
-            topic_services.get_topic_summary_by_id(self.TOPIC_ID, strict=False))
+            topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID, strict=False))
         self.assertIsNone(
             subtopic_page_services.get_subtopic_page_by_id(
                 self.TOPIC_ID, 1, strict=False))
@@ -1376,7 +1285,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
     def test_does_not_update_subtopic_url_fragment_if_it_already_exists(self):
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -1411,8 +1320,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, topic_id, changelist, 'Update url fragment')
 
     def test_does_not_create_topic_url_fragment_if_it_already_exists(self):
-        topic_id_1 = topic_services.get_new_topic_id()
-        topic_id_2 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.user_id, name='topic 1',
             description='Description', canonical_story_ids=[],
@@ -1429,8 +1338,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 url_fragment='topic-frag-one')
 
     def test_does_not_update_topic_if_url_fragment_already_exists(self):
-        topic_id_1 = topic_services.get_new_topic_id()
-        topic_id_2 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_URL_FRAGMENT,
@@ -1454,8 +1363,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, topic_id_2, changelist, 'Update url fragment')
 
     def test_does_not_update_topic_if_name_already_exists(self):
-        topic_id_1 = topic_services.get_new_topic_id()
-        topic_id_2 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_NAME,
@@ -1479,7 +1388,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, topic_id_2, changelist, 'Update name')
 
     def test_does_not_create_topic_if_name_is_non_string(self):
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_NAME,
@@ -1635,12 +1544,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.assign_role(
             self.user_admin, self.user_a,
             topic_domain.ROLE_MANAGER, 'topic_2')
-        topic_rights = topic_services.get_topic_rights_with_user(self.user_id_a)
+        topic_rights = topic_fetchers.get_topic_rights_with_user(self.user_id_a)
         self.assertEqual(len(topic_rights), 2)
 
         topic_services.deassign_user_from_all_topics(
             self.user_admin, self.user_id_a)
-        topic_rights = topic_services.get_topic_rights_with_user(self.user_id_a)
+        topic_rights = topic_fetchers.get_topic_rights_with_user(self.user_id_a)
         self.assertEqual(len(topic_rights), 0)
 
     def test_reassigning_manager_role_to_same_user(self):

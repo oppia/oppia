@@ -35,6 +35,12 @@ import { InteractionCustomizationArgs } from
   providedIn: 'root'
 })
 export class ExplorationHtmlFormatterService {
+  private readonly migratedInteractions: string[] = [
+    'Continue',
+    'FractionInput',
+    'GraphInput'
+  ];
+
   constructor(
       private camelCaseToHyphens: CamelCaseToHyphensPipe,
       private extensionTagAssembler: ExtensionTagAssemblerService,
@@ -72,7 +78,20 @@ export class ExplorationHtmlFormatterService {
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }
-    return element.get(0).outerHTML;
+    element.attr(
+      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
+    let val = element.get(0).outerHTML;
+    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+      val = val.replace(
+        'last-answer="null"></oppia-interactive-' + htmlInteractionId + '>',
+        '[last-answer]="null"></oppia-interactive-' + htmlInteractionId + '>');
+      val = val.replace(
+        'last-answer="lastAnswer"></oppia-interactive-' +
+        htmlInteractionId + '>',
+        '[last-answer]="lastAnswer"></oppia-interactive-' +
+        htmlInteractionId + '>');
+    }
+    return val;
   }
 
   getAnswerHtml(
