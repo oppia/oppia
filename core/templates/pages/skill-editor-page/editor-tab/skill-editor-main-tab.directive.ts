@@ -45,11 +45,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope',  '$timeout', '$uibModal', 'FocusManagerService', 'PageTitleService',
+        '$scope', '$timeout', '$uibModal', 'FocusManagerService',
+        'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope,  $timeout, $uibModal, FocusManagerService, PageTitleService,
+            $scope, $timeout, $uibModal, FocusManagerService, PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
@@ -116,7 +117,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             PageTitleService.setPageTitleForMobileView('Skill Editor');
             $timeout(function() {
               FocusManagerService.setFocus('newQuestionBtn');
-            }, 0);           
+            }, 0);
           };
         }
       ]
