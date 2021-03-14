@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for learnerPlaylistModal.
+ * @fileoverview Component for learnerPlaylistModal.
  */
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnInit } from '@angular/core';
@@ -60,7 +60,3 @@ export class LearnerPlaylistModalComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'learnerPlaylistModalComponent',
-  downgradeComponent(
-    {component: LearnerPlaylistModalComponent}));

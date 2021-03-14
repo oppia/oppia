@@ -15,13 +15,20 @@
 /**
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
-
+import { Pipe } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from
   '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
 
 class MockActiveModal {
   close(): void {
@@ -39,15 +46,14 @@ class MockUrlInterpolationService {
   }
 }
 
-describe('Learner Playlist Modal Controller', function() {
+describe('Learner Playlist Modal Component', function() {
   let component: LearnerPlaylistModalComponent;
-  let csrfService: CsrfTokenService;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [LearnerPlaylistModalComponent],
+      declarations: [LearnerPlaylistModalComponent, MockTranslatePipe],
       providers: [
         {
           provide: NgbActiveModal, useClass: MockActiveModal
@@ -55,7 +61,7 @@ describe('Learner Playlist Modal Controller', function() {
         {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService
-        }
+        },
       ]
     }).compileComponents();
   }));
@@ -70,19 +76,11 @@ describe('Learner Playlist Modal Controller', function() {
     component.removeFromLearnerPlaylistUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
     fixture.detectChanges();
-
-    csrfService = TestBed.inject(CsrfTokenService);
-
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-      return new Promise((resolve) => {
-        resolve('sample-csrf-token');
-      });
-    });
   });
 
 
   it('should remove exploration in learner playlist when clicking on' +
-    ' remove button', fakeAsync(() => {
+    'remove button', fakeAsync(() => {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.removeFromLearnerPlaylistUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
