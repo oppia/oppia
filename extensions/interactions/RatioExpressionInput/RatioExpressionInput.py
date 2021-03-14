@@ -57,8 +57,7 @@ class RatioExpressionInput(base.BaseInteraction):
             'validators': [{
                 'id': 'is_at_least',
                 'min_value': 0,
-            },
-            {
+            }, {
                 'id': 'is_at_most',
                 'max_value': 10,
             }],
