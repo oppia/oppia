@@ -75,7 +75,6 @@ describe('TranslateTextService', () => {
         more: false
       };
 
-      // console.log(translateTextService.getTextToTranslate());
       textAndAvailability = translateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
       textAndAvailability = translateTextService.getTextToTranslate();
@@ -84,23 +83,17 @@ describe('TranslateTextService', () => {
       textAndAvailability = translateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
 
-      // textAndAvailability = translateTextService.getPreviousTextToTranslate();
-      // expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+      textAndAvailability = translateTextService.getPreviousTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
 
-      // console.log(translateTextService.getTextToTranslate());
+      textAndAvailability = translateTextService.getPreviousTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndPreviousAvailability1);
 
-      // textAndAvailability = translateTextService.getPreviousTextToTranslate();
-      // expect(textAndAvailability).toEqual(expectedTextAndPreviousAvailability1);
-      
-      // console.log(translateTextService.getTextToTranslate());
+      textAndAvailability = translateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
 
-      // textAndAvailability = translateTextService.getTextToTranslate();
-      // expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
-
-      // // console.log(translateTextService);
-
-      // textAndAvailability = translateTextService.getTextToTranslate();
-      // expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
+      textAndAvailability = translateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
     }));
 
     it('should return no more available for states with no texts',
