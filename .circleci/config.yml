@@ -157,12 +157,12 @@ jobs:
       - run:
           name: Run e2e navigation test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation" --server_log_level="info"
       - check_release_changelog_update_branch
       - run:
           name: Run e2e admin page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env --server_log_level="info"
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -189,19 +189,19 @@ jobs:
       - run:
           name: Run e2e publication test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env --server_log_level="info"
       - run:
           name: Run e2e library test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env --server_log_level="info"
       - run:
           name: Run e2e collections test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env --server_log_level="info"
       - run:
           name: Run e2e accessibility page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env --server_log_level="info"
       - upload_screenshots
 
   e2e_users:
@@ -219,27 +219,27 @@ jobs:
       - run:
           name: Run e2e users test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env --server_log_level="info"
       - run:
           name: Run e2e subscriptions test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env --server_log_level="info"
       - run:
           name: Run e2e profileMenu test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env --server_log_level="info"
       - run:
           name: Run e2e preferences test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env --server_log_level="info"
       - run:
           name: Run e2e profileFeatures test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env --server_log_level="info"
       - run:
           name: Run e2e wipeout test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env --server_log_level="info"
       - upload_screenshots
 
   e2e_miscellaneous_tests:
@@ -257,19 +257,19 @@ jobs:
       - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadFeatures" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadFeatures" --prod_env --server_log_level="info"
       - run:
           name: Run e2e play voiceovers test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env --server_log_level="info"
       - run:
           name: Run e2e file upload extensions test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env --server_log_level="info"
       - run:
           name: Run e2e contributor dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env --server_log_level="info"
       # Feature Gating test suites must run in non-production environment because
       # the dummy_feature being used must not be enabled in production environment.
       - run:
@@ -293,23 +293,23 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --prod_env --server_log_level="info"
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env --server_log_level="info"
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env --server_log_level="info"
       - run:
           name: Run e2e topic and story editor test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures" --prod_env --server_log_level="info"
       - run:
           name: Run e2e topic and story viewer test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env --server_log_level="info"
       - upload_screenshots
 
 notify:
