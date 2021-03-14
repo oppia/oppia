@@ -129,7 +129,6 @@ def _save_user_query(user_query):
         user_query_dict['id'] = user_query.id
         user_query_model = user_models.UserQueryModel(**user_query_dict)
 
-    user_query_model.update_timestamps()
     user_query_model.put()
 
     return user_query_model.id
@@ -220,5 +219,4 @@ def send_email_to_qualified_users(
 
         recipient_bulk_email_model.sent_email_model_ids.append(
             bulk_email_model_id)
-        recipient_bulk_email_model.update_timestamps()
         recipient_bulk_email_model.put()
