@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for LearnerPlaylistService.js.
+ * @fileoverview Tests for LearnerPlaylistBackendApiService.
  */
 
 import { async, fakeAsync, flushMicrotasks, TestBed } from
@@ -24,7 +24,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 
 import { AlertsService } from 'services/alerts.service';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import { LearnerPlaylistService } from
+import { LearnerPlaylistBackendApiService } from
   'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
@@ -38,7 +38,7 @@ export class MockNgbModalRef {
 }
 
 describe('Learner playlist service factory', () => {
-  let learnerPlaylistService: LearnerPlaylistService;
+  let learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService;
   let http: HttpTestingController;
   let activityId = '1';
   let activityType = 'exploration';
@@ -53,7 +53,8 @@ describe('Learner playlist service factory', () => {
   }));
 
   beforeEach(() => {
-    learnerPlaylistService = TestBed.inject(LearnerPlaylistService);
+    learnerPlaylistBackendApiService =
+      TestBed.inject(LearnerPlaylistBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
     http = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
@@ -78,7 +79,8 @@ describe('Learner playlist service factory', () => {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+      activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
@@ -90,14 +92,15 @@ describe('Learner playlist service factory', () => {
     expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
   }));
 
-  it('should not add playlist to play later list' +
+  it('should not add playlist to play later list ' +
     'and show belongs to completed or incomplete list', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: true,
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+      activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
@@ -109,14 +112,15 @@ describe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  it('should not add playlist to play later list' +
+  it('should not add playlist to play later list ' +
     'and show belongs to subscribed activities', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: true,
       playlist_limit_exceeded: false
     };
-    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+      activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
@@ -128,14 +132,15 @@ describe('Learner playlist service factory', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  it('should not add playlist to play later list' +
+  it('should not add playlist to play later list ' +
     'and show playlist limit exceeded', fakeAsync(() => {
     let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: true
     };
-    learnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+      activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
     expect(req.request.method).toEqual('POST');
@@ -166,7 +171,7 @@ describe('Learner playlist service factory', () => {
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve('success')});
       });
-      learnerPlaylistService.removeFromLearnerPlaylist(
+      learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
         '0', 'title', 'exploration', learnerDashboardActivityIds);
       expect(modalSpy).toHaveBeenCalled();
     });
@@ -189,7 +194,7 @@ describe('Learner playlist service factory', () => {
         collection_playlist_ids: []
       });
 
-    learnerPlaylistService.removeFromLearnerPlaylist(
+    learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
       '0', 'title', 'exploration', learnerDashboardActivityIds);
     flushMicrotasks();
 
@@ -216,7 +221,7 @@ describe('Learner playlist service factory', () => {
         collection_playlist_ids: ['0', '1', '2']
       });
 
-    learnerPlaylistService.removeFromLearnerPlaylist(
+    learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
       '0', 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
 
@@ -225,8 +230,8 @@ describe('Learner playlist service factory', () => {
       ['1', '2']);
   }));
 
-  it('should not remove anything from learner playlist when cancel' +
-    ' button is clicked', fakeAsync(() => {
+  it('should not remove anything from learner playlist when cancel ' +
+    'button is clicked', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
@@ -244,7 +249,7 @@ describe('Learner playlist service factory', () => {
         collection_playlist_ids: ['0', '1', '2']
       });
 
-    learnerPlaylistService.removeFromLearnerPlaylist(
+    learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
       activityId, 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
 

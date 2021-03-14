@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import constants from 'assets/constants';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { LearnerPlaylistService } from
+import { LearnerPlaylistBackendApiService } from
   'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
@@ -52,7 +52,8 @@ export class LearnerDashboardIconsComponent implements OnInit {
   constructor(
     private learnerDashboardIdsBackendApiService:
       LearnerDashboardIdsBackendApiService,
-    private learnerPlaylistService: LearnerPlaylistService
+    private learnerPlaylistBackendApiService:
+      LearnerPlaylistBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -144,7 +145,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
 
   addToLearnerPlaylist(activityId: string, activityType: string): void {
     var isSuccessfullyAdded = (
-      this.learnerPlaylistService.addToLearnerPlaylist(
+      this.learnerPlaylistBackendApiService.addToLearnerPlaylist(
         activityId, activityType));
     if (isSuccessfullyAdded) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
@@ -162,7 +163,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
 
   removeFromLearnerPlaylist(
       activityId: string, activityTitle: string, activityType: string): void {
-    this.learnerPlaylistService.removeFromLearnerPlaylist(
+    this.learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType,
       this.learnerDashboardActivityIds);
   }
