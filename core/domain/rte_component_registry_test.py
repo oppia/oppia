@@ -51,6 +51,11 @@ _COMPONENT_CONFIG_SCHEMA = [
     ('icon_data_url', python_utils.BASESTRING),
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
+MIGRATED_RTE_COMPONENTS = [
+    'collapsible',
+    'image',
+    'link'
+]
 
 
 class RteComponentUnitTests(test_utils.GenericTestBase):
@@ -172,7 +177,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             # TODO(#9762): Remove this if condition once all the files in the
             # rich_text_components directory is migrated from directives
             # to component files.
-            if hyphenated_component_id == 'svgdiagram':
+            if (hyphenated_component_id == 'svgdiagram' or
+                hyphenated_component_id in MIGRATED_RTE_COMPONENTS):
                 main_ts_file = os.path.join(
                     directives_dir, 'oppia-noninteractive-%s.component.ts'
                     % hyphenated_component_id)
