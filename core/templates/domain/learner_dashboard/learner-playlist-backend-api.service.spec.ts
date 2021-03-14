@@ -37,7 +37,7 @@ export class MockNgbModalRef {
   };
 }
 
-describe('Learner playlist service factory', () => {
+fdescribe('Learner playlist Backend Api service ', () => {
   let learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService;
   let http: HttpTestingController;
   let activityId = '1';
@@ -67,10 +67,6 @@ describe('Learner playlist service factory', () => {
     });
     spyOn(alertsService, 'addInfoMessage').and.callThrough();
     spyOn(alertsService, 'addSuccessMessage').and.callThrough();
-  });
-
-  afterEach(() => {
-    http.verify();
   });
 
   it('should successfully add playlist to play later list', fakeAsync(() => {

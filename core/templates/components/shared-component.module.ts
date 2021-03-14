@@ -64,6 +64,7 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 
 
@@ -119,6 +120,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TranslatePipe,
     TruncatePipe,
     LearnerDashboardIconsComponent,
+    LearnerPlaylistModalComponent
   ],
 
   entryComponents: [
@@ -137,6 +139,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThreadTableComponent,
     ThumbnailDisplayComponent,
     LearnerDashboardIconsComponent,
+    LearnerPlaylistModalComponent
   ],
 
   exports: [
@@ -157,6 +160,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     TranslatePipe,
     LearnerDashboardIconsComponent,
+    LearnerPlaylistModalComponent
   ],
 })
 
