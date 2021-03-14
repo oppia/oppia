@@ -120,5 +120,5 @@ describe('Skill editor main tab directive', function() {
     ctrl.$onInit();
     $timeout.flush();
     expect(focusManagerService.setFocus()).toHaveBeenCalled();
-  })
+  });
 });
