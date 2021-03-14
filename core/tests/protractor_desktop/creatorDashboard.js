@@ -62,7 +62,6 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user4@creatorDashboard.com', 'learner4');
 
     await users.login('user1@creatorDashboard.com');
-    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
@@ -135,7 +134,6 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user7@creatorDashboard.com', 'learner7');
 
     await users.login('user5@creatorDashboard.com');
-    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
@@ -202,7 +200,6 @@ describe('Creator dashboard functionality', function() {
     await users.createUser('user10@creatorDashboard.com', 'learner10');
 
     await users.login('user8@creatorDashboard.com');
-    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_5,
       EXPLORATION_CATEGORY,

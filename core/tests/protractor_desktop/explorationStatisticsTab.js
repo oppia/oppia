@@ -60,7 +60,6 @@ describe('Statistics tab', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user1@statisticsTab.com');
-    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     await explorationEditorPage.navigateToSettingsTab();

@@ -46,7 +46,6 @@ describe('Voiceover upload features', function() {
 
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);
-    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('Uploading translation file');

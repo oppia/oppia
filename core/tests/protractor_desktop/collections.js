@@ -58,7 +58,6 @@ describe('Collections', function() {
 
     await users.login('creator@explorations.com');
     // Create four test explorations.
-    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       'First Exploration',
       'Languages',

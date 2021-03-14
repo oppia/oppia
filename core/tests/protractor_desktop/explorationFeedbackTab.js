@@ -125,7 +125,6 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user3@ExplorationFeedback.com');
-    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
@@ -181,7 +180,6 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user5@ExplorationFeedback.com');
-    // Set expectWelcomeModal: true.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,

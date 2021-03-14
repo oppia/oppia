@@ -121,7 +121,6 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadExploration('exploration_player_test.yaml');
       } else {
-        // Set expectWelcomeModal: true.
         await workflow.createAndPublishExploration(
           'Exploration Player Test',
           'Astronomy',
@@ -149,7 +148,6 @@ describe('Learner dashboard functionality', function() {
       if (browser.isMobile) {
         await adminPage.reloadCollection(0);
       } else {
-        // Set expectWelcomeModal: true.
         await workflow.createAndPublishExploration(
           'Demo Exploration',
           'Algebra',
@@ -279,7 +277,6 @@ describe('Learner dashboard functionality', function() {
       // Wait for player page to completely load.
       await waitFor.pageToFullyLoad();
       var explorationId = await general.getExplorationIdFromPlayer();
-      // Set expectWelcomeModal: true.
       await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();

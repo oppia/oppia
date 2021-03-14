@@ -120,7 +120,6 @@ describe('Site language', function() {
     await users.logout();
 
     await users.login('langCreator@explorations.com');
-    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(

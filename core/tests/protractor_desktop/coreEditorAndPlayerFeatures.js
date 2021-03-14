@@ -86,7 +86,6 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the response editor ' +
      'after the interaction is created', async function() {
-    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -315,7 +314,6 @@ describe('Core exploration functionality', function() {
     await users.createUser(
       `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
     await users.login(`user${userNumber}@stateEditor.com`);
-    // Set expectWelcomeModal: true.
     await workflow.createExploration(true);
 
     userNumber++;
