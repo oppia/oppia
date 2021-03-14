@@ -37,7 +37,7 @@ export class LearnerPlaylistModalComponent implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   ngOnInit(): void {
