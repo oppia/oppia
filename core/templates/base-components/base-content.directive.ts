@@ -25,6 +25,9 @@ require('services/contextual/url.service.ts');
 require('services/keyboard-shortcut.service.ts');
 require('services/page-title.service.ts');
 require('services/stateful/background-mask.service.ts');
+require(
+  'components/common-layout-directives/' +
+  'navigation-bars/top-navigation-bar.component.ts');
 
 angular.module('oppia').directive('baseContent', [
   function() {

@@ -25,6 +25,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { TopNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -43,6 +44,7 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
+    TopNavigationBarComponent,
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
@@ -51,6 +53,7 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
+    TopNavigationBarComponent,
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     StateParamChangesEditorComponent,

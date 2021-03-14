@@ -53,3 +53,9 @@ require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.component.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
+require(
+  'core/templates/components/common-layout-directives/' +
+  'navigation-bars/top-navigation-bar.component.ts');
+require(
+  'core/templates/components/button-directives/' +
+  'create-activity-button.component.ts');

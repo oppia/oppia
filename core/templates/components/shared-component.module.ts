@@ -49,6 +49,8 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
+import { TopNavigationBarComponent } from
+  './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
@@ -63,7 +65,7 @@ import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
-
+import { CreateActivityButtonComponent } from 'components/button-directives/create-activity-button.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -109,6 +111,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
+    TopNavigationBarComponent,
+    CreateActivityButtonComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThumbnailDisplayComponent,
@@ -118,7 +122,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   entryComponents: [
     BackgroundBannerComponent,
-    SharingLinksComponent,
+    SharingLinksComponent, TopNavigationBarComponent,
+    CreateActivityButtonComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
@@ -128,6 +133,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
+    TopNavigationBarComponent,
+    CreateActivityButtonComponent,
     SummaryListHeaderComponent,
     ThreadTableComponent,
     ThumbnailDisplayComponent,
