@@ -31,10 +31,21 @@ import feconf
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class MockModel(base_models.BaseModel):
     pass
+
+
+class MockNonAutoLastUpdatedModel(base_models.BaseModel):
+    created_on = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
+
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage."""
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
 
 
 class MockSnapshotModel(base_models.BaseModel):
@@ -146,7 +157,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
         self.invalid_model = MockModel(id='mockmodel')
-        self.invalid_model.update_timestamps()
         self.invalid_model.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
@@ -174,7 +184,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             r'The _get_change_domain_class\(\) method is missing from the '
             'derived class. It should be implemented in the derived class.'):
             snapshot_model = MockSnapshotModel(id='mockmodel')
-            snapshot_model.update_timestamps()
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
@@ -201,18 +210,16 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')
-        user.update_timestamps()
         user.put()
         MockBaseUserModelValidator().validate(user)
 
     def test_validate_deleted_reports_error_for_old_deleted_model(self):
         year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
-        model = MockModel(
+        model = MockNonAutoLastUpdatedModel(
             id='123',
             deleted=True,
             last_updated=year_ago
         )
-        model.update_timestamps(update_last_updated_time=False)
         model.put()
         validator = MockBaseUserModelValidator()
         validator.validate_deleted(model)
@@ -290,8 +297,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         model = MockCommitLogEntryModel(
             id='mock-12345',
             user_id=feconf.MIGRATION_BOT_USER_ID,
-            commit_cmds=[])
-        model.update_timestamps()
+            commit_cmds=[],
+            post_commit_status='public',
+            commit_type='create')
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
@@ -309,8 +318,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         model = MockCommitLogEntryModel(
             id='mock-12345',
             user_id=self.PSEUDONYMOUS_ID,
-            commit_cmds=[])
-        model.update_timestamps()
+            commit_cmds=[],
+            post_commit_status='public',
+            commit_type='create')
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
@@ -328,8 +339,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         model = MockCommitLogEntryModel(
             id='mock-12345',
             user_id='invalid_user_id',
-            commit_cmds=[])
-        model.update_timestamps()
+            commit_cmds=[],
+            post_commit_status='public',
+            commit_type='create')
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
@@ -349,8 +362,11 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             id='mock-12345',
             user_id=feconf.MIGRATION_BOT_USER_ID,
             commit_cmds=[],
-            commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
-        model.update_timestamps()
+            commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            commit_type='create',
+            post_commit_status=feconf.POST_COMMIT_STATUS_PRIVATE
+        )
+        model.put_for_human()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)

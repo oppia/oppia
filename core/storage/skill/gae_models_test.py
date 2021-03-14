@@ -56,8 +56,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False
         )
         commit.skill_id = 'b'
-        commit.update_timestamps()
-        commit.put()
+        commit.put_depending_on_id('committer_id')
         self.assertTrue(
             skill_models.SkillCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
