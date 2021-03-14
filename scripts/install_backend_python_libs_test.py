@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import os
 import re
 import shutil
@@ -41,8 +42,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'requirements_test.txt')
-    TEST_IGNORABLE_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
-        THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'ignorable_requirements_test.txt')
+    TEST_REQUIREMENTS_INVALID_GIT_TXT_FILE_PATH = os.path.join(
+        THIRD_PARTY_DATA_DIRECTORY_FILE_PATH,
+        'requirements_invalid_git_test.txt')
 
     def setUp(self):
         super(InstallBackendPythonLibsTests, self).setUp()
@@ -112,6 +114,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_Popen_error = self.swap(
             subprocess, 'Popen', mock_check_call_error)
 
+    def test_invalid_git_dependency_raises_an_exception(self):
+        swap_requirements = self.swap(
+            common, 'COMPILED_REQUIREMENTS_FILE_PATH',
+            self.TEST_REQUIREMENTS_INVALID_GIT_TXT_FILE_PATH)
+
+        with swap_requirements:
+            self.assertRaisesRegexp(
+                Exception, 'GitHub requirements must match regexp',
+                install_backend_python_libs.get_mismatches)
+
     def test_multiple_discrepancies_returns_correct_mismatches(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
@@ -121,7 +133,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             class Distribution(python_utils.OBJECT):
                 """Distribution object containing python library information."""
 
-                def __init__(self, library_name, version_string):
+                def __init__(self, library_name, version_string, metadata_dict):
                     """Creates mock distribution metadata class that contains
                     the name and version information for a python library.
 
@@ -130,69 +142,62 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                             is representing.
                         version_string: str. The stringified version of this
                             library.
+                        metadata_dict: dict(str: str). The stringified metadata
+                            contents of the library.
                     """
                     self.project_name = library_name
                     self.version = version_string
+                    self.metadata_dict = metadata_dict
+
+                def has_metadata(self, key):
+                    """Returns whether the given metadata key exists.
+
+                    Args:
+                        key: str. The key corresponding to the metadata.
+
+                    Returns:
+                        bool. Whether the metadata exists.
+                    """
+                    return key in self.metadata_dict
+
+                def get_metadata(self, key):
+                    """The contents of the corresponding metadata.
+
+                    Args:
+                        key: str. The key corresponding to the metadata.
+
+                    Returns:
+                        str. The contents of the metadata.
+                    """
+                    return self.metadata_dict[key]
+
             return [
-                Distribution('dependency1', '1.5.1'),
-                Distribution('dependency2', '4.9.1.2'),
-                Distribution('dependency5', '0.5.3')
+                Distribution('dependency1', '1.5.1', {}),
+                Distribution('dependency2', '4.9.1.2', {}),
+                Distribution('dependency5', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'b' * 40},
+                    })
+                }),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                })
             ]
 
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)
         with swap_requirements, swap_find_distributions:
-            self.assertEqual(
-                {
-                    u'dependency1': (u'1.6.1', u'1.5.1'),
-                    u'dependency2': (u'4.9.1', u'4.9.1.2'),
-                    u'dependency3': (u'3.1.5', None),
-                    u'dependency4': (u'0.3.0.1', None),
-                    u'dependency5': (None, u'0.5.3')
-                },
-                install_backend_python_libs.get_mismatches())
-
-    # TODO(#11474): Remove this test for special-case logic once we can use the
-    # Python 3 version of the Firebase SDK.
-    def test_ignored_library_name_mismatches_are_respected(self):
-        swap_requirements = self.swap(
-            common, 'COMPILED_REQUIREMENTS_FILE_PATH',
-            self.TEST_IGNORABLE_REQUIREMENTS_TXT_FILE_PATH)
-
-        def mock_find_distributions(paths): # pylint: disable=unused-argument
-            class Distribution(python_utils.OBJECT):
-                """Distribution object containing python library information."""
-
-                def __init__(self, library_name, version_string):
-                    """Creates mock distribution metadata class that contains
-                    the name and version information for a python library.
-
-                    Args:
-                        library_name: str. The name of the library this object
-                            is representing.
-                        version_string: str. The stringified version of this
-                            library.
-                    """
-                    self.project_name = library_name
-                    self.version = version_string
-            return [
-                Distribution('dependency1', '1.5.1'),
-                Distribution('dependency2', '4.9.1.2'),
-                Distribution('dependency3', '0.5.3'),
-            ]
-
-        swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions)
-        swap_ignored_names = self.swap(
-            install_backend_python_libs, 'IGNORED_LIBRARY_NAME_MISMATCHES',
-            ('dependency3', 'dependency4'))
-        with swap_requirements, swap_find_distributions, swap_ignored_names:
-            self.assertEqual(
-                {
-                    u'dependency1': (u'1.6.1', u'1.5.1'),
-                    u'dependency2': (u'4.9.1', u'4.9.1.2'),
-                },
-                install_backend_python_libs.get_mismatches())
+            self.assertEqual(install_backend_python_libs.get_mismatches(), {
+                u'dependency1': (u'1.6.1', u'1.5.1'),
+                u'dependency2': (u'4.9.1', u'4.9.1.2'),
+                u'dependency3': (u'3.1.5', None),
+                u'dependency4': (u'0.3.0.1', None),
+                u'dependency5': ('a' * 40, 'b' * 40),
+                u'dependency6': (None, 'z' * 40),
+                u'dependency7': ('b' * 40, None),
+            })
 
     def test_library_removal_runs_correct_commands(self):
         """Library exists in the 'third_party/python_libs' directory but it is
@@ -205,7 +210,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (None, u'10.0.1'),
-                u'six': (None, u'10.13.0.1')
+                u'six': (None, u'10.13.0.1'),
             }
 
         def mock_validate_metadata_directories():
@@ -223,12 +228,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with swap_validate_metadata_directories:
                     install_backend_python_libs.main()
 
-        self.assertEqual(
-            removed_dirs,
-            [
-                common.THIRD_PARTY_PYTHON_LIBS_DIR
-            ]
-        )
+        self.assertEqual(removed_dirs, [common.THIRD_PARTY_PYTHON_LIBS_DIR])
 
         self.assertEqual(
             self.cmd_token_list,
@@ -252,7 +252,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return {
                 u'flask': (u'1.1.0.1', u'1.1.1.0'),
                 u'six': (u'1.15.0', None),
-                u'protobuf': (u'2.0.1.3', u'2.0.0.0')
+                u'git-dep1': (
+                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep1' % (
+                        'a' * 40),
+                    'b' * 40),
+                u'git-dep2': (
+                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep2' % (
+                        'a' * 40),
+                    None),
             }
 
         def mock_validate_metadata_directories():
@@ -283,10 +290,19 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('protobuf', '2.0.1.3'),
+                    'pip', 'install',
+                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep1' % (
+                        'a' * 40),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
-                ]
+                ],
+                [
+                    'pip', 'install',
+                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep2' % (
+                        'a' * 40),
+                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--upgrade', '--no-dependencies',
+                ],
             ]
         )
 
@@ -543,6 +559,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     """
                     self.project_name = library_name
                     self.version = version_string
+
+                def has_metadata(self, _):
+                    """Always reports that metadata does not exist."""
+                    return False
             return [
                 Distribution('dependency1', '1.5.1'),
                 Distribution('dependency2', '5.0.0'),

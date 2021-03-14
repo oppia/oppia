@@ -220,7 +220,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             uid: user
             for uid, user in self._users_by_uid.items() if uid not in uids
         }
-        return firebase_admin._user_mgt.BatchDeleteAccountsResponse()
+        return firebase_admin.auth.BatchDeleteAccountsResponse()
 
     def get_user(self, uid):
         """Returns user with given ID if found, otherwise raises an error.
