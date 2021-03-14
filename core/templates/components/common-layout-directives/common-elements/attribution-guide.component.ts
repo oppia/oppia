@@ -30,7 +30,6 @@ import { UrlService } from 'services/contextual/url.service';
   styleUrls: []
 })
 export class AttributionGuideComponent implements OnInit {
-  deviceUsedIsMobile: boolean = false;
   iframed: boolean = false;
   generateAttibutionIsAllowed: boolean = false;
   maskIsShown: boolean = false;
@@ -41,7 +40,6 @@ export class AttributionGuideComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
     this.iframed = this.urlService.isIframed();
     this.generateAttibutionIsAllowed = (
       this.attributionService.isGenerateAttributionAllowed());
