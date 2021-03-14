@@ -191,10 +191,8 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-      // expectWelcomeModal: true.
       await createDummyExplorationOnDesktopAsAdmin(true);
       // Create a second exploration named 'Test Exploration'.
-      // expectWelcomeModal: false.
       await workflow.createAndPublishExploration(
         'Test Exploration',
         'Astronomy',
@@ -302,10 +300,8 @@ describe('Learner dashboard functionality', function() {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-      // expectWelcomeModal: true.
       await createDummyExplorationOnDesktopAsAdmin(true);
       // Create a second exploration named 'Collection Exploration'.
-      // expectWelcomeModal: true.
       await workflow.createAndPublishExploration(
         'Collection Exploration',
         'Architect',

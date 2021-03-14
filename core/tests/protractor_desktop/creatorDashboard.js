@@ -70,7 +70,6 @@ describe('Creator dashboard functionality', function() {
       true
     );
     await creatorDashboardPage.get();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
@@ -142,7 +141,6 @@ describe('Creator dashboard functionality', function() {
       true
     );
     await creatorDashboardPage.get();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_4,
       EXPLORATION_CATEGORY,
@@ -208,7 +206,6 @@ describe('Creator dashboard functionality', function() {
       true
     );
     await creatorDashboardPage.get();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_6,
       EXPLORATION_CATEGORY,

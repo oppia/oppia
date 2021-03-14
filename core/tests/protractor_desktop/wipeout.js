@@ -69,7 +69,6 @@ describe('When account is deleted it', function() {
     await users.logout();
 
     await users.login('voiceArtist@oppia.com');
-    // Set expectWelcomeModal: false.
     await general.openEditor(explorationId, false);
     await general.expect404Error();
     expectedConsoleErrors = [

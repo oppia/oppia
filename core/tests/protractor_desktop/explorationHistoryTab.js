@@ -644,7 +644,6 @@ describe('Exploration history', function() {
     await explorationPlayerPage.expectExplorationToBeOver();
 
     // Verify history states between original and reversion.
-    // expectWelcomeModal: false.
     await general.moveToEditor(false);
     var expectedHistoryStates = [{
       label: 'first',

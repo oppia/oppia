@@ -180,7 +180,6 @@ describe('Full exploration editor', function() {
       true
     );
     var parentId1 = await general.getExplorationIdFromEditor();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'Parent Exploration 2',
       'Algebra',
@@ -190,7 +189,6 @@ describe('Full exploration editor', function() {
       false
     );
     var parentId2 = await general.getExplorationIdFromEditor();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'Refresher Exploration',
       'Algebra',

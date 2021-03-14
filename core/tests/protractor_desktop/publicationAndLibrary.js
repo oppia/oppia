@@ -217,7 +217,6 @@ describe('Library index page', function() {
       LANGUAGE_FRANCAIS,
       true
     );
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT,
       CATEGORY_ENVIRONMENT,
@@ -299,7 +298,6 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('eve@privileges.com');
-    // Set expectWelcomeModal: false.
     await general.openEditor(explorationId, false);
     await general.expect404Error();
     await users.logout();
@@ -335,7 +333,6 @@ describe('Permissions for private explorations', function() {
     await users.logout();
 
     await users.login('guestUser@oppia.tests');
-    // Set expectWelcomeModal: false.
     await general.openEditor(explorationId, false);
     await general.expect404Error();
     await users.logout();

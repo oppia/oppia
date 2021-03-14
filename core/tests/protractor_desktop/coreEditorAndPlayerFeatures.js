@@ -127,7 +127,6 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the response editor ' +
      'during set the interaction', async function() {
-    // Set expectWelcomeModal: false.
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -170,7 +169,6 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the default response editor',
     async function() {
-      // Set expectWelcomeModal: false.
       await workflow.createExploration(false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -207,7 +205,6 @@ describe('Enable correctness feedback and set correctness', function() {
     });
 
   it('should show Learn Again button correctly', async function() {
-    // Set expectWelcomeModal: false.
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);

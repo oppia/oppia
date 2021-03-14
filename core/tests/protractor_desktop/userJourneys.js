@@ -240,7 +240,6 @@ describe('Site language', function() {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
-    // Set expectWelcomeModal: false.
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.

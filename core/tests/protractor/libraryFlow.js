@@ -145,7 +145,6 @@ describe('Rating', function() {
       await adminPage.reloadExploration('rating_test.yaml');
     } else {
       // For a desktop browser, create and publish an exploration.
-      // expectWelcomeModal: true.
       await workflow.createAndPublishExploration(
         EXPLORATION_RATINGTEST,
         CATEGORY_BUSINESS,

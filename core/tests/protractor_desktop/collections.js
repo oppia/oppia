@@ -66,7 +66,6 @@ describe('Collections', function() {
       true
     );
     firstExplorationId = await general.getExplorationIdFromEditor();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'Second Exploration',
       'Languages',
@@ -75,7 +74,6 @@ describe('Collections', function() {
       false
     );
     secondExplorationId = await general.getExplorationIdFromEditor();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'Third Exploration',
       'Languages',
@@ -84,7 +82,6 @@ describe('Collections', function() {
       false
     );
     thirdExplorationId = await general.getExplorationIdFromEditor();
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'Fourth Exploration',
       'Languages',
@@ -94,7 +91,6 @@ describe('Collections', function() {
     );
     fourthExplorationId = await general.getExplorationIdFromEditor();
     // Create searchable explorations.
-    // expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'The Lazy Magician for CollectionSuiteTest',
       'Algorithms',
@@ -102,7 +98,6 @@ describe('Collections', function() {
       'English',
       false
     );
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
@@ -110,7 +105,6 @@ describe('Collections', function() {
       'English',
       false
     );
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       'Test Exploration for CollectionSuiteTest',
       'Languages',

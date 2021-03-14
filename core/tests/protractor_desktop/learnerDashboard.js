@@ -137,7 +137,6 @@ describe('Learner dashboard functionality', function() {
       LANGUAGE_ENGLISH,
       true
     );
-    // Set expectWelcomeModal: false.
     await workflow.createAndPublishExploration(
       EXPLORATION_SINGING,
       CATEGORY_MUSIC,
