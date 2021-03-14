@@ -34,7 +34,6 @@ from core.domain import subscription_services
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 datastore_services = models.Registry.import_datastore_services()
@@ -91,42 +90,47 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
-def get_multiple_explorations_by_version(
-        exp_id, version_numbers, run_conversion=True):
-    """Returns a list of Exploration domain objects corresponding to the
-    specified versions.
+def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+        exp_id, version_numbers):
+    """Returns a list of VersionedExplorationInteractionIdsMapping domain
+    objects corresponding to the specified versions.
 
     Args:
         exp_id: str. ID of the exploration.
         version_numbers: list(int). List of version numbers.
-        run_conversion: bool. When True, updates each Exploration version to
-            the latest states_schema_version if necessary.
 
     Returns:
-        list(Exploration). List of Exploration domain objects.
+        list(VersionedExplorationInteractionIdsMapping). List of Exploration
+        domain objects.
 
     Raises:
         Exception. One or more of the given versions of the exploration could
             not be converted to the latest schema version.
     """
-    explorations = []
+    versioned_exp_interaction_ids_mapping = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
-    error_versions = []
     for index, exploration_model in enumerate(exploration_models):
-        try:
-            explorations.append(
-                get_exploration_from_model(
-                    exploration_model, run_conversion=run_conversion))
-        except utils.ExplorationConversionError:
-            error_versions.append(version_numbers[index])
+        if (exploration_model.states_schema_version !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            raise Exception(
+                'Exploration(id=%s, version=%s, states_schema_version=%s) '
+                'does not match the latest schema version %s' % (
+                    exp_id,
+                    version_numbers[index],
+                    exploration_model.states_schema_version,
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ))
+        states_to_interaction_id_mapping = {}
+        for state_name in exploration_model.states:
+            states_to_interaction_id_mapping[state_name] = (
+                exploration_model.states[state_name]['interaction']['id'])
+        versioned_exp_interaction_ids_mapping.append(
+            exp_domain.VersionedExplorationInteractionIdsMapping(
+                exploration_model.version,
+                states_to_interaction_id_mapping))
 
-    if error_versions:
-        raise Exception(
-            'Exploration %s, versions [%s] could not be converted to latest '
-            'schema version.'
-            % (exp_id, ', '.join(python_utils.MAP(str, error_versions))))
-    return explorations
+    return versioned_exp_interaction_ids_mapping
 
 
 def get_exploration_from_model(exploration_model, run_conversion=True):
