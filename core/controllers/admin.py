@@ -85,11 +85,10 @@ class AdminHandler(base.BaseHandler):
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
         for job in unfinished_job_data:
-            job['can_be_canceled'] = job['is_cancelable'] and any([
-                klass.__name__ == job['job_type']
+            job['can_be_canceled'] = job['is_cancelable'] and any(klass.__name__ == job['job_type']
                 for klass in (
                     jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                        jobs_registry.AUDIT_JOB_MANAGERS))])
+                        jobs_registry.AUDIT_JOB_MANAGERS)))
 
         queued_or_running_job_types = set([
             job['job_type'] for job in unfinished_job_data])
@@ -271,8 +270,8 @@ class AdminHandler(base.BaseHandler):
                         'commit_message should be string, received \'%s\'.' % (
                             commit_message))
                 elif (not isinstance(new_rule_dicts, list) or not all(
-                        [isinstance(rule_dict, dict)
-                         for rule_dict in new_rule_dicts])):
+                        isinstance(rule_dict, dict)
+                         for rule_dict in new_rule_dicts)):
                     raise self.InvalidInputException(
                         'new_rules should be a list of dicts, received'
                         ' \'%s\'.' % new_rule_dicts)
