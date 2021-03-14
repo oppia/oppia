@@ -21,16 +21,17 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
-
 describe('Skill editor main tab directive', function() {
   var $scope = null;
   var ctrl = null;
   var $rootScope = null;
+  let $timeout = null;
   var directive = null;
   var UndoRedoService = null;
   var $uibModal = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
+  var focusManagerService = null;
   var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
   beforeEach(angular.mock.module('oppia'));
 
@@ -38,12 +39,14 @@ describe('Skill editor main tab directive', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
+    $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('skillEditorMainTabDirective')[0];
     SkillEditorStateService = $injector.get('SkillEditorStateService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
+    focusManagerService = $injector.get('FocusManagerService');
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -111,4 +114,11 @@ describe('Skill editor main tab directive', function() {
     $scope.assignedSkillTopicData = assignedSkillTopicData;
     expect($scope.isTopicDropdownEnabled()).toEqual(true);
   });
+
+  it('should set focus on create question button', function() {
+    spyOn(focusManagerService, 'setFocus');
+    ctrl.$onInit();
+    $timeout.flush();
+    expect(focusManagerService.setFocus()).toHaveBeenCalled();
+  })
 });
