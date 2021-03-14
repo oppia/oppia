@@ -63,7 +63,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       }
     };
 
-    var _initRecorder = function() {
+    var _initRecorderAsync = async function() {
       // Browser agnostic AudioContext API check.
       audioContextAvailable = $window.AudioContext ||
         $window.webkitAudioContext;
@@ -126,7 +126,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
 
     return {
       initRecorder: function() {
-        _initRecorder();
+        _initRecorderAsync();
       },
       status: function() {
         return {
@@ -134,7 +134,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
           isRecording: isRecording
         };
       },
-      startRecording: function() {
+      startRecordingAsync: async function() {
         // If worker is not available then do not start recording.
         if (mp3Worker === null) {
           return null;
@@ -159,7 +159,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
           _stopRecord();
         }
       },
-      getMp3Data: function() {
+      getMp3DataAsync: async function() {
         return defer.promise;
       },
       closeRecorder: function() {

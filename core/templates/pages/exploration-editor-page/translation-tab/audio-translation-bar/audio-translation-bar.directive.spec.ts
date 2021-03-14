@@ -234,7 +234,7 @@ describe('Audio translation bar directive', function() {
       spyOn(voiceoverRecordingService, 'status').and.returnValue({
         isAvailable: true
       });
-      spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
         $q.reject());
 
       $scope.checkAndStartRecording();
@@ -250,7 +250,7 @@ describe('Audio translation bar directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     $scope.checkAndStartRecording();
 
@@ -262,9 +262,9 @@ describe('Audio translation bar directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
-    spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
+    spyOn($scope.voiceoverRecorder, 'getMp3DataAsync').and.returnValue(
       $q.resolve([]));
     var waveSurferObjSpy = {
       load: () => {},
@@ -304,7 +304,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -327,7 +327,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -352,7 +352,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -390,7 +390,7 @@ describe('Audio translation bar directive', function() {
 
   it('should play and pause unsaved audio when wave surfer calls on method' +
     ' callback', function() {
-    spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
+    spyOn($scope.voiceoverRecorder, 'getMp3DataAsync').and.returnValue(
       $q.resolve([]));
     var waveSurferObjSpy = {
       load: () => {},
@@ -419,7 +419,7 @@ describe('Audio translation bar directive', function() {
 
   it('should play and pause unsaved audio when wave surfer on method does' +
     ' not call the callbacl', function() {
-    spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
+    spyOn($scope.voiceoverRecorder, 'getMp3DataAsync').and.returnValue(
       $q.resolve([]));
     var waveSurferObjSpy = {
       load: () => {},
@@ -465,7 +465,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
+    spyOn($scope.voiceoverRecorder, 'getMp3DataAsync').and.returnValue(
       $q.resolve([]));
     var waveSurferObjSpy = {
       load: () => {},

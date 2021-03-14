@@ -190,7 +190,7 @@ angular.module('oppia').directive('audioTranslationBar', [
 
           var showPermissionAndStartRecording = function() {
             $scope.checkingMicrophonePermission = true;
-            $scope.voiceoverRecorder.startRecording().then(function() {
+            $scope.voiceoverRecorder.startRecordingAsync().then(function() {
               // When the user accepts the microphone access.
               $scope.showRecorderWarning = true;
               $scope.isTranslationTabBusy = true;
@@ -261,7 +261,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             $scope.voiceoverRecorder.stopRecord();
             $scope.recordingComplete = true;
             cancelTimer();
-            $scope.voiceoverRecorder.getMp3Data().then(function(audio) {
+            $scope.voiceoverRecorder.getMp3DataAsync().then(function(audio) {
               var fileType = 'audio/mp3';
               $scope.audioBlob = new Blob(audio, {type: fileType});
               // Free the browser from web worker.
