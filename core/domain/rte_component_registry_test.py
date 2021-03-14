@@ -178,7 +178,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             # rich_text_components directory is migrated from directives
             # to component files.
             if (hyphenated_component_id == 'svgdiagram' or
-                hyphenated_component_id in MIGRATED_RTE_COMPONENTS):
+                    hyphenated_component_id in MIGRATED_RTE_COMPONENTS):
                 main_ts_file = os.path.join(
                     directives_dir, 'oppia-noninteractive-%s.component.ts'
                     % hyphenated_component_id)
