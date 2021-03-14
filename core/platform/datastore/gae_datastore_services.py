@@ -72,20 +72,6 @@ def get_multi(keys):
     return ndb.get_multi(keys)
 
 
-def update_timestamps_multi(entities, update_last_updated_time=True):
-    """Update the created_on and last_updated fields of all given entities.
-
-    Args:
-        entities: list(datastore_services.Model). List of model instances to
-            be stored.
-        update_last_updated_time: bool. Whether to update the
-            last_updated field of the model.
-    """
-    for entity in entities:
-        entity.update_timestamps(
-            update_last_updated_time=update_last_updated_time)
-
-
 def put_multi(entities):
     """Stores a sequence of Model instances.
 

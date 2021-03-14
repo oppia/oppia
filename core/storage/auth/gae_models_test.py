@@ -209,7 +209,6 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
         user_identifiers_model = (
             auth_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID))
         user_identifiers_model.deleted = True
-        user_identifiers_model.update_timestamps()
         user_identifiers_model.put()
         self.assertEqual(
             user_identifiers_model,

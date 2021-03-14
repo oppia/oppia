@@ -4993,8 +4993,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_snapshot = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
             exp_snapshot_id)
         exp_snapshot.commit_cmds[0] = {}
-        exp_snapshot.update_timestamps()
-        exp_models.ExplorationSnapshotMetadataModel.put(exp_snapshot)
+        exp_models.ExplorationSnapshotMetadataModel.put_for_human(exp_snapshot)
         error_message = 'snapshots contain invalid commit_cmds'
         with self.assertRaisesRegexp(Exception, error_message):
             exp_services.regenerate_missing_stats_for_exploration('ID')
