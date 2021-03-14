@@ -51,7 +51,6 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
         admin_model.role = feconf.ROLE_ID_ADMIN
-        admin_model.update_timestamps()
         admin_model.put()
 
         model_id = '%s.%s.%s.%s' % (
@@ -60,7 +59,6 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = audit_models.RoleQueryAuditModel(
             id=model_id, user_id=self.admin_id,
             intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -74,7 +72,6 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -122,7 +119,6 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
         model_instance_with_invalid_id = audit_models.RoleQueryAuditModel(
             id=model_invalid_id, user_id=self.admin_id,
             intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
-        model_instance_with_invalid_id.update_timestamps()
         model_instance_with_invalid_id.put()
         expected_output = [(
             u'[u\'fully-validated RoleQueryAuditModel\', 1]'
@@ -147,7 +143,6 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
         admin_model.role = feconf.ROLE_ID_ADMIN
-        admin_model.update_timestamps()
         admin_model.put()
 
         model_id = (
@@ -155,7 +150,6 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = audit_models.UsernameChangeAuditModel(
             id=model_id, committer_id=self.admin_id,
             old_username=USER_NAME, new_username='new')
-        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -170,7 +164,6 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -217,7 +210,6 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
         model_instance_with_invalid_id = audit_models.UsernameChangeAuditModel(
             id=model_invalid_id, committer_id=self.admin_id,
             old_username=USER_NAME, new_username='new')
-        model_instance_with_invalid_id.update_timestamps()
         model_instance_with_invalid_id.put()
         expected_output = [(
             u'[u\'fully-validated UsernameChangeAuditModel\', 1]'
