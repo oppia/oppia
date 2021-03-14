@@ -25,7 +25,6 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.domain import user_services
 import feconf
 import utils
@@ -258,7 +257,7 @@ class FetchSkillsHandler(base.BaseHandler):
     def get(self):
         """Returns all skill IDs linked to some topic."""
 
-        skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
+        skill_ids = topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
 
         skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
 
