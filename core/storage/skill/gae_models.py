@@ -133,8 +133,7 @@ class SkillModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
-        skill_commit_log_entry.update_timestamps()
-        skill_commit_log_entry.put()
+        skill_commit_log_entry.put_depending_on_id(committer_id)
 
     @staticmethod
     def get_model_association_to_user():
