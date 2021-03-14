@@ -202,9 +202,7 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
                 state_names_to_retrieve[index])
             continue
         new_state_name = state_names[index]
-        algorithm_ids_to_job_ids = {
-            algorithm_id: job_id
-            for algorithm_id, job_id in classifier_training_job_map.items()}
+        algorithm_ids_to_job_ids = dict(classifier_training_job_map.items())
         state_training_jobs_mapping = (
             classifier_domain.StateTrainingJobsMapping(
                 exp_id, current_exp_version, new_state_name,
@@ -652,11 +650,8 @@ def create_classifier_training_job_for_reverted_exploration(
             classifier_training_job_maps_for_old_version):
         if classifier_training_job_map is not None:
             state_name = state_names[index]
-            algorithm_ids_to_job_ids = {
-                algorithm_id: job_id
-                for algorithm_id, job_id in (
-                    classifier_training_job_map.items())
-            }
+            algorithm_ids_to_job_ids = dict((
+                    classifier_training_job_map.items()))
             state_training_jobs_mapping = (
                 classifier_domain.StateTrainingJobsMapping(
                     exploration.id, exploration.version + 1, state_name,
