@@ -69,8 +69,7 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             return
 
         item.change_cmd = suggestion.change.to_dict()
-        item.update_timestamps(update_last_updated_time=False)
-        item.put()
+        item.put_for_bot()
 
         yield ('SUCCESS', item.id)
 
@@ -285,7 +284,6 @@ class PopulateContributionStatsOneOffJob(
                             language_code]
                     ) = count_value
 
-            stats_model.update_timestamps()
             stats_model.put()
             return key, count_value
 
@@ -338,8 +336,7 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         item.final_reviewer_id = message_models[0].author_id
 
-        item.update_timestamps(update_last_updated_time=False)
-        item.put()
+        item.put_for_bot()
         yield ('CHANGED_MODELS', item.id)
 
     @staticmethod
@@ -388,8 +385,7 @@ class ContentSuggestionFormatUpdateOneOffJob(
             yield ('Failed assertion', '%s %s' % (item.id, e))
 
         if changes_made:
-            item.update_timestamps(update_last_updated_time=False)
-            item.put()
+            item.put_for_bot()
             yield ('SUCCESS - Updated suggestion', item.id)
 
     @staticmethod

@@ -84,47 +84,34 @@ ID_LENGTH = 12
 
 
 class BaseModel(datastore_services.Model):
-    """Base model for all persistent object storage classes."""
+    """Base model for all persistent object storage classes.
+
+    IMPORTANT: If humans can interface with the model directly, then inherit
+    from BaseHumanMaintainedModel instead and use the put_for_human family of
+    methods when appropriate.
+    """
 
     # Specifies whether the model's id is used as a key in Takeout. By default,
     # the model's id is not used as the key for the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY = False
 
-    # When this entity was first created. This value should only be modified by
-    # the update_timestamps method.
+    # When this entity was last updated. This value should only be modified in
+    # this class only and nowhere else.
     created_on = (
-        datastore_services.DateTimeProperty(indexed=True, required=True))
-    # When this entity was last updated. This value should only be modified by
-    # the update_timestamps method.
+        datastore_services.DateTimeProperty(required=True, indexed=True))
+    # When this entity was last updated. This value should only be modified in
+    # this class only and nowhere else.
     last_updated = (
-        datastore_services.DateTimeProperty(indexed=True, required=True))
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
-    def __init__(self, *args, **kwargs):
-        super(BaseModel, self).__init__(*args, **kwargs)
-        self._last_updated_timestamp_is_fresh = False
-
     def _pre_put_hook(self):
-        """Operations to perform just before the model is `put` into storage.
-
-        Raises:
-            Exception. The model has not refreshed the value of last_updated.
-        """
+        """Operations to perform just before the model is `put` into storage."""
         super(BaseModel, self)._pre_put_hook()
-
         if self.created_on is None:
             self.created_on = datetime.datetime.utcnow()
-
-        if self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-            self._last_updated_timestamp_is_fresh = True
-
-        if not self._last_updated_timestamp_is_fresh:
-            raise Exception(
-                '%s did not call update_timestamps() yet' % type(self).__name__)
-
-        self._last_updated_timestamp_is_fresh = False
+        self.last_updated = datetime.datetime.utcnow()
 
     @property
     def id(self):
@@ -276,34 +263,6 @@ class BaseModel(datastore_services.Model):
                     entities[i] = None
         return entities
 
-    def update_timestamps(self, update_last_updated_time=True):
-        """Update the created_on and last_updated fields.
-
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the model.
-        """
-        self._last_updated_timestamp_is_fresh = True
-
-        if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
-
-        if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
-
-    @classmethod
-    def update_timestamps_multi(cls, entities, update_last_updated_time=True):
-        """Update the created_on and last_updated fields of all given entities.
-
-        Args:
-            entities: list(datastore_services.Model). List of model instances to
-                be stored.
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the model.
-        """
-        datastore_services.update_timestamps_multi(
-            entities, update_last_updated_time=update_last_updated_time)
-
     @classmethod
     @transaction_services.run_in_transaction_wrapper
     def put_multi_transactional(cls, entities):
@@ -325,6 +284,7 @@ class BaseModel(datastore_services.Model):
             entities: list(datastore_services.Model). List of model instances to
                 be stored.
         """
+
         datastore_services.put_multi(entities)
 
     @classmethod
@@ -392,45 +352,6 @@ class BaseModel(datastore_services.Model):
 
         raise Exception('New id generator is producing too many collisions.')
 
-    @classmethod
-    def _fetch_page_sorted_by_last_updated(
-            cls, query, page_size, urlsafe_start_cursor):
-        """Fetches a page of entities sorted by their last_updated attribute in
-        descending order (newly updated first).
-
-        Args:
-            query: datastore_services.Query. The query object to be used to
-                fetch entities.
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of returned
-                entities starts from this datastore cursor. Otherwise,
-                the returned entities start from the beginning of the full
-                list of entities.
-
-        Returns:
-            3-tuple (results, cursor, more). As described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next batch
-                    of results. If there are no more results, this will be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(
-                urlsafe_cursor=urlsafe_start_cursor)
-        else:
-            start_cursor = None
-
-        result = query.order(-cls.last_updated).fetch_page(
-            page_size, start_cursor=start_cursor)
-        return (
-            result[0],
-            (result[1].urlsafe() if result[1] else None),
-            result[2])
-
 
 class BaseHumanMaintainedModel(BaseModel):
     """A model that tracks the last time it was updated by a human.
@@ -446,7 +367,15 @@ class BaseHumanMaintainedModel(BaseModel):
 
     # When this entity was last updated on behalf of a human.
     last_updated_by_human = (
-        datastore_services.DateTimeProperty(indexed=True, required=True))
+        datastore_services.DateTimeProperty(indexed=True))
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(BaseHumanMaintainedModel, cls).get_export_policy(),
+            **{'last_updated_by_human': EXPORT_POLICY.NOT_APPLICABLE}
+        )
 
     def put(self):
         """Unsupported operation on human-maintained models."""
@@ -460,6 +389,17 @@ class BaseHumanMaintainedModel(BaseModel):
     def put_for_bot(self):
         """Stores the model instance on behalf of a non-human."""
         return super(BaseHumanMaintainedModel, self).put()
+
+    def put_depending_on_id(self, user_id):
+        """Stores the model instance on behalf of a non-human.
+
+        Args:
+            user_id: str. The ID of the user trying to put this model.
+        """
+        if user_id in feconf.SYSTEM_USERS:
+            self.put_for_bot()
+        else:
+            self.put_for_human()
 
     @classmethod
     def put_multi(cls, unused_instances):
@@ -494,8 +434,62 @@ class BaseHumanMaintainedModel(BaseModel):
         """
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
 
+    def put_multi_depending_on_id(self, user_id, instances):
+        """Stores the model instance on behalf of human or non-human dpeending
+        on the user ID.
 
-class BaseCommitLogEntryModel(BaseModel):
+        Args:
+            user_id: str. The ID of the user trying to put this model.
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        if user_id in feconf.SYSTEM_USERS:
+            return self.put_multi_for_bot(instances)
+        else:
+            return self.put_multi_for_human(instances)
+
+    @classmethod
+    def _fetch_page_sorted_by_last_updated(
+            cls, query, page_size, urlsafe_start_cursor):
+        """Fetches a page of entities sorted by their last_updated attribute in
+        descending order (newly updated first).
+
+        Args:
+            query: datastore_services.Query. The query object to be used to
+                fetch entities.
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of returned
+                entities starts from this datastore cursor. Otherwise,
+                the returned entities start from the beginning of the full
+                list of entities.
+
+        Returns:
+            3-tuple (results, cursor, more). As described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next batch
+                    of results. If there are no more results, this will be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        if urlsafe_start_cursor:
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
+        else:
+            start_cursor = None
+
+        result = query.order(
+            -cls.last_updated_by_human
+        ).fetch_page(page_size, start_cursor=start_cursor)
+        return (
+            result[0], (result[1].urlsafe() if result[1] else None), result[2])
+
+
+class BaseCommitLogEntryModel(BaseHumanMaintainedModel):
     """Base Model for the models that store the log of commits to a
     construct.
     """
@@ -543,7 +537,7 @@ class BaseCommitLogEntryModel(BaseModel):
         relevant to a user for the purposes of Takeout, since commits do not
         contain any personal user data.
         """
-        return dict(BaseModel.get_export_policy(), **{
+        return dict(super(BaseCommitLogEntryModel, cls).get_export_policy(), **{
             'user_id': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_message': EXPORT_POLICY.NOT_APPLICABLE,
@@ -675,7 +669,7 @@ class BaseCommitLogEntryModel(BaseModel):
         return cls.get_by_id(commit_id)
 
 
-class VersionedModel(BaseModel):
+class VersionedModel(BaseHumanMaintainedModel):
     """Model that handles storage of the version history of model instances.
 
     To use this class, you must declare a SNAPSHOT_METADATA_CLASS and a
@@ -833,7 +827,6 @@ class VersionedModel(BaseModel):
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self]
-        self.update_timestamps_multi(entities)
         BaseModel.put_multi_transactional(entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
@@ -962,8 +955,8 @@ class VersionedModel(BaseModel):
 
             entities = (
                 snapshot_metadata_models + snapshot_content_models +
-                versioned_models)
-            cls.update_timestamps_multi(entities)
+                versioned_models
+            )
             BaseModel.put_multi_transactional(entities)
 
     def put(self, *args, **kwargs):
@@ -1247,12 +1240,12 @@ class VersionedModel(BaseModel):
         because the history of commits is not relevant for the purposes of
         Takeout, since commits do not contain any personal user data.
         """
-        return dict(BaseModel.get_export_policy(), **{
+        return dict(super(VersionedModel, cls).get_export_policy(), **{
             'version': EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
-class BaseSnapshotMetadataModel(BaseModel):
+class BaseSnapshotMetadataModel(BaseHumanMaintainedModel):
     """Base class for snapshot metadata classes.
 
     The id of this model is computed using VersionedModel.get_snapshot_id().
@@ -1295,14 +1288,17 @@ class BaseSnapshotMetadataModel(BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data to export/delete corresponding to a user."""
-        return dict(BaseModel.get_export_policy(), **{
-            'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
-            'commit_type': EXPORT_POLICY.EXPORTED,
-            'commit_message': EXPORT_POLICY.EXPORTED,
-            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
-            'commit_cmds_user_ids': EXPORT_POLICY.NOT_APPLICABLE,
-            'content_user_ids': EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(BaseSnapshotMetadataModel, cls).get_export_policy(),
+            **{
+                'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
+                'commit_type': EXPORT_POLICY.EXPORTED,
+                'commit_message': EXPORT_POLICY.EXPORTED,
+                'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+                'commit_cmds_user_ids': EXPORT_POLICY.NOT_APPLICABLE,
+                'content_user_ids': EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1404,9 +1400,10 @@ class BaseSnapshotContentModel(BaseModel):
         because the contents of snapshots are note relevant to the user for
         Takeout.
         """
-        return dict(BaseModel.get_export_policy(), **{
-            'content': EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(BaseSnapshotContentModel, cls).get_export_policy(),
+            **{'content': EXPORT_POLICY.NOT_APPLICABLE}
+        )
 
     @classmethod
     def create(cls, snapshot_id, content):
