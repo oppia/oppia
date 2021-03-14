@@ -47,7 +47,7 @@ def is_exploration_available_for_contribution(exp_id):
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(
         exp_id, strict=False)
 
-    return True if model is not None else False
+    return model is not None
 
 
 def get_exploration_opportunity_summary_from_model(model):
