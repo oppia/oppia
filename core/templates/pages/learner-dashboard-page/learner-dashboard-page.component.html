@@ -35,7 +35,7 @@
       <div class="h-100" ng-if="!$ctrl.checkMobileView()"></div>
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>"
            ng-class="{'oppia-learner-dashboard-mascot-mobile': $ctrl.checkMobileView()}"
-           class="oppia-learner-dashboard-mascot">
+           class="oppia-learner-dashboard-mascot" alt="">
     </div>
 
     <div class="col-sm-8">
@@ -895,7 +895,6 @@
   }
 
   .oppia-learner-dashboard-intro-button:hover,
-  .oppia-learner-dashboard-intro-button:focus,
   .oppia-learner-dashboard-intro-button:active {
     background-color: #3d9991;
     color: #fff;
