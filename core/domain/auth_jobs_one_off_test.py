@@ -89,7 +89,7 @@ class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
         Returns:
             AuthIdUserIdPair. The association the user should create.
         """
-        auth_id = 'aid%d' % python_utils.NEXT(self._auth_id_generator)
+        auth_id = 'aid_index_%d' % python_utils.NEXT(self._auth_id_generator)
         user_id = 'uid_%s' % auth_id
         if email is None:
             email = 'email_%s@test.com' % auth_id
@@ -217,7 +217,7 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
     def test_import_user_error_is_reported(self):
         mock_import_users_error = (
             self.firebase_sdk_stub.mock_import_users_error(
-                call_error_sequence=(True,))) # Always raise an exception.
+                batch_error_pattern=(True,))) # Always raise an exception.
 
         auth_assoc = self.create_oppia_user()
 
@@ -247,7 +247,7 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
         mock_import_users_error = (
             self.firebase_sdk_stub.mock_import_users_error(
-                call_error_sequence=(False, True, False)))
+                batch_error_pattern=(False, True, False)))
 
         auth_assocs = self.create_multi_oppia_users(9)
 
@@ -286,23 +286,23 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
         mock_import_users_error = (
             self.firebase_sdk_stub.mock_import_users_error(
-                user_error_sequence=(False, True, False, False)))
+                individual_error_pattern=(False, True, False, False)))
 
         auth_assocs = self.create_multi_oppia_users(10)
 
         with mock_import_users_error:
             self.assertItemsEqual(self.run_one_off_job(), [
                 ['ERROR: Failed to create Firebase accounts',
-                 'Import user_id=\'uid_aid1\' failed: FirebaseError'],
+                 'Import user_id=\'uid_aid_index_1\' failed: FirebaseError'],
                 ['ERROR: Failed to create Firebase accounts',
-                 'Import user_id=\'uid_aid5\' failed: FirebaseError'],
+                 'Import user_id=\'uid_aid_index_5\' failed: FirebaseError'],
                 ['ERROR: Failed to create Firebase accounts',
-                 'Import user_id=\'uid_aid9\' failed: FirebaseError'],
+                 'Import user_id=\'uid_aid_index_9\' failed: FirebaseError'],
                 ['SUCCESS: Created Firebase accounts', 7],
             ])
 
         successful_assocs = (
-            auth_assocs[:1] + auth_assocs[2:5] + auth_assocs[6:9])
+            auth_assocs[0:1] + auth_assocs[2:5] + auth_assocs[6:9])
         self.assert_multi_auth_mappings_exist(successful_assocs)
         self.firebase_sdk_stub.assert_is_user_multi(
             [a.auth_id for a in successful_assocs])

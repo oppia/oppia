@@ -71,8 +71,6 @@ auth_models, user_models = (
 
 transaction_services = models.Registry.import_transaction_services()
 
-ONLY_FIREBASE_SEED_MODEL_ID = 1
-
 
 def establish_firebase_connection():
     """Establishes the connection to Firebase needed by the rest of the SDK.
@@ -452,18 +450,19 @@ def seed_firebase():
     NOTE: This function is idempotent.
     """
     seed_model = auth_models.FirebaseSeedModel.get(
-        ONLY_FIREBASE_SEED_MODEL_ID, strict=False)
+        auth_models.ONLY_FIREBASE_SEED_MODEL_ID, strict=False)
     if seed_model is None: # Exactly 1 seed model must exist.
-        auth_models.FirebaseSeedModel(id=ONLY_FIREBASE_SEED_MODEL_ID).put()
+        auth_models.FirebaseSeedModel(
+            id=auth_models.ONLY_FIREBASE_SEED_MODEL_ID).put()
 
-    assoc_by_user_id_models = auth_models.UserAuthDetailsModel.get_multi([
+    user_ids_with_admin_email = [
         key.id() for key in user_models.UserSettingsModel.query(
             user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
         ).iter(keys_only=True)
-    ])
-
+    ]
     assoc_by_user_id_models = [
-        model for model in assoc_by_user_id_models
+        model for model in auth_models.UserAuthDetailsModel.get_multi(
+            user_ids_with_admin_email)
         if model is not None and model.gae_id != feconf.SYSTEM_COMMITTER_ID
     ]
     if len(assoc_by_user_id_models) != 1:
@@ -473,9 +472,8 @@ def seed_firebase():
                 feconf.ADMIN_EMAIL_ADDRESS, feconf.SYSTEM_COMMITTER_ID,
                 ', '.join(m.id for m in assoc_by_user_id_models)))
     else:
-        user_id = assoc_by_user_id_models[0].id
-
-    assoc_by_user_id_model = auth_models.UserAuthDetailsModel.get(user_id)
+        assoc_by_user_id_model = assoc_by_user_id_models[0]
+        user_id = assoc_by_user_id_model.id
 
     auth_id = assoc_by_user_id_model.firebase_auth_id
     if auth_id is None:
@@ -494,11 +492,10 @@ def seed_firebase():
         assoc_by_auth_id_model.update_timestamps(update_last_updated_time=False)
         assoc_by_auth_id_model.put()
 
-    super_admin_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
+    custom_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
 
     try:
-        user = firebase_admin.auth.get_user_by_email(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        user = firebase_admin.auth.get_user_by_email(feconf.ADMIN_EMAIL_ADDRESS)
     except firebase_admin.auth.UserNotFoundError:
         create_new_firebase_account = True
     else:
@@ -507,15 +504,14 @@ def seed_firebase():
             firebase_admin.auth.delete_user(user.uid)
             create_new_firebase_account = True
         else:
-            firebase_admin.auth.set_custom_user_claims(
-                user.uid, super_admin_claims)
+            firebase_admin.auth.set_custom_user_claims(user.uid, custom_claims)
             create_new_firebase_account = False
 
     if create_new_firebase_account:
         firebase_admin.auth.import_users([
             firebase_admin.auth.ImportUserRecord(
                 auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
-                custom_claims=super_admin_claims)
+                custom_claims=custom_claims)
         ])
 
 

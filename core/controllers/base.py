@@ -74,7 +74,7 @@ class SessionEndHandler(webapp2.RequestHandler):
     """Handler for destroying existing authentication sessions."""
 
     def get(self):
-        """Establishes a new auth session."""
+        """Destroys an existing auth session."""
         auth_services.destroy_auth_session(self.response)
 
 

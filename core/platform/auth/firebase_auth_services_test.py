@@ -170,11 +170,12 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self._encode_user_claims(self.get_user(uid))
 
     def mock_import_users_error(
-            self, call_error_sequence=(False,), user_error_sequence=(False,)):
+            self,
+            batch_error_pattern=(False,), individual_error_pattern=(False,)):
         """Returns a context in which `import_users` raises an exception.
 
         Example:
-            with mock_import_users_error(call_error_sequence=(False, True)):
+            with mock_import_users_error(batch_error_pattern=(False, True)):
                 import_users() # OK
                 import_users() # Raises!
                 import_users() # OK
@@ -182,26 +183,26 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 import_users() # OK
 
         Args:
-            call_error_sequence: tuple(bool). Enumerates which successive calls
+            batch_error_pattern: tuple(bool). Enumerates which successive calls
                 will raise an exception. The pattern is cycled.
-            user_error_sequence: tuple(bool). Enumerates which individual users
-                will cause an error. The pattern is cycled.
+            individual_error_pattern: tuple(bool). Enumerates which individual
+                users will cause an error. The pattern is cycled.
 
         Returns:
             Context manager. The context manager with the mocked implementation.
         """
-        call_error_sequence = itertools.cycle(call_error_sequence)
-        user_error_sequence = itertools.cycle(user_error_sequence)
+        batch_error_pattern = itertools.cycle(batch_error_pattern)
+        individual_error_pattern = itertools.cycle(individual_error_pattern)
+
         def mock_import_users(user_records):
             """Mock function that fails according to the given input values."""
-            if python_utils.NEXT(call_error_sequence):
+            if python_utils.NEXT(batch_error_pattern):
                 raise firebase_exceptions.DataLossError('Failed to connect')
 
             total_records = len(user_records)
-
             kept_records, error_indices = [], []
             for i, (record, error) in enumerate(
-                    python_utils.ZIP(user_records, user_error_sequence)):
+                    python_utils.ZIP(user_records, individual_error_pattern)):
                 if error:
                     error_indices.append(i)
                 else:

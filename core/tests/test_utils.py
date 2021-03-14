@@ -3804,9 +3804,11 @@ class CallCounter(FunctionWrapper):
     increased when the function raises an exception.
     """
 
-    def __init__(self, f):
+    def __init__(self, f=lambda *_, **__: None):
         """Counts the number of times the given function has been called. See
-        FunctionWrapper for arguments.
+        FunctionWrapper for arguments. If no function is provided, then a simple
+        function that takes any arguments and keyword arguments then returns
+        None is used instead.
         """
         super(CallCounter, self).__init__(f)
         self._times_called = 0

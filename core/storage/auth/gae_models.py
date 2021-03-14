@@ -26,6 +26,8 @@ base_models, user_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
+ONLY_FIREBASE_SEED_MODEL_ID = '1'
+
 
 class UserAuthDetailsModel(base_models.BaseModel):
     """Stores the authentication details for a particular user.

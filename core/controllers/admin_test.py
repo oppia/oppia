@@ -1037,7 +1037,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        call_counter = test_utils.CallCounter(lambda _: None)
+        call_counter = test_utils.CallCounter()
         grant_super_admin_privileges_stub = self.swap(
             firebase_auth_services, 'grant_super_admin_privileges',
             call_counter)
@@ -1071,7 +1071,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        call_counter = test_utils.CallCounter(lambda _: None)
+        call_counter = test_utils.CallCounter()
         revoke_super_admin_privileges_stub = self.swap(
             firebase_auth_services, 'revoke_super_admin_privileges',
             call_counter)
