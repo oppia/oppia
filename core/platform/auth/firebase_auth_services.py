@@ -73,6 +73,8 @@ auth_models, user_models = models.Registry.import_models(
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
+ONLY_FIREBASE_SEED_MODEL_ID = 1
+
 
 def establish_auth_session(request, response):
     """Sets login cookies to maintain a user's sign-in session.
@@ -435,100 +437,78 @@ def revoke_super_admin_privileges(user_id):
         firebase_admin.auth.set_custom_user_claims(firebase_id, None)
 
 
-def create_initial_super_admin():
-    """Creates the initial super-admin account on the Firebase server."""
-    user_settings_model = user_models.UserSettingsModel.query(
-        user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
-    ).get()
+def seed_firebase():
+    """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob."""
+    # Exactly 1 seed model must exist.
+    seed_model = auth_models.FirebaseSeedModel.get(
+        ONLY_FIREBASE_SEED_MODEL_ID, strict=False)
+    if seed_model is None:
+        auth_models.FirebaseSeedModel(id=ONLY_FIREBASE_SEED_MODEL_ID).put()
 
-    if user_settings_model is None:
+    assoc_by_user_id_models = auth_models.UserAuthDetailsModel.get_multi([
+        key.id() for key in user_models.UserSettingsModel.query(
+            user_models.UserSettingsModel.email == feconf.ADMIN_EMAIL_ADDRESS
+        ).iter(keys_only=True)
+    ])
+
+    assoc_by_user_id_models = [
+        model for model in assoc_by_user_id_models
+        if model is not None and model.gae_id != feconf.SYSTEM_COMMITTER_ID
+    ]
+    if len(assoc_by_user_id_models) != 1:
         raise Exception(
-            '%s is not a registered account' % feconf.ADMIN_EMAIL_ADDRESS)
-
-    user_id = user_settings_model.id
-    auth_id = get_auth_id_from_user_id(user_id)
-    if auth_id is None:
-        assoc_exists = False
-        auth_id = user_id[4:] if user_id.startswith('uid_') else user_id
+            '%s must correspond to exactly 1 user (excluding user_id=%s), but '
+            'found user_ids=[%s]' % (
+                feconf.ADMIN_EMAIL_ADDRESS, feconf.SYSTEM_COMMITTER_ID,
+                ', '.join(m.id for m in assoc_by_user_id_models)))
     else:
-        assoc_exists = True
+        admin_user_id = assoc_by_user_id_models[0].id
+
+    assoc_by_user_id_model = auth_models.UserAuthDetailsModel.get(admin_user_id)
+
+    auth_id = assoc_by_user_id_model.firebase_auth_id
+    if auth_id is None:
+        auth_id = (
+            admin_user_id[4:] if admin_user_id.startswith('uid_') else
+            admin_user_id)
+        assoc_by_user_id_model.firebase_auth_id = auth_id
+        assoc_by_user_id_model.update_timestamps(update_last_updated_time=False)
+        assoc_by_user_id_model.put()
+
+    assoc_by_auth_id_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
+    if assoc_by_auth_id_model is None:
+        auth_models.UserIdByFirebaseAuthIdModel(
+            id=auth_id, user_id=admin_user_id).put()
+    elif assoc_by_auth_id_model.user_id != admin_user_id:
+        assoc_by_auth_id_model.user_id = admin_user_id
+        assoc_by_auth_id_model.update_timestamps(update_last_updated_time=False)
+        assoc_by_auth_id_model.put()
 
     super_admin_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
 
     with _firebase_admin_context():
         try:
-            firebase_admin.auth.get_user(auth_id)
+            user = firebase_admin.auth.get_user_by_email(
+                feconf.ADMIN_EMAIL_ADDRESS)
         except firebase_admin.auth.UserNotFoundError:
+            create_new = True
+        else:
+            if user.uid != auth_id:
+                firebase_admin.auth.update_user(user.uid, disabled=True)
+                firebase_admin.auth.delete_user(user.uid)
+                create_new = True
+            else:
+                firebase_admin.auth.set_custom_user_claims(
+                    user.uid, super_admin_claims)
+                create_new = False
+
+        if create_new:
             firebase_admin.auth.import_users([
                 firebase_admin.auth.ImportUserRecord(
                     auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
                     custom_claims=super_admin_claims)
             ])
-        else:
-            firebase_admin.auth.set_custom_user_claims(
-                auth_id, super_admin_claims)
-
-    if not assoc_exists:
-        associate_auth_id_with_user_id(
-            auth_domain.AuthIdUserIdPair(auth_id, user_id))
-
-
-def destroy_firebase_accounts():
-    """Destroys all external Firebase users and their corresponding models.
-
-    Returns:
-        bool. Whether more Firebase accounts need to be deleted.
-    """
-    with _firebase_admin_context():
-        page = firebase_admin.auth.list_users(max_results=1000)
-        users = [u for u in page.users if u.email != feconf.ADMIN_EMAIL_ADDRESS]
-        if not users:
-            return False
-
-        firebase_auth_ids = [user.uid for user in users]
-        emails = [user.email for user in users]
-
-        # First, delete the external Firebase accounts.
-        result = firebase_admin.auth.delete_users(
-            firebase_auth_ids, force_delete=True)
-        if result.errors:
-            logging.warn('\n'.join(
-                '%s: %s' % (e.index, e.reason) for e in result.errors))
-
-        # Next, find all association models in our database.
-        assoc_by_auth_id_models = (
-            auth_models.UserIdByFirebaseAuthIdModel.get_multi(
-                firebase_auth_ids, include_deleted=True))
-
-        user_ids = [None if model is None else model.user_id
-                    for model in assoc_by_auth_id_models]
-        emails_to_look_up = [emails[i] for i, user_id in enumerate(user_ids)
-                             if user_id is None]
-
-        user_ids_to_clear = {uid for uid in user_ids if uid is not None}
-
-        if emails_to_look_up:
-            user_settings_models = user_models.UserSettingsModel.query(
-                user_models.UserSettingsModel.email.IN(emails_to_look_up))
-            user_ids_to_clear.update(m.id for m in user_settings_models)
-
-        # Finally, delete the auth association models we've discovered.
-        auth_models.UserIdByFirebaseAuthIdModel.delete_multi(
-            [m for m in assoc_by_auth_id_models if m is not None])
-
-        assoc_by_user_id_models = [
-            m for m in auth_models.UserAuthDetailsModel.get_multi(
-                user_ids_to_clear)
-            if m is not None
-        ]
-        for assoc_by_user_id_model in assoc_by_user_id_models:
-            assoc_by_user_id_model.firebase_auth_id = None
-
-        auth_models.UserAuthDetailsModel.update_timestamps_multi(
-            assoc_by_user_id_models)
-        auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
-
-        return page.has_next_page
 
 
 @contextlib.contextmanager
@@ -636,6 +616,7 @@ def _create_auth_claims(firebase_claims):
     auth_id = firebase_claims.get('sub')
     email = firebase_claims.get('email')
     role_is_super_admin = (
+        email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)

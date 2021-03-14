@@ -21,10 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import auth_domain
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 platform_auth_services = models.Registry.import_auth_services()
+
+ONLY_FIREBASE_SEED_MODEL_ID = 0
 
 
 def create_profile_user_auth_details(user_id, parent_user_id):
@@ -229,23 +232,14 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
 
 def grant_super_admin_privileges(user_id):
     """Grants super admin privileges to the given user."""
-    platform_auth_services.grant_super_admin_privileges(user_id)
+    firebase_auth_services.grant_super_admin_privileges(user_id)
 
 
 def revoke_super_admin_privileges(user_id):
     """Revokes super admin privileges from the given user."""
-    platform_auth_services.revoke_super_admin_privileges(user_id)
+    firebase_auth_services.revoke_super_admin_privileges(user_id)
 
 
-def create_initial_super_admin():
-    """Creates the initial super-admin account on the Firebase server."""
-    platform_auth_services.create_initial_super_admin()
-
-
-def destroy_firebase_accounts():
-    """Destroys all external Firebase users and their corresponding models.
-
-    Returns:
-        bool. Whether more Firebase accounts need to be deleted.
-    """
-    return platform_auth_services.destroy_firebase_accounts()
+def seed_firebase():
+    """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob."""
+    firebase_auth_services.seed_firebase()

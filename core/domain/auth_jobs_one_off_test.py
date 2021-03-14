@@ -39,112 +39,24 @@ auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-class AuditFirebaseImportReadinessOneOffJobTests(test_utils.AppEngineTestBase):
-
-    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
-
-    def count_one_off_jobs_in_queue(self):
-        """Returns the number of one off jobs in the taskqueue."""
-        return self.count_jobs_in_mapreduce_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
-
-    def run_one_off_job(self):
-        """Begins the one off job and asserts it completes as expected.
-
-        Returns:
-            *. The output of the one off job.
-        """
-        job_id = auth_jobs.AuditFirebaseImportReadinessOneOffJob.create_new()
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
-        auth_jobs.AuditFirebaseImportReadinessOneOffJob.enqueue(job_id)
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
-        return sorted(
-            ast.literal_eval(o) for o in
-            auth_jobs.AuditFirebaseImportReadinessOneOffJob.get_output(job_id))
-
-    def create_user(self, user_id, email, deleted=False):
-        """Creates a new user with the provided ID and email address.
-
-        Args:
-            user_id: str. The user's ID.
-            email: str. The user's email address.
-            deleted: bool. Value for the user's deleted property.
-        """
-        user_models.UserSettingsModel(
-            id=user_id, email=email, deleted=deleted,
-            role=feconf.ROLE_ID_EXPLORATION_EDITOR,
-            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
-        ).put()
-
-    def test_users_with_distinct_emails_returns_empty_output(self):
-        self.create_user('u1', 'u1@test.com')
-        self.create_user('u2', 'u2@test.com')
-
-        self.assertEqual(self.run_one_off_job(), [])
-
-    def test_users_with_same_email_are_reported(self):
-        self.create_user('u1', 'a@test.com')
-        self.create_user('u2', 'a@test.com')
-
-        self.assertEqual(self.run_one_off_job(), [
-            ['ERROR: a@test.com is a shared email', 'u1, u2'],
-        ])
-
-    def test_deleted_users_are_reported(self):
-        self.create_user('u1', 'u1@test.com', deleted=True)
-        self.create_user('u2', 'u2@test.com', deleted=True)
-        self.create_user('u3', 'u3@test.com', deleted=False)
-
-        self.assertEqual(self.run_one_off_job(), [
-            ['ERROR: Found deleted users', 'u1, u2'],
-        ])
-
-    def test_system_committer_is_ignored_by_duplicate_email_check(self):
-        self.create_user('xx', 'admin@test.com')
-        self.create_user('yy', 'admin@test.com')
-        auth_models.UserAuthDetailsModel(
-            id='xx', gae_id=feconf.SYSTEM_COMMITTER_ID
-        ).put()
-        auth_models.UserIdentifiersModel(
-            id=feconf.SYSTEM_COMMITTER_ID, user_id='xx'
-        ).put()
-
-        self.assertEqual(self.run_one_off_job(), [
-            ['INFO: SYSTEM_COMMITTER_ID skipped', ['xx']],
-        ])
-
-    def test_system_committer_is_ignored_by_deleted_check(self):
-        self.create_user('u1', 'admin@test.com', deleted=True)
-        auth_models.UserAuthDetailsModel(
-            id='u1', gae_id=feconf.SYSTEM_COMMITTER_ID
-        ).put()
-        auth_models.UserIdentifiersModel(
-            id=feconf.SYSTEM_COMMITTER_ID, user_id='u1'
-        ).put()
-
-        self.assertEqual(self.run_one_off_job(), [
-            ['INFO: SYSTEM_COMMITTER_ID skipped', ['u1']],
-        ])
-
-
-class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
+class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
+    """Base class for Firebase-dependent one-off jobs."""
 
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
 
     def setUp(self):
-        super(PopulateFirebaseAccountsOneOffJobTests, self).setUp()
+        super(FirebaseOneOffJobTestBase, self).setUp()
         self._auth_id_generator = itertools.count()
         self.exit_stack = contextlib2.ExitStack()
-        self.sdk_stub = firebase_auth_services_test.FirebaseAdminSdkStub()
+        self.firebase_sdk_stub = (
+            firebase_auth_services_test.FirebaseAdminSdkStub())
 
-        self.sdk_stub.install(self)
-        self.exit_stack.callback(self.sdk_stub.uninstall)
+        self.firebase_sdk_stub.install(self)
+        self.exit_stack.callback(self.firebase_sdk_stub.uninstall)
 
     def tearDown(self):
         self.exit_stack.close()
-        super(PopulateFirebaseAccountsOneOffJobTests, self).tearDown()
+        super(FirebaseOneOffJobTestBase, self).tearDown()
 
     def count_one_off_jobs_in_queue(self):
         """Returns the number of one off jobs in the taskqueue."""
@@ -252,6 +164,11 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
             firebase_auth_services.get_multi_auth_ids_from_user_ids(user_ids),
             [None] * len(user_ids))
 
+
+class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
+
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def test_successfully_imports_one_user(self):
         auth_assoc = self.create_oppia_user()
 
@@ -260,15 +177,16 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         ])
 
         self.assert_auth_mapping_exists(auth_assoc)
-        self.sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
+        self.firebase_sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['INFO: Pre-existing Firebase accounts', 1],
         ])
 
     def test_successfully_imports_users_in_bulk(self):
-        self.exit_stack.enter_context(
-            self.swap(auth_jobs, 'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
+        self.exit_stack.enter_context(self.swap(
+            auth_jobs.PopulateFirebaseAccountsOneOffJob,
+            'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
 
         auth_assocs = self.create_multi_oppia_users(11)
 
@@ -277,7 +195,7 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         ])
 
         self.assert_multi_auth_mappings_exist(auth_assocs)
-        self.sdk_stub.assert_multi_firebase_users_exist(
+        self.firebase_sdk_stub.assert_multi_firebase_users_exist(
             [a.auth_id for a in auth_assocs])
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -290,20 +208,23 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [])
 
     def test_initialize_app_error_is_reported(self):
-        self.exit_stack.enter_context(self.sdk_stub.mock_initialize_app_error())
+        self.exit_stack.enter_context(
+            self.firebase_sdk_stub.mock_initialize_app_error())
 
         auth_assoc = self.create_oppia_user()
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['WARNING: No action needed',
+            ['ERROR: initialize_app() failed; All accounts have been skipped',
              'UnknownError(u\'could not init\',)'],
         ])
 
         self.assert_auth_mapping_does_not_exist(auth_assoc)
-        self.sdk_stub.assert_firebase_user_does_not_exist(auth_assoc.auth_id)
+        self.firebase_sdk_stub.assert_firebase_user_does_not_exist(
+            auth_assoc.auth_id)
 
     def test_delete_app_error_is_reported(self):
-        self.exit_stack.enter_context(self.sdk_stub.mock_delete_app_error())
+        self.exit_stack.enter_context(
+            self.firebase_sdk_stub.mock_delete_app_error())
 
         auth_assoc = self.create_oppia_user()
 
@@ -316,60 +237,64 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         # Deleting the app should not be a fatal error, so we should still
         # create a firebase account and an association.
         self.assert_auth_mapping_exists(auth_assoc)
-        self.sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
+        self.firebase_sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['INFO: Pre-existing Firebase accounts', 1],
         ])
 
     def test_import_user_error_is_reported(self):
-        mock_import_users_error = self.sdk_stub.mock_import_users_error(
-            call_error_sequence=(True,)) # Always raise an exception.
+        mock_import_users_error = (
+            self.firebase_sdk_stub.mock_import_users_error(
+                call_error_sequence=(True,))) # Always raise an exception.
 
         auth_assoc = self.create_oppia_user()
 
         with mock_import_users_error:
             self.assertItemsEqual(self.run_one_off_job(), [
-                ['FAILURE: Failed to create Firebase accounts',
+                ['ERROR: Failed to create Firebase accounts',
                  'DataLossError(u\'Failed to connect\',)'],
             ])
 
         self.assert_auth_mapping_does_not_exist(auth_assoc)
-        self.sdk_stub.assert_firebase_user_does_not_exist(auth_assoc.auth_id)
+        self.firebase_sdk_stub.assert_firebase_user_does_not_exist(
+            auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['SUCCESS: Created Firebase accounts', 1],
         ])
 
         self.assert_auth_mapping_exists(auth_assoc)
-        self.sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
+        self.firebase_sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['INFO: Pre-existing Firebase accounts', 1],
         ])
 
     def test_single_import_batch_error_is_reported(self):
-        self.exit_stack.enter_context(
-            self.swap(auth_jobs, 'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
-        mock_import_users_error = self.sdk_stub.mock_import_users_error(
-            call_error_sequence=(False, True, False))
+        self.exit_stack.enter_context(self.swap(
+            auth_jobs.PopulateFirebaseAccountsOneOffJob,
+            'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
+        mock_import_users_error = (
+            self.firebase_sdk_stub.mock_import_users_error(
+                call_error_sequence=(False, True, False)))
 
         auth_assocs = self.create_multi_oppia_users(9)
 
         with mock_import_users_error:
             self.assertItemsEqual(self.run_one_off_job(), [
-                ['FAILURE: Failed to create Firebase accounts',
+                ['ERROR: Failed to create Firebase accounts',
                  'DataLossError(u\'Failed to connect\',)'],
                 ['SUCCESS: Created Firebase accounts', 6],
             ])
 
         successful_assocs = auth_assocs[:3] + auth_assocs[6:]
         self.assert_multi_auth_mappings_exist(successful_assocs)
-        self.sdk_stub.assert_multi_firebase_users_exist(
+        self.firebase_sdk_stub.assert_multi_firebase_users_exist(
             [a.auth_id for a in successful_assocs])
         failed_assocs = auth_assocs[3:6]
         self.assert_multi_auth_mappings_do_not_exist(failed_assocs)
-        self.sdk_stub.assert_multi_firebase_users_do_not_exist(
+        self.firebase_sdk_stub.assert_multi_firebase_users_do_not_exist(
             [a.auth_id for a in failed_assocs])
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -378,7 +303,7 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         ])
 
         self.assert_multi_auth_mappings_exist(auth_assocs)
-        self.sdk_stub.assert_multi_firebase_users_exist(
+        self.firebase_sdk_stub.assert_multi_firebase_users_exist(
             [a.auth_id for a in auth_assocs])
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -386,20 +311,22 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         ])
 
     def test_individual_user_import_errors_are_reported(self):
-        self.exit_stack.enter_context(
-            self.swap(auth_jobs, 'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
-        mock_import_users_error = self.sdk_stub.mock_import_users_error(
-            user_error_sequence=(False, True, False, False))
+        self.exit_stack.enter_context(self.swap(
+            auth_jobs.PopulateFirebaseAccountsOneOffJob,
+            'MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL', 3))
+        mock_import_users_error = (
+            self.firebase_sdk_stub.mock_import_users_error(
+                user_error_sequence=(False, True, False, False)))
 
         auth_assocs = self.create_multi_oppia_users(10)
 
         with mock_import_users_error:
             self.assertItemsEqual(self.run_one_off_job(), [
-                ['FAILURE: Failed to create Firebase accounts',
+                ['ERROR: Failed to create Firebase accounts',
                  'Import user_id=\'uid_aid1\' failed: FirebaseError'],
-                ['FAILURE: Failed to create Firebase accounts',
+                ['ERROR: Failed to create Firebase accounts',
                  'Import user_id=\'uid_aid5\' failed: FirebaseError'],
-                ['FAILURE: Failed to create Firebase accounts',
+                ['ERROR: Failed to create Firebase accounts',
                  'Import user_id=\'uid_aid9\' failed: FirebaseError'],
                 ['SUCCESS: Created Firebase accounts', 7],
             ])
@@ -407,11 +334,11 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         successful_assocs = (
             auth_assocs[:1] + auth_assocs[2:5] + auth_assocs[6:9])
         self.assert_multi_auth_mappings_exist(successful_assocs)
-        self.sdk_stub.assert_multi_firebase_users_exist(
+        self.firebase_sdk_stub.assert_multi_firebase_users_exist(
             [a.auth_id for a in successful_assocs])
         failed_assocs = [auth_assocs[1], auth_assocs[5], auth_assocs[9]]
         self.assert_multi_auth_mappings_do_not_exist(failed_assocs)
-        self.sdk_stub.assert_multi_firebase_users_do_not_exist(
+        self.firebase_sdk_stub.assert_multi_firebase_users_do_not_exist(
             [a.auth_id for a in failed_assocs])
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -420,7 +347,7 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         ])
 
         self.assert_multi_auth_mappings_exist(auth_assocs)
-        self.sdk_stub.assert_multi_firebase_users_exist(
+        self.firebase_sdk_stub.assert_multi_firebase_users_exist(
             [a.auth_id for a in auth_assocs])
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -436,9 +363,9 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         ])
 
         self.assert_auth_mapping_exists(auth_assoc)
-        self.sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
+        self.firebase_sdk_stub.assert_firebase_user_exists(auth_assoc.auth_id)
 
-        user = self.sdk_stub.get_user(auth_assoc.auth_id)
+        user = self.firebase_sdk_stub.get_user(auth_assoc.auth_id)
         self.assertEqual(
             user.custom_claims, {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN})
 
@@ -460,4 +387,5 @@ class PopulateFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
         ])
 
         self.assert_auth_mapping_does_not_exist(auth_assoc)
-        self.sdk_stub.assert_firebase_user_does_not_exist(auth_assoc.auth_id)
+        self.firebase_sdk_stub.assert_firebase_user_does_not_exist(
+            auth_assoc.auth_id)

@@ -814,7 +814,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/session_end', base.SessionEndHandler),
 
     get_redirect_route(r'/seed_firebase', base.SeedFirebaseHandler),
-    get_redirect_route(r'/wipe_firebase', base.WipeFirebaseHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (

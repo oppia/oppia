@@ -739,10 +739,10 @@ class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
     def test_get(self):
         call_counter = test_utils.CallCounter(lambda *_: None)
 
-        create_initial_super_admin_swap = self.swap(
-            firebase_auth_services, 'create_initial_super_admin', call_counter)
+        seed_firebase_swap = self.swap(
+            firebase_auth_services, 'seed_firebase', call_counter)
 
-        with create_initial_super_admin_swap:
+        with seed_firebase_swap:
             self.get_html_response('/seed_firebase', expected_status_int=302)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -754,95 +754,18 @@ class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
 
         call_counter = test_utils.CallCounter(always_raise)
 
-        create_initial_super_admin_swap = self.swap(
-            firebase_auth_services, 'create_initial_super_admin', call_counter)
+        seed_firebase_swap = self.swap(
+            firebase_auth_services, 'seed_firebase', call_counter)
 
         captured_logging_context = self.capture_logging(min_level=logging.ERROR)
 
-        with create_initial_super_admin_swap, captured_logging_context as logs:
+        with seed_firebase_swap, captured_logging_context as logs:
             self.get_html_response('/seed_firebase', expected_status_int=302)
 
         self.assertEqual(call_counter.times_called, 1)
         self.assert_matches_regexps(logs, [
             'Failed to initialize Firebase admin account'
         ])
-
-
-class WipeFirebaseHandlerTests(test_utils.GenericTestBase):
-    """Tests for create initial super admin handler."""
-
-    def setUp(self):
-        super(WipeFirebaseHandlerTests, self).setUp()
-        self.signup(feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME)
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-
-    def test_get(self):
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
-
-        call_counter = test_utils.CallCounter(lambda *_: False)
-
-        destroy_firebase_accounts_swap = self.swap(
-            firebase_auth_services, 'destroy_firebase_accounts', call_counter)
-
-        with destroy_firebase_accounts_swap:
-            response = self.get_html_response(
-                '/wipe_firebase', expected_status_int=302)
-
-        self.assertEqual(response.headers['Location'], 'http://localhost/')
-        self.assertEqual(call_counter.times_called, 1)
-
-    def test_refreshes_if_there_are_more_accounts_to_delete(self):
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
-
-        call_counter = test_utils.CallCounter(lambda *_: True)
-
-        destroy_firebase_accounts_swap = self.swap(
-            firebase_auth_services, 'destroy_firebase_accounts', call_counter)
-
-        with destroy_firebase_accounts_swap:
-            response = self.get_html_response(
-                '/wipe_firebase', expected_status_int=302)
-
-        self.assertEqual(
-            response.headers['Location'], 'http://localhost/wipe_firebase')
-        self.assertEqual(call_counter.times_called, 1)
-
-    def test_get_with_error(self):
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
-
-        def always_raise(*_):
-            """Always raises an exception."""
-            raise Exception()
-
-        call_counter = test_utils.CallCounter(always_raise)
-
-        destroy_firebase_accounts_swap = self.swap(
-            firebase_auth_services, 'destroy_firebase_accounts', call_counter)
-
-        captured_logging_context = self.capture_logging(min_level=logging.ERROR)
-
-        with destroy_firebase_accounts_swap, captured_logging_context as logs:
-            response = self.get_html_response(
-                '/wipe_firebase', expected_status_int=302)
-
-        self.assertEqual(response.headers['Location'], 'http://localhost/')
-        self.assertEqual(call_counter.times_called, 1)
-        self.assert_matches_regexps(logs, [
-            'Failed to wipe out every Firebase account'
-        ])
-
-    def test_get_without_super_admin_privileges(self):
-        self.login(self.NEW_USER_EMAIL, is_super_admin=False)
-
-        call_counter = test_utils.CallCounter(lambda *_: False)
-        destroy_firebase_accounts_swap = self.swap(
-            firebase_auth_services, 'destroy_firebase_accounts', call_counter)
-
-        with destroy_firebase_accounts_swap:
-            response = self.get_json('/wipe_firebase', expected_status_int=401)
-
-        self.assertEqual(response['error'], 'Must be super-admin')
-        self.assertEqual(call_counter.times_called, 0)
 
 
 class LogoutPageTests(test_utils.GenericTestBase):

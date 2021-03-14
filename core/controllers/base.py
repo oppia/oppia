@@ -521,34 +521,15 @@ class BaseHandler(webapp2.RequestHandler):
 
 
 class SeedFirebaseHandler(webapp2.RequestHandler):
-    """Handler to create an initial Firebase admin account if necessary."""
+    """Handler that prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
 
     def get(self):
-        """Seeds the Firebase account server with a single super-admin."""
+        """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob."""
         try:
-            auth_services.create_initial_super_admin()
+            auth_services.seed_firebase()
         except Exception:
-            logging.exception('Failed to initialize Firebase admin account')
+            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
         finally:
-            self.redirect('/')
-
-
-class WipeFirebaseHandler(BaseHandler):
-    """Handler to wipe Firebase of all accounts."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    def get(self):
-        """Wipes the Firebase account servers except for the super-admin."""
-        if not self.current_user_is_super_admin:
-            raise self.UnauthorizedUserException('Must be super-admin')
-        try:
-            if auth_services.destroy_firebase_accounts():
-                self.redirect('/wipe_firebase')
-            else:
-                self.redirect('/')
-        except Exception:
-            logging.exception('Failed to wipe out every Firebase account')
             self.redirect('/')
 
 

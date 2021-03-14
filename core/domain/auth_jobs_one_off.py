@@ -34,60 +34,202 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 
-MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL = 1000
-
-AUDIT_KEY = 'INFO: Pre-existing Firebase accounts'
-FAILURE_KEY = 'FAILURE: Failed to create Firebase accounts'
-SUCCESS_KEY = 'SUCCESS: Created Firebase accounts'
-WARNING_KEY = 'WARNING: No action needed'
-
-SUPER_ADMIN_ACK = 'INFO: Super admin created'
-SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
-
-POPULATED_KEY = 'ALREADY_DONE'
-NOT_POPULATED_KEY = 'NEEDS_WORK'
-
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-class AuditFirebaseImportReadinessOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to confirm whether users are ready for Firebase import."""
+class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Brings Firebase accounts and association models to a deterministic state.
+
+    The following pre-conditions must hold for no errors to occur (accomplished
+    by calling the firebase_auth_services.seed_firebase() function):
+        1.  Exactly one FirebaseSeedModel must exist.
+        2.  feconf.ADMIN_EMAIL_ADDRESS must correspond to a UserAuthDetailsModel
+            where:
+                firebase_auth_id is not None AND
+                gae_id != feconf.SYSTEM_COMMITTER_ID.
+        3.  feconf.ADMIN_EMAIL_ADDRESS must correspond to exactly one
+            UserIdByFirebaseAuthIdModel where:
+                id equals the aforementioned firebase_auth_id AND
+                user_id is the ID of the aforementioned UserAuthDetailsModel.
+        4.  feconf.ADMIN_EMAIL_ADDRESS must correspond to exactly one Firebase
+            account where:
+                uid is equal to the aforementioned firebase_auth_id AND
+                custom_claims == {"role":"super_admin"}.
+
+    The following post-conditions will hold if no errors occur:
+        1.  Exactly one Firebase account will exist: feconf.ADMIN_EMAIL_ADDRESS.
+        2.  Exactly one UserIdByFirebaseAuthIdModel model will exist.
+        3.  Exactly one UserAuthDetailsModel will have a non-None
+            firebase_auth_id value.
+    """
+
+    ASSOC_MODEL_TYPES = (
+        auth_models.UserAuthDetailsModel,
+        auth_models.UserIdByFirebaseAuthIdModel)
+
+    INFO_SUPER_ADMIN_ACK = 'INFO: Found feconf.ADMIN_EMAIL_ADDRESS'
+    INFO_SYSTEM_COMMITTER_ACK = 'INFO: Found feconf.SYSTEM_COMMITTER_ID'
+    INFO_SEED_MODEL_ACK = 'INFO: Found FirebaseSeedModel'
+    INFO_ACCOUNTS_PROCESSED = 'INFO: Firebase accounts processed'
+
+    WARNING_DELETE_APP_FAILED = (
+        'WARNING: firebase_admin.delete_app() failed. No action is needed.')
+
+    ERROR_INITIALIZE_APP_FAILED = (
+        'ERROR: firebase_admin.initialize_app() failed. No accounts deleted.')
+    ERROR_BATCH_DELETE = 'ERROR: Failed to delete a batch of Firebase accounts'
+    ERROR_INDIVIDUAL_DELETE = (
+        'ERROR: Failed to delete an individual Firebase account')
+
+    SUCCESS_DELETE_ACCOUNTS = 'SUCCESS: Firebase accounts deleted'
+    SUCCESS_DELETE_ASSOC_TEMPLATE = 'SUCCESS: %s wiped'
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
+        return [
+            auth_models.FirebaseSeedModel,
+            auth_models.UserAuthDetailsModel,
+            auth_models.UserIdByFirebaseAuthIdModel,
+        ]
 
     @staticmethod
-    def map(user):
-        gae_auth_id = gae_auth_services.get_auth_id_from_user_id(user.id)
-        # NOTE: This committer ID is a legacy ACL-bypass that we no longer
-        # depend on. Because it is obsolete, we do not want it to have a
-        # Firebase account associated with it, or even consider it for import.
-        if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
-            yield (SYSTEM_COMMITTER_ACK, user.id)
+    def map(item):
+        # The map() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = SeedFirebaseOneOffJob
+
+        if isinstance(item, cls.ASSOC_MODEL_TYPES):
+            admin_ack = cls.get_admin_ack(item)
+            yield (
+                admin_ack if admin_ack is not None else
+                (cls.wipe_assoc_model(item), 1))
             return
 
-        if user.deleted:
-            yield ('[DELETED]', user.id)
-        else:
-            yield (user.email, user.id)
+        yield (cls.INFO_SEED_MODEL_ACK, item.id)
+
+        firebase_connection, firebase_error = _acquire_firebase_connection()
+        if firebase_error is not None:
+            yield (cls.ERROR_INITIALIZE_APP_FAILED, firebase_error)
+            return
+
+        num_accounts_processed = 0
+        for user_batch in cls.yield_firebase_user_batches():
+            ids_to_delete = []
+            for user in user_batch:
+                if user.email == feconf.ADMIN_EMAIL_ADDRESS:
+                    yield (
+                        '%s in Firebase account' % cls.INFO_SUPER_ADMIN_ACK,
+                        'firebase_auth_id=%s' % (user.uid))
+                else:
+                    ids_to_delete.append(user.uid)
+
+            try:
+                result = firebase_admin.auth.delete_users(
+                    ids_to_delete, force_delete=True)
+            except Exception as exception:
+                yield (cls.ERROR_BATCH_DELETE, len(ids_to_delete))
+                yield (cls.ERROR_BATCH_DELETE, 'reason=%r' % exception)
+            else:
+                for error in result.errors:
+                    firebase_auth_id = ids_to_delete[error.index]
+                    debug_info = 'firebase_auth_id=%s, reason=%s' % (
+                        firebase_auth_id, error.reason)
+                    yield (cls.ERROR_INDIVIDUAL_DELETE, debug_info)
+                num_deleted = len(ids_to_delete) - len(result.errors)
+                yield (cls.SUCCESS_DELETE_ACCOUNTS, num_deleted)
+            finally:
+                num_accounts_processed += len(ids_to_delete)
+
+        yield (cls.INFO_ACCOUNTS_PROCESSED, num_accounts_processed)
+
+        firebase_error = _release_firebase_connection(firebase_connection)
+        if firebase_error is not None:
+            yield (cls.WARNING_DELETE_APP_FAILED, firebase_error)
 
     @staticmethod
     def reduce(key, values):
-        # NOTE: These are only sorted to make unit tests simpler.
-        if key == SYSTEM_COMMITTER_ACK:
-            yield (SYSTEM_COMMITTER_ACK, values)
-            return
+        # The reduce() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = SeedFirebaseOneOffJob
 
-        joined_user_ids = ', '.join(sorted(values))
-
-        if key == '[DELETED]':
-            yield ('ERROR: Found deleted users', joined_user_ids)
+        if key.startswith('SUCCESS:') or key == cls.INFO_ACCOUNTS_PROCESSED:
+            yield (key, sum(int(v) for v in values))
+        elif key == cls.ERROR_BATCH_DELETE:
+            debug_info = 'count=%d, reasons=[%s]' % (
+                sum(int(v) for v in values if not v.startswith('reason=')),
+                ', '.join({v[7:] for v in values if v.startswith('reason=')}))
+            yield (key, debug_info)
         else:
-            email = key
-            if len(values) > 1:
-                yield ('ERROR: %s is a shared email' % email, joined_user_ids)
+            yield (key, values)
+
+    @classmethod
+    def yield_firebase_user_batches(cls):
+        """Yields every single Firebase account in batches of 1000."""
+        # 1000 is the maximum amount of users that can be deleted at once.
+        page = firebase_admin.auth.list_users(max_results=1000)
+        while page is not None:
+            user_batch = page.users
+            if not user_batch:
+                break
+            yield user_batch
+            page = page.get_next_page()
+
+    @classmethod
+    def get_admin_ack(cls, item):
+        """Returns an acknowledgement key if the item is associated to an admin.
+
+        Args:
+            item: UserAuthDetailsModel|UserIdByFirebaseAuthIdModel. The item to
+                check.
+
+        Returns:
+            str|None. A key acknowledging a super admin, or None if the item
+            does not correspond to a super admin.
+        """
+        model_name = type(item).__name__
+
+        if isinstance(item, auth_models.UserAuthDetailsModel):
+            user_id = item.id
+            gae_auth_id = item.gae_id
+        else:
+            user_id = item.user_id
+            gae_auth_id = auth_models.UserAuthDetailsModel.get(user_id).gae_id
+
+        if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
+            return (
+                '%s in %s' % (cls.INFO_SYSTEM_COMMITTER_ACK, model_name),
+                'user_id=%s' % user_id)
+
+        user_settings_model = user_models.UserSettingsModel.get(user_id)
+        if user_settings_model.email == feconf.ADMIN_EMAIL_ADDRESS:
+            return (
+                '%s in %s' % (cls.INFO_SUPER_ADMIN_ACK, model_name),
+                'user_id=%s' % user_id)
+
+        return None
+
+    @classmethod
+    def wipe_assoc_model(cls, item):
+        """Wipes the given model of Firebase account associations.
+
+        Args:
+            item: UserAuthDetailsModel|UserIdByFirebaseAuthIdModel. The item to
+                wipe.
+
+        Returns:
+            str. The reduce key to yield from the map() function for further
+            processing.
+        """
+        if isinstance(item, auth_models.UserAuthDetailsModel):
+            if item.firebase_auth_id is not None:
+                item.firebase_auth_id = None
+                item.update_timestamps(update_last_updated_time=False)
+                item.put()
+        else:
+            item.delete()
+
+        return cls.SUCCESS_DELETE_ASSOC_TEMPLATE % type(item).__name__
 
 
 class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -98,7 +240,24 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     NOTE: **DO NOT** ASSUME THAT FIREBASE IDS AND OPPIA USER IDS WILL BE THE
     SAME! We are only doing this for users that already exist; future users that
     sign up with Firebase will have an entirely different ID.
+
+    DO NOT START THIS JOB UNTIL SeedFirebaseOneOffJob COMPLETES WITHOUT ANY
+    ERRORS!
     """
+
+    MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL = 1000
+
+    AUDIT_KEY = 'INFO: Pre-existing Firebase accounts'
+    ERROR_KEY = 'ERROR: Failed to create Firebase accounts'
+    SUCCESS_KEY = 'SUCCESS: Created Firebase accounts'
+    WARNING_KEY = 'WARNING: No action needed'
+    ERROR_INITIALIZE_APP_FAILED = (
+        'ERROR: initialize_app() failed; All accounts have been skipped')
+
+    SUPER_ADMIN_ACK = 'INFO: Super admin created'
+    SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
+
+    POPULATED_KEY = 'ALREADY_DONE'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -106,6 +265,10 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user):
+        # The map() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = PopulateFirebaseAccountsOneOffJob
+
         if user.deleted:
             return
 
@@ -114,37 +277,37 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # depend on. Because it is obsolete, we do not want it to have a
         # Firebase account associated with it.
         if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
-            yield (SYSTEM_COMMITTER_ACK, user.id)
+            yield (cls.SYSTEM_COMMITTER_ACK, user.id)
             return
 
         auth_id = firebase_auth_services.get_auth_id_from_user_id(user.id)
         if auth_id is not None:
-            yield (POPULATED_KEY, 1)
+            yield (cls.POPULATED_KEY, 1)
         else:
             user_is_super_admin = (user.email == feconf.ADMIN_EMAIL_ADDRESS)
             if user_is_super_admin:
-                yield (SUPER_ADMIN_ACK, user.id)
+                yield (cls.SUPER_ADMIN_ACK, user.id)
             yield (
                 None, (
-                    _strip_uid_prefix(user.id), user.id, user.email,
+                    cls.strip_uid_prefix(user.id), user.id, user.email,
                     user_is_super_admin))
 
     @staticmethod
     def reduce(key, values):
-        if key == POPULATED_KEY:
-            yield (AUDIT_KEY, len(values))
+        # The reduce() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = PopulateFirebaseAccountsOneOffJob
+
+        if key == cls.POPULATED_KEY:
+            yield (cls.AUDIT_KEY, len(values))
             return
-        elif key in (SUPER_ADMIN_ACK, SYSTEM_COMMITTER_ACK):
+        elif key in (cls.SUPER_ADMIN_ACK, cls.SYSTEM_COMMITTER_ACK):
             yield (key, values)
             return
 
-        try:
-            # NOTE: "app" is the term Firebase uses for the "entry point" to the
-            # Firebase SDK. Oppia only has one server, so it only needs to
-            # instantiate one app.
-            firebase_connection = firebase_admin.initialize_app()
-        except Exception as exception:
-            yield (WARNING_KEY, repr(exception))
+        firebase_connection, firebase_error = _acquire_firebase_connection()
+        if firebase_error is not None:
+            yield (cls.ERROR_INITIALIZE_APP_FAILED, firebase_error)
             return
 
         # NOTE: This is only sorted to make unit testing easier.
@@ -161,16 +324,16 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # can be "imported" in a single call. To compensate, we break up the
         # users into chunks.
         offsets = python_utils.RANGE(
-            0, len(user_records), MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL)
+            0, len(user_records), cls.MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL)
         results = (
-            _populate_firebase([record for record in record_group if record])
-            for record_group in _grouper(
-                user_records, MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL))
+            cls.populate_firebase([r for r in record_group if r is not None])
+            for record_group in cls.grouper(
+                user_records, cls.MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL))
 
         assocs_to_create = []
         for offset, (result, exception) in python_utils.ZIP(offsets, results):
             if exception is not None:
-                yield (FAILURE_KEY, repr(exception))
+                yield (cls.ERROR_KEY, repr(exception))
             else:
                 successful_indices = set(python_utils.RANGE(
                     result.success_count + result.failure_count))
@@ -179,7 +342,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     debug_info = (
                         'Import user_id=%r failed: %s' % (
                             user_fields[offset + error.index][1], error.reason))
-                    yield (FAILURE_KEY, debug_info)
+                    yield (cls.ERROR_KEY, debug_info)
                 assocs_to_create.extend(
                     auth_domain.AuthIdUserIdPair(*user_fields[offset + i][:2])
                     for i in successful_indices)
@@ -187,57 +350,84 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if assocs_to_create:
             firebase_auth_services.associate_multi_auth_ids_with_user_ids(
                 assocs_to_create)
-            yield (SUCCESS_KEY, len(assocs_to_create))
+            yield (cls.SUCCESS_KEY, len(assocs_to_create))
 
+        firebase_error = _release_firebase_connection(firebase_connection)
+        if firebase_error is not None:
+            yield (cls.WARNING_KEY, firebase_error)
+
+    @classmethod
+    def populate_firebase(cls, user_records):
+        """Populates the Firebase server with the given user records.
+
+        Args:
+            user_records: list(firebase_admin.auth.ImportUserRecord). Users to
+                store in Firebase.
+
+        Returns:
+            tuple(UserImportResult|None, Exception|None). The result of the
+            operation, or an exception if the operation failed. Exactly one of
+            the values will be non-None.
+        """
         try:
-            # NOTE: This is not dangerous. We are just deleting the resources
-            # used to form a connection to Firebase servers.
-            firebase_admin.delete_app(firebase_connection)
-        except Exception as exception:
-            yield (WARNING_KEY, repr(exception))
+            return (firebase_auth.import_users(user_records), None)
+        except firebase_exceptions.FirebaseError as exception:
+            return (None, exception)
+
+    @classmethod
+    def strip_uid_prefix(cls, user_id):
+        """Removes the 'uid_' prefix from a user_id and returns the result."""
+        return user_id[4:] if user_id.startswith('uid_') else user_id
+
+    @classmethod
+    def grouper(cls, iterable, chunk_len, fillvalue=None):
+        """Collect data into fixed-length chunks.
+
+        https://docs.python.org/3/library/itertools.html#itertools-recipes.
+
+        Example:
+            grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+
+        Args:
+            iterable: iterable. Any kind of iterable object.
+            chunk_len: int. The chunk size to group values.
+            fillvalue: *. The value used to fill out the last chunk when the
+                iterable is exhausted.
+
+        Returns:
+            iterable(iterable). A sequence of chunks over the input data.
+        """
+        # To understand how/why this works, please refer to the following
+        # stackoverflow post: https://stackoverflow.com/a/49181132/4859885.
+        args = [iter(iterable)] * chunk_len
+        return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
 
 
-def _grouper(iterable, chunk_len, fillvalue=None):
-    """Collect data into fixed-length chunks.
-
-    Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
-
-    Example:
-        grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-
-    Args:
-        iterable: iterable. Any kind of iterable object.
-        chunk_len: int. The chunk size to group values.
-        fillvalue: *. The value used to fill out the last chunk when the
-            iterable is exhausted.
+def _acquire_firebase_connection():
+    """Returns an established Firebase connection, or an exception if raised.
 
     Returns:
-        iterable(iterable). A sequence of chunks over the input data.
-    """
-    # To understand how/why this works, please refer to the following
-    # stackoverflow post: https://stackoverflow.com/a/49181132/4859885.
-    args = [iter(iterable)] * chunk_len
-    return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
-
-
-def _populate_firebase(user_records):
-    """Populates the Firebase server with the given user records.
-
-    Args:
-        user_records: list(firebase_admin.auth.ImportUserRecord). Users to store
-            in Firebase.
-
-    Returns:
-        tuple(UserImportResult|None, Exception|None). The result of the
-        operation, or an exception if the operation failed. Exactly one of the
-        values will be non-None.
+        tuple(firebase_admin.App|None, Exception|None). Exactly one of the
+        values is None.
     """
     try:
-        return (firebase_auth.import_users(user_records), None)
-    except firebase_exceptions.FirebaseError as exception:
-        return (None, exception)
+        # NOTE: "app" is the term Firebase uses for the "entry point" to the
+        # Firebase SDK. Oppia only has one server, so it only needs to
+        # instantiate one app.
+        return (firebase_admin.initialize_app(), None)
+    except Exception as exception:
+        return (None, repr(exception))
 
 
-def _strip_uid_prefix(user_id):
-    """Removes the 'uid_' prefix from a user_id and returns the result."""
-    return user_id[4:] if user_id.startswith('uid_') else user_id
+def _release_firebase_connection(firebase_connection):
+    """Destroys the established Firebase connection.
+
+    Returns:
+        Exception|None. The error raised by the function, or None if successful.
+    """
+    try:
+        firebase_admin.delete_app(firebase_connection)
+    except Exception as exception:
+        return repr(exception)
+    else:
+        return None

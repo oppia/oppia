@@ -292,3 +292,17 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
             to user_id argument.
         """
         return cls.query(cls.user_id == user_id).get()
+
+
+class FirebaseSeedModel(base_models.BaseModel):
+    """Dummy model used to kick-off the DestroyFirebaseAccountsOneOffJob."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model should never be erased."""
+        return base_models.KEEP
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not correspond to any users."""
+        return base_models.NOT_CORRESPONDING_TO_USER

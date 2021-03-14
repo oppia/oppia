@@ -80,7 +80,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         'generate_email_verification_link',
         'generate_password_reset_link',
         'generate_sign_in_with_email_link',
-        'get_user_by_email',
         'get_user_by_phone_number',
         'list_users',
         'revoke_refresh_tokens',
@@ -119,6 +118,9 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 firebase_admin.auth, 'verify_id_token', self._verify_id_token))
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth, 'get_user', self.get_user))
+            swap_stack.enter_context(test.swap(
+                firebase_admin.auth, 'get_user_by_email',
+                self.get_user_by_email))
             swap_stack.enter_context(test.swap(
                 firebase_admin.auth, 'delete_user', self._delete_user))
             swap_stack.enter_context(test.swap(
@@ -393,7 +395,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         })
 
     def get_user(self, uid):
-        """Returns the user with given ID if found, otherwise raises an error.
+        """Returns user with given ID if found, otherwise raises an error.
 
         Args:
             uid: str. The Firebase account ID of the user.
@@ -407,6 +409,24 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         if uid not in self._users_by_uid:
             raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
         return self._users_by_uid[uid]
+
+    def get_user_by_email(self, email):
+        """Returns user with given email if found, otherwise raises an error.
+
+        Args:
+            email: str. The email address of the user.
+
+        Returns:
+            UserRecord. The UserRecord object of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        lookup = (u for u in self._users_by_uid.values() if u.email == email)
+        user = python_utils.NEXT(lookup, None)
+        if user is None:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % email)
+        return user
 
     def _update_user(self, uid, email=None, disabled=False, custom_claims=None):
         """Updates the user in storage if found, otherwise raises an error.
@@ -598,7 +618,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         return res
 
 
-class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
+class SeedFirebaseTests(FirebaseAuthServicesTestBase):
 
     def set_up_models(self, user_id=None, gae_id=None, firebase_auth_id=None):
         """Creates user and auth models to emulate a real admin account.
@@ -625,8 +645,9 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
 
     def test_fails_when_no_admin_exists(self):
         self.assertRaisesRegexp(
-            Exception, 'testadmin@example.com is not a registered account',
-            firebase_auth_services.create_initial_super_admin)
+            Exception,
+            'testadmin@example.com must correspond to exactly 1 user',
+            firebase_auth_services.seed_firebase)
 
     def test_creates_firebase_account_and_models_if_none_exists(self):
         self.set_up_models(user_id='abc')
@@ -637,7 +658,7 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_user_id_from_auth_id('abc'))
         self.firebase_sdk_stub.assert_firebase_user_does_not_exist('abc')
 
-        firebase_auth_services.create_initial_super_admin()
+        firebase_auth_services.seed_firebase()
 
         self.assertEqual(
             firebase_auth_services.get_auth_id_from_user_id('abc'), 'abc')
@@ -656,7 +677,7 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_user_id_from_auth_id('abc'))
         self.firebase_sdk_stub.assert_firebase_user_does_not_exist('abc')
 
-        firebase_auth_services.create_initial_super_admin()
+        firebase_auth_services.seed_firebase()
 
         self.assertEqual(
             firebase_auth_services.get_auth_id_from_user_id('uid_abc'), 'abc')
@@ -676,7 +697,7 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_user_id_from_auth_id('abc'))
         self.assertIsNone(self.firebase_sdk_stub.get_user('abc').custom_claims)
 
-        firebase_auth_services.create_initial_super_admin()
+        firebase_auth_services.seed_firebase()
 
         self.assertEqual(
             firebase_auth_services.get_auth_id_from_user_id('abc'), 'abc')
@@ -696,7 +717,7 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
         self.assertIsNone(
             firebase_auth_services.get_user_id_from_auth_id('jkl'))
 
-        firebase_auth_services.create_initial_super_admin()
+        firebase_auth_services.seed_firebase()
 
         self.assertEqual(
             firebase_auth_services.get_auth_id_from_user_id('uid_abc'), 'abc')
@@ -714,7 +735,7 @@ class CreateInitialSuperAdminTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_user_id_from_auth_id('xyz'), 'abc')
         self.firebase_sdk_stub.assert_firebase_user_does_not_exist('xyz')
 
-        firebase_auth_services.create_initial_super_admin()
+        firebase_auth_services.seed_firebase()
 
         self.assertEqual(
             firebase_auth_services.get_auth_id_from_user_id('abc'), 'xyz')
@@ -809,6 +830,18 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
         self.assertTrue(
             logs[0].startswith('User session has ended and must be renewed'))
+
+    def test_grants_super_admin_privileges_to_feconf_admin_email_address(self):
+        cookie = firebase_admin.auth.create_session_cookie(
+            self.firebase_sdk_stub.create_user(
+                self.AUTH_ID, email=feconf.ADMIN_EMAIL_ADDRESS),
+            datetime.timedelta(days=1))
+
+        self.assertEqual(
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request(session_cookie=cookie)),
+            auth_domain.AuthClaims(
+                self.AUTH_ID, feconf.ADMIN_EMAIL_ADDRESS, True))
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):
