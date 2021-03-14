@@ -116,7 +116,7 @@ export class TranslateTextService {
     return (this.activeIndex + 1 < this.stateAndContent.length);
   }
 
-  init(expId, languageCode, successCallback): void {
+  init(expId: string, languageCode: string, successCallback: () => void): void {
     this.activeExpId = expId;
     this.translateTextBackedApiService.getTranslatableTextsAsync(
       expId, languageCode).then((translatableTexts: TranslatableTexts) => {
