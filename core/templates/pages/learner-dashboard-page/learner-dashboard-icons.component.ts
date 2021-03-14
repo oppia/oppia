@@ -42,10 +42,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
   @Input()
   get activityActive(): boolean {
     return this.activityIsCurrentlyHoveredOver;
-  };
+  }
   set activityActive(hoverState: boolean) {
-    this.activityIsCurrentlyHoveredOver = hoverState
-  };
+    this.activityIsCurrentlyHoveredOver = hoverState;
+  }
   @Input() isContainerNarrow: boolean;
   @Input() isAddToPlaylistIconShown: boolean;
 

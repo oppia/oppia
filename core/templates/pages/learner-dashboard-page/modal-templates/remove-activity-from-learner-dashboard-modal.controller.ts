@@ -44,10 +44,6 @@ angular.module('oppia').controller(
       $scope.subsectionName = subsectionName;
       $scope.activityTitle = activity.title;
       $scope.remove = function() {
-        console.log(
-          sectionNameI18nId,
-          subsectionName,
-          activity.title,)
         var activityType = '';
         if (subsectionName ===
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
@@ -80,7 +76,6 @@ angular.module('oppia').controller(
               activityType: activityType,
               activityId: activity.id
             }));
-        console.log(removeActivityUrl)
         $http['delete'](removeActivityUrl);
         $uibModalInstance.close();
       };
