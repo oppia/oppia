@@ -29,6 +29,11 @@ import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
  * fields.
  */
 
+interface TranslatableObject {
+  text: string,
+  more: boolean
+}
+
 export class StateAndContent {
   constructor(
     private _stateName: string,
@@ -149,14 +154,14 @@ export class TranslateTextService {
     });
   }
 
-  getTextToTranslate(): object {
+  getTextToTranslate(): TranslatableObject {
     return {
       text: this._getNextText(),
       more: this._isMoreTextAvailabelForTranslation()
     };
   }
 
-  getPreviousTextToTranslate(): object {
+  getPreviousTextToTranslate(): TranslatableObject {
     return {
       text: this._getPreviousText(),
       more: this._isPreviousTextAvailableForTranslation()
