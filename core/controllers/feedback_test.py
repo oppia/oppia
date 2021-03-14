@@ -27,7 +27,7 @@ from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -627,7 +627,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.owner_id, name='Name',
             description='Description', canonical_story_ids=[],
@@ -678,8 +678,7 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
     def test_get_recently_posted_feedback_messages(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(
-            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+        response = self.get_json(feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
 
         self.assertEqual(response['results'], [])
         self.assertFalse(response['more'])
@@ -695,10 +694,8 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
             'new subject', 'new text')
 
-        response = self.get_json(
-            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+        response = self.get_json(feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
         results = response['results']
-
         self.assertEqual(len(results), 2)
 
         self.assertFalse(response['more'])

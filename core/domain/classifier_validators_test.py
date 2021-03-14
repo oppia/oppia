@@ -93,7 +93,6 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -139,7 +138,6 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_exp_version(self):
         self.model_instance_0.exp_version = 5
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -154,7 +152,6 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_state_name(self):
         self.model_instance_0.state_name = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -169,7 +166,6 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_schema(self):
         self.model_instance_0.interaction_id = 'invalid'
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -225,7 +221,6 @@ class StateTrainingJobsMappingModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -275,7 +270,6 @@ class StateTrainingJobsMappingModelValidatorTests(
                 id='0.5.StateTest0', exp_id='0', exp_version=5,
                 state_name='StateTest0',
                 algorithm_ids_to_job_ids={'TextClassifier': 'job_id'}))
-        model_instance_with_invalid_exp_version.update_timestamps()
         model_instance_with_invalid_exp_version.put()
         expected_output = [
             (
@@ -294,7 +288,6 @@ class StateTrainingJobsMappingModelValidatorTests(
                 id='0.1.invalid', exp_id='0', exp_version=1,
                 state_name='invalid',
                 algorithm_ids_to_job_ids={'TextClassifier': 'job_id'}))
-        model_instance_with_invalid_state_name.update_timestamps()
         model_instance_with_invalid_state_name.put()
         expected_output = [
             (
