@@ -1098,6 +1098,58 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
+    def swap_with_call_pattern(
+            self, obj, attr, raise_pattern=(None,), return_pattern=(None,)):
+        """Swap obj.attr with a function that follows the given patterns.
+
+        Example:
+            swap_context = self.swap_with_call_pattern(
+                foo_services, 'foo',
+                raise_pattern=(Exception('abc'), None, None, Exception('def')),
+                return_pattern=(1, 2, 3))
+            with swap_context:
+                foo_services.foo() # Raises 'abc'
+                foo_services.foo() # Returns 1
+                foo_services.foo() # Returns 2
+                foo_services.foo() # Raises 'def'
+                foo_services.foo() # Raises 'abc'
+                foo_services.foo() # Returns 3
+                foo_services.foo() # Returns 1
+                foo_services.foo() # Raises 'abc'
+                # etc...
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            raise_pattern: tuple(Exception|None). Describes the pattern of calls
+                which will raise an exception. None values will not raise
+                anything. The pattern is cycled. By default, the function will
+                never raise an Exception.
+            return_pattern: tuple(*). Describes the pattern of values returned
+                by the function when an error is not raised. The pattern is
+                cycled. By default, the function will always return None.
+
+        Yields:
+            None. Nothing.
+
+        Returns:
+            Context manager. The context manager with the mocked implementation.
+        """
+        raise_pattern = itertools.cycle(raise_pattern)
+        return_pattern = itertools.cycle(return_pattern)
+
+        def function_that_follows_pattern(*unused_args, **unused_kwargs):
+            """Function that follows the given calling patterns."""
+            error_to_raise = python_utils.NEXT(raise_pattern)
+            if error_to_raise is not None:
+                raise error_to_raise
+            else:
+                return python_utils.NEXT(return_pattern)
+
+        with self.swap(obj, attr, function_that_follows_pattern):
+            yield
+
+    @contextlib.contextmanager
     def swap_with_checks(
             self, obj, attr, new_value, expected_args=None,
             expected_kwargs=None, called=True):
