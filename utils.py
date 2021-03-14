@@ -22,6 +22,7 @@ import collections
 import datetime
 import hashlib
 import imghdr
+import itertools
 import json
 import os
 import random
@@ -992,3 +993,26 @@ class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
 
     pass
+
+
+def grouper(iterable, chunk_len, fillvalue=None):
+    """Collect data into fixed-length chunks.
+
+    Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
+
+    Example:
+        grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+
+    Args:
+        iterable: iterable. Any kind of iterable object.
+        chunk_len: int. The chunk size of each group.
+        fillvalue: *. The value used to fill out the last chunk in case the
+            iterable is exhausted.
+
+    Returns:
+        iterable(iterable). A sequence of chunks over the input data.
+    """
+    # To understand how/why this works, please refer to the following
+    # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
+    args = [iter(iterable)] * chunk_len
+    return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function

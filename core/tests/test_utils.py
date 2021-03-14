@@ -1467,7 +1467,7 @@ class GenericTestBase(AppEngineTestBase):
     TODO(#12135): Split this enormous test base into smaller, focused pieces.
     """
 
-    # NOTE: For tests that do not/can not use the default super-admin, authors
+    # NOTE: For tests that do not/can not use the default super admin, authors
     # can override the following class-level constant.
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
 

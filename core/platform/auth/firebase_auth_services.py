@@ -54,7 +54,6 @@ Terminology:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import contextlib
 import logging
 
 from constants import constants
@@ -67,13 +66,36 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 
-auth_models, user_models = models.Registry.import_models(
-    [models.NAMES.auth, models.NAMES.user])
+auth_models, user_models = (
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
-datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 ONLY_FIREBASE_SEED_MODEL_ID = 1
+
+
+def establish_firebase_connection():
+    """Establishes the connection to Firebase needed by the rest of the SDK.
+
+    All Firebase operations require an "app", the abstraction used for a
+    Firebase server connection. The initialize_app() function raises an error
+    when it's called more than once, however, so we make this function
+    idempotent by trying to "get" the app first.
+
+    Returns:
+        firebase_admin.App. The App being by the Firebase SDK.
+
+    Raises:
+        Exception. The Firebase app has a genuine problem.
+    """
+    try:
+        return firebase_admin.get_app()
+    except ValueError as error:
+        if 'initialize_app' in python_utils.UNICODE(error):
+            return firebase_admin.initialize_app(
+                options={'projectId': feconf.OPPIA_PROJECT_ID})
+        else:
+            raise
 
 
 def establish_auth_session(request, response):
@@ -93,9 +115,8 @@ def establish_auth_session(request, response):
     if cookie_claims is not None:
         return
 
-    with _firebase_admin_context():
-        fresh_cookie = firebase_auth.create_session_cookie(
-            _get_id_token(request), feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
+    fresh_cookie = firebase_auth.create_session_cookie(
+        _get_id_token(request), feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
     response.set_cookie(
         feconf.FIREBASE_SESSION_COOKIE_NAME,
@@ -163,13 +184,12 @@ def mark_user_for_deletion(user_id):
         assoc_by_auth_id_model.update_timestamps()
         assoc_by_auth_id_model.put()
     else:
-        logging.warn(
+        logging.error(
             '[WIPEOUT] User with user_id=%s has no Firebase account' % user_id)
         return
 
     try:
-        with _firebase_admin_context():
-            firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
+        firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
     except (firebase_exceptions.FirebaseError, ValueError):
         # NOTE: logging.exception appends the stack trace automatically. The
         # errors are not re-raised because wipeout_services, the user of this
@@ -190,11 +210,9 @@ def delete_external_auth_associations(user_id):
     if auth_id is None:
         return
     try:
-        with _firebase_admin_context():
-            try:
-                firebase_auth.delete_user(auth_id)
-            except firebase_auth.UserNotFoundError:
-                logging.exception('[WIPEOUT] Firebase account already deleted')
+        firebase_auth.delete_user(auth_id)
+    except firebase_auth.UserNotFoundError:
+        logging.exception('[WIPEOUT] Firebase account already deleted')
     except (firebase_exceptions.FirebaseError, ValueError):
         # NOTE: logging.exception appends the stack trace automatically. The
         # errors are not re-raised because wipeout_services, the user of this
@@ -219,8 +237,7 @@ def verify_external_auth_associations_are_deleted(user_id):
     if auth_id is None:
         return True
     try:
-        with _firebase_admin_context():
-            firebase_auth.get_user(auth_id)
+        firebase_auth.get_user(auth_id)
     except firebase_auth.UserNotFoundError:
         return True
     except (firebase_exceptions.FirebaseError, ValueError):
@@ -405,44 +422,38 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
 
 
 def grant_super_admin_privileges(user_id):
-    """Grants the user with super-admin privileges.
+    """Grants the user super admin privileges.
 
     Args:
         user_id: str. The Oppia user ID to promote to super admin.
-
-    Returns:
-        bool. Whether the operation succeeded.
     """
-    firebase_id = get_auth_id_from_user_id(user_id)
-    if firebase_id is None:
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
         raise ValueError('user_id=%s has no Firebase account' % user_id)
-    with _firebase_admin_context():
-        firebase_admin.auth.set_custom_user_claims(
-            firebase_id, '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN)
+    firebase_admin.auth.set_custom_user_claims(
+        auth_id, '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
 
 def revoke_super_admin_privileges(user_id):
-    """Revokes the user's super-admin privileges.
+    """Revokes the user's super admin privileges.
 
     Args:
         user_id: str. The Oppia user ID to revoke privileges from.
-
-    Returns:
-        bool. Whether the operation succeeded.
     """
-    firebase_id = get_auth_id_from_user_id(user_id)
-    if firebase_id is None:
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
         raise ValueError('user_id=%s has no Firebase account' % user_id)
-    with _firebase_admin_context():
-        firebase_admin.auth.set_custom_user_claims(firebase_id, None)
+    firebase_admin.auth.set_custom_user_claims(auth_id, None)
 
 
 def seed_firebase():
-    """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob."""
-    # Exactly 1 seed model must exist.
+    """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob.
+
+    NOTE: This function is idempotent.
+    """
     seed_model = auth_models.FirebaseSeedModel.get(
         ONLY_FIREBASE_SEED_MODEL_ID, strict=False)
-    if seed_model is None:
+    if seed_model is None: # Exactly 1 seed model must exist.
         auth_models.FirebaseSeedModel(id=ONLY_FIREBASE_SEED_MODEL_ID).put()
 
     assoc_by_user_id_models = auth_models.UserAuthDetailsModel.get_multi([
@@ -462,15 +473,13 @@ def seed_firebase():
                 feconf.ADMIN_EMAIL_ADDRESS, feconf.SYSTEM_COMMITTER_ID,
                 ', '.join(m.id for m in assoc_by_user_id_models)))
     else:
-        admin_user_id = assoc_by_user_id_models[0].id
+        user_id = assoc_by_user_id_models[0].id
 
-    assoc_by_user_id_model = auth_models.UserAuthDetailsModel.get(admin_user_id)
+    assoc_by_user_id_model = auth_models.UserAuthDetailsModel.get(user_id)
 
     auth_id = assoc_by_user_id_model.firebase_auth_id
     if auth_id is None:
-        auth_id = (
-            admin_user_id[4:] if admin_user_id.startswith('uid_') else
-            admin_user_id)
+        auth_id = user_id[4:] if user_id.startswith('uid_') else user_id
         assoc_by_user_id_model.firebase_auth_id = auth_id
         assoc_by_user_id_model.update_timestamps(update_last_updated_time=False)
         assoc_by_user_id_model.put()
@@ -479,56 +488,35 @@ def seed_firebase():
         auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
     if assoc_by_auth_id_model is None:
         auth_models.UserIdByFirebaseAuthIdModel(
-            id=auth_id, user_id=admin_user_id).put()
-    elif assoc_by_auth_id_model.user_id != admin_user_id:
-        assoc_by_auth_id_model.user_id = admin_user_id
+            id=auth_id, user_id=user_id).put()
+    elif assoc_by_auth_id_model.user_id != user_id:
+        assoc_by_auth_id_model.user_id = user_id
         assoc_by_auth_id_model.update_timestamps(update_last_updated_time=False)
         assoc_by_auth_id_model.put()
 
     super_admin_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
 
-    with _firebase_admin_context():
-        try:
-            user = firebase_admin.auth.get_user_by_email(
-                feconf.ADMIN_EMAIL_ADDRESS)
-        except firebase_admin.auth.UserNotFoundError:
-            create_new = True
-        else:
-            if user.uid != auth_id:
-                firebase_admin.auth.update_user(user.uid, disabled=True)
-                firebase_admin.auth.delete_user(user.uid)
-                create_new = True
-            else:
-                firebase_admin.auth.set_custom_user_claims(
-                    user.uid, super_admin_claims)
-                create_new = False
-
-        if create_new:
-            firebase_admin.auth.import_users([
-                firebase_admin.auth.ImportUserRecord(
-                    auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
-                    custom_claims=super_admin_claims)
-            ])
-
-
-@contextlib.contextmanager
-def _firebase_admin_context():
-    """Returns a context for calling the Firebase Admin SDK.
-
-    Yields:
-        None. No relevent context expression.
-    """
-    # NOTE: "app" is the term Firebase uses for the "entry point" to the
-    # Firebase SDK. Oppia only has one server, so it only needs to instantiate
-    # one app.
-    firebase_connection = firebase_admin.initialize_app(
-        options={'projectId': feconf.OPPIA_PROJECT_ID})
     try:
-        yield
-    finally:
-        # NOTE: This is not dangerous. We are just deleting the resources used
-        # to form a connection to Firebase servers.
-        firebase_admin.delete_app(firebase_connection)
+        user = firebase_admin.auth.get_user_by_email(
+            feconf.ADMIN_EMAIL_ADDRESS)
+    except firebase_admin.auth.UserNotFoundError:
+        create_new_firebase_account = True
+    else:
+        if user.uid != auth_id:
+            firebase_admin.auth.update_user(user.uid, disabled=True)
+            firebase_admin.auth.delete_user(user.uid)
+            create_new_firebase_account = True
+        else:
+            firebase_admin.auth.set_custom_user_claims(
+                user.uid, super_admin_claims)
+            create_new_firebase_account = False
+
+    if create_new_firebase_account:
+        firebase_admin.auth.import_users([
+            firebase_admin.auth.ImportUserRecord(
+                auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
+                custom_claims=super_admin_claims)
+        ])
 
 
 def _get_session_cookie(request):
@@ -589,9 +577,8 @@ def _get_auth_claims_from_session_cookie(cookie):
     # isn't authenticated.
     if cookie:
         try:
-            with _firebase_admin_context():
-                return _create_auth_claims(
-                    firebase_auth.verify_session_cookie(cookie))
+            return _create_auth_claims(
+                firebase_auth.verify_session_cookie(cookie))
         # NOTE: Session cookies only provide temporary authentication, so they
         # are expected to become obsolete over time. The following errors are
         # situations where this can happen.

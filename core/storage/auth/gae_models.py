@@ -300,9 +300,9 @@ class FirebaseSeedModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Model should never be erased."""
-        return base_models.KEEP
+        return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
     def get_model_association_to_user():
         """Model does not correspond to any users."""
-        return base_models.NOT_CORRESPONDING_TO_USER
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER

@@ -63,7 +63,7 @@ def load_template(filename):
 
 
 class SessionBeginHandler(webapp2.RequestHandler):
-    """Class which handles the creation of a new authentication session."""
+    """Handler for creating new authentication sessions."""
 
     def get(self):
         """Establishes a new auth session."""
@@ -71,7 +71,7 @@ class SessionBeginHandler(webapp2.RequestHandler):
 
 
 class SessionEndHandler(webapp2.RequestHandler):
-    """Class which handles the creation of a new authentication session."""
+    """Handler for destroying existing authentication sessions."""
 
     def get(self):
         """Establishes a new auth session."""
@@ -521,10 +521,10 @@ class BaseHandler(webapp2.RequestHandler):
 
 
 class SeedFirebaseHandler(webapp2.RequestHandler):
-    """Handler that prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
+    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob."""
 
     def get(self):
-        """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob."""
+        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
         try:
             auth_services.seed_firebase()
         except Exception:

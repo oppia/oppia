@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import itertools
 
 from core import jobs
 from core.domain import auth_domain
@@ -29,6 +28,7 @@ from core.platform.auth import firebase_auth_services
 from core.platform.auth import gae_auth_services
 import feconf
 import python_utils
+import utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
@@ -36,6 +36,8 @@ from firebase_admin import exceptions as firebase_exceptions
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+
+ID_HASHING_FUNCTION = hash
 
 
 class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -73,11 +75,6 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     INFO_SEED_MODEL_ACK = 'INFO: Found FirebaseSeedModel'
     INFO_ACCOUNTS_PROCESSED = 'INFO: Firebase accounts processed'
 
-    WARNING_DELETE_APP_FAILED = (
-        'WARNING: firebase_admin.delete_app() failed. No action is needed.')
-
-    ERROR_INITIALIZE_APP_FAILED = (
-        'ERROR: firebase_admin.initialize_app() failed. No accounts deleted.')
     ERROR_BATCH_DELETE = 'ERROR: Failed to delete a batch of Firebase accounts'
     ERROR_INDIVIDUAL_DELETE = (
         'ERROR: Failed to delete an individual Firebase account')
@@ -108,11 +105,6 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         yield (cls.INFO_SEED_MODEL_ACK, item.id)
 
-        firebase_connection, firebase_error = _acquire_firebase_connection()
-        if firebase_error is not None:
-            yield (cls.ERROR_INITIALIZE_APP_FAILED, firebase_error)
-            return
-
         num_accounts_processed = 0
         for user_batch in cls.yield_firebase_user_batches():
             ids_to_delete = []
@@ -142,10 +134,6 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 num_accounts_processed += len(ids_to_delete)
 
         yield (cls.INFO_ACCOUNTS_PROCESSED, num_accounts_processed)
-
-        firebase_error = _release_firebase_connection(firebase_connection)
-        if firebase_error is not None:
-            yield (cls.WARNING_DELETE_APP_FAILED, firebase_error)
 
     @staticmethod
     def reduce(key, values):
@@ -245,14 +233,13 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     ERRORS!
     """
 
+    NUM_SHARDS = 50 # Arbitrary value.
     MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL = 1000
 
     AUDIT_KEY = 'INFO: Pre-existing Firebase accounts'
     ERROR_KEY = 'ERROR: Failed to create Firebase accounts'
     SUCCESS_KEY = 'SUCCESS: Created Firebase accounts'
     WARNING_KEY = 'WARNING: No action needed'
-    ERROR_INITIALIZE_APP_FAILED = (
-        'ERROR: initialize_app() failed; All accounts have been skipped')
 
     SUPER_ADMIN_ACK = 'INFO: Super admin created'
     SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
@@ -287,8 +274,11 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_is_super_admin = (user.email == feconf.ADMIN_EMAIL_ADDRESS)
             if user_is_super_admin:
                 yield (cls.SUPER_ADMIN_ACK, user.id)
+
+            # Split up users into different shards to help speed up the job.
+            sharding_key = ID_HASHING_FUNCTION(user.id) % cls.NUM_SHARDS
             yield (
-                None, (
+                sharding_key, (
                     cls.strip_uid_prefix(user.id), user.id, user.email,
                     user_is_super_admin))
 
@@ -303,11 +293,6 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
         elif key in (cls.SUPER_ADMIN_ACK, cls.SYSTEM_COMMITTER_ACK):
             yield (key, values)
-            return
-
-        firebase_connection, firebase_error = _acquire_firebase_connection()
-        if firebase_error is not None:
-            yield (cls.ERROR_INITIALIZE_APP_FAILED, firebase_error)
             return
 
         # NOTE: This is only sorted to make unit testing easier.
@@ -327,7 +312,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             0, len(user_records), cls.MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL)
         results = (
             cls.populate_firebase([r for r in record_group if r is not None])
-            for record_group in cls.grouper(
+            for record_group in utils.grouper(
                 user_records, cls.MAX_USERS_FIREBASE_CAN_IMPORT_PER_CALL))
 
         assocs_to_create = []
@@ -352,10 +337,6 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 assocs_to_create)
             yield (cls.SUCCESS_KEY, len(assocs_to_create))
 
-        firebase_error = _release_firebase_connection(firebase_connection)
-        if firebase_error is not None:
-            yield (cls.WARNING_KEY, firebase_error)
-
     @classmethod
     def populate_firebase(cls, user_records):
         """Populates the Firebase server with the given user records.
@@ -378,56 +359,3 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def strip_uid_prefix(cls, user_id):
         """Removes the 'uid_' prefix from a user_id and returns the result."""
         return user_id[4:] if user_id.startswith('uid_') else user_id
-
-    @classmethod
-    def grouper(cls, iterable, chunk_len, fillvalue=None):
-        """Collect data into fixed-length chunks.
-
-        https://docs.python.org/3/library/itertools.html#itertools-recipes.
-
-        Example:
-            grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-
-        Args:
-            iterable: iterable. Any kind of iterable object.
-            chunk_len: int. The chunk size to group values.
-            fillvalue: *. The value used to fill out the last chunk when the
-                iterable is exhausted.
-
-        Returns:
-            iterable(iterable). A sequence of chunks over the input data.
-        """
-        # To understand how/why this works, please refer to the following
-        # stackoverflow post: https://stackoverflow.com/a/49181132/4859885.
-        args = [iter(iterable)] * chunk_len
-        return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
-
-
-def _acquire_firebase_connection():
-    """Returns an established Firebase connection, or an exception if raised.
-
-    Returns:
-        tuple(firebase_admin.App|None, Exception|None). Exactly one of the
-        values is None.
-    """
-    try:
-        # NOTE: "app" is the term Firebase uses for the "entry point" to the
-        # Firebase SDK. Oppia only has one server, so it only needs to
-        # instantiate one app.
-        return (firebase_admin.initialize_app(), None)
-    except Exception as exception:
-        return (None, repr(exception))
-
-
-def _release_firebase_connection(firebase_connection):
-    """Destroys the established Firebase connection.
-
-    Returns:
-        Exception|None. The error raised by the function, or None if successful.
-    """
-    try:
-        firebase_admin.delete_app(firebase_connection)
-    except Exception as exception:
-        return repr(exception)
-    else:
-        return None

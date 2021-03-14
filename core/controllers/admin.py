@@ -731,7 +731,7 @@ class AdminRoleHandler(base.BaseHandler):
 
 
 class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
-    """Handler for promoting a user to super-admin."""
+    """Handler for granting a user super admin privileges."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -750,7 +750,7 @@ class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
 
 
 class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
-    """Handler for promoting a user to super-admin."""
+    """Handler for revoking a user's super admin privileges."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -768,8 +768,7 @@ class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Cannot revoke privileges from the default super admin account')
 
-        auth_services.revoke_super_admin_privileges(
-            user_settings.user_id)
+        auth_services.revoke_super_admin_privileges(user_settings.user_id)
         self.render_json(self.values)
 
 

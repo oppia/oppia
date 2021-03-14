@@ -633,3 +633,13 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_grouper(self):
+        self.assertEqual(
+            [list(g) for g in utils.grouper(python_utils.RANGE(7), 3)],
+            [[0, 1, 2], [3, 4, 5], [6, None, None]])
+        # Returns an iterable of iterables, so we need to combine them into
+        # strings for easier comparison.
+        self.assertEqual(
+            [''.join(g) for g in utils.grouper('ABCDEFG', 3, fillvalue='x')],
+            ['ABC', 'DEF', 'Gxx'])

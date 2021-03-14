@@ -63,6 +63,7 @@ from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
 from core.domain import user_services
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 import feconf
 
 from mapreduce import main as mapreduce_main
@@ -873,3 +874,5 @@ URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+
+firebase_auth_services.establish_firebase_connection()

@@ -710,7 +710,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
 
 
 class SessionBeginHandlerTests(test_utils.GenericTestBase):
-    """Tests for session begin handler."""
+    """Tests for /session_begin handler."""
 
     def test_get(self):
         call_counter = test_utils.CallCounter(lambda *_: None)
@@ -722,7 +722,7 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
 
 
 class SessionEndHandlerTests(test_utils.GenericTestBase):
-    """Tests for session end handler."""
+    """Tests for /session_end handler."""
 
     def test_get(self):
         call_counter = test_utils.CallCounter(lambda *_: None)
@@ -734,7 +734,7 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
 
 
 class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
-    """Tests for create initial super admin handler."""
+    """Tests for /seed_firebase handler."""
 
     def test_get(self):
         call_counter = test_utils.CallCounter(lambda *_: None)
@@ -764,7 +764,7 @@ class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(call_counter.times_called, 1)
         self.assert_matches_regexps(logs, [
-            'Failed to initialize Firebase admin account'
+            'Failed to prepare for SeedFirebaseOneOffJob'
         ])
 
 
@@ -1251,6 +1251,13 @@ class SignUpTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response('/community-library')
+
+    def test_500_error_is_raised_when_enable_user_creation_is_false(self):
+        self.login('abc@example.com')
+
+        with self.swap(feconf, 'ENABLE_USER_CREATION', False):
+            response = self.get_response_without_checking_for_errors(
+                feconf.SIGNUP_URL + '?return_url=/', [500])
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):

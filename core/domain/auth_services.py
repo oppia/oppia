@@ -27,8 +27,6 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 platform_auth_services = models.Registry.import_auth_services()
 
-ONLY_FIREBASE_SEED_MODEL_ID = 0
-
 
 def create_profile_user_auth_details(user_id, parent_user_id):
     """Returns a domain object for a new profile user.
@@ -231,12 +229,20 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
 
 
 def grant_super_admin_privileges(user_id):
-    """Grants super admin privileges to the given user."""
+    """Grants the user super admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to promote to super admin.
+    """
     firebase_auth_services.grant_super_admin_privileges(user_id)
 
 
 def revoke_super_admin_privileges(user_id):
-    """Revokes super admin privileges from the given user."""
+    """Revokes the user's super admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to revoke privileges from.
+    """
     firebase_auth_services.revoke_super_admin_privileges(user_id)
 
 
