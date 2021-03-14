@@ -56,10 +56,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
   ngOnInit(): void {
     this.learnerDashboardIdsBackendApiService.
       fetchLearnerDashboardIdsAsync().then(
-      (learnerDashboardActivityIds) => {
-        this.learnerDashboardActivityIds = learnerDashboardActivityIds;
-      }
-    )
+        (learnerDashboardActivityIds) => {
+          this.learnerDashboardActivityIds = learnerDashboardActivityIds;
+        }
+      ); 
   }
 
   enablePlaylistTooltip() {
@@ -159,7 +159,6 @@ export class LearnerDashboardIconsComponent implements OnInit {
   }
 
   removeFromLearnerPlaylist(activityId, activityTitle, activityType) {
-    console.log(activityId,activityTitle,activityType);
     this.learnerPlaylistService.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType,
       this.learnerDashboardActivityIds);

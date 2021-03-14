@@ -23,12 +23,9 @@ import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { HttpClient } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { LearnerDashboardActivityIds } from
-  'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
-import { LearnerPlaylistModalComponent } from 
-  'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
+import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 
 interface LearnerPlaylistResponseObject {
   'belongs_to_completed_or_incomplete_list': boolean
