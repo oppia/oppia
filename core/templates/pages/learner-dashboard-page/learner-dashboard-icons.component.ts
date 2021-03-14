@@ -41,9 +41,12 @@ export class LearnerDashboardIconsComponent implements OnInit {
   @Input() activityTitle: string;
   // @Input() activityActive: string;
   @Input()
-  get activityActive(): boolean{ return }
-  set activityActive(hoverState: boolean){
-    this.activityIsCurrentlyHoveredOver = hoverState }
+  get activityActive(): boolean {
+    return
+  }
+  set activityActive(hoverState: boolean) {
+    this.activityIsCurrentlyHoveredOver = hoverState
+  }
   @Input() isContainerNarrow: boolean;
   @Input() isAddToPlaylistIconShown: boolean;
 
