@@ -59,7 +59,11 @@ import { ProfileLinkTextComponent } from
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { AuthService } from 'services/auth.service';
+import { FocusOnDirective } from '../directives/focus-on.directive';
+import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -80,6 +84,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   imports: [
     CommonModule,
     BrowserModule,
+    DynamicContentModule,
     NgbTooltipModule,
     FormsModule,
     ...firebaseAuthModules,
@@ -94,6 +99,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    FocusOnDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -101,13 +107,15 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
-    StorySummaryTileDirective,
     SocialButtonsComponent,
+    StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    ThumbnailDisplayComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
+    TranslatePipe,
+    TruncatePipe,
   ],
 
   entryComponents: [
@@ -123,24 +131,27 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
-    ThumbnailDisplayComponent
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
   ],
 
   exports: [
     // Modules.
+    DynamicContentModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    FocusOnDirective,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    ThumbnailDisplayComponent,
+    SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    ThumbnailDisplayComponent,
     TranslatePipe,
-    SummaryListHeaderComponent
   ],
 })
 

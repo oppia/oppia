@@ -786,9 +786,7 @@ def swap_env(key, value):
 
 
 @contextlib.contextmanager
-def managed_process(
-        command_args, shell=False, timeout_secs=60, proc_name_to_kill=None,
-        **kwargs):
+def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -805,10 +803,6 @@ def managed_process(
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
-        proc_name_to_kill: str|None. If given, the name of a string which
-            matches all additional processes that should be killed when the
-            given process is terminated. (This is needed for, e.g.,
-            elasticsearch.)
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -857,17 +851,6 @@ def managed_process(
         for proc in procs_still_alive:
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
             proc.kill()
-
-        if proc_name_to_kill is not None:
-            python_utils.PRINT(
-                'Killing remaining %s processes' % proc_name_to_kill)
-            for proc in psutil.process_iter():
-                proc_should_be_killed = any(
-                    proc_name_to_kill in cmd_part
-                    for cmd_part in proc.cmdline())
-                if proc_should_be_killed:
-                    logging.warn('Forced to kill %s!' % get_debug_info(proc))
-                    proc.kill()
 
 
 @contextlib.contextmanager
@@ -961,12 +944,8 @@ def managed_elasticsearch_dev_server():
     if os.path.exists(ES_PATH_DATA_DIR):
         shutil.rmtree(ES_PATH_DATA_DIR)
 
+    es_args = ['%s/bin/elasticsearch' % ES_PATH, '-q'] # -q is the quiet flag.
     # Override the default path to ElasticSearch config files.
-    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
-    es_args = [
-        '%s/bin/elasticsearch' % ES_PATH,
-        '-d'
-    ]
-    with managed_process(
-        es_args, shell=True, proc_name_to_kill='elasticsearch') as proc:
+    es_env = {'ES_PATH_CONF': ES_PATH_CONFIG_DIR}
+    with managed_process(es_args, env=es_env, shell=True) as proc:
         yield proc

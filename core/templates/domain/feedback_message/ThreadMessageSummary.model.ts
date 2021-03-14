@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of thread message
+ * @fileoverview Model for creating new frontend instances of thread message
  * summary domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export class ThreadMessageSummary {
   authorUsername: string;
@@ -33,14 +30,3 @@ export class ThreadMessageSummary {
     return this.text.length > 0;
   }
 }
-
-@Injectable({providedIn: 'root'})
-export class ThreadMessageSummaryObjectFactory {
-  createNew(authorUsername: string, text: string): ThreadMessageSummary {
-    return new ThreadMessageSummary(authorUsername, text);
-  }
-}
-
-angular.module('oppia').factory(
-  'ThreadMessageSummaryObjectFactory',
-  downgradeInjectable(ThreadMessageSummaryObjectFactory));
