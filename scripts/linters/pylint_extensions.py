@@ -61,7 +61,7 @@ def read_from_node(node):
     Returns:
         list(str). The data read from the ast node.
     """
-    return list([line.decode('utf-8') for line in node.stream().readlines()])
+    return [line.decode('utf-8') for line in node.stream().readlines()]
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
