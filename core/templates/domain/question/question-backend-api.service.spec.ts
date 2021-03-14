@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service.ts';
+  'domain/question/question-backend-api.service';
 
 describe('Question backend Api service', () => {
   let questionBackendApiService = null;
