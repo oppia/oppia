@@ -27,7 +27,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-noninteractive-link',
-  templateUrl: './link.directive.html',
+  templateUrl: './link.component.html',
   styleUrls: []
 })
 export class NoninteractiveLink implements OnInit {

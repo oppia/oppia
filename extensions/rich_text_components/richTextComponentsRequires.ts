@@ -18,13 +18,13 @@
 
 require(
   'rich_text_components/Collapsible/directives/' +
-  'oppia-noninteractive-collapsible.directive.ts');
+  'oppia-noninteractive-collapsible.component.ts');
 require(
   'rich_text_components/Image/directives/' +
   'oppia-noninteractive-image.component.ts');
 require(
   'rich_text_components/Link/directives/' +
-  'oppia-noninteractive-link.directive.ts');
+  'oppia-noninteractive-link.component.ts');
 require(
   'rich_text_components/Math/directives/' +
   'oppia-noninteractive-math.directive.ts');

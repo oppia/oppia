@@ -23,10 +23,10 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { NgbAccordionModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.directive';
+import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.component';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
-import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.directive';
+import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.component';
 
 
 @NgModule({

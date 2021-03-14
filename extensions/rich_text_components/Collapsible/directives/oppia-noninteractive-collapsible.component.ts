@@ -26,7 +26,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-noninteractive-collapsible',
-  templateUrl: './collapsible.directive.html',
+  templateUrl: './collapsible.component.html',
   styleUrls: []
 })
 export class NoninteractiveCollapsible implements OnInit {
