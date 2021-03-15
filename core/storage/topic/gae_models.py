@@ -150,7 +150,8 @@ class TopicModel(base_models.VersionedModel):
             commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
-        topic_commit_log_entry.put_depending_on_id(committer_id)
+        topic_commit_log_entry.update_timestamps()
+        topic_commit_log_entry.put()
 
     @classmethod
     def get_by_name(cls, topic_name):
@@ -486,7 +487,7 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_status=status,
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
-        ).put_depending_on_id(committer_id)
+        ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
@@ -506,7 +507,8 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.put_depending_on_id(committer_id)
+        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.put()
 
     @staticmethod
     def get_model_association_to_user():
