@@ -398,7 +398,12 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.chapterOutlineButtonsAreShown = (
               !$scope.chapterOutlineButtonsAreShown);
           };
-
+          $scope.addFocusWithoutScroll = function(label) {
+            FocusManagerService.setFocus(label);
+            setTimeout(function() {
+              window.scrollTo(0, 0);
+            }, 5);
+          };
           ctrl.$onInit = function() {
             // Regex pattern for exploration id,
             // EXPLORATION_AND_SKILL_ID_PATTERN
@@ -435,7 +440,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             );
             _init();
             setTimeout(() => {
-              FocusManagerService.setFocus('storyNodeDesc');
+              $scope.addFocusWithoutScroll('storyNodeDesc');
             }, 0);
           };
 

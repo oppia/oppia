@@ -346,6 +346,13 @@ angular.module('oppia').directive('storyEditor', [
             }
           };
 
+          $scope.addFocusWithoutScroll = function(label) {
+            FocusManagerService.setFocus(label);
+            setTimeout(function() {
+              window.scrollTo(0, 0);
+            }, 5);
+          };
+
           ctrl.$onInit = function() {
             $scope.storyPreviewCardIsShown = false;
             $scope.mainStoryCardIsShown = true;
@@ -367,9 +374,7 @@ angular.module('oppia').directive('storyEditor', [
               StoryEditorStateService.onStoryInitialized.subscribe(
                 () =>{
                   _init();
-                  setTimeout(() => {
-                    FocusManagerService.setFocus('metaTagInputField');
-                  }, 0);
+                  $scope.addFocusWithoutScroll('metaTagInputField');
                 }
               ));
             ctrl.directiveSubscriptions.add(

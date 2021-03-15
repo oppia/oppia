@@ -242,9 +242,7 @@ angular.module('oppia').component('preferencesPage', {
 
         $q.all([userInfoPromise, preferencesPromise]).then(function() {
           LoaderService.hideLoadingScreen();
-          setTimeout(() => {
-            ctrl.addFocusWithoutScroll('bioInputField');
-          }, 0);
+          ctrl.addFocusWithoutScroll('bioInputField');
         });
         ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
         ctrl.userCanExportAccount = ENABLE_ACCOUNT_EXPORT;
