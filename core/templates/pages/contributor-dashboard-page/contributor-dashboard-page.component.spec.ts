@@ -15,18 +15,13 @@
 /**
  * @fileoverview Unit tests for contributor dashboard page component.
  */
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 
-describe('Contributor dashboard page', function() {
+fdescribe('Contributor dashboard page', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -44,11 +39,7 @@ describe('Contributor dashboard page', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-      $provide.value('WindowRef', windowRef);
-    }
+    $provide.value('WindowRef', windowRef);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
@@ -64,7 +55,7 @@ describe('Contributor dashboard page', function() {
       .callThrough();
   }));
 
-  describe('when user is logged in', function() {
+  fdescribe('when user is logged in', function() {
     var userInfo = {
       isLoggedIn: () => true,
       getUsername: () => 'username1'
@@ -81,7 +72,7 @@ describe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should set specific properties after $onInit is called', function() {
+    fit('should set specific properties after $onInit is called', function() {
       expect(ctrl.languageCode).toBe('hi');
       expect(TranslationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalledWith('hi');
@@ -90,7 +81,7 @@ describe('Contributor dashboard page', function() {
         '/assets/images/avatar/oppia_avatar_100px.svg');
     });
 
-    it('should initialize $scope properties after controller is initialized' +
+    fit('should initialize $scope properties after controller is initialized' +
       ' and get data from backend', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.username).toBe('username1');
@@ -103,7 +94,7 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     });
 
-    it('should change active tab name when clicking on translate text tab',
+    fit('should change active tab name when clicking on translate text tab',
       function() {
         var changedTab = 'translateTextTab';
         expect(ctrl.activeTabName).toBe('myContributionTab');
@@ -111,7 +102,7 @@ describe('Contributor dashboard page', function() {
         expect(ctrl.activeTabName).toBe(changedTab);
       });
 
-    it('should change active language when clicking on language selector',
+    fit('should change active language when clicking on language selector',
       function() {
         spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
           .and.callThrough();
@@ -124,7 +115,7 @@ describe('Contributor dashboard page', function() {
           .toHaveBeenCalledWith('hi');
       });
 
-    it('should show language selector based on active tab', function() {
+    fit('should show language selector based on active tab', function() {
       var changedTab = 'translateTextTab';
 
       expect(ctrl.activeTabName).toBe('myContributionTab');
@@ -135,7 +126,7 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.showLanguageSelector()).toBe(true);
     });
 
-    it('should call scrollFunction on scroll', function() {
+    fit('should call scrollFunction on scroll', function() {
       var e = document.createEvent('Event');
       var scrollSpy = spyOn(ctrl, 'scrollFunction');
       e.initEvent('scroll', true, true);
@@ -145,7 +136,7 @@ describe('Contributor dashboard page', function() {
       expect(scrollSpy).toHaveBeenCalled();
     });
 
-    it('should show default header if window pageYOffset is ' +
+    fit('should show default header if window pageYOffset is ' +
       'less than 5', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
@@ -157,7 +148,7 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.defaultHeaderVisible).toBe(true);
     });
 
-    it('should show collapsed header if window pageYOffset is' +
+    fit('should show collapsed header if window pageYOffset is' +
       ' scrolled greater than 5', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
@@ -170,7 +161,7 @@ describe('Contributor dashboard page', function() {
     });
   });
 
-  describe('when user is not logged in', function() {
+  fdescribe('when user is not logged in', function() {
     var userInfo = {
       isLoggedIn: () => false
     };
@@ -186,7 +177,7 @@ describe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should have no user data in dashboard page', function() {
+    fit('should have no user data in dashboard page', function() {
       expect(ctrl.userIsLoggedIn).toBe(false);
       expect(ctrl.username).toBe('');
     });
