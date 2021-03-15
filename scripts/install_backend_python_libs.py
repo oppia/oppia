@@ -31,7 +31,7 @@ import utils
 
 import pkg_resources
 
-DIRECT_URL_GIT_REQUIREMENT_PATTERN = (
+GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
     re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)'))
@@ -136,14 +136,14 @@ def _get_requirements_file_contents():
                 continue
 
             elif line.startswith('git'):
-                match = DIRECT_URL_GIT_REQUIREMENT_PATTERN.match(line)
+                match = GIT_DIRECT_URL_REQUIREMENT_PATTERN.match(line)
                 if not match:
                     raise Exception(
                         '%r on line %d of %s does not match '
-                        'DIRECT_URL_GIT_REQUIREMENT_PATTERN=%r' % (
+                        'GIT_DIRECT_URL_REQUIREMENT_PATTERN=%r' % (
                             line, line_num,
                             common.COMPILED_REQUIREMENTS_FILE_PATH,
-                            DIRECT_URL_GIT_REQUIREMENT_PATTERN.pattern))
+                            GIT_DIRECT_URL_REQUIREMENT_PATTERN.pattern))
                 library_name, version_string = match.group(2, 1)
 
             else:
@@ -276,7 +276,7 @@ def _rectify_third_party_directory(mismatches):
         return
 
     git_mismatches, pip_mismatches = (
-        utils.partition(mismatches.items(), predicate=_is_git_mismatch))
+        utils.partition(mismatches.items(), predicate=_is_git_url_mismatch))
 
     for normalized_library_name, versions in git_mismatches:
         requirements_version, directory_version = versions
@@ -284,7 +284,7 @@ def _rectify_third_party_directory(mismatches):
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version or requirements_version != directory_version:
-            _install_git_url(normalized_library_name, requirements_version)
+            _install_direct_url(normalized_library_name, requirements_version)
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
@@ -309,23 +309,25 @@ def _rectify_third_party_directory(mismatches):
                 python_utils.convert_to_bytes(directory_version))
 
 
-def _is_git_mismatch(mismatch_item):
+def _is_git_url_mismatch(mismatch_item):
     """Returns whether the given mismatch item is for a GitHub URL."""
     _, (required, _) = mismatch_item
     return required.startswith('git')
 
 
-def _install_git_url(library_name, direct_git_url):
+def _install_direct_url(library_name, direct_url):
     """Installs a direct URL to GitHub into the third_party/python_libs folder.
 
     Args:
         library_name: str. Name of the library to install.
-        direct_git_url: str. Full definition of the URL to install. Must match
-            DIRECT_URL_GIT_REQUIREMENT_PATTERN.
+        direct_url: str. Full definition of the URL to install. Must match
+            GIT_DIRECT_URL_REQUIREMENT_PATTERN.
     """
     pip_install(
-        '%s#egg=%s' % (direct_git_url, library_name),
-        common.THIRD_PARTY_PYTHON_LIBS_DIR, upgrade=True, no_dependencies=True)
+        '%s#egg=%s' % (direct_url, library_name),
+        common.THIRD_PARTY_PYTHON_LIBS_DIR,
+        upgrade=True,
+        no_dependencies=True)
 
 
 def _get_pip_versioned_package_string(library_name, version_string):
