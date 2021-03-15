@@ -16,6 +16,9 @@
  * @fileoverview Controller for question suggestion review modal.
  */
 
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
@@ -23,16 +26,18 @@ require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
-  '$scope', '$uibModalInstance', 'ContributionOpportunitiesService',
-  'SiteAnalyticsService', 'SuggestionModalService', 'authorName', 'contentHtml',
-  'misconceptionsBySkill', 'question', 'questionHeader', 'reviewable',
-  'skillDifficulty', 'skillRubrics', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
+  '$http', '$scope', '$uibModalInstance', 'ContributionOpportunitiesService',
+  'SiteAnalyticsService', 'SuggestionModalService', 'UrlInterpolationService',
+  'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
+  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
+  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
   'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $scope, $uibModalInstance, ContributionOpportunitiesService,
-      SiteAnalyticsService, SuggestionModalService, authorName, contentHtml,
-      misconceptionsBySkill, question, questionHeader, reviewable,
-      skillDifficulty, skillRubrics, suggestionId, ACTION_ACCEPT_SUGGESTION,
+      $http, $scope, $uibModalInstance, ContributionOpportunitiesService,
+      SiteAnalyticsService, SuggestionModalService, UrlInterpolationService,
+      authorName, contentHtml, misconceptionsBySkill, question,
+      questionHeader, reviewable, skillDifficulty, skillRubrics,
+      suggestion, suggestionId, ACTION_ACCEPT_SUGGESTION,
       ACTION_REJECT_SUGGESTION, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
@@ -72,10 +77,32 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.skillDifficultyLabel = getSkillDifficultyLabel();
     $scope.skillRubricExplanations = getRubricExplanation(
       $scope.skillDifficultyLabel);
+    $scope.reviewMessage = '';
+    $scope.suggestionIsRejected = suggestion.status === 'rejected';
+
+    const _getThreadHandlerUrl = function(suggestionId) {
+      return UrlInterpolationService.interpolateUrl(
+        '/threadhandler/<suggestionId>', { suggestionId });
+    };
+
+    const _getThreadMessagesAsync = function(threadId) {
+      return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
+        let threadMessageBackendDicts = response.data.messages;
+        return threadMessageBackendDicts.map(
+          m => ThreadMessage.createFromBackendDict(m));
+      });
+    };
 
     if (reviewable) {
       SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview(
         'Question');
+    } else if ($scope.suggestionIsRejected) {
+      _getThreadMessagesAsync(suggestionId).then(
+        function(messageSummaries) {
+          $scope.reviewMessage = messageSummaries[1].text;
+          throw new Error('12312312');
+        }
+      );
     }
 
     $scope.questionChanged = function() {
