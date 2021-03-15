@@ -177,7 +177,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         with swap_requirements:
             self.assertRaisesRegexp(
-                Exception, 'GitHub requirements must match regexp',
+                Exception, 'does not match DIRECT_URL_GIT_REQUIREMENT_PATTERN',
                 install_backend_python_libs.get_mismatches)
 
     def test_multiple_discrepancies_returns_correct_mismatches(self):

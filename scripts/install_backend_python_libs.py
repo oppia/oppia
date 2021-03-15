@@ -32,8 +32,8 @@ import utils
 import pkg_resources
 
 DIRECT_URL_GIT_REQUIREMENT_PATTERN = (
-    # NOTE: GitHub links must use commit hashes to declare dependencies. Commits
-    # are SHA1 strings, which are 40-character hexadecimal strings.
+    # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
+    # definition. This helps stabilize the implementation we depend upon.
     re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)'))
 
 
@@ -131,7 +131,7 @@ def _get_requirements_file_contents():
     with python_utils.open_file(
         common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
         trimmed_lines = (line.strip() for line in f.readlines())
-        for line in trimmed_lines:
+        for line_num, line in enumerate(trimmed_lines, start=1):
             if not line or line.startswith('#'):
                 continue
 
@@ -139,7 +139,10 @@ def _get_requirements_file_contents():
                 match = DIRECT_URL_GIT_REQUIREMENT_PATTERN.match(line)
                 if not match:
                     raise Exception(
-                        'GitHub requirements must match regexp=%r' % (
+                        '%r on line %d of %s does not match '
+                        'DIRECT_URL_GIT_REQUIREMENT_PATTERN=%r' % (
+                            line, line_num,
+                            common.COMPILED_REQUIREMENTS_FILE_PATH,
                             DIRECT_URL_GIT_REQUIREMENT_PATTERN.pattern))
                 library_name, version_string = match.group(2, 1)
 
@@ -166,20 +169,20 @@ def _get_third_party_python_libs_directory_contents():
         installed as the key and the version string of that library as the
         value.
     """
-    direct_url_packages, pip_packages = utils.partition(
+    direct_url_packages, standard_packages = utils.partition(
         pkg_resources.find_distributions(common.THIRD_PARTY_PYTHON_LIBS_DIR),
         predicate=lambda dist: dist.has_metadata('direct_url.json'))
 
-    installed_packages = [
-        (pkg.project_name, pkg.version) for pkg in pip_packages
-    ]
+    installed_packages = {
+        pkg.project_name: pkg.version for pkg in standard_packages
+    }
 
     for pkg in direct_url_packages:
         metadata = json.loads(pkg.get_metadata('direct_url.json'))
         version_string = '%s+%s@%s' % (
             metadata['vcs_info']['vcs'], metadata['url'],
             metadata['vcs_info']['commit_id'])
-        installed_packages.append((pkg.project_name, version_string))
+        installed_packages[pkg.project_name] = version_string
 
     # Libraries with different case are considered equivalent libraries:
     # e.g 'Flask' is the same library as 'flask'. Therefore, we
@@ -187,7 +190,7 @@ def _get_third_party_python_libs_directory_contents():
     # ambiguities.
     directory_contents = {
         normalize_python_library_name(library_name): version_string
-        for library_name, version_string in installed_packages
+        for library_name, version_string in installed_packages.items()
     }
 
     return directory_contents
@@ -281,7 +284,7 @@ def _rectify_third_party_directory(mismatches):
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version or requirements_version != directory_version:
-            _install_direct_url(normalized_library_name, requirements_version)
+            _install_git_url(normalized_library_name, requirements_version)
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
@@ -312,6 +315,32 @@ def _is_git_mismatch(mismatch_item):
     return required.startswith('git')
 
 
+def _install_git_url(library_name, direct_git_url):
+    """Installs a direct URL to GitHub into the third_party/python_libs folder.
+
+    Args:
+        library_name: str. Name of the library to install.
+        direct_git_url: str. Full definition of the URL to install. Must match
+            DIRECT_URL_GIT_REQUIREMENT_PATTERN.
+    """
+    pip_install(
+        '%s#egg=%s' % (direct_git_url, library_name),
+        common.THIRD_PARTY_PYTHON_LIBS_DIR, upgrade=True, no_dependencies=True)
+
+
+def _get_pip_versioned_package_string(library_name, version_string):
+    """Returns the standard 'library==version' string for the given values.
+
+    Args:
+        library_name: str. The normalized name of the library.
+        version_string: str. The version of the package as a string.
+
+    Returns:
+        str. The standard versioned library package name.
+    """
+    return '%s==%s' % (library_name, version_string)
+
+
 def _install_library(library_name, version_string):
     """Installs a library with a certain version to the
     'third_party/python_libs' folder.
@@ -326,19 +355,6 @@ def _install_library(library_name, version_string):
         upgrade=True,
         no_dependencies=True
     )
-
-
-def _install_direct_url(library_name, version_string):
-    """Installs a direct GitHub URL to the third_party/python_libs folder.
-
-    Args:
-        library_name: str. Name of the library to install.
-        version_string: str. Full definition of the URL to install. Must match
-            DIRECT_URL_GIT_REQUIREMENT_PATTERN.
-    """
-    pip_install(
-        '%s#egg=%s' % (version_string, library_name),
-        common.THIRD_PARTY_PYTHON_LIBS_DIR, upgrade=True, no_dependencies=True)
 
 
 def _reinstall_all_dependencies():
@@ -504,19 +520,6 @@ def _pip_install_requirements(install_path, requirements_path):
     ])
 
 
-def _get_pip_versioned_package_string(library_name, version_string):
-    """Returns the standard 'library==version' string for the given values.
-
-    Args:
-        library_name: str. The normalized name of the library.
-        version_string: str. The version of the package as a string.
-
-    Returns:
-        str. The standard versioned library package name.
-    """
-    return '%s==%s' % (library_name, version_string)
-
-
 def get_mismatches():
     """Returns a dictionary containing mismatches between the 'requirements.txt'
     file and the 'third_party/python_libs' directory. Mismatches are defined as
@@ -572,21 +575,20 @@ def get_mismatches():
 
 
 def validate_metadata_directories():
-    """Validates that for each installed library in the
-    'third_party/python_libs' folder, there exists a corresponding metadata
-    directory following the correct naming conventions that are detailed by
-    the PEP-427 and PEP-376 python guidelines.
+    """Validates that each library installed in the 'third_party/python_libs'
+    has a corresponding metadata directory following the correct naming
+    conventions detailed in PEP-427, PEP-376, and common Python guidelines.
 
     Raises:
         Exception. An installed library's metadata does not exist in the
-            'third_party/python_libs' directory in the format that we expect
+            'third_party/python_libs' directory in the format which we expect
             (following the PEP-427 and PEP-376 python guidelines).
     """
     directory_contents = _get_third_party_python_libs_directory_contents()
     # Each python metadata directory name contains a python library name that
-    # does not have uniform case. This is because we cannot guarantee the
-    # casing of the directory names generated and there are no options that we
-    # can provide to `pip install` to actually guarantee that a certain casing
+    # does not have uniform case. This is because we cannot guarantee the casing
+    # of the directory names generated and there are no options that we can
+    # provide to `pip install` to actually guarantee that a certain casing
     # format is used to create the directory names. The only official guidelines
     # for naming directories is that it must start with the string:
     # '<library_name>-<library-version>' but no casing guidelines are specified.
@@ -599,10 +601,10 @@ def validate_metadata_directories():
         if os.path.isdir(os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
     }
     for normalized_library_name, version_string in directory_contents.items():
-        if version_string.startswith('git'):
-            # GitHub direct url dependencies are guarantee to have valid
-            # metadata because that's how we were able to obtain a
-            # version_string to begin with.
+        # Direct URL libraries are guaranteed to have metadata directories,
+        # because that's how _get_third_party_python_libs_directory_contents
+        # obtains the version_string being checked here.
+        if version_string.startswith('git+'):
             continue
         # Possible names of the metadata directory installed when <library_name>
         # is installed.
