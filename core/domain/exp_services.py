@@ -814,8 +814,6 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     for model in subscription_models:
         model.exploration_ids = [
             id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
-    user_models.UserSubscriptionsModel.update_timestamps_multi(
-        subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
@@ -1127,12 +1125,10 @@ def save_exploration_summary(exp_summary):
     exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
     if exp_summary_model is not None:
         exp_summary_model.populate(**exp_summary_dict)
-        exp_summary_model.update_timestamps()
         exp_summary_model.put()
     else:
         exp_summary_dict['id'] = exp_summary.id
         model = exp_models.ExpSummaryModel(**exp_summary_dict)
-        model.update_timestamps()
         model.put()
 
     # The index should be updated after saving the exploration
@@ -1666,7 +1662,6 @@ def create_or_update_draft(
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
     exp_user_data.draft_change_list_id = draft_change_list_id
-    exp_user_data.update_timestamps()
     exp_user_data.put()
 
 
@@ -1741,7 +1736,6 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list = None
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
-        exp_user_data.update_timestamps()
         exp_user_data.put()
 
 
@@ -1798,14 +1792,17 @@ def regenerate_missing_stats_for_exploration(exp_id):
     exp_stats_list = stats_services.get_multiple_exploration_stats_by_version(
         exp_id, exp_versions)
 
-    exp_list = exp_fetchers.get_multiple_explorations_by_version(
-        exp_id, exp_versions, run_conversion=False)
+    exp_list = (
+        exp_fetchers
+        .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+            exp_id, exp_versions))
 
     if all(exp_stats is None for exp_stats in exp_stats_list):
         for index, version in enumerate(exp_versions):
             exp_stats_for_version = (
                 stats_services.get_stats_for_new_exploration(
-                    exp_id, version, exp_list[index].states.keys()))
+                    exp_id, version,
+                    exp_list[index].state_interaction_ids_dict.keys()))
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
@@ -1865,7 +1862,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
         elif exp.version == 1:
             new_exploration_stats = (
                 stats_services.get_stats_for_new_exploration(
-                    exp_id, exp.version, exp.states))
+                    exp_id, exp.version, exp.state_interaction_ids_dict.keys()))
             stats_services.create_stats_model(new_exploration_stats)
             missing_exp_stats_indices.append(i)
             missing_exp_stats.append(
@@ -1880,7 +1877,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
             if exp_stats is None:
                 new_exploration_stats = (
                     stats_services.get_stats_for_new_exploration(
-                        exp_id, exp.version, exp.states))
+                        exp_id, exp.version,
+                        exp.state_interaction_ids_dict.keys()))
                 stats_services.create_stats_model(new_exploration_stats)
                 missing_exp_stats_indices.append(i)
                 missing_exp_stats.append(
@@ -1904,7 +1902,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
         # Fill missing State-level stats.
         state_stats_mapping = exp_stats.state_stats_mapping
-        for state_name, _ in exp.states.items():
+        for state_name in exp.state_interaction_ids_dict.keys():
             if state_name in state_stats_mapping:
                 num_valid_state_stats += 1
                 continue
@@ -1918,9 +1916,9 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
             try:
                 prev_interaction_id = (
-                    prev_exp.states[prev_state_name].interaction.id)
+                    prev_exp.state_interaction_ids_dict[state_name])
                 current_interaction_id = (
-                    exp.states[state_name].interaction.id)
+                    exp.state_interaction_ids_dict[state_name])
                 exp_stats_list[i].state_stats_mapping[state_name] = (
                     prev_exp_stats.state_stats_mapping[
                         prev_state_name].clone()
@@ -1942,7 +1940,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
                                 exp_versions_diff.new_to_old_state_names),
                             'old_to_new_state_names': (
                                 exp_versions_diff.old_to_new_state_names),
-                            'prev_exp.states': prev_exp.states.keys(),
+                            'prev_exp.states': (
+                                prev_exp.state_interaction_ids_dict.keys()),
                             'prev_exp_stats': prev_exp_stats
                         }))
 

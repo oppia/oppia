@@ -227,8 +227,7 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_migration_job_skips_deleted_model(self):
         self.model_instance.deleted = True
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
+        self.model_instance.put_for_human()
 
         def mock_get_question_by_id(unused_question_id, strict=True): # pylint: disable=unused-argument
             return None
