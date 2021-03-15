@@ -103,6 +103,7 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.setStatusMessage('No results.');
             } else {
               ctrl.resultRolesVisible = true;
+              ctrl.contributionReviewersDataFetched = false;
               ctrl.setStatusMessage('Success.');
             }
             // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -167,11 +168,12 @@ angular.module('oppia').directive('adminRolesTab', [
             ).then((usersObject) => {
               ctrl.result.usernames = usersObject.usernames;
               ctrl.contributionReviewersDataFetched = true;
+              ctrl.resultRolesVisible = false;
               ctrl.setStatusMessage('Success.');
-              refreshFormData();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
+              refreshFormData();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
@@ -190,10 +192,12 @@ angular.module('oppia').directive('adminRolesTab', [
                 can_submit_questions: contributionRights.can_submit_questions
               };
               ctrl.contributionReviewersDataFetched = true;
+              ctrl.resultRolesVisible = false;
               ctrl.setStatusMessage('Success.');
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
+              refreshFormData();
             }, handleErrorResponse);
           }
           AdminTaskManagerService.finishTask();
@@ -381,6 +385,7 @@ angular.module('oppia').directive('adminRolesTab', [
 
         ctrl.clearReviewersData = function() {
           ctrl.contributionReviewersDataFetched = false;
+          ctrl.resultRolesVisible = false;
           ctrl.result = {};
         };
       }]

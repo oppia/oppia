@@ -20,7 +20,7 @@
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select id="label-target-role-method" ng-model="$ctrl.formData.viewUserRoles.filterCriterion" class="form-control protractor-test-role-method">
+              <select id="label-target-role-method" ng-model="$ctrl.formData.viewUserRoles.filterCriterion" class="form-control protractor-test-role-method" ng-change="$ctrl.clearReviewersData()">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
