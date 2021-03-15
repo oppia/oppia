@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
 @Component({
@@ -26,3 +27,7 @@ import { AppConstants } from 'app.constants';
 export class OppiaFooterComponent {
  siteFeedbackFormUrl:string = AppConstants.SITE_FEEDBACK_FORM_URL;
 }
+
+angular.module('oppia').directive(
+  'oppiaFooter', downgradeComponent(
+    {component: OppiaFooterComponent}));
