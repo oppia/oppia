@@ -256,13 +256,15 @@ angular.module('oppia').component('settingsTab', {
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
         ctrl.closeRolesForm();
         ExplorationRightsService.saveRoleChanges(
-          newMemberUsername, newMemberRole);
+          newMemberUsername, newMemberRole, $rootScope.$applyAsync);
         $rootScope.$applyAsync();
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
         ExplorationRightsService.setViewability(
-          !ExplorationRightsService.viewableIfPrivate());
+          !ExplorationRightsService.viewableIfPrivate(),
+          $rootScope.$applyAsync
+        );
         $rootScope.$applyAsync();
       };
 
@@ -310,7 +312,7 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          ExplorationRightsService.makeCommunityOwned();
+          ExplorationRightsService.makeCommunityOwned($rootScope.$applyAsync);
           $rootScope.$applyAsync();
         }, function() {
           AlertsService.clearWarnings();

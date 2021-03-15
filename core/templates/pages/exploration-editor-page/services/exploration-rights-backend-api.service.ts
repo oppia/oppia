@@ -91,7 +91,7 @@ export class ExplorationRightsService {
   viewableIfPrivate(): boolean {
     return this._viewableIfPrivate;
   }
-  makeCommunityOwned(): Promise<void> {
+  makeCommunityOwned(callback: () => {}): Promise<void> {
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
     return this.httpClient.put(requestUrl, {
@@ -105,10 +105,12 @@ export class ExplorationRightsService {
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
         data.rights.community_owned, data.rights.viewable_if_private);
+      callback();
     });
   }
 
-  setViewability(viewableIfPrivate: boolean): Promise<void> {
+  setViewability(
+      viewableIfPrivate: boolean, callback: () => {}): Promise<void> {
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
@@ -123,10 +125,13 @@ export class ExplorationRightsService {
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
         data.rights.community_owned, data.rights.viewable_if_private);
+      callback();
     });
   }
   saveRoleChanges(
-      newMemberUsername: string, newMemberRole: string): Promise<void> {
+      newMemberUsername: string,
+      newMemberRole: string,
+      callback: () => {}): Promise<void> {
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
@@ -142,6 +147,7 @@ export class ExplorationRightsService {
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
         data.rights.community_owned, data.rights.viewable_if_private);
+      callback();
     });
   }
   publish(): Promise<void> {
