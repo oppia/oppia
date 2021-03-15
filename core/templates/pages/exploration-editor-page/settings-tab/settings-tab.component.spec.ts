@@ -490,7 +490,7 @@ describe('Settings Tab Component', () => {
       ctrl.editRole('Username1', 'editor');
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
-        'Username1', 'editor');
+        'Username1', 'editor', jasmine.any(Function));
       expect(ctrl.isRolesFormOpen).toBe(false);
     });
 
@@ -567,7 +567,7 @@ describe('Settings Tab Component', () => {
       ctrl.toggleViewabilityIfPrivate();
 
       expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
-        true);
+        true, jasmine.any(Function));
     });
 
     it('should refresh settings tab when refreshSettingsTab event occurs',
