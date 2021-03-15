@@ -126,7 +126,6 @@ describe('Full exploration editor', function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
 
-
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
@@ -363,7 +362,6 @@ describe('Full exploration editor', function() {
         'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
       await users.login('user4@editorAndPlayer.com');
 
-
       await workflow.createExploration(true);
       await explorationEditorMainTab.setStateName('card 1');
       await explorationEditorMainTab.setContent(
@@ -425,7 +423,6 @@ describe('Full exploration editor', function() {
     // Creator creates and publishes an exploration.
     await users.login('user1@hintsAndSolutions.com');
 
-
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Introduction');
     await explorationEditorMainTab.setContent(
@@ -466,7 +463,6 @@ describe('Full exploration editor', function() {
       'user10@editorAndPlayer.com', 'user10editorAndPlayer');
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
-
 
     await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(

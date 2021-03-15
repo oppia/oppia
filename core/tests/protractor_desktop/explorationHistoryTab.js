@@ -54,7 +54,6 @@ describe('Exploration history', function() {
 
     // Creating an exploration creates the first commit. Therefore, there
     // should be a date associated with it.
-
     await workflow.createExploration(true);
 
     // Switch to the history tab because that is where the commit history

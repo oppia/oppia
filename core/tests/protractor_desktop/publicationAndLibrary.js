@@ -98,12 +98,10 @@ describe('Library index page', function() {
     await users.logout();
 
     await users.login('varda@publicationAndLibrary.com');
-
     await libraryPage.get();
     await libraryPage.selectLanguages([LANGUAGE_DEUTSCH]);
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     await libraryPage.playExploration(EXPLORATION_VINGILOT);
-
     await general.moveToEditor(true);
 
     // Moderators can edit explorations.

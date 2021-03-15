@@ -176,9 +176,6 @@ describe('Enable correctness feedback and set correctness', function() {
       await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
       await explorationEditorSettingsTab.setLanguage('English');
       await explorationEditorPage.navigateToMainTab();
-
-
-
       // Turn on correctness feedback first.
       await enableCorrectnessFeedbackSetting();
 
@@ -212,7 +209,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.navigateToMainTab();
-
 
     // Turn on correctness feedback first.
     await enableCorrectnessFeedbackSetting();
