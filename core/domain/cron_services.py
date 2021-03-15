@@ -104,6 +104,7 @@ def mark_outdated_models_as_deleted():
         )
     for model_to_mark_as_deleted in models_to_mark_as_deleted:
         model_to_mark_as_deleted.deleted = True
+    datastore_services.update_timestamps_multi(models_to_mark_as_deleted)
     datastore_services.put_multi(models_to_mark_as_deleted)
 
 

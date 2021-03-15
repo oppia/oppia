@@ -26,6 +26,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Review Modal Controller', function() {
   let $scope = null;
+  let $http = null;
+  let $httpBackend = null;
   let $uibModalInstance = null;
   let QuestionObjectFactory = null;
   let SiteAnalyticsService = null;
@@ -42,6 +44,7 @@ describe('Question Suggestion Review Modal Controller', function() {
   const reviewable = true;
   const skillDifficulty = 0.3;
   const suggestionId = '123';
+  let suggestion = null;
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -66,6 +69,7 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
+      const $http = $injector.get('$http');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
@@ -142,8 +146,11 @@ describe('Question Suggestion Review Modal Controller', function() {
         },
       });
 
+      suggestion = { status: 'accepted' };
+
       $scope = $rootScope.$new();
       $controller('QuestionSuggestionReviewModalController', {
+        $http: $http,
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         authorName: authorName,
@@ -154,6 +161,7 @@ describe('Question Suggestion Review Modal Controller', function() {
         reviewable: reviewable,
         skillDifficulty: skillDifficulty,
         skillRubrics: skillRubrics,
+        suggestion: suggestion,
         suggestionId: suggestionId
       });
     }));
@@ -314,7 +322,9 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
 
       $scope = $rootScope.$new();
+      suggestion = { status: 'accepted' };
       $controller('QuestionSuggestionReviewModalController', {
+        $http: $http,
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         authorName: authorName,
@@ -325,6 +335,7 @@ describe('Question Suggestion Review Modal Controller', function() {
         reviewable: reviewable,
         skillDifficulty: skillDifficulty,
         skillRubrics: skillRubrics,
+        suggestion: suggestion,
         suggestionId: suggestionId
       });
     }));
@@ -334,5 +345,118 @@ describe('Question Suggestion Review Modal Controller', function() {
         expect($scope.skillRubricExplanations).toBe(
           'This rubric has not yet been specified.');
       });
+  });
+
+  describe('when a suggestion is rejected', function() {
+    let $rootScope = null;
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $rootScope = $injector.get('$rootScope');
+      $httpBackend = $injector.get('$httpBackend');
+      const skillRubrics = [{
+        explanations: ['explanation'],
+        difficulty: 'Easy'
+      }];
+
+      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      question = QuestionObjectFactory.createFromBackendDict({
+        id: '1',
+        question_state_data: {
+          content: {
+            html: 'Question 1',
+            content_id: 'content_1'
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                dest: 'outcome 1',
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [],
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: null,
+              feedback: {
+                html: 'Correct Answer',
+                content_id: 'content_2'
+              },
+              param_changes: [],
+              labelled_as_correct: true
+            },
+            hints: [{
+              hint_content: {
+                html: 'Hint 1',
+                content_id: 'content_3'
+              }
+            }],
+            solution: {
+              correct_answer: 'This is the correct answer',
+              answer_is_exclusive: false,
+              explanation: {
+                html: 'Solution explanation',
+                content_id: 'content_4'
+              }
+            },
+            id: 'TextInput'
+          },
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
+          written_translations: {
+            translations_mapping: {}
+          },
+        },
+      });
+
+      $scope = $rootScope.$new();
+      suggestion = { status: 'rejected' };
+      $controller('QuestionSuggestionReviewModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        authorName: authorName,
+        contentHtml: contentHtml,
+        misconceptionsBySkill: misconceptionsBySkill,
+        question: question,
+        questionHeader: questionHeader,
+        reviewable: false,
+        skillDifficulty: skillDifficulty,
+        skillRubrics: skillRubrics,
+        suggestion: suggestion,
+        suggestionId: suggestionId
+      });
+    }));
+
+    it('should should fetch the rejection message', function() {
+      let responseDict = {
+        messages: [
+          { text: 'Question submitted.' },
+          { text: 'This is a rejection.' }
+        ]
+      };
+      $httpBackend.expect('GET', '/threadhandler/123').respond(responseDict);
+      $httpBackend.flush();
+      $rootScope.$digest();
+      expect($scope.reviewMessage).toBe('This is a rejection.');
+    });
   });
 });
