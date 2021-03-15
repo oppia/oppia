@@ -30,6 +30,7 @@ import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.
 import { NoninteractiveMath } from './Math/directives/oppia-noninteractive-math.component';
 import { NoninteractiveSvgdiagram } from './Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.component';
+import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-video.component';
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSvgdiagram,
-    NoninteractiveTabs
+    NoninteractiveTabs,
+    NoninteractiveVideo
   ],
   entryComponents: [
     NoninteractiveCollapsible,
@@ -56,7 +58,8 @@ import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSvgdiagram,
-    NoninteractiveTabs
+    NoninteractiveTabs,
+    NoninteractiveVideo
   ],
   exports: [
     NoninteractiveCollapsible,
@@ -64,7 +67,8 @@ import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSvgdiagram,
-    NoninteractiveTabs
+    NoninteractiveTabs,
+    NoninteractiveVideo
   ],
 })
 

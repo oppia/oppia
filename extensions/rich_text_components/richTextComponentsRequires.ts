@@ -39,4 +39,4 @@ require(
   'oppia-noninteractive-tabs.component.ts');
 require(
   'rich_text_components/Video/directives/' +
-  'oppia-noninteractive-video.directive.ts');
+  'oppia-noninteractive-video.component.ts');

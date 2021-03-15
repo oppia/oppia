@@ -1,10 +1,10 @@
-<center>
+<div class="d-flex flex-row justify-content-center align-items-center" style="width: 100%;">
   <div class="oppia-noninteractive-video-iframe-container">
-    <iframe class="oppia-noninteractive-video-iframe" ng-src="<[$ctrl.videoUrl]>"
-            frameborder="0" allowfullscreen tabindex="<[$ctrl.tabIndexVal]>">
+    <iframe class="oppia-noninteractive-video-iframe" [src]="videoUrl"
+            frameborder="0" allowfullscreen tabindex="{{tabIndexVal}}">
     </iframe>
   </div>
-</center>
+</div>
 <style>
   /* The value of 60.9% is derived from the ratio of the height to the width
    * (280/480). See http://alistapart.com/article/creating-intrinsic-ratios-for-video
