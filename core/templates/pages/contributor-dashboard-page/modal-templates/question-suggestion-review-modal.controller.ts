@@ -16,7 +16,7 @@
  * @fileoverview Controller for question suggestion review modal.
  */
 
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+require('domain/feedback_message/ThreadMessageObjectFactory.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -27,18 +27,20 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   '$http', '$scope', '$uibModalInstance', 'ContributionOpportunitiesService',
-  'SiteAnalyticsService', 'SuggestionModalService', 'UrlInterpolationService',
-  'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
-  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
-  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
-  'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'SiteAnalyticsService', 'SuggestionModalService', 'ThreadMessageObjectFactory',
+  'UrlInterpolationService', 'authorName', 'contentHtml',
+  'misconceptionsBySkill', 'question', 'questionHeader', 'reviewable',
+  'skillDifficulty', 'skillRubrics', 'suggestion', 'suggestionId',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $http, $scope, $uibModalInstance, ContributionOpportunitiesService,
-      SiteAnalyticsService, SuggestionModalService, UrlInterpolationService,
-      authorName, contentHtml, misconceptionsBySkill, question,
-      questionHeader, reviewable, skillDifficulty, skillRubrics,
-      suggestion, suggestionId, ACTION_ACCEPT_SUGGESTION,
-      ACTION_REJECT_SUGGESTION, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      SiteAnalyticsService, SuggestionModalService, ThreadMessageObjectFactory,
+      UrlInterpolationService, authorName, contentHtml,
+      misconceptionsBySkill, question, questionHeader, reviewable,
+      skillDifficulty, skillRubrics, suggestion, suggestionId,
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT);
@@ -89,7 +91,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
         let threadMessageBackendDicts = response.data.messages;
         return threadMessageBackendDicts.map(
-          m => ThreadMessage.createFromBackendDict(m));
+          m => ThreadMessageObjectFactory.createFromBackendDict(m));
       });
     };
 
