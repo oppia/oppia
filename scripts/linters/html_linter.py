@@ -40,7 +40,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     _SPACE_AROUND_ATTRIBUTE_REGEX = re.compile(
-        r' +[^=]= +["{]| +=["{]|[^=]= +["{]'
+        r' += +["{]| +=["{]|[^=]= +["{]'
     )
 
     def __init__(self, filepath, file_lines, failed=False):
