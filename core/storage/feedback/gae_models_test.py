@@ -78,8 +78,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             summary=self.SUMMARY,
             message_count=self.MESSAGE_COUNT
         )
-        self.feedback_thread_model.update_timestamps()
-        self.feedback_thread_model.put()
+        self.feedback_thread_model.put_for_human()
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -151,8 +150,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_message_cache_supports_huge_text(self):
         self.feedback_thread_model.last_nonempty_message_text = 'X' * 2000
         # Storing the model should not throw.
-        self.feedback_thread_model.update_timestamps()
-        self.feedback_thread_model.put()
+        self.feedback_thread_model.put_for_human()
 
 
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
@@ -170,7 +168,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             message_id=1,
             author_id='user_id',
             received_via_email=False
-        ).put()
+        ).put_for_human()
         self.assertTrue(
             feedback_models.GeneralFeedbackMessageModel
             .has_reference_to_user_id('user_id'))
@@ -359,21 +357,9 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             user_id='user_id',
             thread_id='exploration.exp_id.thread_id',
             message_ids_read_by_user=[])
-
-        feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated
-
-        # If we do not wish to update the last_updated time, we should set
-        # the update_last_updated_time argument to False in the put function.
-        feedback_thread_model.update_timestamps(update_last_updated_time=False)
-        feedback_thread_model.put()
-        self.assertEqual(feedback_thread_model.last_updated, last_updated)
-
-        # If we do wish to change it however, we can simply use the put function
-        # as the default value of update_last_updated_time is True.
-        feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
         self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
 
@@ -513,7 +499,6 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
         }
         email_instance = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=[message_reference_dict])
-        email_instance.update_timestamps()
         email_instance.put()
 
         retrieved_instance = (

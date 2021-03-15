@@ -87,8 +87,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJob(
                 removed_deprecated_field = True
 
         if removed_deprecated_field:
-            exp_model.update_timestamps(update_last_updated_time=False)
-            exp_models.ExplorationModel.put_multi([exp_model])
+            exp_models.ExplorationModel.put_multi_for_bot([exp_model])
             yield ('SUCCESS_REMOVED - ExplorationModel', exp_model.id)
         else:
             yield ('SUCCESS_ALREADY_REMOVED - ExplorationModel', exp_model.id)
@@ -129,8 +128,9 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
                 removed_deprecated_field = True
 
         if removed_deprecated_field:
-            exp_rights_model.update_timestamps(update_last_updated_time=False)
-            exp_models.ExplorationRightsModel.put_multi([exp_rights_model])
+            exp_models.ExplorationRightsModel.put_multi_for_bot(
+                [exp_rights_model]
+            )
             yield (
                 'SUCCESS_REMOVED - ExplorationRightsModel', exp_rights_model.id)
         else:
@@ -142,56 +142,6 @@ class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
-
-
-class RegenerateStringPropertyIndexOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for regenerating the index of models changed to use an
-    indexed StringProperty.
-
-    Cloud NDB dropped support for StringProperty(indexed=False) and
-    TextProperty(indexed=True). Therefore, to prepare for the migration to Cloud
-    NDB, we need to regenerate the indexes for every model that has been changed
-    in this way.
-
-    https://cloud.google.com/appengine/docs/standard/python/datastore/indexes#unindexed-properties:
-    > changing a property from unindexed to indexed does not affect any existing
-    > entities that may have been created before the change. Queries filtering
-    > on the property will not return such existing entities, because the
-    > entities weren't written to the query's index when they were created. To
-    > make the entities accessible by future queries, you must rewrite them to
-    > Datastore so that they will be entered in the appropriate indexes. That
-    > is, you must do the following for each such existing entity:
-    > 1.  Retrieve (get) the entity from Datastore.
-    > 2.  Write (put) the entity back to Datastore.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [
-            exp_models.ExplorationModel,
-            feedback_models.GeneralFeedbackMessageModel,
-            improvements_models.TaskEntryModel,
-            skill_models.SkillModel,
-            stats_models.ExplorationAnnotationsModel,
-            story_models.StoryModel,
-            story_models.StorySummaryModel,
-        ]
-
-    @staticmethod
-    def map(model):
-        model_kind = type(model).__name__
-        if isinstance(model, base_models.VersionedModel):
-            # Change the method resolution order of model to use BaseModel's
-            # implementation of `put`.
-            model = super(base_models.VersionedModel, model)
-        model.update_timestamps(update_last_updated_time=False)
-        model.put()
-        yield (model_kind, 1)
-
-    @staticmethod
-    def reduce(key, counts):
-        yield (key, len(counts))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -733,9 +683,7 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
             if commit_log_model is None:
                 commit_log_model = regenerate_exp_commit_log_model(
                     item, version)
-                commit_log_model.update_timestamps(
-                    update_last_updated_time=False)
-                commit_log_model.put()
+                commit_log_model.put_for_bot()
                 yield (
                     'Regenerated Exploration Commit Log Model: version %s' % (
                         version), item.id)
@@ -978,7 +926,6 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
         item.content['states'] = versioned_exploration_states['states']
         item.content['states_schema_version'] = current_state_schema_version
-        item.update_timestamps(update_last_updated_time=False)
         item.put()
 
         yield ('SUCCESS - Model saved', 1)

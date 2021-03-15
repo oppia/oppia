@@ -933,12 +933,10 @@ def save_skill_summary(skill_summary):
         skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
     if skill_summary_model is not None:
         skill_summary_model.populate(**skill_summary_dict)
-        skill_summary_model.update_timestamps()
         skill_summary_model.put()
     else:
         skill_summary_dict['id'] = skill_summary.id
         model = skill_models.SkillSummaryModel(**skill_summary_dict)
-        model.update_timestamps()
         model.put()
 
 
@@ -969,7 +967,6 @@ def save_user_skill_mastery(user_skill_mastery):
         skill_id=user_skill_mastery.skill_id,
         degree_of_mastery=user_skill_mastery.degree_of_mastery)
 
-    user_skill_mastery_model.update_timestamps()
     user_skill_mastery_model.put()
 
 
@@ -990,8 +987,6 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
                 user_id, skill_id),
             user_id=user_id, skill_id=skill_id,
             degree_of_mastery=degree_of_mastery))
-    user_models.UserSkillMasteryModel.update_timestamps_multi(
-        user_skill_mastery_models)
     user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
 
 
