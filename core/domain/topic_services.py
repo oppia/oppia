@@ -832,7 +832,8 @@ def save_topic_summary(topic_summary):
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
-        'total_published_chapter_count': topic_summary.total_published_chapter_count,
+        'total_published_chapter_count':
+            topic_summary.total_published_chapter_count,
         'thumbnail_filename': topic_summary.thumbnail_filename,
         'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,

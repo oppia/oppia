@@ -64,7 +64,6 @@ angular.module('oppia').component('classroomPage', {
         ctrl.classroomBackendApiService.fetchClassroomDataAsync(
           ctrl.classroomUrlFragment).then(function(classroomData) {
           ctrl.classroomData = classroomData;
-          console.log(classroomData);
           ctrl.classroomDisplayName = (
             $filter('capitalize')(classroomData.getName()));
           ctrl.pageTitleService.setPageTitle(

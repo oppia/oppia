@@ -1671,8 +1671,9 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
-            total_published_chapter_count, thumbnail_filename, thumbnail_bg_color,
-            url_fragment, topic_model_created_on, topic_model_last_updated):
+            total_published_chapter_count, thumbnail_filename,
+            thumbnail_bg_color, url_fragment, topic_model_created_on,
+            topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
