@@ -23,7 +23,7 @@ import constants from 'assets/constants';
     // Reference doc:
     // https://developers.google.com/analytics/devguides/collection/gtagjs
     window.dataLayer = window.dataLayer || [];
-    const gtag = function(): typeof gtag {
+    window.gtag = function(): void {
       window.dataLayer.push(arguments);
     }
     gtag('set', 'linker', {
