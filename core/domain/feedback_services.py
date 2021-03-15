@@ -140,8 +140,8 @@ def create_message(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether new message is received via email or
             web.
-        should_send_email: bool. Whether the new message(s) need to be added to the
-            email buffer.
+        should_send_email: bool. Whether the new message(s) need to be added to
+            the email buffer.
 
     Returns:
         FeedbackMessage. The domain object representing the new message added
@@ -321,7 +321,7 @@ def create_messages(
             # TODO(#12079): Figure out a better way to avoid sending feedback
             # thread emails for contributor dashboard suggestions.
             (len(text) > 0 or old_statuses[index] != new_statuses[index]) and
-            can_send_email):
+            should_send_email):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
