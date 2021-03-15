@@ -75,7 +75,7 @@
       "description": "has numerator equal to {{x|Int}}"
     },
     "HasDenominatorEqualTo": {
-      "description": "has denominator equal to {{x|NonnegativeInt}}"
+      "description": "has denominator equal to {{x|PositiveInt}}"
     },
     "HasIntegerPartEqualTo": {
       "description": "has integer part equal to {{x|Int}}"
@@ -285,7 +285,10 @@
       "description": "is equivalent to {{x|RatioExpression}}"
     },
     "HasNumberOfTermsEqualTo": {
-      "description": "has number of terms equal to {{y|NonnegativeInt}}"
+      "description": "has number of terms equal to {{y|PositiveInt}}"
+    },
+    "HasSpecificTermEqualTo": {
+      "description": "has term {{x|PositiveInt}} equal to {{y|PositiveInt}}"
     }
   }
 }
