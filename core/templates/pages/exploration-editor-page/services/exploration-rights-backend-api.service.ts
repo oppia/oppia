@@ -166,7 +166,7 @@ export class ExplorationRightsService {
         data.rights.community_owned, data.rights.viewable_if_private);
     });
   }
-  saveModeratorChangeToBackend(emailBody: string): void {
+  saveModeratorChangeToBackend(emailBody: string, callback: () => void): void {
     let explorationModeratorRightsUrl = (
       '/createhandler/moderatorrights/' +
       this.explorationDataService.explorationId);
@@ -182,6 +182,7 @@ export class ExplorationRightsService {
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
         data.rights.community_owned, data.rights.viewable_if_private);
+      callback();
     })['catch'](() => {
       this.init(
         undefined, undefined, undefined, undefined,
