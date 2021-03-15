@@ -192,7 +192,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText += ']';
         } else if (
           varType === 'Real' || varType === 'NonnegativeInt' ||
-          varType === 'Int') {
+          varType === 'Int' || varType === 'PositiveInt') {
           replacementText = inputs[varName] + '';
         } else if (
           varType === 'CodeString' || varType === 'UnicodeString' ||
