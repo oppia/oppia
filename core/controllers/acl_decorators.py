@@ -801,6 +801,12 @@ def can_view_feedback_thread(handler):
         if '.' not in thread_id:
             raise self.InvalidInputException('Thread ID must contain a .')
 
+        entity_type = feedback_services.get_thread(thread_id).entity_type
+        entity_types_with_unrestricted_view_suggestion_access = (
+            feconf.ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS)
+        if entity_type in entity_types_with_unrestricted_view_suggestion_access:
+            return handler(self, thread_id, **kwargs)
+
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
