@@ -48,7 +48,7 @@ _MAX_RETRIES = 10
 _RAND_RANGE = 127 * 127
 
 
-class GeneralFeedbackThreadModel(base_models.BaseHumanMaintainedModel):
+class GeneralFeedbackThreadModel(base_models.BaseModel):
     """Threads for each entity.
 
     The id of instances of this class has the form
@@ -243,16 +243,11 @@ class GeneralFeedbackThreadModel(base_models.BaseHumanMaintainedModel):
             list(GeneralFeedbackThreadModel). List of threads associated with
             the entity. Doesn't include deleted entries.
         """
-        return (
-            cls.get_all()
-            .filter(cls.entity_type == entity_type)
-            .filter(cls.entity_id == entity_id)
-            .order(-cls.last_updated_by_human)
-            .fetch(limit)
-        )
+        return cls.get_all().filter(cls.entity_type == entity_type).filter(
+            cls.entity_id == entity_id).order(-cls.last_updated).fetch(limit)
 
 
-class GeneralFeedbackMessageModel(base_models.BaseHumanMaintainedModel):
+class GeneralFeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 
     The id of instances of this class has the form [thread_id].[message_id]
@@ -689,6 +684,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
                 id=instance_id, user_id=user_id, thread_id=thread_id)
             new_instances.append(new_instance)
 
+        GeneralFeedbackThreadUserModel.update_timestamps_multi(new_instances)
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 
