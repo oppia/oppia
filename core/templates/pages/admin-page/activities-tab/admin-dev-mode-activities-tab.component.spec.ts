@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from 'components/material.module';
 import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
@@ -32,11 +32,11 @@ let generateNewSkillData: boolean = true;
 class MockAdminBackendApiService {
   private reloadExplorationAsync(explorationId: string) {
     return {
-      then : (
-        succesCallback: () => void,
-        errorCallback: (err: object) => void
+      then: (
+          succesCallback: () => void,
+          errorCallback: (err: object) => void
       ) => {
-        if(explorationId === 'expId') {
+        if (explorationId === 'expId') {
           succesCallback();
         }
         if (errorCallback) {
@@ -47,17 +47,17 @@ class MockAdminBackendApiService {
           });
         }
       }
-    }
+    };
   }
 
   private generateDummyExplorationsAsync(
-    numDummyExpsToGenerate: number, numDummyExpsToPublish: number) {
+      numDummyExpsToGenerate: number, numDummyExpsToPublish: number) {
     return {
       then: (
-        succesCallback: () => void,
-        errorCallback: (err: object) => void
+          succesCallback: () => void,
+          errorCallback: (err: object) => void
       ) => {
-        if(numDummyExpsToGenerate === 2 && numDummyExpsToPublish === 1) {
+        if (numDummyExpsToGenerate === 2 && numDummyExpsToPublish === 1) {
           succesCallback();
         }
         if (errorCallback) {
@@ -68,16 +68,16 @@ class MockAdminBackendApiService {
           });
         }
       }
-    }
+    };
   }
 
   private generateDummyNewStructuresDataAsync() {
     return {
       then: (
-        succesCallback: () => void,
-        errorCallback: (err: object) => void
+          succesCallback: () => void,
+          errorCallback: (err: object) => void
       ) => {
-        if(loadNewStructuresData) {
+        if (loadNewStructuresData) {
           succesCallback();
         }
         if (errorCallback) {
@@ -88,16 +88,16 @@ class MockAdminBackendApiService {
           });
         }
       }
-    }
+    };
   }
 
   private generateDummyNewSkillDataAsync() {
     return {
       then: (
-        succesCallback: () => void,
-        errorCallback: (err: object) => void
+          succesCallback: () => void,
+          errorCallback: (err: object) => void
       ) => {
-        if(generateNewSkillData) {
+        if (generateNewSkillData) {
           succesCallback();
         }
         if (errorCallback) {
@@ -108,16 +108,16 @@ class MockAdminBackendApiService {
           });
         }
       }
-    }
+    };
   }
 
   private reloadCollectionAsync(collectionId: string) {
     return {
       then: (
-        succesCallback: () => void,
-        errorCallback: (err: object) => void
+          succesCallback: () => void,
+          errorCallback: (err: object) => void
       ) => {
-        if(collectionId === 'collectionId') {
+        if (collectionId === 'collectionId') {
           succesCallback();
         }
         if (errorCallback) {
@@ -128,11 +128,11 @@ class MockAdminBackendApiService {
           });
         }
       }
-    }
+    };
   }
 }
 
-fdescribe('Admin dev mode activities tab', () => {
+describe('Admin dev mode activities tab', () => {
   let component: AdminDevModeActivitiesTabComponent;
   let fixture: ComponentFixture<AdminDevModeActivitiesTabComponent>;
   let adminDataService: AdminDataService;
@@ -140,7 +140,7 @@ fdescribe('Admin dev mode activities tab', () => {
   let windowRef: WindowRef;
   let adminDataObject = {
     demoExplorationIds: ['expId'],
-    demoExplorations:  [
+    demoExplorations: [
       [
         '0',
         'welcome.yaml'
@@ -159,7 +159,7 @@ fdescribe('Admin dev mode activities tab', () => {
         FormsModule,
         HttpClientTestingModule
       ],
-      providers:[
+      providers: [
         {
           provide: AdminBackendApiService,
           useClass: MockAdminBackendApiService
@@ -169,7 +169,7 @@ fdescribe('Admin dev mode activities tab', () => {
         AdminDevModeActivitiesTabComponent
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(async(() => {
@@ -206,7 +206,6 @@ fdescribe('Admin dev mode activities tab', () => {
   });
 
   describe('.reloadExploration', () => {
-
     it('should not reload a specific exploration if task is running', () => {
       spyOn(
         adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
@@ -220,7 +219,8 @@ fdescribe('Admin dev mode activities tab', () => {
 
     it('should load explorations', () => {
       const expId = component.demoExplorationIds[0];
-      component = component as jasmine.SpyObj<AdminDevModeActivitiesTabComponent>;
+      component =
+        component as jasmine.SpyObj<AdminDevModeActivitiesTabComponent>;
 
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
@@ -234,7 +234,8 @@ fdescribe('Admin dev mode activities tab', () => {
 
     it('should not load explorations with wrong exploration ID', () => {
       const expId = 'wrong-exp-id';
-      component = component as jasmine.SpyObj<AdminDevModeActivitiesTabComponent>;
+      component =
+        component as jasmine.SpyObj<AdminDevModeActivitiesTabComponent>;
 
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
@@ -244,11 +245,10 @@ fdescribe('Admin dev mode activities tab', () => {
 
       expect(component.setStatusMessage.emit)
         .toHaveBeenCalledWith('Server error: Exploration not found.');
-    })
+    });
   });
 
   describe('.printResult', () => {
-
     it('should print correct message when numTried' +
       'is less the number of exploration', () => {
       const numSucceeded = 0;
@@ -277,7 +277,6 @@ fdescribe('Admin dev mode activities tab', () => {
   });
 
   describe('.reloadAllExplorations', () => {
-
     it('should not reload all exploration if' +
       'reloading all exploration is possible', () => {
       component.reloadingAllExplorationPossible = false;
@@ -332,7 +331,6 @@ fdescribe('Admin dev mode activities tab', () => {
   });
 
   describe('.generateDummyExploration', () => {
-
     it('should not generate dummy exploration if publish count is greater' +
       'than generate count', () => {
       component.numDummyExpsToPublish = 2;
@@ -359,7 +357,7 @@ fdescribe('Admin dev mode activities tab', () => {
     });
 
     it('should show error message when dummy explorations' +
-      'are not generated ', () => {
+      'are not generated', () => {
       component.numDummyExpsToPublish = 2;
       component.numDummyExpsToGenerate = 2;
 
@@ -390,7 +388,7 @@ fdescribe('Admin dev mode activities tab', () => {
 
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
         'Server error: New structures not generated.');
-    })
+    });
   });
 
   describe('.generateNewSkillData', () => {
@@ -411,11 +409,10 @@ fdescribe('Admin dev mode activities tab', () => {
 
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
         'Server error: New skill data not generated.');
-    })
+    });
   });
 
   describe('.reloadCollection', () => {
-
     it('should not reload collection if a task is already running', () => {
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
