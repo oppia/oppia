@@ -43,7 +43,7 @@ export class SiteAnalyticsService {
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
-    if (this.windowRef.nativeWindow.gtag && this.CAN_SEND_ANALYTICS_EVENTS) {
+    if (this.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.gtag('event', eventAction, {
         event_category: eventCategory,
         event_label: eventLabel
