@@ -21,7 +21,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 
-fdescribe('Contributor dashboard page', function() {
+describe('Contributor dashboard page', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -55,7 +55,7 @@ fdescribe('Contributor dashboard page', function() {
       .callThrough();
   }));
 
-  fdescribe('when user is logged in', function() {
+  describe('when user is logged in', function() {
     var userInfo = {
       isLoggedIn: () => true,
       getUsername: () => 'username1'
@@ -72,7 +72,7 @@ fdescribe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    fit('should set specific properties after $onInit is called', function() {
+    it('should set specific properties after $onInit is called', function() {
       expect(ctrl.languageCode).toBe('hi');
       expect(TranslationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalledWith('hi');
@@ -81,7 +81,7 @@ fdescribe('Contributor dashboard page', function() {
         '/assets/images/avatar/oppia_avatar_100px.svg');
     });
 
-    fit('should initialize $scope properties after controller is initialized' +
+    it('should initialize $scope properties after controller is initialized' +
       ' and get data from backend', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.username).toBe('username1');
@@ -94,7 +94,7 @@ fdescribe('Contributor dashboard page', function() {
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     });
 
-    fit('should change active tab name when clicking on translate text tab',
+    it('should change active tab name when clicking on translate text tab',
       function() {
         var changedTab = 'translateTextTab';
         expect(ctrl.activeTabName).toBe('myContributionTab');
@@ -102,7 +102,7 @@ fdescribe('Contributor dashboard page', function() {
         expect(ctrl.activeTabName).toBe(changedTab);
       });
 
-    fit('should change active language when clicking on language selector',
+    it('should change active language when clicking on language selector',
       function() {
         spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
           .and.callThrough();
@@ -115,7 +115,7 @@ fdescribe('Contributor dashboard page', function() {
           .toHaveBeenCalledWith('hi');
       });
 
-    fit('should show language selector based on active tab', function() {
+    it('should show language selector based on active tab', function() {
       var changedTab = 'translateTextTab';
 
       expect(ctrl.activeTabName).toBe('myContributionTab');
@@ -126,7 +126,7 @@ fdescribe('Contributor dashboard page', function() {
       expect(ctrl.showLanguageSelector()).toBe(true);
     });
 
-    fit('should call scrollFunction on scroll', function() {
+    it('should call scrollFunction on scroll', function() {
       var e = document.createEvent('Event');
       var scrollSpy = spyOn(ctrl, 'scrollFunction');
       e.initEvent('scroll', true, true);
@@ -136,7 +136,7 @@ fdescribe('Contributor dashboard page', function() {
       expect(scrollSpy).toHaveBeenCalled();
     });
 
-    fit('should show default header if window pageYOffset is ' +
+    it('should show default header if window pageYOffset is ' +
       'less than 5', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
@@ -148,7 +148,7 @@ fdescribe('Contributor dashboard page', function() {
       expect(ctrl.defaultHeaderVisible).toBe(true);
     });
 
-    fit('should show collapsed header if window pageYOffset is' +
+    it('should show collapsed header if window pageYOffset is' +
       ' scrolled greater than 5', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
@@ -161,7 +161,7 @@ fdescribe('Contributor dashboard page', function() {
     });
   });
 
-  fdescribe('when user is not logged in', function() {
+  describe('when user is not logged in', function() {
     var userInfo = {
       isLoggedIn: () => false
     };
@@ -177,7 +177,7 @@ fdescribe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    fit('should have no user data in dashboard page', function() {
+    it('should have no user data in dashboard page', function() {
       expect(ctrl.userIsLoggedIn).toBe(false);
       expect(ctrl.username).toBe('');
     });
