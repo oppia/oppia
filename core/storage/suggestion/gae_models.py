@@ -114,7 +114,7 @@ INCREMENT_SCORE_OF_AUTHOR_BY = 1
 COMMUNITY_CONTRIBUTION_STATS_MODEL_ID = 'community_contribution_stats'
 
 
-class GeneralSuggestionModel(base_models.BaseHumanMaintainedModel):
+class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
 
     The ID of the suggestions created is the same as the ID of the thread
@@ -233,24 +233,20 @@ class GeneralSuggestionModel(base_models.BaseHumanMaintainedModel):
         Raises:
             Exception. There is already a suggestion with the given id.
         """
-        if cls.get_by_id(thread_id):
+        instance_id = thread_id
+
+        if cls.get_by_id(instance_id):
             raise Exception(
                 'There is already a suggestion with the given'
-                ' id: %s' % thread_id)
+                ' id: %s' % instance_id)
 
         cls(
-            id=thread_id,
-            suggestion_type=suggestion_type,
-            target_type=target_type,
-            target_id=target_id,
+            id=instance_id, suggestion_type=suggestion_type,
+            target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
-            status=status,
-            author_id=author_id,
-            final_reviewer_id=final_reviewer_id,
-            change_cmd=change_cmd,
-            score_category=score_category,
-            language_code=language_code
-        ).put_depending_on_id(author_id)
+            status=status, author_id=author_id,
+            final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
+            score_category=score_category, language_code=language_code).put()
 
     @classmethod
     def query_suggestions(cls, query_fields_and_values):
@@ -339,7 +335,7 @@ class GeneralSuggestionModel(base_models.BaseHumanMaintainedModel):
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         suggestion_models = cls.get_all().filter(
             cls.status == STATUS_IN_REVIEW).filter(
-                cls.last_updated_by_human < threshold_time).fetch()
+                cls.last_updated < threshold_time).fetch()
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
@@ -368,10 +364,10 @@ class GeneralSuggestionModel(base_models.BaseHumanMaintainedModel):
         return (
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.last_updated_by_human < threshold_time)
+            .filter(cls.last_updated < threshold_time)
             .filter(cls.suggestion_type.IN(
                 CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
-            .order(cls.last_updated_by_human)
+            .order(cls.last_updated)
             .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
 
     @classmethod
@@ -433,7 +429,7 @@ class GeneralSuggestionModel(base_models.BaseHumanMaintainedModel):
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
-            .order(cls.last_updated_by_human)
+            .order(cls.last_updated)
             .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
         )
 
@@ -459,7 +455,7 @@ class GeneralSuggestionModel(base_models.BaseHumanMaintainedModel):
             .filter(
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.language_code == language_code)
-            .order(cls.last_updated_by_human)
+            .order(cls.last_updated)
             .fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
         )
 
@@ -741,6 +737,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
                 question_reviewer_count=0,
                 question_suggestion_count=0
             )
+            community_contribution_stats_model.update_timestamps()
             community_contribution_stats_model.put()
             return community_contribution_stats_model
 
