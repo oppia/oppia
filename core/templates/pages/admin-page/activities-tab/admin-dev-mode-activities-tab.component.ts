@@ -32,12 +32,12 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
-  reloadingAllExplorationPossible: boolean;
+  reloadingAllExplorationPossible: boolean = false;
   demoExplorationIds: string[] = [];
-  numDummyExpsToPublish: number;
-  numDummyExpsToGenerate: number;
-  DEMO_COLLECTIONS: string[][];
-  DEMO_EXPLORATIONS: string[][];
+  numDummyExpsToPublish: number = 0;
+  numDummyExpsToGenerate: number = 0;
+  DEMO_COLLECTIONS: string[][] = [[]];
+  DEMO_EXPLORATIONS: string[][] = [[]];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -61,10 +61,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminBackendApiService.reloadExplorationAsync(
       explorationId
-    ).then(function() {
+    ).then(() => {
       this.setStatusMessage.emit('Data reloaded successfully.');
       this.adminTaskManagerService.finishTask();
-    }, function(errorResponse) {
+    }, (errorResponse) => {
       this.setStatusMessage.emit(
         'Server error: ' + errorResponse.data.error);
       this.adminTaskManagerService.finishTask();
@@ -109,11 +109,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
       this.adminBackendApiService.reloadExplorationAsync(
         explorationId
-      ).then(function() {
+      ).then(() => {
         ++numSucceeded;
         ++numTried;
         this.printResult(numSucceeded, numFailed, numTried);
-      }, function() {
+      }, () => {
         ++numFailed;
         ++numTried;
         this.printResult(numSucceeded, numFailed, numTried);
@@ -132,10 +132,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage.emit('Processing...');
     this.adminBackendApiService.generateDummyExplorationsAsync(
       this.numDummyExpsToGenerate, this.numDummyExpsToPublish
-    ).then(function() {
+    ).then(() => {
       this.setStatusMessage.emit(
         'Dummy explorations generated successfully.');
-    }, function(errorResponse) {
+    }, (errorResponse) => {
       this.setStatusMessage.emit(
         'Server error: ' + errorResponse.data.error);
     });
@@ -147,10 +147,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage.emit('Processing...');
 
     this.adminBackendApiService.generateDummyNewStructuresDataAsync()
-      .then(function() {
+      .then(() => {
         this.setStatusMessage.emit(
           'Dummy new structures data generated successfully.');
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         this.setStatusMessage.emit(
           'Server error: ' + errorResponse.data.error);
       });
@@ -162,10 +162,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage.emit('Processing...');
 
     this.adminBackendApiService.generateDummyNewSkillDataAsync()
-      .then(function() {
+      .then(() => {
         this.setStatusMessage.emit(
           'Dummy new skill and questions generated successfully.');
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         this.setStatusMessage.emit(
           'Server error: ' + errorResponse.data.error);
       });
@@ -186,9 +186,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
 
     this.adminBackendApiService.reloadCollectionAsync(collectionId)
-      .then(function() {
+      .then(() => {
         this.setStatusMessage.emit('Data reloaded successfully.');
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         this.setStatusMessage.emit(
           'Server error: ' + errorResponse.data.error);
       });
@@ -205,9 +205,6 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.numDummyExpsToPublish = 0;
-    this.numDummyExpsToGenerate = 0;
-    this.reloadingAllExplorationPossible = false;
     this.getDataAsync();
   }
 }
