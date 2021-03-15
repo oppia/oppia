@@ -154,6 +154,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_1.created_on = (
             self.model_instance_1.last_updated + datetime.timedelta(days=1))
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -244,6 +245,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
     def test_model_with_invalid_content_count(self):
         self.model_instance_1.content_count = 10
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [
             (
@@ -257,6 +259,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
     def test_model_with_invalid_translation_counts(self):
         self.model_instance_1.translation_counts = {'hi': 0}
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [
             (
@@ -271,6 +274,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
     def test_model_with_invalid_chapter_title(self):
         self.model_instance_1.chapter_title = 'Invalid title'
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [
             (
@@ -284,6 +288,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
     def test_model_with_invalid_topic_related_property(self):
         self.model_instance_1.topic_name = 'invalid'
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [
             (
@@ -298,6 +303,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
     def test_model_with_invalid_story_related_property(self):
         self.model_instance_1.story_title = 'invalid'
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [
             (
@@ -393,6 +399,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_skill_description(self):
         self.model_instance_0.skill_description = 'invalid'
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         expected_output = [
@@ -409,6 +416,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_question_count(self):
         self.model_instance_0.question_count = 10
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         expected_output = [
@@ -424,6 +432,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_question_count_schema(self):
         self.model_instance_0.question_count = -1
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         expected_output = [

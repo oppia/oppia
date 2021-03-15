@@ -94,7 +94,8 @@ class SubtopicPageModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
-        subtopic_page_commit_log_entry.put_depending_on_id(committer_id)
+        subtopic_page_commit_log_entry.update_timestamps()
+        subtopic_page_commit_log_entry.put()
 
     @classmethod
     def get_export_policy(cls):

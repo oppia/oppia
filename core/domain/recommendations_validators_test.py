@@ -82,6 +82,7 @@ class ExplorationRecommendationsModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -129,6 +130,7 @@ class ExplorationRecommendationsModelValidatorTests(
 
     def test_model_with_id_in_recommended_ids(self):
         self.model_instance_0.recommended_exploration_ids = ['0', '4']
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -159,6 +161,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
         self.content = json.dumps(content_dict)
 
         self.model_instance.content = self.content
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -173,6 +176,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -203,6 +207,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = recommendations_models.TopicSimilaritiesModel(
             id='invalid', content=self.content)
+        self.model_instance.update_timestamps()
         model_with_invalid_id.put()
 
         expected_output = [
@@ -223,6 +228,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'Biology': {}
         }
         self.model_instance.content = json.dumps(content_dict)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         expected_output = [(
@@ -243,6 +249,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'invalid': {'Art': '0.5', 'invalid': '1.0'}
         }
         self.model_instance.content = json.dumps(content_dict)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         expected_output = [(
@@ -261,6 +268,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'Art': {'Art': '1.0', 'Biology': '0.5'}
         }
         self.model_instance.content = json.dumps(content_dict)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         expected_output = [(
@@ -280,6 +288,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'Biology': {'Art': 0.5, 'Biology': 1.0}
         }
         self.model_instance.content = json.dumps(content_dict)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         expected_output = [(
@@ -300,6 +309,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'Biology': {'Art': 0.5, 'Biology': 1.0}
         }
         self.model_instance.content = json.dumps(content_dict)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         expected_output = [(
@@ -320,6 +330,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'Biology': {'Art': 0.6, 'Biology': 1.0}
         }
         self.model_instance.content = json.dumps(content_dict)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         expected_output = [(

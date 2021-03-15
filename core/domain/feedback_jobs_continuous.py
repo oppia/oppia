@@ -107,6 +107,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_layer=active_realtime_layer).put()
             else:
                 model.num_open_threads += 1
+                model.update_timestamps()
                 model.put()
 
         @transaction_services.run_in_transaction_wrapper
@@ -123,6 +124,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_layer=active_realtime_layer).put()
             else:
                 model.num_total_threads += 1
+                model.update_timestamps()
                 model.put()
 
         @transaction_services.run_in_transaction_wrapper
@@ -139,6 +141,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_layer=active_realtime_layer).put()
             else:
                 model.num_open_threads -= 1
+                model.update_timestamps()
                 model.put()
 
         if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
