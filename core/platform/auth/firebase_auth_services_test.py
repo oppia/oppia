@@ -987,6 +987,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
         self.set_up_models(user_id='abc', firebase_auth_id='xyz')
         assoc_model = auth_models.UserIdByFirebaseAuthIdModel.get('xyz')
         assoc_model.user_id = 'jkl'
+        assoc_model.update_timestamps(update_last_updated_time=False)
         assoc_model.put()
 
         self.assertEqual(

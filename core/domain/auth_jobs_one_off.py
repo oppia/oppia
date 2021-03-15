@@ -218,6 +218,7 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 return cls.SUCCESS_ALREADY_DELETED_ASSOC_TEMPLATE % model_name
             else:
                 item.firebase_auth_id = None
+                item.update_timestamps(update_last_updated_time=False)
                 item.put()
         else:
             item.delete()

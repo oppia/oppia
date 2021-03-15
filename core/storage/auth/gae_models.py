@@ -308,3 +308,8 @@ class FirebaseSeedModel(base_models.BaseModel):
     def get_model_association_to_user():
         """Model does not correspond to any users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Model does not correspond to any users."""
+        return False

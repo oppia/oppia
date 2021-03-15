@@ -479,6 +479,7 @@ def seed_firebase():
     if auth_id is None:
         auth_id = user_id[4:] if user_id.startswith('uid_') else user_id
         assoc_by_user_id_model.firebase_auth_id = auth_id
+        assoc_by_user_id_model.update_timestamps(update_last_updated_time=False)
         assoc_by_user_id_model.put()
 
     assoc_by_auth_id_model = (
@@ -488,6 +489,7 @@ def seed_firebase():
             id=auth_id, user_id=user_id).put()
     elif assoc_by_auth_id_model.user_id != user_id:
         assoc_by_auth_id_model.user_id = user_id
+        assoc_by_auth_id_model.update_timestamps(update_last_updated_time=False)
         assoc_by_auth_id_model.put()
 
     custom_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
