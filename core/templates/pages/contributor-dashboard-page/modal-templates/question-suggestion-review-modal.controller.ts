@@ -27,18 +27,18 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   '$http', '$scope', '$uibModalInstance', 'ContributionOpportunitiesService',
-  'SiteAnalyticsService', 'SuggestionModalService', 'ThreadMessageObjectFactory',
-  'UrlInterpolationService', 'authorName', 'contentHtml',
-  'misconceptionsBySkill', 'question', 'questionHeader', 'reviewable',
-  'skillDifficulty', 'skillRubrics', 'suggestion', 'suggestionId',
+  'SiteAnalyticsService', 'SuggestionModalService',
+  'ThreadMessageObjectFactory', 'UrlInterpolationService', 'authorName',
+  'contentHtml', 'misconceptionsBySkill', 'question', 'questionHeader',
+  'reviewable', 'skillDifficulty', 'skillRubrics', 'suggestion', 'suggestionId',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $http, $scope, $uibModalInstance, ContributionOpportunitiesService,
-      SiteAnalyticsService, SuggestionModalService, ThreadMessageObjectFactory,
-      UrlInterpolationService, authorName, contentHtml,
-      misconceptionsBySkill, question, questionHeader, reviewable,
-      skillDifficulty, skillRubrics, suggestion, suggestionId,
+      SiteAnalyticsService, SuggestionModalService,
+      ThreadMessageObjectFactory, UrlInterpolationService, authorName,
+      contentHtml, misconceptionsBySkill, question, questionHeader,
+      reviewable, skillDifficulty, skillRubrics, suggestion, suggestionId,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
       SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
