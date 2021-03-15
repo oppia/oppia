@@ -115,9 +115,9 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         if self._SPACE_AROUND_ATTRIBUTE_REGEX.search(starttag_text):
             error_message = (
-                    '%s --> Attribute for tag %s on line '
-                    '%s has unwanted white spaces around it' % (
-                        self.filepath, tag, line_number))
+                '%s --> Attribute for tag %s on line '
+                '%s has unwanted white spaces around it' % (
+                    self.filepath, tag, line_number))
             self.error_messages.append(error_message)
             self.failed = True
 
