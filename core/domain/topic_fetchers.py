@@ -314,3 +314,159 @@ def get_topic_rights_from_model(topic_rights_model):
         topic_rights_model.manager_ids,
         topic_rights_model.topic_is_published
     )
+
+
+def get_all_topic_summaries():
+    """Returns the summaries of all topics present in the datastore.
+
+    Returns:
+        list(TopicSummary). The list of summaries of all topics present in the
+        datastore.
+    """
+    topic_summaries_models = topic_models.TopicSummaryModel.get_all()
+    topic_summaries = [
+        get_topic_summary_from_model(summary)
+        for summary in topic_summaries_models]
+    return topic_summaries
+
+
+def get_multi_topic_summaries(topic_ids):
+    """Returns the summaries of all topics whose topic ids are passed in.
+
+    Args:
+        topic_ids: list(str). The IDs of topics for which summaries are to be
+            returned.
+
+    Returns:
+        list(TopicSummary). The list of summaries of all given topics present in
+        the datastore.
+    """
+    topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
+    topic_summaries = [
+        get_topic_summary_from_model(summary) if summary else None
+        for summary in topic_summaries_models]
+    return topic_summaries
+
+
+def get_all_skill_ids_assigned_to_some_topic():
+    """Returns the ids of all the skills that are linked to some topics.
+
+    Returns:
+        set([str]). The ids of all the skills linked to some topic.
+    """
+    skill_ids = set([])
+    all_topic_models = topic_models.TopicModel.get_all()
+    all_topics = [get_topic_from_model(topic) for topic in all_topic_models]
+    for topic in all_topics:
+        skill_ids.update(topic.get_all_skill_ids())
+    return skill_ids
+
+
+def get_topic_summary_from_model(topic_summary_model):
+    """Returns a domain object for an Oppia topic summary given a
+    topic summary model.
+
+    Args:
+        topic_summary_model: TopicSummaryModel. The topic summary model object
+            to get the corresponding domain object.
+
+    Returns:
+        TopicSummary. The domain object corresponding to the given model object.
+    """
+    return topic_domain.TopicSummary(
+        topic_summary_model.id, topic_summary_model.name,
+        topic_summary_model.canonical_name,
+        topic_summary_model.language_code,
+        topic_summary_model.description,
+        topic_summary_model.version,
+        topic_summary_model.canonical_story_count,
+        topic_summary_model.additional_story_count,
+        topic_summary_model.uncategorized_skill_count,
+        topic_summary_model.subtopic_count,
+        topic_summary_model.total_skill_count,
+        topic_summary_model.thumbnail_filename,
+        topic_summary_model.thumbnail_bg_color,
+        topic_summary_model.url_fragment,
+        topic_summary_model.topic_model_created_on,
+        topic_summary_model.topic_model_last_updated
+    )
+
+
+def get_topic_summary_by_id(topic_id, strict=True):
+    """Returns a domain object representing a topic summary.
+
+    Args:
+        topic_id: str. ID of the topic summary.
+        strict: bool. Whether to fail noisily if no topic summary with the given
+            id exists in the datastore.
+
+    Returns:
+        TopicSummary or None. The topic summary domain object corresponding to
+        a topic with the given topic_id, if it exists, or else None.
+    """
+    topic_summary_model = topic_models.TopicSummaryModel.get(
+        topic_id, strict=strict)
+    if topic_summary_model:
+        topic_summary = get_topic_summary_from_model(topic_summary_model)
+        return topic_summary
+    else:
+        return None
+
+
+def get_new_topic_id():
+    """Returns a new topic id.
+
+    Returns:
+        str. A new topic id.
+    """
+    return topic_models.TopicModel.get_new_id('')
+
+
+def get_multi_topic_rights(topic_ids):
+    """Returns the rights of all topics whose topic ids are passed in.
+
+    Args:
+        topic_ids: list(str). The IDs of topics for which rights are to be
+            returned.
+
+    Returns:
+        list(TopicRights). The list of rights of all given topics present in
+        the datastore.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
+    topic_rights = [
+        get_topic_rights_from_model(rights) if rights else None
+        for rights in topic_rights_models]
+    return topic_rights
+
+
+def get_topic_rights_with_user(user_id):
+    """Retrieves the rights object for all topics assigned to given user.
+
+    Args:
+        user_id: str. ID of the user.
+
+    Returns:
+        list(TopicRights). The rights objects associated with the topics
+        assigned to given user.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
+    return [
+        get_topic_rights_from_model(model)
+        for model in topic_rights_models
+        if model is not None]
+
+
+def get_all_topic_rights():
+    """Returns the rights object of all topics present in the datastore.
+
+    Returns:
+        dict. The dict of rights objects of all topics present in the datastore
+        keyed by topic id.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_all()
+    topic_rights = {}
+    for model in topic_rights_models:
+        rights = get_topic_rights_from_model(model)
+        topic_rights[rights.id] = rights
+    return topic_rights
