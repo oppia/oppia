@@ -431,7 +431,7 @@ describe('Settings Tab Component', () => {
       $scope.$apply();
 
       expect(explorationRightsService.saveModeratorChangeToBackend)
-        .toHaveBeenCalledWith('Email body');
+        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
