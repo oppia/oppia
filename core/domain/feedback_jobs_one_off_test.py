@@ -94,8 +94,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -107,8 +106,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -119,8 +117,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = 'Non-empty'
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -132,8 +129,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = 'Non-empty'
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -145,8 +141,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -158,8 +153,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_text = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -170,8 +164,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -183,8 +176,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -195,8 +187,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(None, 'first text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -208,8 +199,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -221,8 +211,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -234,8 +223,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -247,8 +235,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = None
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -260,8 +247,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         model.last_nonempty_message_author_id = self.editor_id
-        model.update_timestamps()
-        model.put()
+        model.put_for_human()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
@@ -429,7 +415,6 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
     def test_migration_job_skips_deleted_model(self):
         model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
         model_instance.deleted = True
-        model_instance.update_timestamps()
         model_instance.put()
 
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -510,8 +495,7 @@ class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
         model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
             self.thread_id)
         model_instance.deleted = True
-        model_instance.update_timestamps()
-        model_instance.put()
+        model_instance.put_for_human()
 
         exp_models.ExplorationModel.get_by_id('0').delete(
             self.user_id, 'Delete')

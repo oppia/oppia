@@ -1103,7 +1103,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
         for i in python_utils.RANGE(len(suggestions) - 1):
             self.assertLess(
-                suggestions[i].last_updated, suggestions[i + 1].last_updated)
+                suggestions[i].last_updated_by_human,
+                suggestions[i + 1].last_updated_by_human)
 
     def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
             self):
@@ -1134,7 +1135,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
         self.assertLess(
-            suggestions[0].last_updated, suggestions[1].last_updated)
+            suggestions[0].last_updated_by_human,
+            suggestions[1].last_updated_by_human)
 
         # Reject the suggestion that was created first since it is the one that
         # has been waiting the longest for review.
@@ -1174,7 +1176,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[1].suggestion_id, suggestion_1.suggestion_id)
         self.assertLess(
-            suggestions[0].last_updated, suggestions[1].last_updated)
+            suggestions[0].last_updated_by_human,
+            suggestions[1].last_updated_by_human)
 
     def test_get_question_suggestions_waiting_longest_for_review(self):
         suggestion_1 = self._create_question_suggestion_with_skill_id('skill1')
@@ -1196,7 +1199,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
         for i in python_utils.RANGE(len(suggestions) - 1):
             self.assertLess(
-                suggestions[i].last_updated, suggestions[i + 1].last_updated)
+                suggestions[i].last_updated_by_human,
+                suggestions[i + 1].last_updated_by_human)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         # User proficiency models for user1.
@@ -1847,7 +1851,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 'default question content',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -1871,7 +1875,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 'default translation content',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -1893,7 +1897,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code, '',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -1917,7 +1921,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 'test whitespace',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -1942,7 +1946,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 'translation with rte [Math]',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -1968,7 +1972,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 'translation with rte [Image]',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -1993,7 +1997,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 'translation with rte [Link]',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2019,7 +2023,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 'translation with rte [Link] [Link]',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2045,7 +2049,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 'translation with rte [Link] [Math]',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2071,7 +2075,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
                 '[Link]',
-                translation_suggestion.last_updated
+                translation_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2096,7 +2100,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 'question with rte [Math]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2122,7 +2126,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 'question with rte [Image]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2146,7 +2150,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 'question with rte [Link]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2172,7 +2176,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 'question with rte [Link] [Link]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2198,7 +2202,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 'question with rte [Link] [Math]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2224,7 +2228,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 '[Link]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2250,7 +2254,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 '[Link]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2276,7 +2280,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 '[Link]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
@@ -2303,7 +2307,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 '[Link Test]',
-                question_suggestion.last_updated
+                question_suggestion.last_updated_by_human
             ))
 
         reviewable_suggestion_email_info = (
