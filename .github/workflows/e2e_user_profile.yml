@@ -38,7 +38,7 @@ jobs:
           google-chrome --version
       - name: Run e2e users test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="users" --prod_env
       - name: Run e2e profileMenu test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
