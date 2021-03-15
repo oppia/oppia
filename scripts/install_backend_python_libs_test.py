@@ -299,13 +299,15 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 ['scripts.regenerate_requirements'],
                 [
                     'pip', 'install',
-                    self.get_git_requirement_string('git-dep1', 'a'),
+                    '%s#egg=git-dep1' % (
+                        self.get_git_requirement_string('git-dep1', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install',
-                    self.get_git_requirement_string('git-dep2', 'a'),
+                    '%s#egg=git-dep2' % (
+                        self.get_git_requirement_string('git-dep2', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
@@ -564,6 +566,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 Distribution('dependency1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
                 Distribution('dependency5', '0.5.3', {}),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                }),
             ]
 
         def mock_list_dir(path): # pylint: disable=unused-argument

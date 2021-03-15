@@ -31,7 +31,7 @@ import utils
 
 import pkg_resources
 
-GIT_REQUIREMENTS_PATTERN = (
+DIRECT_URL_GIT_REQUIREMENT_PATTERN = (
     # NOTE: GitHub links must use commit hashes to declare dependencies. Commits
     # are SHA1 strings, which are 40-character hexadecimal strings.
     re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)'))
@@ -136,11 +136,11 @@ def _get_requirements_file_contents():
                 continue
 
             elif line.startswith('git'):
-                match = GIT_REQUIREMENTS_PATTERN.match(line)
+                match = DIRECT_URL_GIT_REQUIREMENT_PATTERN.match(line)
                 if not match:
                     raise Exception(
                         'GitHub requirements must match regexp=%r' % (
-                            GIT_REQUIREMENTS_PATTERN.pattern))
+                            DIRECT_URL_GIT_REQUIREMENT_PATTERN.pattern))
                 library_name, version_string = match.group(2, 1)
 
             else:
@@ -266,8 +266,7 @@ def _rectify_third_party_directory(mismatches):
     # library that the developer did not catch. The only way to enforce the
     # removal of a library is to clean out the folder and reinstall everything
     # from scratch.
-    if any(required is None and installed is not None
-           for required, installed in mismatches.values()):
+    if any(required is None for required, _ in mismatches.values()):
         if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
             shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         _reinstall_all_dependencies()
@@ -282,7 +281,7 @@ def _rectify_third_party_directory(mismatches):
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version or requirements_version != directory_version:
-            _install_git_url(requirements_version)
+            _install_direct_url(normalized_library_name, requirements_version)
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
@@ -329,16 +328,17 @@ def _install_library(library_name, version_string):
     )
 
 
-def _install_git_url(git_url):
+def _install_direct_url(library_name, version_string):
     """Installs a direct GitHub URL to the third_party/python_libs folder.
 
     Args:
-        git_url: str. Full definition of the URL to install. Must match
-            GIT_REQUIREMENTS_PATTERN.
+        library_name: str. Name of the library to install.
+        version_string: str. Full definition of the URL to install. Must match
+            DIRECT_URL_GIT_REQUIREMENT_PATTERN.
     """
     pip_install(
-        git_url, common.THIRD_PARTY_PYTHON_LIBS_DIR, upgrade=True,
-        no_dependencies=True)
+        '%s#egg=%s' % (version_string, library_name),
+        common.THIRD_PARTY_PYTHON_LIBS_DIR, upgrade=True, no_dependencies=True)
 
 
 def _reinstall_all_dependencies():
@@ -475,8 +475,7 @@ def pip_install(
     """Installs third party libraries with pip to a specific path.
 
     Args:
-        versioned_package: str. A 'lib==version' formatted string, or a full
-            GitHub direct URL (see GIT_REQUIREMENTS_PATTERN).
+        versioned_package: str. A 'lib==version' formatted string.
         install_path: str. The installation path for the package.
         upgrade: bool. Whether to call pip with the --upgrade flag.
         no_dependencies: bool. Whether call the pip with --no-dependencies flag.
@@ -542,7 +541,7 @@ def get_mismatches():
         requires flask with version 1.0.1 while the 'third_party/python_libs'
         directory contains flask 1.1.1 (or mismatch 4 above):
             {
-              flask: ('flask==1.0.1', '1.1.1')
+              flask: ('1.0.1', '1.1.1')
             }
     """
     requirements_contents = _get_requirements_file_contents()
@@ -600,6 +599,11 @@ def validate_metadata_directories():
         if os.path.isdir(os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
     }
     for normalized_library_name, version_string in directory_contents.items():
+        if version_string.startswith('git'):
+            # GitHub direct url dependencies are guarantee to have valid
+            # metadata because that's how we were able to obtain a
+            # version_string to begin with.
+            continue
         # Possible names of the metadata directory installed when <library_name>
         # is installed.
         possible_normalized_directory_names = (
