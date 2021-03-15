@@ -49,7 +49,7 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
@@ -87,6 +87,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BrowserModule,
     DynamicContentModule,
     NgbTooltipModule,
+    NgbNavModule,
     FormsModule,
     RichTextComponentsModule,
     ...firebaseAuthModules,
@@ -143,6 +144,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
+    NgbNavModule,
     RichTextComponentsModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,

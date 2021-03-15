@@ -27,7 +27,7 @@ require(
   'oppia-noninteractive-link.component.ts');
 require(
   'rich_text_components/Math/directives/' +
-  'oppia-noninteractive-math.directive.ts');
+  'oppia-noninteractive-math.component.ts');
 require(
   'rich_text_components/Skillreview/directives/' +
   'oppia-noninteractive-skillreview.directive.ts');
@@ -36,7 +36,7 @@ require(
   'oppia-noninteractive-svgdiagram.component.ts');
 require(
   'rich_text_components/Tabs/directives/' +
-  'oppia-noninteractive-tabs.directive.ts');
+  'oppia-noninteractive-tabs.component.ts');
 require(
   'rich_text_components/Video/directives/' +
   'oppia-noninteractive-video.directive.ts');

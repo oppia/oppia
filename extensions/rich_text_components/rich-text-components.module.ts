@@ -22,11 +22,14 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
-import { NgbAccordionModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.component';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
 import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.component';
+import { NoninteractiveMath } from './Math/directives/oppia-noninteractive-math.component';
+import { NoninteractiveSvgdiagram } from './Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
+import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.component';
 
 
 @NgModule({
@@ -36,22 +39,32 @@ import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.
     DynamicContentModule,
     MatButtonModule,
     NgbAccordionModule,
+    NgbNavModule,
     NgbTooltipModule
   ],
   declarations: [
     NoninteractiveCollapsible,
     NoninteractiveImage,
-    NoninteractiveLink
+    NoninteractiveLink,
+    NoninteractiveMath,
+    NoninteractiveSvgdiagram,
+    NoninteractiveTabs
   ],
   entryComponents: [
     NoninteractiveCollapsible,
     NoninteractiveImage,
-    NoninteractiveLink
+    NoninteractiveLink,
+    NoninteractiveMath,
+    NoninteractiveSvgdiagram,
+    NoninteractiveTabs
   ],
   exports: [
     NoninteractiveCollapsible,
     NoninteractiveImage,
-    NoninteractiveLink
+    NoninteractiveLink,
+    NoninteractiveMath,
+    NoninteractiveSvgdiagram,
+    NoninteractiveTabs
   ],
 })
 
