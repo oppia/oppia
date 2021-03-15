@@ -311,7 +311,7 @@ describe('Exploration rights service', () => {
     }));
 
   it('should save moderator change to backend', fakeAsync(() => {
-    explorationRightsService.saveModeratorChangeToBackend('');
+    explorationRightsService.saveModeratorChangeToBackend('', mockFunction);
 
     const req = httpTestingController.expectOne(
       '/createhandler/moderatorrights/12345');
@@ -339,7 +339,7 @@ describe('Exploration rights service', () => {
 
   it('should reject handler when saving moderator change to backend fails',
     fakeAsync(() => {
-      explorationRightsService.saveModeratorChangeToBackend('');
+      explorationRightsService.saveModeratorChangeToBackend('', mockFunction);
 
       const req = httpTestingController.expectOne(
         '/createhandler/moderatorrights/12345');
