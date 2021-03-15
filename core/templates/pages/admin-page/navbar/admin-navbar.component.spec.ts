@@ -22,10 +22,10 @@ import { ImgSanitizerService } from 'services/img-sanitizer.service';
 
 import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
-import { AdminNavbarComponent } from './admin-navbar.component';
+import { OppiaAdminNavbarComponent } from './admin-navbar.component';
 
 describe('Admin Navbar component', () => {
-  let component: AdminNavbarComponent;
+  let component: OppiaAdminNavbarComponent;
   let userService = null;
   let adminRouterService = null;
   let imgSanitizerService = null;
@@ -37,15 +37,15 @@ describe('Admin Navbar component', () => {
   };
   let imagePath = '/path/to/image.png';
   let profileUrl = '/profile/username1';
-  let fixture: ComponentFixture<AdminNavbarComponent>;
+  let fixture: ComponentFixture<OppiaAdminNavbarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [AdminNavbarComponent]
+      declarations: [OppiaAdminNavbarComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminNavbarComponent);
+    fixture = TestBed.createComponent(OppiaAdminNavbarComponent);
     component = fixture.componentInstance;
     userService = TestBed.get(UserService);
     adminRouterService = TestBed.get(AdminRouterService);

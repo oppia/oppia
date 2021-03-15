@@ -221,8 +221,7 @@ describe('Admin backend api service', () => {
       expect(adminData).toEqual(adminDataObject);
     });
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('GET');
     req.flush(adminBackendResponse);
 
@@ -923,8 +922,7 @@ describe('Admin backend api service', () => {
       expIdToRegenerate
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -948,8 +946,7 @@ describe('Admin backend api service', () => {
       expIdToRegenerate
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({
@@ -977,8 +974,7 @@ describe('Admin backend api service', () => {
       topicId
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1002,8 +998,7 @@ describe('Admin backend api service', () => {
       topicId
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({
@@ -1030,8 +1025,7 @@ describe('Admin backend api service', () => {
     abas.uploadTopicSimilaritiesAsync(data)
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1054,8 +1048,7 @@ describe('Admin backend api service', () => {
     abas.uploadTopicSimilaritiesAsync(data)
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({
@@ -1320,8 +1313,7 @@ describe('Admin backend api service', () => {
     abas.revertConfigPropertyAsync(
       configPropertyId).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -1346,8 +1338,7 @@ describe('Admin backend api service', () => {
     abas.revertConfigPropertyAsync(
       configPropertyId).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -1376,8 +1367,7 @@ describe('Admin backend api service', () => {
     abas.saveConfigPropertiesAsync(
       configPropertyValues).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -1400,8 +1390,7 @@ describe('Admin backend api service', () => {
     abas.saveConfigPropertiesAsync(
       configPropertyValues).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -1433,8 +1422,7 @@ describe('Admin backend api service', () => {
       numDummyExpsToGenerate, numDummyExpsToPublish
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1445,7 +1433,8 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to generate dummy explorations', fakeAsync(() => {
+  it('should handle generate dummy explorations ' +
+    'request failure', fakeAsync(() => {
     let action = 'generate_dummy_explorations';
     let numDummyExpsToGenerate = 2;
     let numDummyExpsToPublish = 1;
@@ -1459,8 +1448,7 @@ describe('Admin backend api service', () => {
       numDummyExpsToGenerate, numDummyExpsToPublish
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({
@@ -1475,7 +1463,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should reload explorations', fakeAsync(() => {
+  it('should reload exploration', fakeAsync(() => {
     let action = 'reload_exploration';
     let explorationId = 'exp1';
     let payload = {
@@ -1487,8 +1475,7 @@ describe('Admin backend api service', () => {
       explorationId
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1499,7 +1486,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to generate dummy explorations', fakeAsync(() => {
+  it('should handle reload exploration request failure', fakeAsync(() => {
     let action = 'reload_exploration';
     let explorationId = 'exp1';
     let payload = {
@@ -1511,8 +1498,7 @@ describe('Admin backend api service', () => {
       explorationId
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({
@@ -1536,8 +1522,7 @@ describe('Admin backend api service', () => {
     abas.generateDummyNewStructuresDataAsync()
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1548,7 +1533,8 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to generate dummy new structures data', fakeAsync(() => {
+  it('should handle generate dummy new structures data ' +
+    'request failure', fakeAsync(() => {
     let action = 'generate_dummy_new_structures_data';
     let payload = {
       action: action,
@@ -1557,8 +1543,7 @@ describe('Admin backend api service', () => {
     abas.generateDummyNewStructuresDataAsync()
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({
@@ -1582,8 +1567,7 @@ describe('Admin backend api service', () => {
     abas.generateDummyNewSkillDataAsync()
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1594,7 +1578,8 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to generate dummy new skill data', fakeAsync(() => {
+  it('should handle generate dummy new skill data ' +
+    'request failure', fakeAsync(() => {
     let action = 'generate_dummy_new_skill_data';
     let payload = {
       action: action,
@@ -1603,8 +1588,7 @@ describe('Admin backend api service', () => {
     abas.generateDummyNewSkillDataAsync()
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({
@@ -1619,7 +1603,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should reload collections', fakeAsync(() => {
+  it('should reload collection', fakeAsync(() => {
     let action = 'reload_collection';
     let collectionId = 'exp1';
     let payload = {
@@ -1631,8 +1615,7 @@ describe('Admin backend api service', () => {
       collectionId
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(200);
@@ -1643,7 +1626,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to generate dummy collections', fakeAsync(() => {
+  it('should handle reload collection request failure', fakeAsync(() => {
     let action = 'reload_collection';
     let collectionId = 'exp1';
     let payload = {
@@ -1655,8 +1638,7 @@ describe('Admin backend api service', () => {
       collectionId
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({

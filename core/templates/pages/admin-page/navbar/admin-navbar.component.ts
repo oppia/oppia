@@ -27,10 +27,10 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { AppConstants } from 'app.constants';
 
 @Component({
-  selector: 'admin-navbar',
+  selector: 'oppia-admin-navbar',
   templateUrl: './admin-navbar.component.html',
 })
-export class AdminNavbarComponent implements OnInit {
+export class OppiaAdminNavbarComponent implements OnInit {
   profilePictureDataUrl: string = '';
   imagePath: string;
   username: string = '';
@@ -122,4 +122,4 @@ export class AdminNavbarComponent implements OnInit {
 
 angular.module('oppia').directive(
   'adminNavbar', downgradeComponent(
-    {component: AdminNavbarComponent}));
+    {component: OppiaAdminNavbarComponent}));

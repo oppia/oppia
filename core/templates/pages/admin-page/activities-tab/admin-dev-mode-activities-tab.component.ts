@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 
 @Component({
-  selector: 'admin-dev-mode-activities-tab',
+  selector: 'oppia-admin-dev-mode-activities-tab',
   templateUrl: './admin-dev-mode-activities-tab.component.html',
 })
-export class AdminDevModeActivitiesTabComponent implements OnInit {
+export class OppiaAdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
   reloadingAllExplorationPossible: boolean = false;
   demoExplorationIds: string[] = [];
@@ -210,4 +210,4 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
 angular.module('oppia').directive(
   'adminDevModeActivitiesTab', downgradeComponent(
-    {component: AdminDevModeActivitiesTabComponent}));
+    {component: OppiaAdminDevModeActivitiesTabComponent}));
