@@ -107,6 +107,7 @@ def _save_completed_activities(activities_completed):
         user_models.CompletedActivitiesModel.get_by_id(activities_completed.id))
     if completed_activities_model is not None:
         completed_activities_model.populate(**activities_completed_dict)
+        completed_activities_model.update_timestamps()
         completed_activities_model.put()
     else:
         activities_completed_dict['id'] = activities_completed.id
@@ -128,6 +129,7 @@ def _save_incomplete_activities(incomplete_activities):
         collection_ids=(
             incomplete_activities.collection_ids))
 
+    incomplete_activities_model.update_timestamps()
     incomplete_activities_model.put()
 
 
@@ -148,6 +150,7 @@ def _save_last_playthrough_information(last_playthrough_information):
                 last_playthrough_information.last_played_exp_version),
             last_played_state_name=(
                 last_playthrough_information.last_played_state_name)))
+    last_playthrough_information_model.update_timestamps()
     last_playthrough_information_model.put()
 
 
