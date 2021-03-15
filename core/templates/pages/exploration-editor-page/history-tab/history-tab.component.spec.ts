@@ -51,7 +51,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 describe('History tab component', function() {
   var ctrl = null;

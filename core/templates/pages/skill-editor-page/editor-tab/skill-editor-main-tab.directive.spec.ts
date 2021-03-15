@@ -20,7 +20,13 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 // ^^^ This block is to be removed.
+
+importAllAngularServices();
+
 describe('Skill editor main tab directive', function() {
   var $scope = null;
   var ctrl = null;
@@ -33,9 +39,17 @@ describe('Skill editor main tab directive', function() {
   var SkillEditorStateService = null;
   var focusManagerService = null;
   var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
-  beforeEach(angular.mock.module('oppia'));
 
+  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    focusManagerService = TestBed.get(FocusManagerService);
+  });
+
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -116,9 +130,9 @@ describe('Skill editor main tab directive', function() {
   });
 
   it('should set focus on create question button', function() {
-    spyOn(focusManagerService, 'setFocus');
+    var focusSpy = spyOn(focusManagerService, 'setFocus');
     ctrl.$onInit();
     $timeout.flush();
-    expect(focusManagerService.setFocus()).toHaveBeenCalled();
+    expect(focusSpy).toHaveBeenCalled();
   });
 });
