@@ -45,6 +45,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
             id='test-%s-%s' % (current_time_str, random_int),
             status_code=job_models.STATUS_CODE_NEW, job_type='test',
             time_queued_msec=1, time_started_msec=10, time_finished_msec=20)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -59,6 +60,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -92,6 +94,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_empty_error(self):
         self.model_instance.status_code = job_models.STATUS_CODE_FAILED
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -105,6 +108,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_non_empty_error(self):
         self.model_instance.error = 'invalid'
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -118,6 +122,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_empty_output(self):
         self.model_instance.status_code = job_models.STATUS_CODE_COMPLETED
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -131,6 +136,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_non_empty_output(self):
         self.model_instance.output = 'invalid'
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -144,6 +150,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_time_queued_msec(self):
         self.model_instance.time_queued_msec = 15
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -157,6 +164,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_time_started_msec(self):
         self.model_instance.time_started_msec = 25
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -171,6 +179,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_time_finished_msec(self):
         current_time_msec = utils.get_current_time_in_millisecs()
         self.model_instance.time_finished_msec = current_time_msec * 10.0
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -194,6 +203,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
             id='FeedbackAnalyticsAggregator',
             status_code=job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING,
             last_started_msec=1, last_stopped_msec=10, last_finished_msec=20)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -209,6 +219,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -239,6 +250,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_last_started_msec(self):
         self.model_instance.last_started_msec = 25
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -253,6 +265,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_last_stopped_msec(self):
         current_time_msec = utils.get_current_time_in_millisecs()
         self.model_instance.last_stopped_msec = current_time_msec * 10.0
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -266,6 +279,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_last_finished_msec(self):
         current_time_msec = utils.get_current_time_in_millisecs()
         self.model_instance.last_finished_msec = current_time_msec * 10.0
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -283,6 +297,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
             id='invalid',
             status_code=job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING,
             last_started_msec=1, last_stopped_msec=10, last_finished_msec=20)
+        model_with_invalid_id.update_timestamps()
         model_with_invalid_id.put()
         expected_output = [
             (

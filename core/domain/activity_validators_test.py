@@ -66,6 +66,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
             'type': constants.ACTIVITY_TYPE_COLLECTION,
             'id': '1col',
         }]
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -79,6 +80,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -110,6 +112,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.activity_references = [{
             'type': 'exploration',
         }]
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for fetch properties of '
@@ -126,6 +129,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
             'type': 'invalid_type',
             'id': '0'
         }]
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for domain object check of '
@@ -141,6 +145,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
             'type': 'exploration',
             'id': '1col'
         }]
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for exploration_ids field check of '
@@ -154,6 +159,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_mock_model_with_invalid_id(self):
         model_instance_with_invalid_id = (
             activity_models.ActivityReferencesModel(id='invalid'))
+        model_instance_with_invalid_id.update_timestamps()
         model_instance_with_invalid_id.put()
         expected_output = [(
             u'[u\'fully-validated ActivityReferencesModel\', 1]'
