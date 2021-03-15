@@ -117,6 +117,8 @@ angular.module('oppia').directive('answerGroupEditor', [
               case 'Int':
               case 'NonnegativeInt':
                 return 0;
+              case 'PositiveInt':
+                return 1;
               case 'CodeString':
               case 'UnicodeString':
               case 'NormalizedString':
