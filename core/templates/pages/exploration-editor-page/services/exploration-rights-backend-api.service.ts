@@ -91,7 +91,7 @@ export class ExplorationRightsService {
   viewableIfPrivate(): boolean {
     return this._viewableIfPrivate;
   }
-  makeCommunityOwned(callback: () => {}): Promise<void> {
+  makeCommunityOwned(callback: () => void): Promise<void> {
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
     return this.httpClient.put(requestUrl, {
@@ -110,7 +110,7 @@ export class ExplorationRightsService {
   }
 
   setViewability(
-      viewableIfPrivate: boolean, callback: () => {}): Promise<void> {
+      viewableIfPrivate: boolean, callback: () => void): Promise<void> {
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
@@ -131,7 +131,7 @@ export class ExplorationRightsService {
   saveRoleChanges(
       newMemberUsername: string,
       newMemberRole: string,
-      callback: () => {}): Promise<void> {
+      callback: () => void): Promise<void> {
     let requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 

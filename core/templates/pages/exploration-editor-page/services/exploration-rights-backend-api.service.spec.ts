@@ -49,6 +49,10 @@ describe('Exploration rights service', () => {
     }
   };
 
+  let mockFunction = (): void => {
+    return;
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -173,7 +177,7 @@ describe('Exploration rights service', () => {
     explorationRightsService.init(
       ['abc'], [], [], [], 'private', 'e1234', false, true);
 
-    explorationRightsService.makeCommunityOwned();
+    explorationRightsService.makeCommunityOwned(mockFunction);
 
     const req = httpTestingController.expectOne('/createhandler/rights/12345');
     expect(req.request.method).toEqual('PUT');
@@ -189,7 +193,7 @@ describe('Exploration rights service', () => {
     fakeAsync(() => {
       explorationRightsService.init(
         ['abc'], [], [], [], 'private', 'e1234', false, true);
-      explorationRightsService.makeCommunityOwned().then(
+      explorationRightsService.makeCommunityOwned(mockFunction).then(
         successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -209,7 +213,7 @@ describe('Exploration rights service', () => {
     let sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.viewable_if_private = true;
 
-    explorationRightsService.setViewability(true);
+    explorationRightsService.setViewability(true, mockFunction);
 
     const req = httpTestingController.expectOne(
       '/createhandler/rights/12345');
@@ -225,7 +229,7 @@ describe('Exploration rights service', () => {
     fakeAsync(() => {
       explorationRightsService.init(
         ['abc'], [], [], [], 'private', 'e1234', false, false);
-      explorationRightsService.setViewability(true).then(
+      explorationRightsService.setViewability(true, mockFunction).then(
         successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -244,7 +248,7 @@ describe('Exploration rights service', () => {
   it('should save a new member', fakeAsync(() => {
     let sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.viewer_names.push('newUser');
-    explorationRightsService.saveRoleChanges('newUser', 'viewer');
+    explorationRightsService.saveRoleChanges('newUser', 'viewer', mockFunction);
 
     const req = httpTestingController.expectOne(
       '/createhandler/rights/12345');
@@ -258,7 +262,8 @@ describe('Exploration rights service', () => {
   }));
 
   it('should reject handler when saving a new member fails', fakeAsync(() => {
-    explorationRightsService.saveRoleChanges('newUser', 'viewer').then(
+    explorationRightsService.saveRoleChanges(
+      'newUser', 'viewer', mockFunction).then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
