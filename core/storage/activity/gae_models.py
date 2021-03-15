@@ -66,6 +66,7 @@ class ActivityReferencesModel(base_models.BaseModel):
         entity = cls.get(list_name, strict=False)
         if entity is None:
             entity = cls(id=list_name, activity_references=[])
+            entity.update_timestamps()
             entity.put()
 
         return entity
