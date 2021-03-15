@@ -105,7 +105,8 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.story_id = 'b'
-        commit.put_depending_on_id('committer_id')
+        commit.update_timestamps()
+        commit.put()
         self.assertTrue(
             story_models.StoryCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
@@ -137,6 +138,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             thumbnail_bg_color='#F8BF74',
             version=1,
             url_fragment='story-summary-frag')
+        story_summary_model.update_timestamps()
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
 

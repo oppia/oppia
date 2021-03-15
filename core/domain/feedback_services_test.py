@@ -439,7 +439,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
-            thread.put_for_human()
+            thread.update_timestamps()
+            thread.put()
 
         _close_thread(threads_exp_1[0].id)
 
@@ -468,7 +469,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             original_author_id=self.user_id, subject='Feedback',
             status=feedback_models.STATUS_CHOICES_OPEN, message_count=0,
             has_suggestion=False)
-        thread_3.put_for_human()
+        thread_3.update_timestamps()
+        thread_3.put()
         feedback_services.create_message(
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
             self.user_id, None, None, 'not used here')

@@ -65,6 +65,7 @@ def save_learner_playlist(learner_playlist):
         learner_playlist.id))
     if learner_playlist_model is not None:
         learner_playlist_model.populate(**learner_playlist_dict)
+        learner_playlist_model.update_timestamps()
         learner_playlist_model.put()
     else:
         learner_playlist_dict['id'] = learner_playlist.id

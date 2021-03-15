@@ -2634,6 +2634,42 @@ class MockExpSummaryModel(exp_models.ExpSummaryModel):
         indexed=True, repeated=True, required=False)
 
 
+class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
+
+    JOB = exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
+
+    def run_job(self):
+        """Runs the job and returns its output."""
+        job_id = self.JOB.create_new()
+        self.JOB.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        return [ast.literal_eval(s) for s in self.JOB.get_output(job_id)]
+
+    def test_outputs_successful_writes(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+        self.save_new_valid_exploration('exp2', 'owner2')
+        improvements_models.TaskEntryModel.create(
+            'exploration', 'eid', 1, 'high_bounce_rate', 'state',
+            'Introduction')
+
+        self.assertItemsEqual(
+            self.run_job(), [['ExplorationModel', 2], ['TaskEntryModel', 1]])
+
+    def test_versioned_models_are_not_changed_to_a_newer_version(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+
+        self.assertItemsEqual(self.run_job(), [['ExplorationModel', 1]])
+
+        exp_model = exp_models.ExplorationModel.get_by_id('exp1')
+        self.assertEqual(exp_model.version, 1)
+
+
 class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -2950,7 +2986,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-%s-1' % self.exp_id))
         commit_log_model.commit_message = 'Test change'
-        commit_log_model.put_for_human()
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
 
         job_id = (
             exp_jobs_one_off
@@ -2976,7 +3013,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
                 'exploration-%s-1' % self.exp_id))
         commit_log_model.created_on = commit_log_model.created_on + (
             datetime.timedelta(days=1))
-        commit_log_model.put_for_human()
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
 
         job_id = (
             exp_jobs_one_off
@@ -3350,6 +3388,8 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
                 exp_models.ExplorationSnapshotContentModel.get(
                     '%s-1' % self.VALID_EXP_ID))
             del snapshot_content_model.content['states_schema_version']
+            snapshot_content_model.update_timestamps(
+                update_last_updated_time=False)
             snapshot_content_model.put()
 
             # There is no failure due to a missing states schema version.
@@ -3581,6 +3621,8 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
                 exp_models.ExplorationSnapshotContentModel.get(
                     '%s-1' % self.VALID_EXP_ID))
             del snapshot_content_model.content['states_schema_version']
+            snapshot_content_model.update_timestamps(
+                update_last_updated_time=False)
             snapshot_content_model.put()
 
             # There is no failure due to a missing states schema version.

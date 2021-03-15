@@ -583,7 +583,7 @@ class MockCollectionRightsModel(
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_depending_on_id(committer_id)
+            ).put()
 
 
 class MockExplorationRightsModel(exp_models.ExplorationRightsModel):
@@ -627,7 +627,7 @@ class MockExplorationRightsModel(exp_models.ExplorationRightsModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_depending_on_id(committer_id)
+            ).put()
 
 
 class MockTopicRightsModel(topic_models.TopicRightsModel):
@@ -671,7 +671,7 @@ class MockTopicRightsModel(topic_models.TopicRightsModel):
             post_commit_status=status,
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
-        ).put_depending_on_id(committer_id)
+        ).put()
 
 
 class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
@@ -983,7 +983,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -1014,7 +1014,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                 }
             ],
             deleted=True
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
 
         output = self._run_one_off_job()
         self.assertItemsEqual(output, [['collection-deleted', 1]])
@@ -1030,7 +1030,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -1049,7 +1049,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.USER_1_ID,
             commit_type='edit',
             commit_cmds=[]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
 
         output = self._run_one_off_job()
         self.assertItemsEqual(output, [['exploration-length-0', 1]])
@@ -1069,7 +1069,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -1099,7 +1099,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'different_field': 'test'
                 }
             ]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
         exp_models.ExplorationRightsSnapshotMetadataModel(
             id='%s-1' % self.EXP_1_ID,
             committer_id=self.USER_1_ID,
@@ -1110,7 +1110,7 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'other_field': 'test'
                 }
             ]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
         exp_models.ExplorationRightsSnapshotMetadataModel(
             id='%s-2' % self.EXP_1_ID,
             committer_id=self.USER_1_ID,
@@ -1121,13 +1121,13 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                     'other_field': 'test'
                 }
             ]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
         topic_models.TopicRightsSnapshotMetadataModel(
             id='%s-1' % self.TOP_1_ID,
             committer_id=self.USER_1_ID,
             commit_type='edit',
             commit_cmds=[]
-        ).put_depending_on_id(self.USER_1_ID)
+        ).put()
         output = self._run_one_off_job()
         self.assertItemsEqual(
             output,
@@ -1404,7 +1404,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1428,7 +1428,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1452,7 +1452,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1476,7 +1476,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1500,7 +1500,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1524,7 +1524,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1548,7 +1548,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1572,7 +1572,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
         actual_output = self._run_one_off_job()
 
         expected_output = [
@@ -1681,7 +1681,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS,
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         expected_output = [
             [
@@ -1724,7 +1724,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         expected_output = [
             [
@@ -1763,7 +1763,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         expected_output = [
             [
@@ -1808,7 +1808,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -1864,7 +1864,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='create',
             commit_cmds=self.DUMMY_CREATE_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         actual_output = self._run_one_off_job()
         expected_output = [
@@ -1894,7 +1894,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -1947,7 +1947,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -1986,7 +1986,7 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
             committer_id=self.albert_id,
             commit_type='edit',
             commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put_depending_on_id(self.albert_id)
+        ).put()
 
         actual_output = self._run_one_off_job()
         commit_model = (
@@ -2048,20 +2048,17 @@ class SnapshotMetadataCommitMsgAuditOneOffJobTests(
                 id='model_id-%d-%d' % (i, value_less_than_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_less_than_375
-            ).put_depending_on_id('committer_id')
+                commit_message='a' * value_less_than_375).put()
             model_class(
                 id='model_id-%d-%d' % (i, value_equal_to_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_equal_to_375
-            ).put_depending_on_id('committer_id')
+                commit_message='a' * value_equal_to_375).put()
             model_class(
                 id='model_id-%d-%d' % (i, value_greater_than_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_greater_than_375
-            ).put_depending_on_id('committer_id')
+                commit_message='a' * value_greater_than_375).put()
         self.maxDiff = None
         one_off_results = self._run_one_off_job()
         expected_results = [
@@ -2136,8 +2133,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
             id='model_id-0',
             committer_id='committer_id',
             commit_type='create',
-            commit_message='a' * 400
-        ).put_depending_on_id('committer_id')
+            commit_message='a' * 400).put()
         self._run_one_off_job()
         self.assertEqual(
             len(model_class.get_by_id('model_id-0').commit_message),
@@ -2151,7 +2147,8 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
             'b', 0, 'committer_id', 'a', 'a' * 400, [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
-        commit.put_depending_on_id('committer_id')
+        commit.update_timestamps()
+        commit.put()
         self._run_one_off_job()
         self.assertEqual(
             len(
@@ -2166,175 +2163,3 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
                 collection_models.CollectionCommitLogEntryModel.get_by_id(
                     commit.id).commit_message),
             375)
-
-
-class BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJobTests(
-        test_utils.GenericTestBase):
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            activity_jobs_one_off
-            .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob
-            .create_new()
-        )
-        (
-            activity_jobs_one_off
-            .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob
-            .enqueue(job_id)
-        )
-        self.process_and_flush_pending_mapreduce_tasks()
-        results = (
-            activity_jobs_one_off
-            .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob
-            .get_output(job_id)
-        )
-        return [
-            ast.literal_eval(stringified_item) for stringified_item in results]
-
-    def _compare_last_updated_fields(self, original_model, migrated_model):
-        """Compare if the last updated fields were se correctly.
-
-        Args:
-            original_model: BaseModel. The original model.
-            migrated_model: BaseModel. The model after the migration.
-        """
-        self.assertEqual(
-            original_model.last_updated,
-            migrated_model.last_updated_by_human)
-        self.assertNotEqual(
-            original_model.last_updated,
-            migrated_model.last_updated)
-
-    def test_migrate_one_model_is_successful(self):
-        original_question_model = question_models.QuestionModel(
-            id='q_id',
-            question_state_data={},
-            question_state_data_schema_version=1,
-            language_code='en',
-            linked_skill_ids=[],
-            inapplicable_skill_misconception_ids=[]
-        )
-        original_question_model.put_for_bot()
-
-        output = self._run_one_off_job()
-        # There are some internal config models thus the number is not 1 but 3.
-        self.assertEqual(output, [['SUCCESS', 3]])
-
-        migrated_question_model = question_models.QuestionModel.get('q_id')
-        self._compare_last_updated_fields(
-            original_question_model, migrated_question_model)
-
-    def test_migrate_multiple_models_is_successful(self):
-        original_question_model = question_models.QuestionModel(
-            id='q_id',
-            question_state_data={},
-            question_state_data_schema_version=1,
-            language_code='en',
-            linked_skill_ids=[],
-            inapplicable_skill_misconception_ids=[]
-        )
-        original_question_model.put_for_bot()
-        original_config_model = config_models.ConfigPropertyModel(
-            id='c_id',
-            value={}
-        )
-        original_config_model.put_for_bot()
-
-        output = self._run_one_off_job()
-        # There are some internal config models thus the number is not 2 but 4.
-        self.assertEqual(output, [['SUCCESS', 4]])
-
-        migrated_question_model = question_models.QuestionModel.get('q_id')
-        migrated_config_model = config_models.ConfigPropertyModel.get('c_id')
-        self._compare_last_updated_fields(
-            original_question_model, migrated_question_model)
-        self._compare_last_updated_fields(
-            original_config_model, migrated_config_model)
-
-
-class ExplorationModelsFillLastHumanUpdatedOneOffJobTests(
-        test_utils.GenericTestBase):
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            activity_jobs_one_off
-            .ExplorationModelsFillLastHumanUpdatedOneOffJob.create_new()
-        )
-        (
-            activity_jobs_one_off
-            .ExplorationModelsFillLastHumanUpdatedOneOffJob.enqueue(job_id)
-        )
-        self.process_and_flush_pending_mapreduce_tasks()
-        results = (
-            activity_jobs_one_off
-            .ExplorationModelsFillLastHumanUpdatedOneOffJob.get_output(job_id)
-        )
-        return [
-            ast.literal_eval(stringified_item) for stringified_item in results]
-
-    def _compare_last_updated_fields(self, original_model, migrated_model):
-        """Compare if the last updated fields were se correctly.
-
-        Args:
-            original_model: BaseModel. The original model.
-            migrated_model: BaseModel. The model after the migration.
-        """
-        self.assertEqual(
-            original_model.last_updated,
-            migrated_model.last_updated_by_human)
-        self.assertNotEqual(
-            original_model.last_updated,
-            migrated_model.last_updated)
-
-    def test_migrate_one_model_is_successful(self):
-        original_exp_snapshot_model = (
-            exp_models.ExplorationSnapshotMetadataModel(
-                id='snap_id',
-                committer_id='user_id',
-                commit_type='create'
-            )
-        )
-        original_exp_snapshot_model.put_for_bot()
-
-        output = self._run_one_off_job()
-        self.assertEqual(output, [['SUCCESS', 1]])
-
-        migrated_exp_snapshot_model = (
-            exp_models.ExplorationSnapshotMetadataModel.get('snap_id'))
-        self._compare_last_updated_fields(
-            original_exp_snapshot_model, migrated_exp_snapshot_model)
-
-    def test_migrate_multiple_models_is_successful(self):
-        original_exp_snapshot_model = (
-            exp_models.ExplorationSnapshotMetadataModel(
-                id='snap_id',
-                committer_id='user_id',
-                commit_type='create'
-            )
-        )
-        original_exp_snapshot_model.put_for_bot()
-        original_exp_commit_model = (
-            exp_models.ExplorationCommitLogEntryModel(
-                id='commit_id',
-                user_id='user_id',
-                commit_type='create',
-                commit_cmds={},
-                exploration_id='exp_id',
-                post_commit_status='private'
-            )
-        )
-        original_exp_commit_model.put_for_bot()
-
-        output = self._run_one_off_job()
-        self.assertEqual(output, [['SUCCESS', 2]])
-
-        migrated_exp_snapshot_model = (
-            exp_models.ExplorationSnapshotMetadataModel.get('snap_id'))
-        migrated_exp_commit_model = (
-            exp_models.ExplorationCommitLogEntryModel.get('commit_id'))
-        self._compare_last_updated_fields(
-            original_exp_snapshot_model, migrated_exp_snapshot_model)
-        self._compare_last_updated_fields(
-            original_exp_commit_model, migrated_exp_commit_model)

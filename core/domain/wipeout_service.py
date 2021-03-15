@@ -121,6 +121,8 @@ def save_pending_deletion_requests(pending_deletion_requests):
             )
         final_pending_deletion_request_models.append(deletion_request_model)
 
+    user_models.PendingDeletionRequestModel.update_timestamps_multi(
+        final_pending_deletion_request_models)
     user_models.PendingDeletionRequestModel.put_multi(
         final_pending_deletion_request_models)
 
@@ -659,9 +661,9 @@ def _pseudonymize_config_models(pending_deletion_request):
             if isinstance(model, snapshot_model_classes)]
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_id
+            metadata_model.update_timestamps()
 
-        base_models.BaseHumanMaintainedModel.put_multi_for_human(
-            metadata_models)
+        datastore_services.put_multi(metadata_models)
 
     config_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -742,14 +744,15 @@ def _pseudonymize_activity_models_without_associated_rights_models(
             if isinstance(model, snapshot_model_class)]
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_id
+            metadata_model.update_timestamps()
 
         commit_log_models = [
             model for model in activity_related_models
             if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
-        base_models.BaseHumanMaintainedModel.put_multi_for_human(
-            metadata_models + commit_log_models)
+            commit_log_model.update_timestamps()
+        datastore_services.put_multi(metadata_models + commit_log_models)
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -845,6 +848,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         for snapshot_metadata_model in snapshot_metadata_models:
             if user_id == snapshot_metadata_model.committer_id:
                 snapshot_metadata_model.committer_id = pseudonymized_id
+            snapshot_metadata_model.update_timestamps()
 
         rights_snapshot_metadata_models = [
             model for model in activity_related_models
@@ -894,6 +898,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             ]
             if user_id == rights_snapshot_metadata_model.committer_id:
                 rights_snapshot_metadata_model.committer_id = pseudonymized_id
+            rights_snapshot_metadata_model.update_timestamps()
 
         rights_snapshot_content_models = [
             model for model in activity_related_models
@@ -906,17 +911,19 @@ def _pseudonymize_activity_models_with_associated_rights_models(
                     for field_id in model_dict[field_name]
                 ]
             rights_snapshot_content_model.content = model_dict
+            rights_snapshot_content_model.update_timestamps()
 
         commit_log_models = [
             model for model in activity_related_models
             if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
+            commit_log_model.update_timestamps()
 
-        datastore_services.put_multi(rights_snapshot_content_models)
-        base_models.BaseHumanMaintainedModel.put_multi_for_human(
+        datastore_services.put_multi(
             snapshot_metadata_models +
             rights_snapshot_metadata_models +
+            rights_snapshot_content_models +
             commit_log_models)
 
     activity_ids_to_pids = (
@@ -991,6 +998,7 @@ def _remove_user_id_from_contributors_in_summary_models(
             if user_id in summary_model.contributors_summary:
                 del summary_model.contributors_summary[user_id]
 
+        summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)
 
     for i in python_utils.RANGE(
@@ -1066,12 +1074,14 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             if feedback_thread_model.last_nonempty_message_author_id == user_id:
                 feedback_thread_model.last_nonempty_message_author_id = (
                     pseudonymized_id)
+            feedback_thread_model.update_timestamps()
 
         feedback_message_models = [
             model for model in feedback_related_models
             if isinstance(model, feedback_message_model_class)]
         for feedback_message_model in feedback_message_models:
             feedback_message_model.author_id = pseudonymized_id
+            feedback_message_model.update_timestamps()
 
         general_suggestion_models = [
             model for model in feedback_related_models
@@ -1081,8 +1091,9 @@ def _pseudonymize_feedback_models(pending_deletion_request):
                 general_suggestion_model.author_id = pseudonymized_id
             if general_suggestion_model.final_reviewer_id == user_id:
                 general_suggestion_model.final_reviewer_id = pseudonymized_id
+            general_suggestion_model.update_timestamps()
 
-        base_models.BaseHumanMaintainedModel.put_multi_for_human(
+        datastore_services.put_multi(
             feedback_thread_models +
             feedback_message_models +
             general_suggestion_models)
@@ -1153,6 +1164,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
                 voiceover_application_model.final_reviewer_id = (
                     suggestion_ids_to_pids[voiceover_application_model.id]
                 )
+        voiceover_application_class.update_timestamps_multi(
+            voiceover_application_models)
         voiceover_application_class.put_multi(voiceover_application_models)
 
     suggestion_ids_to_pids = (

@@ -49,14 +49,10 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.AddMissingCommitLogsOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
-    (
-        activity_jobs_one_off
-        .BaseHumanMaintainedModelsFillLastHumanUpdatedOneOffJob),
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
-    activity_jobs_one_off.ExplorationModelsFillLastHumanUpdatedOneOffJob,
     auth_jobs_one_off.AuditFirebaseImportReadinessOneOffJob,
     auth_jobs_one_off.PopulateFirebaseAccountsOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
@@ -75,6 +71,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExpSnapshotsMigrationJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
+    exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.XmlnsAttributeInExplorationMathSvgImagesAuditJob,
@@ -147,6 +144,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DiscardOldDraftsOneOffJob,
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
+    user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
+    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

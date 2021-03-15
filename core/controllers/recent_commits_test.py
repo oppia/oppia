@@ -52,9 +52,12 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         commit1.exploration_id = 'exp_1'
         commit2.exploration_id = 'exp_1'
         commit3.exploration_id = 'exp_2'
-        commit1.put_depending_on_id(self.committer_1_id)
-        commit2.put_depending_on_id(self.committer_2_id)
-        commit3.put_depending_on_id(self.committer_1_id)
+        commit1.update_timestamps()
+        commit1.put()
+        commit2.update_timestamps()
+        commit2.put()
+        commit3.update_timestamps()
+        commit3.put()
 
     def test_get_recent_commits(self):
         """Test that this method should return all nonprivate commits."""
@@ -105,7 +108,8 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 entity_id, 0, self.committer_2_id, 'create', 'created commit',
                 [], 'public', True)
             commit_i.exploration_id = exp_id
-            commit_i.put_depending_on_id(self.committer_2_id)
+            commit_i.update_timestamps()
+            commit_i.put()
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'all_non_private_commits'})

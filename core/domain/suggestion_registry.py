@@ -59,8 +59,8 @@ class BaseSuggestion(python_utils.OBJECT):
         change: Change. The details of the suggestion. This should be an
             object of type ExplorationChange, TopicChange, etc.
         score_category: str. The scoring category for the suggestion.
-        last_updated_by_human: datetime.datetime. Date and time when
-            the suggestion was last updated by human.
+        last_updated: datetime.datetime. Date and time when the suggestion
+            was last updated.
         language_code: str|None. The ISO 639-1 code used to query suggestions
             by language, or None if the suggestion type is not queryable by
             language.
@@ -89,8 +89,7 @@ class BaseSuggestion(python_utils.OBJECT):
             'change': self.change.to_dict(),
             'score_category': self.score_category,
             'language_code': self.language_code,
-            'last_updated_by_human': utils.get_time_in_millisecs(
-                self.last_updated_by_human)
+            'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
 
     def get_score_type(self):
@@ -340,7 +339,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, language_code, last_updated_by_human=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -356,7 +355,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.language_code = language_code
-        self.last_updated_by_human = last_updated_by_human
+        self.last_updated = last_updated
         # Currently, we don't allow adding images in the "edit state content"
         # suggestion, so the image_context is None.
         self.image_context = None
@@ -526,7 +525,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, language_code, last_updated_by_human=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -542,7 +541,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.language_code = language_code
-        self.last_updated_by_human = last_updated_by_human
+        self.last_updated = last_updated
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
     def validate(self):
@@ -663,8 +662,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             the suggestion.
         change_cmd: QuestionChange. The change associated with the suggestion.
         score_category: str. The scoring category for the suggestion.
-        last_updated_by_human: datetime.datetime. Date and time when
-            the suggestion was last updated.
+        last_updated: datetime.datetime. Date and time when the suggestion
+            was last updated.
         language_code: str. The ISO 639-1 code used to query suggestions
             by language. In this case it is the language code of the question.
     """
@@ -672,7 +671,7 @@ class SuggestionAddQuestion(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, language_code, last_updated_by_human=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -686,7 +685,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.change = question_domain.QuestionSuggestionChange(change)
         self.score_category = score_category
         self.language_code = language_code
-        self.last_updated_by_human = last_updated_by_human
+        self.last_updated = last_updated
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
 

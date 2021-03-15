@@ -382,7 +382,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
@@ -392,7 +393,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
@@ -403,7 +405,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of SubtopicPageSnapshotMetadataModel\', '
@@ -473,7 +476,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='0-1-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.update_timestamps()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for subtopic page model '
@@ -492,7 +496,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             'cmd': 'create_new',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd create_new '
@@ -614,6 +619,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -667,6 +673,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             subtopic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -792,7 +799,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_model_with_user_id_migration_bot(self):
         self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]'
@@ -802,7 +810,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_model_with_pseudo_user_id(self):
         self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]'
@@ -813,7 +822,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of SubtopicPageCommitLogEntryModel\', '
@@ -866,7 +876,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 '0-1', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.subtopic_page_id = '0-1'
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.update_timestamps()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for subtopic page model '
@@ -890,7 +901,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.subtopic_page_id = '0-1'
-        model_with_invalid_id.put_for_human()
+        model_with_invalid_id.update_timestamps()
+        model_with_invalid_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for model id check of '
@@ -907,7 +919,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
@@ -920,7 +933,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
@@ -934,7 +948,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'public'
         self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
 
         expected_output = [
             (
@@ -950,7 +965,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'private'
         self.model_instance_0.post_commit_is_private = False
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
 
         expected_output = [
             (
@@ -968,7 +984,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             'cmd': 'create_new',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd create_new '

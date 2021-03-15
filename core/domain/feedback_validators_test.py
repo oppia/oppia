@@ -82,7 +82,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 self.thread_id))
         self.model_instance.has_suggestion = True
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -96,7 +97,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_pseudo_original_author_id(self):
         self.model_instance.original_author_id = self.PSEUDONYMOUS_ID
-        self.model_instance.put_for_bot()
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
 
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackThreadModel\', 1]']
@@ -106,7 +108,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_pseudo_last_nonempty_message_author_id(self):
         self.model_instance.last_nonempty_message_author_id = (
             self.PSEUDONYMOUS_ID)
-        self.model_instance.put_for_bot()
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
 
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackThreadModel\', 1]']
@@ -116,7 +119,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of GeneralFeedbackThreadModel\', '
@@ -199,7 +203,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_wrong_original_author_id_format_failure(self):
         self.model_instance.original_author_id = 'wrong_id'
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for invalid ids in field of '
@@ -212,7 +217,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_wrong_last_nonempty_message_author_id_format_failure(self):
         self.model_instance.last_nonempty_message_author_id = 'wrong_id'
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for invalid ids in field of '
@@ -240,7 +246,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_has_suggestion(self):
         self.model_instance.has_suggestion = False
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for has suggestion '
@@ -299,7 +306,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_pseudo_author_id(self):
         self.model_instance.author_id = self.PSEUDONYMOUS_ID
-        self.model_instance.put_for_bot()
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
 
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackMessageModel\', 1]']
@@ -309,7 +317,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of GeneralFeedbackMessageModel\', '
@@ -352,7 +361,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_wrong_author_id_format_failure(self):
         self.model_instance.author_id = 'wrong_id'
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for invalid ids in field of '
@@ -379,7 +389,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_invalid_message_id(self):
         self.model_instance.message_id = 2
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for message id check of '
@@ -433,6 +444,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -505,6 +517,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
         exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance = feedback_models.FeedbackAnalyticsModel(id='0')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -519,6 +532,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -590,6 +604,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             id=self.owner_id,
             feedback_message_references=feedback_message_references,
             retries=1)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.job_class = (
@@ -604,6 +619,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -661,6 +677,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_message_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('message_id')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -675,6 +692,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_thread_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('thread_id')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -689,6 +707,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_entity_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('entity_id')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -703,6 +722,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_entity_type_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('entity_type')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -719,6 +739,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_entity_type_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0]['entity_type'] = (
             'invalid')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -734,6 +755,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_invalid_entity_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0]['entity_id'] = (
             'invalid')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (

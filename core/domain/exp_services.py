@@ -814,6 +814,8 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     for model in subscription_models:
         model.exploration_ids = [
             id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
+    user_models.UserSubscriptionsModel.update_timestamps_multi(
+        subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
@@ -1125,10 +1127,12 @@ def save_exploration_summary(exp_summary):
     exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
     if exp_summary_model is not None:
         exp_summary_model.populate(**exp_summary_dict)
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
     else:
         exp_summary_dict['id'] = exp_summary.id
         model = exp_models.ExpSummaryModel(**exp_summary_dict)
+        model.update_timestamps()
         model.put()
 
     # The index should be updated after saving the exploration
@@ -1662,6 +1666,7 @@ def create_or_update_draft(
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
     exp_user_data.draft_change_list_id = draft_change_list_id
+    exp_user_data.update_timestamps()
     exp_user_data.put()
 
 
@@ -1736,6 +1741,7 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list = None
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.update_timestamps()
         exp_user_data.put()
 
 

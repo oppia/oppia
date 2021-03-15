@@ -267,6 +267,7 @@ class QuestionSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         item.content['question_state_data'] = versioned_question_state['state']
         item.content['question_state_data_schema_version'] = (
             current_state_schema_version)
+        item.update_timestamps(update_last_updated_time=False)
         item.put()
 
         yield ('SUCCESS - Model saved', 1)

@@ -479,6 +479,7 @@ def record_played_exploration_in_collection_context(
 
     if exploration_id not in progress_model.completed_explorations:
         progress_model.completed_explorations.append(exploration_id)
+        progress_model.update_timestamps()
         progress_model.put()
 
 
@@ -1114,11 +1115,14 @@ def save_collection_summary(collection_summary):
             collection_summary.id))
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.update_timestamps()
+        collection_summary_model.put()
     else:
         collection_summary_dict['id'] = collection_summary.id
-        collection_summary_model = collection_models.CollectionSummaryModel(
+        model = collection_models.CollectionSummaryModel(
             **collection_summary_dict)
-    collection_summary_model.put()
+        model.update_timestamps()
+        model.put()
 
 
 def delete_collection_summaries(collection_ids):

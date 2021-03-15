@@ -149,7 +149,7 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
         more)
 
 
-def put_tasks(tasks):
+def put_tasks(tasks, update_last_updated_time=True):
     """Puts each of the given tasks into storage if necessary, conditionally
     updating their last updated time.
 
@@ -159,6 +159,8 @@ def put_tasks(tasks):
     Args:
         tasks: list(improvements_domain.TaskEntry). Domain objects for each task
             being placed into storage.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the task models.
     """
     task_models = improvements_models.TaskEntryModel.get_multi(
         [t.task_id for t in tasks])
@@ -181,6 +183,8 @@ def put_tasks(tasks):
                     resolved_on=task.resolved_on))
         elif apply_changes_to_model(task, model):
             models_to_put.append(model)
+    improvements_models.TaskEntryModel.update_timestamps_multi(
+        models_to_put, update_last_updated_time=update_last_updated_time)
     improvements_models.TaskEntryModel.put_multi(models_to_put)
 
 

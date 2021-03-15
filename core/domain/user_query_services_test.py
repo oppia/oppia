@@ -45,6 +45,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             submitter_id=self.admin_user_id,
             query_status=feconf.USER_QUERY_STATUS_ARCHIVED,
         )
+        self.user_query_model_1.update_timestamps()
         self.user_query_model_1.put()
 
         self.user_query_model_2 = user_models.UserQueryModel(
@@ -54,6 +55,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             query_status=feconf.USER_QUERY_STATUS_ARCHIVED,
             user_ids=[self.new_user_id]
         )
+        self.user_query_model_2.update_timestamps()
         self.user_query_model_2.put()
 
     def test_get_user_query_returns_user_query(self):

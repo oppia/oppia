@@ -145,6 +145,7 @@ def mark_user_for_deletion(user_id):
 
     if assoc_by_user_id_model is not None:
         assoc_by_user_id_model.deleted = True
+        assoc_by_user_id_model.update_timestamps()
         assoc_by_user_id_model.put()
 
     assoc_by_auth_id_model = (
@@ -155,6 +156,7 @@ def mark_user_for_deletion(user_id):
 
     if assoc_by_auth_id_model is not None:
         assoc_by_auth_id_model.deleted = True
+        assoc_by_auth_id_model.update_timestamps()
         assoc_by_auth_id_model.put()
 
     try:
@@ -311,6 +313,7 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
     # doesn't exist because get_auth_id_from_user_id returned None.
     assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id))
+    assoc_by_auth_id_model.update_timestamps()
     assoc_by_auth_id_model.put()
 
     # The {user_id: auth_id} mapping needs to be created, but the model used to
@@ -325,6 +328,7 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
             assoc_by_user_id_model.firebase_auth_id is None):
         assoc_by_user_id_model = auth_models.UserAuthDetailsModel(
             id=user_id, firebase_auth_id=auth_id)
+        assoc_by_user_id_model.update_timestamps()
         assoc_by_user_id_model.put()
 
 
@@ -365,6 +369,8 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
+    auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(
+        assoc_by_auth_id_models)
     auth_models.UserIdByFirebaseAuthIdModel.put_multi(assoc_by_auth_id_models)
 
     # The {user_id: auth_id} mapping needs to be created, but the model used to
@@ -382,6 +388,8 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
             assoc_by_user_id_model.firebase_auth_id is None)
     ]
     if assoc_by_user_id_models:
+        auth_models.UserAuthDetailsModel.update_timestamps_multi(
+            assoc_by_user_id_models)
         auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
 
 

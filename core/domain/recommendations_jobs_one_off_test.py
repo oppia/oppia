@@ -252,6 +252,7 @@ class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
                 '0'))
         recommendation_model.deleted = True
+        recommendation_model.update_timestamps()
         recommendation_model.put()
 
         exp_models.ExplorationModel.get_by_id('0').delete(
