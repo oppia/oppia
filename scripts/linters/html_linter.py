@@ -21,8 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import html.parser
 import os
-import subprocess
 import re
+import subprocess
 
 import python_utils
 
