@@ -157,7 +157,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance.put_for_bot()
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
 
         expected_output = [
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 2]']
@@ -166,7 +167,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance.put_for_bot()
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
 
         expected_output = [
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 2]']
@@ -176,7 +178,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for time field relation check '
@@ -245,7 +248,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 id='config_model-3', committer_id=self.admin_id,
                 commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.update_timestamps()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for config property model '
@@ -264,7 +268,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             'cmd': 'change_property_value',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -319,6 +324,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -374,6 +380,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             config_models.ConfigPropertySnapshotContentModel(
                 id='config_model-3'))
         model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -517,7 +524,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance.put_for_bot()
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
 
         expected_output = [
             u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 1]']
@@ -526,7 +534,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance.put_for_bot()
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
 
         expected_output = [
             u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 1]']
@@ -536,7 +545,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for time field relation check '
@@ -603,7 +613,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 id='%s-3' % self.parameter_model.id, committer_id=self.admin_id,
                 commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.update_timestamps()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for platform parameter model '
@@ -622,7 +633,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
             'cmd': 'edit_rules',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance.put_for_human()
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd edit_rules check '
@@ -679,6 +691,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
             (
@@ -731,6 +744,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             config_models.PlatformParameterSnapshotContentModel(
                 id='%s-3' % (self.parameter_model.id)))
         model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
