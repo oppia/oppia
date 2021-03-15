@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -40,7 +39,7 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.save_new_story(self.story_id, self.admin_id, self.topic_id)
         self.save_new_topic(

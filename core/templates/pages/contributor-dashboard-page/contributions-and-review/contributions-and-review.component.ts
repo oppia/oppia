@@ -16,6 +16,8 @@
  * @fileoverview Directive for showing and reviewing contributions.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
+
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
@@ -71,7 +73,7 @@ angular.module('oppia').component('contributionsAndReview', {
           color: '#8ed274'
         },
         rejected: {
-          text: 'Rejected',
+          text: 'Revisions Requested',
           color: '#e76c8c'
         }
       };
@@ -184,6 +186,9 @@ angular.module('oppia').component('contributionsAndReview', {
           backdrop: 'static',
           size: 'lg',
           resolve: {
+            suggestion: function() {
+              return cloneDeep(suggestion);
+            },
             authorName: function() {
               return authorName;
             },
@@ -231,20 +236,26 @@ angular.module('oppia').component('contributionsAndReview', {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
-
+        var details = ctrl.contributions[initialSuggestionId].details;
+        var subheading = (
+          details.topic_name + ' / ' + details.story_title +
+          ' / ' + details.chapter_title);
         $uibModal.open({
           templateUrl: _templateUrl,
           backdrop: 'static',
           size: 'lg',
           resolve: {
             suggestionIdToSuggestion: function() {
-              return angular.copy(suggestionIdToSuggestion);
+              return cloneDeep(suggestionIdToSuggestion);
             },
             initialSuggestionId: function() {
               return initialSuggestionId;
             },
             reviewable: function() {
               return reviewable;
+            },
+            subheading: function() {
+              return subheading;
             }
           },
           controller: 'TranslationSuggestionReviewModalController'

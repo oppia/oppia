@@ -113,25 +113,6 @@ describe('Full exploration editor', function() {
     await libraryPage.get();
     await libraryPage.clickExplorationObjective();
     await explorationPlayerPage.reportExploration();
-  });
-
-  it('should let learners suggest changes to an exploration', async function() {
-    await users.createUser(
-      'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
-    await users.login('creator2@editorAndPlayer.com');
-    await workflow.createAndPublishExploration(
-      'Adding Fractions', 'Mathematics', 'Let us learn how to add fractions',
-      'English');
-    await users.logout();
-
-    await users.createUser('learner2@editorAndPlayer.com', 'learner2');
-    await users.login('learner2@editorAndPlayer.com');
-    await libraryPage.get();
-    await libraryPage.findExploration('Adding Fractions');
-    await libraryPage.playExploration('Adding Fractions');
-    await explorationPlayerPage.clickSuggestChangesButton();
-    await explorationPlayerPage.fillAndSubmitSuggestion(
-      'Lets test the suggestion feature', 'Oh wow, It works!');
     await users.logout();
   });
 
