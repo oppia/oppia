@@ -28,7 +28,6 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 @Component({
   selector: 'admin-dev-mode-activities-tab',
   templateUrl: './admin-dev-mode-activities-tab.component.html',
-  styleUrls: []
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();

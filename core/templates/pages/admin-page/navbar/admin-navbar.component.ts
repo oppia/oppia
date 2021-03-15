@@ -29,7 +29,6 @@ import { AppConstants } from 'app.constants';
 @Component({
   selector: 'admin-navbar',
   templateUrl: './admin-navbar.component.html',
-  styleUrls: []
 })
 export class AdminNavbarComponent implements OnInit {
   profilePictureDataUrl: string = '';
