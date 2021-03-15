@@ -100,7 +100,9 @@ angular.module('oppia').component('translationOpportunities', {
           },
           controller: 'TranslationModalController'
         }).result.then(function() {
+          document.body.style.cursor = '';
         }, function() {
+          document.body.style.cursor = '';
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
