@@ -166,6 +166,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             algorithm_version=algorithm_version
         )
 
+        training_job_instance.update_timestamps()
         training_job_instance.put()
         return instance_id
 
@@ -219,6 +220,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
             job_models.append(training_job_instance)
             job_ids.append(instance_id)
+        cls.update_timestamps_multi(job_models)
         cls.put_multi(job_models)
         return job_ids
 
@@ -355,6 +357,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
                 state_name=state_name,
                 algorithm_ids_to_job_ids=algorithm_ids_to_job_ids)
 
+            mapping_instance.update_timestamps()
             mapping_instance.put()
             return instance_id
         raise Exception('A model with the same ID already exists.')
@@ -387,5 +390,6 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
             mapping_models.append(mapping_instance)
             mapping_ids.append(instance_id)
+        cls.update_timestamps_multi(mapping_models)
         cls.put_multi(mapping_models)
         return mapping_ids

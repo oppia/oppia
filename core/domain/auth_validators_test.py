@@ -144,12 +144,14 @@ class UserAuthDetailsModelValidatorTests(AuthValidatorTestBase):
             self.create_user_auth_models(feconf.GAE_AUTH_PROVIDER_ID))
         gae_auth_model.created_on = (
             gae_auth_model.last_updated + datetime.timedelta(days=1))
+        gae_auth_model.update_timestamps()
         gae_auth_model.put()
 
         firebase_auth_model = (
             self.create_user_auth_models(feconf.FIREBASE_AUTH_PROVIDER_ID))
         firebase_auth_model.created_on = (
             firebase_auth_model.last_updated + datetime.timedelta(days=1))
+        firebase_auth_model.update_timestamps()
         firebase_auth_model.put()
 
         output = self.run_job_and_get_output(
@@ -305,6 +307,7 @@ class UserIdentifiersModelValidatorTests(AuthValidatorTestBase):
     def test_audit_with_created_on_greater_than_last_updated_fails(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.assertItemsEqual(self.run_job_and_get_output(), [
@@ -403,6 +406,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(AuthValidatorTestBase):
     def test_audit_with_created_on_greater_than_last_updated_fails(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         self.assertItemsEqual(self.run_job_and_get_output(), [
@@ -418,6 +422,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(AuthValidatorTestBase):
     def test_audit_with_last_updated_greater_than_current_time_fails(self):
         utcnow = datetime.datetime.utcnow()
         self.model_instance.last_updated = utcnow
+        self.model_instance.update_timestamps(update_last_updated_time=False)
         self.model_instance.put()
         mocked_datetime = utcnow - datetime.timedelta(hours=13)
 
