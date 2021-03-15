@@ -29,14 +29,18 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.platform.auth import firebase_auth_services_test
+from core.platform.auth import gae_auth_services
 from core.tests import test_utils
 import feconf
 import python_utils
 
 import contextlib2
+import firebase_admin.auth
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
@@ -46,7 +50,6 @@ class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
 
     def setUp(self):
         super(FirebaseOneOffJobTestBase, self).setUp()
-        self._auth_id_generator = itertools.count()
         self.exit_stack = contextlib2.ExitStack()
         self.firebase_sdk_stub = (
             firebase_auth_services_test.FirebaseAdminSdkStub())
@@ -69,15 +72,169 @@ class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
         Returns:
             *. The output of the one off job.
         """
-        job_id = auth_jobs.PopulateFirebaseAccountsOneOffJob.create_new()
+        job_id = self.JOB_CLASS.create_new()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
-        auth_jobs.PopulateFirebaseAccountsOneOffJob.enqueue(job_id)
+        self.JOB_CLASS.enqueue(job_id)
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
         return sorted(
-            ast.literal_eval(o) for o in
-            auth_jobs.PopulateFirebaseAccountsOneOffJob.get_output(job_id))
+            ast.literal_eval(o) for o in self.JOB_CLASS.get_output(job_id))
+
+    def create_user_auth_models(
+            self, user_id, email=None, firebase_auth_id=None, gae_id=None,
+            deleted=False):
+        """Adds the minimum model set necessary for a user account.
+
+        Args:
+            user_id: str. The Oppia ID of the user.
+            email: str|None. The email address of the user. If None, one will be
+                generated.
+            firebase_auth_id: str|None. The Firebase account ID of the user. If
+                None, no Firebase-related models will be created.
+            gae_id: str|None. The GAE ID of the user. If None, no GAE-related
+                models will be created.
+            deleted: bool. Value for the deleted property of the models.
+        """
+        if email is None:
+            email = '%s@example.com' % user_id
+
+        models_to_put = [
+            user_models.UserSettingsModel(id=user_id, email=email),
+            auth_models.UserAuthDetailsModel(
+                id=user_id, firebase_auth_id=firebase_auth_id, gae_id=gae_id,
+                deleted=deleted),
+        ]
+        if firebase_auth_id is not None:
+            models_to_put.append(
+                auth_models.UserIdByFirebaseAuthIdModel(
+                    id=firebase_auth_id, user_id=user_id,
+                    deleted=deleted))
+        if gae_id is not None:
+            models_to_put.append(
+                auth_models.UserIdentifiersModel(
+                    id=gae_id, user_id=user_id, deleted=deleted))
+
+        datastore_services.put_multi(models_to_put)
+
+    def assert_firebase_assoc_exists(self, firebase_auth_id, user_id):
+        """Asserts that the given user's Firebase association exists.
+
+        Args:
+            user_id: str. The Oppia ID of the user.
+            firebase_auth_id: str. The Firebase account ID of the user.
+        """
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id(user_id),
+            firebase_auth_id)
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id(firebase_auth_id),
+            user_id)
+
+    def assert_firebase_assoc_does_not_exist(self, firebase_auth_id, user_id):
+        """Asserts that the given user's Firebase association doesn't exist.
+
+        Args:
+            firebase_auth_id: str. The Firebase account ID of the user.
+            user_id: str. The Oppia ID of the user.
+        """
+        self.assertIsNone(
+            firebase_auth_services.get_auth_id_from_user_id(user_id))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id(firebase_auth_id))
+
+    def assert_firebase_assoc_exists_multi(self, assocs):
+        """Asserts that the given users' Firebase association exists.
+
+        Args:
+            assocs: list(AuthIdUserIdPair). The associations to check.
+        """
+        auth_ids, user_ids = (list(a) for a in python_utils.ZIP(*assocs))
+        self.assertEqual(
+            firebase_auth_services.get_multi_auth_ids_from_user_ids(user_ids),
+            auth_ids)
+        self.assertEqual(
+            firebase_auth_services.get_multi_user_ids_from_auth_ids(auth_ids),
+            user_ids)
+
+    def assert_firebase_assoc_does_not_exist_multi(self, assocs):
+        """Asserts that the given users' Firebase association doesn't exist.
+
+        Args:
+            assocs: list(AuthIdUserIdPair). The associations to check.
+        """
+        auth_ids, user_ids = (list(a) for a in python_utils.ZIP(*assocs))
+        self.assertEqual(
+            firebase_auth_services.get_multi_user_ids_from_auth_ids(auth_ids),
+            [None] * len(auth_ids))
+        self.assertEqual(
+            firebase_auth_services.get_multi_auth_ids_from_user_ids(user_ids),
+            [None] * len(user_ids))
+
+    def assert_gae_assoc_exists(self, gae_id, user_id):
+        """Asserts that the given user's GAE association exists.
+
+        Args:
+            user_id: str. The Oppia ID of the user.
+            gae_id: str. The GAE ID of the user.
+        """
+        self.assertEqual(
+            gae_auth_services.get_auth_id_from_user_id(user_id), gae_id)
+        self.assertEqual(
+            gae_auth_services.get_user_id_from_auth_id(gae_id), user_id)
+
+    def assert_gae_assoc_does_not_exist(self, gae_id, user_id):
+        """Asserts that the given user's GAE association doesn't exist.
+
+        Args:
+            user_id: str. The Oppia ID of the user.
+            gae_id: str. The GAE ID of the user.
+        """
+        self.assertIsNone(gae_auth_services.get_auth_id_from_user_id(user_id))
+        self.assertIsNone(gae_auth_services.get_user_id_from_auth_id(gae_id))
+
+    def assert_gae_assoc_exists_multi(self, assocs):
+        """Asserts that the given users' GAE association exists.
+
+        Args:
+            assocs: list(AuthIdUserIdPair). The associations to check.
+        """
+        auth_ids, user_ids = (list(a) for a in python_utils.ZIP(*assocs))
+        self.assertEqual(
+            gae_auth_services.get_multi_auth_ids_from_user_ids(user_ids),
+            auth_ids)
+        self.assertEqual(
+            gae_auth_services.get_multi_user_ids_from_auth_ids(auth_ids),
+            user_ids)
+
+    def assert_gae_assoc_does_not_exist_multi(self, assocs):
+        """Asserts that the given users' GAE association doesn't exist.
+
+        Args:
+            assocs: list(AuthIdUserIdPair). The associations to check.
+        """
+        auth_ids, user_ids = (list(a) for a in python_utils.ZIP(*assocs))
+        self.assertEqual(
+            gae_auth_services.get_multi_user_ids_from_auth_ids(auth_ids),
+            [None] * len(auth_ids))
+        self.assertEqual(
+            gae_auth_services.get_multi_auth_ids_from_user_ids(user_ids),
+            [None] * len(user_ids))
+
+
+class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
+
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
+    JOB_CLASS = auth_jobs.PopulateFirebaseAccountsOneOffJob
+
+    def setUp(self):
+        super(PopulateFirebaseAccountsOneOffJobTests, self).setUp()
+        self._auth_id_generator = itertools.count()
+        # Forces all users to produce the same hash value during unit tests to
+        # prevent them from being sharded and complicating the testing logic.
+        self.exit_stack.enter_context(self.swap_to_always_return(
+            auth_jobs, 'ID_HASHING_FUNCTION', value=1))
 
     def create_oppia_user(self, email=None, deleted=False):
         """Returns an (auth_id, user_id) pair for a new user.
@@ -112,70 +269,6 @@ class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
         """
         return [self.create_oppia_user() for _ in python_utils.RANGE(count)]
 
-    def assert_auth_mapping_exists(self, auth_assoc):
-        """Asserts that the given auth association exists.
-
-        Args:
-            auth_assoc: AuthIdUserIdPair. The association to check.
-        """
-        auth_id, user_id = auth_assoc
-        self.assertEqual(
-            firebase_auth_services.get_auth_id_from_user_id(user_id), auth_id)
-        self.assertEqual(
-            firebase_auth_services.get_user_id_from_auth_id(auth_id), user_id)
-
-    def assert_auth_mapping_does_not_exist(self, auth_assoc):
-        """Asserts that the given auth association does not exist.
-
-        Args:
-            auth_assoc: AuthIdUserIdPair. The association to check.
-        """
-        auth_id, user_id = auth_assoc
-        self.assertIsNone(
-            firebase_auth_services.get_auth_id_from_user_id(user_id))
-        self.assertIsNone(
-            firebase_auth_services.get_user_id_from_auth_id(auth_id))
-
-    def assert_multi_auth_mappings_exist(self, auth_assocs):
-        """Asserts that the given auth associations exist.
-
-        Args:
-            auth_assocs: list(AuthIdUserIdPair). The association to check.
-        """
-        auth_ids, user_ids = (list(a) for a in python_utils.ZIP(*auth_assocs))
-        self.assertEqual(
-            firebase_auth_services.get_multi_auth_ids_from_user_ids(user_ids),
-            auth_ids)
-        self.assertEqual(
-            firebase_auth_services.get_multi_user_ids_from_auth_ids(auth_ids),
-            user_ids)
-
-    def assert_multi_auth_mappings_do_not_exist(self, auth_assocs):
-        """Asserts that the given auth associations exist.
-
-        Args:
-            auth_assocs: list(AuthIdUserIdPair). The association to check.
-        """
-        auth_ids, user_ids = (list(a) for a in python_utils.ZIP(*auth_assocs))
-        self.assertEqual(
-            firebase_auth_services.get_multi_user_ids_from_auth_ids(auth_ids),
-            [None] * len(auth_ids))
-        self.assertEqual(
-            firebase_auth_services.get_multi_auth_ids_from_user_ids(user_ids),
-            [None] * len(user_ids))
-
-
-class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
-
-    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
-
-    def setUp(self):
-        super(PopulateFirebaseAccountsOneOffJobTests, self).setUp()
-        # Forces all users to produce the same hash value during unit tests to
-        # prevent them from being sharded and complicating the testing logic.
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            auth_jobs, 'ID_HASHING_FUNCTION', value=1))
-
     def test_successfully_imports_one_user(self):
         auth_assoc = self.create_oppia_user()
 
@@ -183,7 +276,7 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             ['SUCCESS: Created Firebase accounts', 1],
         ])
 
-        self.assert_auth_mapping_exists(auth_assoc)
+        self.assert_firebase_assoc_exists(*auth_assoc)
         self.firebase_sdk_stub.assert_is_user(auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -201,7 +294,7 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             ['SUCCESS: Created Firebase accounts', 11],
         ])
 
-        self.assert_multi_auth_mappings_exist(auth_assocs)
+        self.assert_firebase_assoc_exists_multi(auth_assocs)
         self.firebase_sdk_stub.assert_is_user_multi(
             [a.auth_id for a in auth_assocs])
 
@@ -227,14 +320,14 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
                  'Exception(u\'uh-oh!\',)'],
             ])
 
-        self.assert_auth_mapping_does_not_exist(auth_assoc)
+        self.assert_firebase_assoc_does_not_exist(*auth_assoc)
         self.firebase_sdk_stub.assert_is_not_user(auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['SUCCESS: Created Firebase accounts', 1],
         ])
 
-        self.assert_auth_mapping_exists(auth_assoc)
+        self.assert_firebase_assoc_exists(*auth_assoc)
         self.firebase_sdk_stub.assert_is_user(auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -259,11 +352,11 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             ])
 
         successful_assocs = auth_assocs[:3] + auth_assocs[6:]
-        self.assert_multi_auth_mappings_exist(successful_assocs)
+        self.assert_firebase_assoc_exists_multi(successful_assocs)
         self.firebase_sdk_stub.assert_is_user_multi(
             [a.auth_id for a in successful_assocs])
         failed_assocs = auth_assocs[3:6]
-        self.assert_multi_auth_mappings_do_not_exist(failed_assocs)
+        self.assert_firebase_assoc_does_not_exist_multi(failed_assocs)
         self.firebase_sdk_stub.assert_is_not_user_multi(
             [a.auth_id for a in failed_assocs])
 
@@ -272,7 +365,7 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             ['SUCCESS: Created Firebase accounts', 3],
         ])
 
-        self.assert_multi_auth_mappings_exist(auth_assocs)
+        self.assert_firebase_assoc_exists_multi(auth_assocs)
         self.firebase_sdk_stub.assert_is_user_multi(
             [a.auth_id for a in auth_assocs])
 
@@ -303,11 +396,11 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
 
         successful_assocs = (
             auth_assocs[0:1] + auth_assocs[2:5] + auth_assocs[6:9])
-        self.assert_multi_auth_mappings_exist(successful_assocs)
+        self.assert_firebase_assoc_exists_multi(successful_assocs)
         self.firebase_sdk_stub.assert_is_user_multi(
             [a.auth_id for a in successful_assocs])
         failed_assocs = [auth_assocs[1], auth_assocs[5], auth_assocs[9]]
-        self.assert_multi_auth_mappings_do_not_exist(failed_assocs)
+        self.assert_firebase_assoc_does_not_exist_multi(failed_assocs)
         self.firebase_sdk_stub.assert_is_not_user_multi(
             [a.auth_id for a in failed_assocs])
 
@@ -316,7 +409,7 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             ['SUCCESS: Created Firebase accounts', 3],
         ])
 
-        self.assert_multi_auth_mappings_exist(auth_assocs)
+        self.assert_firebase_assoc_exists_multi(auth_assocs)
         self.firebase_sdk_stub.assert_is_user_multi(
             [a.auth_id for a in auth_assocs])
 
@@ -332,12 +425,8 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             ['INFO: Super admin created', [auth_assoc.user_id]],
         ])
 
-        self.assert_auth_mapping_exists(auth_assoc)
-        self.firebase_sdk_stub.assert_is_user(auth_assoc.auth_id)
-
-        user = self.firebase_sdk_stub.get_user(auth_assoc.auth_id)
-        self.assertEqual(
-            user.custom_claims, {'role': feconf.FIREBASE_ROLE_SUPER_ADMIN})
+        self.assert_firebase_assoc_exists(*auth_assoc)
+        self.firebase_sdk_stub.assert_is_super_admin(auth_assoc.auth_id)
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['INFO: Pre-existing Firebase accounts', 1],
@@ -356,5 +445,160 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             ['INFO: SYSTEM_COMMITTER_ID skipped', [auth_assoc.user_id]],
         ])
 
-        self.assert_auth_mapping_does_not_exist(auth_assoc)
+        self.assert_firebase_assoc_does_not_exist(*auth_assoc)
         self.firebase_sdk_stub.assert_is_not_user(auth_assoc.auth_id)
+
+
+class SeedFirebaseOneOffJobTests(FirebaseOneOffJobTestBase):
+
+    JOB_CLASS = auth_jobs.SeedFirebaseOneOffJob
+
+    def run_one_off_job(self, include_seed_ack=False):
+        output = super(SeedFirebaseOneOffJobTests, self).run_one_off_job()
+        if include_seed_ack:
+            return output
+        return [o for o in output if o[0] != 'INFO: Found FirebaseSeedModel']
+
+    def put_firebase_seed_model(self):
+        """Creates the sole expected FirebaseSeedModel into storage."""
+        auth_models.FirebaseSeedModel(
+            id=auth_models.ONLY_FIREBASE_SEED_MODEL_ID).put()
+
+    def test_with_no_models(self):
+        self.assertItemsEqual(self.run_one_off_job(), [])
+
+    def test_wipes_firebase_auth_models_of_non_admin_user(self):
+        self.create_user_auth_models('uid_abc', firebase_auth_id='123')
+
+        self.assert_firebase_assoc_exists('123', 'uid_abc')
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['SUCCESS: UserAuthDetailsModel wiped', 1],
+            ['SUCCESS: UserIdByFirebaseAuthIdModel wiped', 1],
+        ])
+        self.assert_firebase_assoc_does_not_exist('123', 'uid_abc')
+
+    def test_ignores_users_without_firebase_auth_models(self):
+        self.create_user_auth_models('uid_abc', gae_id='123')
+
+        self.assert_gae_assoc_exists('123', 'uid_abc')
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['SUCCESS: UserAuthDetailsModel already wiped', 1],
+        ])
+        self.assert_gae_assoc_exists('123', 'uid_abc')
+
+    def test_acknowledges_admin_email_address_without_modifying_it(self):
+        self.create_user_auth_models(
+            'uid_abc', email=feconf.ADMIN_EMAIL_ADDRESS, firebase_auth_id='123')
+        self.firebase_sdk_stub.create_user(
+            '123', email=feconf.ADMIN_EMAIL_ADDRESS)
+
+        self.assert_firebase_assoc_exists('123', 'uid_abc')
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['INFO: Found feconf.ADMIN_EMAIL_ADDRESS in UserAuthDetailsModel',
+             ['user_id=uid_abc']],
+            ['INFO: Found feconf.ADMIN_EMAIL_ADDRESS in '
+             'UserIdByFirebaseAuthIdModel', ['user_id=uid_abc']],
+        ])
+
+        self.assert_firebase_assoc_exists('123', 'uid_abc')
+
+    def test_acknowledges_system_comitter_id_without_modifying_it(self):
+        self.create_user_auth_models(
+            'uid_abc', firebase_auth_id='123',
+            gae_id=feconf.SYSTEM_COMMITTER_ID, email=feconf.ADMIN_EMAIL_ADDRESS)
+        self.firebase_sdk_stub.create_user(
+            '123', email=feconf.ADMIN_EMAIL_ADDRESS)
+
+        self.assert_firebase_assoc_exists('123', 'uid_abc')
+        self.assert_gae_assoc_exists(feconf.SYSTEM_COMMITTER_ID, 'uid_abc')
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['INFO: Found feconf.SYSTEM_COMMITTER_ID in UserAuthDetailsModel',
+             ['user_id=uid_abc']],
+            ['INFO: Found feconf.SYSTEM_COMMITTER_ID in '
+             'UserIdByFirebaseAuthIdModel', ['user_id=uid_abc']],
+        ])
+
+        self.assert_firebase_assoc_exists('123', 'uid_abc')
+
+    def test_acknowledges_firebase_seed_model(self):
+        self.put_firebase_seed_model()
+
+        self.assertItemsEqual(self.run_one_off_job(include_seed_ack=True), [
+            ['INFO: Found FirebaseSeedModel', ['1']],
+        ])
+
+    def test_deletes_many_users(self):
+        self.put_firebase_seed_model()
+
+        self.exit_stack.enter_context(self.swap(
+            self.JOB_CLASS, 'MAX_USERS_FIREBASE_CAN_DELETE_PER_CALL', 3))
+
+        uids = ['aid_%d' % i for i in python_utils.RANGE(10)]
+        self.firebase_sdk_stub.import_users(
+            [firebase_admin.auth.ImportUserRecord(uid) for uid in uids])
+
+        self.firebase_sdk_stub.assert_is_user_multi(uids)
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['SUCCESS: Firebase accounts deleted', 10],
+        ])
+        self.firebase_sdk_stub.assert_is_not_user_multi(uids)
+
+    def test_acknowledges_firebase_super_admin(self):
+        self.put_firebase_seed_model()
+
+        self.firebase_sdk_stub.create_user(
+            '123', email=feconf.ADMIN_EMAIL_ADDRESS)
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['INFO: Found feconf.ADMIN_EMAIL_ADDRESS in Firebase account',
+             ['firebase_auth_id=123']],
+        ])
+
+    def test_reports_error_if_user_batch_failed(self):
+        self.put_firebase_seed_model()
+
+        uh_oh = Exception('uh-oh!')
+        unlucky = Exception('unlucky')
+        self.exit_stack.enter_context(
+            self.firebase_sdk_stub.mock_delete_users_error(
+                batch_error_pattern=[None, uh_oh, None, unlucky]))
+        self.exit_stack.enter_context(self.swap(
+            self.JOB_CLASS, 'MAX_USERS_FIREBASE_CAN_DELETE_PER_CALL', 3))
+
+        uids = ['aid_%d' % i for i in python_utils.RANGE(10)]
+        self.firebase_sdk_stub.import_users(
+            [firebase_admin.auth.ImportUserRecord(uid) for uid in uids])
+
+        self.firebase_sdk_stub.assert_is_user_multi(uids)
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['ERROR: Failed to delete a batch of Firebase accounts',
+             'count=4, reasons=[%r, %r]' % (uh_oh, unlucky)],
+            ['SUCCESS: Firebase accounts deleted', 6],
+        ])
+        self.firebase_sdk_stub.assert_is_not_user_multi(uids[:3] + uids[6:9])
+        self.firebase_sdk_stub.assert_is_user_multi(uids[3:6] + uids[9:])
+
+    def test_reports_error_if_individual_users_failed(self):
+        self.put_firebase_seed_model()
+
+        self.exit_stack.enter_context(
+            self.firebase_sdk_stub.mock_delete_users_error(
+                individual_error_pattern=[None, 'uh-oh!', None, None]))
+        self.exit_stack.enter_context(self.swap(
+            self.JOB_CLASS, 'MAX_USERS_FIREBASE_CAN_DELETE_PER_CALL', 3))
+
+        uids = ['aid_%d' % i for i in python_utils.RANGE(10)]
+        self.firebase_sdk_stub.import_users(
+            [firebase_admin.auth.ImportUserRecord(uid) for uid in uids])
+
+        self.firebase_sdk_stub.assert_is_user_multi(uids)
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['ERROR: Failed to delete an individual Firebase account',
+             ['firebase_auth_id=aid_1, reason=uh-oh!',
+              'firebase_auth_id=aid_5, reason=uh-oh!',
+              'firebase_auth_id=aid_9, reason=uh-oh!']
+            ],
+            ['SUCCESS: Firebase accounts deleted', 7],
+        ])

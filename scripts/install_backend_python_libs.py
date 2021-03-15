@@ -34,7 +34,7 @@ import pkg_resources
 GIT_REQUIREMENTS_PATTERN = (
     # NOTE: GitHub links must use commit hashes to declare dependencies. Commits
     # are SHA1 strings, which are 40-character hexadecimal strings.
-    re.compile(r'git\+git://github\.com/.*@([0-9a-f]{40})#egg=(.*)'))
+    re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)'))
 
 
 def normalize_python_library_name(library_name):
@@ -124,45 +124,36 @@ def _get_requirements_file_contents():
     'requirements.txt' file.
 
     Returns:
-        tuple(dict(str, str), dict(str, str)). Dictionaries with the normalized
-        name of the library as the key, and the version string of that library
-        as the value. The first dict contains normal pip dependencies, the
-        second contains GitHub dependencies.
+        dict(str, str). Dictionary with the normalized name of the library as
+        the key and the version string of that library as the value.
     """
-    pip_requirements = collections.defaultdict()
-    git_requirements = collections.defaultdict()
+    requirements_contents = collections.defaultdict()
     with python_utils.open_file(
         common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            trimmed_line = line.strip()
-            if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+        trimmed_lines = (line.strip() for line in f.readlines())
+        for line in trimmed_lines:
+            if not line or line.startswith('#'):
                 continue
-            elif trimmed_line.startswith('git'):
-                match = GIT_REQUIREMENTS_PATTERN.match(trimmed_line)
+
+            elif line.startswith('git'):
+                match = GIT_REQUIREMENTS_PATTERN.match(line)
                 if not match:
                     raise Exception(
                         'GitHub requirements must match regexp=%r' % (
                             GIT_REQUIREMENTS_PATTERN.pattern))
-                library_name, commit_id = match.group(2, 1)
-                normalized_library_name = (
-                    normalize_python_library_name(library_name))
-                # We need the entire line to install GitHub URLs.
-                git_requirements[normalized_library_name] = (
-                    commit_id, trimmed_line)
-                continue
-            library_name_and_version_string = trimmed_line.split(
-                ' ')[0].split('==')
+                library_name, version_string = match.group(2, 1)
+
+            else:
+                library_name, version_string = line.split(' ')[0].split('==')
+
             # Libraries with different case are considered equivalent libraries:
             # e.g 'Flask' is the same library as 'flask'. Therefore, we
             # normalize all library names in order to compare libraries without
             # ambiguities.
             normalized_library_name = (
-                normalize_python_library_name(
-                    library_name_and_version_string[0]))
-            version_str = library_name_and_version_string[1]
-            pip_requirements[normalized_library_name] = version_str
-    return pip_requirements, git_requirements
+                normalize_python_library_name(library_name))
+            requirements_contents[normalized_library_name] = version_string
+    return requirements_contents
 
 
 def _get_third_party_python_libs_directory_contents():
@@ -179,32 +170,30 @@ def _get_third_party_python_libs_directory_contents():
         pkg_resources.find_distributions(common.THIRD_PARTY_PYTHON_LIBS_DIR),
         predicate=lambda dist: dist.has_metadata('direct_url.json'))
 
-    git_packages = []
-    for d in direct_url_packages:
-        metadata = json.loads(d.get_metadata('direct_url.json'))
-        if metadata['vcs_info']['vcs'] == 'git':
-            git_packages.append(
-                (d.project_name, metadata['vcs_info']['commit_id']))
+    installed_packages = [
+        (pkg.project_name, pkg.version) for pkg in pip_packages
+    ]
 
-    pip_packages = [(d.project_name, d.version) for d in pip_packages]
+    for pkg in direct_url_packages:
+        metadata = json.loads(pkg.get_metadata('direct_url.json'))
+        version_string = '%s+%s@%s' % (
+            metadata['vcs_info']['vcs'], metadata['url'],
+            metadata['vcs_info']['commit_id'])
+        installed_packages.append((pkg.project_name, version_string))
 
     # Libraries with different case are considered equivalent libraries:
     # e.g 'Flask' is the same library as 'flask'. Therefore, we
     # normalize all library names in order to compare libraries without
     # ambiguities.
-    pip_directory_contents = {
-        normalize_python_library_name(library_name): version_str
-        for library_name, version_str in pip_packages
-    }
-    git_directory_contents = {
-        normalize_python_library_name(library_name): commit_id
-        for library_name, commit_id in git_packages
+    directory_contents = {
+        normalize_python_library_name(library_name): version_string
+        for library_name, version_string in installed_packages
     }
 
-    return pip_directory_contents, git_directory_contents
+    return directory_contents
 
 
-def _remove_metadata(library_name, version_str):
+def _remove_metadata(library_name, version_string):
     """Removes the residual metadata files pertaining to a specific library that
     was reinstalled with a new version. The reason we need this function is
     because `pip install --upgrade` upgrades libraries to a new version but
@@ -215,12 +204,12 @@ def _remove_metadata(library_name, version_str):
 
     Args:
         library_name: str. Name of the library to remove the metadata for.
-        version_str: str. Stringified version of the library to remove the
+        version_string: str. Stringified version of the library to remove the
             metadata for.
     """
     possible_normalized_directory_names = (
         _get_possible_normalized_metadata_directory_names(
-            library_name, version_str))
+            library_name, version_string))
     normalized_directory_names = [
         normalize_directory_name(name)
         for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
@@ -278,7 +267,7 @@ def _rectify_third_party_directory(mismatches):
     # removal of a library is to clean out the folder and reinstall everything
     # from scratch.
     if any(required is None and installed is not None
-            for required, installed in mismatches.values()):
+           for required, installed in mismatches.values()):
         if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
             shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         _reinstall_all_dependencies()
@@ -286,6 +275,14 @@ def _rectify_third_party_directory(mismatches):
 
     git_mismatches, pip_mismatches = (
         utils.partition(mismatches.items(), predicate=_is_git_mismatch))
+
+    for normalized_library_name, versions in git_mismatches:
+        requirements_version, directory_version = versions
+
+        # The library listed in 'requirements.txt' is not in the
+        # 'third_party/python_libs' directory.
+        if not directory_version or requirements_version != directory_version:
+            _install_git_url(requirements_version)
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
@@ -309,15 +306,6 @@ def _rectify_third_party_directory(mismatches):
                 normalized_library_name,
                 python_utils.convert_to_bytes(directory_version))
 
-    for normalized_library_name, versions in git_mismatches:
-        requirement_definition, installed_commit_id = versions
-
-        # The library listed in 'requirements.txt' is not in the
-        # 'third_party/python_libs' directory.
-        if (not installed_commit_id or
-                installed_commit_id not in requirement_definition):
-            _install_git_url(requirement_definition)
-
 
 def _is_git_mismatch(mismatch_item):
     """Returns whether the given mismatch item is for a GitHub URL."""
@@ -325,16 +313,16 @@ def _is_git_mismatch(mismatch_item):
     return required.startswith('git')
 
 
-def _install_library(library_name, version_str):
+def _install_library(library_name, version_string):
     """Installs a library with a certain version to the
     'third_party/python_libs' folder.
 
     Args:
         library_name: str. Name of the library to install.
-        version_str: str. Stringified version of the library to install.
+        version_string: str. Stringified version of the library to install.
     """
     pip_install(
-        _get_pip_versioned_package_string(library_name, version_str),
+        _get_pip_versioned_package_string(library_name, version_string),
         common.THIRD_PARTY_PYTHON_LIBS_DIR,
         upgrade=True,
         no_dependencies=True
@@ -364,7 +352,7 @@ def _reinstall_all_dependencies():
 
 
 def _get_possible_normalized_metadata_directory_names(
-        library_name, version_str):
+        library_name, version_string):
     """Returns possible normalized metadata directory names for python libraries
     installed using pip (following the guidelines of PEP-427 and PEP-376).
     This ensures that our _remove_metadata() function works as intended. More
@@ -375,7 +363,7 @@ def _get_possible_normalized_metadata_directory_names(
 
     Args:
         library_name: str. Name of the library.
-        version_str: str. Stringified version of the library.
+        version_string: str. Stringified version of the library.
 
     Returns:
         set(str). Set containing the possible normalized directory name strings
@@ -385,15 +373,15 @@ def _get_possible_normalized_metadata_directory_names(
     # underscores.
     return {
         normalize_directory_name(
-            '%s-%s.dist-info' % (library_name, version_str)),
+            '%s-%s.dist-info' % (library_name, version_string)),
         normalize_directory_name(
             '%s-%s.dist-info' % (
-                library_name.replace('-', '_'), version_str)),
+                library_name.replace('-', '_'), version_string)),
         normalize_directory_name(
-            '%s-%s.egg-info' % (library_name, version_str)),
+            '%s-%s.egg-info' % (library_name, version_string)),
         normalize_directory_name(
             '%s-%s.egg-info' % (
-                library_name.replace('-', '_'), version_str)),
+                library_name.replace('-', '_'), version_string)),
     }
 
 
@@ -517,17 +505,17 @@ def _pip_install_requirements(install_path, requirements_path):
     ])
 
 
-def _get_pip_versioned_package_string(library_name, version_str):
+def _get_pip_versioned_package_string(library_name, version_string):
     """Returns the standard 'library==version' string for the given values.
 
     Args:
         library_name: str. The normalized name of the library.
-        version_str: str. The version of the package as a string.
+        version_string: str. The version of the package as a string.
 
     Returns:
         str. The standard versioned library package name.
     """
-    return '%s==%s' % (library_name, version_str)
+    return '%s==%s' % (library_name, version_string)
 
 
 def get_mismatches():
@@ -557,51 +545,29 @@ def get_mismatches():
               flask: ('flask==1.0.1', '1.1.1')
             }
     """
-    pip_requirements, git_requirements = _get_requirements_file_contents()
-
-    pip_directory_contents, git_directory_contents = (
-        _get_third_party_python_libs_directory_contents())
+    requirements_contents = _get_requirements_file_contents()
+    directory_contents = _get_third_party_python_libs_directory_contents()
 
     mismatches = {}
-
-    # pip package mismatches.
-
-    for normalized_library_name in pip_requirements:
+    for normalized_library_name in requirements_contents:
         # Library exists in the directory and the requirements file.
-        if normalized_library_name in pip_directory_contents:
+        if normalized_library_name in directory_contents:
             # Library matches but version doesn't match.
-            if (pip_directory_contents[normalized_library_name] !=
-                    pip_requirements[normalized_library_name]):
+            if (directory_contents[normalized_library_name] !=
+                    requirements_contents[normalized_library_name]):
                 mismatches[normalized_library_name] = (
-                    pip_requirements[normalized_library_name],
-                    pip_directory_contents[normalized_library_name])
+                    requirements_contents[normalized_library_name],
+                    directory_contents[normalized_library_name])
         # Library exists in the requirements file but not in the directory.
         else:
             mismatches[normalized_library_name] = (
-                pip_requirements[normalized_library_name], None)
+                requirements_contents[normalized_library_name], None)
 
-    for normalized_library_name in pip_directory_contents:
+    for normalized_library_name in directory_contents:
         # Library exists in the directory but is not in the requirements file.
-        if normalized_library_name not in pip_requirements:
+        if normalized_library_name not in requirements_contents:
             mismatches[normalized_library_name] = (
-                None, pip_directory_contents[normalized_library_name])
-
-    # GitHub package mismatches.
-
-    for normalized_library_name in git_requirements:
-        definition, commit_id = git_requirements[normalized_library_name]
-
-        if normalized_library_name in git_directory_contents:
-            if git_directory_contents[normalized_library_name] != commit_id:
-                mismatches[normalized_library_name] = (
-                    definition, git_directory_contents[normalized_library_name])
-        else:
-            mismatches[normalized_library_name] = (definition, None)
-
-    for normalized_library_name in git_directory_contents:
-        if normalized_library_name not in git_requirements:
-            mismatches[normalized_library_name] = (
-                None, git_directory_contents[normalized_library_name])
+                None, directory_contents[normalized_library_name])
 
     return mismatches
 
@@ -617,8 +583,7 @@ def validate_metadata_directories():
             'third_party/python_libs' directory in the format that we expect
             (following the PEP-427 and PEP-376 python guidelines).
     """
-    pip_directory_contents, git_directory_contents = (
-        _get_third_party_python_libs_directory_contents())
+    directory_contents = _get_third_party_python_libs_directory_contents()
     # Each python metadata directory name contains a python library name that
     # does not have uniform case. This is because we cannot guarantee the
     # casing of the directory names generated and there are no options that we
@@ -634,12 +599,12 @@ def validate_metadata_directories():
         for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         if os.path.isdir(os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
     }
-    for normalized_library_name, version_str in pip_directory_contents.items():
+    for normalized_library_name, version_string in directory_contents.items():
         # Possible names of the metadata directory installed when <library_name>
         # is installed.
         possible_normalized_directory_names = (
             _get_possible_normalized_metadata_directory_names(
-                normalized_library_name, version_str))
+                normalized_library_name, version_string))
         # If any of the possible metadata directory names show up in the
         # directory, that is confirmation that <library_name> was installed
         # correctly with the correct metadata.

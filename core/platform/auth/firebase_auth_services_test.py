@@ -24,7 +24,6 @@ import datetime
 import itertools
 import json
 import logging
-import operator
 
 from core.domain import auth_domain
 from core.domain import user_services
@@ -38,6 +37,7 @@ import utils
 import contextlib2
 import firebase_admin
 from firebase_admin import exceptions as firebase_exceptions
+import mock
 import webapp2
 
 auth_models, user_models = (
@@ -84,6 +84,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         'get_user',
         'get_user_by_email',
         'import_users',
+        'list_users',
         'set_custom_user_claims',
         'update_user',
         'verify_id_token',
@@ -96,7 +97,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         'generate_password_reset_link',
         'generate_sign_in_with_email_link',
         'get_user_by_phone_number',
-        'list_users',
         'revoke_refresh_tokens',
     ]
 
@@ -173,7 +173,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         """
         if uid in self._users_by_uid:
             raise firebase_admin.auth.UidAlreadyExistsError(
-                'uid=%r already exists' % uid)
+                'uid=%r already exists' % uid, None, None)
         self._set_user_fragile(uid, email, disabled, None)
         return self._encode_user_claims(self.get_user(uid))
 
@@ -207,20 +207,29 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 deleted, even if they're not disabled. Defaults to False.
 
         Returns:
-            BatchDeleteAccountsResponse: Holds the errors encountered, if any.
+            BatchDeleteAccountsResponse. Holds the errors encountered, if any.
 
         Raises:
-            ValueError: If any of the identifiers are invalid or if more than
+            ValueError. If any of the identifiers are invalid or if more than
                 1000 identifiers are specified.
         """
         if len(uids) > 1000:
             raise ValueError('`uids` paramter must have <= 1000 entries.')
-        uids = set(uids)
-        self._users_by_uid = {
-            uid: user
-            for uid, user in self._users_by_uid.items() if uid not in uids
-        }
-        return firebase_admin.auth.BatchDeleteAccountsResponse()
+
+        if force_delete:
+            uids_to_delete = set(uids)
+            errors = []
+        else:
+            disabled_uids, enabled_uids = utils.partition(
+                uids, predicate=lambda uid: self._users_by_uid[uid].disabled,
+                enumerated=True)
+            uids_to_delete = {uid for _, uid in disabled_uids}
+            errors = [(i, 'uid=%r must be disabled first' % uid)
+                      for i, uid in enabled_uids]
+
+        for uid in uids_to_delete.intersection(self._users_by_uid):
+            del self._users_by_uid[uid]
+        return self._create_delete_users_result_fragile(errors)
 
     def get_user(self, uid):
         """Returns user with given ID if found, otherwise raises an error.
@@ -270,7 +279,55 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         for record in records:
             self._set_user_fragile(
                 record.uid, record.email, record.disabled, record.custom_claims)
-        return self._create_user_import_result_fragile(len(records), {})
+        return self._create_user_import_result_fragile(len(records), [])
+
+    def list_users(self, page_token=None, max_results=1000):
+        """Retrieves a page of user accounts from a Firebase project.
+
+        The `page_token` argument governs the starting point of the page. The
+        `max_results` argument governs the maximum number of user accounts that
+        may be included in the returned page. This function never returns None.
+        If there are no user accounts in the Firebase project, this returns an
+        empty page.
+
+        Args:
+            page_token: str|None. A non-empty page token string, which indicates
+                the starting point of the page (optional). Defaults to `None`,
+                which will retrieve the first page of users.
+            max_results: int|None. A positive integer indicating the maximum
+                number of users to include in the returned page (optional).
+                Defaults to 1000, which is also the maximum number allowed.
+
+        Returns:
+            ListUsersPage. A ListUsersPage instance.
+
+        Raises:
+            ValueError. If max_results or page_token are invalid.
+            FirebaseError. If an error occurs while retrieving the user
+                accounts.
+        """
+        if max_results > 1000:
+            raise ValueError('max_results=%r must be <= 1000' % max_results)
+
+        # NOTE: This is only sorted to make unit testing easier.
+        all_users = sorted(self._users_by_uid.values(), key=lambda u: u.uid)
+        page_list = [
+            [user for user in user_group if user is not None]
+            for user_group in utils.grouper(all_users, max_results)
+        ]
+
+        if not page_list:
+            return self._create_list_users_page_fragile([], 0)
+
+        try:
+            page_index = int(page_token) if page_token is not None else 0
+        except (ValueError, TypeError):
+            raise ValueError('page_token=%r is invalid' % page_token)
+
+        if 0 <= page_index < len(page_list):
+            return self._create_list_users_page_fragile(page_list, page_index)
+        else:
+            raise ValueError('page_token=%r is invalid' % page_token)
 
     def set_custom_user_claims(self, uid, custom_claims):
         """Updates the custom claims of the given user.
@@ -423,7 +480,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
     def mock_delete_users_error(
             self,
-            batch_error_pattern=(None,), individual_error_pattern=(False,)):
+            batch_error_pattern=(None,), individual_error_pattern=(None,)):
         """Returns a context in which `delete_users` fails according to the
         given patterns.
 
@@ -452,21 +509,21 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
         def mock_delete_users(uids, force_delete=False):
             """Mock function that fails according to the input patterns."""
-            if python_utils.NEXT(batch_error_pattern):
-                raise firebase_exceptions.DataLossError('Failed to connect')
+            error_to_raise = python_utils.NEXT(batch_error_pattern)
+            if error_to_raise is not None:
+                raise error_to_raise
 
-            uids_to_delete, error_indices = [], []
-            for i, (uid, error) in enumerate(
-                    python_utils.ZIP(uids, individual_error_pattern)):
-                if error:
-                    error_indices.append(i)
-                else:
-                    uids_to_delete.append(uid)
+            uids_to_delete, uids_to_fail = utils.partition(
+                python_utils.ZIP(uids, individual_error_pattern),
+                predicate=lambda uid_and_error: uid_and_error[1] is None,
+                enumerated=True)
 
-            if uids_to_delete:
-                self.delete_users(uids_to_delete, force_delete=force_delete)
+            uids_to_delete = [uid for _, (uid, _) in uids_to_delete]
+            errors = [(i, error) for i, (_, error) in uids_to_fail]
 
-            return self._create_delete_users_result_fragile(error_indices)
+            self.delete_users(uids_to_delete, force_delete=force_delete)
+
+            return self._create_delete_users_result_fragile(errors)
 
         return self._test.swap(
             firebase_admin.auth, 'delete_users', mock_delete_users)
@@ -507,19 +564,15 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             if error_to_raise is not None:
                 raise error_to_raise
 
-            records_to_fail, records_to_import = utils.partition(
-                python_utils.ZIP(individual_error_pattern, records),
-                predicate=(
-                    lambda error_record_pair: error_record_pair[0] is not None),
+            records_to_import, records_to_fail = utils.partition(
+                python_utils.ZIP(records, individual_error_pattern),
+                predicate=lambda record_and_error: record_and_error[1] is None,
                 enumerated=True)
 
-            errors = {i: reason for i, (reason, _) in records_to_fail}
-            records_to_import = [record for _, (_, record) in records_to_import]
+            self.import_users([record for _, (record, _) in records_to_import])
 
-            if records_to_import:
-                self.import_users(records_to_import)
-
-            return self._create_user_import_result_fragile(len(records), errors)
+            return self._create_user_import_result_fragile(
+                len(records), [(i, error) for i, (_, error) in records_to_fail])
 
         return self._test.swap(
             firebase_admin.auth, 'import_users', mock_import_users)
@@ -572,25 +625,55 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             'customAttributes': custom_claims,
         })
 
-    def _create_delete_users_result_fragile(self, error_indices):
+    def _create_list_users_page_fragile(self, page_list, page_index):
+        """Creates a new ListUsersPage mock.
+
+        FRAGILE! The mock is not from the real SDK, so it's vulnerable to
+        becoming out-of-sync with the interface of the real ListUsersPage.
+
+        Args:
+            page_list: list(list(UserRecord)). The pages of users.
+            page_index: int. The starting index of the page.
+
+        Returns:
+            Mock. A mock implementation of ListUsersPage.
+        """
+        page = mock.Mock()
+        if page_index < len(page_list):
+            page.users = page_list[page_index]
+            page.has_next_page = (page_index + 1) < len(page_list)
+            page.next_page_token = (
+                '' if not page.has_next_page else
+                python_utils.UNICODE(page_index + 1))
+            page.get_next_page = lambda: (
+                None if not page.has_next_page else
+                self._create_list_users_page_fragile(page_list, page_index + 1))
+            page.iterate_all = lambda: (
+                itertools.chain.from_iterable(page_list[page_index:]))
+        else:
+            page.users = []
+            page.has_next_page = False
+            page.next_page_token = ''
+            page.get_next_page = lambda: None
+            page.iterate_all = lambda: iter([])
+        return page
+
+    def _create_delete_users_result_fragile(self, errors):
         """Creates a new BatchDeleteAccountsResponse instance with the given
         values.
 
-        FRAGILE! The dict keys used by the BatchDeleteAccountsResponse constructor are an
-        implementation detail that may break in future versions of the SDK.
+        FRAGILE! The dict keys used by the BatchDeleteAccountsResponse
+        constructor are an implementation detail that may break in future
+        versions of the SDK.
 
         Args:
-            error_indices: list(int). The indicies of the records which
-                have failed.
+            errors: list(tuple(int, str)). A list of (index, error) pairs.
 
         Returns:
             firebase_admin.auth.BatchDeleteAccountsResponse. The response.
         """
-        return firebase_admin.auth.UserImportResult({
-            'error': [
-                {'index': i, 'message': error} for i, error in errors.items()
-            ],
-        }, total)
+        return firebase_admin.auth.BatchDeleteAccountsResponse(
+            errors=[{'index': i, 'message': error} for i, error in errors])
 
     def _create_user_import_result_fragile(self, total, errors):
         """Creates a new UserImportResult instance with the given values.
@@ -600,14 +683,13 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
         Args:
             total: int. The total number of records initially requested.
-            errors: dict(int: str). A dict mapping indicies to their reason for
-                failing.
+            errors: list(tuple(int, str)). A list of (index, error) pairs.
 
         Returns:
-            firebase_admin.auth.UserImportResult. The response
+            firebase_admin.auth.UserImportResult. The response.
         """
         return firebase_admin.auth.UserImportResult({
-            'error': [{'index': i, 'message': e} for i, e in errors.items()],
+            'error': [{'index': i, 'message': error} for i, error in errors],
         }, total)
 
 
@@ -905,7 +987,6 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
         self.set_up_models(user_id='abc', firebase_auth_id='xyz')
         assoc_model = auth_models.UserIdByFirebaseAuthIdModel.get('xyz')
         assoc_model.user_id = 'jkl'
-        assoc_model.update_timestamps(update_last_updated_time=False)
         assoc_model.put()
 
         self.assertEqual(

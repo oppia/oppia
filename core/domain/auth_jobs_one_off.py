@@ -32,7 +32,6 @@ import utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
-from firebase_admin import exceptions as firebase_exceptions
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -73,7 +72,6 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     INFO_SUPER_ADMIN_ACK = 'INFO: Found feconf.ADMIN_EMAIL_ADDRESS'
     INFO_SYSTEM_COMMITTER_ACK = 'INFO: Found feconf.SYSTEM_COMMITTER_ID'
     INFO_SEED_MODEL_ACK = 'INFO: Found FirebaseSeedModel'
-    INFO_ACCOUNTS_PROCESSED = 'INFO: Firebase accounts processed'
 
     ERROR_BATCH_DELETE = 'ERROR: Failed to delete a batch of Firebase accounts'
     ERROR_INDIVIDUAL_DELETE = (
@@ -81,6 +79,9 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     SUCCESS_DELETE_ACCOUNTS = 'SUCCESS: Firebase accounts deleted'
     SUCCESS_DELETE_ASSOC_TEMPLATE = 'SUCCESS: %s wiped'
+    SUCCESS_ALREADY_DELETED_ASSOC_TEMPLATE = 'SUCCESS: %s already wiped'
+
+    MAX_USERS_FIREBASE_CAN_DELETE_PER_CALL = 1000
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -98,24 +99,25 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         if isinstance(item, cls.ASSOC_MODEL_TYPES):
             admin_ack = cls.get_admin_ack(item)
-            yield (
-                admin_ack if admin_ack is not None else
-                (cls.wipe_assoc_model(item), 1))
+            if admin_ack is not None:
+                yield admin_ack
+            else:
+                yield (cls.wipe_assoc_model(item), 1)
             return
 
         yield (cls.INFO_SEED_MODEL_ACK, item.id)
 
-        num_accounts_processed = 0
         for user_batch in cls.yield_firebase_user_batches():
-            ids_to_delete = []
-            for user in user_batch:
-                if user.email == feconf.ADMIN_EMAIL_ADDRESS:
-                    yield (
-                        '%s in Firebase account' % cls.INFO_SUPER_ADMIN_ACK,
-                        'firebase_auth_id=%s' % (user.uid))
-                else:
-                    ids_to_delete.append(user.uid)
+            admins_to_ack, users_to_delete = utils.partition(
+                user_batch,
+                predicate=lambda user: user.email == feconf.ADMIN_EMAIL_ADDRESS)
 
+            for user in admins_to_ack:
+                yield (
+                    '%s in Firebase account' % cls.INFO_SUPER_ADMIN_ACK,
+                    'firebase_auth_id=%s' % (user.uid))
+
+            ids_to_delete = [user.uid for user in users_to_delete]
             try:
                 result = firebase_admin.auth.delete_users(
                     ids_to_delete, force_delete=True)
@@ -129,11 +131,8 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         firebase_auth_id, error.reason)
                     yield (cls.ERROR_INDIVIDUAL_DELETE, debug_info)
                 num_deleted = len(ids_to_delete) - len(result.errors)
-                yield (cls.SUCCESS_DELETE_ACCOUNTS, num_deleted)
-            finally:
-                num_accounts_processed += len(ids_to_delete)
-
-        yield (cls.INFO_ACCOUNTS_PROCESSED, num_accounts_processed)
+                if num_deleted:
+                    yield (cls.SUCCESS_DELETE_ACCOUNTS, num_deleted)
 
     @staticmethod
     def reduce(key, values):
@@ -141,21 +140,24 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # variable instead of changing the function into a classmethod.
         cls = SeedFirebaseOneOffJob
 
-        if key.startswith('SUCCESS:') or key == cls.INFO_ACCOUNTS_PROCESSED:
+        if key.startswith('SUCCESS:'):
             yield (key, sum(int(v) for v in values))
         elif key == cls.ERROR_BATCH_DELETE:
+            reasons, counts = utils.partition(
+                values, predicate=lambda value: value.startswith('reason='))
             debug_info = 'count=%d, reasons=[%s]' % (
-                sum(int(v) for v in values if not v.startswith('reason=')),
-                ', '.join({v[7:] for v in values if v.startswith('reason=')}))
+                sum(int(c) for c in counts),
+                ', '.join(sorted({r[7:] for r in reasons})))
             yield (key, debug_info)
         else:
             yield (key, values)
 
     @classmethod
     def yield_firebase_user_batches(cls):
-        """Yields every single Firebase account in batches of 1000."""
+        """Yields every single Firebase account in batches."""
         # 1000 is the maximum amount of users that can be deleted at once.
-        page = firebase_admin.auth.list_users(max_results=1000)
+        page = firebase_admin.auth.list_users(
+            max_results=cls.MAX_USERS_FIREBASE_CAN_DELETE_PER_CALL)
         while page is not None:
             user_batch = page.users
             if not user_batch:
@@ -209,15 +211,18 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             str. The reduce key to yield from the map() function for further
             processing.
         """
+        model_name = type(item).__name__
+
         if isinstance(item, auth_models.UserAuthDetailsModel):
-            if item.firebase_auth_id is not None:
+            if item.firebase_auth_id is None:
+                return cls.SUCCESS_ALREADY_DELETED_ASSOC_TEMPLATE % model_name
+            else:
                 item.firebase_auth_id = None
-                item.update_timestamps(update_last_updated_time=False)
                 item.put()
         else:
             item.delete()
 
-        return cls.SUCCESS_DELETE_ASSOC_TEMPLATE % type(item).__name__
+        return cls.SUCCESS_DELETE_ASSOC_TEMPLATE % model_name
 
 
 class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -324,9 +329,8 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     result.success_count + result.failure_count))
                 for error in result.errors:
                     successful_indices.remove(error.index)
-                    debug_info = (
-                        'Import user_id=%r failed: %s' % (
-                            user_fields[offset + error.index][1], error.reason))
+                    debug_info = 'Import user_id=%r failed: %s' % (
+                        user_fields[offset + error.index][1], error.reason)
                     yield (cls.ERROR_KEY, debug_info)
                 assocs_to_create.extend(
                     auth_domain.AuthIdUserIdPair(*user_fields[offset + i][:2])

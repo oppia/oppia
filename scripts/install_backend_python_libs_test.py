@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import itertools
 import json
 import os
 import re
@@ -32,6 +33,47 @@ from scripts import common
 from scripts import install_backend_python_libs
 
 import pkg_resources
+
+
+class Distribution(python_utils.OBJECT):
+    """Mock distribution object containing python library information."""
+
+    def __init__(self, library_name, version_string, metadata_dict):
+        """Creates mock distribution metadata class that contains the name and
+        version information for a python library.
+
+        Args:
+            library_name: str. The name of the library this object is
+                representing.
+            version_string: str. The stringified version of this library.
+            metadata_dict: dict(str: str). The stringified metadata contents of
+                the library.
+        """
+        self.project_name = library_name
+        self.version = version_string
+        self.metadata_dict = metadata_dict
+
+    def has_metadata(self, key):
+        """Returns whether the given metadata key exists.
+
+        Args:
+            key: str. The key corresponding to the metadata.
+
+        Returns:
+            bool. Whether the metadata exists.
+        """
+        return key in self.metadata_dict
+
+    def get_metadata(self, key):
+        """The contents of the corresponding metadata.
+
+        Args:
+            key: str. The key corresponding to the metadata.
+
+        Returns:
+            str. The contents of the metadata.
+        """
+        return self.metadata_dict[key]
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -114,6 +156,20 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_Popen_error = self.swap(
             subprocess, 'Popen', mock_check_call_error)
 
+    def get_git_requirement_string(self, name, sha1_piece):
+        """Utility function for constructing a GitHub URL for testing.
+
+        Args:
+            name: str. Name of the package.
+            sha1_piece: str. Commit hash of the package. The piece is
+                concatenated with itself to construct a full 40-character hash.
+
+        Returns:
+            str. The full GitHub URL dependency.
+        """
+        sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
+        return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
+
     def test_invalid_git_dependency_raises_an_exception(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
@@ -130,57 +186,18 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.TEST_REQUIREMENTS_TXT_FILE_PATH)
 
         def mock_find_distributions(paths): # pylint: disable=unused-argument
-            class Distribution(python_utils.OBJECT):
-                """Distribution object containing python library information."""
-
-                def __init__(self, library_name, version_string, metadata_dict):
-                    """Creates mock distribution metadata class that contains
-                    the name and version information for a python library.
-
-                    Args:
-                        library_name: str. The name of the library this object
-                            is representing.
-                        version_string: str. The stringified version of this
-                            library.
-                        metadata_dict: dict(str: str). The stringified metadata
-                            contents of the library.
-                    """
-                    self.project_name = library_name
-                    self.version = version_string
-                    self.metadata_dict = metadata_dict
-
-                def has_metadata(self, key):
-                    """Returns whether the given metadata key exists.
-
-                    Args:
-                        key: str. The key corresponding to the metadata.
-
-                    Returns:
-                        bool. Whether the metadata exists.
-                    """
-                    return key in self.metadata_dict
-
-                def get_metadata(self, key):
-                    """The contents of the corresponding metadata.
-
-                    Args:
-                        key: str. The key corresponding to the metadata.
-
-                    Returns:
-                        str. The contents of the metadata.
-                    """
-                    return self.metadata_dict[key]
-
             return [
                 Distribution('dependency1', '1.5.1', {}),
                 Distribution('dependency2', '4.9.1.2', {}),
                 Distribution('dependency5', '0.5.3', {
                     'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency5',
                         'vcs_info': {'vcs': 'git', 'commit_id': 'b' * 40},
                     })
                 }),
                 Distribution('dependency6', '0.5.3', {
                     'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
                         'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
                     })
                 })
@@ -194,9 +211,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'dependency2': (u'4.9.1', u'4.9.1.2'),
                 u'dependency3': (u'3.1.5', None),
                 u'dependency4': (u'0.3.0.1', None),
-                u'dependency5': ('a' * 40, 'b' * 40),
-                u'dependency6': (None, 'z' * 40),
-                u'dependency7': ('b' * 40, None),
+                u'dependency5': (
+                    self.get_git_requirement_string('dependency5', 'a'),
+                    self.get_git_requirement_string('dependency5', 'b')),
+                u'dependency6': (
+                    None, self.get_git_requirement_string('dependency6', 'z')),
+                u'dependency7': (
+                    self.get_git_requirement_string('dependency7', 'b'), None),
             })
 
     def test_library_removal_runs_correct_commands(self):
@@ -253,13 +274,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'flask': (u'1.1.0.1', u'1.1.1.0'),
                 u'six': (u'1.15.0', None),
                 u'git-dep1': (
-                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep1' % (
-                        'a' * 40),
-                    'b' * 40),
+                    self.get_git_requirement_string('git-dep1', 'a'),
+                    self.get_git_requirement_string('git-dep1', 'b')),
                 u'git-dep2': (
-                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep2' % (
-                        'a' * 40),
-                    None),
+                    self.get_git_requirement_string('git-dep2', 'a'), None),
             }
 
         def mock_validate_metadata_directories():
@@ -280,26 +298,24 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 ['scripts.regenerate_requirements'],
                 [
+                    'pip', 'install',
+                    self.get_git_requirement_string('git-dep1', 'a'),
+                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--upgrade', '--no-dependencies',
+                ],
+                [
+                    'pip', 'install',
+                    self.get_git_requirement_string('git-dep2', 'a'),
+                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--upgrade', '--no-dependencies',
+                ],
+                [
                     'pip', 'install', '%s==%s' % ('flask', '1.1.0.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install', '%s==%s' % ('six', '1.15.0'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--upgrade', '--no-dependencies',
-                ],
-                [
-                    'pip', 'install',
-                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep1' % (
-                        'a' * 40),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--upgrade', '--no-dependencies',
-                ],
-                [
-                    'pip', 'install',
-                    'git+git://github.com/oppia/git-dep@%s#egg=git-dep2' % (
-                        'a' * 40),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
@@ -544,29 +560,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_exception_raised_when_metadata_directory_names_are_missing(self):
         def mock_find_distributions(paths): # pylint: disable=unused-argument
-            class Distribution(python_utils.OBJECT):
-                """Distribution object containing python library information."""
-
-                def __init__(self, library_name, version_string):
-                    """Creates mock distribution metadata class that contains
-                    the name and version information for a python library.
-
-                    Args:
-                        library_name: str. The name of the library this object
-                            is representing.
-                        version_string: str. The stringified version of this
-                            library.
-                    """
-                    self.project_name = library_name
-                    self.version = version_string
-
-                def has_metadata(self, _):
-                    """Always reports that metadata does not exist."""
-                    return False
             return [
-                Distribution('dependency1', '1.5.1'),
-                Distribution('dependency2', '5.0.0'),
-                Distribution('dependency5', '0.5.3')
+                Distribution('dependency1', '1.5.1', {}),
+                Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency5', '0.5.3', {}),
             ]
 
         def mock_list_dir(path): # pylint: disable=unused-argument
@@ -623,18 +620,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_pip_install_without_import_error(self):
         with self.swap_Popen:
-            install_backend_python_libs.pip_install(
-                'package', 'version', 'path')
+            install_backend_python_libs.pip_install('package==version', 'path')
 
     def test_pip_install_with_user_prefix_error(self):
         with self.swap_Popen_error, self.swap_check_call:
-            install_backend_python_libs.pip_install('pkg', 'ver', 'path')
+            install_backend_python_libs.pip_install('pkg==ver', 'path')
 
     def test_pip_install_exception_handling(self):
         with self.assertRaisesRegexp(
             Exception, 'Error installing package') as context:
-            install_backend_python_libs.pip_install(
-                'package', 'version', 'path')
+            install_backend_python_libs.pip_install('package==version', 'path')
         self.assertTrue('Error installing package' in context.exception)
 
     def test_pip_install_with_import_error_and_darwin_os(self):
@@ -647,7 +642,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     ImportError, 'Error importing pip: No module named pip'):
                     install_backend_python_libs.pip_install(
-                        'package', 'version', 'path')
+                        'package==version', 'path')
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
@@ -664,7 +659,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     Exception, 'Error importing pip: No module named pip'):
                     install_backend_python_libs.pip_install(
-                        'package', 'version', 'path')
+                        'package==version', 'path')
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
@@ -680,7 +675,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     Exception, 'Error importing pip: No module named pip'):
                     install_backend_python_libs.pip_install(
-                        'package', 'version', 'path')
+                        'package==version', 'path')
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
