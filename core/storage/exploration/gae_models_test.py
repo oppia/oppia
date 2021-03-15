@@ -64,6 +64,23 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
 
+    def test_reconstitute(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'id', title='A Title',
+            category='A Category', objective='An Objective')
+        exp_services.save_new_exploration('id', exploration)
+        exp_model = exp_models.ExplorationModel.get_by_id('id')
+        snapshot_dict = exp_model.compute_snapshot()
+        snapshot_dict['skill_tags'] = ['tag1', 'tag2']
+        snapshot_dict['default_skin'] = 'conversation_v1'
+        snapshot_dict['skin_customizations'] = {}
+        snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(
+            snapshot_dict)
+        exp_model = exp_models.ExplorationModel(**snapshot_dict)
+        snapshot_dict = exp_model.compute_snapshot()
+        for field in ['skill_tags', 'default_skin', 'skin_customization']:
+            self.assertNotIn(field, snapshot_dict)
+
 
 class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationContextModel class."""
@@ -310,6 +327,35 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
+    def test_reconstitute_excludes_deprecated_properties(self):
+        exp_models.ExplorationRightsModel(
+            id='id_0',
+            owner_ids=['owner_id'],
+            editor_ids=['editor_id'],
+            voice_artist_ids=['voice_artist_id'],
+            viewer_ids=['viewer_id'],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+        saved_model = exp_models.ExplorationRightsModel.get('id_0')
+
+        snapshot_dict = saved_model.compute_snapshot()
+        snapshot_dict['translator_ids'] = ['owner_id']
+        snapshot_dict['all_viewer_ids'] = []
+
+        snapshot_dict = exp_models.ExplorationRightsModel.convert_to_valid_dict(
+            snapshot_dict)
+
+        exp_rights_model = exp_models.ExplorationRightsModel(**snapshot_dict)
+
+        for field in ['translator_ids', 'all_viewer_ids']:
+            self.assertNotIn(field, exp_rights_model._properties) # pylint: disable=protected-access
+            self.assertNotIn(field, exp_rights_model._values) # pylint: disable=protected-access
+
 
 class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     """Test the revert method on ExplorationRightsModel class."""
@@ -393,7 +439,6 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
-        snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
@@ -418,7 +463,6 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
-        snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
@@ -432,31 +476,19 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             new_collection_model.to_dict(exclude=self.excluded_fields)
         )
 
-    def test_revert_to_version_with_translator_ids_field_is_successful(self):
-        broken_dict = dict(**self.original_dict)
-        del broken_dict['voice_artist_ids']
-        broken_dict['translator_ids'] = [self.USER_ID_2]
-
-        snapshot_model = (
-            exp_models.ExplorationRightsSnapshotContentModel
-            .get_by_id(
-                exp_models.ExplorationRightsModel.get_snapshot_id(
-                    self.EXPLORATION_ID_1, 1))
-        )
-        snapshot_model.content = broken_dict
-        snapshot_model.update_timestamps()
-        snapshot_model.put()
+    def test_revert_to_check_deprecated_fields_are_absent(self):
         with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
-        new_collection_model = (
-            exp_models.ExplorationRightsModel.get_by_id(
-                self.EXPLORATION_ID_1))
-        self.assertDictEqual(
-            self.original_dict,
-            new_collection_model.to_dict(exclude=self.excluded_fields)
-        )
+            exp_rights_model = (
+                exp_models.ExplorationRightsModel.get_by_id(
+                    self.EXPLORATION_ID_1))
+
+            snapshot_dict = exp_rights_model.compute_snapshot()
+
+            self.assertNotIn('translator_ids', snapshot_dict)
+            self.assertNotIn('all_viewer_ids', snapshot_dict)
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
@@ -474,8 +506,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
-        commit.update_timestamps()
-        commit.put()
+        commit.put_depending_on_id('committer_id')
         self.assertTrue(
             exp_models.ExplorationCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
@@ -494,10 +525,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
         public_commit.exploration_id = 'b'
-        private_commit.update_timestamps()
-        private_commit.put()
-        public_commit.update_timestamps()
-        public_commit.put()
+        private_commit.put_depending_on_id('committer_id')
+        public_commit.put_depending_on_id('committer_id')
         results, _, more = (
             exp_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=None))
@@ -527,10 +556,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit1.exploration_id = 'a'
         commit2.exploration_id = 'a'
-        commit1.update_timestamps()
-        commit1.put()
-        commit2.update_timestamps()
-        commit2.put()
+        commit1.put_depending_on_id('committer_id')
+        commit2.put_depending_on_id('committer_id')
 
         actual_models = (
             exp_models.ExplorationCommitLogEntryModel.get_multi(
@@ -623,7 +650,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
-        public_exploration_summary_model.update_timestamps()
         public_exploration_summary_model.put()
 
         private_exploration_summary_model = (
@@ -645,7 +671,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
-        private_exploration_summary_model.update_timestamps()
         private_exploration_summary_model.put()
         exploration_summary_models = (
             exp_models.ExpSummaryModel.get_non_private())
@@ -674,7 +699,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_created_on=None,
             ))
         good_rating_exploration_summary_model.scaled_average_rating = 100
-        good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
 
         bad_rating_exploration_summary_model = (
@@ -697,7 +721,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_created_on=None,
             ))
         bad_rating_exploration_summary_model.scaled_average_rating = 0
-        bad_rating_exploration_summary_model.update_timestamps()
         bad_rating_exploration_summary_model.put()
 
         self.assertEqual(
@@ -715,7 +738,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         # Test that private summaries should be ignored.
         good_rating_exploration_summary_model.status = (
             constants.ACTIVITY_STATUS_PRIVATE)
-        good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
         self.assertEqual(
             exp_models.ExpSummaryModel.get_top_rated(2),
@@ -741,7 +763,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
-        viewable_exploration_summary_model.update_timestamps()
         viewable_exploration_summary_model.put()
 
         unviewable_exploration_summary_model = (
@@ -763,7 +784,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
-        unviewable_exploration_summary_model.update_timestamps()
         unviewable_exploration_summary_model.put()
         exploration_summary_models = (
             exp_models.ExpSummaryModel
@@ -791,7 +811,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
-        editable_collection_summary_model.update_timestamps()
         editable_collection_summary_model.put()
 
         uneditable_collection_summary_model = (
@@ -813,7 +832,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
-        uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
 
         exploration_summary_models = (

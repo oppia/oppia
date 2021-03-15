@@ -49,7 +49,7 @@ describe('Topic viewer navbar breadcrumb component', () => {
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'classroom1');
 
-    spyOn(topicViewerBackendApiService, 'fetchTopicData').and.resolveTo(
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
       readOnlyTopicObjectFactory.createFromBackendDict({
         subtopics: [],
         skill_descriptions: {},

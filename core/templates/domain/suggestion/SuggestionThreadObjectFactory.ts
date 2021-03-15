@@ -20,12 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SuggestionBackendDict, Suggestion, SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionBackendDict, Suggestion } from
+  'domain/suggestion/suggestion.model';
 import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+  'domain/feedback_message/ThreadMessage.model';
+import { ThreadMessageSummary } from
+  'domain/feedback_message/ThreadMessageSummary.model';
 import { FeedbackThreadBackendDict } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 
@@ -107,19 +107,13 @@ export class SuggestionThread {
 
 @Injectable({providedIn: 'root'})
 export class SuggestionThreadObjectFactory {
-  constructor(
-    private suggestionObjectFactory: SuggestionObjectFactory,
-    private threadMessageSummaryObjectFactory:
-      ThreadMessageSummaryObjectFactory) {}
-
   private createEditExplorationStateContentSuggestionFromBackendDict(
       suggestionBackendDict: SuggestionBackendDict): Suggestion {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
       return null;
     }
-    return this.suggestionObjectFactory.createFromBackendDict(
-      suggestionBackendDict);
+    return Suggestion.createFromBackendDict(suggestionBackendDict);
   }
 
   createFromBackendDicts(
@@ -132,7 +126,7 @@ export class SuggestionThreadObjectFactory {
       feedbackThreadBackendDict.last_updated_msecs,
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.thread_id,
-      this.threadMessageSummaryObjectFactory.createNew(
+      new ThreadMessageSummary(
         feedbackThreadBackendDict.last_nonempty_message_author,
         feedbackThreadBackendDict.last_nonempty_message_text),
       this.createEditExplorationStateContentSuggestionFromBackendDict(

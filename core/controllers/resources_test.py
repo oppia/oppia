@@ -27,7 +27,7 @@ from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import story_services
 from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -144,7 +144,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')
         story_id = story_services.get_new_story_id()
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         skill_id = skill_services.get_new_skill_id()
         self.save_new_story(story_id, admin_id, topic_id)
         self.save_new_topic(
@@ -446,7 +446,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_get_response_with_dev_mode_disabled_returns_404_status(self):
         self.login(self.EDITOR_EMAIL)
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.get_json(
                 '/assetsdevhandler/exploration/0/assets/image/myfile',
                 expected_status_int=404)

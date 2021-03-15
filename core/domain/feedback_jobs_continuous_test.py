@@ -178,8 +178,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread.entity_id = exp_id
             thread.subject = 'subject'
-            thread.update_timestamps()
-            thread.put()
+            thread.put_for_human()
             self._run_job_and_check_results(
                 exp_id, {
                     'num_open_threads': 1,
@@ -198,16 +197,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
-            thread_1.update_timestamps()
-            thread_1.put()
+            thread_1.put_for_human()
             thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_2)
             thread_2.message_count = 0
             thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_2.entity_id = exp_id
             thread_2.subject = 'subject'
-            thread_2.update_timestamps()
-            thread_2.put()
+            thread_2.put_for_human()
 
             self._run_job_and_check_results(
                 exp_id, {
@@ -233,24 +230,21 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id_1
             thread_1.subject = 'subject'
-            thread_1.update_timestamps()
-            thread_1.put()
+            thread_1.put_for_human()
             thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_2)
             thread_2.message_count = 0
             thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_2.entity_id = exp_id_1
             thread_2.subject = 'subject'
-            thread_2.update_timestamps()
-            thread_2.put()
+            thread_2.put_for_human()
             thread_3 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_3)
             thread_3.message_count = 0
             thread_3.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_3.entity_id = exp_id_3
             thread_3.subject = 'subject'
-            thread_3.update_timestamps()
-            thread_3.put()
+            thread_3.put_for_human()
             self.process_and_flush_pending_mapreduce_tasks()
             MockFeedbackAnalyticsAggregator.start_computation()
             self.assertEqual(
@@ -315,8 +309,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
-            thread_1.update_timestamps()
-            thread_1.put()
+            thread_1.put_for_human()
 
             # Start job.
             self._run_job_and_check_results(
@@ -335,8 +328,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
-            thread.update_timestamps()
-            thread.put()
+            thread.put_for_human()
 
             self._run_job_and_check_results(
                 exp_id, {
@@ -357,8 +349,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
-            thread_1.update_timestamps()
-            thread_1.put()
+            thread_1.put_for_human()
 
             # Start job.
             self._run_job_and_check_results(
@@ -377,8 +368,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
-            thread.update_timestamps()
-            thread.put()
+            thread.put_for_human()
 
             # Restart job.
             self._run_job_and_check_results(
@@ -397,8 +387,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_OPEN
-            thread.update_timestamps()
-            thread.put()
+            thread.put_for_human()
 
             # Restart job.
             self._run_job_and_check_results(
@@ -420,8 +409,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
-            thread_1.update_timestamps()
-            thread_1.put()
+            thread_1.put_for_human()
 
             self._run_job_and_check_results(
                 exp_id, {
@@ -438,8 +426,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
-            thread.update_timestamps()
-            thread.put()
+            thread.put_for_human()
 
             # Restart job.
             self._run_job_and_check_results(
@@ -458,8 +445,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_IGNORED
-            thread.update_timestamps()
-            thread.put()
+            thread.put_for_human()
 
             # Restart job.
             self._run_job_and_check_results(

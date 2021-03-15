@@ -568,7 +568,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         with user_two_fake_hash_one:
             model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_1)
-            model.update_timestamps()
             model.put()
 
         user_two_deterministic_hash_lambda_two = (
@@ -578,7 +577,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         with user_two_deterministic_hash_two:
             model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_2)
-            model.update_timestamps()
             model.put()
 
         suggestion_models.GeneralVoiceoverApplicationModel(
@@ -630,60 +628,60 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         collection_models.CollectionSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         skill_models.SkillSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
         subtopic_models.SubtopicPageSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         topic_models.TopicRightsSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         topic_models.TopicSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         story_models.StorySnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         question_models.QuestionSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         config_models.ConfigPropertySnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         exploration_models.ExplorationRightsSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         improvements_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
@@ -702,7 +700,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
-        ).put()
+        ).put_depending_on_id(self.USER_ID_1)
 
         user_models.UserEmailPreferencesModel(
             id=self.USER_ID_1,
@@ -909,7 +907,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             summary=self.THREAD_SUMMARY,
             message_count=self.THREAD_MESSAGE_COUNT
         )
-        feedback_thread_model.put()
+        feedback_thread_model.put_for_human()
 
         thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
@@ -974,7 +972,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             summary=self.THREAD_SUMMARY,
             message_count=self.THREAD_MESSAGE_COUNT
         )
-        feedback_thread_model.put()
+        feedback_thread_model.put_for_human()
 
         thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
@@ -992,7 +990,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
 
         # Retrieve all models for export.
-        all_models = [
+        all_model_classes = [
             clazz
             for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
@@ -1000,13 +998,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ]
 
         # Iterate over models and test export policies.
-        for model in all_models:
-            export_method = model.get_model_association_to_user()
-            export_policy = model.get_export_policy()
-            renamed_export_keys = model.get_field_names_for_takeout()
+        for model_class in all_model_classes:
+            export_method = model_class.get_model_association_to_user()
+            export_policy = model_class.get_export_policy()
+            renamed_export_keys = model_class.get_field_names_for_takeout()
             exported_field_names = []
             field_used_as_key_for_takeout_dict = None
-            for field_name in model._properties: # pylint: disable=protected-access
+            for field_name in model_class._properties:  # pylint: disable=protected-access
                 if (export_policy[field_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
                     if field_name in renamed_export_keys:
@@ -1026,7 +1024,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(len(exported_field_names), 0)
             elif (export_method ==
                   base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
-                exported_data = model.export_data(self.USER_ID_1)
+                exported_data = model_class.export_data(self.USER_ID_1)
                 self.assertEqual(
                     sorted([
                         python_utils.UNICODE(key)
@@ -1038,9 +1036,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   .MODEL_ASSOCIATION_TO_USER
                   .ONE_INSTANCE_SHARED_ACROSS_USERS):
                 self.assertIsNotNone(
-                    model.get_field_name_mapping_to_takeout_keys)
-                exported_data = model.export_data(self.USER_ID_1)
-                field_mapping = model.get_field_name_mapping_to_takeout_keys()
+                    model_class.get_field_name_mapping_to_takeout_keys)
+                exported_data = model_class.export_data(self.USER_ID_1)
+                field_mapping = (
+                    model_class.get_field_name_mapping_to_takeout_keys())
                 self.assertEqual(
                     sorted(exported_field_names),
                     sorted(field_mapping.keys())
@@ -1052,7 +1051,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             elif (export_method ==
                   base_models
                   .MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
-                exported_data = model.export_data(self.USER_ID_1)
+                exported_data = model_class.export_data(self.USER_ID_1)
                 for model_id in exported_data.keys():
                     # If we are using a field as a Takeout key.
                     if field_used_as_key_for_takeout_dict:
@@ -1060,8 +1059,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.assertEqual(
                             model_id,
                             getattr(
-                                model,
-                                field_used_as_key_for_takeout_dict)
+                                model_class, field_used_as_key_for_takeout_dict)
                         )
                     self.assertEqual(
                         sorted([
@@ -1085,8 +1083,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             summary=self.THREAD_SUMMARY,
             message_count=self.THREAD_MESSAGE_COUNT
         )
-        feedback_thread_model.update_timestamps()
-        feedback_thread_model.put()
+        feedback_thread_model.put_for_human()
 
         expected_stats_data = {
             'impact_score': self.USER_1_IMPACT_SCORE,

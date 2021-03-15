@@ -19,6 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+import http.cookies
+
 from core.domain import auth_domain
 from core.platform import models
 import python_utils
@@ -28,6 +31,36 @@ from google.appengine.api import users
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 transaction_services = models.Registry.import_transaction_services()
+
+
+def establish_auth_session(unused_request, unused_response):
+    """Sets login cookies to maintain a user's sign-in session.
+
+    Args:
+        unused_request: webapp2.Request. Unused because App Engine handles user
+            authentication implicitly.
+        unused_response: webapp2.Response. Unused because App Engine handles
+            user authentication implicitly.
+    """
+    pass
+
+
+def destroy_auth_session(response):
+    """Clears login cookies from the given response headers.
+
+    Args:
+        response: webapp2.Response. Response to clear the cookies from.
+    """
+    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
+    # for https:// . We just unset both below. We also unset dev_appserver_login
+    # cookie used in local server.
+    for cookie_name in (b'ACSID', b'SACSID', b'dev_appserver_login'):
+        cookie = http.cookies.SimpleCookie()
+        cookie[cookie_name] = ''
+        cookie[cookie_name]['expires'] = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        response.headers.add_header(*cookie.output().split(b': ', 1))
 
 
 def get_auth_claims_from_request(unused_request):
@@ -61,7 +94,6 @@ def mark_user_for_deletion(user_id):
 
     if assoc_by_user_id_model is not None:
         assoc_by_user_id_model.deleted = True
-        assoc_by_user_id_model.update_timestamps()
         assoc_by_user_id_model.put()
 
     assoc_by_auth_id_model = (
@@ -72,7 +104,6 @@ def mark_user_for_deletion(user_id):
 
     if assoc_by_auth_id_model is not None:
         assoc_by_auth_id_model.deleted = True
-        assoc_by_auth_id_model.update_timestamps()
         assoc_by_auth_id_model.put()
 
 
@@ -197,7 +228,6 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
     # doesn't exist because get_auth_id_from_user_id returned None.
     assoc_by_auth_id_model = (
         auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id))
-    assoc_by_auth_id_model.update_timestamps()
     assoc_by_auth_id_model.put()
 
     # The {user_id: auth_id} mapping needs to be created, but the model used to
@@ -211,7 +241,6 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
     if assoc_by_user_id_model is None or assoc_by_user_id_model.gae_id is None:
         assoc_by_user_id_model = (
             auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id))
-        assoc_by_user_id_model.update_timestamps()
         assoc_by_user_id_model.put()
 
 
@@ -252,8 +281,6 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
         auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
-    auth_models.UserIdentifiersModel.update_timestamps_multi(
-        assoc_by_auth_id_models)
     auth_models.UserIdentifiersModel.put_multi(assoc_by_auth_id_models)
 
     # The {user_id: auth_id} mapping needs to be created, but the model used to
@@ -271,6 +298,4 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
             assoc_by_user_id_model.gae_id is None)
     ]
     if assoc_by_user_id_models:
-        auth_models.UserAuthDetailsModel.update_timestamps_multi(
-            assoc_by_user_id_models)
         auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)

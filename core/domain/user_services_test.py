@@ -38,8 +38,9 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import requests_mock
 import utils
+
+import requests_mock
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -2044,7 +2045,6 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self):
         model = user_models.UserStatsModel.get_or_create(self.owner_id)
         model.schema_version = 0
-        model.update_timestamps()
         model.put()
 
         self.assertIsNone(user_services.get_user_impact_score(self.owner_id))

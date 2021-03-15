@@ -69,8 +69,7 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             return
 
         item.change_cmd = suggestion.change.to_dict()
-        item.update_timestamps(update_last_updated_time=False)
-        item.put()
+        item.put_for_bot()
 
         yield ('SUCCESS', item.id)
 
@@ -285,7 +284,6 @@ class PopulateContributionStatsOneOffJob(
                             language_code]
                     ) = count_value
 
-            stats_model.update_timestamps()
             stats_model.put()
             return key, count_value
 
@@ -338,8 +336,7 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         item.final_reviewer_id = message_models[0].author_id
 
-        item.update_timestamps(update_last_updated_time=False)
-        item.put()
+        item.put_for_bot()
         yield ('CHANGED_MODELS', item.id)
 
     @staticmethod
@@ -348,3 +345,49 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class ContentSuggestionFormatUpdateOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates the format of content suggestions."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.suggestion_type != feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+            return
+
+        changes_made = False
+        if 'old_value' in item.change_cmd:
+            del item.change_cmd['old_value']
+            changes_made = True
+            yield ('CHANGED - Removed old_value', item.id)
+        if 'content_id' in item.change_cmd['new_value']:
+            del item.change_cmd['new_value']['content_id']
+            changes_made = True
+            yield ('CHANGED - Removed content_id', item.id)
+
+        # Validate the eventual suggestion format.
+        try:
+            assert set(item.change_cmd.keys()) == set([
+                'state_name', 'cmd', 'new_value', 'property_name']), (
+                    'Bad change_cmd keys')
+            assert item.change_cmd['cmd'] == 'edit_state_property', (
+                'Wrong cmd in change_cmd')
+            assert item.change_cmd['property_name'] == 'content', (
+                'Bad property name')
+            assert item.change_cmd['new_value'].keys() == ['html'], (
+                'Bad new_value keys')
+        except AssertionError as e:
+            yield ('Failed assertion', '%s %s' % (item.id, e))
+
+        if changes_made:
+            item.put_for_bot()
+            yield ('SUCCESS - Updated suggestion', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

@@ -33,15 +33,32 @@ from core.platform import models
 import feconf
 import python_utils
 
-(feedback_models, email_models, suggestion_models) = (
-    models.Registry.import_models(
-        [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+(
+    email_models, expl_models, feedback_models,
+    question_models, skill_models, suggestion_models,
+    topic_models
+) = models.Registry.import_models([
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.suggestion,
+    models.NAMES.topic
+])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
+
+TARGET_TYPE_TO_TARGET_MODEL = {
+    feconf.ENTITY_TYPE_EXPLORATION: (
+        expl_models.ExplorationModel),
+    feconf.ENTITY_TYPE_QUESTION: (
+        question_models.QuestionModel),
+    feconf.ENTITY_TYPE_SKILL: (
+        skill_models.SkillModel),
+    feconf.ENTITY_TYPE_TOPIC: (
+        topic_models.TopicModel)
+}
 
 
 def get_exp_id_from_thread_id(thread_id):
@@ -92,8 +109,7 @@ def _create_models_for_thread_and_first_message(
     thread.subject = subject
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
-    thread.update_timestamps()
-    thread.put()
+    thread.put_for_human()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
         subject, text)
@@ -257,9 +273,8 @@ def create_messages(
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
-    feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
+    feedback_models.GeneralFeedbackMessageModel.put_multi_for_human(
         message_models)
-    feedback_models.GeneralFeedbackMessageModel.put_multi(message_models)
 
     # Update the message data cache of the threads.
     for thread_model in thread_models:
@@ -284,9 +299,8 @@ def create_messages(
                         updated_subject != thread_model.subject):
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
-    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
+    feedback_models.GeneralFeedbackThreadModel.put_multi_for_human(
         thread_models)
-    feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
     # the thread, so that the last_updated time changes to show that there is
@@ -305,14 +319,15 @@ def create_messages(
         # we need not update the suggestion.
         if suggestion_model:
             suggestion_models_to_update.append(suggestion_model)
-    suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
-        suggestion_models_to_update)
-    suggestion_models.GeneralSuggestionModel.put_multi(
+    suggestion_models.GeneralSuggestionModel.put_multi_for_human(
         suggestion_models_to_update)
 
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id))):
+            user_services.is_user_registered(author_id)) and
+            # TODO(#12079): Figure out a better way to avoid sending feedback
+            # thread emails for contributor dashboard suggestions.
+            (len(text) > 0 or old_statuses[index] != new_statuses[index])):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
@@ -409,7 +424,6 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
         feedback_models.GeneralFeedbackThreadUserModel.create(
             user_id, thread_id))
     feedback_thread_user_model.message_ids_read_by_user = message_ids
-    feedback_thread_user_model.update_timestamps()
     feedback_thread_user_model.put()
 
 
@@ -483,8 +497,6 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     # Update both the new and previously existing models in the datastore.
     current_feedback_thread_user_models.extend(
         new_feedback_thread_user_models)
-    feedback_models.GeneralFeedbackThreadUserModel.update_timestamps_multi(
-        current_feedback_thread_user_models)
     feedback_models.GeneralFeedbackThreadUserModel.put_multi(
         current_feedback_thread_user_models)
 
@@ -895,12 +907,10 @@ def _add_feedback_message_reference_transactional(user_id, reference):
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     if model is not None:
         model.feedback_message_references.append(reference.to_dict())
-        model.update_timestamps()
         model.put()
     else:
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=[reference.to_dict()])
-        model.update_timestamps()
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
@@ -920,7 +930,6 @@ def update_feedback_email_retries_transactional(user_id):
     if (time_since_buffered >
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):
         model.retries += 1
-        model.update_timestamps()
         model.put()
 
 
@@ -946,7 +955,6 @@ def pop_feedback_message_references_transactional(
         # the retries count will be incorrect.
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=remaining_references)
-        model.update_timestamps()
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
@@ -991,7 +999,6 @@ def clear_feedback_message_references_transactional(
         model.delete()
     else:
         model.feedback_message_references = updated_references
-        model.update_timestamps()
         model.put()
 
 
