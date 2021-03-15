@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import html.parser
 import os
 import subprocess
+import re
 
 import python_utils
 
@@ -37,6 +38,8 @@ class TagMismatchException(Exception):
 
 class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
+
+    _SPACE_AROUND_ATTRIBUTE_REGEX = re.compile(r' +[^=]= +["{]| +=["{]|[^=]= +["{]')
 
     def __init__(self, filepath, file_lines, failed=False):
         """Define various variables to parse HTML.
@@ -109,6 +112,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
         indentation_of_first_attribute = (
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
+
+        if self._SPACE_AROUND_ATTRIBUTE_REGEX.search(starttag_text):
+            error_message = (
+                    '%s --> Attribute for tag %s on line '
+                    '%s has unwanted white spaces around it' % (
+                        self.filepath, tag, line_number))
+            self.error_messages.append(error_message)
+            self.failed = True
 
         # Check whether the values of all attributes are placed
         # in double quotes.
