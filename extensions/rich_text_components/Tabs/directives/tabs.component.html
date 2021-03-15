@@ -2,10 +2,11 @@
   <ng-container ngbNavItem *ngFor="let tabContent of tabContents">
     <a ngbNavLink>{{ tabContent.title }}</a>
     <ng-template ngbNavContent>
-      <p>
+      <span>
+        <br>
         <angular-html-bind-wrapper class="protractor-test-tab-content" [htmlData]="tabContent.content">
         </angular-html-bind-wrapper>
-      </p> 
+      </span> 
     </ng-template>
   </ng-container>
 </nav>
