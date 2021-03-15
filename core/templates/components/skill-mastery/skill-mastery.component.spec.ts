@@ -13,16 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SkillMasteryViewerComponent
+ * @fileoverview Unit tests for SkillMasteryViewerComponent.
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { SkillMasteryViewerComponent } from './skill-mastery.component';
-import { SkillMasteryListConstants } from
-  'components/skills-mastery-list/skills-mastery-list.constants';
-import { SkillMasteryBackendApiService } from
-  'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryListConstants } from 'components/skills-mastery-list/skills-mastery-list.constants';
+import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillMastery } from 'domain/skill/skill-mastery.model';
 
 let component: SkillMasteryViewerComponent;
@@ -41,8 +40,7 @@ describe('SkillMasteryViewerComponent', () => {
       declarations: [SkillMasteryViewerComponent],
       providers: [SkillMasteryBackendApiService],
       imports: [HttpClientTestingModule]
-    })
-      .compileComponents();
+    }).compileComponents();
     skillMasteryBackendApiService = TestBed.get(SkillMasteryBackendApiService);
   }));
 

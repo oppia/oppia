@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for collection local nav component
+ * @fileoverview Unit tests for CollectionLocalNavComponent.
  */
 
 import { EventEmitter } from '@angular/core';
@@ -41,8 +41,7 @@ describe('CollectionLocalNavComponent', () => {
     TestBed.configureTestingModule({
       declarations: [CollectionLocalNavComponent],
       imports: [HttpClientTestingModule]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     rocbs = TestBed.get(ReadOnlyCollectionBackendApiService);
     urlService = TestBed.get(UrlService);
@@ -62,10 +61,6 @@ describe('CollectionLocalNavComponent', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
-  });
-
-  it('should call the constructor', () => {
-    expect(component).toBeTruthy;
   });
 
   it('should initialize collectionTitle', () => {
