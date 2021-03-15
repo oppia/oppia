@@ -75,6 +75,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
                 id=self.user_id_2)
 
         email_preferences_model.subscription_notifications = False
+        email_preferences_model.update_timestamps()
         email_preferences_model.put()
 
         with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
