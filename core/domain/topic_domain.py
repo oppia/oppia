@@ -1671,7 +1671,7 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
-            total_chapter_count, thumbnail_filename, thumbnail_bg_color,
+            total_published_chapter_count, thumbnail_filename, thumbnail_bg_color,
             url_fragment, topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
@@ -1691,8 +1691,8 @@ class TopicSummary(python_utils.OBJECT):
             subtopic_count: int. The number of subtopics in the topic.
             total_skill_count: int. The total number of skills in the topic
                 (including those that are uncategorized).
-            total_chapter_count: int. The total number of chapters associated
-                with the stories of the topic.
+            total_published_chapter_count: int. The total number of chapters
+                that are published and associated with the stories of the topic.
             thumbnail_filename: str. The filename for the topic thumbnail.
             thumbnail_bg_color: str. The background color for the thumbnail.
             url_fragment: str. The url fragment of the topic.
@@ -1712,7 +1712,7 @@ class TopicSummary(python_utils.OBJECT):
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
         self.total_skill_count = total_skill_count
-        self.total_chapter_count = total_chapter_count
+        self.total_published_chapter_count = total_published_chapter_count
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.topic_model_created_on = topic_model_created_on
@@ -1851,7 +1851,7 @@ class TopicSummary(python_utils.OBJECT):
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
             'total_skill_count': self.total_skill_count,
-            'total_chapter_count': self.total_chapter_count,
+            'total_published_chapter_count': self.total_published_chapter_count,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'topic_model_created_on': utils.get_time_in_millisecs(

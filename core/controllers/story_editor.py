@@ -131,6 +131,12 @@ class EditableStoryDataHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
+        # Generate new TopicSummary after a Story has been edited to
+        # make sure the TopicSummaryTile displays the correct number
+        # of chapters.
+        topic_id = story.corresponding_topic_id
+        topic_services.generate_topic_summary(topic_id)
+
     @acl_decorators.can_delete_story
     def delete(self, story_id):
         """Handles Delete requests."""
