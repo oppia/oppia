@@ -20,17 +20,15 @@ import { TestBed } from '@angular/core/testing';
 
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
-import { ThreadMessageObjectFactory } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
+import { ThreadMessage } from
+  'domain/feedback_message/ThreadMessage.model';
 
 describe('SuggestionThreadObjectFactory', () => {
   let suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
-  let threadMessageObjectFactory: ThreadMessageObjectFactory;
 
   beforeEach(() => {
     suggestionThreadObjectFactory =
       TestBed.get(SuggestionThreadObjectFactory);
-    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
   });
 
   let suggestionThreadBackendDict;
@@ -143,7 +141,7 @@ describe('SuggestionThreadObjectFactory', () => {
       expect(suggestionThread.getMessages()).toEqual([]);
 
       let messages = [
-        threadMessageObjectFactory.createFromBackendDict({
+        ThreadMessage.createFromBackendDict({
           author_username: 'author1',
           text: 'message1',
           created_on_msecs: 1000000,
@@ -153,7 +151,7 @@ describe('SuggestionThreadObjectFactory', () => {
           updated_status: 'status',
           updated_subject: 'subject',
         }),
-        threadMessageObjectFactory.createFromBackendDict({
+        ThreadMessage.createFromBackendDict({
           author_username: 'author2',
           text: 'message2',
           created_on_msecs: 1000000,

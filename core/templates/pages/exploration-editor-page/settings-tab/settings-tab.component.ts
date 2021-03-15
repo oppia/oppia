@@ -268,25 +268,31 @@ angular.module('oppia').component('settingsTab', {
         $rootScope.$applyAsync();
       };
 
+      ctrl._successCallback = () => {
+        $rootScope.$applyAsync();
+      };
+
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          true);
+          true, ctrl._successCallback);
       };
       ctrl.muteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          true
+          true,
+          ctrl._successCallback
         );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          false
+          false,
+          ctrl._successCallback
         );
       };
       ctrl.unmuteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          false);
+          false, ctrl._successCallback);
       };
 
       // Methods relating to control buttons.

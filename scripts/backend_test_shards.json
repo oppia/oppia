@@ -90,6 +90,7 @@
         "core.domain.interaction_registry_test",
         "core.domain.skill_domain_test",
         "core.domain.auth_services_test",
+        "core.domain.auth_jobs_one_off_test",
         "core.domain.opportunity_services_test",
         "core.domain.audit_validators_test",
         "core.domain.feedback_domain_test",
@@ -110,7 +111,8 @@
     "4": [
         "core.domain.prod_validators_test",
         "core.domain.skill_jobs_one_off_test",
-        "core.domain.email_validators_test"
+        "core.domain.email_validators_test",
+        "core.domain.exploration_validators_test"
     ],
     "5": [
         "core.domain.suggestion_validators_test",
@@ -192,7 +194,10 @@
     ],
     "9": [
         "core.domain.user_jobs_one_off_test",
-        "core.domain.topic_validators_test"
+        "core.domain.topic_validators_test",
+        "jobs.jobs_utils_test",
+        "jobs.base_model_validator_test",
+        "jobs.base_model_validator_errors_test"
     ],
     "10": [
         "core.domain.question_jobs_one_off_test",
@@ -208,7 +213,7 @@
         "scripts.linters.other_files_linter_test",
         "scripts.regenerate_requirements_test",
         "scripts.install_third_party_test",
-        "scripts.check_frontend_coverage_test",
+        "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
         "scripts.release_scripts.update_changelog_and_credits_test",
         "scripts.setup_test",
