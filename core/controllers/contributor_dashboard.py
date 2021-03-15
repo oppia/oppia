@@ -17,6 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+import pprint
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -109,15 +112,27 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     this batch.
         """
         topics_with_skills = topic_fetchers.get_all_topics_with_skills()
+        logging.error(
+            'topics_with_skills: %s'
+            % [topic.to_dict() for topic in topics_with_skills])
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
+        logging.error(
+            'skill_opportunities: %s'
+            % [opp.to_dict() for opp in skill_opportunities])
         id_to_skill_opportunity_dict = {
             opp.id: opp.to_dict() for opp in skill_opportunities}
+        logging.error(
+            'id_to_skill_opportunity_dict: %s' % id_to_skill_opportunity_dict)
         opportunities = []
         for topic in topics_with_skills:
             for skill_id in topic.get_all_skill_ids():
                 if len(opportunities) == constants.OPPORTUNITIES_PAGE_SIZE:
                     break
+                logging.error('skill_id: %s' % skill_id)
+                logging.error(
+                    'skill_id in id_to_skill_opportunity_dict: %s'
+                    % (skill_id in id_to_skill_opportunity_dict))
                 if skill_id in id_to_skill_opportunity_dict:
                     skill_opportunity_dict = (
                         id_to_skill_opportunity_dict[skill_id])
