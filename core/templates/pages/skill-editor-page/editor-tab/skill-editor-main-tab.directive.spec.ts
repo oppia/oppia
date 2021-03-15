@@ -25,7 +25,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 // ^^^ This block is to be removed.
 
-
 describe('Skill editor main tab directive', function() {
   var $scope = null;
   var ctrl = null;
