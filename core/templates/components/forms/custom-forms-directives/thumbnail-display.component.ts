@@ -19,7 +19,7 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ImageSanitizerService } from 'services/image-sanitizer.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Component({
   selector: 'oppia-thumbnail-display',
@@ -27,7 +27,7 @@ import { ImageSanitizerService } from 'services/image-sanitizer.service';
   styleUrls: []
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
-  constructor(private imageSanitizerService: ImageSanitizerService) {}
+  constructor(private svgSanitizerService: SvgSanitizerService) {}
   @Input() imgSrc: string;
   @Input() aspectRatio: string;
   @Input() classes: string[];
@@ -45,7 +45,7 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   updateSvgInViewIfSafe(): void {
     // If the SVG image is passed as base64 data.
     if (this.imgSrc.indexOf('data:image/svg+xml;base64') === 0) {
-      const safeResourceUrl = this.imageSanitizerService
+      const safeResourceUrl = this.svgSanitizerService
         .getTrustedSvgResourceUrl(this.imgSrc);
       if (safeResourceUrl !== null) {
         this.imageSourceInView = safeResourceUrl;

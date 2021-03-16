@@ -25,7 +25,7 @@ import constants from 'assets/constants';
 @Injectable({
   providedIn: 'root'
 })
-export class ImageSanitizerService {
+export class SvgSanitizerService {
   constructor(private sanitizer: DomSanitizer) {}
 
   cleanMathExpressionSvgString(svgString: string): string {
@@ -174,24 +174,7 @@ export class ImageSanitizerService {
     }
     return null;
   }
-
-  isValidBase64Png(base64ImageData: string): boolean {
-    const DATA_URL_PATTERN = /^data:image\/png;base64,[a-z0-9+\/%]+=*$/i;
-    // Check if data passed is a valid base64 PNG.
-    if (!base64ImageData.match(DATA_URL_PATTERN)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  getTrustedPngResourceUrl(base64ImageData: string): SafeUrl | null {
-    if (this.isValidBase64Png(base64ImageData)) {
-      return this.sanitizer.bypassSecurityTrustUrl(base64ImageData);
-    }
-    return null;
-  }
 }
 
 angular.module('oppia').factory(
-  'ImageSanitizerService', downgradeInjectable(ImageSanitizerService));
+  'SvgSanitizerService', downgradeInjectable(SvgSanitizerService));

@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
-import { ImageSanitizerService } from 'services/image-sanitizer.service';
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { AppConstants } from 'app.constants';
 
@@ -46,7 +45,6 @@ export class OppiaAdminNavbarComponent implements OnInit {
     private adminRouterService: AdminRouterService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
-    private imageSanitizerService: ImageSanitizerService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -95,8 +93,7 @@ export class OppiaAdminNavbarComponent implements OnInit {
 
   async getProfileImageDataAsync(): Promise<void> {
     let dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    this.profilePictureDataUrl = this.imageSanitizerService
-      .getTrustedPngResourceUrl(dataUrl) as string;
+    this.profilePictureDataUrl = decodeURIComponent(dataUrl);
   }
 
   async getUserInfoAsync(): Promise<void> {

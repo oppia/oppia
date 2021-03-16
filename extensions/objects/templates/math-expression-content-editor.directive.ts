@@ -21,7 +21,7 @@ require('directives/mathjax-bind.directive.ts');
 require('services/alerts.service.ts');
 require('services/external-rte-save.service.ts');
 require('services/image-upload-helper.service.ts');
-require('services/image-sanitizer.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -30,10 +30,10 @@ import { Subscription } from 'rxjs';
 // in via initArgs.
 
 angular.module('oppia').directive('mathExpressionContentEditor', [
-  'AlertsService', 'ExternalRteSaveService', 'ImageSanitizerService',
+  'AlertsService', 'ExternalRteSaveService', 'SvgSanitizerService',
   'ImageUploadHelperService',
   function(
-      AlertsService, ExternalRteSaveService, ImageSanitizerService,
+      AlertsService, ExternalRteSaveService, SvgSanitizerService,
       ImageUploadHelperService) {
     return {
       restrict: 'E',
@@ -89,10 +89,10 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
         // backend.
         var processAndSaveSvg = function() {
           var cleanedSvgString = (
-            ImageSanitizerService.cleanMathExpressionSvgString(
+            SvgSanitizerService.cleanMathExpressionSvgString(
               ctrl.svgString));
           var dimensions = (
-            ImageSanitizerService.
+            SvgSanitizerService.
               extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
           var fileName = (
             ImageUploadHelperService.generateMathExpressionImageFilename(
@@ -103,7 +103,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
             'data:image/svg+xml;base64,' +
             btoa(unescape(encodeURIComponent(cleanedSvgString))));
           var invalidTagsAndAttributes = (
-            ImageSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+            SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
               dataURI));
           var tags = invalidTagsAndAttributes.tags;
           var attrs = invalidTagsAndAttributes.attrs;
