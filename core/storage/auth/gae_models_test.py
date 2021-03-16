@@ -297,6 +297,8 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
 class FirebaseSeedModelTests(test_utils.GenericTestBase):
     """Tests for auth_models.FirebaseSeedModel."""
 
+    USER_ID = 'user_id'
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             auth_models.FirebaseSeedModel.get_deletion_policy(),
