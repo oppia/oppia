@@ -79,8 +79,6 @@ import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioTranslationLanguageService } from
@@ -501,7 +499,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static angularNameService: AngularNameService;
   static answerClassificationService: AnswerClassificationService;
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
-  static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
   static audioBarStatusService: AudioBarStatusService;
   static audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -790,7 +787,6 @@ private algebraicExpressionInputValidationService:
 private angularNameService: AngularNameService,
 private answerClassificationService: AnswerClassificationService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
-private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
 private audioBarStatusService: AudioBarStatusService,
 private audioTranslationLanguageService: AudioTranslationLanguageService,
@@ -1087,8 +1083,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.answerClassificationService);
     OppiaAngularRootComponent.answerGroupObjectFactory = (
       this.answerGroupObjectFactory);
-    OppiaAngularRootComponent.answerStatsObjectFactory = (
-      this.answerStatsObjectFactory);
     OppiaAngularRootComponent.appService = this.appService;
     OppiaAngularRootComponent.audioBarStatusService = (
       this.audioBarStatusService);

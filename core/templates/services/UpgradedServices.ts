@@ -47,8 +47,6 @@ import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { AssetsBackendApiService } from
   'services/assets-backend-api.service';
@@ -552,8 +550,6 @@ export class UpgradedServices {
     upgradedServices['AlgebraicExpressionInputRulesService'] =
       new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
-    upgradedServices['AnswerStatsObjectFactory'] =
-      new AnswerStatsObjectFactory();
     upgradedServices['AppService'] = new AppService();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
     upgradedServices['AudioTranslationManagerService'] =
@@ -813,8 +809,7 @@ export class UpgradedServices {
     upgradedServices['SkillCreationBackendApiService'] =
         new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['StateTopAnswersStatsObjectFactory'] =
-        new StateTopAnswersStatsObjectFactory(
-          upgradedServices['AnswerStatsObjectFactory']);
+        new StateTopAnswersStatsObjectFactory();
     upgradedServices['SpeechSynthesisChunkerService'] =
         new SpeechSynthesisChunkerService(
           upgradedServices['HtmlEscaperService']);

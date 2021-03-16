@@ -22,8 +22,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -62,7 +60,6 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { EditabilityService } from 'services/editability.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -103,10 +100,6 @@ describe('Exploration editor tab component', function() {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
-    $provide.value(
-      'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
-    $provide.value(
-      'EditabilityService', TestBed.get(EditabilityService));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));

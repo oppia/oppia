@@ -14,7 +14,7 @@
 
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateObjectsBackendDict } from
   'domain/exploration/StatesObjectFactory';
 import { ExplorationPermissions } from

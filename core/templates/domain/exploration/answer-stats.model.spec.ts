@@ -13,19 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AnswerStatsObjectFactory.ts
+ * @fileoverview Unit tests for answer-stats.model.ts
  */
 
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 
 describe('Answer Stats Object Factory', () => {
-  let asof: AnswerStatsObjectFactory;
-
-  beforeEach(() => {
-    asof = new AnswerStatsObjectFactory();
-  });
-
   it('should create an answer stats object from backend dict', () => {
     const answerStatsObjectBackend = {
       answer: 'hola',
@@ -33,7 +26,7 @@ describe('Answer Stats Object Factory', () => {
     };
 
     const answerStatsObject = (
-      asof.createFromBackendDict(answerStatsObjectBackend));
+      AnswerStats.createFromBackendDict(answerStatsObjectBackend));
 
     expect(answerStatsObject.toBackendDict()).toEqual(answerStatsObjectBackend);
     expect(answerStatsObject.getAnswer()).toBe('hola');
@@ -50,7 +43,7 @@ describe('Answer Stats Object Factory', () => {
     };
 
     const answerStatsObject = (
-      asof.createFromBackendDict(answerStatsObjectBackend));
+      AnswerStats.createFromBackendDict(answerStatsObjectBackend));
 
     expect(answerStatsObject.toBackendDict()).toEqual(answerStatsObjectBackend);
     expect(answerStatsObject.getAnswer()).toBe(2);

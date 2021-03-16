@@ -17,7 +17,7 @@
  */
 
 import { AnswerStats } from
-  'domain/exploration/AnswerStatsObjectFactory';
+  'domain/exploration/answer-stats.model';
 import { InteractionAnswer } from
   'interactions/answer-defs';
 

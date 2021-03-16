@@ -21,13 +21,12 @@ require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerStatsBackendDict, AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStatsBackendDict, AnswerStats } from
+  'domain/exploration/answer-stats.model';
 import { UtilsService } from 'services/utils.service';
 
 describe('Oppia sorted tiles visualization', function() {
   let $compile, $rootScope, $uibModal;
-  let answerStatsObjectFactory: AnswerStatsObjectFactory;
   let utilsService: UtilsService;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -38,7 +37,6 @@ describe('Oppia sorted tiles visualization', function() {
     $compile = $injector.get('$compile');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
   }));
 
   const newDirective = (
@@ -48,7 +46,7 @@ describe('Oppia sorted tiles visualization', function() {
         '</oppia-visualization-sorted-tiles>');
       const scope = $rootScope.$new();
       scope.data = (
-        data.map(d => answerStatsObjectFactory.createFromBackendDict(d)));
+        data.map(d => AnswerStats.createFromBackendDict(d)));
       scope.options = options;
       const element = $compile(elementHtml)(scope);
       $rootScope.$digest();

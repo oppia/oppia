@@ -16,15 +16,13 @@
  * @fileoverview Tests for StateTopAnswerStatsObjectFactory.
  */
 
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from
+  'domain/exploration/answer-stats.model';
 import { StateTopAnswersStatsObjectFactory } from
   'domain/statistics/state-top-answers-stats-object.factory';
 
 describe('State top answers stats object factory', () => {
-  var stasof = new StateTopAnswersStatsObjectFactory(
-    new AnswerStatsObjectFactory());
-  var asof = new AnswerStatsObjectFactory();
+  var stasof = new StateTopAnswersStatsObjectFactory();
 
   it('should create a state top answers stats object from a backend dict',
     () => {
@@ -51,8 +49,9 @@ describe('State top answers stats object factory', () => {
       };
 
       var stateAnswers = {
-        Hola: backendDict.answers.Hola.map(dict => asof.createFromBackendDict(
-          dict))
+        Hola: backendDict.answers.Hola.map(
+          dict => AnswerStats.createFromBackendDict(
+            dict))
       };
 
       var stateTopAnswerStats = (

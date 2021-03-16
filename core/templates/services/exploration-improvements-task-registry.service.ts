@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { group } from 'd3-array';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { States } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config.model';
