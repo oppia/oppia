@@ -17,7 +17,7 @@
       </div>
       <div ng-if="!$ctrl.isFileUploaded()">
         <oppia-image-uploader (file-changed)="onFileChanged($event)"
-                              [allowed-image-formats]="$ctrl.allowedImageFormats">
+                              [allowed-image-formats]="allowedImageFormats">
         </oppia-image-uploader>
       </div>
       <div ng-if="$ctrl.isFileUploaded()">
