@@ -321,7 +321,8 @@ angular.module('oppia').directive('adminMiscTab', [
               // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
-              ctrl.setStatusMessage('Server error: ' + errorResponse);
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
@@ -339,7 +340,8 @@ angular.module('oppia').directive('adminMiscTab', [
               // once the directive is migrated to angular.
               $rootScope.$apply();
             }, errorResponse => {
-              ctrl.setStatusMessage('Server error: ' + errorResponse);
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
