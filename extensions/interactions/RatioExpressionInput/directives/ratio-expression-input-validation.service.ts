@@ -66,6 +66,14 @@ export class RatioExpressionInputValidationService {
             'The number of terms in a ratio should be greater than 1.')
         }
       ];
+    } else if (expectedNumberOfTerms > 10) {
+      return [
+        {
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'The number of terms in a ratio should not be greater than 10.')
+        }
+      ];
     } else {
       return [];
     }
