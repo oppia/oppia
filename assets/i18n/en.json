@@ -592,7 +592,7 @@
     "I18N_TEACH_TESTIMONIAL_3": "“I never expected the students to learn tech and do maths lessons so fast. It's their first exposure to smarttech and they were really struggling to handle them at first. Now, I feel so elated to see them doing the Oppia lessons even before I enter the class!”",
     "I18N_TEACH_TESTIMONIAL_4": "“to be written3”",
     "I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
-    "I18N_TOPIC_VIEWER_CHAPTER": "Chapter",
+    "I18N_TOPIC_VIEWER_CHAPTER": "{count, plural, one{1 chapter} other{# chapters}}",
     "I18N_TOPIC_VIEWER_DESCRIPTION": "Description",
     "I18N_TOPIC_VIEWER_LESSON": "Lesson",
     "I18N_TOPIC_VIEWER_LESSONS": "Lessons",

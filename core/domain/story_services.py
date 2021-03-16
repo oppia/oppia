@@ -623,6 +623,13 @@ def update_story(
         new_exploration_context_models)
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
+    # Generate new TopicSummary after a Story has been edited to
+    # make sure the TopicSummaryTile displays the correct number
+    # of chapters.
+    topic_id = new_story.corresponding_topic_id
+    from core.domain import topic_services
+    topic_services.generate_topic_summary(topic_id)
+
 
 def _is_topic_published(story):
     """Returns whether the story's corresponding topic is published.

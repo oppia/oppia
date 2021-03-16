@@ -780,19 +780,19 @@ def compute_summary_of_topic(topic):
     """
     canonical_story_count = 0
     additional_story_count = 0
-    published_chapter_count = 0
+    published_node_count = 0
     for reference in topic.canonical_story_references:
         if reference.story_is_published:
             canonical_story_count += 1
             story_summary = story_fetchers.get_story_summary_by_id(
                 reference.story_id)
-            published_chapter_count += len(story_summary.node_titles)
+            published_node_count += len(story_summary.node_titles)
     for reference in topic.additional_story_references:
         if reference.story_is_published:
             additional_story_count += 1
     topic_model_canonical_story_count = canonical_story_count
     topic_model_additional_story_count = additional_story_count
-    total_model_published_chapter_count = published_chapter_count
+    total_model_published_node_count = published_node_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
@@ -805,7 +805,7 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, total_model_published_chapter_count,
+        total_skill_count, total_model_published_node_count,
         topic.thumbnail_filename, topic.thumbnail_bg_color, topic.url_fragment,
         topic.created_on, topic.last_updated
     )
@@ -832,8 +832,8 @@ def save_topic_summary(topic_summary):
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
-        'total_published_chapter_count':
-            topic_summary.total_published_chapter_count,
+        'total_published_node_count':
+            topic_summary.total_published_node_count,
         'thumbnail_filename': topic_summary.thumbnail_filename,
         'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
