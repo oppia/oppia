@@ -343,7 +343,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated CollectionSnapshotMetadataModel\', 3]'
@@ -353,7 +354,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated CollectionSnapshotMetadataModel\', 3]'
@@ -364,7 +366,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionSnapshotMetadataModel\', '
@@ -434,7 +437,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             collection_models.CollectionSnapshotMetadataModel(
                 id='0-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.update_timestamps()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for collection model '
@@ -455,7 +459,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             'cmd': 'delete_collection_node',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -539,6 +544,7 @@ class CollectionSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -594,6 +600,7 @@ class CollectionSnapshotContentModelValidatorTests(
             collection_models.CollectionSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -881,7 +888,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
 
     def test_model_with_committer_id_migration_bot(self):
         self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]'
@@ -891,7 +899,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
 
     def test_model_with_pseudo_committer_id(self):
         self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]'
@@ -902,7 +911,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionRightsSnapshotMetadataModel\', '
@@ -972,7 +982,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             collection_models.CollectionRightsSnapshotMetadataModel(
                 id='0-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.update_timestamps()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for collection rights model '
@@ -994,7 +1005,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             'cmd': 'release_ownership',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -1076,6 +1088,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1131,6 +1144,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             collection_models.CollectionRightsSnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -1187,7 +1201,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_community_owned=False,
                 post_commit_is_private=False))
-        self.rights_model_instance.put_for_human()
+        self.rights_model_instance.update_timestamps()
+        self.rights_model_instance.put()
 
         self.model_instance_0 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
@@ -1217,7 +1232,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_user_id_migration_bot(self):
         self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]'
@@ -1227,7 +1243,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_pseudo_user_id(self):
         self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
-        self.model_instance_1.put_for_bot()
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
 
         expected_output = [
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]'
@@ -1238,7 +1255,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionCommitLogEntryModel\', '
@@ -1305,7 +1323,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.collection_id = '0'
-        model_with_invalid_version_in_id.put_for_human()
+        model_with_invalid_version_in_id.update_timestamps()
+        model_with_invalid_version_in_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for collection model '
@@ -1329,7 +1348,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.collection_id = '0'
-        model_with_invalid_id.put_for_human()
+        model_with_invalid_id.update_timestamps()
+        model_with_invalid_id.put()
         expected_output = [
             (
                 u'[u\'failed validation check for model id check of '
@@ -1346,7 +1366,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
@@ -1359,7 +1380,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
@@ -1374,7 +1396,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_0.post_commit_status = (
             feconf.POST_COMMIT_STATUS_PUBLIC)
         self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
 
         expected_output = [
             (
@@ -1391,7 +1414,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_0.post_commit_status = (
             feconf.POST_COMMIT_STATUS_PRIVATE)
         self.model_instance_0.post_commit_is_private = False
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
 
         expected_output = [
             (
@@ -1411,7 +1435,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             'cmd': 'delete_collection_node',
             'invalid_attribute': 'invalid'
         }]
-        self.model_instance_0.put_for_human()
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit cmd '
@@ -1497,6 +1522,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.model_instance_0 = (
             collection_models.CollectionSummaryModel.get_by_id('0'))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         self.model_instance_1 = (
@@ -1523,6 +1549,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -1558,6 +1585,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         collection_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.collection_model_last_updated = (
             collection_model.last_updated)
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1631,6 +1659,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         sorted_contributor_ids = sorted(
             self.model_instance_0.contributors_summary.keys())
         self.model_instance_0.contributors_summary = {'invalid': 1}
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1646,6 +1675,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_node_count(self):
         self.model_instance_0.node_count = 10
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1660,8 +1690,10 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_ratings(self):
         self.model_instance_0.ratings = {'1': 0, '2': 1}
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         self.model_instance_1.ratings = {}
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         expected_output = [(
             u'[u\'failed validation check for ratings check of '
@@ -1674,6 +1706,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_collection_related_property(self):
         self.model_instance_0.title = 'invalid'
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1688,6 +1721,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_collection_rights_related_property(self):
         self.model_instance_0.status = 'public'
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (

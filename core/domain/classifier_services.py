@@ -292,6 +292,8 @@ def _update_classifier_training_jobs_status(job_ids, status):
 
         classifier_training_job_models[index].status = status
 
+    classifier_models.ClassifierTrainingJobModel.update_timestamps_multi(
+        classifier_training_job_models)
     classifier_models.ClassifierTrainingJobModel.put_multi(
         classifier_training_job_models)
 
@@ -337,6 +339,7 @@ def _update_scheduled_check_time_for_new_training_job(job_id):
     classifier_training_job_model.next_scheduled_check_time = (
         datetime.datetime.utcnow() + datetime.timedelta(
             minutes=feconf.CLASSIFIER_JOB_TTL_MINS))
+    classifier_training_job_model.update_timestamps()
     classifier_training_job_model.put()
 
 
@@ -583,6 +586,7 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
             classifier_training_job.next_scheduled_check_time = (
                 datetime.datetime.utcnow())
             classifier_training_job.status = feconf.TRAINING_JOB_STATUS_NEW
+            classifier_training_job.update_timestamps()
             classifier_training_job.put()
 
     if algorithm_ids_to_remove:
@@ -599,6 +603,7 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
     state_training_jobs_mapping.validate()
     state_training_jobs_mapping_model.algorithm_ids_to_job_ids = (
         state_training_jobs_mapping.algorithm_ids_to_job_ids)
+    state_training_jobs_mapping_model.update_timestamps()
     state_training_jobs_mapping_model.put()
 
 
