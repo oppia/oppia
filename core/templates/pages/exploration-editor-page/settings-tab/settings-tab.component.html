@@ -192,7 +192,7 @@
           <div>
             <div class="oppia-on-off-switch">
               <input span ng-if="$ctrl.areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" checked disabled>
-              <input span ng-if="!$ctrl.areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" ng-click="$ctrl.enableParameters()">
+              <input span ng-if="!$ctrl.areParametersEnabled()" ng-disabled="$ctrl.explorationIsLinkedToStory" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" ng-click="$ctrl.enableParameters()">
               <label class="oppia-on-off-switch-label protractor-test-enable-parameters" for="parameter-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -202,6 +202,9 @@
         </div>
         <span class="form-text secondary-info-text">
           Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank" rel="noopener">more info</a>).
+        </span>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.explorationIsLinkedToStory">
+          Explorations in a story cannot have parameters enabled.
         </span>
       </div>
       <hr class="oppia-feature-separator">
@@ -238,7 +241,7 @@
           <div>
             <div class="oppia-on-off-switch">
               <input type="checkbox" ng-if="!$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()">
-              <input type="checkbox" ng-if="$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()" checked>
+              <input type="checkbox" ng-if="$ctrl.isCorrectnessFeedbackEnabled()" ng-disabled="$ctrl.explorationIsLinkedToStory" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()" checked>
               <label class="oppia-on-off-switch-label protractor-test-enable-mark-correctness-feedback" for="correctness-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -248,6 +251,9 @@
         </div>
         <span class="form-text secondary-info-text">
           Correctness feedback allows the user to categorise answer groups as correct or incorrect.
+        </span>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.explorationIsLinkedToStory && $ctrl.isCorrectnessFeedbackEnabled()">
+          Correctness feedback cannot be disabled for an exploration linked to a story.
         </span>
       </div>
       <hr class="oppia-feature-separator">

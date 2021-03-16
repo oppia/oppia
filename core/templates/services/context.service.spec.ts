@@ -117,6 +117,11 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('editor');
     });
 
+    it('should correctly retrieve the story context', () => {
+      ecs.setExplorationIsLinkedToStory();
+      expect(ecs.isExplorationLinkedToStory()).toBe(true);
+    });
+
     it('should correctly retrieve exploration editor mode', () => {
       expect(ecs.isInExplorationEditorMode()).toBe(true);
     });

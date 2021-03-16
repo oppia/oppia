@@ -147,6 +147,10 @@ export class ContextService {
     this.explorationIsLinkedToStory = true;
   }
 
+  isExplorationLinkedToStory(): boolean {
+    return this.explorationIsLinkedToStory;
+  }
+
   isInExplorationContext(): boolean {
     return (
       this.getPageContext() ===

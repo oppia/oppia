@@ -78,6 +78,7 @@ require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/context.service');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
@@ -93,7 +94,8 @@ angular.module('oppia').component('settingsTab', {
   template: require('./settings-tab.component.html'),
   controller: [
     '$http', '$uibModal', 'AlertsService', 'ChangeListService',
-    'EditabilityService', 'EditableExplorationBackendApiService',
+    'ContextService', 'EditabilityService',
+    'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesService',
@@ -108,7 +110,8 @@ angular.module('oppia').component('settingsTab', {
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
         $http, $uibModal, AlertsService, ChangeListService,
-        EditabilityService, EditableExplorationBackendApiService,
+        ContextService, EditabilityService,
+        EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesService,
@@ -126,6 +129,7 @@ angular.module('oppia').component('settingsTab', {
       var EXPLORE_PAGE_PREFIX = '/explore/';
 
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.explorationIsLinkedToStory = false;
 
       ctrl.getExplorePageUrl = function() {
         return (
@@ -161,6 +165,9 @@ angular.module('oppia').component('settingsTab', {
             }
 
             ctrl.stateNames = ExplorationStatesService.getStateNames();
+            ctrl.explorationIsLinkedToStory = (
+              ContextService.isExplorationLinkedToStory());
+            console.log(ctrl.explorationIsLinkedToStory);
           }
           ctrl.hasPageLoaded = true;
         });

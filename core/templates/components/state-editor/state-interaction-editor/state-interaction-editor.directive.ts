@@ -60,6 +60,7 @@ require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/context.service');
 
 import { Subscription } from 'rxjs';
 
@@ -217,6 +218,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.openInteractionCustomizerModal = function() {
+            if ()
             if (EditabilityService.isEditable()) {
               AlertsService.clearWarnings();
 
