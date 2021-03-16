@@ -129,8 +129,8 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               }
             } else {
               // Make list of dicts from the list of choices.
-              for (var i = 0; i < ctrl.choices.length; i++) {
-                ctrl.list.push({title: ctrl.choices[i], items: []});
+              for (let choice of ctrl.choices) {
+                ctrl.list.push({title: choice, items: []});
               }
             }
 
