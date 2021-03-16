@@ -51,7 +51,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-fdescribe('Exploration save and publish buttons component', function() {
+describe('Exploration save and publish buttons component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;

@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for the UserExplorationPermissionsService.
  */
+import { EventEmitter } from '@angular/core';
 
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
@@ -105,5 +106,19 @@ describe('User Exploration Permissions Service', () => {
     expect(req2.request.method).toEqual('GET');
     req2.flush(samplePermissionsData);
     flushMicrotasks();
+  }));
+
+  it('should fetch rights data irrespective' +
+  'whether it is cached or not', fakeAsync(() => {
+    let mockuserExplorationPermissionsFetched = new EventEmitter();
+    ueps.fetchPermissionsAsync();
+    let req = httpTestingController.expectOne(
+      '/createhandler/permissions/' + sampleExplorationId);
+
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePermissionsData);
+    flushMicrotasks();
+    expect(ueps.onUserExplorationPermissionsFetched).toEqual(
+      mockuserExplorationPermissionsFetched);
   }));
 });
