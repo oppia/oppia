@@ -1,10 +1,11 @@
-<div class="d-flex flex-row justify-content-center align-items-center" style="width: 100%;">
-  <div class="oppia-noninteractive-video-iframe-container">
-    <iframe class="oppia-noninteractive-video-iframe" [src]="videoUrl"
-            frameborder="0" allowfullscreen tabindex="{{tabIndexVal}}">
-    </iframe>
+<div class="oppia-noninteractive-video-iframe-container">
+  <div class="oppia-noninteractive-video-iframe">
+    <youtube-player [videoId]="videoId" [startSeconds]="start"
+                    [endSeconds]="end" [playerVars]="playerVars"></youtube-player>
   </div>
 </div>
+<!-- <youtube-player class="oppia-noninteractive-video-iframe" [videoId]="videoId" [startSeconds]="start"
+                [endSeconds]="end" [playerVars]="{autoplay: autoplay}" [width]=""></youtube-player> -->
 <style>
   /* The value of 60.9% is derived from the ratio of the height to the width
    * (280/480). See http://alistapart.com/article/creating-intrinsic-ratios-for-video
@@ -15,7 +16,7 @@
     position: relative;
   }
 
-  .oppia-noninteractive-video-iframe {
+  .oppia-noninteractive-video-iframe /deep/ iframe {
     height: 100%;
     left: 0;
     position: absolute;

@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
+import { YouTubePlayerModule } from '@angular/youtube-player';
 import { NgbAccordionModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.component';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
@@ -41,7 +42,8 @@ import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-vid
     MatButtonModule,
     NgbAccordionModule,
     NgbNavModule,
-    NgbTooltipModule
+    NgbTooltipModule,
+    YouTubePlayerModule
   ],
   declarations: [
     NoninteractiveCollapsible,
