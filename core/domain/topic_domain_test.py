@@ -1422,6 +1422,18 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'Expected total_skill_count to be greater than or equal to '
             'uncategorized_skill_count 10, received \'5\'')
 
+    def test_validation_fails_with_invalid_total_published_node_count(self):
+        self.topic_summary.total_published_node_count = '10'
+        self._assert_validation_error(
+            'Expected total published node count to be an integer, '
+            'received \'10\'')
+
+    def test_validation_fails_with_negative_total_published_node_count(self):
+        self.topic_summary.total_published_node_count = -1
+        self._assert_validation_error(
+            'Expected total_published_node_count to be non-negative, '
+            'received \'-1\'')
+
     def test_validation_fails_with_invalid_subtopic_count(self):
         self.topic_summary.subtopic_count = '10'
         self._assert_validation_error(
