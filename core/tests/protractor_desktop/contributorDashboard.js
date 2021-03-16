@@ -218,7 +218,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(2);
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      'Question 1', SKILL_DESCRIPTIONS[0], 'Rejected', null);
+      'Question 1', SKILL_DESCRIPTIONS[0], 'Revisions Requested', null);
     await users.logout();
   });
 
