@@ -51,8 +51,8 @@ describe('Classroom page functionality', function() {
       });
   });
 
-  beforeEach(async function() {
-    await users.login('creator@classroomPage.com');
+  afterAll(async function() {
+    await users.logout();
   });
 
   it('should add a new published topic to the Math classroom',
@@ -107,7 +107,6 @@ describe('Classroom page functionality', function() {
       await topicEditorPage.publishTopic();
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(1);
-      await users.logout();
     });
 
   afterEach(async function() {
