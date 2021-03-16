@@ -67,7 +67,6 @@ import { OppiaFooterComponent } from '../pages/oppia-footer.component';
 import { I18nFooter } from '../../templates/I18nFooter';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 
-
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
   AngularFireModule.initializeApp(AuthService.firebaseConfig),
