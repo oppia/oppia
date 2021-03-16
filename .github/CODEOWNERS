@@ -166,9 +166,9 @@
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @DubeySandeep @vojtechjelinek
 /scripts/linters/ @Hudda @DubeySandeep
-/scripts/linters/codeowner_linter*.py @sajalasati
-/scripts/linters/pylint_extensions*.py @sajalasati
-/scripts/linters/python_linter*.py @sajalasati
+/scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
+/scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
+/scripts/linters/python_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/ts_ignore_exceptions.json @vojtechjelinek
 /ubuntu_dockerfile @DubeySandeep
 
