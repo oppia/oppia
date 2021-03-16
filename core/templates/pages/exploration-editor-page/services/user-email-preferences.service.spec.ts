@@ -35,7 +35,7 @@ describe('User Email Preferences Service', () => {
     explorationId: string = expId;
   }
 
-  let userEmailPreferencesService :
+  let userEmailPreferencesService:
   UserEmailPreferencesService;
   let httpTestingController: HttpTestingController;
   let csrfTokenService: CsrfTokenService;
