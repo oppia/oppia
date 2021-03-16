@@ -58,6 +58,7 @@ import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
+import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
 import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
@@ -116,10 +117,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe,
     WrapTextWithEllipsisPipe,
-    ThreadTableComponent,
     ThumbnailDisplayComponent,
+    ThreadTableComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
     TruncatePipe,
   ],
@@ -137,8 +138,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
-    ThreadTableComponent,
     ThumbnailDisplayComponent,
+    ThreadTableComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
   ],
 
   exports: [
@@ -160,8 +162,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
-    SummaryListHeaderComponent,
     WrapTextWithEllipsisPipe,
   ],
 })
