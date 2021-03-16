@@ -29,9 +29,6 @@ describe('SvgSanitizerService', () => {
     bypassSecurityTrustResourceUrl(str: string): string {
       return str;
     }
-    bypassSecurityTrustUrl(str: string): string {
-      return str;
-    }
   }
 
   /**
@@ -83,8 +80,7 @@ describe('SvgSanitizerService', () => {
   });
 
   it('should check for invalid base64 images', () => {
-    expect(svgSanitizerService.isValidBase64Svg(invalidBase64data))
-      .toBe(false);
+    expect(svgSanitizerService.isValidBase64Svg(invalidBase64data)).toBe(false);
   });
 
   it(

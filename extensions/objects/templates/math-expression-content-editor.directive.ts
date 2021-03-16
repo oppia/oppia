@@ -34,8 +34,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
   'SvgSanitizerService',
   function(
       AlertsService, ExternalRteSaveService, ImageUploadHelperService,
-      SvgSanitizerService,
-  ) {
+      SvgSanitizerService) {
     return {
       restrict: 'E',
       scope: {},

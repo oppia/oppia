@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview SVG and PNG related checks and sanitization service.
+ * @fileoverview SVG related checks and sanitization service.
  */
 
 import { Injectable } from '@angular/core';
