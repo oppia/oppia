@@ -23,7 +23,7 @@ import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
 import { OppiaAdminNavbarComponent } from './admin-navbar.component';
 
-fdescribe('Admin Navbar component', () => {
+describe('Admin Navbar component', () => {
   let component: OppiaAdminNavbarComponent;
   let userService = null;
   let adminRouterService = null;
