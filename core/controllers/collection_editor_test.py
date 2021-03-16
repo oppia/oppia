@@ -23,6 +23,7 @@ from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import user_domain
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -45,8 +46,8 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_domain.UserActionsInfo(self.owner_id)
+        self.admin = user_domain.UserActionsInfo(self.admin_id)
 
         self.json_dict = {
             'version': 1,

@@ -57,6 +57,7 @@ from core.domain import subtopic_page_services
 from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.platform.search import elastic_search_services
@@ -2784,7 +2785,7 @@ tags: []
             owner_id: str. The user_id of the owner of the exploration.
             exploration_id: str. The ID of the new exploration.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_domain.UserActionsInfo(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
@@ -2856,7 +2857,7 @@ tags: []
             owner_id: str. The user_id of the owner of the collection.
             collection_id: str. ID of the collection to be published.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_domain.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(

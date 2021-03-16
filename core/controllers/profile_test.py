@@ -26,6 +26,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -164,7 +165,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
         # a single exploration shows 1 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-        user_a = user_services.UserActionsInfo(user_a_id)
+        user_a = user_domain.UserActionsInfo(user_a_id)
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
@@ -191,7 +192,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
         self.signup(self.EMAIL_B, self.USERNAME_B)
         user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-        user_a = user_services.UserActionsInfo(user_a_id)
+        user_a = user_domain.UserActionsInfo(user_a_id)
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)

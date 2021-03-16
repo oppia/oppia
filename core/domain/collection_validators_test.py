@@ -29,7 +29,7 @@ from core.domain import exp_services
 from core.domain import prod_validation_jobs_one_off
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -168,7 +168,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'title',
                 'new_value': ''
             }], 'Changes.')
-        owner = user_services.UserActionsInfo(self.owner_id)
+        owner = user_domain.UserActionsInfo(self.owner_id)
         rights_manager.publish_collection(owner, '0')
         expected_output = [
             (
@@ -626,7 +626,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_domain.UserActionsInfo(self.owner_id)
 
         editor_email = 'user@editor.com'
         viewer_email = 'user@viewer.com'
@@ -1470,7 +1470,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_domain.UserActionsInfo(self.owner_id)
 
         editor_email = 'user@editor.com'
         viewer_email = 'user@viewer.com'

@@ -29,7 +29,7 @@ from core.domain import exp_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -502,7 +502,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_exploration(system_user, self.EXP_ID_3)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_3)
@@ -534,7 +534,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0])
 
         # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_0)
@@ -602,7 +602,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_collection(system_user, self.COL_ID_3)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
@@ -634,7 +634,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0])
 
         # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_collection(system_user, self.COL_ID_0)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
@@ -708,7 +708,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_exploration(system_user, self.EXP_ID_3)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_3)
@@ -743,7 +743,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0])
 
         # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_0)
@@ -811,7 +811,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_collection(system_user, self.COL_ID_3)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
@@ -843,7 +843,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0])
 
         # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_collection(system_user, self.COL_ID_0)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
@@ -890,7 +890,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Unpublish EXP_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_exploration(system_user, self.EXP_ID_1)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_1)
@@ -918,7 +918,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0])
 
         # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_0)
@@ -965,7 +965,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Unpublish COL_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_collection(system_user, self.COL_ID_1)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_1)
@@ -993,7 +993,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0])
 
         # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
         rights_manager.unpublish_collection(system_user, self.COL_ID_0)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)

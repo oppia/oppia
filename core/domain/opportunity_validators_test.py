@@ -30,7 +30,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -333,7 +333,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_domain.UserActionsInfo(self.admin_id)
 
         for i in python_utils.RANGE(3):
             skill_id = '%s' % i

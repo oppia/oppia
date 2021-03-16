@@ -33,7 +33,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import taskqueue_services
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -472,7 +472,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_domain.UserActionsInfo(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,

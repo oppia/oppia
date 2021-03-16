@@ -39,7 +39,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.domain import user_services
+from core.domain import user_domain
 import feconf
 import utils
 
@@ -369,7 +369,7 @@ class TopicRightsHandler(base.BaseHandler):
         if topic_rights is None:
             raise self.InvalidInputException(
                 'Expected a valid topic id to be provided.')
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
         can_edit_topic = topic_services.check_can_edit_topic(
             user_actions_info, topic_rights)
 

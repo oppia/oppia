@@ -34,7 +34,7 @@ from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -635,7 +635,7 @@ def apply_change_list(skill_id, change_list, committer_id):
         Skill. The resulting skill domain object.
     """
     skill = skill_fetchers.get_skill_by_id(skill_id)
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_domain.UserActionsInfo(committer_id)
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:

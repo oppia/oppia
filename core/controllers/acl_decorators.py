@@ -38,6 +38,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import user_domain
 from core.domain import user_services
 import feconf
 import utils
@@ -1784,7 +1785,7 @@ def can_delete_question(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if (role_services.ACTION_DELETE_ANY_QUESTION in
                 user_actions_info.actions):
@@ -1975,7 +1976,7 @@ def can_delete_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
         if role_services.ACTION_DELETE_ANY_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
@@ -2015,7 +2016,7 @@ def can_create_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
         if role_services.ACTION_CREATE_NEW_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
@@ -2112,7 +2113,7 @@ def can_delete_topic(handler):
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
@@ -2153,7 +2154,7 @@ def can_create_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if role_services.ACTION_CREATE_NEW_TOPIC in user_actions_info.actions:
             return handler(self, **kwargs)
@@ -2197,7 +2198,7 @@ def can_access_topics_and_skills_dashboard(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if (
                 role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD in
@@ -2245,7 +2246,7 @@ def can_view_any_topic_editor(handler):
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if (
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
@@ -2289,7 +2290,7 @@ def can_manage_rights_for_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if (
                 role_services.ACTION_MANAGE_TOPIC_RIGHTS in
@@ -2338,7 +2339,7 @@ def can_change_topic_publication_status(handler):
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if (
                 role_services.ACTION_CHANGE_TOPIC_STATUS in
@@ -2411,7 +2412,7 @@ def can_access_topic_viewer_page(handler):
         topic_id = topic.id
         topic_rights = topic_fetchers.get_topic_rights(
             topic_id, strict=False)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
 
         if (
                 topic_rights.topic_is_published or
@@ -2478,7 +2479,7 @@ def can_access_story_viewer_page(handler):
         topic_is_published = False
         topic_id = story.corresponding_topic_id
         story_id = story.id
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
             if topic.url_fragment != topic_url_fragment:
@@ -2569,7 +2570,7 @@ def can_access_subtopic_viewer_page(handler):
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_domain.UserActionsInfo(self.user_id)
         topic_rights = topic_fetchers.get_topic_rights(topic.id)
 
         if (
@@ -2671,7 +2672,7 @@ def get_decorator_for_accepting_suggestion(decorator):
             """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
-            user_actions_info = user_services.UserActionsInfo(self.user_id)
+            user_actions_info = user_domain.UserActionsInfo(self.user_id)
             if (
                     role_services.ACTION_ACCEPT_ANY_SUGGESTION in
                     user_actions_info.actions):

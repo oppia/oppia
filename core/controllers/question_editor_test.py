@@ -23,7 +23,7 @@ from constants import constants
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_services
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -53,11 +53,11 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
 
-        self.topic_manager = user_services.UserActionsInfo(
+        self.topic_manager = user_domain.UserActionsInfo(
             self.topic_manager_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.new_user = user_services.UserActionsInfo(self.new_user_id)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.admin = user_domain.UserActionsInfo(self.admin_id)
+        self.new_user = user_domain.UserActionsInfo(self.new_user_id)
+        self.editor = user_domain.UserActionsInfo(self.editor_id)
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(

@@ -27,7 +27,7 @@ from core.domain import feedback_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -62,7 +62,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_domain.UserActionsInfo(self.owner_id)
 
     def _get_thread_ids_subscribed_to(self, user_id):
         """Returns the feedback thread ids to which the user corresponding to

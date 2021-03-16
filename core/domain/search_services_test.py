@@ -25,7 +25,7 @@ from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import python_utils
@@ -54,7 +54,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_domain.UserActionsInfo(self.owner_id)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)

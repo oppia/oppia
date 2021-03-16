@@ -25,7 +25,7 @@ from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import user_domain
 from core.tests import test_utils
 
 
@@ -65,8 +65,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.moderator = user_services.UserActionsInfo(self.moderator_id)
+        self.owner = user_domain.UserActionsInfo(self.owner_id)
+        self.moderator = user_domain.UserActionsInfo(self.moderator_id)
 
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)

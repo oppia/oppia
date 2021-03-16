@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -259,13 +259,13 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         for exp_id, exp in self.EXP_DATA.items():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
-            owner = user_services.UserActionsInfo(exp['owner_id'])
+            owner = user_domain.UserActionsInfo(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_domain.UserActionsInfo(self.admin_id)
 
     def test_recommendation_categories_and_matrix_headers_match(self):
         topic_similarities_lines = (

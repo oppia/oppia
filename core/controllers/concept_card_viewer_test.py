@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import user_services
+from core.domain import user_domain
 from core.tests import test_utils
 import feconf
 
@@ -74,7 +74,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                 }
             })
         )
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_domain.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Description',
