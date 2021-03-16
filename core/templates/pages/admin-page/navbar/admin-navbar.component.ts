@@ -121,5 +121,5 @@ export class OppiaAdminNavbarComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'adminNavbar', downgradeComponent(
+  'oppiaAdminNavbar', downgradeComponent(
     {component: OppiaAdminNavbarComponent}));

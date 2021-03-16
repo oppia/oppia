@@ -209,5 +209,5 @@ export class OppiaAdminDevModeActivitiesTabComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'adminDevModeActivitiesTab', downgradeComponent(
+  'oppiaAdminDevModeActivitiesTab', downgradeComponent(
     {component: OppiaAdminDevModeActivitiesTabComponent}));

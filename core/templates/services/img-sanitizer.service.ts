@@ -176,7 +176,7 @@ export class ImgSanitizerService {
   }
 
   isValidBase64Png(base64ImageData: string): boolean {
-    const DATA_URL_PATTERN = /^data:image\/png;base64,[a-z0-9+\/]+=*$/i;
+    const DATA_URL_PATTERN = /^data:image\/png;base64,[a-z0-9+\/%]+=*$/i;
     // Check if data passed is a valid base64 PNG.
     if (!base64ImageData.match(DATA_URL_PATTERN)) {
       return false;
