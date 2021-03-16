@@ -35,7 +35,7 @@ describe('Confirm Or Cancel Modal Component', () => {
   });
 
   it('should close modal with the correct value', function() {
-    var message = 'closing';
+    const message = 'closing';
     confirmOrCancelModal.confirm<string>(message);
     expect(closeSpy).toHaveBeenCalledWith(message);
   });
@@ -46,7 +46,7 @@ describe('Confirm Or Cancel Modal Component', () => {
   });
 
   it('should dismiss modal with the correct value', function() {
-    var message = 'canceling';
+    const message = 'canceling';
     confirmOrCancelModal.cancel<string>(message);
     expect(dismissSpy).toHaveBeenCalledWith(message);
   });
