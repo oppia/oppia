@@ -19,6 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { AlertsService } from 'services/alerts.service';
 
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
@@ -28,7 +29,9 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
   template: ''
 })
 export class LoginPageComponent implements OnInit {
-  constructor(private authService: AuthService, private windowRef: WindowRef) {}
+  constructor(
+      private alertsService: AlertsService, private authService: AuthService,
+      private windowRef: WindowRef) {}
 
   static get isEnabled(): boolean {
     return AppConstants.ENABLE_LOGIN_PAGE;
@@ -46,8 +49,13 @@ export class LoginPageComponent implements OnInit {
         if (rejectionReason === null) {
           // Null rejections are used to signal that a user is not logged in.
           this.authService.signInWithRedirectAsync();
+        } else if (rejectionReason.code === 'auth/user-disabled') {
+          // Disabled Firebase accounts are reserved for users that are pending
+          // account deletion.
+          this.redirectToPendingAccountDeletionPage();
         } else {
-          this.redirectToHomePage();
+          this.alertsService.addWarning(rejectionReason.message);
+          setTimeout(() => this.redirectToHomePage(), 2000);
         }
       });
   }
@@ -62,6 +70,10 @@ export class LoginPageComponent implements OnInit {
 
   private redirectToHomePage(): void {
     this.windowRef.nativeWindow.location.assign('/');
+  }
+
+  private redirectToPendingAccountDeletionPage(): void {
+    this.windowRef.nativeWindow.location.assign('/pending-account-deletion');
   }
 }
 

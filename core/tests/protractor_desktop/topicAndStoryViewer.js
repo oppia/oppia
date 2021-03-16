@@ -161,8 +161,10 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
 
+    // This should return the user to the exploration page.
     await users.createAndLoginUser(
       'newStoryViewer@storyviewer.com', 'newStoryViewer');
+
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
