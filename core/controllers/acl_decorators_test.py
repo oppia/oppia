@@ -26,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -691,55 +692,66 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
+        self.public_exp_thread_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.published_exp_id,
+            self.owner_id, 'public exp', 'some text')
+        self.private_exp_thread_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.private_exp_id, self.owner_id,
+            'private exp', 'some text')
+        self.disabled_exp_thread_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, feconf.DISABLED_EXPLORATION_IDS[0],
+            self.owner_id, 'disabled exp', 'some text')
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_can_not_view_feedback_threads_with_disabled_exp_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % feconf.DISABLED_EXPLORATION_IDS[0],
+                '/mock_view_feedback_thread/%s' % self.disabled_exp_thread_id,
                 expected_status_int=404)
 
     def test_viewer_cannot_view_feedback_for_private_exploration(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % self.private_exp_id, expected_status_int=401)
+                '/mock_view_feedback_thread/%s' % self.private_exp_thread_id,
+                expected_status_int=401)
             self.assertEqual(
                 response['error'], 'You do not have credentials to view '
                 'exploration feedback.')
         self.logout()
 
+    def test_viewer_can_view_non_exploration_related_feedback(self):
+        self.login(self.viewer_email)
+        skill_thread_id = feedback_services.create_thread(
+            'skill', 'skillid1', None, 'unused subject', 'unused text')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_view_feedback_thread/%s' % skill_thread_id)
+
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.published_exp_id))
+                '/mock_view_feedback_thread/%s' % self.public_exp_thread_id)
 
     def test_owner_cannot_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id))
+                '/mock_view_feedback_thread/%s' % self.private_exp_thread_id)
         self.logout()
 
     def test_moderator_can_view_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.published_exp_id))
+                '/mock_view_feedback_thread/%s' % self.public_exp_thread_id)
         self.logout()
 
     def test_admin_can_view_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id))
+                '/mock_view_feedback_thread/%s' % self.private_exp_thread_id)
         self.logout()
 
 
