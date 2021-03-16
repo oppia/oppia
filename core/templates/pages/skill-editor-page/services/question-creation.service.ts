@@ -55,8 +55,6 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
-require('services/question-validation.service.ts');
-
 
 angular.module('oppia').factory('QuestionCreationService', [
   '$location', '$rootScope', '$uibModal', 'AlertsService',

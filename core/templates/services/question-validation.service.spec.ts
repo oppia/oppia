@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,49 +16,29 @@
  * @fileoverview Unit tests for QuestionValidationService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// question-misconception-editor.component.ts is upgraded to Angular 8.
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-// ^^^ This block is to be removed.
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { QuestionValidationService } from './question-validation.service';
 
-require('domain/question/QuestionObjectFactory.ts');
-require('services/question-validation.service.ts');
+describe('Question Validation Service', () => {
+  let misconceptionObjectFactory: MisconceptionObjectFactory;
+  let mockMisconceptionObject;
+  let mockQuestionDict;
+  let questionObjectFactory: QuestionObjectFactory;
+  let qvs: QuestionValidationService;
+  let ses;
 
-describe('Question Validation Service', function() {
-  var misconceptionObjectFactory = null;
-  var mockMisconceptionObject = null;
-  var mockQuestionDict = null;
-  var QuestionObjectFactory = null;
-  var qvs = null;
-  var ses = null;
-  importAllAngularServices();
+  beforeEach(() => {
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
+    qvs = TestBed.inject(QuestionValidationService);
+    ses = TestBed.inject(StateEditorService);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    spyOn(ses, 'isCurrentSolutionValid').and.returnValue(true);
+  });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-  }));
-
-  beforeEach(angular.mock.inject(
-    function($injector) {
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-      qvs = $injector.get('QuestionValidationService');
-      ses = $injector.get('StateEditorService');
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      spyOn(ses, 'isCurrentSolutionValid').and.returnValue(true);
-    }));
-
-  beforeEach(function() {
+  beforeEach(() => {
     mockQuestionDict = {
       id: 'question_1',
       question_state_data: {
@@ -173,34 +153,34 @@ describe('Question Validation Service', function() {
     };
   });
 
-  it('should return false if question validation fails', function() {
-    var interaction = mockQuestionDict.question_state_data.interaction;
+  it('should return false if question validation fails', () => {
+    let interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[0].outcome.labelled_as_correct = false;
     expect(
       qvs.isQuestionValid(
-        QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return false if misconceptions are not addressed', function() {
-    var interaction = mockQuestionDict.question_state_data.interaction;
+  it('should return false if misconceptions are not addressed', () => {
+    let interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[1].tagged_skill_misconception_id = null;
     expect(
       qvs.isQuestionValid(
-        QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return false if solution is invalid', function() {
+  it('should return false if solution is invalid', () => {
     ses.isCurrentSolutionValid.and.returnValue(false);
     expect(
       qvs.isQuestionValid(
-        QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return true if validation is successful', function() {
-    var question = QuestionObjectFactory.createFromBackendDict(
+  it('should return true if validation is successful', () => {
+    let question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
   });
