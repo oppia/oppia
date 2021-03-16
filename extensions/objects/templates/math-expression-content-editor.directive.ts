@@ -103,7 +103,8 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
             'data:image/svg+xml;base64,' +
             btoa(unescape(encodeURIComponent(cleanedSvgString))));
           var invalidTagsAndAttributes = (
-            ImageSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
+            ImageSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+              dataURI));
           var tags = invalidTagsAndAttributes.tags;
           var attrs = invalidTagsAndAttributes.attrs;
           if (tags.length === 0 && attrs.length === 0) {
