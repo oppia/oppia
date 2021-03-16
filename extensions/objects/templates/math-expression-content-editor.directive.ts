@@ -30,12 +30,12 @@ import { Subscription } from 'rxjs';
 // in via initArgs.
 
 angular.module('oppia').directive('mathExpressionContentEditor', [
-  'AlertsService', 'ExternalRteSaveService', 'SvgSanitizerService',
-  'ImageUploadHelperService',
+  'AlertsService', 'ExternalRteSaveService', 'ImageUploadHelperService',
+  'SvgSanitizerService',
   function(
       AlertsService, ExternalRteSaveService, ImageUploadHelperService,
       SvgSanitizerService,
-      ) {
+  ) {
     return {
       restrict: 'E',
       scope: {},
