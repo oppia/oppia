@@ -18,8 +18,8 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ImgSanitizerService } from 'services/img-sanitizer.service';
 
+import { ImageSanitizerService } from 'services/image-sanitizer.service';
 import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
 import { OppiaAdminNavbarComponent } from './admin-navbar.component';
@@ -28,7 +28,7 @@ describe('Admin Navbar component', () => {
   let component: OppiaAdminNavbarComponent;
   let userService = null;
   let adminRouterService = null;
-  let imgSanitizerService = null;
+  let imageSanitizerService = null;
   let userProfileImage = 'profile-data-url';
   let userInfo = {
     isModerator: () => true,
@@ -49,14 +49,14 @@ describe('Admin Navbar component', () => {
     component = fixture.componentInstance;
     userService = TestBed.get(UserService);
     adminRouterService = TestBed.get(AdminRouterService);
-    imgSanitizerService = TestBed.get(ImgSanitizerService);
+    imageSanitizerService = TestBed.get(ImageSanitizerService);
     fixture.detectChanges();
 
     spyOn(userService, 'getProfileImageDataUrlAsync')
       .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo);
-    spyOn(imgSanitizerService, 'getTrustedPngResourceUrl')
+    spyOn(imageSanitizerService, 'getTrustedPngResourceUrl')
       .and.returnValue(userProfileImage);
 
     component.ngOnInit();

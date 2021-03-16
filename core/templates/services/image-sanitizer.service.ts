@@ -25,7 +25,7 @@ import constants from 'assets/constants';
 @Injectable({
   providedIn: 'root'
 })
-export class ImgSanitizerService {
+export class ImageSanitizerService {
   constructor(private sanitizer: DomSanitizer) {}
 
   cleanMathExpressionSvgString(svgString: string): string {
@@ -194,4 +194,4 @@ export class ImgSanitizerService {
 }
 
 angular.module('oppia').factory(
-  'ImgSanitizerService', downgradeInjectable(ImgSanitizerService));
+  'ImageSanitizerService', downgradeInjectable(ImageSanitizerService));

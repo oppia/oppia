@@ -17,15 +17,15 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
-import { ImgSanitizerService } from 'services/img-sanitizer.service';
+import { ImageSanitizerService } from 'services/image-sanitizer.service';
 
 import { ThumbnailDisplayComponent } from './thumbnail-display.component';
 
 describe('Thumbnail Component', () => {
   let component: ThumbnailDisplayComponent;
   let fixture: ComponentFixture<ThumbnailDisplayComponent>;
-  let imgSantitizerService: ImgSanitizerService;
-  class MockImgSanitizerService {
+  let imageSanitizerService: ImageSanitizerService;
+  class MockImageSanitizerService {
     getTrustedSvgResourceUrl(str: string): string {
       return str;
     }
@@ -74,20 +74,20 @@ describe('Thumbnail Component', () => {
       ],
       providers: [
         {
-          provide: ImgSanitizerService,
-          useClass: MockImgSanitizerService
+          provide: ImageSanitizerService,
+          useClass: MockImageSanitizerService
         }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ThumbnailDisplayComponent);
     component = fixture.componentInstance;
-    imgSantitizerService = TestBed.get(ImgSanitizerService);
+    imageSanitizerService = TestBed.get(ImageSanitizerService);
   }));
 
   it('should not render malicious SVG\'s on Init', fakeAsync(() => {
     const sanitizerSpy = spyOn(
-      imgSantitizerService, 'getTrustedSvgResourceUrl');
+      imageSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = maliciousSvg;
     component.ngOnInit();
@@ -100,7 +100,7 @@ describe('Thumbnail Component', () => {
 
   it('should not render malicious SVG\'s on value change', fakeAsync(() => {
     const sanitizerSpy = spyOn(
-      imgSantitizerService, 'getTrustedSvgResourceUrl');
+      imageSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = maliciousSvg;
     component.ngOnChanges();
@@ -113,7 +113,7 @@ describe('Thumbnail Component', () => {
 
   it('should not try to render invalid base64 images', fakeAsync(() => {
     const sanitizerSpy = spyOn(
-      imgSantitizerService, 'getTrustedSvgResourceUrl');
+      imageSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = invalidBase64data;
     component.ngOnChanges();
