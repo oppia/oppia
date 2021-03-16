@@ -194,7 +194,8 @@ export class StoryEditorStateService {
    */
   saveStory(
       commitMessage: string,
-      successCallback: (value?: Object) => void)
+      successCallback: (value?: Object) => void,
+      errorCallback: (value?: Object) => void)
   : boolean {
     if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
@@ -217,9 +218,12 @@ export class StoryEditorStateService {
           successCallback();
         }
       }, error => {
-        this.alertsService.addWarning(
-          error || 'There was an error when saving the story.');
+        let errorMessage = error || 'There was an error when saving the story.';
+        this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
+        if (errorCallback) {
+          errorCallback(errorMessage);
+        }
       });
     return true;
   }

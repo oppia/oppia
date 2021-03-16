@@ -18,9 +18,12 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -46,25 +49,57 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
+import { AuthService } from 'services/auth.service';
+import { FocusOnDirective } from '../directives/focus-on.directive';
+import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+
+
+// TODO(#11462): Delete these conditional values once firebase auth is launched.
+const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireModule.initializeApp(AuthService.firebaseConfig),
+  AngularFireAuthModule,
+] : [];
+
+const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
+  AngularFireAuth,
+  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+] : [
+  {provide: AngularFireAuth, useValue: null},
+];
 
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
+  imports: [
+    CommonModule,
+    BrowserModule,
+    DynamicContentModule,
+    NgbTooltipModule,
+    FormsModule,
+    ...firebaseAuthModules,
+  ],
+
+  providers: [
+    ...firebaseAuthProviders,
+  ],
 
   declarations: [
     AttributionGuideComponent,
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    FocusOnDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -72,11 +107,15 @@ import { TakeBreakModalComponent } from
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
-    StorySummaryTileDirective,
     SocialButtonsComponent,
+    StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    SummaryListHeaderComponent,
+    TakeBreakModalComponent,
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
     TranslatePipe,
-    TakeBreakModalComponent
+    TruncatePipe,
   ],
 
   entryComponents: [
@@ -90,21 +129,29 @@ import { TakeBreakModalComponent } from
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    SummaryListHeaderComponent,
+    ThreadTableComponent,
+    ThumbnailDisplayComponent,
   ],
 
   exports: [
     // Modules.
+    DynamicContentModule,
     FormsModule,
     MaterialModule,
+    NgbTooltipModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    FocusOnDirective,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    TranslatePipe
+    ThumbnailDisplayComponent,
+    TranslatePipe,
   ],
 })
 

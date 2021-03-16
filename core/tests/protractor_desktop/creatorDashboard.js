@@ -74,6 +74,7 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
+    await users.logout();
 
     await users.login('user2@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
@@ -159,7 +160,6 @@ describe('Creator dashboard functionality', function() {
 
     await users.login('user5@creatorDashboard.com');
     await creatorDashboardPage.get();
-
     var titles = await creatorDashboardPage.getExpSummaryTileTitles();
     expect(titles.length).toEqual(2);
     expect(await titles[0].getText()).toEqual(EXPLORATION_TITLE_4);

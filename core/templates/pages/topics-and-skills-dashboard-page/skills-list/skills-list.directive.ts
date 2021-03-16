@@ -190,8 +190,10 @@ angular.module('oppia').directive('skillsList', [
             });
           };
 
-          ctrl.assignSkillToTopic = function(skillId) {
-            var topicSummaries = $scope.getEditableTopicSummaries();
+          ctrl.assignSkillToTopic = function(skill) {
+            var skillId = skill.id;
+            var topicSummaries = $scope.getEditableTopicSummaries().filter(
+              topicSummary => !skill.topicNames.includes(topicSummary.name));
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -260,18 +262,18 @@ angular.module('oppia').directive('skillsList', [
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
               // Transfer questions from the old skill to the new skill.
-              TopicsAndSkillsDashboardBackendApiService.mergeSkills(
+              TopicsAndSkillsDashboardBackendApiService.mergeSkillsAsync(
                 skill.id, supersedingSkillId).then(function() {
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.
                 $timeout(function() {
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
+                  var successToast = 'Merged Skills.';
+                  AlertsService.addSuccessMessage(successToast, 1000);
                 }, 100);
-              }, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
+              }, function(response) {
+                AlertsService.addWarning(response.error.error);
               });
             }, function() {
               // Note to developers:

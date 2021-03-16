@@ -16,49 +16,104 @@
  * @fileoverview Service for managing the authorizations of logged-in users.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
+import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
+import firebase from 'firebase/app';
+import { md5 } from 'hash-wasm';
+import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService implements OnDestroy {
-  private tokenCache: BehaviorSubject<string | null>;
-  private tokenSubscription: Subscription;
+export class AuthService {
+  constructor(
+      @Optional() private angularFireAuth: AngularFireAuth,
+      private authBackendApiService: AuthBackendApiService) {}
 
-  constructor(private angularFireAuth: AngularFireAuth) {
-    // An Observable (i.e. stream of values) Subject (i.e. producer of values).
-    // BehaviorSubjects are "cold" observables (i.e. lazy streams that only emit
-    // values when prompted by a subscriber), and emits the value it last
-    // produced to new subscribers (or null, the initial value we've given it).
-    this.tokenCache = new BehaviorSubject(null);
-    // Object used to control the lifetime of a subscription. After the
-    // subscription becomes obsolete, we should call ".unsubscribe()" on it to
-    // prevent a memory leak.
-    this.tokenSubscription = (
-      // Given an untrusted source of ID Tokens, prepare to apply a sequence of
-      // transformations on the values it emits using a "pipe".
-      this.angularFireAuth.idToken.pipe(
-        // Catch errors thrown by the untrusted source and change them into a
-        // "cold" Observable that eternally emits "null".
-        catchError(_ => new BehaviorSubject(null)))
-        // Subscribe to the results, forwarding every token (or null) it emits
-        // into our BehaviorSubject.
-        .subscribe(this.tokenCache));
+  static get firebaseAuthIsEnabled(): boolean {
+    return AppConstants.FIREBASE_AUTH_ENABLED;
   }
 
-  ngOnDestroy(): void {
-    this.tokenSubscription.unsubscribe();
+  static get firebaseEmulatorIsEnabled(): boolean {
+    return (
+      AuthService.firebaseAuthIsEnabled &&
+      AppConstants.FIREBASE_EMULATOR_ENABLED);
   }
 
-  get idToken$(): Observable<string | null> {
-    return this.tokenCache.asObservable();
+  static get firebaseConfig(): FirebaseOptions {
+    return !AuthService.firebaseAuthIsEnabled ? undefined : {
+      apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
+      authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
+      projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
+      storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
+      messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+      appId: AppConstants.FIREBASE_CONFIG_APP_ID,
+    } as const;
+  }
+
+  static get firebaseEmulatorConfig(): readonly [string, number] {
+    return AuthService.firebaseEmulatorIsEnabled ?
+      ['localhost', 9099] : undefined;
+  }
+
+  /**
+   * Prompts the user to sign-in with a trusted identity provider, then fulfills
+   * with true if the user is new, otherwise fulfills with false.
+   * Rejects when sign-in failed.
+   */
+  async signInAsync(): Promise<boolean> {
+    if (!this.angularFireAuth) {
+      throw new Error('AngularFireAuth is not available');
+    }
+
+    const creds = AuthService.firebaseEmulatorIsEnabled ?
+      await this.emulatorSignInAsync() : await this.productionSignInAsync();
+
+    const idToken = await creds.user.getIdToken();
+    await this.authBackendApiService.beginSessionAsync(idToken);
+
+    return creds.additionalUserInfo.isNewUser;
   }
 
   async signOutAsync(): Promise<void> {
-    return this.angularFireAuth.signOut();
+    if (!this.angularFireAuth) {
+      throw new Error('AngularFireAuth is not available');
+    }
+
+    await this.angularFireAuth.signOut();
+  }
+
+  /** Assumes that angularFireAuth is not null. */
+  private async emulatorSignInAsync(): Promise<firebase.auth.UserCredential> {
+    const email = prompt('Please enter the email address to sign-in with');
+    const password = await md5(email);
+    try {
+      return await this.angularFireAuth.signInWithEmailAndPassword(
+        email, password);
+    } catch (err) {
+      if (err.code !== 'auth/user-not-found') {
+        throw err;
+      }
+    }
+    return await this.angularFireAuth.createUserWithEmailAndPassword(
+      email, password);
+  }
+
+  /** Assumes that angularFireAuth is not null. */
+  private async productionSignInAsync(): Promise<firebase.auth.UserCredential> {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    // Oppia only needs an email address for account management.
+    provider.addScope('email');
+    // Always prompt the user to select an account, even when they only own one.
+    provider.setCustomParameters({prompt: 'select_account'});
+    await this.angularFireAuth.signInWithRedirect(provider);
+    return await this.angularFireAuth.getRedirectResult();
   }
 }
+
+angular.module('oppia').factory(
+  'AuthService', downgradeInjectable(AuthService));

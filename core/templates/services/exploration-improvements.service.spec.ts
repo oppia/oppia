@@ -172,9 +172,9 @@ describe('ExplorationImprovementsService', function() {
     this.eibasGetTasksAsyncSpy = (
       spyOn(explorationImprovementsBackendApiService, 'getTasksAsync'));
     this.essGetExplorationStatsSpy = (
-      spyOn(explorationStatsService, 'getExplorationStats'));
+      spyOn(explorationStatsService, 'getExplorationStatsAsync'));
     this.pibasFetchIssuesSpy = (
-      spyOn(playthroughIssuesBackendApiService, 'fetchIssues'));
+      spyOn(playthroughIssuesBackendApiService, 'fetchIssuesAsync'));
     this.stassGetTopAnswersByStateNameAsyncSpy = (
       spyOn(stateTopAnswersStatsService, 'getTopAnswersByStateNameAsync'));
 

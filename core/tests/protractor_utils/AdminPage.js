@@ -24,9 +24,10 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var REVIEW_CATEGORY_TRANSLATION = 'TRANSLATION';
-  var REVIEW_CATEGORY_VOICEOVER = 'VOICEOVER';
-  var REVIEW_CATEGORY_QUESTION = 'QUESTION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'TRANSLATION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER = 'VOICEOVER';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'QUESTION';
+  var CATEGORY_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
@@ -41,22 +42,26 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
-  var assignReviewerForm = element(
-    by.css('.protractor-test-assign-reviewer-form'));
-  var viewReviewerForm = element(by.css('.protractor-test-view-reviewer-form'));
+  var addContributionRightsForm = element(
+    by.css('.protractor-test-add-contribution-rights-form'));
+  var viewContributionRightsForm = element(by.css(
+    '.protractor-test-view-contribution-rights-form'));
   var languageSelectCss = by.css('.protractor-test-form-language-select');
-  var reviewerUsernameCss = by.css('.protractor-test-form-reviewer-username');
-  var reviewCategorySelectCss = by.css(
-    '.protractor-test-form-review-category-select');
-  var reviewerFormSubmitButtonCss = by.css(
-    '.protractor-test-reviewer-form-submit-button');
+  var contributorUsernameCss = by.css(
+    '.protractor-test-form-contributor-username');
+  var categorySelectCss = by.css(
+    '.protractor-test-form-contribution-rights-category-select');
+  var contributionRightsFormSubmitButtonCss = by.css(
+    '.protractor-test-contribution-rights-form-submit-button');
   var userTranslationReviewerLanguageCss = by.css(
     '.protractor-test-translation-reviewer-language');
   var userVoiceoverReviewerLanguageCss = by.css(
     '.protractor-test-voiceover-reviewer-language');
   var userQuestionReviewerCss = by.css('.protractor-test-question-reviewer');
-  var viewReviewerMethodInputCss = by.css(
-    '.protractor-test-view-reviewer-method');
+  var userQuestionContributorCss = by.css(
+    '.protractor-test-question-contributor');
+  var viewContributionRightsMethodInputCss = by.css(
+    '.protractor-test-view-contribution-rights-method');
 
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
@@ -304,6 +309,8 @@ var AdminPage = function() {
         by.css('.protractor-test-one-off-jobs-stop-btn'));
       await action.click(
         'UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
+      await browser.refresh();
+      await waitFor.pageToFullyLoad();
     } else {
       await this._stopOneOffJob(jobName, ++i);
     }
@@ -330,15 +337,11 @@ var AdminPage = function() {
   };
 
   this.updateRole = async function(name, newRole) {
-    await waitFor.elementToBeClickable(
-      adminRolesTab, 'Admin Roles tab is not clickable');
     await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
     await action.sendKeys('Update Form Name', updateFormName, name);
-    var roleOption = roleSelect.element(
-      by.cssContainingText('option', newRole));
-    await action.click('Role Option', roleOption);
+    await action.select('Role Drop Down', roleSelect, newRole);
     await action.click('Update Form Submit', updateFormSubmit);
     await waitFor.visibilityOf(
       statusMessage, 'Confirmation message not visible');
@@ -348,18 +351,14 @@ var AdminPage = function() {
   };
 
   this.getUsersAsssignedToRole = async function(role) {
-    await action.sendKeys('Role Drop Down', roleDropdown, 'By Role');
-
-    await action.sendKeys('Role Value Option', roleValueOption, role);
-
+    await action.select('Role Drop Down', roleDropdown, 'By Role');
+    await action.select('Role Value Option', roleValueOption, role);
     await action.click('View Role Button', viewRoleButton);
   };
 
   this.viewRolesbyUsername = async function(username) {
-    await action.sendKeys('Role Drop Down', roleDropdown, 'By Username');
-
+    await action.select('Role Drop Down', roleDropdown, 'By Username');
     await action.sendKeys('Role Username Option', roleUsernameOption, username);
-
     await action.click('View Role Button', viewRoleButton);
   };
 
@@ -386,88 +385,105 @@ var AdminPage = function() {
     }
   };
 
-  var _assignReviewer = async function(
-      username, reviewCategory, languageDescription = null) {
+  var _assignContributionRights = async function(
+      username, category, languageDescription = null) {
     await _switchToRolesTab();
 
     await waitFor.visibilityOf(
-      assignReviewerForm, 'Assign reviewer form is not visible');
+      addContributionRightsForm, 'Assign reviewer form is not visible');
 
-    var usernameInputField = assignReviewerForm.element(reviewerUsernameCss);
+    var usernameInputField = addContributionRightsForm.element(
+      contributorUsernameCss);
     await action.sendKeys(
       'Username input field', usernameInputField, username);
 
-    var reviewCategorySelectField = assignReviewerForm.element(
-      reviewCategorySelectCss);
+    var categorySelectField = addContributionRightsForm.element(
+      categorySelectCss);
     await action.select(
-      'Review category selector', reviewCategorySelectField, reviewCategory);
+      'Review category selector', categorySelectField, category);
 
     if (languageDescription !== null) {
-      var languageSelectField = assignReviewerForm.element(languageSelectCss);
+      var languageSelectField = addContributionRightsForm.element(
+        languageSelectCss);
       await action.select(
         'Language selector', languageSelectField, languageDescription);
     }
 
-    var submitButton = assignReviewerForm.element(reviewerFormSubmitButtonCss);
+    var submitButton = addContributionRightsForm.element(
+      contributionRightsFormSubmitButtonCss);
     await action.click('Submit assign reviewer button', submitButton);
 
     await waitFor.textToBePresentInElement(
       statusMessage, 'Successfully added', (
-        'Status message for assigning ' + reviewCategory + ' reviewer takes ' +
+        'Status message for assigning ' + category + ' reviewer takes ' +
         'too long to appear'));
   };
 
-  var _getUserReviewRightsElement = async function(username, reviewCategory) {
+  var _getUserContributionRightsElement = async function(username, category) {
     await _switchToRolesTab();
 
     await waitFor.visibilityOf(
-      viewReviewerForm, 'View reviewer form is not visible');
+      viewContributionRightsForm, 'View reviewer form is not visible');
 
-    var viewMethodInput = viewReviewerForm.element(viewReviewerMethodInputCss);
+    var viewMethodInput = viewContributionRightsForm.element(
+      viewContributionRightsMethodInputCss);
     await action.select(
       'Reviewer view method dropdown', viewMethodInput, 'By Username');
 
-    var usernameInputField = viewReviewerForm.element(reviewerUsernameCss);
+    var usernameInputField = viewContributionRightsForm.element(
+      contributorUsernameCss);
     await action.sendKeys(
       'Username input field', usernameInputField, username);
 
-    var submitButton = viewReviewerForm.element(reviewerFormSubmitButtonCss);
+    var submitButton = viewContributionRightsForm.element(
+      contributionRightsFormSubmitButtonCss);
     await action.click('View reviewer role button', submitButton);
 
     await waitFor.textToBePresentInElement(
       statusMessage, 'Success',
-      'Could not view reviewer rights successfully');
+      'Could not view contribution rights successfully');
 
-    if (reviewCategory === REVIEW_CATEGORY_TRANSLATION) {
+    if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION) {
       return element.all(userTranslationReviewerLanguageCss);
-    } else if (reviewCategory === REVIEW_CATEGORY_VOICEOVER) {
+    } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER) {
       return element.all(userVoiceoverReviewerLanguageCss);
-    } else if (reviewCategory === REVIEW_CATEGORY_QUESTION) {
+    } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION) {
       return element(userQuestionReviewerCss);
+    } else if (category === CATEGORY_SUBMIT_QUESTION) {
+      return element(userQuestionContributorCss);
     }
   };
 
   this.assignTranslationReviewer = async function(
       username, languageDescription) {
-    await _assignReviewer(
-      username, REVIEW_CATEGORY_TRANSLATION, languageDescription);
+    await _assignContributionRights(
+      username,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+      languageDescription);
   };
 
   this.assignVoiceoverReviewer = async function(username, languageDescription) {
-    await _assignReviewer(
-      username, REVIEW_CATEGORY_VOICEOVER, languageDescription);
+    await _assignContributionRights(
+      username,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+      languageDescription);
   };
 
   this.assignQuestionReviewer = async function(username) {
-    await _assignReviewer(username, REVIEW_CATEGORY_QUESTION);
+    await _assignContributionRights(
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
+  };
+
+  this.assignQuestionContributor = async function(username) {
+    await _assignContributionRights(username, CATEGORY_SUBMIT_QUESTION);
   };
 
   this.expectUserToBeTranslationReviewer = async function(
       username, languageDescription) {
-    var reviewRights = await _getUserReviewRightsElement(
-      username, REVIEW_CATEGORY_TRANSLATION);
+    var contributionRights = await _getUserContributionRightsElement(
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION);
     var languageList = await Promise.all(
-      reviewRights.map(function(languageElem) {
+      contributionRights.map(function(languageElem) {
         return languageElem.getText();
       }));
     expect(languageList).toContain(languageDescription);
@@ -475,9 +491,9 @@ var AdminPage = function() {
 
   this.expectUserToBeVoiceoverReviewer = async function(
       username, languageDescription) {
-    var reviewRights = await _getUserReviewRightsElement(
-      username, REVIEW_CATEGORY_VOICEOVER);
-    var languageList = await Promise.all(reviewRights.map(
+    var contributionRights = await _getUserContributionRightsElement(
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
+    var languageList = await Promise.all(contributionRights.map(
       function(languageElem) {
         return languageElem.getText();
       }));
@@ -485,11 +501,21 @@ var AdminPage = function() {
   };
 
   this.expectUserToBeQuestionReviewer = async function(username) {
-    var reviewRight = await _getUserReviewRightsElement(
-      username, REVIEW_CATEGORY_QUESTION);
+    var contributionRights = await _getUserContributionRightsElement(
+      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
     await waitFor.visibilityOf(
-      reviewRight, 'Review Right Element taking too long to appear');
-    expect(await reviewRight.getText()).toBe('Allowed');
+      contributionRights,
+      'Review Question Right Element taking too long to appear');
+    expect(await contributionRights.getText()).toBe('Allowed');
+  };
+
+  this.expectUserToBeQuestionContributor = async function(username) {
+    var contributionRights = await _getUserContributionRightsElement(
+      username, CATEGORY_SUBMIT_QUESTION);
+    await waitFor.visibilityOf(
+      contributionRights,
+      'Submit Question Right Element taking too long to appear');
+    expect(await contributionRights.getText()).toBe('Allowed');
   };
 };
 

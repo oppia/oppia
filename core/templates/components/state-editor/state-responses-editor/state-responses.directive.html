@@ -152,12 +152,12 @@
                     <div ng-if="inapplicableSkillMisconceptionIds.includes(skillId + '-' + misconception.getId())"
                          ng-click="updateOptionalMisconceptionIdStatus(skillId + '-' + misconception.getId(), true)"
                          ng-mouseleave="setActiveEditOption(null)">
-                        MARK AS "APPLICABLE"
+                        Mark as "Applicable"
                     </div>
                     <div ng-if="!inapplicableSkillMisconceptionIds.includes(skillId + '-' + misconception.getId())"
                          ng-click="updateOptionalMisconceptionIdStatus(skillId + '-' + misconception.getId(), false)"
                          ng-mouseleave="setActiveEditOption(null)">
-                        MARK AS "NOT APPLICABLE"
+                        Mark as "Not Applicable"
                     </div>
                   </div>
                   <div ng-if="EditabilityService.isEditable()"
@@ -177,14 +177,14 @@
 
 <style>
   state-responses .state-responses-header-container {
-    padding: 0 30px;
+    padding: 0 20px 0 30px
   }
   state-responses .state-responses-header {
     align-content: center;
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: 30px 0 10px;
+    padding: 15px 0 15px;
   }
   state-responses .oppia-exp-answer-card-header {
     font-size: 18px;
@@ -204,9 +204,6 @@
   }
   state-responses .oppia-add-response-button-container {
     margin: 22px 0;
-  }
-  state-responses .state-responses-header i {
-    display: none;
   }
   state-responses .solicit-answer-checkbox {
     padding-bottom: 20px;
@@ -239,11 +236,13 @@
   state-responses .optional-misconception-edit-options {
     background-color: #FFF;
     border: 2px solid #000;
+    border-radius: 4px;
     cursor: pointer;
+    padding: 0.3rem;
     position: absolute;
-    right: 15px;
+    right: -15%;
     text-align: center;
-    top: calc(50% - 0.75em);
+    top: calc(100% - 0.75em);
     width: 15em;
     z-index: 1;
   }

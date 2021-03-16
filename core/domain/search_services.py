@@ -164,7 +164,7 @@ def _should_index_collection(collection):
     return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
-def search_explorations(query, categories, language_codes, limit, cursor=None):
+def search_explorations(query, categories, language_codes, size, offset=None):
     """Searches through the available explorations.
 
     Args:
@@ -177,24 +177,23 @@ def search_explorations(query, categories, language_codes, limit, cursor=None):
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        limit: int. The maximum number of results to return.
-        cursor: str or None. A cursor, used to get the next page of results. If
-            there are more documents that match the query than 'limit', this
-            function will return a cursor to get the next page.
+        size: int. The maximum number of results to return.
+        offset: str or None. A marker that is used to get the next page of
+            results. If there are more documents that match the query than
+            'size', this function will return an offset to get the next page.
 
     Returns:
         tuple. A 2-tuple consisting of:
             - list(str). A list of exploration ids that match the query.
-            - str or None. A cursor if there are more matching explorations to
-              fetch, None otherwise. If a cursor is returned, it will be a
+            - str or None. An offset if there are more matching explorations to
+              fetch, None otherwise. If an offset is returned, it will be a
               web-safe string that can be used in URLs.
     """
-    # TODO(#11314): Change this (and callers of this function) to use an offset
-    # instead once the underlying search service is migrated over to
-    # elasticsearch.
+    # TODO(#11314): Change the offset to an int once the underlying search
+    # service is fully migrated to elasticsearch.
     return platform_search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, categories, language_codes,
-        cursor=cursor, size=limit, ids_only=True)
+        offset=offset, size=size, ids_only=True)
 
 
 def delete_explorations_from_search_index(exploration_ids):
@@ -216,7 +215,7 @@ def clear_exploration_search_index():
     platform_search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
 
 
-def search_collections(query, categories, language_codes, limit, cursor=None):
+def search_collections(query, categories, language_codes, size, offset=None):
     """Searches through the available collections.
 
     Args:
@@ -229,24 +228,23 @@ def search_collections(query, categories, language_codes, limit, cursor=None):
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        limit: int. The maximum number of results to return.
-        cursor: str or None. A cursor, used to get the next page of results.
-            If there are more documents that match the query than 'limit', this
-            function will return a cursor to get the next page.
+        size: int. The maximum number of results to return.
+        offset: str|None. An offset, used to get the next page of results.
+            If there are more documents that match the query than 'size', this
+            function will return an offset to get the next page.
 
     Returns:
-        2-tuple of (collection_ids, cursor). Where:
+        2-tuple of (collection_ids, offset). Where:
             - A list of collection ids that match the query.
-            - A cursor if there are more matching collections to fetch, None
-              otherwise. If a cursor is returned, it will be a web-safe string
+            - An offset if there are more matching collections to fetch, None
+              otherwise. If an offset is returned, it will be a web-safe string
               that can be used in URLs.
     """
-    # TODO(#11314): Change this (and callers of this function) to use an offset
-    # instead once the underlying search service is migrated over to
-    # elasticsearch.
+    # TODO(#11314): Change the offset to be an int instead once the underlying
+    # search service is migrated over to elasticsearch.
     return platform_search_services.search(
         query, SEARCH_INDEX_COLLECTIONS, categories, language_codes,
-        cursor=cursor, size=limit, ids_only=True)
+        offset=offset, size=size, ids_only=True)
 
 
 def delete_collections_from_search_index(collection_ids):

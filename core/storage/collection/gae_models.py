@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import datetime
 
 from constants import constants
@@ -72,17 +73,12 @@ class CollectionModel(base_models.VersionedModel):
     # The version of all property blob schemas.
     schema_version = datastore_services.IntegerProperty(
         required=True, default=1, indexed=True)
-    # DEPRECATED in v2.4.2. Do not use.
-    nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
     # A dict representing the contents of a collection. Currently, this
     # contains the list of nodes. This dict should contain collection data
     # whose structure might need to be changed in the future.
     collection_contents = (
         datastore_services.JsonProperty(default={}, indexed=False))
-
-    # DEPRECATED in v2.4.2. Do not use.
-    nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -104,14 +100,62 @@ class CollectionModel(base_models.VersionedModel):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'collection_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'nodes': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'collection_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
     def get_collection_count(cls):
         """Returns the total number of collections."""
         return cls.get_all().count()
+
+    @staticmethod
+    def convert_to_valid_dict(model_dict):
+        """Replace invalid fields and values in the CollectionModel dict.
+
+        Some old CollectionModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the CollectionModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+
+        # The nodes field is moved to collection_contents dict. We
+        # need to move the values from nodes field to collection_contents dict
+        # and delete nodes.
+        if 'nodes' in model_dict and model_dict['nodes']:
+            model_dict['collection_contents']['nodes'] = (
+                copy.deepcopy(model_dict['nodes']))
+            del model_dict['nodes']
+
+        return model_dict
+
+    def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+
+        Some old CollectionModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+            with the the snapshot.
+        """
+        self.populate(
+            **CollectionModel.convert_to_valid_dict(snapshot_dict))
+        return self
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -136,9 +180,6 @@ class CollectionModel(base_models.VersionedModel):
 
         collection_rights = CollectionRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when collections
-        # are changed).
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, collection_rights.status,
@@ -185,7 +226,7 @@ class CollectionModel(base_models.VersionedModel):
                 commit_log_models.append(collection_commit_log)
             CollectionCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -270,9 +311,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -317,9 +355,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # DEPRECATED in v2.8.3, so translator_ids are not exported.
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -384,7 +420,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         # and delete translator_ids.
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
-            model_dict['translator_ids'] = []
+            del model_dict['translator_ids']
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.
@@ -441,9 +477,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when collections
-            # are changed).
             CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -456,7 +489,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))

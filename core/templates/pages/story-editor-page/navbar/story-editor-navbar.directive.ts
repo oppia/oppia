@@ -31,6 +31,8 @@ require('pages/story-editor-page/services/story-editor-navigation.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+require('services/alerts.service.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('storyEditorNavbar', [
@@ -41,11 +43,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'EditableStoryBackendApiService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'EditableStoryBackendApiService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryValidationService', 'UndoRedoService',
         function(
-            $rootScope, $scope, $uibModal, EditableStoryBackendApiService,
+            $rootScope, $scope, $uibModal, AlertsService,
+            EditableStoryBackendApiService,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryValidationService, UndoRedoService) {
           var ctrl = this;
@@ -166,7 +170,11 @@ angular.module('oppia').directive('storyEditorNavbar', [
               backdrop: 'static',
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
-              StoryEditorStateService.saveStory(commitMessage);
+              StoryEditorStateService.saveStory(
+                commitMessage, null, function(errorMessage) {
+                  AlertsService.addInfoMessage(errorMessage, 5000);
+                }
+              );
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

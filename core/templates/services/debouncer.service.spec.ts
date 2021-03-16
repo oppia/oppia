@@ -20,9 +20,9 @@ import { DebouncerService } from 'services/debouncer.service';
 import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Debouncer service', () => {
-  let ds;
-  let ls;
-  var loggerServiceSpy;
+  let ds: DebouncerService;
+  let ls: LoggerService;
+  let loggerServiceSpy: jasmine.Spy<(msg: string) => void>;
 
   beforeEach(() => {
     ds = TestBed.get(DebouncerService);

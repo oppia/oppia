@@ -193,7 +193,7 @@ export class Interaction {
         value: Object[] | Object
     ): void => {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
-        contentIds.push(value.getContentId());
+        contentIds.push(value.contentId);
       } else if (value instanceof Array) {
         value.forEach(
           element => traverseValueAndRetrieveContentIdsFromSubtitled(element));

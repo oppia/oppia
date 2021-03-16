@@ -191,13 +191,13 @@ class _Gae(Platform):
 
     @classmethod
     def import_auth_services(cls):
-        """Imports and returns firebase_auth_services module.
+        """Imports and returns gae_auth_services module.
 
         Returns:
-            module. The firebase_auth_services module.
+            module. The gae_auth_services module.
         """
-        from core.platform.auth import firebase_auth_services
-        return firebase_auth_services
+        from core.platform.auth import gae_auth_services
+        return gae_auth_services
 
     @classmethod
     def import_transaction_services(cls):
@@ -283,7 +283,7 @@ class _Gae(Platform):
         Returns:
             module. The core.platform.taskqueue services module.
         """
-        if (constants.DEV_MODE or utils.is_local_server_environment()):
+        if constants.EMULATOR_MODE:
             from core.platform.taskqueue import dev_mode_taskqueue_services
             return dev_mode_taskqueue_services
         else:
@@ -297,8 +297,8 @@ class _Gae(Platform):
         Returns:
             module. The gae_search_services module.
         """
-        from core.platform.search import gae_search_services
-        return gae_search_services
+        from core.platform.search import elastic_search_services
+        return elastic_search_services
 
     NAME = 'gae'
 

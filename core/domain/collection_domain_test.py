@@ -643,10 +643,11 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         # Should not be able to create a collection from no YAML content.
         with self.assertRaisesRegexp(
-            Exception, 'Please ensure that you are uploading a YAML text file, '
+            utils.InvalidInputException,
+            'Please ensure that you are uploading a YAML text file, '
             'not a zip file. The YAML parser returned the following error: '
-            '\'NoneType\' object has no attribute \'read\''):
-            collection_domain.Collection.from_yaml('collection3', None)
+        ):
+            collection_domain.Collection.from_yaml('collection3', '')
 
     def test_from_yaml_with_no_schema_version_specified_raises_error(self):
         collection = collection_domain.Collection(
