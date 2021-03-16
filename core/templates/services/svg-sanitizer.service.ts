@@ -17,7 +17,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';

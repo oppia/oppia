@@ -33,8 +33,9 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
   'AlertsService', 'ExternalRteSaveService', 'SvgSanitizerService',
   'ImageUploadHelperService',
   function(
-      AlertsService, ExternalRteSaveService, SvgSanitizerService,
-      ImageUploadHelperService) {
+      AlertsService, ExternalRteSaveService, ImageUploadHelperService,
+      SvgSanitizerService,
+      ) {
     return {
       restrict: 'E',
       scope: {},
@@ -103,8 +104,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
             'data:image/svg+xml;base64,' +
             btoa(unescape(encodeURIComponent(cleanedSvgString))));
           var invalidTagsAndAttributes = (
-            SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
-              dataURI));
+            SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
           var tags = invalidTagsAndAttributes.tags;
           var attrs = invalidTagsAndAttributes.attrs;
           if (tags.length === 0 && attrs.length === 0) {

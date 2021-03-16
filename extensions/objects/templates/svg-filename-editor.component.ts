@@ -41,7 +41,7 @@ angular.module('oppia').component('svgFilenameEditor', {
     '$http', '$q', '$sce', '$scope', 'AlertsService',
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
-    'SvgSanitizerService', 'ImageUploadHelperService',
+    'ImageUploadHelperService', 'SvgSanitizerService',
     'UrlInterpolationService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     'MAX_SVG_DIAGRAM_HEIGHT', 'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT',
     'MIN_SVG_DIAGRAM_WIDTH',
@@ -49,7 +49,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
-        SvgSanitizerService, ImageUploadHelperService,
+        ImageUploadHelperService, SvgSanitizerService,
         UrlInterpolationService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE,
         MAX_SVG_DIAGRAM_HEIGHT, MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT,
         MIN_SVG_DIAGRAM_WIDTH) {
