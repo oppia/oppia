@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ describe('Translation opportunities component', () => {
     false, false, false, false, false,
     'en', 'username', 'test@example.com', true
   );
-  let notLoggedInUserInfo = new UserInfo(
+  const notLoggedInUserInfo = new UserInfo(
     false, false, false, false, false,
     'en', null, null, false
   );

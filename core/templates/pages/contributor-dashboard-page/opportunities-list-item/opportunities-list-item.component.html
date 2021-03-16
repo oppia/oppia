@@ -38,13 +38,13 @@
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <button class="oppia-opportunities-button protractor-test-opportunity-list-item-button"
             [hidden]="opportunityDataIsLoading"
-            (click)="clickActionButton(opportunity.id)">
+            (click)="clickActionButton.emit(opportunity.id)">
       {{ opportunity?.actionButtonTitle }}
     </button>
   </div>
 </div>
 <style>
-  .oppia-opportunities-button {
+.oppia-opportunities-button {
   background-color: #ffffff;
   border: 2px solid #009688;
   border-radius: 5px;

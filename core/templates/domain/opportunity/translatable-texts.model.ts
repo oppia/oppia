@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
  * @fileoverview Frontend Model for skill opportunity.
  */
 
+export interface ContentDict {
+  [contentId: string]: string
+}
+
 export interface StateNamesToContentIdMapping {
-  [state: string]: {[contentId:string]: string}
+  [state: string]: ContentDict
 }
 
 export interface TranslatableTextsBackendDict {
@@ -26,15 +30,9 @@ export interface TranslatableTextsBackendDict {
 }
 
 export class TranslatableTexts {
-  readonly stateNamesToContentIdMapping: StateNamesToContentIdMapping;
-  readonly version: string;
-
   constructor(
-      stateNamesToContentIdMapping:StateNamesToContentIdMapping,
-      version: string) {
-    this.stateNamesToContentIdMapping = stateNamesToContentIdMapping;
-    this.version = version;
-  }
+      readonly stateNamesToContentIdMapping: StateNamesToContentIdMapping,
+      readonly version: string) {}
 
   static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
     TranslatableTexts {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,8 @@ describe('Opportunities List Item Component', () => {
         labelColor: '#fff',
         progressPercentage: 50
       };
-      component.clickActionButton = () => jasmine.createSpy('click', () => {});
+      component.clickActionButton.emit =
+        () => jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = 35;

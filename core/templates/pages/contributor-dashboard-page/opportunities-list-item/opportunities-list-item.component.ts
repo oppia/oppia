@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * @fileoverview Component for the item view of an opportunity.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 export class ExplorationOpportunityDict {
@@ -33,7 +33,8 @@ export class ExplorationOpportunityDict {
 })
 export class OpportunitiesListItemComponent {
   @Input() opportunity: ExplorationOpportunityDict;
-  @Input() clickActionButton;
+  @Output() clickActionButton: EventEmitter<string> = (
+    new EventEmitter());
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() opportunityHeadingTruncationLength: number;

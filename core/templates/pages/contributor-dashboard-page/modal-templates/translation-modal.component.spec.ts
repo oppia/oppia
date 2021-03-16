@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LoginRequiredModalComponent.
+ * @fileoverview Unit tests for TranslationModalComponent.
 */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -30,7 +30,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from '../services/translate-text.service';
 
-describe('Login Required Modal Content', () => {
+describe('Translation Modal Component', () => {
   let contextService: ContextService;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
@@ -80,6 +80,7 @@ describe('Login Required Modal Content', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
+
   it('should close', () => {
     spyOn(activeModal, 'close');
     component.close();
@@ -194,10 +195,12 @@ describe('Login Required Modal Content', () => {
       target.click();
       expect(broadcastSpy).toHaveBeenCalledWith(target);
     });
+
     describe('when copy mode is active', () => {
       beforeEach(() => {
         ckEditorCopyContentService.toggleCopyMode();
       });
+
       it('should prevent default behavior', () => {
         target.click();
         expect(propagationSpy).toHaveBeenCalled();

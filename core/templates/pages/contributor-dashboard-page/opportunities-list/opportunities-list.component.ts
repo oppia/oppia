@@ -16,7 +16,7 @@
  * @fileoverview Component for the list view of opportunities.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -36,7 +36,9 @@ export class OpportunitiesListComponent {
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() loadMoreOpportunities;
-  @Input() clickActionButton;
+  @Output() clickActionButton: EventEmitter<string> = (
+    new EventEmitter()
+  );
   @Input() opportunityHeadingTruncationLength: number;
 
   loadingOpportunityData: boolean;

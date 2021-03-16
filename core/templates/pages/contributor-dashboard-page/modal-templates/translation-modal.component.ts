@@ -42,6 +42,10 @@ export class TranslationOpportunityDict {
   progressPercentage: string;
   actionButtonTitle: string;
 }
+export interface HTMLSchema {
+    'type': string;
+    'ui_config': UiConfig;
+}
 
 @Component({
   selector: 'translation-modal',
@@ -111,10 +115,7 @@ export class TranslationModalContent {
     this.activeModal.close();
   }
 
-  getHtmlSchema(): {
-    'type': string;
-    'ui_config': UiConfig;
-    } {
+  getHtmlSchema(): HTMLSchema {
     return this.HTML_SCHEMA;
   }
 

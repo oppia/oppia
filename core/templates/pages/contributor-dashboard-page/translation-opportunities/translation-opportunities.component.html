@@ -1,6 +1,6 @@
 <div>
   <opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
-                      [clickActionButton]="onClickButton.bind(this)"
+                      (clickActionButton)="onClickButton($event)"
                       [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
                       [progressBarRequired]="true">
   </opportunities-list>

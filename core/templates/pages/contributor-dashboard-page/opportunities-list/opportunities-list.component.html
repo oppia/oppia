@@ -1,7 +1,7 @@
 <div class="oppia-opportunities-list">
   <div *ngFor="let opportunity of visibleOpportunities">
     <opportunities-list-item [opportunity]="opportunity"
-                             [clickActionButton]="clickActionButton"
+                             (clickActionButton)="clickActionButton.emit($event)"
                              [progressBarRequired]="progressBarRequired"
                              [labelRequired]="labelRequired"
                              [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength">
