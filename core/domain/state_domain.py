@@ -596,7 +596,7 @@ class InteractionInstance(python_utils.OBJECT):
             bool. Whether the interaction is supported by the Android app.
         """
         return (
-            self.id and
+            self.id is None or
             self.id in android_validation_constants.VALID_INTERACTION_IDS
         )
 
