@@ -2620,4 +2620,8 @@ def create_login_url(target_url):
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
+    # TODO(#11462): Remove all Frontend users of this function, since the login
+    # URL can be built using simple string concatenation.
+    #
+    # This path corresponds to: core/templates/pages/login-page/*.
     return '/login?return_url=%s' % target_url

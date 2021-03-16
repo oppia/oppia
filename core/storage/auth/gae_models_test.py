@@ -306,3 +306,8 @@ class FirebaseSeedModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             auth_models.FirebaseSeedModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_has_reference_to_existing_user_id(self):
+        self.assertFalse(
+            auth_models.FirebaseSeedModel.has_reference_to_user_id(
+                self.USER_ID))

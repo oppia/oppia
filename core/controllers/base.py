@@ -172,6 +172,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.user_id = None
         self.username = None
+        self.email = None
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
@@ -195,6 +196,7 @@ class BaseHandler(webapp2.RequestHandler):
                     auth_services.destroy_auth_session(self.response)
                     return
 
+            self.email = user_settings.email
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 

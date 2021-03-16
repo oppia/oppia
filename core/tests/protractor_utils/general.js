@@ -41,7 +41,6 @@ var scrollToTop = async function() {
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [];
 var CONSOLE_PATTERNS_TO_IGNORE = [
-  /localhost:9099/,
 ];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {
@@ -172,6 +171,14 @@ var ensurePageHasNoTranslationIds = async function() {
       .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
 };
 
+var acceptPrompt = async function(promptResponse) {
+  await waitFor.alertToBePresent();
+  const alert = await browser.switchTo().alert();
+  await alert.sendKeys(promptResponse);
+  await alert.accept();
+  await waitFor.pageToFullyLoad();
+};
+
 var acceptAlert = async function() {
   await waitFor.alertToBePresent();
   await (await browser.switchTo().alert()).accept();
@@ -238,6 +245,7 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
 };
 
 exports.acceptAlert = acceptAlert;
+exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 exports.isInDevMode = isInDevMode;

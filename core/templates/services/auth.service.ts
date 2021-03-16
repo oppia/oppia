@@ -58,6 +58,12 @@ class DevAuthServiceImpl extends AuthServiceImpl {
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
     const email = prompt('Please enter the email address to sign-in with');
+    // We've configured the Firebase emulator to use email/password for user
+    // authentication. To save developers and end-to-end test authors the
+    // trouble of providing passwords, we always use the md5 hash of the email
+    // address instead. This will never be done in production, where the
+    // emulator DOES NOT run. Instead, production takes the user to the Google
+    // sign-in page, which eventually redirects them back to Oppia.
     const password = await md5(email);
     let creds: firebase.auth.UserCredential;
     try {
@@ -162,6 +168,8 @@ export class AuthService {
   }
 
   async signOutAsync(): Promise<void> {
+    // The latter calls to Oppia, the former calls to Firebase. There's no risk
+    // in running these simultaneously, we only care that they both complete.
     await Promise.all([
       this.authServiceImpl.signOutAsync(),
       this.authBackendApiService.endSessionAsync(),

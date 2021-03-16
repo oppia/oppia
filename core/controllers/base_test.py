@@ -713,7 +713,7 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_begin handler."""
 
     def test_get(self):
-        call_counter = test_utils.CallCounter(lambda *_: None)
+        call_counter = test_utils.CallCounter()
 
         with self.swap(auth_services, 'establish_auth_session', call_counter):
             self.get_html_response('/session_begin', expected_status_int=200)
@@ -725,7 +725,7 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_end handler."""
 
     def test_get(self):
-        call_counter = test_utils.CallCounter(lambda *_: None)
+        call_counter = test_utils.CallCounter()
 
         with self.swap(auth_services, 'destroy_auth_session', call_counter):
             self.get_html_response('/session_end', expected_status_int=200)
@@ -737,7 +737,7 @@ class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
     """Tests for /seed_firebase handler."""
 
     def test_get(self):
-        call_counter = test_utils.CallCounter(lambda *_: None)
+        call_counter = test_utils.CallCounter()
 
         seed_firebase_swap = self.swap(
             firebase_auth_services, 'seed_firebase', call_counter)
@@ -775,7 +775,7 @@ class LogoutPageTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
         self.get_html_response('/explore/0')
 
-        call_counter = test_utils.CallCounter(lambda _: None)
+        call_counter = test_utils.CallCounter()
 
         with self.swap(auth_services, 'destroy_auth_session', call_counter):
             # Logout with valid query arg. This test only validates that the

@@ -29,6 +29,12 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   var user = await FirebaseAdmin.auth().createUser({
     email: email,
     emailVerified: true,
+    // We've configured the Firebase emulator to use email/password for user
+    // authentication. To save developers and end-to-end test authors the
+    // trouble of providing passwords, we always use the md5 hash of the email
+    // address instead. This will never be done in production, where the
+    // emulator DOES NOT run. Instead, production takes the user to the Google
+    // sign-in page, which eventually redirects them back to Oppia.
     password: await HashWasm.md5(email),
   });
   if (isSuperAdmin) {
@@ -38,15 +44,14 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
 };
 
 var login = async function(email) {
-  // Use of element and action is not possible because the login page is
-  // non-angular. The full url is also necessary.
+  // Use of element and action is not reliable, because we do not always begin
+  // on an Angular page. To forgive callers from non-Angular pages (e.g., the
+  // very first function call of a test), we use browser.driver instead.
+  // The full url is necessary.
   await browser.driver.get(
     general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
-  await waitFor.alertToBePresent();
-  const alert = await browser.switchTo().alert();
-  await alert.sendKeys(email);
-  await alert.accept();
+  await general.acceptPrompt(email);
 
   await waitFor.pageToFullyLoad();
 };
@@ -55,7 +60,8 @@ var logout = async function() {
   await browser.driver.get(general.SERVER_URL_PREFIX + '/');
 
   await general.openProfileDropdown();
-  await action.click('Logout link', $('.protractor-test-logout-link'));
+  const logoutLink = element(by.css('.protractor-test-logout-link'));
+  await action.click('Logout link', logoutLink);
   await waitFor.pageToFullyLoad();
 };
 

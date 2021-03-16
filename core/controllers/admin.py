@@ -737,6 +737,10 @@ class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
         username = self.request.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
@@ -756,6 +760,10 @@ class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
         username = self.request.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
