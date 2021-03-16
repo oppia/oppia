@@ -88,6 +88,7 @@ describe('Login Page', () => {
     TestBed.configureTestingModule({
       declarations: [LoginPageComponent],
       providers: [
+        { provide: AlertsService, useValue: alertsService },
         { provide: AuthService, useValue: authService },
         { provide: WindowRef, useValue: windowRef },
       ],
@@ -139,12 +140,14 @@ describe('Login Page', () => {
     expect(windowRef.location).toBeNull();
 
     redirectResultPromise.reject({code: 'auth/unknown-error', message: '?'});
+
+    // An error should have appeared, but redirect will not happen immediately.
     flushMicrotasks();
-
     expect(windowRef.location).toBeNull();
+    expect(alertsService.addWarning).toHaveBeenCalledWith('?');
 
-    tick(2000); // After 2 seconds, the page will redirect.
-
+    // The user will be given 2 seconds to acknowledge the warning.
+    tick(2000);
     expect(windowRef.location).toEqual('/');
 
     flush();
