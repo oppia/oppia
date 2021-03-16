@@ -18,6 +18,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
 
 import { ExplorationPermissionsBackendApiService } from
@@ -29,9 +30,12 @@ import { ExplorationPermissions } from
   providedIn: 'root'
 })
 export class UserExplorationPermissionsService {
+  private userExplorationPermissionsFetched = new EventEmitter<void>();
+
   constructor(
     private explorationPermissionsBackendApiService:
-    ExplorationPermissionsBackendApiService) {}
+    ExplorationPermissionsBackendApiService) {
+  }
 
   static permissionsPromise: Promise<ExplorationPermissions> = null;
 
@@ -46,8 +50,12 @@ export class UserExplorationPermissionsService {
   async fetchPermissionsAsync(): Promise<ExplorationPermissions> {
     UserExplorationPermissionsService.permissionsPromise = (
       this.explorationPermissionsBackendApiService.getPermissionsAsync());
-
+    this.userExplorationPermissionsFetched.emit();
     return UserExplorationPermissionsService.permissionsPromise;
+  }
+
+  get onUserExplorationPermissionsFetched(): EventEmitter<void> {
+    return this.userExplorationPermissionsFetched;
   }
 }
 

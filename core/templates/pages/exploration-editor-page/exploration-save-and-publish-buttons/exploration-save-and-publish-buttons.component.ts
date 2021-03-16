@@ -144,14 +144,16 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
             $scope.explorationCanBePublished = permissions.canPublish;
           });
         ctrl.directiveSubscriptions.add(
-          ExplorationRightsService.onExplorationUnpublished.subscribe(
-            () => {
-              UserExplorationPermissionsService.getPermissionsAsync()
-                .then(function(permissions) {
-                  $scope.explorationCanBePublished = permissions.canPublish;
-                });
-            }
-          )
+          UserExplorationPermissionsService.onUserExplorationPermissionsFetched
+            .subscribe(
+              () => {
+                UserExplorationPermissionsService.getPermissionsAsync()
+                  .then(function(permissions) {
+                    $scope.explorationCanBePublished = permissions.canPublish;
+                    $scope.$applyAsync();
+                  });
+              }
+            )
         );
       };
 

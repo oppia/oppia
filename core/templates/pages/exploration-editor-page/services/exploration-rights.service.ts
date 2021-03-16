@@ -27,7 +27,6 @@ angular.module('oppia').factory('ExplorationRightsService', [
   function(
       $http, AlertsService, ExplorationDataService,
       ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
-    var explorationUnpublishedEventEmitter = new EventEmitter();
     return {
       init: function(
           ownerNames, editorNames, voiceArtistNames, viewerNames, status,
@@ -133,14 +132,14 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      saveModeratorChangeToBackend: function(
-          emailBody, onExplorationRightsUpdatedcallback) {
+      saveModeratorChangeToBackendAsync: async function(
+          emailBody) {
         var that = this;
         var explorationModeratorRightsUrl = (
           '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
 
-        $http.put(explorationModeratorRightsUrl, {
+        return $http.put(explorationModeratorRightsUrl, {
           email_body: emailBody,
           version: ExplorationDataService.data.version
         }).then(function(response) {
@@ -151,14 +150,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
-          if (onExplorationRightsUpdatedcallback) {
-            onExplorationRightsUpdatedcallback();
-          }
-          explorationUnpublishedEventEmitter.emit();
         });
-      },
-      get onExplorationUnpublished() {
-        return explorationUnpublishedEventEmitter;
       },
     };
   }

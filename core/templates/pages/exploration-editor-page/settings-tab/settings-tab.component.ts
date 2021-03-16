@@ -100,7 +100,6 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationRightsService',
-    'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
     'RouterService', 'UrlInterpolationService', 'UserEmailPreferencesService',
@@ -116,7 +115,6 @@ angular.module('oppia').component('settingsTab', {
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
-        ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
         RouterService, UrlInterpolationService, UserEmailPreferencesService,
@@ -337,13 +335,6 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
 
         var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
-        var onUnpublishCallback = function() {
-          UserExplorationPermissionsService.fetchPermissionsAsync()
-            .then(function(permissions) {
-              ctrl.canUnpublish = permissions.canUnpublish;
-              ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-            });
-        };
 
         $http.get(moderatorEmailDraftUrl).then(function(response) {
           // If the draft email body is empty, email functionality will not
@@ -360,8 +351,14 @@ angular.module('oppia').component('settingsTab', {
             },
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
-            ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody, onUnpublishCallback);
+            ExplorationRightsService.saveModeratorChangeToBackendAsync(
+              emailBody).then(function() {
+              UserExplorationPermissionsService.fetchPermissionsAsync()
+                .then(function(permissions) {
+                  ctrl.canUnpublish = permissions.canUnpublish;
+                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                });
+            });
           }, function() {
             AlertsService.clearWarnings();
           });
@@ -408,15 +405,17 @@ angular.module('oppia').component('settingsTab', {
           )
         );
         ctrl.directiveSubscriptions.add(
-          ExplorationSaveService.onExplorationPublished.subscribe(
-            () => {
-              UserExplorationPermissionsService.getPermissionsAsync()
-                .then(function(permissions) {
-                  ctrl.canUnpublish = permissions.canUnpublish;
-                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-                });
-            }
-          )
+          UserExplorationPermissionsService.onUserExplorationPermissionsFetched
+            .subscribe(
+              () => {
+                UserExplorationPermissionsService.getPermissionsAsync()
+                  .then(function(permissions) {
+                    ctrl.canUnpublish = permissions.canUnpublish;
+                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                    $rootScope.$applyAsync();
+                  });
+              }
+            )
         );
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
           EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
