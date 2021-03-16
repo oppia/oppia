@@ -94,7 +94,7 @@ angular.module('oppia').component('settingsTab', {
   template: require('./settings-tab.component.html'),
   controller: [
     '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
-    'ContextService', 'EditabilityService', 
+    'ContextService', 'EditabilityService',
     'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
@@ -110,7 +110,7 @@ angular.module('oppia').component('settingsTab', {
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
         $http, $rootScope, $uibModal, AlertsService, ChangeListService,
-        ContextService, EditabilityService, 
+        ContextService, EditabilityService,
         EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,

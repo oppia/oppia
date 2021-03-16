@@ -63,7 +63,6 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/context.service');
 
 import { Subscription } from 'rxjs';
-import { ContextService } from 'services/context.service';
 
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -90,7 +89,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'state-interaction-editor.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'ContextService', 
-        'EditabilityService', 'ExplorationHtmlFormatterService', 
+        'EditabilityService', 'ExplorationHtmlFormatterService',
         'InteractionDetailsCacheService',
         'ResponsesService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
@@ -98,7 +97,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
             $scope, $uibModal, AlertsService, ContextService, 
-            EditabilityService, ExplorationHtmlFormatterService, 
+            EditabilityService, ExplorationHtmlFormatterService,
             InteractionDetailsCacheService,
             ResponsesService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
@@ -221,17 +220,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
           $scope.isInteractionDisabled = function() {
             if (
-              StateInteractionIdService.displayed == 'EndExploration' && 
+              StateInteractionIdService.displayed === 'EndExploration' &&
               ContextService.isExplorationLinkedToStory()) {
               return true;
             }
             return false;
           };
 
-          $scope.openInteractionCustomizerModal = function() {   
+          $scope.openInteractionCustomizerModal = function() {
             if ($scope.isInteractionDisabled()) {
               return;
-            }   
+            }
             if (EditabilityService.isEditable()) {
               AlertsService.clearWarnings();
 

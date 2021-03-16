@@ -38,8 +38,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
   'VALID_RTE_COMPONENTS_FOR_ANDROID',
   function(
-    CkEditorCopyContentService, ContextService, RteHelperService,
-    VALID_RTE_COMPONENTS_FOR_ANDROID) {
+      CkEditorCopyContentService, ContextService, RteHelperService,
+      VALID_RTE_COMPONENTS_FOR_ANDROID) {
     /**
      * Creates a CKEditor configuration.
      * @param config CKEditor config to add to
@@ -145,8 +145,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
             ContextService.isExplorationLinkedToStory() &&
             VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(componentDefn.id) === -1);
           if (
-              !(hideComplexExtensionFlag || notRelatedToLessonsFlag ||
-                notSupportedOnAndroidFlag)) {
+            !(hideComplexExtensionFlag || notRelatedToLessonsFlag ||
+              notSupportedOnAndroidFlag)) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
