@@ -57,17 +57,7 @@ class MockRouterService {
   }
 }
 
-class MockExplorationSaveService {
-  private explorationPublishedEventEmitter: EventEmitter<void>;
-  get onExplorationPublished() {
-    return this.explorationPublishedEventEmitter;
-  }
-  set explorationPublishedEmitter(val) {
-    this.explorationPublishedEventEmitter = val;
-  }
-}
-
-describe('Settings Tab Component', function() {
+fdescribe('Settings Tab Component', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
@@ -92,7 +82,6 @@ describe('Settings Tab Component', function() {
   var userExplorationPermissionsService = null;
   var windowRef = null;
   var routerService = null;
-  var explorationSaveService = null;
 
   var testSubscriptipns = null;
   var refreshGraphSpy = null;
@@ -119,7 +108,6 @@ describe('Settings Tab Component', function() {
       TestBed.get(UserExplorationPermissionsService));
     windowRef = TestBed.get(WindowRef);
     routerService = new MockRouterService();
-    explorationSaveService = new MockExplorationSaveService;
     mockWindowDimensionsService = {
       isWindowNarrow: () => true
     };
@@ -188,6 +176,8 @@ describe('Settings Tab Component', function() {
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
+      spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+        .returnValue($q.resolve(userPermissions));
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
@@ -195,12 +185,10 @@ describe('Settings Tab Component', function() {
       explorationCategoryService.init('Astrology');
 
       routerService.refreshSettingsTabEmitter = new EventEmitter();
-      explorationSaveService.explorationPublishedEmitter = new EventEmitter();
       $scope = $rootScope.$new();
       ctrl = $componentController('settingsTab', {
         $scope: $scope,
         AlertsService: alertsService,
-        ExplorationSaveService: explorationSaveService,
         UserExplorationPermissionsService: userExplorationPermissionsService,
         RouterService: routerService,
         WindowRef: windowRef,
@@ -246,19 +234,6 @@ describe('Settings Tab Component', function() {
 
       expect(ctrl.stateNames).toEqual(['Introduction']);
       expect(ctrl.hasPageLoaded).toBe(true);
-    });
-
-    it('should refresh permissions when onExplorationPublished flag is ' +
-        'broadcasted', function() {
-      ctrl.canUnpublish = false;
-      expect(ctrl.canUnpublish).toBe(false);
-
-      explorationSaveService.onExplorationPublished.emit();
-      $scope.$apply();
-
-      expect(userExplorationPermissionsService.getPermissionsAsync)
-        .toHaveBeenCalled();
-      expect(ctrl.canUnpublish).toBe(true);
     });
 
     it('should get explore page url based on the exploration id', function() {
@@ -447,36 +422,12 @@ describe('Settings Tab Component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('Email body')
       });
-      spyOn(explorationRightsService, 'saveModeratorChangeToBackend').and
-        .callFake((emailBody, onUnpublishcallback) => {
-          onUnpublishcallback();
+      spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
+        .callFake((emailBody) => {
           return $q.resolve();
         });
-
-      $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
-        draft_email_body: 'Draf message'
-      });
-      ctrl.unpublishExplorationAsModerator();
-      $httpBackend.flush();
-      $scope.$apply();
-
-      expect(explorationRightsService.saveModeratorChangeToBackend)
-        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
-    });
-
-    it('should call onUnpublishcallback which will invoke' +
-    'fetchPermissionsAsync', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('Email body')
-      });
       ctrl.canUnpublish = false;
-      spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
-        .returnValue($q.resolve(userPermissions));
-      spyOn(explorationRightsService, 'saveModeratorChangeToBackend').and
-        .callFake((emailBody, onUnpublishcallback) => {
-          onUnpublishcallback();
-          return $q.resolve();
-        });
+      ctrl.canReleaseOwnership = false;
 
       $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
         draft_email_body: 'Draf message'
@@ -485,11 +436,12 @@ describe('Settings Tab Component', function() {
       $httpBackend.flush();
       $scope.$apply();
 
-      expect(explorationRightsService.saveModeratorChangeToBackend)
-        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
+      expect(explorationRightsService.saveModeratorChangeToBackendAsync)
+        .toHaveBeenCalledWith('Email body');
       expect(userExplorationPermissionsService.fetchPermissionsAsync)
         .toHaveBeenCalled();
       expect(ctrl.canUnpublish).toBe(true);
+      expect(ctrl.canReleaseOwnership).toBe(true);
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
@@ -691,13 +643,11 @@ describe('Settings Tab Component', function() {
         'Introduction']);
 
       explorationCategoryService.init('Astrology');
-      explorationSaveService.explorationPublishedEmitter = new EventEmitter();
       routerService.refreshSettingsTabEmitter = new EventEmitter();
       $scope = $rootScope.$new();
       ctrl = $componentController('settingsTab', {
         $scope: $scope,
         AlertsService: alertsService,
-        ExplorationSaveService: explorationSaveService,
         UserExplorationPermissionsService: userExplorationPermissionsService,
         RouterService: routerService,
         WindowRef: windowRef,
@@ -728,7 +678,8 @@ describe('Settings Tab Component', function() {
       ctrl.canUnpublish = false;
       expect(ctrl.canUnpublish).toBe(false);
 
-      explorationSaveService.onExplorationPublished.emit();
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
       $scope.$apply();
 
       expect(userExplorationPermissionsService.getPermissionsAsync)
@@ -740,7 +691,8 @@ describe('Settings Tab Component', function() {
       ctrl.canReleaseOwnership = false;
       expect(ctrl.canReleaseOwnership).toBe(false);
 
-      explorationSaveService.onExplorationPublished.emit();
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
       $scope.$apply();
 
       expect(userExplorationPermissionsService.getPermissionsAsync)
