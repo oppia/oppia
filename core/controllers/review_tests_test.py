@@ -22,7 +22,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import user_domain
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -45,7 +45,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_domain.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.topic_id = 'topic_id'
         self.story_id_1 = 'story_id_1'

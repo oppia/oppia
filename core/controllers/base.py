@@ -30,7 +30,6 @@ import traceback
 from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import user_domain
 from core.domain import user_services
 import feconf
 import python_utils
@@ -209,7 +208,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.user = user_domain.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.values['is_moderator'] = (
             user_services.is_at_least_moderator(self.user_id))

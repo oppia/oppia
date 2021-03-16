@@ -52,7 +52,6 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 import feconf
@@ -722,7 +721,7 @@ class AdminRoleHandler(base.BaseHandler):
             username=username)
 
         if topic_id:
-            user = user_domain.UserActionsInfo(user_id)
+            user = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)

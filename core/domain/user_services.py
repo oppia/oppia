@@ -544,14 +544,27 @@ def get_user_ids_by_role(role):
     return [user.id for user in user_settings]
 
 
+def get_user_actions_info(user_id):
+    """Get user actions info for a user.
+
+    Args:
+        user_id: str|None. The user ID of the user we want to get actions for.
+
+    Returns:
+        UserActionsInfo. User object with system committer user id.
+    """
+    role = get_user_role_from_id(user_id)
+    actions = role_services.get_all_actions(role)
+    return user_domain.UserActionsInfo(user_id, role, actions)
+
+
 def get_system_user():
     """Returns user object with system committer user id.
 
     Returns:
         UserActionsInfo. User object with system committer user id.
     """
-    system_user = user_domain.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
-    return system_user
+    return get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
 
 
 def _save_user_settings(user_settings):

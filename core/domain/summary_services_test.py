@@ -31,7 +31,6 @@ from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import summary_services
-from core.domain import user_domain
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -92,8 +91,8 @@ class ExplorationDisplayableSummariesTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
-        self.albert = user_domain.UserActionsInfo(self.albert_id)
-        self.bob = user_domain.UserActionsInfo(self.bob_id)
+        self.albert = user_services.get_user_actions_info(self.albert_id)
+        self.bob = user_services.get_user_actions_info(self.bob_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
@@ -348,7 +347,7 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.albert = user_domain.UserActionsInfo(self.albert_id)
+        self.albert = user_services.get_user_actions_info(self.albert_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id, language_code=self.LANGUAGE_CODE_ES)
@@ -454,8 +453,8 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        self.owner = user_domain.UserActionsInfo(self.owner_id)
-        self.editor = user_domain.UserActionsInfo(self.editor_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
     def test_get_learner_dict_with_deleted_exp_fails_validation(self):
         self.save_new_valid_collection(
@@ -605,7 +604,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
-        self.albert = user_domain.UserActionsInfo(self.albert_id)
+        self.albert = user_services.get_user_actions_info(self.albert_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
@@ -758,7 +757,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.albert = user_domain.UserActionsInfo(self.albert_id)
+        self.albert = user_services.get_user_actions_info(self.albert_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id,
@@ -863,7 +862,7 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         super(ActivityReferenceAccessCheckerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_domain.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def test_requiring_nonexistent_activities_be_public_raises_exception(self):
         with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
@@ -931,8 +930,8 @@ class CollectionNodeMetadataDictsTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
-        self.albert = user_domain.UserActionsInfo(self.albert_id)
-        self.bob = user_domain.UserActionsInfo(self.bob_id)
+        self.albert = user_services.get_user_actions_info(self.albert_id)
+        self.bob = user_services.get_user_actions_info(self.bob_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID1, self.albert_id,
@@ -1064,7 +1063,7 @@ class CollectionNodeMetadataDictsTest(
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_guest_can_fetch_public_exploration_metadata_dicts(self):
-        new_guest_user = user_domain.UserActionsInfo()
+        new_guest_user = user_services.get_user_actions_info(None)
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID3, self.EXP_ID4], new_guest_user)
 
@@ -1081,7 +1080,7 @@ class CollectionNodeMetadataDictsTest(
         self.assertEqual(metadata_dicts, expected_metadata_dicts)
 
     def test_guest_cannot_fetch_private_exploration_metadata_dicts(self):
-        new_guest_user = user_domain.UserActionsInfo()
+        new_guest_user = user_services.get_user_actions_info(None)
         self.save_new_valid_exploration('exp_id', self.albert_id)
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
             ['exp_id'], new_guest_user)

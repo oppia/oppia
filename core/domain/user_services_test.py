@@ -1119,8 +1119,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.admin = user_domain.UserActionsInfo(self.admin_id)
-        self.owner = user_domain.UserActionsInfo(self.owner_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(

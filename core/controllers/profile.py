@@ -463,7 +463,9 @@ class UserInfoHandler(base.BaseHandler):
         # The following headers are added to prevent caching of this response.
         self.response.cache_control.no_store = True
         if self.username:
-            user_actions = user_domain.UserActionsInfo(self.user_id).actions
+            user_actions = user_services.get_user_actions_info(
+                self.user_id
+            ).actions
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             self.render_json({

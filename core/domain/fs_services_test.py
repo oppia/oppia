@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import image_services
-from core.domain import user_domain
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 from proto import text_classifier_pb2
@@ -64,7 +64,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_domain.UserActionsInfo(self.user_id_admin)
+        self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self):
         with python_utils.open_file(

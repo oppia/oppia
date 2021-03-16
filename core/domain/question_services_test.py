@@ -27,7 +27,7 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import user_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -57,11 +57,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
 
-        self.topic_manager = user_domain.UserActionsInfo(
+        self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
-        self.admin = user_domain.UserActionsInfo(self.admin_id)
-        self.new_user = user_domain.UserActionsInfo(self.new_user_id)
-        self.editor = user_domain.UserActionsInfo(self.editor_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.new_user = user_services.get_user_actions_info(self.new_user_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description 1')

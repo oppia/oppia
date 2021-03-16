@@ -28,7 +28,6 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -76,7 +75,7 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.owner = user_domain.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
@@ -1857,7 +1856,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             user_id=self.viewer_id))
 
     def test_contributor_ids(self):
-        albert = user_domain.UserActionsInfo(self.albert_id)
+        albert = user_services.get_user_actions_info(self.albert_id)
 
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)

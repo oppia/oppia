@@ -23,7 +23,6 @@ import re
 
 from constants import constants
 from core.domain import role_services
-from core.domain import user_services
 
 from core.platform import models
 import feconf
@@ -399,10 +398,10 @@ class UserActionsInfo(python_utils.OBJECT):
         actions: list(str). A list of actions accessible to the role.
     """
 
-    def __init__(self, user_id=None):
+    def __init__(self, user_id, role, actions):
         self._user_id = user_id
-        self._role = user_services.get_user_role_from_id(user_id)
-        self._actions = role_services.get_all_actions(self._role)
+        self._role = role
+        self._actions = actions
 
     @property
     def user_id(self):

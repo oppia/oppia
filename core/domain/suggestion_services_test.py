@@ -34,7 +34,6 @@ from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_services
-from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1286,7 +1285,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
-        self.editor = user_domain.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
