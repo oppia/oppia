@@ -77,7 +77,8 @@ describe('Opportunities List Item Component', () => {
   describe('when opportunity is not provided', () => {
     beforeEach(() => {
       component.opportunity = null;
-      component.clickActionButton = () => jasmine.createSpy('click', () => {});
+      component.clickActionButton.emit =
+        () => jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = null;
