@@ -1824,6 +1824,16 @@ class TopicSummary(python_utils.OBJECT):
                 'uncategorized_skill_count %s, received \'%s\'' % (
                     self.uncategorized_skill_count, self.total_skill_count))
 
+        if not isinstance(self.total_published_node_count, int):
+            raise utils.ValidationError(
+                'Expected total published node count to be an integer, '
+                'received \'%s\'' % self.total_published_node_count)
+
+        if self.total_published_node_count < 0:
+            raise utils.ValidationError(
+                'Expected total_published_node_count to be non-negative, '
+                'received \'%s\'' % self.total_published_node_count)
+
         if not isinstance(self.subtopic_count, int):
             raise utils.ValidationError(
                 'Expected subtopic count to be an integer, received \'%s\''

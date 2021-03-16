@@ -1265,6 +1265,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'uncategorized_skill_count': 1,
             'subtopic_count': 1,
             'total_skill_count': 1,
+            'total_published_node_count': 1,
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
@@ -1273,8 +1274,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', current_time,
-            current_time)
+            1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
+            current_time, current_time)
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic summary passes validation.
