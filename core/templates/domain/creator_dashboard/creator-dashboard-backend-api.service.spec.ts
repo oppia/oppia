@@ -204,7 +204,7 @@ describe('Creator Dashboard backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      creatorDashboardBackendApiService.fetchDashboardData()
+      creatorDashboardBackendApiService.fetchDashboardDataAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);
@@ -223,7 +223,7 @@ describe('Creator Dashboard backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      creatorDashboardBackendApiService.fetchDashboardData()
+      creatorDashboardBackendApiService.fetchDashboardDataAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);

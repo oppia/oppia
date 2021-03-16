@@ -269,7 +269,7 @@ describe('Creator dashboard controller', () => {
       };
 
       beforeEach(function() {
-        spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+        spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
           .and.returnValue($q.resolve({
             dashboardStats: CreatorDashboardStats
               .createFromBackendDict(dashboardData.dashboard_stats),
@@ -573,7 +573,7 @@ describe('Creator dashboard controller', () => {
     };
 
     beforeEach(function() {
-      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({
           dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
@@ -674,7 +674,7 @@ describe('Creator dashboard controller', () => {
     };
 
     beforeEach(function() {
-      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({
           dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
@@ -733,7 +733,7 @@ describe('Creator dashboard controller', () => {
 
   describe('when fetching dashboard fails', function() {
     it('should use reject handler', function() {
-      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404
         }));
