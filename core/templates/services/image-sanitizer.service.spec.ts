@@ -83,7 +83,8 @@ describe('ImageSanitizerService', () => {
   });
 
   it('should check for invalid base64 images', () => {
-    expect(imageSanitizerService.isValidBase64Svg(invalidBase64data)).toBe(false);
+    expect(imageSanitizerService.isValidBase64Svg(invalidBase64data))
+      .toBe(false);
   });
 
   it(
