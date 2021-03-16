@@ -154,7 +154,7 @@
       <input type="text" [(ngModel)]="selectedVertexLabel" [oppiaFocusOn]="vertexLabelEditBegun">
       <button mat-raised-button
               (click)="state.selectedVertex = null"
-              [innerHTML] = "'I18N_INTERACTIONS_GRAPH_UPDATE_LABEL' | translate">
+              [innerHTML]="'I18N_INTERACTIONS_GRAPH_UPDATE_LABEL' | translate">
       </button>
     </div>
     <div *ngIf="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
@@ -166,7 +166,7 @@
              (focus)="shouldShowWrongWeightWarning = false">
       <button mat-raised-button
               (click)="onUpdateEdgeWeight()"
-              [innerHTML] = "'I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT' | translate">
+              [innerHTML]="'I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT' | translate">
       </button>
     </div>
   </div>
