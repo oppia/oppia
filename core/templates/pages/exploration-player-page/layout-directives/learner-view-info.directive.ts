@@ -80,12 +80,12 @@ angular.module('oppia').directive('learnerViewInfo', [
               ).then(function(response) {
                 expInfo = response.summaries[0];
                 openInformationCardModal();
-                $rootScope.$apply();
+                $rootScope.$applyAsync();
               }, function() {
                 $log.error(
                   'Information card failed to load for exploration ' +
                   explorationId);
-                $rootScope.$apply();
+                $rootScope.$applyAsync();
               });
             }
           };
