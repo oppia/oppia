@@ -64,6 +64,7 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { OppiaFooterComponent } from '../pages/oppia-footer.component';
+import { I18nFooter } from '../../templates/I18nFooter';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -98,6 +99,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
+    I18nFooter,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -144,6 +146,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
+    I18nFooter,
     OppiaFooterComponent,
     SharingLinksComponent,
     StorySummaryTileDirective,
