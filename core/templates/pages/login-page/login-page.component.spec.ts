@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for the login page.
  */
 
-import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoginPageComponent } from './login-page.component';
@@ -60,6 +61,7 @@ class PendingPromise<T = void> {
 
 describe('Login Page', () => {
   let redirectResultPromise: PendingPromise;
+  let alertsService: jasmine.SpyObj<AlertsService>;
   let authService: jasmine.SpyObj<AuthService>;
   let windowRef: MockWindowRef;
   let alertSpy: jasmine.Spy;
@@ -75,6 +77,8 @@ describe('Login Page', () => {
 
   beforeEach(() => {
     alertSpy = spyOn(window, 'alert');
+    alertsService = (
+      jasmine.createSpyObj<AlertsService>('AlertsService', ['addWarning']));
     authService = jasmine.createSpyObj<AuthService>('AuthService', {
       handleRedirectResultAsync: Promise.resolve(),
       signInWithRedirectAsync: Promise.resolve(),
@@ -112,15 +116,34 @@ describe('Login Page', () => {
     flush();
   }));
 
-  it('should redirect to home page after failed redirect', fakeAsync(() => {
+  it('should acknowledge a user pending account deletion', fakeAsync(() => {
     redirectResultPromise = spyOnHandleRedirectResultAsync();
 
     component.ngOnInit();
 
     expect(windowRef.location).toBeNull();
 
-    redirectResultPromise.reject(new Error());
+    redirectResultPromise.reject({code: 'auth/user-disabled', message: '!'});
     flushMicrotasks();
+
+    expect(windowRef.location).toEqual('/pending-account-deletion');
+
+    flush();
+  }));
+
+  it('should redirect to home page after failed login', fakeAsync(() => {
+    redirectResultPromise = spyOnHandleRedirectResultAsync();
+
+    component.ngOnInit();
+
+    expect(windowRef.location).toBeNull();
+
+    redirectResultPromise.reject({code: 'auth/unknown-error', message: '?'});
+    flushMicrotasks();
+
+    expect(windowRef.location).toBeNull();
+
+    tick(2000); // After 2 seconds, the page will redirect.
 
     expect(windowRef.location).toEqual('/');
 
