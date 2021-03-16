@@ -91,7 +91,7 @@ describe('Playthrough Issues Service', function() {
 
   it('should get issues from backend', function() {
     var backendCallSpy = spyOn(
-      PlaythroughIssuesBackendApiService, 'fetchIssues').and.returnValue(
+      PlaythroughIssuesBackendApiService, 'fetchIssuesAsync').and.returnValue(
       $q.resolve(backendIssues.map(
         PlaythroughIssueObjectFactory.createFromBackendDict)));
 
@@ -105,7 +105,7 @@ describe('Playthrough Issues Service', function() {
 
   it('should get playthrough from backend', function() {
     var backendCallSpy = spyOn(
-      PlaythroughIssuesBackendApiService, 'fetchPlaythrough').and
+      PlaythroughIssuesBackendApiService, 'fetchPlaythroughAsync').and
       .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
         backendPlaythrough)));
     var playthroughId = 'exp_id1';
@@ -202,7 +202,7 @@ describe('Playthrough Issues Service', function() {
 
   it('should resolve issue', function() {
     var backendCallSpy = spyOn(
-      PlaythroughIssuesBackendApiService, 'resolveIssue').and.returnValue(
+      PlaythroughIssuesBackendApiService, 'resolveIssueAsync').and.returnValue(
       $q.resolve());
     var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
       angular.copy(backendIssues[0]));
@@ -214,7 +214,7 @@ describe('Playthrough Issues Service', function() {
   });
 
   it('should open playthrough modal', function() {
-    spyOn(PlaythroughIssuesBackendApiService, 'fetchPlaythrough').and
+    spyOn(PlaythroughIssuesBackendApiService, 'fetchPlaythroughAsync').and
       .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
         backendPlaythrough)));
     var openModalSpy = spyOn(ImprovementModalService, 'openPlaythroughModal')

@@ -174,7 +174,7 @@ describe('ExplorationImprovementsService', function() {
     this.essGetExplorationStatsSpy = (
       spyOn(explorationStatsService, 'getExplorationStatsAsync'));
     this.pibasFetchIssuesSpy = (
-      spyOn(playthroughIssuesBackendApiService, 'fetchIssues'));
+      spyOn(playthroughIssuesBackendApiService, 'fetchIssuesAsync'));
     this.stassGetTopAnswersByStateNameAsyncSpy = (
       spyOn(stateTopAnswersStatsService, 'getTopAnswersByStateNameAsync'));
 
