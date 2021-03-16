@@ -69,11 +69,11 @@ var openEditRolesForm = async function() {
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
-var createExploration = async function(expectWelcomeModal) {
+var createExploration = async function(welcomeModalIsShown) {
   await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  if (expectWelcomeModal) {
+  if (welcomeModalIsShown) {
     await explorationEditorMainTab.exitTutorial();
   }
 };
@@ -162,8 +162,8 @@ var publishExploration = async function() {
 
 // Creates and publishes a minimal exploration.
 var createAndPublishExploration = async function(
-    title, category, objective, language, expectWelcomeModal) {
-  await createExploration(expectWelcomeModal);
+    title, category, objective, language, welcomeModalIsShown) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
@@ -183,8 +183,8 @@ var createAndPublishExploration = async function(
 };
 
 var createAddExpDetailsAndPublishExp = async function(
-    title, category, objective, language, tags, expectWelcomeModal) {
-  await createExploration(expectWelcomeModal);
+    title, category, objective, language, tags, welcomeModalIsShown) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
@@ -197,9 +197,9 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language, expectWelcomeModal,
+    title, category, objective, language, welcomeModalIsShown,
     correctnessFeedbackIsEnabled) {
-  await createExploration(expectWelcomeModal);
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));

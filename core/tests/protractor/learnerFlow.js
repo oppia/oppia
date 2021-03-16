@@ -55,12 +55,12 @@ describe('Learner dashboard functionality', function() {
   };
 
   var createDummyExplorationOnDesktopAsAdmin = async function(
-      expectWelcomeModal) {
+      welcomeModalIsShown) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
     await waitFor.pageToFullyLoad();
-    if (expectWelcomeModal) {
+    if (welcomeModalIsShown) {
       await explorationEditorMainTab.exitTutorial();
     }
     await explorationEditorMainTab.setStateName('First');

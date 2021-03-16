@@ -107,12 +107,12 @@ var getExplorationIdFromPlayer = async function() {
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = async function(explorationId, expectWelcomeModal) {
+var openEditor = async function(explorationId, welcomeModalIsShown) {
   await browser.get(EDITOR_URL_SLICE + explorationId);
   await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  if (expectWelcomeModal) {
+  if (welcomeModalIsShown) {
     await explorationEditorMainTab.exitTutorial();
   }
 };
@@ -130,9 +130,9 @@ var moveToPlayer = async function() {
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = async function(expectWelcomeModal) {
+var moveToEditor = async function(welcomeModalIsShown) {
   var explorationId = await getExplorationIdFromPlayer();
-  await openEditor(explorationId, expectWelcomeModal);
+  await openEditor(explorationId, welcomeModalIsShown);
 };
 
 var expect404Error = async function() {
