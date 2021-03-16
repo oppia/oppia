@@ -736,6 +736,21 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_space_after_docstring)
 
+    def test_two_lines_empty_docstring_raise_correct_message(self):
+        node_with_docstring = astroid.extract_node(
+            u"""def func():
+                    \"\"\"
+                    \"\"\"
+                    pass
+        """)
+        message = testutils.Message(
+            msg_id='single-line-docstring-span-two-lines',
+            node=node_with_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_docstring)
+
     def test_single_line_docstring_span_two_lines(self):
         node_single_line_docstring_span_two_lines = astroid.extract_node(
             u"""def func(): #@
