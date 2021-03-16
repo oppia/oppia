@@ -415,8 +415,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         $scope.originalContentIdToContent = $scope.getContentIdToContent(
           StateCustomizationArgsService.displayed);
       }
-      $scope.explorationIsLinkedToStory = ContextService.isExplorationLinkedToStory();
-      console.log($scope.explorationIsLinkedToStory);
+      $scope.explorationIsLinkedToStory = (
+        ContextService.isExplorationLinkedToStory());
     };
 
     $scope.init();

@@ -167,7 +167,6 @@ angular.module('oppia').component('settingsTab', {
             ctrl.stateNames = ExplorationStatesService.getStateNames();
             ctrl.explorationIsLinkedToStory = (
               ContextService.isExplorationLinkedToStory());
-            console.log(ctrl.explorationIsLinkedToStory);
           }
           ctrl.hasPageLoaded = true;
           $rootScope.$applyAsync();

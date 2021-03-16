@@ -63,6 +63,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/context.service');
 
 import { Subscription } from 'rxjs';
+import { ContextService } from 'services/context.service';
 
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -88,15 +89,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
         '/components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
-        'ExplorationHtmlFormatterService', 'InteractionDetailsCacheService',
+        '$scope', '$uibModal', 'AlertsService', 'ContextService', 
+        'EditabilityService', 'ExplorationHtmlFormatterService', 
+        'InteractionDetailsCacheService',
         'ResponsesService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
-            $scope, $uibModal, AlertsService, EditabilityService,
-            ExplorationHtmlFormatterService, InteractionDetailsCacheService,
+            $scope, $uibModal, AlertsService, ContextService, 
+            EditabilityService, ExplorationHtmlFormatterService, 
+            InteractionDetailsCacheService,
             ResponsesService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -216,8 +219,19 @@ angular.module('oppia').directive('stateInteractionEditor', [
             );
           };
 
-          $scope.openInteractionCustomizerModal = function() {
-            if ()
+          $scope.isInteractionDisabled = function() {
+            if (
+              StateInteractionIdService.displayed == 'EndExploration' && 
+              ContextService.isExplorationLinkedToStory()) {
+              return true;
+            }
+            return false;
+          };
+
+          $scope.openInteractionCustomizerModal = function() {   
+            if ($scope.isInteractionDisabled()) {
+              return;
+            }   
             if (EditabilityService.isEditable()) {
               AlertsService.clearWarnings();
 
