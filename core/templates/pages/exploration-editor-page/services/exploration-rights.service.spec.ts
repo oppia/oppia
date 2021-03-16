@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 
-describe('Exploration rights service', function() {
+fdescribe('Exploration rights service', function() {
   var ers, als;
   var $httpBackend = null;
   var CsrfService = null;
@@ -72,6 +72,11 @@ describe('Exploration rights service', function() {
 
     clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
   }));
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
 
   it('should correctly initializes the service', function() {
     expect(ers.ownerNames).toBeUndefined();
@@ -262,7 +267,7 @@ describe('Exploration rights service', function() {
   it('should save moderator change to backend', function() {
     $httpBackend.expectPUT('/createhandler/moderatorrights/12345').respond(
       200, sampleDataResults);
-    ers.saveModeratorChangeToBackend();
+    ers.saveModeratorChangeToBackendAsync();
     $httpBackend.flush();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
@@ -279,25 +284,11 @@ describe('Exploration rights service', function() {
       sampleDataResults.rights.viewable_if_private);
   });
 
-  it('should callback to be called in saveModeratorChangeToBackend',
-    function() {
-      $httpBackend.expectPUT('/createhandler/moderatorrights/12345').respond(
-        200, sampleDataResults);
-      const onUnpublishingcallbackFunc = jasmine.createSpy(
-        'onUnpublishingcallback');
-
-      ers.saveModeratorChangeToBackend(
-        'Email body', onUnpublishingcallbackFunc);
-      $httpBackend.flush();
-
-      expect(onUnpublishingcallbackFunc).toHaveBeenCalled();
-    });
-
   it('should reject handler when saving moderator change to backend fails',
     function() {
       $httpBackend.expectPUT('/createhandler/moderatorrights/12345')
         .respond(500);
-      ers.saveModeratorChangeToBackend();
+      ers.saveModeratorChangeToBackendAsync();
       $httpBackend.flush();
 
       expect(clearWarningsSpy).not.toHaveBeenCalled();
