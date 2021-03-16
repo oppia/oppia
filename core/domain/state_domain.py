@@ -26,7 +26,7 @@ import logging
 import re
 
 from constants import constants
-from core.domain import android_validation_constants
+import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
@@ -597,8 +597,8 @@ class InteractionInstance(python_utils.OBJECT):
         """
         if self.id:
             return (
-                self.id in
-                android_validation_constants.VALID_INTERACTION_IDS)
+                    self.id in
+                    android_validation_constants.VALID_INTERACTION_IDS)
 
         return True
 
