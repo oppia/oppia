@@ -41,8 +41,7 @@ import {
 import {
   SuggestionBackendDict,
   Suggestion,
-  SuggestionObjectFactory
-} from 'domain/suggestion/SuggestionObjectFactory';
+} from 'domain/suggestion/suggestion.model';
 import {
   ProfileSummary,
   SubscriberSummaryBackendDict,
@@ -96,7 +95,6 @@ export class CreatorDashboardBackendApiService {
   constructor(
     private http: HttpClient,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
-    private suggestionObjectFactory: SuggestionObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
     private loggerService: LoggerService) {}
@@ -129,7 +127,7 @@ export class CreatorDashboardBackendApiService {
     return suggestionThreads;
   }
 
-  _fetchDashboardData(): Promise<CreatorDashboardData> {
+  async _fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this.http.get<CreatorDashboardDataBackendDict>(
       '/creatordashboardhandler/data').toPromise().then(dashboardData => {
       return {
@@ -153,12 +151,12 @@ export class CreatorDashboardBackendApiService {
               .createFromBackendDict(feedbackThread))),
         createdSuggestionsList: (
           dashboardData.created_suggestions_list.map(
-            suggestionDict => this.suggestionObjectFactory
-              .createFromBackendDict(suggestionDict))),
+            suggestionDict => Suggestion.createFromBackendDict(
+              suggestionDict))),
         suggestionsToReviewList: (
           dashboardData.suggestions_to_review_list.map(
-            suggestionDict => this.suggestionObjectFactory
-              .createFromBackendDict(suggestionDict))),
+            suggestionDict => Suggestion.createFromBackendDict(
+              suggestionDict))),
         createdSuggestionThreadsList: this._getSuggestionThreads(
           dashboardData.threads_for_created_suggestions_list,
           dashboardData.created_suggestions_list),
@@ -182,8 +180,8 @@ export class CreatorDashboardBackendApiService {
     });
   }
 
-  fetchDashboardData(): Promise<CreatorDashboardData> {
-    return this._fetchDashboardData();
+  async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
+    return this._fetchDashboardDataAsync();
   }
 }
 

@@ -96,8 +96,7 @@ commands:
       - run:
           name: Skip build for release changelog update PRs
           command: |
-            PR_BRANCH=$(curl -s https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER} | jq -r '.head.ref')
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ "$PR_BRANCH" == update-changelog-for-release* ]]; then
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ ${CIRCLE_BRANCH} == update-changelog-for-release* ]]; then
               circleci-agent step halt
             fi
 
@@ -147,6 +146,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -293,15 +293,15 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --prod_env
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --server_log_level=info --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
       - run:
           name: Run e2e topic and story editor test
           command: |
