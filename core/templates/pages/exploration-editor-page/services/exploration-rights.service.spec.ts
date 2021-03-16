@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 
-fdescribe('Exploration rights service', function() {
+describe('Exploration rights service', function() {
   var ers, als;
   var $httpBackend = null;
   var CsrfService = null;
