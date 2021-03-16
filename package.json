@@ -116,6 +116,7 @@
     "@angular/common": "^10.2.2",
     "@angular/compiler": "^10.2.2",
     "@angular/core": "^10.2.2",
+    "@angular/elements": "10.2.2",
     "@angular/fire": "^6.1.0",
     "@angular/forms": "^10.2.2",
     "@angular/material": "^10.2.2",
