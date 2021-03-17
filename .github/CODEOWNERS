@@ -234,6 +234,7 @@
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @srijanreddy98
@@ -249,6 +250,7 @@
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
 /core/templates/services/attribution.service*.ts @srijanreddy98
+/core/templates/services/ngb-modal.service.ts @srijanreddy98
 
 
 # Global frontend services
