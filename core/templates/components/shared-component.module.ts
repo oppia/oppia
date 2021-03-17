@@ -63,7 +63,7 @@ import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
-import { OppiaFooterComponent } from '../pages/oppia-footer.component';
+import { OppiaFooterComponent } from 'pages/oppia-footer.component';
 import { I18nFooter } from '../../templates/I18nFooter';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 
