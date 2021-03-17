@@ -41,6 +41,10 @@ class MockModel(base_models.BaseModel):
     pass
 
 
+class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    pass
+
+
 class BaseModelValidatorTests(unittest.TestCase):
 
     def setUp(self):
@@ -168,4 +172,28 @@ class ValidateModelIdTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelInvalidIdError(invalid_id_model)
+                ]))
+
+
+class ValidateCommitTypeTests(BaseModelValidatorTests):
+    def test_validate_commit_type(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_commit_type_model = MockCommitLogEntryModel(
+                id='123',
+                created_on=self.year_ago,
+                last_updated=self.now,
+                commit_type='invalid-type',
+                user_id='',
+                post_commit_status='',
+                commit_cmds=[])
+            pcoll = p | beam.Create([invalid_commit_type_model])
+
+            output = (
+                pcoll | beam.ParDo(base_model_validator.ValidateCommitType()))
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelInvalidCommitTypeError(
+                        invalid_commit_type_model)
                 ]))

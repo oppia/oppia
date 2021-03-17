@@ -115,6 +115,25 @@ class ValidateModelTimeFields(beam.DoFn):
             yield errors.ModelMutatedDuringJobError(model)
 
 
+class ValidateCommitType(beam.DoFn):
+    """DoFn to check whether commit type is valid"""
+
+    def process(self, input_model):
+        """Function that defines how to process each element in a pipeline of
+        models.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Yields:
+            ModelCommitTypeError. Error for commit_type validation.
+        """
+        model = jobs_utils.clone_model(input_model)
+        if model.commit_type not in (
+                base_models.VersionedModel.COMMIT_TYPE_CHOICES):
+            yield errors.ModelInvalidCommitTypeError(model)
+
+
 class BaseModelValidator(beam.PTransform):
     """Composite beam Transform which returns a pipeline of validation
     errors.

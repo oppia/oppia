@@ -116,3 +116,17 @@ class ModelExpiredError(ModelValidationError):
     @property
     def message(self):
         return self._message
+
+
+class ModelInvalidCommitTypeError(ModelValidationError):
+    """Error class for commit_type validation errors."""
+
+    def __init__(self, model):
+        super(ModelInvalidCommitTypeError, self).__init__(model)
+        self._message = (
+            '%s Commit type %s is not allowed'
+            % (self.base_message, model.commit_type))
+
+    @property
+    def message(self):
+        return self._message

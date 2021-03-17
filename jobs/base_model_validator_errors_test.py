@@ -34,6 +34,10 @@ class MockModel(base_models.BaseModel):
     pass
 
 
+class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    pass
+
+
 class ValidatorErrorTestBase(unittest.TestCase):
     """Base class for valiator error tests."""
 
@@ -160,5 +164,24 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
         msg = (
             'Entity id %s: Model marked as deleted is older than %s days'
             % (model.id, days))
+
+        self.assertEqual(error.message, msg)
+
+
+class ModelInvalidCommitTypeErrorTests(ValidatorErrorTestBase):
+    def test_model_invalid_id_error(self):
+        model = MockCommitLogEntryModel(
+            id='123',
+            created_on=self.year_ago,
+            last_updated=self.now,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[])
+        error = errors.ModelInvalidCommitTypeError(model)
+
+        msg = (
+            'Entity id %s: Commit type invalid-type is not allowed'
+            % (model.id))
 
         self.assertEqual(error.message, msg)
