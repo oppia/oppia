@@ -99,18 +99,9 @@ angular.module('oppia').component('contributorDashboardPage', {
         // that the element is visible before focussing.
         if (ctrl.activeTabName === 'translateTextTab') {
           $timeout(() => {
-            ctrl.addFocusWithoutScroll('selectLangDropDown');
+            FocusManagerService.setFocus('selectLangDropDown');
           }, 0);
         }
-      };
-
-      ctrl.addFocusWithoutScroll = function(label) {
-        FocusManagerService.setFocus(label);
-        // The $timeout is required to ensure that the element
-        // has been foccused and only then the window.scroll() acts.
-        $timeout(function() {
-          window.scrollTo(0, 0);
-        }, 5);
       };
 
       ctrl.$onInit = function() {
