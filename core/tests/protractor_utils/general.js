@@ -40,16 +40,10 @@ var scrollToTop = async function() {
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [];
-var CONSOLE_PATTERNS_TO_IGNORE = [
-];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   var browserLogs = await browser.manage().logs().get('browser');
-  browserLogs = browserLogs.filter(function(browserLog) {
-    return CONSOLE_PATTERNS_TO_IGNORE.every(
-      pattern => browserLog.message.match(pattern) === null);
-  });
   var fatalErrors = [];
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
