@@ -50,12 +50,16 @@ class RatioExpressionInput(base.BaseInteraction):
         'name': 'numberOfTerms',
         'description': (
             'The number of elements that the answer must have.'
-            ' If set to 0, a ratio of any length will be accepted.'),
+            ' If set to 0, a ratio of any length will be accepted.'
+            ' The number of elements should not be greater than 10.'),
         'schema': {
             'type': 'int',
             'validators': [{
                 'id': 'is_at_least',
                 'min_value': 0,
+            }, {
+                'id': 'is_at_most',
+                'max_value': 10,
             }],
         },
         'default_value': 0,
