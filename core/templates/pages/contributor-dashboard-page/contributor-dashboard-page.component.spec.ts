@@ -87,7 +87,7 @@ describe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    fit('should set focus on select lang field', function() {
+    it('should set focus on select lang field', function() {
       var focusSpy = spyOn(focusManagerService, 'setFocus');
       ctrl.onTabClick('translateTextTab');
       $timeout.flush();
