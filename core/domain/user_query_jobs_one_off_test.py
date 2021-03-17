@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import taskqueue_services
@@ -168,6 +169,14 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
 
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
+
+    def test_predicate_functions(self):
+        predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+        job_class = user_query_jobs_one_off.UserQueryOneOffJob
+        for predicate in predicates:
+            predicate_function = getattr(
+                job_class, '_is_%s_query_satisfied' % predicate['backend_id'])
+            self.assertIsNotNone(predicate_function)
 
     def test_user_has_not_logged_in_last_n_days(self):
         user_query_1_id = user_query_services.save_new_user_query(
