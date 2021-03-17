@@ -985,13 +985,11 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.create_user(
             'xyz', email=feconf.ADMIN_EMAIL_ADDRESS)
 
-        self.assertIsNone(self.firebase_sdk_stub.get_user('xyz').custom_claims)
+        self.firebase_sdk_stub.assert_is_not_super_admin('xyz')
 
         firebase_auth_services.seed_firebase()
 
-        self.assertEqual(
-            self.firebase_sdk_stub.get_user('xyz').custom_claims,
-            {'role': 'super_admin'})
+        self.firebase_sdk_stub.assert_is_super_admin('xyz')
 
     def test_updates_user_id_if_assoc_model_is_inconsistent(self):
         self.set_up_models(user_id='abc', firebase_auth_id='xyz')
