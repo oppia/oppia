@@ -43,13 +43,18 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   }
 };
 
-var login = async function(email) {
-  // Use of element and action is not reliable, because we do not always begin
-  // on an Angular page. To forgive callers from non-Angular pages (e.g., the
-  // very first function call of a test), we use browser.driver instead.
-  // The full url is necessary.
-  await browser.driver.get(
-    general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+var login = async function(email, useLoginButton = false) {
+  if (useLoginButton) {
+    var loginButton = element(by.css('.protractor-test-login-button'));
+    await action.click('Login button', loginButton);
+  } else {
+    // Use of element and action is not reliable, because we do not always begin
+    // on an Angular page. To forgive callers from non-Angular pages (e.g., the
+    // very first function call of a test), we use browser.driver instead.
+    // The full url is necessary.
+    await browser.driver.get(
+      general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+  }
 
   await general.acceptPrompt(email);
 
@@ -79,47 +84,54 @@ var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
 };
 
-var createAndLoginUser = async function(email, username) {
+var createAndLoginUser = async function(
+    email, username, useLoginButton = false) {
   await _createFirebaseAccount(email);
-  await login(email);
+  await login(email, useLoginButton);
   await _completeSignup(username);
 };
 
-var createAndLoginAdminUser = async function(email, username) {
+var createAndLoginAdminUser = async function(
+    email, username, useLoginButton = false) {
   await _createFirebaseAccount(email, true);
-  await login(email);
+  await login(email, useLoginButton);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.updateRole(username, 'admin');
 };
 
-var createAndLoginAdminUserMobile = async function(email, username) {
+var createAndLoginAdminUserMobile = async function(
+    email, username, useLoginButton = false) {
   await _createFirebaseAccount(email, true);
-  await login(email);
+  await login(email, useLoginButton);
   await _completeSignup(username);
 };
 
-var createAdminMobile = async function(email, username) {
-  await createAndLoginAdminUserMobile(email, username);
+var createAdminMobile = async function(
+    email, username, useLoginButton = false) {
+  await createAndLoginAdminUserMobile(email, username, useLoginButton);
   await logout();
 };
 
-var createUser = async function(email, username) {
-  await createAndLoginUser(email, username);
+var createUser = async function(
+    email, username, useLoginButton = false) {
+  await createAndLoginUser(email, username, useLoginButton);
   await logout();
 };
 
-var createModerator = async function(email, username) {
+var createModerator = async function(
+    email, username, useLoginButton = false) {
   await _createFirebaseAccount(email, true);
-  await login(email);
+  await login(email, useLoginButton);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.updateRole(username, 'moderator');
   await logout();
 };
 
-var createAdmin = async function(email, username) {
-  await createAndLoginAdminUser(email, username);
+var createAdmin = async function(
+    email, username, useLoginButton = false) {
+  await createAndLoginAdminUser(email, username, useLoginButton);
   await logout();
 };
 

@@ -164,8 +164,9 @@ describe('Topic and Story viewer functionality', function() {
     await explorationPlayerPage.submitAnswer('Continue', null);
 
     // This should return the user to the exploration page.
+    const useLoginButton = true;
     await users.createAndLoginUser(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer');
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', useLoginButton);
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
