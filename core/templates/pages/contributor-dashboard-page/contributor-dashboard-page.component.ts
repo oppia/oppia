@@ -109,7 +109,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         $timeout(function() {
           $window.scrollTo(0, 0);
         }, 5);
-      }
+      };
 
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = null;

@@ -497,9 +497,9 @@ angular.module('oppia').component('learnerDashboardPage', {
 
         $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
           LoaderService.hideLoadingScreen();
-        // The $timeout is required because at execution time,
-        // the element may not be present in the DOM yet.Thus it ensure
-        // that the element is visible before focussing.
+          // The $timeout is required because at execution time,
+          // the element may not be present in the DOM yet.Thus it ensure
+          // that the element is visible before focussing.
           $timeout(() => {
             ctrl.addFocusWithoutScroll('ourLessonsBtn');
           }, 0);

@@ -28,7 +28,7 @@ describe('Contributor dashboard page', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
-  var $window = null
+  var $window = null;
   var LocalStorageService = null;
   var $timeout = null;
   var UserService = null;
@@ -78,7 +78,7 @@ describe('Contributor dashboard page', function() {
     $timeout.flush();
     expect(focusSpy).toHaveBeenCalled();
     $timeout.flush();
-    expect(windowSpy).toHaveBeenCalled()
+    expect(windowSpy).toHaveBeenCalled();
   });
 
   describe('when user is logged in', function() {
