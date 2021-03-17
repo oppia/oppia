@@ -29,6 +29,7 @@ module.exports = {
         'http://127.0.0.1:8181/contact',
         'http://127.0.0.1:8181/contributor-dashboard',
         'http://127.0.0.1:8181/creator-dashboard',
+        'http://127.0.0.1:8181/creator-guidelines',
         'http://127.0.0.1:8181/delete-account',
         'http://127.0.0.1:8181/donate',
         "http://127.0.0.1:8181/emaildashboard",
