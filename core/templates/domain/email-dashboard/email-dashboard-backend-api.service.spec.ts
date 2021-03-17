@@ -30,32 +30,14 @@ import { EmailDashboardQueryResults } from
 describe('Email dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;
   let edbas: EmailDashboardBackendApiService;
-  let defaultData = [
-    {
-      attribute: 'inactive_in_last_n_days',
-      value: 10
-    },
-    {
-      attribute: 'has_not_logged_in_for_n_days',
-      value: -1
-    },
-    {
-      attribute: 'created_at_least_n_exps',
-      value: -1
-    },
-    {
-      attribute: 'created_fewer_than_n_exps',
-      value: -1
-    },
-    {
-      attribute: 'edited_at_least_n_exps',
-      value: -1
-    },
-    {
-      attribute: 'edited_fewer_than_n_exps',
-      value: -1
-    }
-  ];
+  let defaultData = {
+    inactive_in_last_n_days: null,
+    has_not_logged_in_for_n_days: null,
+    created_at_least_n_exps: null,
+    created_fewer_than_n_exps: null,
+    edited_at_least_n_exps: null,
+    edited_fewer_than_n_exps: null
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -174,7 +156,7 @@ describe('Email dashboard backend api service', () => {
 
   it('should correctly submit query.', fakeAsync(() => {
     var postData = defaultData;
-    postData[0].value = 10;
+    postData.inactive_in_last_n_days = 10;
 
     let backendResponse = {
       query: {
@@ -204,7 +186,7 @@ describe('Email dashboard backend api service', () => {
   it('should use the rejection handler if the query submission failed.',
     fakeAsync(() => {
       var postData = defaultData;
-      postData[0].value = 10;
+      postData.inactive_in_last_n_days = 10;
 
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');

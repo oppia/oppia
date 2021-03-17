@@ -87,17 +87,15 @@ describe('Email Dashboard Page', function() {
     // Initialize ctrl.data.
     ctrl.resetForm();
     // Mock some values.
+    ctrl.data = {};
     EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
-      ctrl.data.push({
-        attribute: predicate.backend_attr,
-        value: 1
-      });
+      ctrl.data[predicate.backend_attr] = 1;
     });
 
     ctrl.resetForm();
 
-    ctrl.data.forEach(element => {
-      expect(element.value).toBe(null);
+    Object.values(ctrl.data).forEach(value => {
+      expect(value).toBe(null);
     });
   });
 
@@ -105,12 +103,9 @@ describe('Email Dashboard Page', function() {
     ctrl.resetForm();
     expect(ctrl.areAllInputsEmpty()).toBe(true);
 
+    ctrl.data = {};
     EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
-      ctrl.data.push({
-        attribute: predicate.backend_attr,
-        value: 1,
-        default_value: predicate.default_value
-      });
+      ctrl.data[predicate.backend_attr] = 1;
     });
     expect(ctrl.areAllInputsEmpty()).toBe(false);
   });
@@ -119,11 +114,9 @@ describe('Email Dashboard Page', function() {
     // Initialize ctrl.data.
     ctrl.resetForm();
     // Mock some values.
+    ctrl.data = {};
     EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
-      ctrl.data.push({
-        attribute: predicate.backend_attr,
-        value: 1,
-      });
+      ctrl.data[predicate.backend_attr] = 1;
     });
 
     spyOn(EmailDashboardDataService, 'submitQueryAsync').and.callFake(

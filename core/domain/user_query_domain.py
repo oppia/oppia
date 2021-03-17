@@ -32,6 +32,8 @@ __attribute_names__ = [
 
 USER_QUERY_PARAMS = collections.namedtuple(
     'USER_QUERY_PARAMS', __attribute_names__)
+USER_QUERY_PARAMS.__new__.__defaults__ = (None,) * len(
+    USER_QUERY_PARAMS._fields)
 
 
 class UserQuery(python_utils.OBJECT):

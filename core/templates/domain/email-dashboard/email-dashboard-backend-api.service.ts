@@ -29,12 +29,7 @@ import {
   EmailDashboardQueryBackendDict,
 } from 'domain/email-dashboard/email-dashboard-query.model';
 
-interface QueryDatum {
-  attribute: string,
-  value: string | number
-}
-
-export type QueryData = QueryDatum[];
+export type QueryData = Record<string, string | number>;
 
 @Injectable({
   providedIn: 'root'
@@ -91,15 +86,10 @@ export class EmailDashboardBackendApiService {
   }
 
   async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery> {
-    let postData = {};
-    data.forEach(datum => {
-      postData[datum.attribute] = datum.value;
-    });
-
     return new Promise((resolve, reject) => {
       this.http.post<EmailDashboardQueryBackendDict>(
         this.QUERY_DATA_URL, {
-          data: postData}).toPromise().then(data => {
+          data: data}).toPromise().then(data => {
         let queryObject = EmailDashboardQuery.createFromBackendDict(data);
         resolve(queryObject);
       }, errorResponse => {

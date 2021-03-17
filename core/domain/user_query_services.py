@@ -36,10 +36,12 @@ def _get_user_query_from_model(user_query_model):
     Returns:
         UserQuery. User query domain object.
     """
-    attributes = [
-        getattr(user_query_model, predicate['backend_attr']) for predicate in (
-            constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
-    user_query_params = user_query_domain.USER_QUERY_PARAMS(*attributes)
+    attributes = {
+        predicate['backend_attr']: getattr(
+            user_query_model, predicate['backend_attr'])
+        for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    }
+    user_query_params = user_query_domain.USER_QUERY_PARAMS(**attributes)
 
     return user_query_domain.UserQuery(
         user_query_model.id,
@@ -103,12 +105,6 @@ def _save_user_query(user_query):
     """
     user_query.validate()
 
-    query_params = {
-        predicate['backend_attr']: getattr(
-            user_query.params, predicate['backend_attr'])
-        for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-    }
-
     user_query_dict = {
         'submitter_id': user_query.submitter_id,
         'query_status': user_query.status,
@@ -116,7 +112,7 @@ def _save_user_query(user_query):
         'sent_email_model_id': user_query.sent_email_model_id,
         'deleted': user_query.deleted
     }
-    user_query_dict.update(query_params)
+    user_query_dict.update(dict(user_query.params._asdict()))
 
     user_query_model = (
         user_models.UserQueryModel.get(user_query.id, strict=False))
@@ -141,9 +137,6 @@ def save_new_user_query(submitter_id, query_params):
     Returns:
         str. The ID of the newly saved user query.
     """
-    for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION:
-        if predicate['backend_attr'] not in query_params.keys():
-            query_params[predicate['backend_attr']] = None
     query_id = user_models.UserQueryModel.get_new_id('')
     user_query_params = user_query_domain.USER_QUERY_PARAMS(**query_params)
     user_query = (

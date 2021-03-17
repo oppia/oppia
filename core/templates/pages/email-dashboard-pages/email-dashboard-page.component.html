@@ -11,9 +11,9 @@
                   <[customizationArgSpec.description]>:
                 </label>
                 <div class="col-7">
-                  <schema-based-editor local-value="$ctrl.data[$index].value"
+                  <schema-based-editor local-value="$ctrl.data[customizationArgSpec.backend_attr]"
                                        schema="customizationArgSpec.schema"
-                                       not-required="$ctrl.notRequired"
+                                       not-required="true"
                                        class="protractor-test-email-dashboard-input-{{ $index }}">
                   </schema-based-editor>
                 </div>

@@ -32,24 +32,15 @@ angular.module('oppia').component('emailDashboardPage', {
         $rootScope, EmailDashboardDataService, LoaderService,
         UserService, EMAIL_DASHBOARD_PREDICATE_DEFINITION) {
       var ctrl = this;
-      ctrl.notRequired = true;
       ctrl.resetForm = function() {
-        ctrl.data = [];
+        ctrl.data = {};
         EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
-          ctrl.data.push({
-            attribute: predicate.backend_attr,
-            value: predicate.default_value,
-          });
+          ctrl.data[predicate.backend_attr] = predicate.default_value;
         });
       };
 
       ctrl.areAllInputsEmpty = function() {
-        for (var i = 0; i < ctrl.data.length; i++) {
-          if (ctrl.data[i].value !== null) {
-            return false;
-          }
-        }
-        return true;
+        return Object.values(ctrl.data).every(value => value === null);
       };
 
       ctrl.submitQueryAsync = async function() {
