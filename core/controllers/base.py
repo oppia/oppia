@@ -78,6 +78,23 @@ class SessionEndHandler(webapp2.RequestHandler):
         auth_services.destroy_auth_session(self.response)
 
 
+class SeedFirebaseHandler(webapp2.RequestHandler):
+    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob.
+
+    TODO(#11462): Delete this handler once the Firebase migration logic is
+    rollback-safe and all backup data is using post-migration data.
+    """
+
+    def get(self):
+        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
+        try:
+            auth_services.seed_firebase()
+        except Exception:
+            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
+        finally:
+            self.redirect('/')
+
+
 class LogoutPage(webapp2.RequestHandler):
     """Class which handles the logout URL."""
 
@@ -520,19 +537,6 @@ class BaseHandler(webapp2.RequestHandler):
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
     TemporaryMaintenanceException = (
         UserFacingExceptions.TemporaryMaintenanceException)
-
-
-class SeedFirebaseHandler(webapp2.RequestHandler):
-    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob."""
-
-    def get(self):
-        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
-        try:
-            auth_services.seed_firebase()
-        except Exception:
-            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
-        finally:
-            self.redirect('/')
 
 
 class Error404Handler(BaseHandler):

@@ -448,6 +448,9 @@ def seed_firebase():
     """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob.
 
     NOTE: This function is idempotent.
+
+    TODO(#11462): Delete this handler once the Firebase migration logic is
+    rollback-safe and all backup data is using post-migration data.
     """
     seed_model = auth_models.FirebaseSeedModel.get(
         auth_models.ONLY_FIREBASE_SEED_MODEL_ID, strict=False)

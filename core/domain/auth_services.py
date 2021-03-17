@@ -246,6 +246,8 @@ def revoke_super_admin_privileges(user_id):
     firebase_auth_services.revoke_super_admin_privileges(user_id)
 
 
+# TODO(#11462): Delete this handler once the Firebase migration logic is
+# rollback-safe and all backup data is using post-migration data.
 def seed_firebase():
     """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob."""
     firebase_auth_services.seed_firebase()

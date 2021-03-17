@@ -743,9 +743,11 @@ class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
             firebase_auth_services, 'seed_firebase')
 
         with swap as call_counter:
-            self.get_html_response('/seed_firebase', expected_status_int=302)
+            response = self.get_html_response(
+                '/seed_firebase', expected_status_int=302)
 
         self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(response.location, 'http://localhost/')
 
     def test_get_with_error(self):
         swap = self.swap_with_call_counter(
@@ -754,9 +756,11 @@ class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
         captured_logging_context = self.capture_logging(min_level=logging.ERROR)
 
         with swap as call_counter, captured_logging_context as logs:
-            self.get_html_response('/seed_firebase', expected_status_int=302)
+            response = self.get_html_response(
+                '/seed_firebase', expected_status_int=302)
 
         self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(response.location, 'http://localhost/')
         self.assert_matches_regexps(logs, [
             'Failed to prepare for SeedFirebaseOneOffJob'
         ])
