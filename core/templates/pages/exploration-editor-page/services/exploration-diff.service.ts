@@ -243,8 +243,8 @@ export class ExplorationDiffService {
               this.STATE_PROPERTY_DELETED);
           }
         } else if (change.cmd === 'rename_state') {
-          let newStateName = null;
-          let oldStateName = null;
+          let newStateName;
+          let oldStateName;
           if (directionForwards) {
             newStateName = (
               <ExplorationChangeRenameState> change).new_state_name;
