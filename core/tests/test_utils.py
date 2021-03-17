@@ -1119,7 +1119,7 @@ class TestBase(unittest.TestCase):
                 # explicitly checked that it isn't before raising.
                 raise raises # pylint: disable=raising-bad-type
             return returns
-        call_counter = CallCounter(f=stubbed_function)
+        call_counter = CallCounter(stubbed_function)
         with self.swap(obj, attr, call_counter):
             yield call_counter
 
@@ -3778,11 +3778,9 @@ class CallCounter(FunctionWrapper):
     increased when the function raises an exception.
     """
 
-    def __init__(self, f=lambda *_, **__: None):
+    def __init__(self, f):
         """Counts the number of times the given function has been called. See
-        FunctionWrapper for arguments. If no function is provided, then a simple
-        function that takes any arguments and keyword arguments then returns
-        None is used instead.
+        FunctionWrapper for arguments.
         """
         super(CallCounter, self).__init__(f)
         self._times_called = 0
