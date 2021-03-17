@@ -24,7 +24,7 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').controller('AddAudioTranslationModalController', [
-  '$controller', '$q', '$rootScope' ,'$scope', '$uibModalInstance',
+  '$controller', '$q', '$rootScope', '$scope', '$uibModalInstance',
   'AssetsBackendApiService', 'ContextService', 'audioFile', 'generatedFilename',
   'isAudioAvailable', 'languageCode',
   function(
