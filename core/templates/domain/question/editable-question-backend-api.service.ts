@@ -66,8 +66,8 @@ export class EditableQuestionBackendApiService {
       questionObject: Question,
       imagesData: ImageData[],
       successCallback: (value: EditableQuestionBackendResponse) => void,
-      errorCallback: (reason?: string) => void):
-        Promise<EditableQuestionBackendResponse> {
+      errorCallback: (reason?: string) => void
+  ): Promise<EditableQuestionBackendResponse> {
     return new Promise((resolve, reject) => {
       let postData = {
         question_dict: questionObject,
