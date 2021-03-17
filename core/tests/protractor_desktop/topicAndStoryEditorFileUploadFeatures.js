@@ -185,6 +185,7 @@ describe('Chapter editor functionality', function() {
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
+      info.push(i === 0);
       await workflow.createAndPublishExploration.apply(workflow, info);
       var url = await browser.getCurrentUrl();
       var id = url.split('/')[4].replace('#', '');

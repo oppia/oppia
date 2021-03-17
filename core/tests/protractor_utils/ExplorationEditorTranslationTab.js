@@ -31,32 +31,17 @@ var ExplorationEditorTranslationTab = function() {
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
-    try {
-      await waitFor.visibilityOf(
-        dismissWelcomeModalButton, 'Welcome modal not becoming visible');
-      await waitFor.elementToBeClickable(
-        dismissWelcomeModalButton,
-        'Welcome modal is taking too long to appear');
-      await dismissWelcomeModalButton.click();
-      await waitFor.invisibilityOf(
-        translationWelcomeModal,
-        'Translation welcome modal takes too long to disappear');
-    } catch (e) {
-      // Since the welcome modal appears only once, the wait for its
-      // visibilty will only resolve once and timeout the other times.
-      // This is just an empty error function to catch the timeouts that
-      // happen when the the welcome modal has been dismissed once. If
-      // this is not present then protractor uses the default error
-      // function which is not appropriate in this case as this is not an
-      // error.
-    }
+    await action.click(
+      'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
+    await waitFor.invisibilityOf(
+      translationWelcomeModal,
+      'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
     if (await buttons.count() === 1) {
-      var skipButton = await button.get(0);
-      await skipButton.click();
-    } else if (await buttons.count() > 1) {
+      await action.click('Skip button', button.get(0));
+    } else if (await buttons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
     }

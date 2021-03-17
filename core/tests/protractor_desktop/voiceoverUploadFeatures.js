@@ -46,7 +46,7 @@ describe('Voiceover upload features', function() {
 
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('Uploading translation file');
     await explorationEditorMainTab.setContent(await forms.toRichText(
@@ -121,7 +121,6 @@ describe('Voiceover upload features', function() {
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-      await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();
@@ -143,7 +142,6 @@ describe('Voiceover upload features', function() {
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-      await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();

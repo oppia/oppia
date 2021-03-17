@@ -152,14 +152,9 @@ var ExplorationEditorMainTab = function() {
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
-    // If the editor welcome modal shows up, exit it.
-    var isVisible = await editorWelcomeModal.isPresent();
-
-    if (isVisible) {
-      await action.click(
-        'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
-    }
-
+    // Exit the welcome modal.
+    await action.click(
+      'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
     await waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
@@ -486,12 +481,10 @@ var ExplorationEditorMainTab = function() {
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
   this.setContent = async function(richTextInstructions) {
-    this.exitTutorial();
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
-    await waitFor.elementToBeClickable(stateEditButton);
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
@@ -897,7 +890,6 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setStateName = async function(name) {
-    this.exitTutorial();
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
     await action.waitForAutosave();

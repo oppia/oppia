@@ -54,12 +54,15 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktopAsAdmin = async function() {
+  var createDummyExplorationOnDesktopAsAdmin = async function(
+      welcomeModalIsShown) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
     await waitFor.pageToFullyLoad();
-    await explorationEditorMainTab.exitTutorial();
+    if (welcomeModalIsShown) {
+      await explorationEditorMainTab.exitTutorial();
+    }
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
@@ -122,7 +125,8 @@ describe('Learner dashboard functionality', function() {
           'Exploration Player Test',
           'Astronomy',
           'To test the exploration player',
-          'English'
+          'English',
+          true
         );
       }
       await users.logout();
@@ -148,7 +152,8 @@ describe('Learner dashboard functionality', function() {
           'Demo Exploration',
           'Algebra',
           'To test collection player',
-          'English'
+          'English',
+          true
         );
         // Update the role of the user to admin since only admin users
         // can create a collection.
@@ -186,13 +191,14 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-      await createDummyExplorationOnDesktopAsAdmin();
+      await createDummyExplorationOnDesktopAsAdmin(true);
       // Create a second exploration named 'Test Exploration'.
       await workflow.createAndPublishExploration(
         'Test Exploration',
         'Astronomy',
         'To expand the horizon of the minds!',
-        'English'
+        'English',
+        false
       );
     }
     await users.logout();
@@ -269,7 +275,7 @@ describe('Learner dashboard functionality', function() {
       // Wait for player page to completely load.
       await waitFor.pageToFullyLoad();
       var explorationId = await general.getExplorationIdFromPlayer();
-      await general.openEditor(explorationId);
+      await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();
       await users.logout();
@@ -294,13 +300,14 @@ describe('Learner dashboard functionality', function() {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-      await createDummyExplorationOnDesktopAsAdmin();
+      await createDummyExplorationOnDesktopAsAdmin(true);
       // Create a second exploration named 'Collection Exploration'.
       await workflow.createAndPublishExploration(
         'Collection Exploration',
         'Architect',
         'To be a part of a collection!',
-        'English'
+        'English',
+        false
       );
       // Update the role of the user to admin since only admin users
       // can create a collection.

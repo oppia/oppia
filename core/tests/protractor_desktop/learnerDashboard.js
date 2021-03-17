@@ -55,7 +55,8 @@ describe('Learner dashboard functionality', function() {
       'Activations',
       'Chemistry',
       'Learn about different types of chemistry activations.',
-      'English'
+      'English',
+      true
     );
     await users.logout();
 
@@ -96,7 +97,8 @@ describe('Learner dashboard functionality', function() {
       'BUS101',
       'Business',
       'Learn about different business regulations around the world.',
-      'English'
+      'English',
+      true
     );
     await users.logout();
 
@@ -129,11 +131,19 @@ describe('Learner dashboard functionality', function() {
       'creator@learnerDashboard.com', 'creatorLearnerDashboard');
     await users.login('creator@learnerDashboard.com');
     await workflow.createAndPublishExploration(
-      EXPLORATION_FRACTION, CATEGORY_MATHEMATICS,
-      EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
+      EXPLORATION_FRACTION,
+      CATEGORY_MATHEMATICS,
+      EXPLORATION_OBJECTIVE,
+      LANGUAGE_ENGLISH,
+      true
+    );
     await workflow.createAndPublishExploration(
-      EXPLORATION_SINGING, CATEGORY_MUSIC,
-      EXPLORATION_OBJECTIVE2, LANGUAGE_ENGLISH);
+      EXPLORATION_SINGING,
+      CATEGORY_MUSIC,
+      EXPLORATION_OBJECTIVE2,
+      LANGUAGE_ENGLISH,
+      false
+    );
     await users.logout();
 
     await users.createUser(
