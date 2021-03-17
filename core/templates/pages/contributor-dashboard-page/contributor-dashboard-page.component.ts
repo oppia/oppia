@@ -53,12 +53,12 @@ angular.module('oppia').component('contributorDashboardPage', {
   controller: [
     '$rootScope', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
-    'UserService', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
+    'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
         $rootScope, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
-        UserService, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
+        UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
@@ -101,6 +101,22 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
+        ctrl.defaultHeaderVisible = true;
+
+        WindowRef.nativeWindow.addEventListener('scroll', function() {
+          ctrl.scrollFunction();
+        });
+
+        ctrl.scrollFunction = function() {
+          if (WindowRef.nativeWindow.pageYOffset >= 5) {
+            ctrl.defaultHeaderVisible = false;
+          } else {
+            ctrl.defaultHeaderVisible = true;
+          }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
+        };
 
         UserService.getProfileImageDataUrlAsync().then(
           function(dataUrl) {
