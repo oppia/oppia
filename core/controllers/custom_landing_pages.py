@@ -28,7 +28,10 @@ class FractionLandingRedirectPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        """Handles GET requests."""
+        """Handles GET requests.
+        Args:
+            topic: str. Topic of page to be redirected to.
+        """
         self.redirect('/math/fractions')
 
 
