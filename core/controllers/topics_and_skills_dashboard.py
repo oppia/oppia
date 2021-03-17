@@ -45,6 +45,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
+        """Handles GET requests."""
         self.render_template(
             'topics-and-skills-dashboard-page.mainpage.html')
 
@@ -305,6 +306,7 @@ class NewSkillHandler(base.BaseHandler):
 
     @acl_decorators.can_create_skill
     def post(self):
+        """Handles POST requests."""
         description = self.payload.get('description')
         linked_topic_ids = self.payload.get('linked_topic_ids')
         explanation_dict = self.payload.get('explanation_dict')
