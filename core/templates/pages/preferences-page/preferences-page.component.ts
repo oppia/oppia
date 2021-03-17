@@ -185,7 +185,7 @@ angular.module('oppia').component('preferencesPage', {
 
       ctrl.addFocusWithoutScroll = function(label) {
         FocusManagerService.setFocus(label);
-        setTimeout(function() {
+        $timeout(function() {
           window.scrollTo(0, 0);
         }, 5);
       };

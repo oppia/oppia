@@ -52,7 +52,7 @@ angular.module('oppia').directive('storyEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$timeout', '$uibModal', 'AlertsService',
         'FocusManagerService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
@@ -60,7 +60,7 @@ angular.module('oppia').directive('storyEditor', [
         'MAX_CHARS_IN_STORY_DESCRIPTION',
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
-            $rootScope, $scope, $uibModal, AlertsService,
+            $rootScope, $scope, $timeout, $uibModal, AlertsService,
             FocusManagerService,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, WindowDimensionsService,
@@ -346,13 +346,6 @@ angular.module('oppia').directive('storyEditor', [
             }
           };
 
-          $scope.addFocusWithoutScroll = function(label) {
-            FocusManagerService.setFocus(label);
-            setTimeout(function() {
-              window.scrollTo(0, 0);
-            }, 5);
-          };
-
           ctrl.$onInit = function() {
             $scope.storyPreviewCardIsShown = false;
             $scope.mainStoryCardIsShown = true;
@@ -374,7 +367,7 @@ angular.module('oppia').directive('storyEditor', [
               StoryEditorStateService.onStoryInitialized.subscribe(
                 () =>{
                   _init();
-                  $scope.addFocusWithoutScroll('metaTagInputField');
+                  FocusManagerService.setFocus('metaTagInputField');
                 }
               ));
             ctrl.directiveSubscriptions.add(

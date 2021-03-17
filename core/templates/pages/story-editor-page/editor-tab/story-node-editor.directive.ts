@@ -63,14 +63,14 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$timeout', '$scope', '$uibModal', 'AlertsService',
         'ExplorationIdValidationService', 'FocusManagerService',
         'PageTitleService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_CHAPTER_TITLE', function(
-            $rootScope, $scope, $uibModal, AlertsService,
+            $rootScope, $timeout, $scope, $uibModal, AlertsService,
             ExplorationIdValidationService, FocusManagerService,
             PageTitleService,
             StoryEditorStateService, StoryUpdateService,
@@ -439,7 +439,10 @@ angular.module('oppia').directive('storyNodeEditor', [
               )
             );
             _init();
-            setTimeout(() => {
+            // The $timeout is required because at execution time, 
+            // the element may not be present in the DOM yet.Thus it ensure
+            // that the element is visible before focussing.
+            $timeout(() => {
               $scope.addFocusWithoutScroll('storyNodeDesc');
             }, 0);
           };
