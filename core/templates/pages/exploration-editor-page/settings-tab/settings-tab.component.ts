@@ -367,6 +367,7 @@ angular.module('oppia').component('settingsTab', {
                 .then(function(permissions) {
                   ctrl.canUnpublish = permissions.canUnpublish;
                   ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                  $rootScope.$applyAsync();
                 });
             });
           }, function() {

@@ -101,11 +101,12 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.loadingDotsAreShown = true;
       };
 
-      var hideLoadingDots = function() {
+      var hideLoadingAndUpdatePermission = function() {
         $scope.loadingDotsAreShown = false;
         UserExplorationPermissionsService.fetchPermissionsAsync()
           .then(function(permissions) {
             $scope.explorationCanBePublished = permissions.canPublish;
+            $scope.$applyAsync();
           });
       };
 
@@ -114,7 +115,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.loadingDotsAreShown = true;
 
         ExplorationSaveService.showPublishExplorationModal(
-          showLoadingDots, hideLoadingDots)
+          showLoadingDots, hideLoadingAndUpdatePermission)
           .then(function() {
             $scope.publishIsInProcess = false;
             $scope.loadingDotsAreShown = false;
@@ -127,7 +128,8 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
-        ExplorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
+        ExplorationSaveService.saveChanges(showLoadingDots,
+          hideLoadingAndUpdatePermission)
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
