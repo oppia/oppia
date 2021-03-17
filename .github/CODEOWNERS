@@ -146,26 +146,29 @@
 
 # Dev workflow team.
 /.circleci/ @U8NWXD @kevintab95
-/.eslintignore @DubeySandeep
-/.eslintrc @DubeySandeep
-/.htmllintrc @DubeySandeep
-/.coveragerc @DubeySandeep
+/.eslintignore @Hudda @DubeySandeep
+/.eslintrc @Hudda @DubeySandeep
+/.htmllintrc @Hudda @DubeySandeep
+/.coveragerc @Hudda @DubeySandeep
 /.gitattributes @DubeySandeep
 /.gitignore @DubeySandeep
-/.isort.cfg @DubeySandeep
-/.pylintrc @DubeySandeep
-/.stylelintrc @DubeySandeep
+/.isort.cfg @Hudda @DubeySandeep
+/.pylintrc @Hudda @DubeySandeep
+/.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
-/core/templates/css/.stylelintrc @DubeySandeep
-/tox.ini @DubeySandeep
+/core/templates/css/.stylelintrc @Hudda @DubeySandeep
+/tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
 /scripts/check_frontend_test_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @DubeySandeep @vojtechjelinek
-/scripts/linters/ @DubeySandeep
+/scripts/linters/ @Hudda @DubeySandeep
+/scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
+/scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
+/scripts/linters/python_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/ts_ignore_exceptions.json @vojtechjelinek
 /ubuntu_dockerfile @DubeySandeep
 
