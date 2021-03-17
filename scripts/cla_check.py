@@ -14,16 +14,19 @@
 """This script performs cla check for PR authors.
 """
 
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
+import json
 import os.path
 import sys
-import json
 
-# If modifying these scopes, delete the file token.json.
+import python_utils
+
+from google.oauth2.credentials import Credentials # isort:skip pylint: disable=import-only-modules
+from googleapiclient.discovery import build # isort:skip pylint: disable=import-only-modules
+
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -38,36 +41,38 @@ Run the script from the oppia root folder:
 Note that the root folder MUST be named 'oppia'.
 """)
 
-def getValues():
+
+def get_values():
+    """Does Google Sheets API Call."""
     result = None
     creds = None
     try:
         creds = Credentials.from_authorized_user_info(
-            json.loads(TOKEN), SCOPES)
+            json.loads(TOKEN), scopes=SCOPES)  # pylint: disable=explicit-keyword-args
         service = build('sheets', 'v4', credentials=creds)
-        # Call the Sheets API
         sheet = service.spreadsheets()
-        result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                                    range=SAMPLE_RANGE_NAME).execute()
+        result = sheet.values().get(
+            spreadsheetId=SAMPLE_SPREADSHEET_ID, range=SAMPLE_RANGE_NAME
+            ).execute()
         result = result.get('values', [])
-    except:
-        print("API error:", sys.exc_info()[0])
-    finally:
-        return result
+    except Exception as e:
+        python_utils.PRINT('API error:', e)
+    return result
 
 
 def main():
-    prAuthor = [sys.argv[1]]
-    print('Checking if ', prAuthor, ' has signed the CLA')
-    values = getValues()
+    """Runs cla check."""
+    pr_author = [sys.argv[1]]
+    python_utils.PRINT('Checking if ', pr_author, ' has signed the CLA')
+    values = get_values()
     if not values:
-        print('No data found.')
+        python_utils.PRINT('No data found.')
         exit(1)
-    if(prAuthor in values):
-        print(prAuthor, ' has signed the CLA')
+    if pr_author in values:
+        python_utils.PRINT(pr_author, ' has signed the CLA')
         exit(0)
     else:
-        print(prAuthor, ' has not signed the CLA')
+        python_utils.PRINT(pr_author, ' has not signed the CLA')
         exit(1)
 
 
