@@ -156,7 +156,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
         """Handles PUT requests.
-
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
@@ -205,7 +204,6 @@ class ResubmitSuggestionHandler(base.BaseHandler):
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
         """Handles PUT requests.
-
         Args:
             suggestion_id: str. The ID of the suggestion.
         """
@@ -226,7 +224,6 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
         """Handles PUT requests.
-
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
@@ -264,7 +261,6 @@ class SuggestionsProviderHandler(base.BaseHandler):
     def _require_valid_suggestion_and_target_types(
             self, target_type, suggestion_type):
         """Checks whether the given target_type and suggestion_type are valid.
-
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
@@ -283,7 +279,6 @@ class SuggestionsProviderHandler(base.BaseHandler):
 
     def _render_suggestions(self, target_type, suggestions):
         """Renders retrieved suggestions.
-
         Args:
             target_type: str. The suggestion type.
             suggestions: list(BaseSuggestion). A list of suggestions to render.
@@ -316,7 +311,6 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests.
-
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
@@ -336,7 +330,6 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
         """Handles GET requests.
-
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
