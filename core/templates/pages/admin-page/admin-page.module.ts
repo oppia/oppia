@@ -26,8 +26,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { AdminFeaturesTabComponent } from
   'pages/admin-page/features-tab/admin-features-tab.component';
-import { OppiaAdminNavbarComponent } from './navbar/admin-navbar.component';
-import { OppiaAdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
+import { AdminNavbarComponent } from './navbar/admin-navbar.component';
+import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { OppiaAdminProdModeActivitiesTabComponent } from
@@ -46,15 +46,15 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
-    OppiaAdminNavbarComponent,
-    OppiaAdminDevModeActivitiesTabComponent
+    AdminNavbarComponent,
+    AdminDevModeActivitiesTabComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
-    OppiaAdminNavbarComponent,
-    OppiaAdminDevModeActivitiesTabComponent
+    AdminNavbarComponent,
+    AdminDevModeActivitiesTabComponent
   ],
   providers: [
     {

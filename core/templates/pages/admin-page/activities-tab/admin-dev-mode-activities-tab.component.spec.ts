@@ -25,7 +25,7 @@ import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backen
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
-import { OppiaAdminDevModeActivitiesTabComponent } from './admin-dev-mode-activities-tab.component';
+import { AdminDevModeActivitiesTabComponent } from './admin-dev-mode-activities-tab.component';
 
 let loadNewStructuresData: boolean = true;
 let generateNewSkillData: boolean = true;
@@ -134,8 +134,8 @@ class MockAdminBackendApiService {
 }
 
 describe('Admin dev mode activities tab', () => {
-  let component: OppiaAdminDevModeActivitiesTabComponent;
-  let fixture: ComponentFixture<OppiaAdminDevModeActivitiesTabComponent>;
+  let component: AdminDevModeActivitiesTabComponent;
+  let fixture: ComponentFixture<AdminDevModeActivitiesTabComponent>;
   let adminDataService: AdminDataService;
   let adminTaskManagerService: AdminTaskManagerService;
   let windowRef: WindowRef;
@@ -167,13 +167,13 @@ describe('Admin dev mode activities tab', () => {
         },
       ],
       declarations: [
-        OppiaAdminDevModeActivitiesTabComponent
+        AdminDevModeActivitiesTabComponent
       ]
     }).compileComponents();
   }));
 
   beforeEach(async(() => {
-    fixture = TestBed.createComponent(OppiaAdminDevModeActivitiesTabComponent);
+    fixture = TestBed.createComponent(AdminDevModeActivitiesTabComponent);
     component = fixture.componentInstance;
     adminDataService = TestBed.get(AdminDataService);
     adminTaskManagerService = TestBed.get(AdminTaskManagerService);
@@ -220,7 +220,7 @@ describe('Admin dev mode activities tab', () => {
     it('should load explorations', () => {
       const expId = component.demoExplorationIds[0];
       component =
-        component as jasmine.SpyObj<OppiaAdminDevModeActivitiesTabComponent>;
+        component as jasmine.SpyObj<AdminDevModeActivitiesTabComponent>;
 
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
@@ -235,7 +235,7 @@ describe('Admin dev mode activities tab', () => {
     it('should not load explorations with wrong exploration ID', () => {
       const expId = 'wrong-exp-id';
       component =
-        component as jasmine.SpyObj<OppiaAdminDevModeActivitiesTabComponent>;
+        component as jasmine.SpyObj<AdminDevModeActivitiesTabComponent>;
 
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');

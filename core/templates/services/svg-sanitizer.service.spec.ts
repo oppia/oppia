@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for SvgSanitizationService.
+ * @fileoverview Unit test for SVGSanitizationService.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';

@@ -21,10 +21,10 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
-import { OppiaAdminNavbarComponent } from './admin-navbar.component';
+import { AdminNavbarComponent } from './admin-navbar.component';
 
 describe('Admin Navbar component', () => {
-  let component: OppiaAdminNavbarComponent;
+  let component: AdminNavbarComponent;
   let userService = null;
   let adminRouterService = null;
   let userProfileImage = 'profile-data-url';
@@ -35,15 +35,15 @@ describe('Admin Navbar component', () => {
   };
   let imagePath = '/path/to/image.png';
   let profileUrl = '/profile/username1';
-  let fixture: ComponentFixture<OppiaAdminNavbarComponent>;
+  let fixture: ComponentFixture<AdminNavbarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [OppiaAdminNavbarComponent]
+      declarations: [AdminNavbarComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(OppiaAdminNavbarComponent);
+    fixture = TestBed.createComponent(AdminNavbarComponent);
     component = fixture.componentInstance;
     userService = TestBed.get(UserService);
     adminRouterService = TestBed.get(AdminRouterService);

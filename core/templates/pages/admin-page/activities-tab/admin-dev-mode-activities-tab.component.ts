@@ -29,7 +29,7 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
   selector: 'oppia-admin-dev-mode-activities-tab',
   templateUrl: './admin-dev-mode-activities-tab.component.html',
 })
-export class OppiaAdminDevModeActivitiesTabComponent implements OnInit {
+export class AdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
   reloadingAllExplorationPossible: boolean = false;
   demoExplorationIds: string[] = [];
@@ -210,4 +210,4 @@ export class OppiaAdminDevModeActivitiesTabComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaAdminDevModeActivitiesTab', downgradeComponent(
-    {component: OppiaAdminDevModeActivitiesTabComponent}));
+    {component: AdminDevModeActivitiesTabComponent}));
