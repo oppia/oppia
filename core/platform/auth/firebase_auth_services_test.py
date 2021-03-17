@@ -432,9 +432,9 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             uid: str. The ID of the user to confirm.
         """
         self.assert_is_user(uid)
+        custom_claims = self.get_user(uid).custom_claims or {}
         self._test.assertEqual(
-            self.get_user(uid).custom_claims.get('role', None),
-            feconf.FIREBASE_ROLE_SUPER_ADMIN)
+            custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
     def assert_is_not_super_admin(self, uid):
         """Asserts that the given ID does not have super admin privileges.
@@ -446,9 +446,9 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             uid: str. The ID of the user to confirm.
         """
         self.assert_is_user(uid)
+        custom_claims = self.get_user(uid).custom_claims or {}
         self._test.assertNotEqual(
-            self.get_user(uid).custom_claims.get('role', None),
-            feconf.FIREBASE_ROLE_SUPER_ADMIN)
+            custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
     def assert_is_user_multi(self, uids):
         """Asserts that every account with the given ids exist.
