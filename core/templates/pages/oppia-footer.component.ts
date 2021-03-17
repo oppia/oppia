@@ -25,7 +25,7 @@ import { AppConstants } from 'app.constants';
   templateUrl: './oppia-footer.component.html'
 })
 export class OppiaFooterComponent {
- siteFeedbackFormUrl:string = AppConstants.SITE_FEEDBACK_FORM_URL;
+  siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
 }
 
 angular.module('oppia').directive(
