@@ -29,7 +29,10 @@ class SubtopicViewerPage(base.BaseHandler):
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, *args):
-        """Handles GET requests."""
+        """Handles GET requests.
+        Args:
+            topic: str. Takes Arguments
+        """
 
         self.render_template('subtopic-viewer-page.mainpage.html')
 
