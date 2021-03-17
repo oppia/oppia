@@ -116,7 +116,7 @@ class ValidateModelTimeFields(beam.DoFn):
 
 
 class ValidateCommitType(beam.DoFn):
-    """DoFn to check whether commit type is valid"""
+    """DoFn to check whether commit type is valid."""
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
