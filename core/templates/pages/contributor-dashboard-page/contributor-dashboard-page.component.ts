@@ -51,13 +51,13 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$timeout', 'FocusManagerService',
+    '$rootScope', '$timeout', '$window', 'FocusManagerService',
     'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
-        $rootScope, $timeout, FocusManagerService,
+        $rootScope, $timeout, $window, FocusManagerService,
         LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
@@ -99,10 +99,17 @@ angular.module('oppia').component('contributorDashboardPage', {
         // that the element is visible before focussing.
         if (ctrl.activeTabName === 'translateTextTab') {
           $timeout(() => {
-            FocusManagerService.setFocus('selectLangDropDown');
+            ctrl.addFocusWithoutScroll('selectLangDropDown');
           }, 0);
         }
       };
+
+      ctrl.addFocusWithoutScroll = function(label) {
+        FocusManagerService.setFocus(label);
+        $timeout(function() {
+          $window.scrollTo(0, 0);
+        }, 5);
+      }
 
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = null;

@@ -49,7 +49,7 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$rootScope', '$uibModal',
+    '$http', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
     'AlertsService', 'DateTimeFormatService', 'DeviceInfoService',
     'FocusManagerService',
     'LearnerDashboardBackendApiService', 'LoaderService',
@@ -61,7 +61,7 @@ angular.module('oppia').component('learnerDashboardPage', {
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $rootScope, $uibModal,
+        $http, $q, $rootScope, $timeout, $uibModal, $window,
         AlertsService, DateTimeFormatService, DeviceInfoService,
         FocusManagerService,
         LearnerDashboardBackendApiService, LoaderService,
@@ -385,8 +385,8 @@ angular.module('oppia').component('learnerDashboardPage', {
 
       ctrl.addFocusWithoutScroll = function(label) {
         FocusManagerService.setFocus(label);
-        setTimeout(function() {
-          window.scrollTo(0, 0);
+        $timeout(function() {
+          $window.scrollTo(0, 0);
         }, 5);
       };
 
@@ -497,7 +497,10 @@ angular.module('oppia').component('learnerDashboardPage', {
 
         $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
           LoaderService.hideLoadingScreen();
-          setTimeout(() => {
+        // The $timeout is required because at execution time,
+        // the element may not be present in the DOM yet.Thus it ensure
+        // that the element is visible before focussing.
+          $timeout(() => {
             ctrl.addFocusWithoutScroll('ourLessonsBtn');
           }, 0);
         });

@@ -63,14 +63,16 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$timeout', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
+        'AlertsService',
         'ExplorationIdValidationService', 'FocusManagerService',
         'PageTitleService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_CHAPTER_TITLE', function(
-            $rootScope, $scope, $timeout, $uibModal, AlertsService,
+            $rootScope, $scope, $timeout, $uibModal, $window,
+            AlertsService,
             ExplorationIdValidationService, FocusManagerService,
             PageTitleService,
             StoryEditorStateService, StoryUpdateService,
@@ -400,8 +402,8 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
           $scope.addFocusWithoutScroll = function(label) {
             FocusManagerService.setFocus(label);
-            setTimeout(function() {
-              window.scrollTo(0, 0);
+            $timeout(function() {
+              $window.scrollTo(0, 0);
             }, 5);
           };
           ctrl.$onInit = function() {
