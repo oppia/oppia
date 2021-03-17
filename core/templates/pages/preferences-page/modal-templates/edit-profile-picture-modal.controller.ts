@@ -92,6 +92,6 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
     $scope.remove = function() {
       $scope.reset();
       $uibModalInstance.close($scope.croppedImageDataUrl);
-    }
+    };
   }
 ]);
