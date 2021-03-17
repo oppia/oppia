@@ -108,8 +108,6 @@
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.ts @sagangwee
-/core/templates/components/angular-html-bind/angular-html-bind-wrapper.directive.ts @sagangwee
-/core/templates/components/angular-html-bind/angular-html-bind-wrapper.directive.spec.ts @sagangwee
 
 
 # Core documentation

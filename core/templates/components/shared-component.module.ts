@@ -150,7 +150,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     // Components, directives, and pipes.
-    AngularHtmlBindWrapperDirective,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
