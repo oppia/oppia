@@ -224,15 +224,15 @@
                uib-tooltip="Remove"
                tooltip-placement="top">
             </i>
-            <exploration-summary-tile exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.lastUpdatedMsec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.numViews"
-                                      thumbnail-icon-url="tile.thumbnailIconUrl"
-                                      thumbnail-bg-color="tile.thumbnailBgColor"
+            <exploration-summary-tile [get-exploration-id]="tile.id"
+                                      [get-exploration-title]="tile.title"
+                                      [get-last-updated-msec]="tile.lastUpdatedMsec"
+                                      [get-objective]="tile.objective"
+                                      [get-category]="tile.category"
+                                      [get-ratings]="tile.ratings"
+                                      [get-num-views]="tile.numViews"
+                                      [get-thumbnail-icon-url]="tile.thumbnailIconUrl"
+                                      [get-thumbnail-bg-color]="tile.thumbnailBgColor"
                                       class="protractor-test-exp-summary-tile">
             </exploration-summary-tile>
           </div>
@@ -272,15 +272,15 @@
 
           <div ng-repeat="tile in $ctrl.getVisibleExplorationList($ctrl.startCompletedExpIndex) | orderBy:$ctrl.getValueOfExplorationSortKey:$ctrl.isCurrentExpSortDescending track by tile.id"
                class="oppia-exploration-summary-tile-container">
-            <exploration-summary-tile exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.lastUpdatedMsec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.numViews"
-                                      thumbnail-icon-url="tile.thumbnailIconUrl"
-                                      thumbnail-bg-color="tile.thumbnailBgColor"
+            <exploration-summary-tile [get-exploration-id]="tile.id"
+                                      [get-exploration-title]="tile.title"
+                                      [get-last-updated-msec]="tile.lastUpdatedMsec"
+                                      [get-objective]="tile.objective"
+                                      [get-category]="tile.category"
+                                      [get-ratings]="tile.ratings"
+                                      [get-num-views]="tile.numViews"
+                                      [get-thumbnail-icon-url]="tile.thumbnailIconUrl"
+                                      [get-thumbnail-bg-color]="tile.thumbnailBgColor"
                                       class="protractor-test-exp-summary-tile">
             </exploration-summary-tile>
           </div>
@@ -328,17 +328,17 @@
                uib-tooltip="Remove"
                tooltip-placement="top">
             </i>
-            <exploration-summary-tile exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.lastUpdatedMsec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.numViews"
-                                      thumbnail-icon-url="tile.thumbnailIconUrl"
-                                      thumbnail-bg-color="tile.thumbnailBgColor"
+            <exploration-summary-tile [get-exploration-id]="tile.id"
+                                      [get-exploration-title]="tile.title"
+                                      [get-last-updated-msec]="tile.lastUpdatedMsec"
+                                      [get-objective]="tile.objective"
+                                      [get-category]="tile.category"
+                                      [get-ratings]="tile.ratings"
+                                      [get-num-views]="tile.numViews"
+                                      [get-thumbnail-icon-url]="tile.thumbnailIconUrl"
+                                      [get-thumbnail-bg-color]="tile.thumbnailBgColor"
                                       class="oppia-exploration-summary-tile protractor-test-exp-summary-tile"
-                                      is-playlist-tile="true">
+                                      [is-playlist-tile]="true">
             </exploration-summary-tile>
           </div>
         </div>

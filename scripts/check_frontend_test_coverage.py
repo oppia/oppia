@@ -103,7 +103,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-player-state.service.ts',
     'exploration-save.service.ts',
     'exploration-states.service.ts',
-    'exploration-summary-tile.directive.ts',
+    'exploration-summary-tile.component.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',

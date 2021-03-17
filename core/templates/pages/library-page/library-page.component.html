@@ -22,15 +22,15 @@
 
           <div ng-repeat="tile in $ctrl.activityList" class="d-inline-block">
             <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
-                                      exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      [get-exploration-id]="tile.id"
+                                      [get-exploration-title]="tile.title"
+                                      [get-last-updated-msec]="tile.last_updated_msec"
+                                      [get-objective]="tile.objective"
+                                      [get-category]="tile.category"
+                                      [get-ratings]="tile.ratings"
+                                      [get-num-views]="tile.num_views"
+                                      [get-thumbnail-icon-url]="tile.thumbnail_icon_url"
+                                      [get-thumbnail-bg-color]="tile.thumbnail_bg_color"
                                       class="protractor-test-exp-summary-tile">
             </exploration-summary-tile>
           </div>
@@ -113,18 +113,18 @@
                                            show-learner-dashboard-icons-if-possible="true">
                   </collection-summary-tile>
                   <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
-                                            exploration-id="tile.id"
-                                            exploration-title="tile.title"
-                                            last-updated-msec="tile.last_updated_msec"
-                                            objective="tile.objective"
-                                            category="tile.category"
-                                            ratings="tile.ratings"
-                                            num-views="tile.num_views"
-                                            thumbnail-icon-url="tile.thumbnail_icon_url"
-                                            thumbnail-bg-color="tile.thumbnail_bg_color"
+                                            [get-exploration-id]="tile.id"
+                                            [get-exploration-title]="tile.title"
+                                            [get-last-updated-msec]="tile.last_updated_msec"
+                                            [get-objective]="tile.objective"
+                                            [get-category]="tile.category"
+                                            [get-ratings]="tile.ratings"
+                                            [get-num-views]="tile.num_views"
+                                            [get-thumbnail-icon-url]="tile.thumbnail_icon_url"
+                                            [get-thumbnail-bg-color]="tile.thumbnail_bg_color"
                                             class="protractor-test-exp-summary-tile"
-                                            activity-is-owned-by-current-user="$ctrl.activitiesOwned.explorations[tile.id]"
-                                            show-learner-dashboard-icons-if-possible="true">
+                                            [is-owned-by-current-user]="$ctrl.activitiesOwned.explorations[tile.id]"
+                                            [show-learner-dashboard-icons-if-possible]="true">
                   </exploration-summary-tile>
                 </div>
               </div>
@@ -167,18 +167,18 @@
                                          container-is-narrow="true">
                 </collection-summary-tile>
                 <exploration-summary-tile ng-if="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].activity_type == 'exploration'"
-                                          exploration-id="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].id"
-                                          exploration-title="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].title"
-                                          last-updated-msec="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].last_updated_msec"
-                                          objective="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].objective"
-                                          category="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].category"
-                                          ratings="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].ratings"
-                                          num-views="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].num_views"
-                                          thumbnail-icon-url="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_icon_url"
-                                          thumbnail-bg-color="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_bg_color"
+                                          [get-exploration-id]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].id"
+                                          [get-exploration-title]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].title"
+                                          [get-last-updated-msec]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].last_updated_msec"
+                                          [get-objective]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].objective"
+                                          [get-category]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].category"
+                                          [get-ratings]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].ratings"
+                                          [get-num-views]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].num_views"
+                                          [get-thumbnail-icon-url]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_icon_url"
+                                          [get-thumbnail-bg-color]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_bg_color"
                                           class="protractor-test-exp-summary-tile"
-                                          show-learner-dashboard-icons-if-possible="true"
-                                          container-is-narrow="true">
+                                          [show-learner-dashboard-icons-if-possible]="true"
+                                          [is-container-narrow]="true">
                 </exploration-summary-tile>
               </div>
             </div>
