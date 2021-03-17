@@ -100,7 +100,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       _getThreadMessagesAsync(suggestionId).then(
         function(messageSummaries) {
           $scope.reviewMessage = messageSummaries[1].text;
-          throw new Error('12312312');
         }
       );
     }

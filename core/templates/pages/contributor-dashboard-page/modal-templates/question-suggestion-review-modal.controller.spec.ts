@@ -446,16 +446,16 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should should fetch the rejection message', function() {
-      let responseDict = {
+    it('should fetch the rejection message', function() {
+      const responseDict = {
         messages: [
           { text: 'Question submitted.' },
           { text: 'This is a rejection.' }
         ]
       };
+
       $httpBackend.expect('GET', '/threadhandler/123').respond(responseDict);
       $httpBackend.flush();
-      $rootScope.$digest();
       expect($scope.reviewMessage).toBe('This is a rejection.');
     });
   });
