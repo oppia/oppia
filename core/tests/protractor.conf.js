@@ -284,8 +284,8 @@ exports.config = {
       }
     },
     loggingPrefs: {
-      driver: 'INFO',
-      browser: 'INFO'
+      driver: 'DEBUG',
+      browser: 'DEBUG'
     }
   },
 
