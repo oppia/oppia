@@ -462,6 +462,7 @@
     "I18N_PREFERENCES_PROFILE_PICTURE_DRAG": "Drag to crop and resize:",
     "I18N_PREFERENCES_PROFILE_PICTURE_ERROR": "Error: Could not read image file.",
     "I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD": "Upload Profile Picture",
+    "I18N_PREFERENCES_REMOVE_PROFILE_PICTURE_BUTTON": "Remove Profile Picture",
     "I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "Select preferred languages...",
     "I18N_PREFERENCES_SUBJECT_INTERESTS": "Subject Interests",
     "I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK": "E.g.: mathematics, computer science, art, ...",
