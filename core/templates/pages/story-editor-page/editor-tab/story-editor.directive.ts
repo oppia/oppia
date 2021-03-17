@@ -52,7 +52,7 @@ angular.module('oppia').directive('storyEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$timeout', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'FocusManagerService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
@@ -60,7 +60,7 @@ angular.module('oppia').directive('storyEditor', [
         'MAX_CHARS_IN_STORY_DESCRIPTION',
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
-            $rootScope, $scope, $timeout, $uibModal, AlertsService,
+            $rootScope, $scope, $uibModal, AlertsService,
             FocusManagerService,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, WindowDimensionsService,

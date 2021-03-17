@@ -94,7 +94,7 @@ angular.module('oppia').component('contributorDashboardPage', {
 
       ctrl.onTabClick = function(activeTabName) {
         ctrl.activeTabName = activeTabName;
-        // The $timeout is required because at execution time, 
+        // The $timeout is required because at execution time,
         // the element may not be present in the DOM yet.Thus it ensure
         // that the element is visible before focussing.
         if (ctrl.activeTabName === 'translateTextTab') {
