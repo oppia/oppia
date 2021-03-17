@@ -31,9 +31,6 @@ workflows:
       - e2e_library_and_collections:
           requires:
             - e2e_navigation_and_misc
-      - e2e_users:
-          requires:
-            - e2e_navigation_and_misc
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
