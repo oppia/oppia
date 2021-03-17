@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @load('base-components/header.template.html', {"title": "Guide to Oppia for Parents and Teachers | Oppia"})
+    @load('base-components/header.template.html', {"title": "Creator Guidelines | Oppia"})
   </head>
 
   <body>
     <oppia-root>
       <div ng-controller="Base">
         <base-content>
+          <navbar-breadcrumb>
+          </navbar-breadcrumb>
           <content>
-            <teach-page class="protractor-test-teach-page"></teach-page>
+            <participation-playbook></participation-playbook>
           </content>
         </base-content>
       </div>
