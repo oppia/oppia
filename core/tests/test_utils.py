@@ -1098,7 +1098,8 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
-    def swap_with_call_counter(self, obj, attr, raises=None, returns=None):
+    def swap_with_call_counter(
+            self, obj, attr, raises=None, returns=None, call_through=False):
         """Swap obj.attr with a CallCounter instance.
 
         Args:
@@ -1107,19 +1108,25 @@ class TestBase(unittest.TestCase):
             raises: Exception|None. The exception raised by the swapped
                 function. If None, then no exception is raised.
             returns: *. The return value of the swapped function.
+            call_through: bool. Whether to call through to the real function,
+                rather than use a stub implementation. If True, the `raises` and
+                `returns` arguments will be ignored.
 
         Yields:
             CallCounter. A CallCounter instance that's installed as obj.attr's
             implementation while within the context manager returned.
         """
-        def stubbed_function(*_, **__):
-            """Behaves according to provided values (always raises/returns)."""
-            if raises is not None:
-                # Pylint thinks we're trying to raise `None` even though we've
-                # explicitly checked that it isn't before raising.
-                raise raises # pylint: disable=raising-bad-type
-            return returns
-        call_counter = CallCounter(stubbed_function)
+        if call_through:
+            impl = obj.attr
+        else:
+            def impl(*_, **__):
+                """Behaves according to the given values."""
+                if raises is not None:
+                    # Pylint thinks we're trying to raise `None` even though we've
+                    # explicitly checked that it isn't before raising.
+                    raise raises # pylint: disable=raising-bad-type
+                return returns
+        call_counter = CallCounter(impl)
         with self.swap(obj, attr, call_counter):
             yield call_counter
 

@@ -2624,5 +2624,5 @@ def create_login_url(return_url):
     # didn't control the page or URL responsible for user authentication.
     # This is no longer the case. We've implemented our own user authentication
     # flow on top of the Firebase SDK in "core/templates/pages/login-page", and
-    # this function will always redirect to it's static location ("/login").
+    # this function will always redirect to its static location ("/login").
     return '/login?%s' % python_utils.url_encode({'return_url': return_url})

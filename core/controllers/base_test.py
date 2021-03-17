@@ -1252,7 +1252,7 @@ class SignUpTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'ENABLE_USER_CREATION', False):
             response = self.get_response_without_checking_for_errors(
-                feconf.SIGNUP_URL + '?return_url=/', [500])
+                '%s?return_url=/' % feconf.SIGNUP_URL, [500])
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
