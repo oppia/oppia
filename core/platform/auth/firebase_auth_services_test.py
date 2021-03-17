@@ -698,48 +698,58 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
     APP = object()
 
     def test_initializes_when_connection_does_not_exist(self):
-        get_app_swap = self.swap_to_always_raise(
-            firebase_admin, 'get_app', error=ValueError('initialize_app'))
-        initialize_app_swap = self.swap_to_always_return(
-            firebase_admin, 'initialize_app', value=self.APP)
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', raises=ValueError('initialize_app'))
+        init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app', returns=self.APP)
 
-        with get_app_swap, initialize_app_swap:
-            self.assertIs(
-                firebase_auth_services.establish_firebase_connection(),
-                self.APP)
+        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
+            firebase_auth_services.establish_firebase_connection()
+
+        self.assertEqual(get_app_counter.times_called, 1)
+        self.assertEqual(init_app_counter.times_called, 1)
 
     def test_returns_existing_connection(self):
-        get_app_swap = self.swap_to_always_return(
-            firebase_admin, 'get_app', value=self.APP)
-        initialize_app_swap = self.swap_to_always_raise(
-            firebase_admin, 'initialize_app')
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', returns=self.APP)
+        init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app',
+            raises=Exception('unexpected call'))
 
-        with get_app_swap, initialize_app_swap:
-            self.assertIs(
-                firebase_auth_services.establish_firebase_connection(),
-                self.APP)
+        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
+            firebase_auth_services.establish_firebase_connection()
+
+        self.assertEqual(get_app_counter.times_called, 1)
+        self.assertEqual(init_app_counter.times_called, 0)
 
     def test_raises_authentic_get_app_error(self):
-        get_app_swap = self.swap_to_always_raise(
-            firebase_admin, 'get_app', error=ValueError('uh-oh!'))
-        initialize_app_swap = self.swap_to_always_return(
-            firebase_admin, 'initialize_app', value=self.APP)
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', raises=ValueError('uh-oh!'))
+        init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app',
+            raises=Exception('unexpected call'))
 
-        with get_app_swap, initialize_app_swap:
+        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
             self.assertRaisesRegexp(
                 ValueError, 'uh-oh!',
                 firebase_auth_services.establish_firebase_connection)
+
+        self.assertEqual(get_app_counter.times_called, 1)
+        self.assertEqual(init_app_counter.times_called, 0)
 
     def test_raises_authentic_initialize_app_error(self):
-        get_app_swap = self.swap_to_always_raise(
-            firebase_admin, 'get_app', error=ValueError('initialize_app'))
-        initialize_app_swap = self.swap_to_always_raise(
-            firebase_admin, 'initialize_app', error=ValueError('uh-oh!'))
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', raises=ValueError('initialize_app'))
+        init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app', raises=ValueError('uh-oh!'))
 
-        with get_app_swap, initialize_app_swap:
+        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
             self.assertRaisesRegexp(
                 ValueError, 'uh-oh!',
                 firebase_auth_services.establish_firebase_connection)
+
+        self.assertEqual(get_app_counter.times_called, 1)
+        self.assertEqual(init_app_counter.times_called, 1)
 
 
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):

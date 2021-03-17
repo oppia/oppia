@@ -498,29 +498,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
             self.assertRaisesRegexp(ValueError, 'abc', obj.func)
 
-    def test_swap_with_call_pattern(self):
-        obj = mock.Mock()
-        obj.func = lambda: None
-
-        swap_context = self.swap_with_call_pattern(
-            obj, 'func',
-            raise_pattern=(Exception('abc'), None, None, Exception('def')),
-            return_pattern=(1, 2, 3))
-
-        self.assertIsNone(obj.func())
-        with swap_context:
-            self.assertRaisesRegexp(Exception, 'abc', obj.func)
-            self.assertEqual(obj.func(), 1)
-            self.assertEqual(obj.func(), 2)
-            self.assertRaisesRegexp(Exception, 'def', obj.func)
-            self.assertRaisesRegexp(Exception, 'abc', obj.func)
-            self.assertEqual(obj.func(), 3)
-            self.assertEqual(obj.func(), 1)
-            self.assertRaisesRegexp(Exception, 'def', obj.func)
-            self.assertRaisesRegexp(Exception, 'abc', obj.func)
-            self.assertEqual(obj.func(), 2)
-        self.assertIsNone(obj.func())
-
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
             return

@@ -87,10 +87,10 @@ def establish_firebase_connection():
         Exception. The Firebase app has a genuine problem.
     """
     try:
-        return firebase_admin.get_app()
+        firebase_admin.get_app()
     except ValueError as error:
         if 'initialize_app' in python_utils.UNICODE(error):
-            return firebase_admin.initialize_app(
+            firebase_admin.initialize_app(
                 options={'projectId': feconf.OPPIA_PROJECT_ID})
         else:
             raise
