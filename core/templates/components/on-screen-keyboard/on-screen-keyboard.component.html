@@ -1,4 +1,5 @@
 <div class="oppia-osk-container" ng-if="$ctrl.showOSK()" ng-click="$ctrl.activateGuppy()">
+  <div class="oppia-osk-container" ng-click="$ctrl.activateGuppy()">
   <div class="oppia-osk-navbar">
     <button ng-class="($ctrl.currentTab === $ctrl.mainTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab($ctrl.mainTab)">
       123
@@ -212,4 +213,5 @@
     border-left: 3px #808080 solid;
     border-right: 3px #808080 solid;
   }
+
 </style>
