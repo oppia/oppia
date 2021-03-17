@@ -1,0 +1,41 @@
+name: CLA check
+
+# check if the PR author has signed the CLA
+
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  cla_check:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install dependencies
+        run: |
+          pip install google-api-python-client google-auth-oauthlib
+      - name: execute cla script
+        env:
+          SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
+        run: |
+          python -m scripts.cla_check.py ${{ github.event.pull_request.user.login }}
+      - name: Comment on failure
+        if: ${{ failure() }}
+        env:
+            GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "Author of the PR has not signed the CLA"
