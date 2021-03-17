@@ -69,10 +69,10 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // this.
   activityType;
   resizeSubscription;
-  explorationIsCurrentlyHoveredOver;
-  isWindowLarge;
+  explorationIsCurrentlyHoveredOver: boolean;
+  isWindowLarge: boolean;
   userIsLoggedIn: boolean;
-  isRefresherExploration;
+  isRefresherExploration: boolean;
 
   contributors;
 
