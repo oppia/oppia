@@ -1122,8 +1122,8 @@ class TestBase(unittest.TestCase):
             def impl(*_, **__):
                 """Behaves according to the given values."""
                 if raises is not None:
-                    # Pylint thinks we're trying to raise `None` even though we've
-                    # explicitly checked that it isn't before raising.
+                    # Pylint thinks we're trying to raise `None` even though
+                    # we've explicitly checked for it above.
                     raise raises # pylint: disable=raising-bad-type
                 return returns
         call_counter = CallCounter(impl)
