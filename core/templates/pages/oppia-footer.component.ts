@@ -29,5 +29,6 @@ export class OppiaFooterComponent {
 }
 
 angular.module('oppia').directive(
-  'oppiaFooter', downgradeComponent(
-    {component: OppiaFooterComponent}));
+  'oppiaFooter', downgradeComponent({
+    component: OppiaFooterComponent
+  }) as angular.IDirectiveFactory);
