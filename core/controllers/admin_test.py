@@ -1038,12 +1038,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        call_counter = test_utils.CallCounter()
-        grant_super_admin_privileges_stub = self.swap(
-            firebase_auth_services, 'grant_super_admin_privileges',
-            call_counter)
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges')
 
-        with grant_super_admin_privileges_stub:
+        with grant_super_admin_privileges_stub as call_counter:
             response = self.get_json(
                 '/admingrantsuperadminhandler',
                 params={'username': self.ADMIN_USERNAME},
@@ -1055,12 +1053,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges_requires_system_default_admin(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        call_counter = test_utils.CallCounter()
-        grant_super_admin_privileges_stub = self.swap(
-            firebase_auth_services, 'grant_super_admin_privileges',
-            call_counter)
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges')
 
-        with grant_super_admin_privileges_stub:
+        with grant_super_admin_privileges_stub as call_counter:
             response = self.get_json(
                 '/admingrantsuperadminhandler',
                 params={'username': self.ADMIN_USERNAME},
@@ -1091,12 +1087,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        call_counter = test_utils.CallCounter()
-        revoke_super_admin_privileges_stub = self.swap(
-            firebase_auth_services, 'revoke_super_admin_privileges',
-            call_counter)
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges')
 
-        with revoke_super_admin_privileges_stub:
+        with revoke_super_admin_privileges_stub as call_counter:
             response = self.get_json(
                 '/adminrevokesuperadminhandler',
                 params={'username': self.ADMIN_USERNAME},
@@ -1108,12 +1102,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_requires_system_default_admin(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        call_counter = test_utils.CallCounter()
-        revoke_super_admin_privileges_stub = self.swap(
-            firebase_auth_services, 'revoke_super_admin_privileges',
-            call_counter)
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges')
 
-        with revoke_super_admin_privileges_stub:
+        with revoke_super_admin_privileges_stub as call_counter:
             response = self.get_json(
                 '/adminrevokesuperadminhandler',
                 params={'username': self.ADMIN_USERNAME},

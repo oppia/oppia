@@ -713,9 +713,10 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_begin handler."""
 
     def test_get(self):
-        call_counter = test_utils.CallCounter()
+        swap = self.swap_with_call_counter(
+            auth_services, 'establish_auth_session')
 
-        with self.swap(auth_services, 'establish_auth_session', call_counter):
+        with swap as call_counter:
             self.get_html_response('/session_begin', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -725,9 +726,10 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_end handler."""
 
     def test_get(self):
-        call_counter = test_utils.CallCounter()
+        swap = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
-        with self.swap(auth_services, 'destroy_auth_session', call_counter):
+        with swap as call_counter:
             self.get_html_response('/session_end', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -737,29 +739,21 @@ class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
     """Tests for /seed_firebase handler."""
 
     def test_get(self):
-        call_counter = test_utils.CallCounter()
+        swap = self.swap_with_call_counter(
+            firebase_auth_services, 'seed_firebase')
 
-        seed_firebase_swap = self.swap(
-            firebase_auth_services, 'seed_firebase', call_counter)
-
-        with seed_firebase_swap:
+        with swap as call_counter:
             self.get_html_response('/seed_firebase', expected_status_int=302)
 
         self.assertEqual(call_counter.times_called, 1)
 
     def test_get_with_error(self):
-        def always_raise(*_):
-            """Always raises an exception."""
-            raise Exception()
-
-        call_counter = test_utils.CallCounter(always_raise)
-
-        seed_firebase_swap = self.swap(
-            firebase_auth_services, 'seed_firebase', call_counter)
+        swap = self.swap_with_call_counter(
+            firebase_auth_services, 'seed_firebase', raises=Exception())
 
         captured_logging_context = self.capture_logging(min_level=logging.ERROR)
 
-        with seed_firebase_swap, captured_logging_context as logs:
+        with swap as call_counter, captured_logging_context as logs:
             self.get_html_response('/seed_firebase', expected_status_int=302)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -775,9 +769,10 @@ class LogoutPageTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
         self.get_html_response('/explore/0')
 
-        call_counter = test_utils.CallCounter()
+        swap = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
-        with self.swap(auth_services, 'destroy_auth_session', call_counter):
+        with swap as call_counter:
             # Logout with valid query arg. This test only validates that the
             # login cookies have expired after hitting the logout url.
             self.get_html_response('/logout', expected_status_int=302)
