@@ -65,7 +65,6 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { AngularHtmlBindWrapperDirective } from './angular-html-bind/angular-html-bind-wrapper.directive';
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 
