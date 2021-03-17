@@ -18,16 +18,10 @@
 
 import { VisualizationInfo } from
   'domain/exploration/visualization-info.model';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from
+  'domain/exploration/answer-stats.model';
 
 describe('Visualization info model', () => {
-  let asof: AnswerStatsObjectFactory;
-
-  beforeEach(() =>{
-    asof = new AnswerStatsObjectFactory();
-  });
-
   it('should correctly convert backend dict in visualization object.', () => {
     let backendDict = {
       addressed_info_is_supported: true,
@@ -39,7 +33,8 @@ describe('Visualization info model', () => {
       options: {}
     };
 
-    let answerStatObjects = backendDict.data.map(asof.createFromBackendDict);
+    let answerStatObjects = backendDict.data.map(
+      AnswerStats.createFromBackendDict);
     let visualizationInfoObject =
       VisualizationInfo.createFromBackendDict(backendDict);
 

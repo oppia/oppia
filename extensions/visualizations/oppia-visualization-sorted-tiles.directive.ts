@@ -18,7 +18,7 @@
 
 import { sum } from 'd3-array';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
