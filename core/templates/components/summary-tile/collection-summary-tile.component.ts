@@ -87,11 +87,11 @@ export class CollectionSummaryTileComponent implements OnInit {
       this.getThumbnailIconUrl);
   };
 
-  getStaticImageUrl(imagePath): string {
+  getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setHoverState(hoverState): void {
+  setHoverState(hoverState: boolean): void {
     this.collectionIsCurrentlyHoveredOver = hoverState;
   }
 }
