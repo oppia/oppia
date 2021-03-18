@@ -15,6 +15,8 @@
         <h4 [innerHTML]="'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate"></h4>
         <ul>
           <li><a href="/get-started" [innerHTML]="'I18N_FOOTER_GET_STARTED' | translate"></a></li>
+          <li><a href="/creator-guidelines" translate="I18N_PLAYBOOK_HEADING"></a></li>
+          <li><a href="/teach" translate="I18N_FOOTER_TEACH_PAGE"></a></li>
           <li><a href="/community-library" [innerHTML]="'I18N_FOOTER_BROWSE_LIBRARY' | translate"></a></li>
           <li><a href="https://groups.google.com/forum/?place=forum/oppia#!forum/oppia" [innerHTML]="'I18N_FOOTER_FORUM' | translate"></a></li>
         </ul>
@@ -31,7 +33,7 @@
       </div>
       <div class="col-sm-3">
         <h4><span [innerHTML]="'I18N_LANGUAGE_FOOTER_VIEW_IN' | translate"></span></h4>
-        <i18n-footer></i18n-footer>
+        <oppia-i18n-footer></oppia-i18n-footer>
         <social-buttons></social-buttons>
       </div>
     </div>
