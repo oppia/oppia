@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,90 +13,89 @@
 // limitations under the License.
 
 /**
- * @fileoverview Summary tile for collections.
+ * @fileoverview Component for a collection summary tile.
  */
 
-require('pages/learner-dashboard-page/learner-dashboard-icons.component.ts');
-require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+import constants from 'assets/constants';
+import { CollectionSummaryTileConstants } from 'components/summary-tile/collection-summary-tile.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { UserService } from 'services/user.service';
 
-require('components/summary-tile/collection-summary-tile.constants.ajs.ts');
+@Component({
+  selector: 'collection-summary-tile',
+  templateUrl: './collection-summary-tile.component.html',
+})
+export class CollectionSummaryTileComponent implements OnInit {
 
-angular.module('oppia').directive('collectionSummaryTile', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getCollectionId: '&collectionId',
-        getCollectionTitle: '&collectionTitle',
-        getObjective: '&objective',
-        getNodeCount: '&nodeCount',
-        getLastUpdatedMsec: '&lastUpdatedMsec',
-        getThumbnailIconUrl: '&thumbnailIconUrl',
-        getThumbnailBgColor: '&thumbnailBgColor',
-        isLinkedToEditorPage: '=?isLinkedToEditorPage',
-        getCategory: '&category',
-        isPlaylistTile: '&isPlaylistTile',
-        showLearnerDashboardIconsIfPossible: (
-          '&showLearnerDashboardIconsIfPossible'),
-        isContainerNarrow: '&containerIsNarrow',
-        isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/collection-summary-tile.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$rootScope', 'DateTimeFormatService', 'UserService',
-        'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_EDITOR_URL',
-        'COLLECTION_VIEWER_URL', function(
-            $rootScope, DateTimeFormatService, UserService,
-            ACTIVITY_TYPE_COLLECTION, COLLECTION_EDITOR_URL,
-            COLLECTION_VIEWER_URL) {
-          var ctrl = this;
-          ctrl.getLastUpdatedDatetime = function() {
-            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-              ctrl.getLastUpdatedMsec());
-          };
+  @Input() getCollectionId: string;
+  @Input() getCollectionTitle: string;
+  @Input() getLastUpdatedMsec: number;
+  @Input() getObjective: string;
+  @Input() getNodeCount: string;
+  @Input() getCategory: string;
+  @Input() getThumbnailIconUrl: string;
+  @Input() getThumbnailBgColor: string;
+  @Input() isPlaylistTile: boolean;
+  @Input() isLinkedToEditorPage: boolean;
+  @Input() showLearnerDashboardIconsIfPossible: string;
+  @Input() isContainerNarrow: boolean;
+  @Input() isOwnedByCurrentUser: boolean;
 
-          ctrl.getCollectionLink = function() {
-            var targetUrl = (
-              ctrl.isLinkedToEditorPage ?
-                COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
-            return UrlInterpolationService.interpolateUrl(
-              targetUrl, {
-                collection_id: ctrl.getCollectionId()
-              }
-            );
-          };
+  userIsLoggedIn: boolean;
+  collectionIsCurrentlyHoveredOver: boolean;
+  defaultEmptyTitle: string;
+  activityTypeCollection: string;
 
-          ctrl.getCompleteThumbnailIconUrl = function() {
-            return UrlInterpolationService.getStaticImageUrl(
-              ctrl.getThumbnailIconUrl());
-          };
+  constructor(
+    private dateTimeFormatService: DateTimeFormatService,
+    private userService: UserService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
+  ngOnInit(): void {
+    this.userService.getUserInfoAsync().then(userInfo => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });
+    this.defaultEmptyTitle = CollectionSummaryTileConstants.DEFAULT_EMPTY_TITLE;
+    this.activityTypeCollection = constants.ACTIVITY_TYPE_COLLECTION;
+  }
 
-          ctrl.setHoverState = function(hoverState) {
-            ctrl.collectionIsCurrentlyHoveredOver = hoverState;
-          };
-          ctrl.$onInit = function() {
-            ctrl.userIsLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
-              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$applyAsync();
-            });
-            ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
-            ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
-          };
-        }
-      ]
-    };
-  }]);
+  getLastUpdatedDatetime(): string {
+    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+      this.getLastUpdatedMsec);
+  }
+
+  getCollectionLink(): string {
+    var targetUrl = (
+      this.isLinkedToEditorPage ?
+        CollectionSummaryTileConstants.COLLECTION_EDITOR_URL :
+        CollectionSummaryTileConstants.COLLECTION_VIEWER_URL
+      );
+    return this.urlInterpolationService.interpolateUrl(
+      targetUrl, {
+        collection_id: this.getCollectionId
+      }
+    );
+  }
+
+  getCompleteThumbnailIconUrl(): string {
+    return this.urlInterpolationService.getStaticImageUrl(
+      this.getThumbnailIconUrl);
+  };
+
+  getStaticImageUrl(imagePath): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  setHoverState(hoverState): void {
+    this.collectionIsCurrentlyHoveredOver = hoverState;
+  }
+}
+
+angular.module('oppia').directive(
+  'collectionSummaryTile', downgradeComponent(
+    {component: CollectionSummaryTileComponent}));

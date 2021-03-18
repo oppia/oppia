@@ -378,14 +378,14 @@
                tooltip-placement="top">
             </i>
             <collection-summary-tile
-                                     collection-id="tile.id"
-                                     collection-title="tile.title"
-                                     last-updated-msec="tile.lastUpdatedMsec"
-                                     objective="tile.objective"
-                                     node-count="tile.nodeCount"
-                                     category="tile.category"
-                                     thumbnail-icon-url="tile.thumbnailIconUrl"
-                                     thumbnail-bg-color="tile.thumbnailBgColor">
+                                     [get-collection-id]="tile.id"
+                                     [get-collection-title]="tile.title"
+                                     [get-last-updated-msec]="tile.lastUpdatedMsec"
+                                     [get-objective]="tile.objective"
+                                     [get-node-count]="tile.nodeCount"
+                                     [get-category]="tile.category"
+                                     [get-thumbnail-icon-url]="tile.thumbnailIconUrl"
+                                     [get-thumbnail-bg-color]="tile.thumbnailBgColor">
             </collection-summary-tile>
           </div>
 
@@ -437,15 +437,15 @@
                tooltip-placement="top">
             </i>
             <collection-summary-tile class="oppia-learner-playlist-tiles-sortable"
-                                     collection-id="tile.id"
-                                     collection-title="tile.title"
-                                     last-updated-msec="tile.lastUpdatedMsec"
-                                     objective="tile.objective"
-                                     node-count="tile.nodeCount"
-                                     category="tile.category"
-                                     thumbnail-icon-url="tile.thumbnailIconUrl"
-                                     thumbnail-bg-color="tile.thumbnailBgColor"
-                                     is-playlist-tile="true">
+                                     [get-collection-id]="tile.id"
+                                     [get-collection-title]="tile.title"
+                                     [get-last-updated-msec]="tile.lastUpdatedMsec"
+                                     [get-objective]="tile.objective"
+                                     [get-node-count]="tile.nodeCount"
+                                     [get-category]="tile.category"
+                                     [get-thumbnail-icon-url]="tile.thumbnailIconUrl"
+                                     [get-thumbnail-bg-color]="tile.thumbnailBgColor"
+                                     [is-playlist-title]="true">
             </collection-summary-tile>
           </div>
         </div>
@@ -488,14 +488,14 @@
           <div ng-repeat="tile in $ctrl.completedCollectionsList"
                class="oppia-exploration-summary-tile-container">
             <collection-summary-tile
-                                     collection-id="tile.id"
-                                     collection-title="tile.title"
-                                     last-updated-msec="tile.lastUpdatedMsec"
-                                     objective="tile.objective"
-                                     node-count="tile.nodeCount"
-                                     category="tile.category"
-                                     thumbnail-icon-url="tile.thumbnailIconUrl"
-                                     thumbnail-bg-color="tile.thumbnailBgColor">
+                                     [get-collection-id]="tile.id"
+                                     [get-collection-title]="tile.title"
+                                     [get-last-updated-msec]="tile.lastUpdatedMsec"
+                                     [get-objective]="tile.objective"
+                                     [get-node-count]="tile.nodeCount"
+                                     [get-category]="tile.category"
+                                     [get-thumbnail-icon-url]="tile.thumbnailIconUrl"
+                                     [get-thumbnail-bg-color]="tile.thumbnailBgColor">
             </collection-summary-tile>
           </div>
 

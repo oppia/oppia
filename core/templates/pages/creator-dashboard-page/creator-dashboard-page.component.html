@@ -361,14 +361,14 @@
         ng-if="$ctrl.activeTab === 'myCollections' && $ctrl.collectionsList.length > 0">
       <span ng-repeat="collection in $ctrl.collectionsList">
         <collection-summary-tile class="protractor-test-collection-card"
-                                 collection-id="collection.id"
-                                 collection-title="collection.title"
-                                 last-updated-msec="collection.lastUpdatedMsec"
-                                 node-count="collection.nodeCount"
-                                 objective="collection.objective"
-                                 thumbnail-icon-url="collection.thumbnailIconUrl"
-                                 thumbnail-bg-color="collection.thumbnailBgColor"
-                                 is-linked-to-editor-page="true">
+                                 [get-collection-id]="collection.id"
+                                 [get-collection-title]="collection.title"
+                                 [get-last-updated-msec]="collection.lastUpdatedMsec"
+                                 [get-node-count]="collection.nodeCount"
+                                 [get-objective]="collection.objective"
+                                 [get-thumbnail-icon-url]="collection.thumbnailIconUrl"
+                                 [get-thumbnail-bg-color]="collection.thumbnailBgColor"
+                                 [is-linked-to-editor-page]="true">
         </collection-summary-tile>
       </span>
     </ul>

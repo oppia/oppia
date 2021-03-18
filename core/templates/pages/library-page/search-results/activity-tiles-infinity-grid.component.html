@@ -3,15 +3,15 @@
      infinite-scroll-disabled="$ctrl.endOfPageIsReached || $ctrl.searchResultsAreLoading">
   <div ng-repeat="activity in $ctrl.allActivitiesInOrder track by $index" class="d-inline-block">
     <collection-summary-tile ng-if="activity.activity_type === 'collection'"
-                             collection-id="activity.id"
-                             collection-title="activity.title"
-                             last-updated-msec="activity.last_updated_msec"
-                             node-count="activity.node_count"
-                             objective="activity.objective"
-                             thumbnail-icon-url="activity.thumbnail_icon_url"
-                             thumbnail-bg-color="activity.thumbnail_bg_color"
-                             show-learner-dashboard-icons-if-possible="true"
-                             container-is-narrow="$ctrl.libraryWindowIsNarrow"
+                             [get-collection-id]="activity.id"
+                             [get-collection-title]="activity.title"
+                             [get-last-updated-msec]="activity.last_updated_msec"
+                             [get-node-count]="activity.node_count"
+                             [get-objective]="activity.objective"
+                             [get-thumbnail-icon-url]="activity.thumbnail_icon_url"
+                             [get-thumbnail-bg-color]="activity.thumbnail_bg_color"
+                             [show-learner-dashboard-icons-if-possible]="true"
+                             [is-container-narrow]="$ctrl.libraryWindowIsNarrow"
                              class="protractor-test-collection-summary-tile">
     </collection-summary-tile>
     <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
