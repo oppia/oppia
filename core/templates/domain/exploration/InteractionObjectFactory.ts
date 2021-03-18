@@ -62,7 +62,8 @@ import {
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
   TextInputCustomizationArgsBackendDict,
-  NumericExpressionInputCustomizationArgsBackendDict
+  NumericExpressionInputCustomizationArgsBackendDict,
+  NumericInputCustomizationArgsBackendDict
 } from 'interactions/customization-args-defs';
 import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
@@ -355,6 +356,18 @@ export class InteractionObjectFactory {
       }
     };
   }
+
+  _createFromNumericInputCustomizationArgsBackendDict(
+    caBackendDict: NumericInputCustomizationArgsBackendDict
+): NumericInputCustomizationArgs {
+  const { placeholder } = caBackendDict;
+  return {
+    placeholder: {
+      value: this.subtitledUnicodeFactory.createFromBackendDict(
+        placeholder.value)
+    }
+  };
+}
 
   _createFromRatioExpressionInputCustomizationArgsBackendDict(
       caBackendDict: RatioExpressionInputCustomizationArgsBackendDict

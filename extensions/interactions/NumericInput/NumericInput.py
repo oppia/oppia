@@ -38,7 +38,18 @@ class NumericInput(base.BaseInteraction):
     can_have_solution = True
     show_generic_submit_button = True
 
-    _customization_arg_specs = []
+    _customization_arg_specs = [{
+        "description": "Allow only input greater than or equal to zero for NumericInput interaction.",
+        "name": "input",
+        "schema": {
+        "type": "bool",
+        "validators": [{
+           "min_value": 0,
+           "id": "is_at_least"
+         }]
+     },
+     "default_value": "false"
+    }]
 
     _answer_visualization_specs = [{
         # Table with answer counts for top N answers.

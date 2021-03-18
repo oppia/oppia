@@ -30,7 +30,7 @@ import { OutcomeObjectFactory } from
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory.ts';
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -353,14 +353,26 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: 'Type input greater than or equal to zero.'
+          }
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      placeholder: {
+        value: new SubtitledUnicode(
+          'Type input greater than or equal to zero.', 'ca_placeholder_0')
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +

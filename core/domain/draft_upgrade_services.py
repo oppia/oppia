@@ -104,6 +104,22 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v42_dict_to_v43_dict(cls, draft_change_list):
+        """Converts draft change list from state version 42 to 43. State
+        version 43 adds a customization arg for the Numeric Input
+        interactions that allows creators to set input range greater
+        than or equal to zero.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, draft_change_list):
         """Converts draft change list from state version 41 to 42.
 

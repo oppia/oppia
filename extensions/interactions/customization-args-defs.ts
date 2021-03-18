@@ -405,8 +405,16 @@ export interface NumericExpressionInputCustomizationArgs {
 }
 
 
-export interface NumericInputCustomizationArgsBackendDict { }
-export interface NumericInputCustomizationArgs { }
+export interface NumericInputCustomizationArgsBackendDict {
+  placeholder: {
+    value: SubtitledUnicodeBackendDict;
+  };
+}
+export interface NumericInputCustomizationArgs {
+  placeholder: {
+    value: SubtitledUnicode;
+  };
+}
 
 
 export interface NumberWithUnitsCustomizationArgsBackendDict { }
