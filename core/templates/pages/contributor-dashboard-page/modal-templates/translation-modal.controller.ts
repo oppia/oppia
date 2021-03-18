@@ -154,28 +154,16 @@ angular.module('oppia').controller('TranslationModalController', [
       return attributes.filter(attribute => attribute);
     };
 
-    $scope.findAvailableElements = function(
-        originalElements, translatedElements, isRawImage) {
-      const states = isRawImage ? Array.from(
-        originalElements, function(originalElement) {
-          return translatedElements.some(
-            translatedElement => (translatedElement === originalElement));
-        }) : Array.from(
-          originalElements, function(originalElement) {
-            return translatedElements.some(
-              translatedElement => (
-                translatedElement === originalElement &&
-                originalElement !== ''));
-          });
-      return states;
-    };
-
     $scope.copiedAllElements = function(originalElements, translatedElements) {
+      console.log(originalElements);
+      console.log(translatedElements);
       const hasMatchingTranslatedElement = (element) => translatedElements.includes(element);
-      return originalElements.every(hasMatchingTranslatedElement);
+      return !originalElements.every(hasMatchingTranslatedElement);
     };
 
     $scope.changedImgDetails = function(originalElements, translatedElements) {
+      console.log(originalElements);
+      console.log(translatedElements);
       const hasMatchingTranslatedElement = (element) => (translatedElements.includes(element) && element !== '');
       return originalElements.every(hasMatchingTranslatedElement);
     };
@@ -199,13 +187,15 @@ angular.module('oppia').controller('TranslationModalController', [
         textToTranslate, translatedText): TranslationError {
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
+      console.log(translatedElements);
+      console.log(originalElements);
 
       const hasUncopiedImgs = $scope.copiedAllElements(
         originalElements.foundImageFilePaths,
         translatedElements.foundImageFilePaths);
       const hasDuplicateAltTexts = $scope.changedImgDetails(
-        originalElements.foundImageAltTxts,
-        translatedElements.foundImageAltTxts);
+        originalElements.foundImageAlts,
+        translatedElements.foundImageAlts);
       const hasDuplicateDescriptions = $scope.changedImgDetails(
         originalElements.foundImageDescriptions,
         translatedElements.foundImageDescriptions);
@@ -232,6 +222,8 @@ angular.module('oppia').controller('TranslationModalController', [
 
       let translationError = $scope.validateImages(
         originalElements, translatedElements);
+
+      console.log(translationError);
 
       if (translationError.hasUncopiedImgs) {
         $scope.hasImgCopyError = true;
