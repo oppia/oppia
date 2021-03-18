@@ -24,7 +24,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/collection-summary-tile.directive.ts');
+require('components/summary-tile/collection-summary-tile.component.ts');
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 

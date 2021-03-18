@@ -24,7 +24,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
-require('components/summary-tile/collection-summary-tile.directive.ts');
+require('components/summary-tile/collection-summary-tile.component.ts');
 require('components/summary-tile/exploration-summary-tile.component.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
