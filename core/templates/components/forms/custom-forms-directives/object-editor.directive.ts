@@ -58,13 +58,23 @@ angular.module('oppia').directive('objectEditor', [
           return scope.isEditable;
         };
         if (directiveName) {
-          element.html(
-            '<' + directiveName +
-            '-editor get-always-editable="getAlwaysEditable()"' +
-            ' get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
-            ' get-schema="getSchema()" value="value"></' +
-            directiveName + '-editor>');
-          $compile(element.contents())(scope);
+          if (directiveName === 'algebraic-expression') {
+            element.html(
+              '<' + directiveName +
+              '-editor get-always-editable="getAlwaysEditable()"' +
+              ' get-init-args="getInitArgs()" get-is-editable="' +
+              'getIsEditable()" get-schema="getSchema()" [(value)]="value"></' +
+              directiveName + '-editor>');
+            $compile(element.contents())(scope);
+          } else {
+            element.html(
+              '<' + directiveName +
+              '-editor get-always-editable="getAlwaysEditable()"' +
+              ' get-init-args="getInitArgs()" get-is-editable=' +
+              '"getIsEditable()" get-schema="getSchema()" value="value"></' +
+              directiveName + '-editor>');
+            $compile(element.contents())(scope);
+          }
         } else {
           $log.error('Error in objectEditor: no editor type supplied.');
         }
