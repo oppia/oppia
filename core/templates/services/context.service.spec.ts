@@ -260,37 +260,10 @@ describe('Context service', () => {
       });
   });
 
-  describe('behavior in other pages', () => {
+  describe('behavior in different pages', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
-    });
-
-    it('should throw an error when trying to retrieve the exploration id',
-      () => {
-        spyOn(urlService, 'getPathname').and.returnValue('/about');
-        expect(() => ecs.getExplorationId()).toThrowError(
-          'ContextService should not be used outside the ' +
-          'context of an exploration or a question.');
-      }
-    );
-
-    it('should retrieve other as page context', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/about');
-      expect(ecs.getPageContext()).toBe('other');
-    }
-    );
-
-    it('should retrive exploration preview mode', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/about');
-      spyOn(urlService, 'getHash').and.returnValue('#/preview');
-      expect(ecs.getEditorTabContext()).toBe('preview');
-    });
-
-    it('should retrieve entity id and type', () => {
-      ecs.setCustomEntityContext('other', '100');
-      expect(ecs.getEntityId()).toBe('100');
-      expect(ecs.getEntityType()).toBe('other');
     });
 
     it('should correctly retrieve the page context', () => {
@@ -319,6 +292,38 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/contributor-dashboard/123');
       expect(ecs.getPageContext()).toBe('contributor_dashboard');
+    });
+  });
+
+  describe('behavior in other pages', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/about');
+      spyOn(urlService, 'getHash').and.returnValue('#/preview');
+    });
+
+    it('should throw an error when trying to retrieve the exploration id',
+      () => {
+        expect(() => ecs.getExplorationId()).toThrowError(
+          'ContextService should not be used outside the ' +
+          'context of an exploration or a question.');
+      }
+    );
+
+    it('should retrieve other as page context', () => {
+      expect(ecs.getPageContext()).toBe('other');
+    }
+    );
+
+    it('should retrive exploration preview mode', () => {
+      expect(ecs.getEditorTabContext()).toBe('preview');
+    });
+
+    it('should retrieve entity id and type', () => {
+      ecs.setCustomEntityContext('other', '100');
+      expect(ecs.getEntityId()).toBe('100');
+      expect(ecs.getEntityType()).toBe('other');
     });
   });
 });
