@@ -1,0 +1,6 @@
+<div class="oppia-toast-container toast-top-center" *ngIf="promoBarIsEnabled && promoIsVisible">
+  <div class="toast toast-info oppia-toast">
+    <button type="button" class="toast-close-button" (click)="dismissPromo()" role="button">&times;</button>
+    <div class="toast-message">{{ promoBarMessage }}</div>
+  </div>
+</div>

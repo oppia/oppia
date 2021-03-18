@@ -34,7 +34,7 @@ require(
   'alert-message.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'promo-bar.directive.ts');
+  'promo-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'side-navigation-bar.directive.ts');
