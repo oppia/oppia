@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for ResponsesService.
  */
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -54,6 +55,9 @@ describe('Responses Service', () => {
   let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     alertsService = TestBed.get(AlertsService);
     explorationHtmlFormatterService = TestBed.get(

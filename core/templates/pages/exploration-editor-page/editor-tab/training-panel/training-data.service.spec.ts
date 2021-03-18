@@ -16,52 +16,7 @@
  * @fileoverview Unit tests for the training data service.
  */
 
-import {
-  HttpClient,
-  HttpXhrBackend,
-  // eslint-disable-next-line camelcase
-  ɵangular_packages_common_http_http_d
-} from '@angular/common/http';
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// training-data.service.ts is upgraded to Angular 8.
-import { AlertsService } from 'services/alerts.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { LoggerService } from 'services/contextual/logger.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { UtilsService } from 'services/utils.service';
-import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-// ^^^ This block is to be removed.
-
 import { TranslatorProviderForTests } from 'tests/test.extras';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
@@ -95,56 +50,6 @@ describe('TrainingDataService', function() {
 
   beforeEach(function() {
     angular.mock.module('oppia');
-    // Set a global value for INTERACTION_SPECS that will be used by all the
-    // descendant dependencies.
-    angular.mock.module(function($provide) {
-      $provide.value('AngularNameService', new AngularNameService());
-      $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
-      $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value(
-        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-          new ParamChangeObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-      $provide.value('SolutionValidityService', new SolutionValidityService());
-      $provide.value(
-        'StateClassifierMappingService', new StateClassifierMappingService(
-          new ClassifierDataBackendApiService(
-            new HttpClient(new HttpXhrBackend(
-              new ɵangular_packages_common_http_http_d())),
-            new UrlInterpolationService(
-              new AlertsService(new LoggerService()),
-              new UrlService(new WindowRef()), new UtilsService())),
-          new LoggerService()
-        ));
-      $provide.value(
-        'StateEditorService', new StateEditorService(
-          new SolutionValidityService()));
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value(
-        'WrittenTranslationObjectFactory',
-        new WrittenTranslationObjectFactory());
-      $provide.value(
-        'WrittenTranslationsObjectFactory',
-        new WrittenTranslationsObjectFactory(
-          new WrittenTranslationObjectFactory()));
-    });
     mockExplorationData = {
       explorationId: 0,
       autosaveChangeList: function() {}

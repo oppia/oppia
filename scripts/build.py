@@ -113,7 +113,8 @@ FILEPATHS_NOT_TO_RENAME = (
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
-    'webpack_bundles/*'
+    'webpack_bundles/*',
+    'third_party/generated/proto/.gitkeep*'
 )
 
 PAGES_IN_APP_YAML = (
