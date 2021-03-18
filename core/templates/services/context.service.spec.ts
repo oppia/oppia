@@ -64,6 +64,15 @@ describe('Context service', () => {
       expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(false);
       expect(ecs.isInQuestionPlayerMode()).toEqual(false);
     });
+
+    it('should correctly check the page context', ()=> {
+      expect(ecs.isInExplorationContext()).toBe(true);
+    });
+
+    it('should correctly set and retrive the exploration id', () => {
+      ecs.setExplorationId('1000');
+      expect(ecs.getExplorationId()).toBe('1000');
+    });
   });
 
   describe('behavior in the exploration learner embed view', () => {
@@ -160,6 +169,11 @@ describe('Context service', () => {
       () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
+
+    it('should correctly affirm that page contains reference to skills',
+    () => {
+      expect(ecs.canEntityReferToSkills()).toBe(true);
+    });
   });
 
   describe('behavior in question editor modal', () => {
@@ -250,12 +264,11 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and.returnValue('/about');
-      spyOn(urlService, 'getHash').and.returnValue('');
     });
 
     it('should throw an error when trying to retrieve the exploration id',
       () => {
+        spyOn(urlService, 'getPathname').and.returnValue('/about');
         expect(() => ecs.getExplorationId()).toThrowError(
           'ContextService should not be used outside the ' +
           'context of an exploration or a question.');
@@ -263,8 +276,47 @@ describe('Context service', () => {
     );
 
     it('should retrieve other as page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/about');
       expect(ecs.getPageContext()).toBe('other');
     }
     );
+
+    it('should retrive exploration preview mode', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/about');
+      spyOn(urlService, 'getHash').and.returnValue('#/preview');
+      expect(ecs.getEditorTabContext()).toBe('preview');
+    });
+
+    it('should retrieve entity id and type', () => {
+      ecs.setCustomEntityContext('other','100');
+      expect(ecs.getEntityId()).toBe('100');
+      expect(ecs.getEntityType()).toBe('other');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
+      expect(ecs.getPageContext()).toBe('question_editor');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/session/123');
+      expect(ecs.getPageContext()).toBe('question_player');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/collection_editor/123');
+      expect(ecs.getPageContext()).toBe('collection_editor');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/topics-and-skills-dashboard/123');
+      expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/contributor-dashboard/123');
+      expect(ecs.getPageContext()).toBe('contributor_dashboard');
+    });
+
   });
 });
