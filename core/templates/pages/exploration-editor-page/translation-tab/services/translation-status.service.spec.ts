@@ -16,13 +16,6 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-import {
-  HttpClient,
-  HttpXhrBackend,
-  // eslint-disable-next-line camelcase
-  ɵangular_packages_common_http_http_d
-} from '@angular/common/http';
-
 import { UpgradedServices } from 'services/UpgradedServices';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once

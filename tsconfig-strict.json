@@ -37,7 +37,6 @@
     "core/templates/domain/classifier/answer-classification-result.model.ts",
     "core/templates/domain/classifier/answer-classification-result.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
@@ -143,5 +142,5 @@
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts"
   ],
-  "include": ["typings/*.ts"],
+  "include": ["typings/*.ts"]
 }
