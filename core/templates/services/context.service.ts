@@ -218,7 +218,7 @@ export class ContextService {
   setExplorationId(explorationId: string): void {
     this.explorationId = explorationId;
   }
-  
+
   // Returns a string representing the explorationId (obtained from the
   // URL).
   getExplorationId(): string {

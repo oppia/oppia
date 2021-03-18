@@ -171,9 +171,9 @@ describe('Context service', () => {
       });
 
     it('should correctly affirm that page contains reference to skills',
-    () => {
-      expect(ecs.canEntityReferToSkills()).toBe(true);
-    });
+      () => {
+        expect(ecs.canEntityReferToSkills()).toBe(true);
+      });
   });
 
   describe('behavior in question editor modal', () => {
@@ -288,7 +288,7 @@ describe('Context service', () => {
     });
 
     it('should retrieve entity id and type', () => {
-      ecs.setCustomEntityContext('other','100');
+      ecs.setCustomEntityContext('other', '100');
       expect(ecs.getEntityId()).toBe('100');
       expect(ecs.getEntityType()).toBe('other');
     });
@@ -304,19 +304,21 @@ describe('Context service', () => {
     });
 
     it('should correctly retrieve the page context', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/collection_editor/123');
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/collection_editor/123');
       expect(ecs.getPageContext()).toBe('collection_editor');
     });
 
     it('should correctly retrieve the page context', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/topics-and-skills-dashboard/123');
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/topics-and-skills-dashboard/123');
       expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
     });
 
     it('should correctly retrieve the page context', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/contributor-dashboard/123');
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/contributor-dashboard/123');
       expect(ecs.getPageContext()).toBe('contributor_dashboard');
     });
-
   });
 });
