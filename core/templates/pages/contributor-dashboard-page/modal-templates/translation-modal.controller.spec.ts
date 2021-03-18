@@ -314,18 +314,4 @@ describe('Translation Modal Controller', function() {
       $httpBackend.flush();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
-
-  it('should be able to set TranslationError objects', () => {
-    let translationError = new TranslationError(false, false, false, false);
-
-    translationError.triedToCopyText = true;
-    translationError.hasUncopiedImgs = true;
-    translationError.hasDuplicateDescriptions = true;
-    translationError.hasDuplicateAltTexts = true;
-
-    expect(translationError.triedToCopyText).toBe(true);
-    expect(translationError.hasUncopiedImgs).toBe(true);
-    expect(translationError.hasDuplicateDescriptions).toBe(true);
-    expect(translationError.hasDuplicateAltTexts).toBe(true);
-  });
 });

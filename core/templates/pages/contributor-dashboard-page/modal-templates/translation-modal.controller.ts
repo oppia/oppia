@@ -18,7 +18,6 @@
 
 export class TranslationError {
   constructor(
-    private _triedToCopyText: boolean,
     private _hasUncopiedImgs: boolean,
     private _hasDuplicateAltTexts: boolean,
     private _hasDuplicateDescriptions: boolean) {}
@@ -26,26 +25,11 @@ export class TranslationError {
   get hasDuplicateDescriptions(): boolean {
     return this._hasDuplicateDescriptions;
   }
-  set hasDuplicateDescriptions(value: boolean) {
-    this._hasDuplicateDescriptions = value;
-  }
   get hasDuplicateAltTexts(): boolean {
     return this._hasDuplicateAltTexts;
   }
-  set hasDuplicateAltTexts(value: boolean) {
-    this._hasDuplicateAltTexts = value;
-  }
   get hasUncopiedImgs(): boolean {
     return this._hasUncopiedImgs;
-  }
-  set hasUncopiedImgs(value: boolean) {
-    this._hasUncopiedImgs = value;
-  }
-  get triedToCopyText(): boolean {
-    return this._triedToCopyText;
-  }
-  set triedToCopyText(value: boolean) {
-    this._triedToCopyText = value;
   }
 }
 
@@ -119,7 +103,7 @@ angular.module('oppia').controller('TranslationModalController', [
 
     $scope.onContentClick = function($event) {
       const paragraphCopyValidation = $scope.validateParagraphCopy($event);
-      if (paragraphCopyValidation.triedToCopyText) {
+      if (paragraphCopyValidation) {
         return $scope.triedToCopyText = true;
       }
       $scope.triedToCopyText = false;
@@ -136,7 +120,7 @@ angular.module('oppia').controller('TranslationModalController', [
       const triedTextCopy = $event.target.localName === 'p' && !(
         paragraphChildrenElements.some(
           child => child.localName === 'oppia-noninteractive-math'));
-      return new TranslationError(triedTextCopy, false, false, false);
+      return triedTextCopy;
     };
 
     $scope.copyContent = function($event) {
@@ -158,9 +142,9 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.activeWrittenTranslation.html = '';
     };
 
-    $scope.findImgAttributes = function(elements, type) {
+    $scope.getElementTexts = function(elements, type) {
       const textWrapperLength = 6;
-      let attributes = Array.from(elements, function(element: HTMLElement) {
+      const attributes = Array.from(elements, function(element: HTMLElement) {
         if (element.localName === 'oppia-noninteractive-image') {
           const attribute = element.attributes[type].value;
           return attribute.substring(
@@ -172,7 +156,7 @@ angular.module('oppia').controller('TranslationModalController', [
 
     $scope.findAvailableElements = function(
         originalElements, translatedElements, isRawImage) {
-      let states = isRawImage ? Array.from(
+      const states = isRawImage ? Array.from(
         originalElements, function(originalElement) {
           return translatedElements.some(
             translatedElement => (translatedElement === originalElement));
@@ -186,17 +170,27 @@ angular.module('oppia').controller('TranslationModalController', [
       return states;
     };
 
+    $scope.copiedAllElements = function(originalElements, translatedElements) {
+      const hasMatchingTranslatedElement = (element) => translatedElements.includes(element);
+      return originalElements.every(hasMatchingTranslatedElement);
+    };
+
+    $scope.changedImgDetails = function(originalElements, translatedElements) {
+      const hasMatchingTranslatedElement = (element) => (translatedElements.includes(element) && element !== '');
+      return originalElements.every(hasMatchingTranslatedElement);
+    };
+
     $scope.getTexts = function(rawText) {
-      const foundImageFilePaths = $scope.findImgAttributes(
+      const foundImageFilePaths = $scope.getElementTexts(
         rawText, 'filepath-with-value');
-      const foundImageAltTxts = $scope.findImgAttributes(
+      const foundImageAlts = $scope.getElementTexts(
         rawText, 'alt-with-value');
-      const foundImageDescriptions = $scope.findImgAttributes(
+      const foundImageDescriptions = $scope.getElementTexts(
         rawText, 'caption-with-value');
 
       return {
         foundImageFilePaths,
-        foundImageAltTxts,
+        foundImageAlts,
         foundImageDescriptions
       };
     };
@@ -206,24 +200,18 @@ angular.module('oppia').controller('TranslationModalController', [
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
 
-      const copiedImgStates = $scope.findAvailableElements(
+      const hasUncopiedImgs = $scope.copiedAllElements(
         originalElements.foundImageFilePaths,
-        translatedElements.foundImageFilePaths, true);
-      const duplicateImgAltTextStates = $scope.findAvailableElements(
+        translatedElements.foundImageFilePaths);
+      const hasDuplicateAltTexts = $scope.changedImgDetails(
         originalElements.foundImageAltTxts,
-        translatedElements.foundImageAltTxts, false);
-      const duplicateImgDescriptionStates = $scope.findAvailableElements(
+        translatedElements.foundImageAltTxts);
+      const hasDuplicateDescriptions = $scope.changedImgDetails(
         originalElements.foundImageDescriptions,
-        translatedElements.foundImageDescriptions, false);
-
-      const hasUncopiedImgs = copiedImgStates.some(state => state === false);
-      const hasDuplicateAltTexts = duplicateImgAltTextStates.some(
-        state => state === true);
-      const hasDuplicateDescriptions = duplicateImgDescriptionStates.some(
-        state => state === true);
+        translatedElements.foundImageDescriptions);
 
       return new TranslationError(
-        false, hasUncopiedImgs, hasDuplicateAltTexts,
+        hasUncopiedImgs, hasDuplicateAltTexts,
         hasDuplicateDescriptions);
     };
 
@@ -242,13 +230,13 @@ angular.module('oppia').controller('TranslationModalController', [
       const translatedElements = angular.element(
         $scope.activeWrittenTranslation.html);
 
-      let translationValidators = $scope.validateImages(
+      let translationError = $scope.validateImages(
         originalElements, translatedElements);
 
-      if (translationValidators.hasUncopiedImgs) {
+      if (translationError.hasUncopiedImgs) {
         $scope.hasImgCopyError = true;
-      } else if (translationValidators.hasDuplicateAltTexts ||
-        translationValidators.hasDuplicateDescriptions) {
+      } else if (translationError.hasDuplicateAltTexts ||
+        translationError.hasDuplicateDescriptions) {
         $scope.hasImgTextError = true;
       } else {
         if (!$scope.uploadingTranslation && !$scope.loadingData) {
