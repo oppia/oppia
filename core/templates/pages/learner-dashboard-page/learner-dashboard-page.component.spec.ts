@@ -72,7 +72,7 @@ describe('Learner dashboard page', function() {
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
       $flushPendingTasks = $injector.get('$flushPendingTasks');
-      focusManagerService = $injector.get('FocusManagerService')
+      focusManagerService = $injector.get('FocusManagerService');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
@@ -309,8 +309,8 @@ describe('Learner dashboard page', function() {
       ctrl.addFocusWithoutScroll('ourLessonsBtn');
       $timeout.flush();
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-      expect(windowSpy).toHaveBeenCalled()
-    })
+      expect(windowSpy).toHaveBeenCalled();
+    });
     it('should get static image url', function() {
       var imagePath = '/path/to/image.png';
       expect(ctrl.getStaticImageUrl(imagePath)).toBe(
