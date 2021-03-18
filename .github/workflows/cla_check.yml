@@ -18,13 +18,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: '2.x'
+          architecture: 'x64'
       - name: Setup python by installing wheel
         run: pip install wheel==0.35.0
       - name: Install third party
@@ -36,7 +35,7 @@ jobs:
         env:
           SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
         run: |
-          python -m scripts.cla_check.py ${{ github.event.pull_request.user.login }}
+          PYTHONIOENCODING=utf-8 python -m scripts.cla_check ${{ github.event.pull_request.user.login }}
       - name: Comment on failure
         if: ${{ failure() }}
         env:
