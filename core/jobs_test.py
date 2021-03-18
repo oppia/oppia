@@ -57,12 +57,22 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """
+        Args:
+            item:*.A single element of type given by entity_class().
+        """
         current_class = MockJobManagerOne
         if current_class.entity_created_before_job_queued(item):
             yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
+        """
+        Args :
+            key:*. A key value as emitted from the map() fuction, above.
+            values : list(*). a list of all values from all mappers that were
+                tagged with the given key.
+        """
         yield (key, sum([int(value) for value in values]))
 
 
@@ -75,12 +85,24 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """
+        Args:
+            item:*.A single element of type given by entity_class().
+        """
+
         current_class = MockJobManagerTwo
         if current_class.entity_created_before_job_queued(item):
             yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
+        """
+        Args :
+            key:*. A key value as emitted from the map() fuction, above.
+            values : list(*). a list of all values from all mappers that were
+                tagged with the given key.
+        """
+
         yield (key, sum([int(value) for value in values]))
 
 
@@ -92,12 +114,24 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """
+        Args:
+            item:*.A single element of type given by entity_class().
+        """
+
         current_class = MockFailingJobManager
         if current_class.entity_created_before_job_queued(item):
             yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
+        """
+        Args :
+            key:*. A key value as emitted from the map() fuction, above.
+            values : list(*). a list of all values from all mappers that were
+                tagged with the given key.
+        """
+
         yield (key, sum([int(value) for value in values]))
 
 
@@ -281,6 +315,10 @@ class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _post_failure_hook(cls, job_id):
+        """
+        Args:
+            job_id : str.The ID of the Job to enqueue.
+        """
         model = MockSumModel.get_by_id(SUM_MODEL_ID)
         model.failed = True
         model.update_timestamps()
@@ -319,12 +357,22 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """
+        Args:
+            item: *.A single element of the type given by entity_class().
+        """
         current_class = SampleMapReduceJobManager
         if current_class.entity_created_before_job_queued(item):
             yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
+        """
+        Args:
+            key:*.A key value as emitted from the map() fuction , above.
+            values :list(*).A list of all values from all mappers that were
+            tagged with the given key.
+        """
         yield (key, sum([int(value) for value in values]))
 
 
@@ -337,6 +385,11 @@ class MapReduceJobForCheckingParamNames(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        """
+        Args:
+            item: *.A single element of the type given by entity_class().
+        """
+
         jobs.BaseMapReduceOneOffJobManager.get_mapper_param('exp_id')
 
 
@@ -596,10 +649,22 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """
+        Args:
+            item: *.A single element of the type given by entity_class().
+        """
+
         yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
+        """
+        Args:
+            key:*.A key value as emitted from map() fuction , above.
+            values:list(*).A list of all values from all mappers that were
+                tagged with the given key;
+        """
+
         yield [key, sum([int(value) for value in values])]
 
 
@@ -654,6 +719,10 @@ class MockStartExplorationMRJobManager(
 
     @staticmethod
     def map(item):
+        """
+        Args :
+            item:*.A single element of type given by entity_class().
+        """
         current_class = MockStartExplorationMRJobManager
         if current_class.entity_created_before_job_queued(item):
             yield (
@@ -663,6 +732,11 @@ class MockStartExplorationMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        """
+        Args:
+            key:*.A key value as emitted from map() fuction, above.
+            stringified_values:list(*).All the Stringified value strings.
+        """
         started_count = 0
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
@@ -702,6 +776,12 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             cls, active_realtime_layer, event_type, exp_id, unused_exp_version,
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
+        """
+        Args:
+            active_realtime_layer:int.The currently active realtime datastore layer.
+            event_type :str.The event triggered by a student.
+
+        """
 
         @transaction_services.run_in_transaction_wrapper
         def _increment_counter():
@@ -961,7 +1041,11 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging.error().
+            Args:
+                msg:str.The incomming message.
+                *args:list(*).
+            """
             observed_log_messages.append(msg % args)
 
         StartExplorationEventCounter.start_computation()
@@ -983,7 +1067,11 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging.error().
+                Args:
+                msg:str.The incomming message.
+                *args:list(*).
+            """
             observed_log_messages.append(msg % args)
 
         StartExplorationEventCounter.start_computation()
