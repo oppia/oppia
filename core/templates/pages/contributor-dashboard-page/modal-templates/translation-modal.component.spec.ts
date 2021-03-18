@@ -23,7 +23,7 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
-import { TranslationModalContent, TranslationOpportunityDict } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
@@ -39,9 +39,9 @@ describe('Translation Modal Component', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
-  let fixture: ComponentFixture<TranslationModalContent>;
-  let component: TranslationModalContent;
-  let opportunity: TranslationOpportunityDict = {
+  let fixture: ComponentFixture<TranslationModalComponent>;
+  let component: TranslationModalComponent;
+  let opportunity: TranslationOpportunity = {
     id: '1',
     heading: 'Heading',
     subheading: 'subheading',
@@ -55,14 +55,14 @@ describe('Translation Modal Component', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        TranslationModalContent
+        TranslationModalComponent
       ],
       providers: [
         NgbActiveModal
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents().then(() => {
-      fixture = TestBed.createComponent(TranslationModalContent);
+      fixture = TestBed.createComponent(TranslationModalComponent);
       component = fixture.componentInstance;
       component.opportunity = opportunity;
     });

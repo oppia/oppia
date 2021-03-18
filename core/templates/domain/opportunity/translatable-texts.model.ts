@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend Model for skill opportunity.
+ * @fileoverview Frontend Model for translatable texts
  */
 
-export interface ContentDict {
+export interface ContentIdToContentMapping {
   [contentId: string]: string
 }
 
 export interface StateNamesToContentIdMapping {
-  [state: string]: ContentDict
+  [state: string]: ContentIdToContentMapping
 }
 
 export interface TranslatableTextsBackendDict {
@@ -42,11 +42,11 @@ export class TranslatableTexts {
     );
   }
 
-  getStateWiseContents(): StateNamesToContentIdMapping {
+  get stateWiseContents(): StateNamesToContentIdMapping {
     return this.stateNamesToContentIdMapping;
   }
 
-  getExplorationVersion(): string {
+  get explorationVersion(): string {
     return this.version;
   }
 }

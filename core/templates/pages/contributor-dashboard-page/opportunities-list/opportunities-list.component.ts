@@ -21,18 +21,18 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
-import { ExplorationOpportunityDict } from '../opportunities-list-item/opportunities-list-item.component';
+import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'opportunities-list',
+  selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
   styleUrls: []
 })
 export class OpportunitiesListComponent {
   @Input() loadOpportunities: ()=>Promise<{
-    opportunitiesDicts: ExplorationOpportunityDict[], more: boolean}>;
+    opportunitiesDicts: ExplorationOpportunity[], more: boolean}>;
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() loadMoreOpportunities;
@@ -43,7 +43,7 @@ export class OpportunitiesListComponent {
 
   loadingOpportunityData: boolean;
   lastPageNumber: number;
-  opportunities: ExplorationOpportunityDict[] = [];
+  opportunities: ExplorationOpportunity[] = [];
   visibleOpportunities = [];
   directiveSubscriptions = new Subscription();
   activePageNumber: number;
@@ -131,5 +131,5 @@ export class OpportunitiesListComponent {
 }
 
 angular.module('oppia').directive(
-  'opportunitiesList', downgradeComponent(
+  'oppiaOpportunitiesList', downgradeComponent(
     {component: OpportunitiesListComponent}));

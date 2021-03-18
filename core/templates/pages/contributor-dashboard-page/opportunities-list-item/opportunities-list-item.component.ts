@@ -19,7 +19,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-export class ExplorationOpportunityDict {
+export interface ExplorationOpportunity {
   id: string;
   labelText: string;
   labelColor: string;
@@ -27,12 +27,12 @@ export class ExplorationOpportunityDict {
 }
 
 @Component({
-  selector: 'opportunities-list-item',
+  selector: 'oppia-opportunities-list-item',
   templateUrl: './opportunities-list-item.component.html',
   styleUrls: []
 })
 export class OpportunitiesListItemComponent {
-  @Input() opportunity: ExplorationOpportunityDict;
+  @Input() opportunity: ExplorationOpportunity;
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
   @Input() labelRequired: boolean;
@@ -70,5 +70,5 @@ export class OpportunitiesListItemComponent {
 }
 
 angular.module('oppia').directive(
-  'opportunitiesListItem', downgradeComponent(
+  'oppiaOpportunitiesListItem', downgradeComponent(
     {component: OpportunitiesListItemComponent}));

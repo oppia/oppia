@@ -31,8 +31,15 @@ import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
+
+import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
+import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { TranslationModalComponent } from './modal-templates/translation-modal.component';
+import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
+
 
 @NgModule({
   imports: [
@@ -50,7 +57,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
-    TranslationModalContent
+    TranslationModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -61,7 +68,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
-    TranslationModalContent
+    TranslationModalComponent
   ],
   providers: [
     {
@@ -84,11 +91,6 @@ class ContributorDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
-import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
-import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
-import { TranslationModalContent } from './modal-templates/translation-modal.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

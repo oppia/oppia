@@ -53,11 +53,11 @@ describe('Translatable Texts model', () => {
         1: 'text3'
       }
     };
-    expect(sampleTranslatableTexts.getStateWiseContents())
+    expect(sampleTranslatableTexts.stateWiseContents)
       .toEqual(expectedStatewiseContents);
   });
 
   it('should get version number', () => {
-    expect(sampleTranslatableTexts.getExplorationVersion()).toBe('1');
+    expect(sampleTranslatableTexts.explorationVersion).toBe('1');
   });
 });

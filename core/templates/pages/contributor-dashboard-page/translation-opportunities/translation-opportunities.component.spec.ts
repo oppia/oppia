@@ -25,7 +25,7 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 import { OpportunitiesListComponent } from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
 import { OpportunitiesListItemComponent } from 'pages/contributor-dashboard-page/opportunities-list-item/opportunities-list-item.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { TranslationModalContent } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import { TranslationModalComponent } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationOpportunitiesComponent } from './translation-opportunities.component';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
@@ -68,7 +68,7 @@ describe('Translation opportunities component', () => {
         OpportunitiesListComponent,
         OpportunitiesListItemComponent,
         SchemaBasedEditorDirective,
-        TranslationModalContent,
+        TranslationModalComponent,
         TranslationOpportunitiesComponent,
         WrapTextWithEllipsisPipe,
       ],
@@ -78,7 +78,7 @@ describe('Translation opportunities component', () => {
       ],
     }).compileComponents();
     translationModal = TestBed.createComponent(
-      TranslationModalContent) as unknown as NgbModalRef;
+      TranslationModalComponent) as unknown as NgbModalRef;
     httpTestingController = TestBed.inject(HttpTestingController);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);

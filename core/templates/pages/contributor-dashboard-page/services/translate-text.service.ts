@@ -169,8 +169,8 @@ export class TranslateTextService {
   }
 
   suggestTranslatedText(
-      translationHtml: string, languageCode: string, imagesData:ImagesData[],
-      successCallback: ()=>void): void {
+      translationHtml: string, languageCode: string, imagesData:
+      ImagesData[], successCallback: () => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,

@@ -36,7 +36,7 @@ export class ImageLocalStorageService {
   // minimum limit, for all browsers, per hostname, that can be stored in
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
   // the limit below.
-  MAX_IMAGES_STORABLE = 5 * 1024 / 100;
+  MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
   thumbnailBgColor: string = null;
 
   constructor(

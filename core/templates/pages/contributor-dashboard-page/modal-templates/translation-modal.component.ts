@@ -35,7 +35,7 @@ class UiConfig {
   'language'?: string;
   'languageDirection'?: string;
 }
-export class TranslationOpportunityDict {
+export interface TranslationOpportunity {
   id: string;
   heading: string;
   subheading: string;
@@ -48,13 +48,11 @@ export interface HTMLSchema {
 }
 
 @Component({
-  selector: 'translation-modal',
-  templateUrl: './translation-modal.component.html',
-  styleUrls: [],
-  providers: []
+  selector: 'oppia-translation-modal',
+  templateUrl: './translation-modal.component.html'
 })
-export class TranslationModalContent {
-  @Input() opportunity: TranslationOpportunityDict;
+export class TranslationModalComponent {
+  @Input() opportunity: TranslationOpportunity;
   activeWrittenTranslation: {html: string} = {html: ''};
   uploadingTranslation = false;
   subheading: string;
@@ -176,5 +174,5 @@ export class TranslationModalContent {
 }
 
 angular.module('oppia').directive(
-  'translationModalComponent', downgradeComponent(
-    {component: TranslationModalContent}));
+  'oppiaTranslationModal', downgradeComponent(
+    {component: TranslationModalComponent}));

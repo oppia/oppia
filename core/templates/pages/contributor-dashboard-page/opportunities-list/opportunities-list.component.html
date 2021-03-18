@@ -1,15 +1,15 @@
 <div class="oppia-opportunities-list">
   <div *ngFor="let opportunity of visibleOpportunities">
-    <opportunities-list-item [opportunity]="opportunity"
+    <oppia-opportunities-list-item [opportunity]="opportunity"
                              (clickActionButton)="clickActionButton.emit($event)"
                              [progressBarRequired]="progressBarRequired"
                              [labelRequired]="labelRequired"
                              [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength">
-    </opportunities-list-item>
+    </oppia-opportunities-list-item>
   </div>
   <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
-    <opportunities-list-item></opportunities-list-item>
-    <opportunities-list-item></opportunities-list-item>
+    <oppia-opportunities-list-item></oppia-opportunities-list-item>
+    <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
   <div class="oppia-opportunity-pagination-contaniner" *ngIf="visibleOpportunities.length > 0">
     <button type="button"

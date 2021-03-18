@@ -24,15 +24,15 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
-import { TranslationModalContent, TranslationOpportunityDict } from '../modal-templates/translation-modal.component';
+import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 
 @Component({
-  selector: 'translation-opportunities',
+  selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
 })
 export class TranslationOpportunitiesComponent {
-  allOpportunities: {[id: string]: TranslationOpportunityDict} = {};
+  allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
   constructor(
     private readonly contextService: ContextService,
@@ -46,16 +46,16 @@ export class TranslationOpportunitiesComponent {
     private readonly injector: Injector
   ) {}
 
-  getOpportunitySummary(expId: string): TranslationOpportunityDict {
+  getOpportunitySummary(expId: string): TranslationOpportunity {
     return this.allOpportunities[expId];
   }
 
   getPresentableOpportunitiesData(
       {opportunities, more}: ExplorationOpportunitiesDict): {
-    opportunitiesDicts: TranslationOpportunityDict[];
+    opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   } {
-    const opportunitiesDicts: TranslationOpportunityDict[] = [];
+    const opportunitiesDicts: TranslationOpportunity[] = [];
     for (let index in opportunities) {
       const opportunity = opportunities[index];
       const subheading = opportunity.getOpportunitySubheading();
@@ -64,7 +64,7 @@ export class TranslationOpportunitiesComponent {
         this.translationLanguageService.getActiveLanguageCode());
       const progressPercentage = (
         opportunity.getTranslationProgressPercentage(languageCode));
-      const opportunityDict: TranslationOpportunityDict = {
+      const opportunityDict: TranslationOpportunity = {
         id: opportunity.getExplorationId(),
         heading: heading,
         subheading: subheading,
@@ -86,7 +86,7 @@ export class TranslationOpportunitiesComponent {
       'Translation');
     const opportunity = this.getOpportunitySummary(expId);
     const modalRef = this.modalService.open(
-      TranslationModalContent, {
+      TranslationModalComponent, {
         size: 'lg',
         backdrop: 'static',
         injector: this.injector
@@ -101,7 +101,7 @@ export class TranslationOpportunitiesComponent {
   }
 
   loadMoreOpportunities(): Promise<{
-    opportunitiesDicts: TranslationOpportunityDict[];
+    opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
     return this.contributionOpportunitiesService
@@ -111,7 +111,7 @@ export class TranslationOpportunitiesComponent {
   }
 
   loadOpportunities(): Promise<{
-    opportunitiesDicts: TranslationOpportunityDict[];
+    opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
     return this.contributionOpportunitiesService
@@ -122,5 +122,5 @@ export class TranslationOpportunitiesComponent {
 }
 
 angular.module('oppia').directive(
-  'translationOpportunities', downgradeComponent(
+  'oppiaTranslationOpportunities', downgradeComponent(
     {component: TranslationOpportunitiesComponent}));
