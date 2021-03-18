@@ -153,6 +153,9 @@
             </a>
           </div>
         </li>
+        <li ng-if="!$ctrl.inClassroomPage">
+          <create-activity-button ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
+        </li>
       </ul>
     </li>
   </ul>
