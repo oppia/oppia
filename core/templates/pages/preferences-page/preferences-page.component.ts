@@ -187,7 +187,7 @@ angular.module('oppia').component('preferencesPage', {
         FocusManagerService.setFocus(label);
         $timeout(function() {
           $window.scrollTo(0, 0);
-        }, 5);
+        }, 0);
       };
 
       ctrl.$onInit = function() {

@@ -29,9 +29,6 @@ import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-act
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -52,7 +49,7 @@ describe('Learner dashboard page', function() {
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
   var focusManagerService = null;
-
+  var $flushPendingTasks = null;
   var profilePictureDataUrl = 'profile-picture-url';
   var userInfo = {
     getUsername: () => 'username1'
@@ -66,13 +63,6 @@ describe('Learner dashboard page', function() {
     }
   }));
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-    focusManagerService = TestBed.get(FocusManagerService);
-  });
-
   describe('when succesfully fetching learner dashboard data', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
@@ -81,6 +71,8 @@ describe('Learner dashboard page', function() {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
+      focusManagerService = $injector.get('FocusManagerService')
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
@@ -306,18 +298,19 @@ describe('Learner dashboard page', function() {
     });
 
     it('should set focus on browse lesson btn', function() {
-      let defer = $q.defer();
-      defer.resolve([{},{}]);
-      spyOn($q, 'all').and.returnValue(defer.promise);
-      var focusSpy = spyOn(focusManagerService, 'setFocus');
-      var windowSpy = spyOn ($window, 'scrollTo');
-      ctrl.$onInit();
-      $timeout.flush();
-      expect(focusSpy).toHaveBeenCalled();
-      $timeout.flush();
-      expect(windowSpy).toHaveBeenCalled();
+      var spy = spyOn(ctrl, 'addFocusWithoutScroll');
+      $flushPendingTasks();
+      expect(spy).toHaveBeenCalledWith('ourLessonsBtn');
     });
 
+    it('should scroll back to top of window after focusing', function() {
+      var focusSpy = spyOn(focusManagerService, 'setFocus');
+      var windowSpy = spyOn($window, 'scrollTo');
+      ctrl.addFocusWithoutScroll('ourLessonsBtn');
+      $timeout.flush();
+      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
+      expect(windowSpy).toHaveBeenCalled()
+    })
     it('should get static image url', function() {
       var imagePath = '/path/to/image.png';
       expect(ctrl.getStaticImageUrl(imagePath)).toBe(
