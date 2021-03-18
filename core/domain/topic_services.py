@@ -757,6 +757,28 @@ def delete_topic_summary(topic_id):
     topic_models.TopicSummaryModel.get(topic_id).delete()
 
 
+def update_story_and_topic_summary(
+    committer_id, story_id, change_list, commit_message, topic_id):
+    """Updates a story. Commits changes. Then generates a new
+    topic summary.
+
+    Args:
+        committer_id: str. The id of the user who is performing the update
+            action.
+        story_id: str. The story id.
+        change_list: list(StoryChange). These changes are applied in sequence to
+            produce the resulting story.
+        commit_message: str or None. A description of changes made to the
+            story.
+        topic_id: str. The id of the topic to which the story is belongs.
+    """
+    story_services.update_story(
+        committer_id, story_id, change_list, commit_message)
+    # Generate new TopicSummary after a Story has been updated to
+    # make sure the TopicSummaryTile displays the correct number
+    # of chapters on the classroom page.
+    generate_topic_summary(topic_id)
+
 def generate_topic_summary(topic_id):
     """Creates and stores a summary of the given topic.
 
