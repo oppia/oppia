@@ -95,7 +95,7 @@ describe('Pretest question backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      pretestQuestionBackendApiService.fetchPretestQuestions(
+      pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
         'expId', 'story-fragment').then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
@@ -116,7 +116,7 @@ describe('Pretest question backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      pretestQuestionBackendApiService.fetchPretestQuestions(
+      pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
         'expId', 'story-fragment').then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(

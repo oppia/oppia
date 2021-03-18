@@ -76,7 +76,7 @@ export class PretestQuestionBackendApiService {
     });
   }
 
-  fetchPretestQuestions(
+  async fetchPretestQuestionsAsync(
       explorationId: string,
       storyUrlFragment: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
