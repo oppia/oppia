@@ -48,7 +48,10 @@ class StoryPageDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
-        """Handles GET requests."""
+        """Handles GET requests.
+        Args:
+            story_id: str. The Story id
+        """
         story = story_fetchers.get_story_by_id(story_id)
         topic_id = story.corresponding_topic_id
         topic_name = topic_fetchers.get_topic_by_id(topic_id).name
@@ -94,7 +97,13 @@ class StoryProgressHandler(base.BaseHandler):
 
     def _record_node_completion(
             self, story_id, node_id, completed_node_ids, ordered_nodes):
-        """Records node completion."""
+        """Records node completion.
+        Args:
+            story_id: str. The Story id.
+            node_id: str. The Node id.
+            completed_node_id: str. The Completed Node id.
+            ordered_nodes: str. The Ordered Nodes id.
+        """
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
 
@@ -124,7 +133,11 @@ class StoryProgressHandler(base.BaseHandler):
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id, node_id):
-        """Handles GET requests."""
+        """Handles GET requests.
+        Args:
+            story_id: str. The Story id.
+            node_id: str. The Node id.
+        """
         (
             _, _, classroom_url_fragment, topic_url_fragment,
             story_url_fragment, node_id) = self.request.path.split('/')
@@ -169,6 +182,11 @@ class StoryProgressHandler(base.BaseHandler):
 
     @acl_decorators.can_access_story_viewer_page
     def post(self, story_id, node_id):
+        """Handles POST Requests.
+        Args:
+            story_id: str. The Story id.
+            node_id: str. The Node id.
+        """
         story = story_fetchers.get_story_by_id(story_id)
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id)
