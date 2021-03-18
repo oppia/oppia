@@ -69,14 +69,24 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """ Entity Classes to Map Over """
         return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(item):
+        """
+        Args:
+            item: item to be Mapped.
+        """
         yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
+        """ Reduce Method
+        Args:
+            key: index of value.
+            values: values that to be reduced.
+        """
         yield (key, sum([int(value) for value in values]))
 
 
@@ -138,6 +148,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_reload_exploration_in_production_mode(self):
+        """Test that Reload Exploration in Production Mode."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -154,6 +165,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_load_new_structures_data_in_production_mode(self):
+        """ Test that Load New Strcutures Data in Production Mode. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -168,6 +180,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_admins_cannot_load_new_structures_data(self):
+        """ Non Admin Test that Load New Strcutures Data in Production Mode. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         assert_raises_regexp = self.assertRaisesRegexp(
@@ -180,6 +193,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_generate_dummy_skill_data_in_production_mode(self):
+        """ Test that Generate Dummy Skill Data in Production Mode. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -194,6 +208,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_admins_cannot_generate_dummy_skill_data(self):
+        """ Non Admins Test that Generate Dummy Skill Data in Production Mode. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         assert_raises_regexp = self.assertRaisesRegexp(
@@ -206,6 +221,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_reload_collection_in_production_mode(self):
+        """ Test that Reload Collection in Production Mode. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -222,6 +238,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_reload_collection(self):
+        """ Test that Reload Collection. """
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
@@ -257,6 +274,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_load_new_structures_data(self):
+        """ Test that Load New Data Structures Data. """
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -293,6 +311,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_generate_dummy_skill_and_questions_data(self):
+        """ Test that Generate Dummy Skill and Questions Data. """
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -310,6 +329,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_regenerate_topic_related_opportunities_action(self):
+        """ Test that Regenerate Topic related opportunities Action. """
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -385,6 +405,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertLess(old_creation_time, new_creation_time)
 
     def test_regenerate_missing_exploration_stats_action(self):
+        """ Test that Generate Missing Exploration Stats Action. """
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         self.set_admins([self.ADMIN_USERNAME])
@@ -413,6 +434,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             })
 
     def test_admin_topics_csv_download_handler(self):
+        """ Test that Admin Topics of CSV Download Handler. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_custom_response(
             '/admintopicscsvdownloadhandler', 'text/csv')
@@ -432,6 +454,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_job_output_handler(self):
+        """ Test that Admin Topics of Job Output Handler. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         self.save_new_valid_exploration('exp_id', self.admin_id)
@@ -457,6 +480,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_revert_config_property(self):
+        """ Test that Revert Config Property. """
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
@@ -485,6 +509,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_start_new_one_off_job(self):
+        """ Test that Start New One off Job. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         self.assertEqual(
@@ -509,6 +534,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cancel_one_off_job(self):
+        """ Test that Cancel one Job. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         job_id = SampleMapReduceJobManager.create_new()
@@ -539,6 +565,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_start_computation(self):
+        """ Test that Start Computation. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -573,6 +600,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stop_computation_with_running_jobs(self):
+        """ Test that Stop Computation With Running Jobs. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -609,6 +637,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stop_computation_with_finished_jobs(self):
+        """ Test that Stop Computation with Finished Jobs. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -646,6 +675,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stop_computation_with_stopped_jobs(self):
+        """ Test that Stop Computation with Stopped Jobs. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -688,6 +718,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_upload_topic_similarities(self):
+        """ Test That Upload Topic Similarities. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -719,6 +750,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_handler_includes_all_feature_flags(self):
+        """ Handles GET requests. 
+        Test that handle all include feature flags. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
             'test_feature_1', 'feature for test.', 'dev')
@@ -738,6 +771,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_post_with_flag_changes_updates_feature_flags(self):
+        """ Handles POST requests. 
+        Test that handle all flag changes updates. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -781,6 +816,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_post_flag_changes_correctly_updates_flags_returned_by_getter(self):
+        """ Handles POST requests. 
+        Test that handle all flag changes and updates flages we get by getter. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -825,6 +862,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_invalid_rules_returns_400(self):
+        """ Test that update flag rules with Invalid Rules, Return 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -868,6 +906,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_unknown_feature_name_returns_400(self):
+        """ Test that update flag rules with Unknown Feature Name, Return 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -906,6 +945,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_update_flag_rules_with_feature_name_of_non_string_type_returns_400(
             self):
+        """ Test that update flag rules with Feature Name of a Non-String Data Type, Return 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -927,6 +967,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_update_flag_rules_with_message_of_non_string_type_returns_400(
             self):
+        """ Test that update flag rules with Message of Non-String Data Type, Return 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -947,6 +988,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_rules_of_non_list_type_returns_400(self):
+        """ Test that update flag rules with Non-List Data Type, Return 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -968,6 +1010,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_update_flag_rules_with_rules_of_non_list_of_dict_type_returns_400(
             self):
+        """ Test that update flag rules with Non-List of Dictionary Data Type, Return 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -988,6 +1031,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_unexpected_exception_returns_500(self):
+        """ Test that update flag rules with Unexpected Exceptions, Return 500. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -1042,6 +1086,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
     def test_generate_count_greater_than_publish_count(self):
+        """ Test that Generate Count that Greater than Publish Count. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -1056,6 +1101,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 3)
 
     def test_generate_count_equal_to_publish_count(self):
+        """ Test that Generate Count that Equal to Publish Count. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -1070,6 +1116,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 2)
 
     def test_generate_count_less_than_publish_count(self):
+        """ Test that Generate Count that Less than Publish Count. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
@@ -1086,6 +1133,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 0)
 
     def test_handler_raises_error_with_non_int_num_dummy_exps_to_generate(self):
+        """ Test that Raises an Error with Non-Integer, Dummy Explorations to Generate. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -1106,6 +1154,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_handler_raises_error_with_non_int_num_dummy_exps_to_publish(self):
+        """ Test that Raises an Error with Non-Integer, Dummy Explorations to Publish. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -1126,6 +1175,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_generate_dummy_explorations_in_prod_mode(self):
+        """ Test that Generate Dummy Explorations in Production Mode. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -1211,6 +1261,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
 
     def test_cannot_view_role_with_invalid_view_filter_criterion(self):
+        """ Test that View Role with Invalid View Filter criteria. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -1221,6 +1272,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid filter criterion to view roles.')
 
     def test_changing_user_role_from_topic_manager_to_moderator(self):
+        """ Test that Chnage User Rolefrom Topic Manager to Moderator. """
         user_email = 'user1@example.com'
         username = 'user1'
 
@@ -1253,6 +1305,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_changing_user_role_from_exploration_editor_to_topic_manager(self):
+        """ Test that Chnage Role with from Exploration Editor to Topic Manager. """
         user_email = 'user1@example.com'
         username = 'user1'
 
@@ -1357,6 +1410,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
 
     def test_handler_when_exp_version_is_not_int_throws_exception(self):
+        """ Test that Handles when Exploration Version is Non-Integer, Throws Exceptions. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         # Test that it returns all answers when 'num_answers' is 0.
@@ -1393,6 +1447,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'Exploration \'exp\' does not have \'state name\' state.')
 
     def test_handler_raises_error_with_invalid_exploration_id(self):
+        """ Test that Raises Error when Exploration ID is Invalid. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         payload = {
             'exp_id': 'invalid_exp_id',
@@ -1411,6 +1466,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'found.')
 
     def test_handler_raises_error_with_invalid_exploration_version(self):
+        """ Test that Raises Error when Exploration Version is Invalid. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         payload = {
             'exp_id': self.EXP_ID,
@@ -1666,6 +1722,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.QUESTION_REVIEWER_EMAIL)
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
+        """ Test that Add Reviewer with Invalid Username, raises error. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
