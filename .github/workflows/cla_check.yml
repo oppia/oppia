@@ -34,11 +34,7 @@ jobs:
       - name: execute cla script
         env:
           SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }} 
         run: |
           PYTHONIOENCODING=utf-8 python -m scripts.cla_check ${{ github.event.pull_request.user.login }}
-      - name: Comment on failure
-        if: ${{ failure() }}
-        env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "Author of the PR has not signed the CLA"
