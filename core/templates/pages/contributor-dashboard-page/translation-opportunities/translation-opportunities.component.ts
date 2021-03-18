@@ -127,8 +127,8 @@ angular.module('oppia').component('translationOpportunities', {
 
       ctrl.resetCursorStyle = function() {
         document.body.style.cursor = '';
-        //function used to reset cursor style to normal if copy mode is left on
-        //and the translation modal is closed down
+        // Function used to reset cursor style to normal if copy mode is left on
+        // and the translation modal is closed down
       };
 
 
