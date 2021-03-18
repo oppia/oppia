@@ -106,10 +106,10 @@ angular.module('oppia').config([
 
 import { Component, ElementRef, Injector } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
-@Component({
+@Directive({
   selector: 'oppia-i18n-footer'
 })
-export class I18nFooter extends UpgradeComponent {
+export class I18nFooterDirective extends UpgradeComponent {
   constructor(elementRef: ElementRef, injector: Injector) {
     super('i18nFooter', elementRef, injector);
   }
