@@ -717,7 +717,8 @@ def check_can_unpublish_activity(user, activity_rights):
 
 
 def _assign_role(
-        committer, assignee_id, new_role, activity_id, activity_type):
+        committer, assignee_id, new_role, activity_id, activity_type,
+        allow_assigning_any_role=False):
     """Assigns a new role to the user.
 
     Args:
@@ -733,6 +734,7 @@ def _assign_role(
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
+        allow_assigning_any_role: bool. Flag to assign any role to exploration.
 
     Raises:
         Exception. The committer does not have rights to modify a role.
@@ -759,7 +761,9 @@ def _assign_role(
     assignee_username = user_services.get_username(assignee_id)
     old_role = rights_domain.ROLE_NONE
 
-    if new_role == rights_domain.ROLE_OWNER:
+    if allow_assigning_any_role:
+        old_role = activity_rights.assign_role(assignee_id, new_role)
+    elif new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):
             raise Exception('This user already owns this %s.' % activity_type)
 
@@ -1067,7 +1071,7 @@ def assign_role_for_exploration(
     """
     _assign_role(
         committer, assignee_id, new_role, exploration_id,
-        constants.ACTIVITY_TYPE_EXPLORATION)
+        constants.ACTIVITY_TYPE_EXPLORATION, allow_assigning_any_role=True)
     if new_role in [
             rights_domain.ROLE_OWNER,
             rights_domain.ROLE_EDITOR,

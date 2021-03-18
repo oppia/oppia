@@ -232,13 +232,9 @@ class ExplorationRightsHandler(EditorHandler):
             if new_member_id is None:
                 raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
-
-            exp_rights = rights_manager.get_exploration_rights(
-                exploration_id)
-            if exp_rights.has_any_role(new_member_id):
+            if new_member_id == self.user_id:
                 raise self.InvalidInputException(
-                    'User already has some rights in exploration')
-
+                    'Users are not allowed to assign other roles to themselves')
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(

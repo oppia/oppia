@@ -35,6 +35,9 @@ require(
   'remove-role-confirmation-modal.controller.ts');
 require(
   'pages/exploration-editor-page/settings-tab/templates/' +
+  'reassign-role-confirmation-modal.controller.ts');
+require(
+  'pages/exploration-editor-page/settings-tab/templates/' +
   'moderator-unpublish-exploration-modal.controller.ts');
 require(
   'pages/exploration-editor-page/settings-tab/templates/' +
@@ -135,6 +138,27 @@ angular.module('oppia').component('settingsTab', {
           WindowRef.nativeWindow.location.protocol + '//' +
           WindowRef.nativeWindow.location.host +
           EXPLORE_PAGE_PREFIX + ctrl.explorationId);
+      };
+
+      var reassignRole = function(username, newRole, oldRole) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'reassign-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => username,
+            newRole: () => newRole,
+            oldRole: () => oldRole
+          },
+          controller: 'ReassignRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.saveRoleChanges(
+            username, newRole);
+          ctrl.closeRolesForm();
+        });
       };
 
       ctrl.refreshSettingsTab = function() {
@@ -256,8 +280,15 @@ angular.module('oppia').component('settingsTab', {
 
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
         ctrl.closeRolesForm();
-        ExplorationRightsService.saveRoleChanges(
-          newMemberUsername, newMemberRole);
+        if (!ExplorationRightsService.checkUserAlreadyHasRoles(
+          newMemberUsername)) {
+          ExplorationRightsService.saveRoleChanges(
+            newMemberUsername, newMemberRole);
+          return;
+        }
+        let oldRole = ExplorationRightsService.getOldRole(
+          newMemberUsername);
+        reassignRole(newMemberUsername, newMemberRole, oldRole);
       };
 
       ctrl.removeRole = function(memberUsername, memberRole) {
@@ -276,6 +307,7 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.removeRoleAsync(memberUsername);
         });
+        ctrl.closeRolesForm();
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
@@ -391,10 +423,15 @@ angular.module('oppia').component('settingsTab', {
       };
 
       ctrl.closeRolesForm = function() {
+        ctrl.errorMessage = '';
+        ctrl.rolesSaveButtonEnabled = true;
         ctrl.isRolesFormOpen = false;
       };
 
       ctrl.onRolesFormUsernameBlur = function() {
+        ctrl.rolesSaveButtonEnabled = true;
+        ctrl.errorMessage = '';
+
         if (ctrl.newMemberUsername.length <= 0) {
           ctrl.rolesSaveButtonEnabled = false;
           ctrl.errorMessage = '';
@@ -403,20 +440,27 @@ angular.module('oppia').component('settingsTab', {
 
         if (ExplorationTitleService.savedMemento.length <= 0) {
           ctrl.rolesSaveButtonEnabled = false;
-          ctrl.errorMessage = 'Please provide a title before inviting.';
+          ctrl.errorMessage = (
+            'Please provide a title before inviting.');
           return;
         }
 
-        if (ExplorationRightsService.checkUserAlreadyHasRoles(
-          ctrl.newMemberUsername)) {
+        if (ctrl.newMemberUsername === ctrl.loggedinUser) {
           ctrl.rolesSaveButtonEnabled = false;
           ctrl.errorMessage = (
-            'Given user already has some rights in exploration.');
+            'Users are not allowed to assign other roles to themselves.');
           return;
         }
-
-        ctrl.rolesSaveButtonEnabled = true;
-        ctrl.errorMessage = '';
+        if (ExplorationRightsService.checkUserAlreadyHasRoles(
+          ctrl.newMemberUsername)) {
+          var oldRole = ExplorationRightsService.getOldRole(
+            ctrl.newMemberUsername);
+          if (oldRole === ctrl.newMemberRole.value) {
+            ctrl.rolesSaveButtonEnabled = false;
+            ctrl.errorMessage = `User is already ${oldRole}.`;
+            return;
+          }
+        }
       };
 
       ctrl.toggleCards = function(card) {

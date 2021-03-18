@@ -235,17 +235,29 @@ class ActivityRights(python_utils.OBJECT):
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
-    def has_any_role(self, user_id):
-        """Checks whether the user is assigned to any role in the activity.
+    def assign_role(self, user_id, new_role):
+        """Assigns new role to user and removes previous role if present.
 
         Args:
             user_id: str. The ID of the user.
+            new_role: str. The role of the user.
 
         Returns:
-            bool. Whether the user is assigned to any role in the activity.
+            str. The previous role of the user.
         """
-        return user_id in (self.owner_ids + self.editor_ids + (
-            self.voice_artist_ids + self.viewer_ids))
+        old_role = ROLE_NONE
+        for role, user_ids in python_utils.ZIP(
+                [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
+                [self.owner_ids, self.editor_ids, self.viewer_ids,
+                 self.voice_artist_ids]):
+            if user_id in user_ids:
+                user_ids.remove(user_id)
+                old_role = role
+
+            if new_role == role:
+                user_ids.append(user_id)
+
+        return old_role
 
 
 class ExplorationRightsChange(change_domain.BaseChange):

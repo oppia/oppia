@@ -140,6 +140,17 @@ angular.module('oppia').factory('ExplorationRightsService', [
         allUsernames = allUsernames.concat(this.viewerNames);
         return allUsernames.indexOf(username) > -1;
       },
+      getOldRole: function(username) {
+        if (this.ownerNames.indexOf(username) > -1) {
+          return 'owner';
+        } else if (this.editorNames.indexOf(username) > -1) {
+          return 'editor';
+        } else if (this.voiceArtistNames.indexOf(username) > -1) {
+          return 'voice artist';
+        } else {
+          return 'viewer';
+        }
+      },
       publish: function() {
         var that = this;
         var requestUrl = (

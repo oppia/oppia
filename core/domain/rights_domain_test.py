@@ -25,7 +25,14 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
+import feconf
 import utils
+
+ROLE_OWNER = feconf.ROLE_OWNER
+ROLE_EDITOR = feconf.ROLE_EDITOR
+ROLE_VOICE_ARTIST = feconf.ROLE_VOICE_ARTIST
+ROLE_VIEWER = feconf.ROLE_VIEWER
+ROLE_NONE = feconf.ROLE_NONE
 
 
 class ActivityRightsTests(test_utils.GenericTestBase):
@@ -188,20 +195,23 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             'Activity should have atleast one owner.'):
             self.activity_rights.validate()
 
-    def test_has_any_role_for_existing_user_returns_true(self):
-        self.activity_rights.owner_ids = ['123456', '789213']
+    def test_assign_role_replaces_old_role(self):
+        self.activity_rights.owner_ids = ['123456']
+        self.activity_rights.editor_ids = []
+        self.activity_rights.viewer_ids = []
+        self.activity_rights.voice_artist_ids = []
+
+        self.activity_rights.assign_role('123456', ROLE_VOICE_ARTIST)
+        self.assertTrue('123456' not in self.activity_rights.owner_ids)
+        self.assertTrue('123456' in self.activity_rights.voice_artist_ids)
+
+    def test_assign_new_role(self):
+        self.activity_rights.owner_ids = []
         self.activity_rights.editor_ids = []
         self.activity_rights.viewer_ids = []
 
-        self.assertTrue(self.activity_rights.has_any_role('123456'))
-
-    def test_has_any_role_for_not_existing_user_returns_false(self):
-        self.activity_rights.owner_ids = ['123456', '789213']
-        self.activity_rights.editor_ids = []
-        self.activity_rights.viewer_ids = []
-
-        self.assertFalse(
-            self.activity_rights.has_any_role('not_existing_user'))
+        self.activity_rights.assign_role('123456', ROLE_OWNER)
+        self.assertTrue('123456' in self.activity_rights.owner_ids)
 
 
 class ExplorationRightsChangeTests(test_utils.GenericTestBase):
