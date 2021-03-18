@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,12 +60,12 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
+import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
 import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -97,6 +97,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   ],
 
   declarations: [
+    AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
@@ -122,6 +123,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   ],
 
   entryComponents: [
+    AudioFileUploaderComponent,
     BackgroundBannerComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
@@ -147,10 +149,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     // Components, directives, and pipes.
+    AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
     SharingLinksComponent,
+    SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
