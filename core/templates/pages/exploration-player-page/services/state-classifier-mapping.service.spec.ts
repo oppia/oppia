@@ -75,28 +75,45 @@ describe('State classifier mapping service', () => {
       mappingService = TestBed.get(StateClassifierMappingService);
     });
 
-    it('should return correct classifier details.', () => {
+    it('should return classifier data when it exists.', () => {
       mappingService.init('0', 0);
       var stateName = 'stateName1';
-      var stateNameNonexistent = 'stateName2';
 
       mappingService.testOnlySetClassifierData(stateName, classifierData);
       var retrievedClassifier = mappingService.getClassifier(stateName);
-      var nonExistentClassifier = mappingService.getClassifier(
-        stateNameNonexistent);
 
       expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
       expect(retrievedClassifier.classifierData).toEqual(
         classifierFrozenModel.serialize());
       expect(retrievedClassifier.algorithmVersion).toEqual(1);
+    });
+
+    it('should return undefined when classifier data does not exist.', () => {
+      mappingService.init('0', 0);
+      var stateNameNonexistent = 'stateName2';
+      var nonExistentClassifier = mappingService.getClassifier(
+        stateNameNonexistent);
       expect(nonExistentClassifier).toBe(undefined);
+    });
+
+    it('should return true when it has classifier data.', () => {
+      mappingService.init('0', 0);
+      var stateName = 'stateName1';
+      mappingService.testOnlySetClassifierData(stateName, classifierData);
+      expect(mappingService.hasClassifierData(stateName)).toBe(true);
+    });
+
+    it('should return false when it does not have classifier data .', () => {
+      mappingService.init('0', 0);
+      var stateNameNonexistent = 'stateName2';
+      expect(mappingService.hasClassifierData(
+        stateNameNonexistent)).toBe(false);
     });
 
     it('should not return correct classifier details when init is not ' +
       'called', () => {
       var stateName = 'stateName1';
       var retrievedClassifier = mappingService.getClassifier(stateName);
-
       expect(retrievedClassifier).toBe(undefined);
     });
   });
