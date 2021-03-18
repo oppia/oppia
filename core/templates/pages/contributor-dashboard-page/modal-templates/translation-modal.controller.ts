@@ -155,16 +155,14 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.copiedAllElements = function(originalElements, translatedElements) {
-      console.log(originalElements);
-      console.log(translatedElements);
-      const hasMatchingTranslatedElement = (element) => translatedElements.includes(element);
+      const hasMatchingTranslatedElement = (
+        element) => translatedElements.includes(element);
       return !originalElements.every(hasMatchingTranslatedElement);
     };
 
     $scope.changedImgDetails = function(originalElements, translatedElements) {
-      console.log(originalElements);
-      console.log(translatedElements);
-      const hasMatchingTranslatedElement = (element) => (translatedElements.includes(element) && element !== '');
+      const hasMatchingTranslatedElement = (element) => (
+        translatedElements.includes(element) && element !== '');
       return originalElements.every(hasMatchingTranslatedElement);
     };
 
@@ -187,8 +185,6 @@ angular.module('oppia').controller('TranslationModalController', [
         textToTranslate, translatedText): TranslationError {
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
-      console.log(translatedElements);
-      console.log(originalElements);
 
       const hasUncopiedImgs = $scope.copiedAllElements(
         originalElements.foundImageFilePaths,
@@ -222,8 +218,6 @@ angular.module('oppia').controller('TranslationModalController', [
 
       let translationError = $scope.validateImages(
         originalElements, translatedElements);
-
-      console.log(translationError);
 
       if (translationError.hasUncopiedImgs) {
         $scope.hasImgCopyError = true;

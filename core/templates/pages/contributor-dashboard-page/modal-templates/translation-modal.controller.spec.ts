@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for TranslationModalController.
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { TranslationError } from './translation-modal.controller';
 
 describe('Translation Modal Controller', function() {
   let $httpBackend = null;
