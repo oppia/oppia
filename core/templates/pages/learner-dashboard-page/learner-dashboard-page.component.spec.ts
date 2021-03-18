@@ -307,7 +307,7 @@ describe('Learner dashboard page', function() {
 
     it('should set focus on browse lesson btn', function() {
       let defer = $q.defer();
-      defer.resolve([UserService.getProfileImageDataUrlAsync(),{}])
+      defer.resolve([{},{}]);
       spyOn($q, 'all').and.returnValue(defer.promise);
       var focusSpy = spyOn(focusManagerService, 'setFocus');
       var windowSpy = spyOn ($window, 'scrollTo');
