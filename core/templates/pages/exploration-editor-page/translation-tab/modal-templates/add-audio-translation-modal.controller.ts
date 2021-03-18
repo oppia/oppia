@@ -24,13 +24,13 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').controller('AddAudioTranslationModalController', [
-  '$controller', '$q', '$scope', '$uibModalInstance', 'AssetsBackendApiService',
-  'ContextService', 'audioFile', 'generatedFilename', 'isAudioAvailable',
-  'languageCode',
+  '$controller', '$q', '$rootScope', '$scope', '$uibModalInstance',
+  'AssetsBackendApiService', 'ContextService', 'audioFile', 'generatedFilename',
+  'isAudioAvailable', 'languageCode',
   function(
-      $controller, $q, $scope, $uibModalInstance, AssetsBackendApiService,
-      ContextService, audioFile, generatedFilename, isAudioAvailable,
-      languageCode) {
+      $controller, $q, $rootScope, $scope, $uibModalInstance,
+      AssetsBackendApiService, ContextService, audioFile, generatedFilename,
+      isAudioAvailable, languageCode) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -59,11 +59,13 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
     $scope.updateUploadedFile = function(file) {
       $scope.errorMessage = null;
       uploadedFile = file;
+      $rootScope.$applyAsync();
     };
 
     $scope.clearUploadedFile = function() {
       $scope.errorMessage = null;
       uploadedFile = null;
+      $rootScope.$applyAsync();
     };
 
     $scope.confirm = function() {

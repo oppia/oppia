@@ -61,7 +61,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Skill Description 2')
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -108,7 +108,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
     def test_handler_updates_story_summary_dicts(self):
         self.login(self.ADMIN_EMAIL)
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         canonical_story_id = story_services.get_new_story_id()
         additional_story_id = story_services.get_new_story_id()
 
@@ -241,7 +241,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.save_new_story(
             story_services.get_new_story_id(),
             self.admin_id,
-            topic_services.get_new_topic_id(),
+            topic_fetchers.get_new_topic_id(),
             title='title',
             description='description',
             notes='note',
@@ -272,7 +272,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.get_json(
             '%s/%s/%s' % (
                 feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                self.topic_id, topic_services.get_new_topic_id()),
+                self.topic_id, topic_fetchers.get_new_topic_id()),
             expected_status_int=404)
 
         self.logout()
@@ -374,7 +374,7 @@ class TopicEditorTests(
         self.get_html_response(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=404)
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
@@ -464,7 +464,7 @@ class TopicEditorTests(
         self.get_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=404)
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
@@ -697,7 +697,7 @@ class TopicEditorTests(
         # topic version.
         self.login(self.ADMIN_EMAIL)
 
-        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Name 1',
             abbreviated_name='topic-three', url_fragment='topic-three',
@@ -850,7 +850,7 @@ class TopicEditorTests(
         self.delete_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=404)
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
@@ -906,7 +906,7 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.TOPIC_RIGHTS_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=400)
+                topic_fetchers.get_new_topic_id()), expected_status_int=400)
         self.assertEqual(
             json_response['error'],
             'Expected a valid topic id to be provided.')
@@ -966,7 +966,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
         csrf_token = self.get_new_csrf_token()
 
-        new_topic_id = topic_services.get_new_topic_id()
+        new_topic_id = topic_fetchers.get_new_topic_id()
         self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
