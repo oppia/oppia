@@ -65,12 +65,13 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   beforeAll(async function() {
     // Should create a user and login.
-    await users.createUser('user11@accessibility.com', 'user11accessibility');
-    await users.login('user11@accessibility.com', true);
+    await users.createAndLoginAdminUser(
+      'user11@accessibility.com', 'user11accessibility');
+    libraryPage = new LibraryPage.LibraryPage();
   });
 
-  beforeAll(function() {
-    libraryPage = new LibraryPage.LibraryPage();
+  afterAll(async function() {
+    await users.logout();
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {
@@ -546,7 +547,8 @@ describe('screenreader and keyboard user accessibility features', function() {
         EXPLORATION.title,
         EXPLORATION.category,
         EXPLORATION.objective,
-        EXPLORATION.language
+        EXPLORATION.language,
+        true
       );
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');

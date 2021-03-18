@@ -43,13 +43,12 @@ describe('Topics and skills dashboard functionality', function() {
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAdmin(
+    await users.createAndLoginAdminUser(
       'creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDB');
   });
 
   beforeEach(async function() {
-    await users.login('creator@topicsAndSkillsDashboard.com');
     await topicsAndSkillsDashboardPage.get();
   });
 
@@ -231,6 +230,9 @@ describe('Topics and skills dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+  });
+
+  afterAll(async function() {
     await users.logout();
   });
 });

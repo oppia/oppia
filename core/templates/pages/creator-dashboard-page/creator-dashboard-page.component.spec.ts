@@ -23,6 +23,8 @@ import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboar
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Suggestion } from 'domain/suggestion/suggestion.model';
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
@@ -60,10 +62,8 @@ describe('Creator dashboard controller', () => {
   var CsrfService = null;
   var feedbackThreadObjectFactory = null;
   var SuggestionModalForCreatorDashboardService = null;
-  var suggestionObjectFactory = null;
   var suggestionsService = null;
   var SuggestionThreadObjectFactory = null;
-  var ThreadMessageObjectFactory = null;
   var UserService = null;
   var userInfo = {
     canCreateCollections: () => true
@@ -90,13 +90,10 @@ describe('Creator dashboard controller', () => {
       'FeedbackThreadObjectFactory');
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
-    suggestionObjectFactory = $injector.get(
-      'SuggestionObjectFactory');
     suggestionsService = $injector.get(
       'SuggestionsService');
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
-    ThreadMessageObjectFactory = $injector.get('ThreadMessageObjectFactory');
     UserService = $injector.get('UserService');
 
     spyOn(CsrfService, 'getTokenAsync').and.returnValue(
@@ -213,8 +210,8 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: '',
-            old_value: '',
+            new_value: { html: ''},
+            old_value: { html: ''},
           },
           last_updated_msecs: 0
         }, {
@@ -226,8 +223,8 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: '',
-            old_value: '',
+            new_value: { html: ''},
+            old_value: { html: ''},
           },
           last_updated_msecs: 0
         }],
@@ -251,8 +248,8 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: '',
-            old_value: '',
+            new_value: { html: ''},
+            old_value: { html: ''},
           },
           last_updated_msecs: 0
         }, {
@@ -264,15 +261,15 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: '',
-            old_value: '',
+            new_value: { html: ''},
+            old_value: { html: ''},
           },
           last_updated_msecs: 0
         }]
       };
 
       beforeEach(function() {
-        spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+        spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
           .and.returnValue($q.resolve({
             dashboardStats: CreatorDashboardStats
               .createFromBackendDict(dashboardData.dashboard_stats),
@@ -294,12 +291,14 @@ describe('Creator dashboard controller', () => {
                   .createFromBackendDict(feedbackThread))),
             createdSuggestionsList: (
               dashboardData.created_suggestions_list.map(
-                suggestionDict => suggestionObjectFactory
-                  .createFromBackendDict(suggestionDict))),
+                suggestionDict => Suggestion.createFromBackendDict(
+                  suggestionDict
+                ))),
             suggestionsToReviewList: (
               dashboardData.suggestions_to_review_list.map(
-                suggestionDict => suggestionObjectFactory
-                  .createFromBackendDict(suggestionDict))),
+                suggestionDict => Suggestion.createFromBackendDict(
+                  suggestionDict
+                ))),
             createdSuggestionThreadsList: _getSuggestionThreads(
               dashboardData.threads_for_created_suggestions_list,
               dashboardData.created_suggestions_list,
@@ -475,10 +474,10 @@ describe('Creator dashboard controller', () => {
         var threadId = 'exp1';
         var messages = [{
           author_username: '',
-          created_om_msecs: 0,
+          created_on_msecs: 0,
           entity_type: '',
           entity_id: '',
-          message_id: '',
+          message_id: 0,
           text: '',
           updated_status: '',
           updated_subject: '',
@@ -488,7 +487,7 @@ describe('Creator dashboard controller', () => {
             dashboardData.threads_for_created_suggestions_list[0],
             dashboardData.created_suggestions_list[0]));
         suggestionThreadObject.setMessages(messages.map(m => (
-          ThreadMessageObjectFactory.createFromBackendDict(m))));
+          ThreadMessage.createFromBackendDict(m))));
 
         $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({
           messages: messages
@@ -574,7 +573,7 @@ describe('Creator dashboard controller', () => {
     };
 
     beforeEach(function() {
-      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({
           dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
@@ -596,12 +595,14 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(feedbackThread))),
           createdSuggestionsList: (
             dashboardData.created_suggestions_list.map(
-              suggestionDict => suggestionObjectFactory
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           suggestionsToReviewList: (
             dashboardData.suggestions_to_review_list.map(
-              suggestionDict => suggestionObjectFactory
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           createdSuggestionThreadsList: _getSuggestionThreads(
             dashboardData.threads_for_created_suggestions_list,
             dashboardData.created_suggestions_list,
@@ -663,8 +664,8 @@ describe('Creator dashboard controller', () => {
         author_name: '',
         change: {
           state_name: '',
-          new_value: '',
-          old_value: '',
+          new_value: { html: ''},
+          old_value: { html: ''},
         },
         last_updated_msecs: 0
       }],
@@ -673,7 +674,7 @@ describe('Creator dashboard controller', () => {
     };
 
     beforeEach(function() {
-      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({
           dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
@@ -695,12 +696,14 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(feedbackThread))),
           createdSuggestionsList: (
             dashboardData.created_suggestions_list.map(
-              suggestionDict => suggestionObjectFactory
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           suggestionsToReviewList: (
             dashboardData.suggestions_to_review_list.map(
-              suggestionDict => suggestionObjectFactory
-                .createFromBackendDict(suggestionDict))),
+              suggestionDict => Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
           createdSuggestionThreadsList: _getSuggestionThreads(
             dashboardData.threads_for_created_suggestions_list,
             dashboardData.created_suggestions_list,
@@ -730,7 +733,7 @@ describe('Creator dashboard controller', () => {
 
   describe('when fetching dashboard fails', function() {
     it('should use reject handler', function() {
-      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
+      spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404
         }));

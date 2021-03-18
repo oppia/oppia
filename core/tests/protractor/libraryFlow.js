@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for library flow.
  */
 
+var action = require('../protractor_utils/action.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
@@ -47,8 +48,7 @@ describe('Library pages tour', function() {
 
   var rateExploration = async function() {
     var adminPage = new AdminPage.AdminPage();
-    await users.createUser('random@gmail.com', 'random');
-    await users.login('random@gmail.com', true);
+    await users.createAndLoginAdminUser('random@gmail.com', 'random');
     // We need an exploration to rate here.
     if (browser.isMobile) {
       await adminPage.reloadExploration(
@@ -58,7 +58,8 @@ describe('Library pages tour', function() {
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
-        EXPLORATION_LANGUAGE
+        EXPLORATION_LANGUAGE,
+        true
       );
     }
     await libraryPage.get();
@@ -83,7 +84,8 @@ describe('Library pages tour', function() {
     // exploration has to be rated by the user.
     await rateExploration();
     await libraryPage.get();
-    await element(by.css('.protractor-test-library-top-rated')).click();
+    var topRatedButton = element(by.css('.protractor-test-library-top-rated'));
+    await action.click('Top Rated Button', topRatedButton);
     await waitFor.pageToFullyLoad();
     expect(await browser.getCurrentUrl()).toContain(
       'community-library/top-rated');
@@ -117,8 +119,7 @@ describe('Rating', function() {
 
   var addRating = async function(
       userEmail, userName, explorationName, ratingValue) {
-    await users.createUser(userEmail, userName);
-    await users.login(userEmail);
+    await users.createAndLoginUser(userEmail, userName);
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_RATINGTEST);
     await libraryPage.playExploration(EXPLORATION_RATINGTEST);
@@ -133,9 +134,9 @@ describe('Rating', function() {
 
   it('should display ratings on exploration when minimum ratings have been ' +
      'submitted', async function() {
-    await users.createUser('user11@explorationRating.com', 'user11Rating');
+    await users.createAndLoginAdminUser(
+      'user11@explorationRating.com', 'user11Rating');
     // Create a test exploration.
-    await users.login('user11@explorationRating.com', true);
 
     // We need a test exploration here.
     if (browser.isMobile) {
@@ -145,8 +146,12 @@ describe('Rating', function() {
     } else {
       // For a desktop browser, create and publish an exploration.
       await workflow.createAndPublishExploration(
-        EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
-        'this is an objective', LANGUAGE_ENGLISH);
+        EXPLORATION_RATINGTEST,
+        CATEGORY_BUSINESS,
+        'this is an objective',
+        LANGUAGE_ENGLISH,
+        true
+      );
     }
     await users.logout();
 

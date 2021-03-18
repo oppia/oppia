@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 require('pages/admin-page/roles-tab/role-graph.directive.ts');
 
+require('domain/admin/admin-backend-api.service');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
@@ -26,21 +27,23 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminRolesTab', [
-  '$http', '$rootScope', 'AdminDataService', 'AdminTaskManagerService',
+  '$rootScope', 'AdminBackendApiService',
+  'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService',
   'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
   'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
-  'ADMIN_ROLE_HANDLER_URL', 'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
+  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
   'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
-      $http, $rootScope, AdminDataService, AdminTaskManagerService,
+      $rootScope, AdminBackendApiService,
+      AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService,
       ACTION_REMOVE_ALL_REVIEW_RIGHTS,
       ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
-      ADMIN_ROLE_HANDLER_URL, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
       CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
@@ -59,7 +62,10 @@ angular.module('oppia').directive('adminRolesTab', [
 
         var handleErrorResponse = function(errorResponse) {
           ctrl.setStatusMessage(
-            'Server error: ' + errorResponse.data.error);
+            'Server error: ' + errorResponse);
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the directive is migrated to angular.
+          $rootScope.$apply();
         };
 
         var getLanguageDescriptions = function(languageCodes) {
@@ -87,14 +93,11 @@ angular.module('oppia').directive('adminRolesTab', [
 
           AdminTaskManagerService.startTask();
           ctrl.result = {};
-          $http.get(ADMIN_ROLE_HANDLER_URL, {
-            params: {
-              filter_criterion: formResponse.filterCriterion,
-              role: formResponse.role,
-              username: formResponse.username
-            }
-          }).then(function(response) {
-            ctrl.result = response.data;
+          AdminBackendApiService.viewUsersRoleAsync(
+            formResponse.filterCriterion, formResponse.role,
+            formResponse.username
+          ).then((userRoles) => {
+            ctrl.result = userRoles;
             if (Object.keys(ctrl.result).length === 0) {
               ctrl.resultRolesVisible = false;
               ctrl.setStatusMessage('No results.');
@@ -102,6 +105,9 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.resultRolesVisible = true;
               ctrl.setStatusMessage('Success.');
             }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
             refreshFormData();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
@@ -113,15 +119,17 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Updating User Role');
           AdminTaskManagerService.startTask();
-          $http.post(ADMIN_ROLE_HANDLER_URL, {
-            role: formResponse.newRole,
-            username: formResponse.username,
-            topic_id: formResponse.topicId
-          }).then(function(response) {
+          AdminBackendApiService.updateUserRoleAsync(
+            formResponse.newRole, formResponse.username,
+            formResponse.topicId
+          ).then(() => {
             ctrl.setStatusMessage(
               'Role of ' + formResponse.username + ' successfully updated to ' +
               formResponse.newRole);
             refreshFormData();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
@@ -132,15 +140,17 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
-          $http.post('/addcontributionrightshandler', {
-            category: formResponse.category,
-            username: formResponse.username,
-            language_code: formResponse.languageCode
-          }).then(function(response) {
+          AdminBackendApiService.addContributionReviewerAsync(
+            formResponse.category, formResponse.username,
+            formResponse.languageCode
+          ).then(() => {
             ctrl.setStatusMessage(
               'Successfully added "' + formResponse.username + '" as ' +
               formResponse.category + ' reviewer.');
             refreshFormData();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
@@ -152,39 +162,38 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-            $http.get(
-              '/getcontributorusershandler', {
-                params: {
-                  category: formResponse.category,
-                  language_code: formResponse.languageCode
-                }
-              }).then(function(response) {
-              ctrl.result.usernames = response.data.usernames;
+            AdminBackendApiService.viewContributionReviewersAsync(
+              formResponse.category, formResponse.languageCode
+            ).then((usersObject) => {
+              ctrl.result.usernames = usersObject.usernames;
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
             var voiceoverLanguages = [];
-            $http.get(
-              '/contributionrightsdatahandler', {
-                params: {
-                  username: formResponse.username
-                }
-              }).then(function(response) {
+            AdminBackendApiService.contributionReviewerRightsAsync(
+              formResponse.username
+            ).then((contributionRights) => {
               translationLanguages = getLanguageDescriptions(
-                response.data.can_review_translation_for_language_codes);
+                contributionRights.can_review_translation_for_language_codes);
               voiceoverLanguages = getLanguageDescriptions(
-                response.data.can_review_voiceover_for_language_codes);
+                contributionRights.can_review_voiceover_for_language_codes);
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
-                questions: response.data.can_review_questions,
-                can_submit_questions: response.data.can_submit_questions
+                questions: contributionRights.can_review_questions,
+                can_submit_questions: contributionRights.can_submit_questions
               };
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
             }, handleErrorResponse);
           }
           AdminTaskManagerService.finishTask();
@@ -196,15 +205,15 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
-          $http.put(
-            '/removecontributionrightshandler', {
-              username: formResponse.username,
-              removal_type: formResponse.method,
-              category: formResponse.category,
-              language_code: formResponse.languageCode
-            }).then(function(response) {
+          AdminBackendApiService.removeContributionReviewerAsync(
+            formResponse.username, formResponse.method,
+            formResponse.category, formResponse.languageCode
+          ).then(() => {
             ctrl.setStatusMessage('Success.');
             refreshFormData();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
           }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
