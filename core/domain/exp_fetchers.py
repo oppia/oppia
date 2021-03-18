@@ -70,8 +70,8 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
             <= states_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
         raise Exception(
-            'Sorry, we can only process v%d-v%d and unversioned exploration '
-            'state schemas at present.' % (
+            'Sorry, we can only process v%d-v%d exploration state schemas at '
+            'present.' % (
                 feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
                 feconf.CURRENT_STATE_SCHEMA_VERSION))
 

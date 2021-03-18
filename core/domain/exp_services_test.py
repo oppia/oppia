@@ -1005,43 +1005,18 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(migration_bot_settings_model, None)
 
     def test_get_multiple_explorations_from_model_by_id(self):
-        rights_manager.create_new_exploration_rights(
-            'exp_id_1', self.owner_id)
-
-        exploration_model = exp_models.ExplorationModel(
-            id='exp_id_1',
+        self.save_new_valid_exploration(
+            'exp_id_1', self.owner_id, title='title 1',
             category='category 1',
-            title='title 1',
             objective='objective 1',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME
         )
-
-        exploration_model.commit(
-            self.owner_id, 'exploration model created',
-            [{
-                'cmd': 'create',
-                'title': 'title 1',
-                'category': 'category 1',
-            }])
-
-        rights_manager.create_new_exploration_rights(
-            'exp_id_2', self.owner_id)
-
-        exploration_model = exp_models.ExplorationModel(
-            id='exp_id_2',
+        self.save_new_valid_exploration(
+            'exp_id_2', self.owner_id, title='title 2',
             category='category 2',
-            title='title 2',
             objective='objective 2',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME
         )
-
-        exploration_model.commit(
-            self.owner_id, 'exploration model created',
-            [{
-                'cmd': 'create',
-                'title': 'title 2',
-                'category': 'category 2',
-            }])
 
         explorations = exp_fetchers.get_multiple_explorations_by_id(
             ['exp_id_1', 'exp_id_2'])
@@ -1294,21 +1269,6 @@ title: Title
         exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertNotEqual(exp.title, feconf.DEFAULT_EXPLORATION_TITLE)
         self.assertNotEqual(exp.category, feconf.DEFAULT_EXPLORATION_CATEGORY)
-
-    def test_loading_untitled_yaml_defaults_exploration_title_category(self):
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            self.owner_id, self.SAMPLE_UNTITLED_YAML_CONTENT, self.EXP_ID, [])
-        exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exp.title, feconf.DEFAULT_EXPLORATION_TITLE)
-        self.assertEqual(exp.category, feconf.DEFAULT_EXPLORATION_CATEGORY)
-
-    def test_loading_old_yaml_migrates_exp_to_latest_schema_version(self):
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            self.owner_id, self.SAMPLE_UNTITLED_YAML_CONTENT, self.EXP_ID, [])
-        exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(
-            exp.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def test_loading_yaml_with_assets_loads_assets_from_filesystem(self):
         test_asset = (self.TEST_ASSET_PATH, self.TEST_ASSET_CONTENT)
