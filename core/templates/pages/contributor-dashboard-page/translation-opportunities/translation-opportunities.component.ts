@@ -100,9 +100,9 @@ angular.module('oppia').component('translationOpportunities', {
           },
           controller: 'TranslationModalController'
         }).result.then(function() {
-          document.body.style.cursor = '';
+          ctrl.resetCursorStyle();
         }, function() {
-          document.body.style.cursor = '';
+          ctrl.resetCursorStyle();
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
@@ -124,6 +124,13 @@ angular.module('oppia').component('translationOpportunities', {
             TranslationLanguageService.getActiveLanguageCode()).then(
             getPresentableOpportunitiesData);
       };
+
+      ctrl.resetCursorStyle = function() {
+        document.body.style.cursor = '';
+        //function used to reset cursor style to normal if copy mode is left on
+        //and the translation modal is closed down
+      };
+
 
       ctrl.loadOpportunities = function() {
         return ContributionOpportunitiesService
