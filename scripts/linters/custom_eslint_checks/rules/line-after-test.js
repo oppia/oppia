@@ -30,7 +30,7 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-     line: 'There should be a single line break before it'
+      line: 'There should be a single line break before it'
     }
   },
 

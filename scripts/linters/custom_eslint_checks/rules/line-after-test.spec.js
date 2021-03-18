@@ -37,18 +37,18 @@ ruleTester.run('line-after-test', rule, {
       errors: [{
         message: ('There should be a single line break before it'),
         type: null
-        }]
+      }]
     },
     {
       code:
        `it('should check for the line break')
 
-       
+
         it('should check for line break and multiline')`,
       errors: [{
         message: ('There should be a single line break before it'),
         type: null
-        }]
+      }]
     },
-    ]  
+  ]
 });
