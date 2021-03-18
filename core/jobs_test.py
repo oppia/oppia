@@ -57,9 +57,8 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """
-        Args:
-            item:*.A single element of type given by entity_class().
+        """Args:
+            item: *. A single element of type given by entity_class().
         """
         current_class = MockJobManagerOne
         if current_class.entity_created_before_job_queued(item):
@@ -778,7 +777,8 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             unused_play_type):
         """
         Args:
-            active_realtime_layer:int.The currently active realtime datastore layer.
+            active_realtime_layer:int.The currently active realtime datastore
+                layer.
             event_type :str.The event triggered by a student.
 
         """
