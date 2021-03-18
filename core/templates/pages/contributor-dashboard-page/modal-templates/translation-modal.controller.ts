@@ -155,8 +155,8 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.copiedAllElements = function(originalElements, translatedElements) {
-      const hasMatchingTranslatedElement = (
-        element) => translatedElements.includes(element);
+      const hasMatchingTranslatedElement = (element) => (
+        translatedElements.includes(element));
       return !originalElements.every(hasMatchingTranslatedElement);
     };
 
