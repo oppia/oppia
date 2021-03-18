@@ -58,7 +58,6 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
-require('services/question-validation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
