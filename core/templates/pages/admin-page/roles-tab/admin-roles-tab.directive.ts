@@ -166,7 +166,8 @@ angular.module('oppia').directive('adminRolesTab', [
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then((usersObject) => {
-              ctrl.contributionReviewersResult.usernames = usersObject.usernames;
+              ctrl.contributionReviewersResult.usernames =
+                usersObject.usernames;
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               // TODO(#8521): Remove the use of $rootScope.$apply()
