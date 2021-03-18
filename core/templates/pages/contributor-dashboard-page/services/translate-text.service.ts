@@ -18,6 +18,12 @@
  */
 
 export class StateAndContent {
+  /**
+   * 
+   * @param {string} _stateName - Name of State 
+   * @param {string} _contentID - Content ID 
+   * @param {string} _contentText - Content of the text 
+   */
   constructor(
     private _stateName: string,
     private _contentID: string,
@@ -62,6 +68,10 @@ angular.module('oppia').factory('TranslateTextService', [
     var activeContentId = null;
     var activeContentText = null;
 
+    /**
+     * 
+     * @returns {string} Returns the next active text content if entered
+     */
     const getNextText = function() {
       if (stateAndContent.length === 0) {
         return null;
@@ -74,6 +84,10 @@ angular.module('oppia').factory('TranslateTextService', [
       return activeContentText;
     };
 
+    /**
+     * 
+     * @returns {string} Returns the previous active text content if entered
+     */
     const getPreviousText = function() {
       if (stateAndContent.length === 0 || activeIndex <= 0) {
         return null;
@@ -86,10 +100,18 @@ angular.module('oppia').factory('TranslateTextService', [
       return activeContentText;
     };
 
+    /**
+     * 
+     * @returns {boolean} Checks if the previous text is available for translation
+     */
     const isPreviousTextAvailableForTranslation = function() {
       return activeIndex > 0;
     };
 
+    /**
+     * 
+     * @returns {boolean} If null text is entered returns false, else checks if more text is available for translation
+     */
     const isMoreTextAvailableForTranslation = function() {
       if (stateAndContent.length === 0) {
         return false;
