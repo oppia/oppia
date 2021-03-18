@@ -27,6 +27,7 @@ import subprocess
 import sys
 import time
 
+from constants import constants
 import feconf
 import python_utils
 from scripts import build
@@ -137,7 +138,11 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env. '
+         'This flag is required for tests to run on CircleCI, since CircleCI '
+         'sometimes flakes when parallelism is used. It is not required in the '
+         'local dev environment. See https://discuss.circleci.com/t/'
+         'build-fails-with-error-spawn-enomem/30537/10',
     action='store_true')
 
 _PARSER.add_argument(
@@ -537,17 +542,22 @@ def run_tests(args):
 
     with contextlib2.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server())
-        stack.enter_context(common.managed_firebase_auth_emulator())
+        if constants.EMULATOR_MODE:
+            stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
+        python_utils.PRINT('Waiting for servers to come up...')
+
         # Wait for the servers to come up.
-        common.wait_for_port_to_be_open(feconf.ES_PORT)
+        common.wait_for_port_to_be_open(feconf.ES_LOCALHOST_PORT)
         common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+        python_utils.PRINT('Servers have come up.')
         python_utils.PRINT(
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots'
+            'core/tests/protractor.conf.js, you can view screenshots '
             'of the failed tests in ../protractor-screenshots/')
+
         commands = [common.NODE_BIN_PATH]
         if args.debug_mode:
             commands.append('--inspect-brk')

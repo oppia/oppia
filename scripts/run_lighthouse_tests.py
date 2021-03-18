@@ -25,6 +25,7 @@ import re
 import subprocess
 import sys
 
+from constants import constants
 import feconf
 import python_utils
 from scripts import build
@@ -212,11 +213,12 @@ def main(args=None):
 
     with contextlib2.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server())
-        stack.enter_context(common.managed_firebase_auth_emulator())
+        if constants.EMULATOR_MODE:
+            stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.
-        common.wait_for_port_to_be_open(feconf.ES_PORT)
+        common.wait_for_port_to_be_open(feconf.ES_LOCALHOST_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
 
         run_lighthouse_puppeteer_script()

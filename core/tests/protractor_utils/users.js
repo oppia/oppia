@@ -19,13 +19,14 @@
 
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
-
+var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
-var login = async function(
+var _login = async function(
     email, isSuperAdmin = false, manualNavigation = true) {
-  // Use of element is not possible because the login page is non-angular.
+  // Use of element and action is not possible because the login page
+  // is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;
   // The manualNavigation argument is used to determine whether to navigate to
@@ -46,7 +47,6 @@ var login = async function(
       }
       return true;
     }, waitFor.DEFAULT_WAIT_TIME_MSECS, 'Login takes too long.');
-
   await (await driver.findElement(protractor.By.name('email'))).clear();
   await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
   if (isSuperAdmin) {
@@ -70,7 +70,12 @@ var login = async function(
   }
 };
 
+var login = async function(email, manualNavigation = true) {
+  await _login(email, false, manualNavigation);
+};
+
 var logout = async function() {
+  // Use of action is not possible because logout page is non-angular.
   var driver = browser.driver;
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   await (await driver.findElement(protractor.By.id('submit-logout'))).click();
@@ -96,16 +101,14 @@ var _completeSignup = async function(username, manualNavigation = true) {
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));
   var registerUser = element(by.css('.protractor-test-register-user'));
-  await waitFor.visibilityOf(
-    usernameInput, 'No username input field was displayed');
-  await usernameInput.sendKeys(username);
-  await agreeToTermsCheckbox.click();
-  await registerUser.click();
+  await action.sendKeys('Username input', usernameInput, username);
+  await action.click('agreeToTerms Checkbox', agreeToTermsCheckbox);
+  await action.click('Register User button', registerUser);
   await waitFor.pageToFullyLoad();
 };
 
 var completeLoginFlowFromStoryViewerPage = async function(email, username) {
-  await login(email, false, false);
+  await _login(email, false, false);
   await _completeSignup(username, false);
 };
 
@@ -120,7 +123,7 @@ var createAndLoginUser = async function(email, username) {
 };
 
 var createModerator = async function(email, username) {
-  await login(email, true);
+  await _login(email, true);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.updateRole(username, 'moderator');
@@ -133,7 +136,7 @@ var createAdmin = async function(email, username) {
 };
 
 var createAndLoginAdminUser = async function(email, username) {
-  await login(email, true);
+  await _login(email, true);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.updateRole(username, 'admin');
@@ -145,7 +148,7 @@ var createAdminMobile = async function(email, username) {
 };
 
 var createAndLoginAdminUserMobile = async function(email, username) {
-  await login(email, true);
+  await _login(email, true);
   await _completeSignup(username);
 };
 

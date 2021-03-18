@@ -12,33 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for translation suggestion review modal.
  */
 
-require('domain/feedback_message/ThreadMessageObjectFactory.ts');
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
+require('services/alerts.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$http', '$scope', '$uibModalInstance', 'ContributionAndReviewService',
-    'SiteAnalyticsService', 'ThreadMessageObjectFactory',
-    'UrlInterpolationService', 'initialSuggestionId', 'reviewable',
+    '$http', '$scope', '$uibModalInstance', 'AlertsService',
+    'ContributionAndReviewService', 'SiteAnalyticsService',
+    'UrlInterpolationService',
+    'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION',
     function(
-        $http, $scope, $uibModalInstance, ContributionAndReviewService,
-        SiteAnalyticsService, ThreadMessageObjectFactory,
-        UrlInterpolationService, initialSuggestionId, reviewable,
-        suggestionIdToSuggestion, ACTION_ACCEPT_SUGGESTION,
-        ACTION_REJECT_SUGGESTION) {
+        $http, $scope, $uibModalInstance, AlertsService,
+        ContributionAndReviewService, SiteAnalyticsService,
+        UrlInterpolationService,
+        initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
+        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
       $scope.activeSuggestion = suggestionIdToSuggestion[
         $scope.activeSuggestionId];
+      $scope.subheading = subheading;
       delete suggestionIdToSuggestion[initialSuggestionId];
       var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 
@@ -47,6 +51,8 @@ angular.module('oppia').controller(
           .registerContributorDashboardViewSuggestionForReview('Translation');
       }
 
+      // The length of the commit message should not exceed 375 characters,
+      // since this is the maximum allowed commit message size.
       var generateCommitMessage = function() {
         var contentId = $scope.activeSuggestion.change.content_id;
         var stateName = $scope.activeSuggestion.change.state_name;
@@ -64,7 +70,7 @@ angular.module('oppia').controller(
         return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
           let threadMessageBackendDicts = response.data.messages;
           return threadMessageBackendDicts.map(
-            m => ThreadMessageObjectFactory.createFromBackendDict(m));
+            m => ThreadMessage.createFromBackendDict(m));
         });
       };
 
@@ -113,17 +119,21 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           ACTION_ACCEPT_SUGGESTION,
           $scope.reviewMessage, generateCommitMessage(),
-          $scope.showNextItemToReview);
+          $scope.showNextItemToReview, (error) => {
+            $scope.rejectAndReviewNext('Invalid Suggestion');
+            AlertsService.clearWarnings();
+            AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
+          });
       };
 
-      $scope.rejectAndReviewNext = function() {
+      $scope.rejectAndReviewNext = function(reviewMessage) {
         $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
           'Translation');
 
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          ACTION_REJECT_SUGGESTION, $scope.reviewMessage,
+          ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
           generateCommitMessage(), $scope.showNextItemToReview);
       };
 

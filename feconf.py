@@ -414,10 +414,12 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch Host
-# and Port when switching to prod server.
-ES_HOST = 'localhost'
-ES_PORT = 9200
+ES_LOCALHOST_PORT = 9200
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
+# auth information during deployment.
+ES_CLOUD_ID = None
+ES_USERNAME = None
+ES_PASSWORD = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
@@ -430,12 +432,6 @@ REDISPORT = 6379
 # project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
-
-# Used by the Admin SDK to connect with the Firebase Authentication emulator.
-# NOTE: this name is is NOT a typo despite the inclusion of the port number, it
-# is the environment variable expected to be set:
-# https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
-FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -506,9 +502,6 @@ ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
-
-# Maximum allowed commit message length for SnapshotMetadata models.
-MAX_COMMIT_MESSAGE_LENGTH = 1000
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -829,6 +822,7 @@ SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -936,6 +930,13 @@ USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
 USER_QUERY_STATUS_FAILED = 'failed'
+
+ALLOWED_USER_QUERY_STATUSES = (
+    USER_QUERY_STATUS_PROCESSING,
+    USER_QUERY_STATUS_COMPLETED,
+    USER_QUERY_STATUS_ARCHIVED,
+    USER_QUERY_STATUS_FAILED
+)
 
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
@@ -1106,6 +1107,15 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+# The name of the cookie Oppia will place the session cookie into. The name is
+# arbitrary. If it is changed later on, then the cookie will live-on in the
+# users' browsers as garbage (although it would expire eventually, see MAX_AGE).
+FIREBASE_SESSION_COOKIE_NAME = 'session'
+# The duration a session cookie from Firebase should remain valid for. After the
+# duration expires, a new cookie will need to be generated. Generating a new
+# cookie requires the user to sign-in _explicitly_.
+FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=14)
+
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
 # these back to appropriate places (rights_domain, topic_domain).
 # The reserved prefix for keys that are automatically inserted into a
@@ -1136,6 +1146,10 @@ ROLE_EDITOR = 'editor'
 ROLE_VOICE_ARTIST = 'voice artist'
 ROLE_VIEWER = 'viewer'
 ROLE_NONE = 'none'
+
+# The list of entity types that do not require entity specific access control
+# when viewing respective suggestions.
+ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS = [ENTITY_TYPE_SKILL]
 
 # The allowed list of roles which can be used in change_role command.
 ALLOWED_ACTIVITY_ROLES = [
@@ -1264,6 +1278,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
 USER_ID_REGEX = r'uid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
+PSEUDONYMOUS_ID_REGEX = r'pid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
 
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5

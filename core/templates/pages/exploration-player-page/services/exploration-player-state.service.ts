@@ -67,7 +67,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
-    if (!questionPlayerMode) {
+    if (!questionPlayerMode && !('skill_editor' === UrlService.getPathname()
+      .split('/')[1].replace(/"/g, "'"))) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(explorationId, version)
         .then(function(exploration) {
@@ -138,7 +139,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       $q.all([
         EditableExplorationBackendApiService.fetchApplyDraftExploration(
           explorationId),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
@@ -175,9 +176,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           explorationId);
       $q.all([
         explorationDataPromise,
-        PretestQuestionBackendApiService.fetchPretestQuestions(
+        PretestQuestionBackendApiService.fetchPretestQuestionsAsync(
           explorationId, storyUrlFragment),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];

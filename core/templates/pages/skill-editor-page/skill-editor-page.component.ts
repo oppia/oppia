@@ -28,8 +28,6 @@ require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts');
 require(
-  'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
-require(
   'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -47,11 +45,14 @@ angular.module('oppia').component('skillEditorPage', {
     '$rootScope', '$uibModal', 'BottomNavbarStatusService',
     'SkillEditorRoutingService', 'SkillEditorStateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService', 'WindowRef',
+    'MAX_COMMIT_MESSAGE_LENGTH',
     function(
         $rootScope, $uibModal, BottomNavbarStatusService,
         SkillEditorRoutingService, SkillEditorStateService,
-        UndoRedoService, UrlInterpolationService, UrlService, WindowRef) {
+        UndoRedoService, UrlInterpolationService, UrlService, WindowRef,
+        MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
+      ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.getActiveTabName = function() {
         return SkillEditorRoutingService.getActiveTabName();

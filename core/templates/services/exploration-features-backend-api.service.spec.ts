@@ -54,7 +54,7 @@ describe('exploration features backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      explorationFeaturesBackendApiService.fetchExplorationFeatures('0')
+      explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync('0')
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne('/explorehandler/features/0');
@@ -73,7 +73,7 @@ describe('exploration features backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      explorationFeaturesBackendApiService.fetchExplorationFeatures('0')
+      explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync('0')
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne('/explorehandler/features/0');

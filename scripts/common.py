@@ -69,10 +69,6 @@ BUF_VERSION = '0.29.0'
 # the version of protobuf library being used.
 PROTOC_VERSION = PROTOBUF_VERSION
 
-# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
-# there is a `make test` bug in redis 6.0.6 where the solution has not been
-# released. This is explained in this issue:
-# https://github.com/redis/redis/issues/7540.
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
 # 2. Extract the cli in the folder that it was downloaded, most likely
@@ -88,7 +84,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-REDIS_CLI_VERSION = '6.0.5'
+REDIS_CLI_VERSION = '6.0.10'
 ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
@@ -157,6 +153,25 @@ COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
 # "requirements.txt" file so that all installations using "requirements.txt"
 # will be identical.
 REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
+
+DIRS_TO_ADD_TO_SYS_PATH = [
+    GOOGLE_APP_ENGINE_SDK_HOME,
+    PYLINT_PATH,
+
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
+    PSUTIL_DIR,
+    os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
+    CURR_DIR,
+    THIRD_PARTY_PYTHON_LIBS_DIR
+]
 
 
 def is_windows_os():
@@ -640,29 +655,6 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
-@contextlib.contextmanager
-def managed_elasticsearch_dev_server():
-    """Returns a context manager for ElasticSearch server for running tests
-    in development mode and running a local dev server. This is only required
-    in a development environment.
-
-    Yields:
-        psutil.Process. The ElasticSearch server process.
-    """
-    # Clear previous data stored in the local cluster.
-    if os.path.exists(ES_PATH_DATA_DIR):
-        shutil.rmtree(ES_PATH_DATA_DIR)
-
-    # Override the default path to ElasticSearch config files.
-    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
-    es_args = [
-        '%s/bin/elasticsearch' % ES_PATH,
-        '-d'
-    ]
-    with managed_process(es_args, shell=True) as proc:
-        yield proc
-
-
 def wait_for_port_to_be_closed(port_number):
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
@@ -825,6 +817,7 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
+    python_utils.PRINT('Starting new process: %s' % command)
     popen_proc = psutil.Popen(command, shell=shell, **kwargs)
 
     try:
@@ -833,6 +826,7 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         procs_to_kill = (
             popen_proc.children(recursive=True) if popen_proc.is_running() else
             [])
+
         # Children must be terminated before the parent, otherwise they risk
         # becoming zombies.
         procs_to_kill.append(popen_proc)
@@ -845,8 +839,8 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         for proc in procs_to_kill:
             if proc.is_running():
                 procs_still_alive.append(proc)
-                proc.terminate()
                 logging.info('Terminating %s...' % get_debug_info(proc))
+                proc.terminate()
             else:
                 logging.info('%s has ended.' % get_debug_info(proc))
 
@@ -855,8 +849,8 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         for proc in procs_gone:
             logging.info('%s has ended.' % get_debug_info(proc))
         for proc in procs_still_alive:
-            proc.kill()
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
+            proc.kill()
 
 
 @contextlib.contextmanager
@@ -929,15 +923,29 @@ def managed_firebase_auth_emulator():
 
     emulator_args = [
         FIREBASE_PATH, 'emulators:start', '--only', 'auth',
-        '--project', feconf.OPPIA_PROJECT_ID
+        '--project', feconf.OPPIA_PROJECT_ID,
     ]
     with contextlib2.ExitStack() as stack:
-        # These two environment values allow the Firebase SDKs to acknowledge
-        # the existence of the Firebase emulator.
-        stack.enter_context(swap_env('GCLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
-        stack.enter_context(swap_env(
-            'FIREBASE_AUTH_EMULATOR_HOST', feconf.FIREBASE_AUTH_EMULATOR_HOST))
-
         # OK to use shell=True here because we are passing string literals and
         # constants, so no risk of shell-injection attacks.
         yield stack.enter_context(managed_process(emulator_args, shell=True))
+
+
+@contextlib.contextmanager
+def managed_elasticsearch_dev_server():
+    """Returns a context manager for ElasticSearch server for running tests
+    in development mode and running a local dev server. This is only required
+    in a development environment.
+
+    Yields:
+        psutil.Process. The ElasticSearch server process.
+    """
+    # Clear previous data stored in the local cluster.
+    if os.path.exists(ES_PATH_DATA_DIR):
+        shutil.rmtree(ES_PATH_DATA_DIR)
+
+    es_args = ['%s/bin/elasticsearch' % ES_PATH, '-q'] # -q is the quiet flag.
+    # Override the default path to ElasticSearch config files.
+    es_env = {'ES_PATH_CONF': ES_PATH_CONFIG_DIR}
+    with managed_process(es_args, env=es_env, shell=True) as proc:
+        yield proc

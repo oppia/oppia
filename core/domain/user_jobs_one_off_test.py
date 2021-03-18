@@ -1352,171 +1352,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(owner_settings.last_edited_an_exploration)
 
 
-class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
-        test_utils.GenericTestBase):
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            user_jobs_one_off
-            .FillExplorationIdsInUserSubscriptionsModelOneOffJob
-            .create_new()
-        )
-        (
-            user_jobs_one_off
-            .FillExplorationIdsInUserSubscriptionsModelOneOffJob.enqueue(
-                job_id))
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        stringified_output = (
-            user_jobs_one_off
-            .FillExplorationIdsInUserSubscriptionsModelOneOffJob
-            .get_output(job_id)
-        )
-        eval_output = [ast.literal_eval(stringified_item) for
-                       stringified_item in stringified_output]
-        return eval_output
-
-    def test_for_empty_activity_ids(self):
-        # Generate empty activity_ids.
-        original_subscription_model = (
-            user_models.UserSubscriptionsModel(
-                id='model_id',
-                activity_ids=[]
-            )
-        )
-        original_subscription_model.update_timestamps()
-        original_subscription_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual([[u'SUCCESS', 1]], output)
-
-        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
-            'model_id')
-        self.assertEqual(
-            migrated_subscription_model.exploration_ids, [])
-        self.assertEqual(
-            original_subscription_model.last_updated,
-            migrated_subscription_model.last_updated
-        )
-
-    def test_for_non_empty_activity_ids(self):
-        # Generate non-empty activity_ids.
-        original_subscription_model = (
-            user_models.UserSubscriptionsModel(
-                id='model_id',
-                activity_ids=['exp_1', 'exp_2', 'exp_3']
-            )
-        )
-        original_subscription_model.update_timestamps()
-        original_subscription_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual([[u'SUCCESS', 1]], output)
-
-        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
-            'model_id')
-        self.assertEqual(
-            migrated_subscription_model.exploration_ids,
-            ['exp_1', 'exp_2', 'exp_3']
-        )
-        self.assertEqual(
-            original_subscription_model.last_updated,
-            migrated_subscription_model.last_updated
-        )
-
-    def test_for_multiple_models(self):
-        # Generate 3 models.
-        for i in python_utils.RANGE(3):
-            original_subscription_model = (
-                user_models.UserSubscriptionsModel(
-                    id='model_id_%s' % i,
-                    activity_ids=['exp_%s' % i]
-                )
-            )
-            original_subscription_model.update_timestamps()
-            original_subscription_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(output, [['SUCCESS', 3]])
-        for i in python_utils.RANGE(3):
-            migrated_subscription_model = (
-                user_models.UserSubscriptionsModel.get('model_id_%s' % i))
-            self.assertEqual(
-                migrated_subscription_model.exploration_ids,
-                ['exp_%s' % i]
-            )
-            self.assertEqual(
-                original_subscription_model.get(
-                    'model_id_%s' % i).last_updated,
-                migrated_subscription_model.last_updated
-            )
-
-    def test_for_existing_exploration_ids(self):
-        # Generate a model with populated exploration IDs.
-        original_subscription_model = (
-            user_models.UserSubscriptionsModel(
-                id='model_id',
-                activity_ids=['exp_1', 'exp_2', 'exp_3'],
-                exploration_ids=['exp_4', 'exp_5']
-            )
-        )
-        original_subscription_model.update_timestamps()
-        original_subscription_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(output, [['SUCCESS', 1]])
-
-        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
-            'model_id')
-        self.assertEqual(
-            migrated_subscription_model.exploration_ids,
-            ['exp_1', 'exp_2', 'exp_3']
-        )
-        self.assertEqual(
-            original_subscription_model.last_updated,
-            migrated_subscription_model.last_updated
-        )
-
-    def test_rerun(self):
-        original_subscription_model = (
-            user_models.UserSubscriptionsModel(
-                id='model_id',
-                activity_ids=[]
-            )
-        )
-        original_subscription_model.update_timestamps()
-        original_subscription_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual([[u'SUCCESS', 1]], output)
-
-        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
-            'model_id')
-        self.assertEqual(
-            migrated_subscription_model.exploration_ids,
-            []
-        )
-        self.assertEqual(
-            original_subscription_model.last_updated,
-            migrated_subscription_model.last_updated
-        )
-
-        output = self._run_one_off_job()
-        self.assertEqual([[u'SUCCESS', 1]], output)
-
-        self.assertEqual(
-            migrated_subscription_model.exploration_ids,
-            []
-        )
-        self.assertEqual(
-            original_subscription_model.last_updated,
-            migrated_subscription_model.last_updated
-        )
-
-
 class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -1597,6 +1432,137 @@ class MockUserSettingsModelWithGaeId(user_models.UserSettingsModel):
 
     gae_id = (
         datastore_services.StringProperty(indexed=True, required=True))
+
+
+class MockUserSubscriptionsModelWithActivityIDs(
+        user_models.UserSubscriptionsModel):
+    """Mock UserSubscriptionsModel so that it allows to set 'activity_ids'. """
+
+    activity_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
+
+
+class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.RemoveActivityIDsOneOffJob.create_new())
+        user_jobs_one_off.RemoveActivityIDsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.RemoveActivityIDsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_subscription_model_with_activity_ids(self):
+        with self.swap(
+            user_models, 'UserSubscriptionsModel',
+            MockUserSubscriptionsModelWithActivityIDs):
+            original_subscription_model = (
+                user_models.UserSubscriptionsModel(
+                    id='id',
+                    activity_ids=['exp_1', 'exp_2', 'exp_3']
+                )
+            )
+            original_subscription_model.update_timestamps()
+            original_subscription_model.put()
+
+            self.assertIsNotNone(
+                original_subscription_model.activity_ids)
+            self.assertIn(
+                'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
+            self.assertIn(
+                'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - UserSubscriptionsModel', 1]], output)
+
+            migrated_subscription_model = (
+                user_models.UserSubscriptionsModel.get_by_id('id'))
+
+            self.assertNotIn(
+                'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_subscription_model.last_updated,
+                migrated_subscription_model.last_updated)
+
+    def test_one_subscription_model_without_activity_ids(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='id'
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
+    def test_rerun(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='id'
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
 
 
 class MockUserSubscriptionsModelWithFeedbackThreadIDs(
@@ -1692,6 +1658,8 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
 
 class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     USER_ID_1 = 'user_id'
     USER_ID_2 = 'user_id_2'
     EMAIL_1 = 'test@email.com'
@@ -1704,17 +1672,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
     EXP_ID_ONE = 'exp_id_one'
     EXP_ID_TWO = 'exp_id_two'
     EXP_ID_THREE = 'exp_id_three'
-
-    def setUp(self):
-
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(FixUserSettingsCreatedOnOneOffJobTests, self).setUp()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -2005,6 +1962,8 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
 class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     USER_ID_1 = 'user_id'
     USER_ID_2 = 'user_id_2'
     EMAIL_1 = 'test@email.com'
@@ -2019,15 +1978,7 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
     EXP_ID_THREE = 'exp_id_three'
 
     def setUp(self):
-
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(UserSettingsCreatedOnAuditOneOffJobTests, self).setUp()
+        super(UserSettingsCreatedOnAuditOneOffJobTests, self).setUp()
 
         self.user_settings_model = (
             user_models.UserSettingsModel(
@@ -2593,6 +2544,8 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 
 class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.ProfilePictureAuditOneOffJob.create_new()
@@ -2608,14 +2561,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         return eval_output
 
     def setUp(self):
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(ProfilePictureAuditOneOffJobTests, self).setUp()
+        super(ProfilePictureAuditOneOffJobTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.generate_initial_profile_picture(self.owner_id)
@@ -2733,6 +2679,8 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
 class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
@@ -2752,16 +2700,6 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
             if item[0] == 'FAILURE':
                 item[1] = sorted(item[1])
         return eval_output
-
-    def setUp(self):
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(UniqueHashedNormalizedUsernameAuditJobTests, self).setUp()
 
     def test_audit_user_with_username_is_successful(self):
         model = user_models.UserSettingsModel(id='id', email='email@email.com')
@@ -2830,3 +2768,104 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
             output = self._run_one_off_job()
 
         self.assertEqual(output, [['FAILURE', ['username1', 'username2']]])
+
+
+class DiscardOldDraftsOneOffJobTests(test_utils.GenericTestBase):
+
+    EXP_USER_DATA_MODEL_ID = 'user_id.exp_id'
+    USER_ID = 'user_id'
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(DiscardOldDraftsOneOffJobTests, self).setUp()
+        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the DiscardOldDraftsOneOffJob and verifies that the output
+        matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one-off
+                job.
+        """
+        job_id = user_jobs_one_off.DiscardOldDraftsOneOffJob.create_new()
+        user_jobs_one_off.DiscardOldDraftsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = user_jobs_one_off.DiscardOldDraftsOneOffJob.get_output(
+            job_id)
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    def _create_exp_user_data_model(self, draft_change_list, last_updated):
+        """Creates a new ExplorationUserDataModel with the given parameters.
+
+        Args:
+            draft_change_list: list(dict)|None. The change list corresponding
+                to the user's draft for this exploration, or None if there is
+                no such draft.
+            last_updated: datetime.datetime. When the draft was last updated.
+        """
+        user_models.ExplorationUserDataModel(
+            id=self.EXP_USER_DATA_MODEL_ID,
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID,
+            rating=2,
+            rated_on=datetime.datetime(2018, 1, 1),
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=last_updated,
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1
+        ).put()
+
+    def test_models_without_drafts_are_ignored(self):
+        self._create_exp_user_data_model(None, None)
+        self._run_job_and_verify_output([])
+
+    def test_draft_left_alone_if_it_is_current(self):
+        self._create_exp_user_data_model(
+            {'new_content': {}}, datetime.datetime(2021, 1, 1))
+        self._run_job_and_verify_output([])
+
+    def test_draft_discarded_if_exploration_is_missing(self):
+        exp_services.delete_exploration(self.USER_ID, self.EXP_ID)
+
+        self._create_exp_user_data_model(
+            {'new_content': {}}, datetime.datetime(2021, 1, 1))
+        old_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertIsNotNone(old_model.draft_change_list)
+        self.assertIsNotNone(old_model.draft_change_list_last_updated)
+        self.assertIsNotNone(old_model.draft_change_list_exp_version)
+
+        self._run_job_and_verify_output([
+            '[u\'DISCARDED - Exploration is missing\', [u\'%s\']]' %
+            self.EXP_USER_DATA_MODEL_ID,
+            '[u\'SUCCESS - Discarded draft\', 1]'
+        ])
+        new_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertLess(old_model.last_updated, new_model.last_updated)
+        self.assertIsNone(new_model.draft_change_list)
+        self.assertIsNone(new_model.draft_change_list_last_updated)
+        self.assertIsNone(new_model.draft_change_list_exp_version)
+
+    def test_draft_discarded_if_it_is_too_old(self):
+        self._create_exp_user_data_model(
+            {'new_content': {}}, datetime.datetime(2017, 1, 1))
+        old_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertIsNotNone(old_model.draft_change_list)
+        self.assertIsNotNone(old_model.draft_change_list_last_updated)
+        self.assertIsNotNone(old_model.draft_change_list_exp_version)
+
+        self._run_job_and_verify_output([
+            '[u\'DISCARDED - Draft is old\', [u\'%s\']]' %
+            self.EXP_USER_DATA_MODEL_ID,
+            '[u\'SUCCESS - Discarded draft\', 1]'
+        ])
+        new_model = user_models.ExplorationUserDataModel.get_by_id(
+            self.EXP_USER_DATA_MODEL_ID)
+        self.assertLess(old_model.last_updated, new_model.last_updated)
+        self.assertIsNone(new_model.draft_change_list)
+        self.assertIsNone(new_model.draft_change_list_last_updated)
+        self.assertIsNone(new_model.draft_change_list_exp_version)

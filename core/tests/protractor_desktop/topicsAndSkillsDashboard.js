@@ -43,13 +43,12 @@ describe('Topics and skills dashboard functionality', function() {
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAdmin(
+    await users.createAndLoginAdminUser(
       'creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDB');
   });
 
   beforeEach(async function() {
-    await users.login('creator@topicsAndSkillsDashboard.com');
     await topicsAndSkillsDashboardPage.get();
   });
 
@@ -188,6 +187,13 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
         'Skill to be merged', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.clickCreateQuestionButton();
     await explorationEditorMainTab.setContent(
@@ -199,6 +205,9 @@ describe('Topics and skills dashboard functionality', function() {
       'FuzzyEquals', ['correct']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
@@ -221,6 +230,9 @@ describe('Topics and skills dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+  });
+
+  afterAll(async function() {
     await users.logout();
   });
 });

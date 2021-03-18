@@ -63,7 +63,9 @@ require(
   'exploration-param-changes.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-rights-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -211,6 +213,13 @@ angular.module('oppia').component('settingsTab', {
       ctrl.areParametersEnabled = function() {
         return ExplorationFeaturesService.areParametersEnabled();
       };
+
+      ctrl.areParametersUsed = function() {
+        if (ctrl.hasPageLoaded) {
+          return (ExplorationDataService.data.param_changes.length > 0);
+        }
+      };
+
       ctrl.enableParameters = function() {
         ExplorationFeaturesService.enableParameters();
       };
@@ -247,33 +256,41 @@ angular.module('oppia').component('settingsTab', {
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
         ctrl.closeRolesForm();
         ExplorationRightsService.saveRoleChanges(
-          newMemberUsername, newMemberRole);
+          newMemberUsername, newMemberRole, $rootScope.$applyAsync);
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
         ExplorationRightsService.setViewability(
-          !ExplorationRightsService.viewableIfPrivate());
+          !ExplorationRightsService.viewableIfPrivate(),
+          $rootScope.$applyAsync
+        );
+      };
+
+      ctrl._successCallback = () => {
+        $rootScope.$applyAsync();
       };
 
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          true);
+          true, ctrl._successCallback);
       };
       ctrl.muteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          true
+          true,
+          ctrl._successCallback
         );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          false
+          false,
+          ctrl._successCallback
         );
       };
       ctrl.unmuteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          false);
+          false, ctrl._successCallback);
       };
 
       // Methods relating to control buttons.
@@ -299,7 +316,7 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          ExplorationRightsService.makeCommunityOwned();
+          ExplorationRightsService.makeCommunityOwned($rootScope.$applyAsync);
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -345,7 +362,7 @@ angular.module('oppia').component('settingsTab', {
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
             ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody);
+              emailBody, $rootScope.$applyAsync);
           }, function() {
             AlertsService.clearWarnings();
           });

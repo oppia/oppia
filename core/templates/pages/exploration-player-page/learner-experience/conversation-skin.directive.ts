@@ -776,7 +776,7 @@ angular.module('oppia').directive('conversationSkin', [
                     classroom_url_fragment: classroomUrlFragment,
                     story_url_fragment: storyUrlFragment
                   });
-                StoryViewerBackendApiService.fetchStoryData(
+                StoryViewerBackendApiService.fetchStoryDataAsync(
                   topicUrlFragment, classroomUrlFragment,
                   storyUrlFragment).then(
                   function(res) {
@@ -797,7 +797,7 @@ angular.module('oppia').directive('conversationSkin', [
                     $rootScope.$apply();
                   });
                 if ($scope.isLoggedIn) {
-                  StoryViewerBackendApiService.recordChapterCompletion(
+                  StoryViewerBackendApiService.recordChapterCompletionAsync(
                     topicUrlFragment, classroomUrlFragment,
                     storyUrlFragment, nodeId
                   ).then(function(returnObject) {
@@ -1298,6 +1298,12 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              // TODO(#11996): Remove when migrating to Angular2+.
+              CurrentInteractionService.onAnswerChanged$.subscribe(() => {
+                $rootScope.$applyAsync();
+              })
+            );
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isLoggedIn = null;
             $scope.storyNodeIdToAdd = null;

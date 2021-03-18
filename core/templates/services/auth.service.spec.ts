@@ -18,124 +18,214 @@
 
 import { TestBed } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { of } from 'rxjs';
-import { marbles } from 'rxjs-marbles';
+import { md5 } from 'hash-wasm';
 
+import { AppConstants } from 'app.constants';
 import { AuthService } from 'services/auth.service';
-import { MockAngularFireAuth } from 'tests/unit-test-utils';
-
+import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 describe('Auth service', () => {
-  const setUpSystemUnderTest = (
-      idTokenSource$ = of(null)): [AngularFireAuth, AuthService] => {
-    const mockAngularFireAuth = new MockAngularFireAuth(idTokenSource$);
+  let authService: AuthService;
+
+  let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
+  let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
+
+  beforeEach(() => {
+    angularFireAuth = jasmine.createSpyObj<AngularFireAuth>([
+      'createUserWithEmailAndPassword',
+      'getRedirectResult',
+      'signInWithEmailAndPassword',
+      'signInWithRedirect',
+      'signOut',
+    ]);
+    authBackendApiService = (
+      jasmine.createSpyObj<AuthBackendApiService>(['beginSessionAsync']));
 
     TestBed.configureTestingModule({
       providers: [
-        AuthService,
-        {provide: AngularFireAuth, useValue: mockAngularFireAuth},
+        {provide: AngularFireAuth, useValue: angularFireAuth},
+        {provide: AuthBackendApiService, useValue: authBackendApiService},
       ]
     });
 
-    return [TestBed.inject(AngularFireAuth), TestBed.inject(AuthService)];
-  };
+    authService = TestBed.inject(AuthService);
+  });
+
+  it('should not use firebase auth in unit tests', () => {
+    expect(AuthService.firebaseAuthIsEnabled).toBeFalse();
+  });
+
+  it('should be in emulator mode by default', () => {
+    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
+      .and.returnValue(true);
+
+    expect(AuthService.firebaseEmulatorIsEnabled).toBeTrue();
+  });
+
+  it('should not provide firebase config if auth is disabled', () => {
+    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
+      .and.returnValue(false);
+
+    expect(AuthService.firebaseConfig).toBeUndefined();
+  });
+
+  it('should use firebase constants for the config', () => {
+    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
+      .and.returnValue(true);
+
+    expect(AuthService.firebaseConfig).toEqual({
+      apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
+      authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
+      projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
+      storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
+      messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+      appId: AppConstants.FIREBASE_CONFIG_APP_ID,
+    });
+  });
+
+  it('should return emulator config when emulator is enabled', () => {
+    spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
+      .and.returnValue(true);
+
+    expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
+  });
+
+  it('should return undefined when emulator is disabled', () => {
+    spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
+      .and.returnValue(false);
+
+    expect(AuthService.firebaseEmulatorConfig).toBeUndefined();
+  });
 
   it('should resolve when sign out succeeds', async() => {
-    const [angularFireAuth, authService] = setUpSystemUnderTest();
-
-    spyOn(angularFireAuth, 'signOut').and.resolveTo();
+    angularFireAuth.signOut.and.resolveTo();
 
     await expectAsync(authService.signOutAsync()).toBeResolvedTo();
   });
 
   it('should reject when sign out fails', async() => {
-    const [angularFireAuth, authService] = setUpSystemUnderTest();
-
-    spyOn(angularFireAuth, 'signOut').and.rejectWith(new Error('fail'));
+    angularFireAuth.signOut.and.rejectWith(new Error('fail'));
 
     await expectAsync(authService.signOutAsync()).toBeRejectedWithError('fail');
   });
 
-  it('should unsubscribe from source after calling ngOnDestroy', marbles(m => {
-    // AuthService calls .subscribe() on the source ID tokens at "frame 0" of
-    // the marble diagrams (represented by the ^ character).
-    //
-    // We schedule ngOnDestroy() to be called two frames _after_ that (each
-    // non-whitespace character of the marble diagram is "1 frame").
-    //
-    // Given that ngOnDestroy() is supposed to call .unsubscribe() on the source
-    // observable, that means the subscription should end (represented by the !
-    // character) two frames after the subscription starts.
-    //
-    // Note that the lifetime of the source tokens are not bounded by the
-    // subscription. AuthService simply subscribes, listens for a few frames,
-    // and then unsubscribes (because it was destroyed with `.ngOnDestroy()`).
-    const sourceIdTokens = m.hot('           --^---');
-    const expectedAuthServiceSubscription = '  ^-! ';
+  it('should throw if signOutAsync is called without angular fire', async() => {
+    await expectAsync(
+      new AuthService(null, authBackendApiService).signOutAsync()
+    ).toBeRejectedWithError('AngularFireAuth is not available');
+  });
 
-    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
-    m.scheduler.schedule(() => authService.ngOnDestroy(), 2);
+  it('should throw if signInAsync is called without angular fire', async() => {
+    await expectAsync(
+      new AuthService(null, authBackendApiService).signInAsync()
+    ).toBeRejectedWithError('AngularFireAuth is not available');
+  });
 
-    m.expect(sourceIdTokens)
-      .toHaveSubscriptions(expectedAuthServiceSubscription);
-  }));
+  describe('Sign In Behavior', function() {
+    beforeEach(async() => {
+      authBackendApiService.beginSessionAsync.and.resolveTo();
 
-  it('should emit null when subscription is too early', marbles(m => {
-    // Subscribing to the service's idToken$ emits null for early observers
-    // because the source hasn't produced anything yet. The subscription ends
-    // before 'a' is emitted, so null is the first and last value observed.
-    const sourceIdTokens = m.hot('-----a-');
-    const expectedObservations = '-N--   ';
-    const givenSubscription = '   -^-!   ';
+      this.email = 'email@test.com';
+      this.password = await md5(this.email);
+      this.creds = {
+        user: jasmine.createSpyObj(['getIdToken']),
+        credential: null,
+        additionalUserInfo: {isNewUser: false, profile: {}, providerId: null},
+      };
+    });
 
-    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
+    describe('Production enabled', () => {
+      beforeEach(() => {
+        spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
+          .and.returnValue(false);
+      });
 
-    m.expect(authService.idToken$, givenSubscription)
-      .toBeObservable(expectedObservations, {N: null});
-  }));
+      it('should sign in using redirect', async() => {
+        angularFireAuth.signInWithRedirect.and.resolveTo();
 
-  it('should emit most recent value after subscribing', marbles(m => {
-    const sourceIdTokens = m.hot('-a---b---');
-    // The early observer will see 'a' and stick around to see 'b' as well.
-    const earlyObservations = '   ---a-b---';
-    const earlySubscription = '   ---^-----';
-    // The late observer will only see 'b'.
-    const lateObservations = '    -------b-';
-    const lateSubscription = '    -------^-';
+        this.creds.user.getIdToken.and.resolveTo('TKN');
+        this.creds.additionalUserInfo.isNewUser = false;
+        angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
 
-    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
+        const signInPromise = authService.signInAsync();
 
-    m.expect(authService.idToken$, earlySubscription)
-      .toBeObservable(earlyObservations);
-    m.expect(authService.idToken$, lateSubscription)
-      .toBeObservable(lateObservations);
-  }));
+        await expectAsync(signInPromise).toBeResolvedTo(false);
 
-  it('should emit null when the source errors', marbles(m => {
-    // Even though the source emits an error (represented with the # character),
-    // the subscriber just observes a null value and continues, rather than
-    // ending abruptly from the same error.
-    const sourceIdTokens = m.hot('a---#  ');
-    const expectedObservations = '--a-N--';
-    const givenSubscription = '   --^----';
+        expect(angularFireAuth.signInWithRedirect).toHaveBeenCalled();
+      });
 
-    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
+      it('should recognize new users', async() => {
+        angularFireAuth.signInWithRedirect.and.resolveTo();
 
-    m.expect(authService.idToken$, givenSubscription)
-      .toBeObservable(expectedObservations, {a: 'a', N: null});
-  }));
+        this.creds.user.getIdToken.and.resolveTo('TKN');
+        this.creds.additionalUserInfo.isNewUser = true;
+        angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
 
-  it('should continue to emit null after the source errors', marbles(m => {
-    // The source has closed due to an error, but new subscribers can still
-    // register themselves and observe a single null value without ending the
-    // stream.
-    const sourceIdTokens = m.hot('-#    ');
-    const expectedObservations = '---N--';
-    const givenSubscription = '   ---^--';
+        const signInPromise = authService.signInAsync();
 
-    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
+        await expectAsync(signInPromise).toBeResolvedTo(true);
 
-    m.expect(authService.idToken$, givenSubscription)
-      .toBeObservable(expectedObservations, {N: null});
-  }));
+        expect(angularFireAuth.signInWithRedirect).toHaveBeenCalled();
+      });
+
+      it('should propogate errors', async() => {
+        angularFireAuth.signInWithRedirect.and.resolveTo();
+
+        const error = {code: 'auth/operation-not-allowed'};
+        angularFireAuth.getRedirectResult.and.rejectWith(error);
+
+        await expectAsync(authService.signInAsync()).toBeRejectedWith(error);
+      });
+    });
+
+    describe('Emulator enabled', () => {
+      beforeEach(() => {
+        spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
+          .and.returnValue(true);
+      });
+
+      it('should sign in using prompt', async() => {
+        spyOn(window, 'prompt').and.returnValue(this.email);
+
+        this.creds.user.getIdToken.and.resolveTo('TKN');
+        this.creds.additionalUserInfo.isNewUser = false;
+        angularFireAuth.signInWithEmailAndPassword.and.resolveTo(this.creds);
+
+        const signInPromise = authService.signInAsync();
+
+        await expectAsync(signInPromise).toBeResolvedTo(false);
+
+        expect(angularFireAuth.signInWithEmailAndPassword.calls.first().args)
+          .toEqual([this.email, this.password]);
+      });
+
+      it('should recognize new users', async() => {
+        spyOn(window, 'prompt').and.returnValue(this.email);
+
+        angularFireAuth.signInWithEmailAndPassword
+          .and.rejectWith({code: 'auth/user-not-found'});
+
+        this.creds.user.getIdToken.and.resolveTo('TKN');
+        this.creds.additionalUserInfo.isNewUser = true;
+        angularFireAuth.createUserWithEmailAndPassword
+          .and.resolveTo(this.creds);
+
+        const signInPromise = authService.signInAsync();
+
+        await expectAsync(signInPromise).toBeResolvedTo(true);
+
+        expect(angularFireAuth.signInWithEmailAndPassword.calls.first().args)
+          .toEqual([this.email, this.password]);
+      });
+
+      it('should propogate errors', async() => {
+        spyOn(window, 'prompt').and.returnValue(this.email);
+
+        const error = {code: 'auth/operation-not-allowed'};
+        angularFireAuth.signInWithEmailAndPassword.and.rejectWith(error);
+
+        await expectAsync(authService.signInAsync()).toBeRejectedWith(error);
+      });
+    });
+  });
 });

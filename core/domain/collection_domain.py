@@ -476,7 +476,6 @@ class Collection(python_utils.OBJECT):
         new_collection_dict = (
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
-        collection_dict['nodes'] = new_collection_dict['nodes']
         collection_dict['skills'] = new_collection_dict['skills']
         collection_dict['next_skill_id'] = (
             new_collection_dict['next_skill_id'])
@@ -503,10 +502,6 @@ class Collection(python_utils.OBJECT):
         This changes the structure of each node to not include skills as well
         as remove skills from the Collection model itself.
         """
-        new_collection_dict = (
-            cls._convert_collection_contents_v5_dict_to_v6_dict(
-                collection_dict))
-        collection_dict['nodes'] = new_collection_dict['nodes']
         del collection_dict['skills']
         del collection_dict['next_skill_index']
 
