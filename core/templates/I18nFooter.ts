@@ -104,7 +104,7 @@ angular.module('oppia').config([
   }
 ]);
 
-import { Component, ElementRef, Injector } from '@angular/core';
+import { Directive, ElementRef, Injector } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 @Directive({
   selector: 'oppia-i18n-footer'
