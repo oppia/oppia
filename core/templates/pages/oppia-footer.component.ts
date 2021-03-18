@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the footer.
+ * @fileoverview Component for the footer.
  */
 
 import { Component } from '@angular/core';
