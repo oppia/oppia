@@ -102,36 +102,8 @@
                  target="_blank"
                  rel="noopener"
                  translate="I18N_TOPNAV_BLOG">
-                Blog
               </a>
             </li>
-            <!-- <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-get-started-link "
-                 href="/get-started"
-                 translate="I18N_TOPNAV_GET_STARTED">
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content"
-                 href="/contact"
-                 translate="I18N_TOPNAV_CONTACT_US">
-              </a>
-            </li>
-            <li class="nav-item">
-              <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {tab: $ctrl.ACTION_CLOSE})"
-                 class="dropdown-item nav-link oppia-navbar-tab-content"
-                 href="https://oppiafoundation.org/volunteer"
-                 target="_blank"
-                 rel="noopener"
-                 translate="I18N_TOPNAV_GET_INVOLVED">
-              </a>
-            </li> 
-            <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content"
-                 href="/teach#teach"
-                 translate="I18N_FOOTER_TEACH">
-              </a>
-            </li>-->
           </ul>
         </li>
         <li ng-class="{'open' : $ctrl.activeMenuName === 'getInvolvedMenu'}" uib-dropdown 
@@ -151,7 +123,7 @@
         <li class="nav-item">
           <a ng-keydown="$ctrl.onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: $ctrl.ACTION_CLOSE})"
              class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
-             href="/volunteer"
+             href="https://oppiafoundation.org/volunteer"
              translate="I18N_TOPNAV_VOLUNTEER">
           </a>
         </li>
@@ -165,7 +137,7 @@
         </li>
         <li class="nav-item">
           <a class="dropdown-item nav-link oppia-navbar-tab-content"
-             href="http://oppiafoundation.org"
+             href="/donate"
              target="_blank"
              rel="noopener"
              translate="I18N_TOPNAV_DONATE">
@@ -181,9 +153,6 @@
             </a>
           </div>
         </li>
-        <!-- <li ng-if="!$ctrl.inClassroomPage">
-          <create-activity-button ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
-        </li> -->
       </ul>
     </li>
   </ul>
