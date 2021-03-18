@@ -4254,8 +4254,8 @@ title: Old Title
 
         with self.assertRaisesRegexp(
             Exception,
-            'Sorry, we can only process v1-v%d and unversioned exploration '
-            'state schemas at present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
+            'Sorry, we can only process v41-v%d exploration state schemas at '
+            'present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
             exp_fetchers.get_exploration_from_model(exp_model)
 
     def test_update_exploration_with_empty_change_list_does_not_update(self):

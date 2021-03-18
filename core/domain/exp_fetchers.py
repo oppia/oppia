@@ -66,12 +66,14 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     if states_schema_version is None or states_schema_version < 1:
         states_schema_version = 0
 
-    if not (0 <= states_schema_version
+    if not (feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION
+            <= states_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
         raise Exception(
-            'Sorry, we can only process v1-v%d and unversioned exploration '
-            'state schemas at present.' %
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+            'Sorry, we can only process v%d-v%d and unversioned exploration '
+            'state schemas at present.' % (
+                feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
+                feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):

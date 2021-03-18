@@ -1830,61 +1830,6 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = (
-        """author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
-
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
 

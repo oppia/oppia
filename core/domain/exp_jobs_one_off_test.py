@@ -1631,8 +1631,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             exp_jobs_one_off
             .ExplorationContentValidationJobForCKEditor.get_output(job_id))
         expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
-            'exploration state schemas at present. when loading exploration\', '
+            u'[u\'Error Sorry, we can only process v41-v%sexploration state '
+            'schemas at present. when loading exploration\', '
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
@@ -2498,8 +2498,8 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
             .RTECustomizationArgsValidationOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
-            'exploration state schemas at present. when loading exploration\', '
+            u'[u\'Error Sorry, we can only process v41-v%s exploration state '
+            'schemas at present. when loading exploration\', '
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
