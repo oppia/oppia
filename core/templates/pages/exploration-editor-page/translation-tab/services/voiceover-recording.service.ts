@@ -63,7 +63,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       }
     };
 
-    var _initRecorderAsync = async function() {
+    var _initRecorder = function() {
       // Browser agnostic AudioContext API check.
       audioContextAvailable = $window.AudioContext ||
         $window.webkitAudioContext;
@@ -126,7 +126,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
 
     return {
       initRecorder: function() {
-        _initRecorderAsync();
+        _initRecorder();
       },
       status: function() {
         return {
