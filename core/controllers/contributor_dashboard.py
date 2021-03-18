@@ -49,7 +49,10 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self, opportunity_type):
-        """Handles GET requests."""
+        """Handles GET requests.
+        Args:
+            opportunity_type: str. Type of Opportunity.
+        """
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
         search_cursor = self.request.get('cursor', None)
