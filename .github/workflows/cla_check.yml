@@ -25,10 +25,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "3.8"
+      - name: Setup python by installing wheel
+        run: pip install wheel==0.35.0
+      - name: Install third party
+        run: python -m scripts.install_third_party_libs
       - name: Install dependencies
         run: |
           pip install google-api-python-client google-auth-oauthlib
-          sudo apt-get install python-yaml
       - name: execute cla script
         env:
           SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
