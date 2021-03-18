@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
-* @fileoverview Lint check to ensure that there is exactly one line break
-* after each test cases.
-*/
+ * @fileoverview Lint check to ensure that there is exactly one line break
+ * after each test cases.
+ */
 
 'use strict';
 
@@ -30,7 +30,7 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      line: 'There should be a single line break '
+      line: 'There should be a single line break before it'
     }
   },
 
@@ -40,22 +40,19 @@ module.exports = {
 
     var checkLineBreak = function(testMessageNode) {
       var line = testMessageNode.loc.start.line;
-      if (lines[line - 2] !== undefined) {
-        if (lines[line - 2]){
-         context.report({
-             testMessageNode,
-             loc: testMessageNode.loc,
-              messageId: 'line'
-         });
-            
-        }
-        if (lines[line-2] === '' && lines[line-3] === '') {
+      if (line >= 2 && lines[line - 2]) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
           messageId: 'line'
         });
       }
+      if (line >= 2 && lines[line - 2] === '' && lines[line - 3] === '') {
+        context.report({
+          testMessageNode,
+          loc: testMessageNode.loc,
+          messageId: 'line'
+        });
       }
     };
 
