@@ -28,7 +28,10 @@ import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -38,6 +41,8 @@ describe('Learner dashboard page', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
+  var $timeout = null;
+  var $window = null;
   var $uibModal = null;
   var AlertsService = null;
   var CsrfTokenService = null;
@@ -46,13 +51,14 @@ describe('Learner dashboard page', function() {
   var LearnerDashboardBackendApiService = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
+  var focusManagerService = null;
 
   var profilePictureDataUrl = 'profile-picture-url';
   var userInfo = {
     getUsername: () => 'username1'
   };
   var learnerDashboardData = null;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -60,10 +66,19 @@ describe('Learner dashboard page', function() {
     }
   }));
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    focusManagerService = TestBed.get(FocusManagerService);
+  });
+
   describe('when succesfully fetching learner dashboard data', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
+      $window = $injector.get('$window');
+      $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
       CsrfTokenService = $injector.get('CsrfTokenService');
@@ -288,6 +303,19 @@ describe('Learner dashboard page', function() {
       expect(ctrl.noExplorationActivity).toBe(false);
       expect(ctrl.noCollectionActivity).toBe(false);
       expect(ctrl.noActivity).toBe(false);
+    });
+
+    it('should set focus on browse lesson btn', function() {
+      let defer = $q.defer();
+      defer.resolve([UserService.getProfileImageDataUrlAsync(),{}])
+      spyOn($q, 'all').and.returnValue(defer.promise);
+      var focusSpy = spyOn(focusManagerService, 'setFocus');
+      var windowSpy = spyOn ($window, 'scrollTo');
+      ctrl.$onInit();
+      $timeout.flush();
+      expect(focusSpy).toHaveBeenCalled();
+      $timeout.flush();
+      expect(windowSpy).toHaveBeenCalled();
     });
 
     it('should get static image url', function() {

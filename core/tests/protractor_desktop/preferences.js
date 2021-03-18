@@ -144,11 +144,13 @@ describe('Preferences', function() {
       await users.createUser('lorem@preferences.com', 'loremPreferences');
       await users.login('lorem@preferences.com');
       await preferencesPage.get();
+      await waitFor.pageToFullyLoad();
       await preferencesPage.selectCreatorDashboard();
       await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/creator-dashboard');
       await preferencesPage.get();
+      await waitFor.pageToFullyLoad();
       await preferencesPage.selectLearnerDashboard();
       await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
