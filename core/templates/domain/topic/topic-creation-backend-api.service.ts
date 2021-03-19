@@ -67,7 +67,7 @@ export class TopicCreationBackendApiService {
       });
   }
 
-  createTopic(
+  async createTopicAsync(
       topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): Promise<TopicCreationResponse> {
     return new Promise((resolve, reject) => {

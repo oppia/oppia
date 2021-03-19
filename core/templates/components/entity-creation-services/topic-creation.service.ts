@@ -74,7 +74,7 @@ angular.module('oppia').factory('TopicCreationService', [
           var newTab = $window.open();
           var imagesData = ImageLocalStorageService.getStoredImagesData();
           var bgColor = ImageLocalStorageService.getThumbnailBgColor();
-          TopicCreationBackendApiService.createTopic(
+          TopicCreationBackendApiService.createTopicAsync(
             newlyCreatedTopic, imagesData, bgColor).then(
             function(response) {
               TopicsAndSkillsDashboardBackendApiService.
