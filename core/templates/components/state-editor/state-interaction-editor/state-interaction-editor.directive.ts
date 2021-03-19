@@ -219,12 +219,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.isInteractionDisabled = function() {
-            if (
+            return (
               StateInteractionIdService.displayed === 'EndExploration' &&
-              ContextService.isExplorationLinkedToStory()) {
-              return true;
-            }
-            return false;
+              ContextService.isExplorationLinkedToStory());
           };
 
           $scope.openInteractionCustomizerModal = function() {

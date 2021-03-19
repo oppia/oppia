@@ -118,6 +118,7 @@ describe('Context service', () => {
     });
 
     it('should correctly retrieve the story context', () => {
+      expect(ecs.isExplorationLinkedToStory()).toBe(false);
       ecs.setExplorationIsLinkedToStory();
       expect(ecs.isExplorationLinkedToStory()).toBe(true);
     });
