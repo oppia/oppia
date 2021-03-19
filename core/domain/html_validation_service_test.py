@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import os
 
 import bs4
@@ -28,8 +27,6 @@ from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
 import python_utils
-
-import contextlib2
 
 
 class ContentMigrationTests(test_utils.GenericTestBase):

@@ -287,8 +287,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    states_schema_version,
-                    item.id)
+                    states_schema_version)
                 states_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -880,8 +879,7 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    current_state_schema_version,
-                    exp_id)
+                    current_state_schema_version)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -969,8 +967,7 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         while current_state_schema_version < target_state_schema_version:
             exp_domain.Exploration.update_states_from_model(
                 versioned_exploration_states,
-                current_state_schema_version,
-                exp_id)
+                current_state_schema_version)
             current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:

@@ -26,27 +26,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
-import functools
 import json
 import re
 import string
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import customization_args_util
-from core.domain import expression_parser
-from core.domain import html_validation_service
-from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-from extensions import domain
 import feconf
 import python_utils
-import schema_utils
 import utils
-
-from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -1669,8 +1660,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version,
-            exploration_id):
+            cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -1686,7 +1676,6 @@ class Exploration(python_utils.OBJECT):
                     dicts used to initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
-            exploration_id: str. ID of the exploration.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -1727,16 +1716,12 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(
-            cls, yaml_content, exp_id, title=None, category=None):
+    def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:
             yaml_content: str. The YAML representation of the exploration.
-            exp_id: str. ID of the exploration.
-            title: str. The exploration title.
-            category: str. The exploration category.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -1757,7 +1742,6 @@ class Exploration(python_utils.OBJECT):
                 % e)
 
         exploration_schema_version = exploration_dict.get('schema_version')
-        initial_schema_version = exploration_schema_version
         if exploration_schema_version is None:
             raise utils.InvalidInputException(
                 'Invalid YAML file: no schema version specified.')
@@ -1775,7 +1759,7 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 47
 
-        return (exploration_dict, initial_schema_version)
+        return exploration_dict
 
     @classmethod
     def from_yaml(cls, exploration_id, yaml_content):
@@ -1794,9 +1778,7 @@ class Exploration(python_utils.OBJECT):
                 outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 CURRENT_EXP_SCHEMA_VERSION].
         """
-        migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id)
-        exploration_dict, initial_schema_version = migration_result
+        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

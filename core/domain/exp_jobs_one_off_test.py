@@ -1111,7 +1111,6 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         swap_exp_schema_46 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_41, swap_exp_schema_46:
-            # TODO: change state dict to actually be v41
             exp_model = exp_models.ExplorationModel(
                 id=self.NEW_EXP_ID, category='category', title=self.EXP_TITLE,
                 objective='Old objective', language_code='en', tags=[],
