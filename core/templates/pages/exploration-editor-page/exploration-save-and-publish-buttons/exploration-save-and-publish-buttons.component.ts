@@ -47,7 +47,6 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ExplorationWarningsService, UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
       };

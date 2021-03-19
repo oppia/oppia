@@ -108,8 +108,8 @@ describe('User Exploration Permissions Service', () => {
     flushMicrotasks();
   }));
 
-  it('should fetch rights data irrespective' +
-  'whether it is cached or not', fakeAsync(() => {
+  it('should emit when the user exploration' +
+  'permissions are fetched', fakeAsync(() => {
     let mockuserExplorationPermissionsFetched = new EventEmitter();
     ueps.fetchPermissionsAsync();
     let req = httpTestingController.expectOne(

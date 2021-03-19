@@ -462,7 +462,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
       get onInitExplorationPage() {
         return _initExplorationPageEventEmitter;
-      },
+      }
     };
   }
 ]);
