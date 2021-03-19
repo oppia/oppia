@@ -195,6 +195,8 @@ describe('Admin dev mode activities tab', () => {
     });
 
     it('should not reload all exploration without user\'s confirmation', () => {
+      component.reloadingAllExplorationPossible = true;
+      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       component.reloadAllExplorations();
       mockConfirmResult(false);
 
