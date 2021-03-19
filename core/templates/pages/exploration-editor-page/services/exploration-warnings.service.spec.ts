@@ -18,7 +18,7 @@
 
 import { fakeAsync } from '@angular/core/testing';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
 
@@ -28,8 +28,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -85,8 +83,6 @@ describe('Exploration Warnings Service', function() {
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
         new RuleObjectFactory()));
-    $provide.value(
-      'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
