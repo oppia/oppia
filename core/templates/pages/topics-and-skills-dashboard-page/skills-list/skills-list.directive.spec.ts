@@ -27,6 +27,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { Subscription } from 'rxjs';
 
+import { TopicSummary } from 'domain/topic/topic-summary.model';
+
 describe('Skills List Directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -241,7 +243,25 @@ describe('Skills List Directive', function() {
       });
 
       $scope.getEditableTopicSummaries = function() {
-        return [{id: 'dnfsdk', version: 1}];
+        let sampleTopicSummary = TopicSummary.createFromBackendDict({
+          id: 'dnfsdk',
+          name: 'topicName',
+          language_code: 'en',
+          description: 'abc',
+          version: 1,
+          canonical_story_count: 0,
+          additional_story_count: 0,
+          subtopic_count: 0,
+          total_skill_count: 0,
+          total_published_node_count: 0,
+          uncategorized_skill_count: 0,
+          thumbnail_filename: 'abc.svg',
+          thumbnail_bg_color: '#FFFFFF',
+          topic_model_created_on: 45,
+          topic_model_last_updated: 45,
+          url_fragment: 'topic-one'
+        });
+        return [sampleTopicSummary];
       };
       var skillId = 'CdjnJUE332dd';
 

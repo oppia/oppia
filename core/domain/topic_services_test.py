@@ -114,6 +114,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.total_skill_count, 2)
+        self.assertEqual(topic_summary.total_published_node_count, 0)
         self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
