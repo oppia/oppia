@@ -67,6 +67,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { UpgradedServices } from 'services/UpgradedServices';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -81,7 +82,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   {provide: AngularFireAuth, useValue: null},
 ];
 
-
 @NgModule({
   imports: [
     CommonModule,
@@ -95,6 +95,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   providers: [
     ...firebaseAuthProviders,
+    ...UpgradedServices.providers,
   ],
 
   declarations: [

@@ -26,6 +26,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
+const { UpgradedServices } = require('services/UpgradedServices');
+new UpgradedServices();
 require(
   'pages/pending-account-deletion-page/' +
   'pending-account-deletion-page.module.ts');

@@ -16,8 +16,6 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import {
   HttpClient,
@@ -527,16 +525,12 @@ import { SolutionVerificationService } from
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { QuestionValidationService } from './question-validation.service';
 
-interface UpgradedServicesDict {
-  [service: string]: unknown;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
 export class UpgradedServices {
-  getUpgradedServices(): UpgradedServicesDict {
-    var upgradedServices = {};
+  static ugs: Record<string, unknown> = {};
+  static providers;
+
+  constructor() {
+    let upgradedServices = {};
     // We are using eslint disable here for multilines because we have not used
     // dot notation at a lot of places so it does not seem practical to use
     // "eslint disable next line" for each of them. Also, we can't use dot
@@ -544,43 +538,42 @@ export class UpgradedServices {
     // exist on type '{}'" lint error will be raised by the linter.
     /* eslint-disable-next-line oppia/no-multiline-disable */
     /* eslint-disable dot-notation */
-
     // Topological level: 0.
     upgradedServices['AdminRouterService'] = new AdminRouterService();
     upgradedServices['AdminTaskManagerService'] = new AdminTaskManagerService();
     upgradedServices['AlgebraicExpressionInputRulesService'] =
-      new AlgebraicExpressionInputRulesService();
+          new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AppService'] = new AppService();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
     upgradedServices['AudioTranslationManagerService'] =
-      new AudioTranslationManagerService();
+          new AudioTranslationManagerService();
     upgradedServices['AutoplayedVideosService'] = new AutoplayedVideosService();
     upgradedServices['BackgroundMaskService'] = new BackgroundMaskService();
     upgradedServices['baseInteractionValidationService'] =
-      new baseInteractionValidationService();
+          new baseInteractionValidationService();
     upgradedServices['BrowserCheckerService'] =
-      new BrowserCheckerService(new WindowRef());
+          new BrowserCheckerService(new WindowRef());
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['CollectionValidationService'] =
-      new CollectionValidationService();
+          new CollectionValidationService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['ConstructTranslationIdsService'] =
-      new ConstructTranslationIdsService();
+          new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['DragAndDropSortInputRulesService'] =
-      new DragAndDropSortInputRulesService();
+          new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EndExplorationRulesService'] =
-      new EndExplorationRulesService();
+          new EndExplorationRulesService();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
     upgradedServices['ExplorationFeaturesService'] =
-      new ExplorationFeaturesService();
+          new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
@@ -589,17 +582,17 @@ export class UpgradedServices {
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageClickInputRulesService'] =
-      new ImageClickInputRulesService();
+          new ImageClickInputRulesService();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['InteractionDetailsCacheService'] =
-      new InteractionDetailsCacheService();
+          new InteractionDetailsCacheService();
     upgradedServices['InteractiveMapRulesService'] =
-      new InteractiveMapRulesService();
+          new InteractiveMapRulesService();
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['ItemSelectionInputRulesService'] =
-      new ItemSelectionInputRulesService();
+          new ItemSelectionInputRulesService();
     upgradedServices['LearnerActionObjectFactory'] =
-      new LearnerActionObjectFactory();
+          new LearnerActionObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
@@ -607,127 +600,128 @@ export class UpgradedServices {
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
-      new MathEquationInputRulesService();
+          new MathEquationInputRulesService();
     upgradedServices['Meta'] = new Meta({});
     upgradedServices['MisconceptionObjectFactory'] =
-      new MisconceptionObjectFactory();
+          new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
-      new MultipleChoiceInputRulesService();
+          new MultipleChoiceInputRulesService();
     upgradedServices['MusicPhrasePlayerService'] =
-      new MusicPhrasePlayerService();
+          new MusicPhrasePlayerService();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
-      new NormalizeWhitespacePunctuationAndCasePipe();
+          new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['NumberAttemptsService'] = new NumberAttemptsService();
     upgradedServices['NumericExpressionInputRulesService'] =
-      new NumericExpressionInputRulesService();
+          new NumericExpressionInputRulesService();
     upgradedServices['NumericInputRulesService'] =
-      new NumericInputRulesService();
+          new NumericInputRulesService();
     upgradedServices['ParamChangeObjectFactory'] =
-      new ParamChangeObjectFactory();
+          new ParamChangeObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
-      new PlayerCorrectnessFeedbackEnabledService();
+          new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
-      new PlaythroughIssueObjectFactory();
+          new PlaythroughIssueObjectFactory();
     upgradedServices['RatingComputationService'] =
-      new RatingComputationService();
+          new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
-      new RatioExpressionInputRulesService();
+          new RatioExpressionInputRulesService();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['RubricObjectFactory'] =
-      new RubricObjectFactory();
+          new RubricObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SchemaFormSubmittedService'] =
-      new SchemaFormSubmittedService();
+          new SchemaFormSubmittedService();
     upgradedServices['SchemaUndefinedLastElementService'] =
-      new SchemaUndefinedLastElementService();
+          new SchemaUndefinedLastElementService();
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['ShortSkillSummaryObjectFactory'] =
-      new ShortSkillSummaryObjectFactory();
+          new ShortSkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StateEditorRefreshService'] =
-      new StateEditorRefreshService();
+          new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory();
+          new StoryContentsObjectFactory();
     upgradedServices['StoryObjectFactory'] = new StoryObjectFactory(
       upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['StoryReferenceObjectFactory'] =
-      new StoryReferenceObjectFactory();
+          new StoryReferenceObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
-      new SubtitledHtmlObjectFactory();
+          new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
-      new SubtitledUnicodeObjectFactory();
+          new SubtitledUnicodeObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
     upgradedServices['ThreadStatusDisplayService'] =
-      new ThreadStatusDisplayService();
+          new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
-        new TopicsAndSkillsDashboardPageService();
+            new TopicsAndSkillsDashboardPageService();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['VoiceoverObjectFactory'] = new VoiceoverObjectFactory();
     upgradedServices['WindowRef'] = new WindowRef();
     upgradedServices['WinnowingPreprocessingService'] =
-      new WinnowingPreprocessingService();
+          new WinnowingPreprocessingService();
     upgradedServices['WrittenTranslationObjectFactory'] =
-      new WrittenTranslationObjectFactory();
+          new WrittenTranslationObjectFactory();
     upgradedServices['baseInteractionValidationService'] =
-      new baseInteractionValidationService();
+          new baseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
-      new ɵangular_packages_common_http_http_d();
+          new ɵangular_packages_common_http_http_d();
 
     // Topological level: 1.
     upgradedServices['AlgebraicExpressionInputValidationService'] =
-      new AlgebraicExpressionInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new AlgebraicExpressionInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['AlertsService'] = new AlertsService(
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
     upgradedServices['CodeReplValidationService'] =
-      new CodeReplValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new CodeReplValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['ContinueValidationService'] =
-      new ContinueValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new ContinueValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['DeviceInfoService'] = new DeviceInfoService(
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
-      new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+          new DocumentAttributeCustomizationService(
+            upgradedServices['WindowRef']);
     upgradedServices['DragAndDropSortInputValidationService'] =
-      new DragAndDropSortInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new DragAndDropSortInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['EndExplorationValidationService'] =
-      new EndExplorationValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new EndExplorationValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['ExpressionSyntaxTreeService'] =
-      new ExpressionSyntaxTreeService(
-        upgradedServices['ExpressionParserService']);
+          new ExpressionSyntaxTreeService(
+            upgradedServices['ExpressionParserService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory();
+          new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
-      new FractionInputRulesService(
-        upgradedServices['FractionObjectFactory'],
-        upgradedServices['UtilsService']);
+          new FractionInputRulesService(
+            upgradedServices['FractionObjectFactory'],
+            upgradedServices['UtilsService']);
     upgradedServices['FractionInputValidationService'] =
-      new FractionInputValidationService(
-        upgradedServices['FractionObjectFactory'],
-        upgradedServices['baseInteractionValidationService']);
+          new FractionInputValidationService(
+            upgradedServices['FractionObjectFactory'],
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['GraphInputRulesService'] =
-      new GraphInputRulesService(
-        upgradedServices['GraphUtilsService'],
-        upgradedServices['UtilsService']);
+          new GraphInputRulesService(
+            upgradedServices['GraphUtilsService'],
+            upgradedServices['UtilsService']);
     upgradedServices['GraphInputValidationService'] =
-      new GraphInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new GraphInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['GuestCollectionProgressService'] =
-      new GuestCollectionProgressService(
-        upgradedServices['WindowRef']);
+          new GuestCollectionProgressService(
+            upgradedServices['WindowRef']);
     upgradedServices['HintObjectFactory'] = new HintObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] = new HtmlEscaperService(
@@ -735,63 +729,64 @@ export class UpgradedServices {
     upgradedServices['HttpXhrBackend'] = new HttpXhrBackend(
       upgradedServices['ɵangular_packages_common_http_http_d']);
     upgradedServices['ImageClickInputValidationService'] =
-      new ImageClickInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new ImageClickInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['InteractiveMapValidationService'] =
-      new InteractiveMapValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new InteractiveMapValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['ItemSelectionInputValidationService'] =
-      new ItemSelectionInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new ItemSelectionInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['LocalStorageService'] = new LocalStorageService();
     upgradedServices['LogicProofValidationService'] =
-      new LogicProofValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new LogicProofValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
-      new MathEquationInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new MathEquationInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['MessengerService'] = new MessengerService(
       upgradedServices['LoggerService'],
       upgradedServices['WindowRef']);
     upgradedServices['MetaTagCustomizationService'] =
-      new MetaTagCustomizationService(upgradedServices['WindowRef']);
+          new MetaTagCustomizationService(upgradedServices['WindowRef']);
     upgradedServices['MultipleChoiceInputValidationService'] =
-      new MultipleChoiceInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new MultipleChoiceInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['MusicNotesInputRulesService'] =
-      new MusicNotesInputRulesService(
-        upgradedServices['UtilsService']);
+          new MusicNotesInputRulesService(
+            upgradedServices['UtilsService']);
     upgradedServices['MusicNotesInputValidationService'] =
-      new MusicNotesInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new MusicNotesInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['NormalizeWhitespacePipe'] = new NormalizeWhitespacePipe(
       upgradedServices['UtilsService']);
     upgradedServices['NumericInputValidationService'] =
-      new NumericInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new NumericInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
-      new NumberWithUnitsObjectFactory(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['FractionObjectFactory']);
+          new NumberWithUnitsObjectFactory(
+            upgradedServices['UnitsObjectFactory'],
+            upgradedServices['FractionObjectFactory']);
     upgradedServices['NumericExpressionInputValidationService'] =
-      new NumericExpressionInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new NumericExpressionInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsRulesService'] =
-      new NumberWithUnitsRulesService(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['UtilsService']);
+          new NumberWithUnitsRulesService(
+            upgradedServices['UnitsObjectFactory'],
+            upgradedServices['UtilsService']);
     upgradedServices['OutcomeObjectFactory'] =
-      new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
+          new OutcomeObjectFactory(
+            upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['PageTitleService'] = new PageTitleService(
       upgradedServices['Meta'], upgradedServices['Title']);
     upgradedServices['ParamChangesObjectFactory'] =
-      new ParamChangesObjectFactory(
-        upgradedServices['ParamChangeObjectFactory']);
+          new ParamChangesObjectFactory(
+            upgradedServices['ParamChangeObjectFactory']);
     upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
       upgradedServices['ParamTypeObjectFactory']);
     upgradedServices['PencilCodeEditorValidationService'] =
-      new PencilCodeEditorValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new PencilCodeEditorValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
@@ -799,79 +794,79 @@ export class UpgradedServices {
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['QuestionValidationService'] =
-    new QuestionValidationService(
-      upgradedServices['StateEditorService']
-    );
+        new QuestionValidationService(
+          upgradedServices['StateEditorService']
+        );
     upgradedServices['RatioExpressionInputValidationService'] =
-          new RatioExpressionInputValidationService(
-            upgradedServices['baseInteractionValidationService']);
+              new RatioExpressionInputValidationService(
+                upgradedServices['baseInteractionValidationService']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
-      new RecordedVoiceoversObjectFactory(
-        upgradedServices['VoiceoverObjectFactory']);
+          new RecordedVoiceoversObjectFactory(
+            upgradedServices['VoiceoverObjectFactory']);
     upgradedServices['SetInputValidationService'] =
-      new SetInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new SetInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['SkillCreationBackendApiService'] =
-        new SkillCreationBackendApiService(upgradedServices['HttpClient']);
+            new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['StateTopAnswersStatsObjectFactory'] =
-        new StateTopAnswersStatsObjectFactory();
+            new StateTopAnswersStatsObjectFactory();
     upgradedServices['SpeechSynthesisChunkerService'] =
-        new SpeechSynthesisChunkerService(
-          upgradedServices['HtmlEscaperService']);
+            new SpeechSynthesisChunkerService(
+              upgradedServices['HtmlEscaperService']);
     upgradedServices['SVMPredictionService'] = new SVMPredictionService();
     upgradedServices['SchemaDefaultValueService'] =
-      new SchemaDefaultValueService(
-        upgradedServices['LoggerService'],
-        upgradedServices['SubtitledHtmlObjectFactory'],
-        upgradedServices['SubtitledUnicodeObjectFactory']);
+          new SchemaDefaultValueService(
+            upgradedServices['LoggerService'],
+            upgradedServices['SubtitledHtmlObjectFactory'],
+            upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
       upgradedServices['WindowRef']);
     upgradedServices['StateClassifierMappingService'] =
-      new StateClassifierMappingService();
+          new StateClassifierMappingService();
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']);
     upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory();
+          new StoryContentsObjectFactory();
     upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory(
       upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['TextInputValidationService'] =
-      new TextInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+          new TextInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['TopicCreationBackendApiService'] =
-        new TopicCreationBackendApiService(
-          upgradedServices['HttpClient']);
+            new TopicCreationBackendApiService(
+              upgradedServices['HttpClient']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']);
     upgradedServices['WorkedExampleObjectFactory'] =
-      new WorkedExampleObjectFactory(
-        upgradedServices['SubtitledHtmlObjectFactory']);
+          new WorkedExampleObjectFactory(
+            upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['WrittenTranslationsObjectFactory'] =
-      new WrittenTranslationsObjectFactory(
-        upgradedServices['WrittenTranslationObjectFactory']);
+          new WrittenTranslationsObjectFactory(
+            upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['RuleObjectFactory']);
     upgradedServices['CkEditorCopyContentService'] =
-      new CkEditorCopyContentService(
-        upgradedServices['HtmlEscaperService'],);
+          new CkEditorCopyContentService(
+            upgradedServices['HtmlEscaperService'],);
     upgradedServices['AutogeneratedAudioPlayerService'] =
-      new AutogeneratedAudioPlayerService(
-        upgradedServices['SpeechSynthesisChunkerService']);
+          new AutogeneratedAudioPlayerService(
+            upgradedServices['SpeechSynthesisChunkerService']);
     upgradedServices['BottomNavbarStatusService'] = (
       new BottomNavbarStatusService(
         upgradedServices['WindowDimensionsService']));
     upgradedServices['PreventPageUnloadEventService'] =
-        new PreventPageUnloadEventService(upgradedServices['WindowRef']);
+            new PreventPageUnloadEventService(upgradedServices['WindowRef']);
     upgradedServices['CodeReplPredictionService'] =
-      new CodeReplPredictionService(
-        upgradedServices['CountVectorizerService'],
-        upgradedServices['PythonProgramTokenizer'],
-        upgradedServices['SVMPredictionService'],
-        upgradedServices['WinnowingPreprocessingService']);
+          new CodeReplPredictionService(
+            upgradedServices['CountVectorizerService'],
+            upgradedServices['PythonProgramTokenizer'],
+            upgradedServices['SVMPredictionService'],
+            upgradedServices['WinnowingPreprocessingService']);
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
@@ -882,18 +877,18 @@ export class UpgradedServices {
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService']);
     upgradedServices['EditorFirstTimeEventsService'] =
-      new EditorFirstTimeEventsService(
-        upgradedServices['SiteAnalyticsService']);
+          new EditorFirstTimeEventsService(
+            upgradedServices['SiteAnalyticsService']);
     upgradedServices['ExplorationImprovementsTaskRegistryService'] =
-      new ExplorationImprovementsTaskRegistryService();
+          new ExplorationImprovementsTaskRegistryService();
     upgradedServices['ExpressionEvaluatorService'] =
-      new ExpressionEvaluatorService(
-        upgradedServices['ExpressionParserService'],
-        upgradedServices['ExpressionSyntaxTreeService']);
+          new ExpressionEvaluatorService(
+            upgradedServices['ExpressionParserService'],
+            upgradedServices['ExpressionSyntaxTreeService']);
     upgradedServices['ExtensionTagAssemblerService'] =
-      new ExtensionTagAssemblerService(
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['CamelCaseToHyphensPipe']);
+          new ExtensionTagAssemblerService(
+            upgradedServices['HtmlEscaperService'],
+            upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['FocusManagerService'] = new FocusManagerService(
       upgradedServices['DeviceInfoService'],
       upgradedServices['IdGenerationService']);
@@ -902,57 +897,64 @@ export class UpgradedServices {
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(
       upgradedServices['BrowserCheckerService']);
     upgradedServices['NumberWithUnitsValidationService'] =
-      new NumberWithUnitsValidationService(
-        upgradedServices['NumberWithUnitsObjectFactory'],
-        upgradedServices['baseInteractionValidationService']);
+          new NumberWithUnitsValidationService(
+            upgradedServices['NumberWithUnitsObjectFactory'],
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
       upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['PencilCodeEditorRulesService'] =
-      new PencilCodeEditorRulesService(
-        upgradedServices['NormalizeWhitespacePipe'],
-        upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
-        upgradedServices['CodeNormalizerService']);
+          new PencilCodeEditorRulesService(
+            upgradedServices['NormalizeWhitespacePipe'],
+            upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
+            upgradedServices['CodeNormalizerService']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateCustomizationArgsService'] =
-      new StateCustomizationArgsService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+          new StateCustomizationArgsService(
+            upgradedServices['AlertsService'],
+            upgradedServices['UtilsService']);
     upgradedServices['StateHintsService'] = new StateHintsService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateInteractionIdService'] =
-      new StateInteractionIdService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+          new StateInteractionIdService(
+            upgradedServices['AlertsService'],
+            upgradedServices['UtilsService']);
     upgradedServices['StateNextContentIdIndexService'] =
-      new StateNextContentIdIndexService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+          new StateNextContentIdIndexService(
+            upgradedServices['AlertsService'],
+            upgradedServices['UtilsService']);
     upgradedServices['StatePropertyService'] = new StatePropertyService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateRecordedVoiceoversService'] =
-      new StateRecordedVoiceoversService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+          new StateRecordedVoiceoversService(
+            upgradedServices['AlertsService'],
+            upgradedServices['UtilsService']);
     upgradedServices['StateSolicitAnswerDetailsService'] =
-      new StateSolicitAnswerDetailsService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+          new StateSolicitAnswerDetailsService(
+            upgradedServices['AlertsService'],
+            upgradedServices['UtilsService']);
     upgradedServices['StateSolutionService'] = new StateSolutionService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateWrittenTranslationsService'] =
-      new StateWrittenTranslationsService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+          new StateWrittenTranslationsService(
+            upgradedServices['AlertsService'],
+            upgradedServices['UtilsService']);
     upgradedServices['StoryEditorNavigationService'] =
-        new StoryEditorNavigationService(upgradedServices['WindowRef']);
+            new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
-      new SubtopicPageContentsObjectFactory(
-        upgradedServices['RecordedVoiceoversObjectFactory'],
-        upgradedServices['SubtitledHtmlObjectFactory']);
+          new SubtopicPageContentsObjectFactory(
+            upgradedServices['RecordedVoiceoversObjectFactory'],
+            upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['SubtopicPageObjectFactory'] =
-      new SubtopicPageObjectFactory(
-        upgradedServices['SubtopicPageContentsObjectFactory']);
+          new SubtopicPageObjectFactory(
+            upgradedServices['SubtopicPageContentsObjectFactory']);
     upgradedServices['StoryObjectFactory'] =
-      new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
+          new StoryObjectFactory(
+            upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
-      new SuggestionThreadObjectFactory();
+          new SuggestionThreadObjectFactory();
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
@@ -973,238 +975,238 @@ export class UpgradedServices {
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['AssetsBackendApiService'] =
-      new AssetsBackendApiService(
-        upgradedServices['CsrfTokenService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new AssetsBackendApiService(
+            upgradedServices['CsrfTokenService'],
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardBackendApiService'] =
-      new EmailDashboardBackendApiService(
-        upgradedServices['HttpClient']);
+          new EmailDashboardBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['ExplorationPermissionsBackendApiService'] =
-      new ExplorationPermissionsBackendApiService(
-        upgradedServices['ContextService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new ExplorationPermissionsBackendApiService(
+            upgradedServices['ContextService'],
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationRecommendationsBackendApiService'] =
-      new ExplorationRecommendationsBackendApiService(
-        upgradedServices['HttpClient']);
+          new ExplorationRecommendationsBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['InteractionRulesRegistryService'] =
-      new InteractionRulesRegistryService(
-        upgradedServices['AlgebraicExpressionInputRulesService'],
-        upgradedServices['CodeReplRulesService'],
-        upgradedServices['ContinueRulesService'],
-        upgradedServices['DragAndDropSortInputRulesService'],
-        upgradedServices['EndExplorationRulesService'],
-        upgradedServices['FractionInputRulesService'],
-        upgradedServices['GraphInputRulesService'],
-        upgradedServices['ImageClickInputRulesService'],
-        upgradedServices['InteractiveMapRulesService'],
-        upgradedServices['ItemSelectionInputRulesService'],
-        upgradedServices['LogicProofRulesService'],
-        upgradedServices['MathEquationInputRulesService'],
-        upgradedServices['MultipleChoiceInputRulesService'],
-        upgradedServices['MusicNotesInputRulesService'],
-        upgradedServices['NumberWithUnitsRulesService'],
-        upgradedServices['NumericExpressionInputRulesService'],
-        upgradedServices['NumericInputRulesService'],
-        upgradedServices['PencilCodeEditorRulesService'],
-        upgradedServices['RatioExpressionInputRulesService'],
-        upgradedServices['SetInputRulesService'],
-        upgradedServices['TextInputRulesService']);
+          new InteractionRulesRegistryService(
+            upgradedServices['AlgebraicExpressionInputRulesService'],
+            upgradedServices['CodeReplRulesService'],
+            upgradedServices['ContinueRulesService'],
+            upgradedServices['DragAndDropSortInputRulesService'],
+            upgradedServices['EndExplorationRulesService'],
+            upgradedServices['FractionInputRulesService'],
+            upgradedServices['GraphInputRulesService'],
+            upgradedServices['ImageClickInputRulesService'],
+            upgradedServices['InteractiveMapRulesService'],
+            upgradedServices['ItemSelectionInputRulesService'],
+            upgradedServices['LogicProofRulesService'],
+            upgradedServices['MathEquationInputRulesService'],
+            upgradedServices['MultipleChoiceInputRulesService'],
+            upgradedServices['MusicNotesInputRulesService'],
+            upgradedServices['NumberWithUnitsRulesService'],
+            upgradedServices['NumericExpressionInputRulesService'],
+            upgradedServices['NumericInputRulesService'],
+            upgradedServices['PencilCodeEditorRulesService'],
+            upgradedServices['RatioExpressionInputRulesService'],
+            upgradedServices['SetInputRulesService'],
+            upgradedServices['TextInputRulesService']);
     upgradedServices['AudioTranslationLanguageService'] =
-      new AudioTranslationLanguageService(
-        upgradedServices['BrowserCheckerService'],
-        upgradedServices['LanguageUtilService']);
+          new AudioTranslationLanguageService(
+            upgradedServices['BrowserCheckerService'],
+            upgradedServices['LanguageUtilService']);
     upgradedServices['ConceptCardBackendApiService'] =
-      new ConceptCardBackendApiService(
-        upgradedServices['ConceptCardObjectFactory'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new ConceptCardBackendApiService(
+            upgradedServices['ConceptCardObjectFactory'],
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ClassroomBackendApiService'] =
-      new ClassroomBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+          new ClassroomBackendApiService(
+            upgradedServices['UrlInterpolationService'],
+            upgradedServices['HttpClient']);
     upgradedServices['CollectionCreationBackendService'] = (
       new CollectionCreationBackendService(
         upgradedServices['HttpClient']));
     upgradedServices['CollectionRightsBackendApiService'] =
-      new CollectionRightsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new CollectionRightsBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ContributionOpportunitiesBackendApiService'] =
-      new ContributionOpportunitiesBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+          new ContributionOpportunitiesBackendApiService(
+            upgradedServices['UrlInterpolationService'],
+            upgradedServices['HttpClient']);
     upgradedServices['CreatorDashboardBackendApiService'] =
-      new CreatorDashboardBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['FeedbackThreadObjectFactory'],
-        upgradedServices['SuggestionThreadObjectFactory'],
-        upgradedServices['SuggestionsService'],
-        upgradedServices['LoggerService']);
+          new CreatorDashboardBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['FeedbackThreadObjectFactory'],
+            upgradedServices['SuggestionThreadObjectFactory'],
+            upgradedServices['SuggestionsService'],
+            upgradedServices['LoggerService']);
     upgradedServices['CurrentInteractionService'] =
-      new CurrentInteractionService(
-        upgradedServices['ContextService'],
-        upgradedServices['PlayerPositionService'],
-        upgradedServices['PlayerTranscriptService']);
+          new CurrentInteractionService(
+            upgradedServices['ContextService'],
+            upgradedServices['PlayerPositionService'],
+            upgradedServices['PlayerTranscriptService']);
     upgradedServices['ExplorationFeaturesBackendApiService'] =
-      new ExplorationFeaturesBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new ExplorationFeaturesBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
-      new ExplorationHtmlFormatterService(
-        upgradedServices['CamelCaseToHyphensPipe'],
-        upgradedServices['ExtensionTagAssemblerService'],
-        upgradedServices['HtmlEscaperService']);
+          new ExplorationHtmlFormatterService(
+            upgradedServices['CamelCaseToHyphensPipe'],
+            upgradedServices['ExtensionTagAssemblerService'],
+            upgradedServices['HtmlEscaperService']);
     upgradedServices['ExplorationImprovementsBackendApiService'] =
-      new ExplorationImprovementsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new ExplorationImprovementsBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
-      new ExplorationStatsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new ExplorationStatsBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['GenerateContentIdService'] =
-     new GenerateContentIdService(
-       upgradedServices['StateNextContentIdIndexService']);
+         new GenerateContentIdService(
+           upgradedServices['StateNextContentIdIndexService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
-        new LearnerAnswerDetailsBackendApiService(
-          upgradedServices['HttpClient'],
-          upgradedServices['UrlInterpolationService']);
+            new LearnerAnswerDetailsBackendApiService(
+              upgradedServices['HttpClient'],
+              upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerDashboardBackendApiService'] =
-      new LearnerDashboardBackendApiService(
-        upgradedServices['HttpClient']);
+          new LearnerDashboardBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
-        new LearnerDashboardIdsBackendApiService(
-          upgradedServices['HttpClient']);
+            new LearnerDashboardIdsBackendApiService(
+              upgradedServices['HttpClient']);
     upgradedServices['PlatformFeatureBackendApiService'] =
-      new PlatformFeatureBackendApiService(
-        upgradedServices['HttpClient']
-      );
+          new PlatformFeatureBackendApiService(
+            upgradedServices['HttpClient']
+          );
     upgradedServices['PlatformFeatureAdminBackendApiService'] =
-      new PlatformFeatureAdminBackendApiService(
-        upgradedServices['HttpClient']);
+          new PlatformFeatureAdminBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['PlatformFeatureDummyBackendApiService'] =
-      new PlatformFeatureDummyBackendApiService(
-        upgradedServices['HttpClient']);
+          new PlatformFeatureDummyBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
-      new PlaythroughBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new PlaythroughBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['PlaythroughIssuesBackendApiService'] =
-      new PlaythroughIssuesBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['PlaythroughIssueObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+          new PlaythroughIssuesBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['PlaythroughIssueObjectFactory'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['PretestQuestionBackendApiService'] =
-      new PretestQuestionBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+          new PretestQuestionBackendApiService(
+            upgradedServices['UrlInterpolationService'],
+            upgradedServices['HttpClient']);
     upgradedServices['ProfilePageBackendApiService'] =
-      new ProfilePageBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlService']);
+          new ProfilePageBackendApiService(
+            upgradedServices['UrlInterpolationService'],
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlService']);
     upgradedServices['QuestionBackendApiService'] =
-      new QuestionBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new QuestionBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
-      new ReadOnlyCollectionBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new ReadOnlyCollectionBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
-      new ReadOnlySubtopicPageObjectFactory(
-        upgradedServices['SubtopicPageContentsObjectFactory'],
-        upgradedServices['SubtopicObjectFactory']);
+          new ReadOnlySubtopicPageObjectFactory(
+            upgradedServices['SubtopicPageContentsObjectFactory'],
+            upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
-      new ReadOnlyTopicObjectFactory(
-        upgradedServices['SubtopicObjectFactory'],
-        upgradedServices['ShortSkillSummaryObjectFactory']);
+          new ReadOnlyTopicObjectFactory(
+            upgradedServices['SubtopicObjectFactory'],
+            upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =
-      new ReviewTestBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['UrlService']);
+          new ReviewTestBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService'],
+            upgradedServices['UrlService']);
     upgradedServices['SearchExplorationsBackendApiService'] =
-      new SearchExplorationsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new SearchExplorationsBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['SolutionVerificationService'] =
-      new SolutionVerificationService(
-        upgradedServices['InteractionRulesRegistryService'],
-        upgradedServices['AnswerClassificationService'],
-        upgradedServices['StateEditorService']);
+          new SolutionVerificationService(
+            upgradedServices['InteractionRulesRegistryService'],
+            upgradedServices['AnswerClassificationService'],
+            upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
-      new SkillCreationBackendApiService(
-        upgradedServices['HttpClient']);
+          new SkillCreationBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['SkillMasteryBackendApiService'] =
-      new SkillMasteryBackendApiService(
-        upgradedServices['HttpClient']);
+          new SkillMasteryBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['SkillObjectFactory'] =
-      new SkillObjectFactory(
-        upgradedServices['ConceptCardObjectFactory'],
-        upgradedServices['MisconceptionObjectFactory'],
-        upgradedServices['RubricObjectFactory'],
-        upgradedServices['ValidatorsService']);
+          new SkillObjectFactory(
+            upgradedServices['ConceptCardObjectFactory'],
+            upgradedServices['MisconceptionObjectFactory'],
+            upgradedServices['RubricObjectFactory'],
+            upgradedServices['ValidatorsService']);
     upgradedServices['SkillRightsBackendApiService'] =
-      new SkillRightsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new SkillRightsBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['StateCardObjectFactory'] =
-      new StateCardObjectFactory(
-        upgradedServices['AudioTranslationLanguageService']);
+          new StateCardObjectFactory(
+            upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['StateInteractionStatsBackendApiService'] =
-      new StateInteractionStatsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new StateInteractionStatsBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['StateParamChangesService'] =
-      new StateParamChangesService(
-        upgradedServices['AlertsService'],
-        upgradedServices['UrlInterpolationService']);
+          new StateParamChangesService(
+            upgradedServices['AlertsService'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['StateTopAnswersStatsBackendApiService'] =
-      new StateTopAnswersStatsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['StateTopAnswersStatsObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+          new StateTopAnswersStatsBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['StateTopAnswersStatsObjectFactory'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['StatsReportingBackendApiService'] =
-      new StatsReportingBackendApiService(
-        upgradedServices['ContextService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new StatsReportingBackendApiService(
+            upgradedServices['ContextService'],
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['StoryViewerBackendApiService'] =
-        new StoryViewerBackendApiService(
-          upgradedServices['HttpClient'],
-          upgradedServices['UrlInterpolationService']);
+            new StoryViewerBackendApiService(
+              upgradedServices['HttpClient'],
+              upgradedServices['UrlInterpolationService']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
-      new SubtopicPageContentsObjectFactory(
-        upgradedServices['RecordedVoiceoversObjectFactory'],
-        upgradedServices['SubtitledHtmlObjectFactory']);
+          new SubtopicPageContentsObjectFactory(
+            upgradedServices['RecordedVoiceoversObjectFactory'],
+            upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['TextInputPredictionService'] =
-      new TextInputPredictionService(
-        upgradedServices['CountVectorizerService'],
-        upgradedServices['SVMPredictionService'],
-        upgradedServices['TextInputTokenizer']);
+          new TextInputPredictionService(
+            upgradedServices['CountVectorizerService'],
+            upgradedServices['SVMPredictionService'],
+            upgradedServices['TextInputTokenizer']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['TopicCreationBackendApiService'] =
-      new TopicCreationBackendApiService(upgradedServices['HttpClient']);
+          new TopicCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
-      new TopicsAndSkillsDashboardBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['ShortSkillSummaryObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+          new TopicsAndSkillsDashboardBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['ShortSkillSummaryObjectFactory'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['TopicViewerBackendApiService'] =
-      new TopicViewerBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+          new TopicViewerBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['TranslationsBackendApiService'] =
-      new TranslationsBackendApiService(
-        upgradedServices['HttpClient']);
+          new TranslationsBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['UserBackendApiService'] = new UserBackendApiService(
       upgradedServices['HttpClient']);
     upgradedServices['UserService'] = new UserService(
@@ -1216,29 +1218,29 @@ export class UpgradedServices {
 
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =
-      new CollectionCreationService(
-        upgradedServices['CollectionCreationBackendService'],
-        upgradedServices['AlertsService'],
-        upgradedServices['SiteAnalyticsService'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['LoaderService'],
-        upgradedServices['WindowRef']);
+          new CollectionCreationService(
+            upgradedServices['CollectionCreationBackendService'],
+            upgradedServices['AlertsService'],
+            upgradedServices['SiteAnalyticsService'],
+            upgradedServices['UrlInterpolationService'],
+            upgradedServices['LoaderService'],
+            upgradedServices['WindowRef']);
     upgradedServices['EditableCollectionBackendApiService'] =
-      new EditableCollectionBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['ReadOnlyCollectionBackendApiService'],
-        upgradedServices['UrlInterpolationService']);
+          new EditableCollectionBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['ReadOnlyCollectionBackendApiService'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationRecommendationsService'] =
-      new ExplorationRecommendationsService(
-        upgradedServices['ContextService'],
-        upgradedServices['UrlService'],
-        upgradedServices['ExplorationRecommendationsBackendApiService']);
+          new ExplorationRecommendationsService(
+            upgradedServices['ContextService'],
+            upgradedServices['UrlService'],
+            upgradedServices['ExplorationRecommendationsBackendApiService']);
     upgradedServices['ExplorationStatsService'] = new ExplorationStatsService(
       upgradedServices['ExplorationStatsBackendApiService']);
     upgradedServices['ExtensionTagAssemblerService'] =
-      new ExtensionTagAssemblerService(
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['CamelCaseToHyphensPipe']);
+          new ExtensionTagAssemblerService(
+            upgradedServices['HtmlEscaperService'],
+            upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
       upgradedServices['PlatformFeatureBackendApiService'],
       upgradedServices['WindowRef'],
@@ -1246,72 +1248,72 @@ export class UpgradedServices {
       upgradedServices['UrlService'],
       upgradedServices['BrowserCheckerService']);
     upgradedServices['PopulateRuleContentIdsService'] =
-      new PopulateRuleContentIdsService(
-        upgradedServices['GenerateContentIdService']);
+          new PopulateRuleContentIdsService(
+            upgradedServices['GenerateContentIdService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
-      new PredictionAlgorithmRegistryService(
-        upgradedServices['CodeReplPredictionService'],
-        upgradedServices['TextInputPredictionService']);
+          new PredictionAlgorithmRegistryService(
+            upgradedServices['CodeReplPredictionService'],
+            upgradedServices['TextInputPredictionService']);
     upgradedServices['ProfileLinkImageBackendApiService'] =
-      new ProfileLinkImageBackendApiService(
-        upgradedServices['HttpClient']);
+          new ProfileLinkImageBackendApiService(
+            upgradedServices['HttpClient']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
-      new ReadOnlySubtopicPageObjectFactory(
-        upgradedServices['SubtopicPageContentsObjectFactory'],
-        upgradedServices['SubtopicObjectFactory']);
+          new ReadOnlySubtopicPageObjectFactory(
+            upgradedServices['SubtopicPageContentsObjectFactory'],
+            upgradedServices['SubtopicObjectFactory']);
     upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
       upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['UserExplorationPermissionsService'] = (
       new UserExplorationPermissionsService(
         upgradedServices['ExplorationPermissionsBackendApiService']));
     upgradedServices['SubtopicViewerBackendApiService'] =
-      new SubtopicViewerBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['ReadOnlySubtopicPageObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+          new SubtopicViewerBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['ReadOnlySubtopicPageObjectFactory'],
+            upgradedServices['UrlInterpolationService']);
     upgradedServices['SubtopicPageObjectFactory'] =
-      new SubtopicPageObjectFactory(
-        upgradedServices['SubtopicPageContentsObjectFactory']);
+          new SubtopicPageObjectFactory(
+            upgradedServices['SubtopicPageContentsObjectFactory']);
 
     // Topological level: 5.
     upgradedServices['AnswerClassificationService'] =
-      new AnswerClassificationService(
-        upgradedServices['AlertsService'],
-        upgradedServices['AppService'],
-        upgradedServices['InteractionSpecsService'],
-        upgradedServices['PredictionAlgorithmRegistryService'],
-        upgradedServices['StateClassifierMappingService']);
+          new AnswerClassificationService(
+            upgradedServices['AlertsService'],
+            upgradedServices['AppService'],
+            upgradedServices['InteractionSpecsService'],
+            upgradedServices['PredictionAlgorithmRegistryService'],
+            upgradedServices['StateClassifierMappingService']);
     upgradedServices['AudioPreloaderService'] = new AudioPreloaderService(
       upgradedServices['AssetsBackendApiService'],
       upgradedServices['AudioTranslationLanguageService'],
       upgradedServices['ComputeGraphService'],
       upgradedServices['ContextService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
-      new ExplorationHtmlFormatterService(
-        upgradedServices['CamelCaseToHyphensPipe'],
-        upgradedServices['ExtensionTagAssemblerService'],
-        upgradedServices['HtmlEscaperService']);
+          new ExplorationHtmlFormatterService(
+            upgradedServices['CamelCaseToHyphensPipe'],
+            upgradedServices['ExtensionTagAssemblerService'],
+            upgradedServices['HtmlEscaperService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
-      new SubtopicViewerBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['ReadOnlySubtopicPageObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+          new SubtopicViewerBackendApiService(
+            upgradedServices['HttpClient'],
+            upgradedServices['ReadOnlySubtopicPageObjectFactory'],
+            upgradedServices['UrlInterpolationService']);
 
     // Topological level: 6.
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
     upgradedServices['StateInteractionStatsService'] =
-      new StateInteractionStatsService(
-        upgradedServices['AnswerClassificationService'],
-        upgradedServices['FractionObjectFactory'],
-        upgradedServices['InteractionRulesRegistryService'],
-        upgradedServices['StateInteractionStatsBackendApiService']);
+          new StateInteractionStatsService(
+            upgradedServices['AnswerClassificationService'],
+            upgradedServices['FractionObjectFactory'],
+            upgradedServices['InteractionRulesRegistryService'],
+            upgradedServices['StateInteractionStatsBackendApiService']);
     upgradedServices['StateTopAnswersStatsService'] =
-      new StateTopAnswersStatsService(
-        upgradedServices['AnswerClassificationService'],
-        upgradedServices['InteractionRulesRegistryService'],
-        upgradedServices['StateTopAnswersStatsBackendApiService']);
+          new StateTopAnswersStatsService(
+            upgradedServices['AnswerClassificationService'],
+            upgradedServices['InteractionRulesRegistryService'],
+            upgradedServices['StateTopAnswersStatsBackendApiService']);
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
@@ -1324,9 +1326,9 @@ export class UpgradedServices {
 
     // Topological level: 8.
     upgradedServices['InteractionAttributesExtractorService'] =
-      new InteractionAttributesExtractorService(
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['InteractionObjectFactory']);
+          new InteractionAttributesExtractorService(
+            upgradedServices['HtmlEscaperService'],
+            upgradedServices['InteractionObjectFactory']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],
@@ -1346,11 +1348,1043 @@ export class UpgradedServices {
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']);
 
+    let providers = [
+      {
+        provide: AdminBackendApiService,
+        useValue: upgradedServices['AdminBackendApiService']
+      },
+      {
+        provide: AdminDataService,
+        useValue: upgradedServices['AdminDataService']
+      },
+      {
+        provide: AdminRouterService,
+        useValue: upgradedServices['AdminRouterService']
+      },
+      {
+        provide: AdminTaskManagerService,
+        useValue: upgradedServices['AdminTaskManagerService']
+      },
+      {
+        provide: AlertsService,
+        useValue: upgradedServices['AlertsService']
+      },
+      {
+        provide: AlgebraicExpressionInputRulesService,
+        useValue: upgradedServices['AlgebraicExpressionInputRulesService']
+      },
+      {
+        provide: AlgebraicExpressionInputValidationService,
+        useValue: upgradedServices['AlgebraicExpressionInputValidationService']
+      },
+      {
+        provide: AngularNameService,
+        useValue: upgradedServices['AngularNameService']
+      },
+      {
+        provide: AnswerClassificationService,
+        useValue: upgradedServices['AnswerClassificationService']
+      },
+      {
+        provide: AnswerGroupObjectFactory,
+        useValue: upgradedServices['AnswerGroupObjectFactory']
+      },
+      {
+        provide: AppService,
+        useValue: upgradedServices['AppService']
+      },
+      {
+        provide: AssetsBackendApiService,
+        useValue: upgradedServices['AssetsBackendApiService']
+      },
+      {
+        provide: AudioBarStatusService,
+        useValue: upgradedServices['AudioBarStatusService']
+      },
+      {
+        provide: AudioPreloaderService,
+        useValue: upgradedServices['AudioPreloaderService']
+      },
+      {
+        provide: AudioTranslationLanguageService,
+        useValue: upgradedServices['AudioTranslationLanguageService']
+      },
+      {
+        provide: AudioTranslationManagerService,
+        useValue: upgradedServices['AudioTranslationManagerService']
+      },
+      {
+        provide: AutogeneratedAudioPlayerService,
+        useValue: upgradedServices['AutogeneratedAudioPlayerService']
+      },
+      {
+        provide: AutoplayedVideosService,
+        useValue: upgradedServices['AutoplayedVideosService']
+      },
+      {
+        provide: BackgroundMaskService,
+        useValue: upgradedServices['BackgroundMaskService']
+      },
+      {
+        provide: BottomNavbarStatusService,
+        useValue: upgradedServices['BottomNavbarStatusService']
+      },
+      {
+        provide: BrowserCheckerService,
+        useValue: upgradedServices['BrowserCheckerService']
+      },
+      {
+        provide: CamelCaseToHyphensPipe,
+        useValue: upgradedServices['CamelCaseToHyphensPipe']
+      },
+      {
+        provide: CkEditorCopyContentService,
+        useValue: upgradedServices['CkEditorCopyContentService']
+      },
+      {
+        provide: ClassroomBackendApiService,
+        useValue: upgradedServices['ClassroomBackendApiService']
+      },
+      {
+        provide: CodeNormalizerService,
+        useValue: upgradedServices['CodeNormalizerService']
+      },
+      {
+        provide: CodeReplPredictionService,
+        useValue: upgradedServices['CodeReplPredictionService']
+      },
+      {
+        provide: CodeReplRulesService,
+        useValue: upgradedServices['CodeReplRulesService']
+      },
+      {
+        provide: CodeReplValidationService,
+        useValue: upgradedServices['CodeReplValidationService']
+      },
+      {
+        provide: CollectionCreationBackendService,
+        useValue: upgradedServices['CollectionCreationBackendService']
+      },
+      {
+        provide: CollectionCreationService,
+        useValue: upgradedServices['CollectionCreationService']
+      },
+      {
+        provide: CollectionRightsBackendApiService,
+        useValue: upgradedServices['CollectionRightsBackendApiService']
+      },
+      {
+        provide: CollectionValidationService,
+        useValue: upgradedServices['CollectionValidationService']
+      },
+      {
+        provide: ComputeGraphService,
+        useValue: upgradedServices['ComputeGraphService']
+      },
+      {
+        provide: ConceptCardBackendApiService,
+        useValue: upgradedServices['ConceptCardBackendApiService']
+      },
+      {
+        provide: ConceptCardObjectFactory,
+        useValue: upgradedServices['ConceptCardObjectFactory']
+      },
+      {
+        provide: ConstructTranslationIdsService,
+        useValue: upgradedServices['ConstructTranslationIdsService']
+      },
+      {
+        provide: ContextService,
+        useValue: upgradedServices['ContextService']
+      },
+      {
+        provide: ContinueRulesService,
+        useValue: upgradedServices['ContinueRulesService']
+      },
+      {
+        provide: ContinueValidationService,
+        useValue: upgradedServices['ContinueValidationService']
+      },
+      {
+        provide: ContributionOpportunitiesBackendApiService,
+        useValue: upgradedServices['ContributionOpportunitiesBackendApiService']
+      },
+      {
+        provide: CountVectorizerService,
+        useValue: upgradedServices['CountVectorizerService']
+      },
+      {
+        provide: CreatorDashboardBackendApiService,
+        useValue: upgradedServices['CreatorDashboardBackendApiService']
+      },
+      {
+        provide: CsrfTokenService,
+        useValue: upgradedServices['CsrfTokenService']
+      },
+      {
+        provide: CurrentInteractionService,
+        useValue: upgradedServices['CurrentInteractionService']
+      },
+      {
+        provide: DateTimeFormatService,
+        useValue: upgradedServices['DateTimeFormatService']
+      },
+      {
+        provide: DebouncerService,
+        useValue: upgradedServices['DebouncerService']
+      },
+      {
+        provide: DeviceInfoService,
+        useValue: upgradedServices['DeviceInfoService']
+      },
+      {
+        provide: DocumentAttributeCustomizationService,
+        useValue: upgradedServices['DocumentAttributeCustomizationService']
+      },
+      {
+        provide: DragAndDropSortInputRulesService,
+        useValue: upgradedServices['DragAndDropSortInputRulesService']
+      },
+      {
+        provide: DragAndDropSortInputValidationService,
+        useValue: upgradedServices['DragAndDropSortInputValidationService']
+      },
+      {
+        provide: EditabilityService,
+        useValue: upgradedServices['EditabilityService']
+      },
+      {
+        provide: EditableCollectionBackendApiService,
+        useValue: upgradedServices['EditableCollectionBackendApiService']
+      },
+      {
+        provide: EditorFirstTimeEventsService,
+        useValue: upgradedServices['EditorFirstTimeEventsService']
+      },
+      {
+        provide: EmailDashboardBackendApiService,
+        useValue: upgradedServices['EmailDashboardBackendApiService']
+      },
+      {
+        provide: EndExplorationRulesService,
+        useValue: upgradedServices['EndExplorationRulesService']
+      },
+      {
+        provide: EndExplorationValidationService,
+        useValue: upgradedServices['EndExplorationValidationService']
+      },
+      {
+        provide: ExplorationDiffService,
+        useValue: upgradedServices['ExplorationDiffService']
+      },
+      {
+        provide: ExplorationFeaturesBackendApiService,
+        useValue: upgradedServices['ExplorationFeaturesBackendApiService']
+      },
+      {
+        provide: ExplorationFeaturesService,
+        useValue: upgradedServices['ExplorationFeaturesService']
+      },
+      {
+        provide: ExplorationHtmlFormatterService,
+        useValue: upgradedServices['ExplorationHtmlFormatterService']
+      },
+      {
+        provide: ExplorationImprovementsBackendApiService,
+        useValue: upgradedServices['ExplorationImprovementsBackendApiService']
+      },
+      {
+        provide: ExplorationImprovementsTaskRegistryService,
+        useValue: upgradedServices['ExplorationImprovementsTaskRegistryService']
+      },
+      {
+        provide: ExplorationObjectFactory,
+        useValue: upgradedServices['ExplorationObjectFactory']
+      },
+      {
+        provide: ExplorationPermissionsBackendApiService,
+        useValue: upgradedServices['ExplorationPermissionsBackendApiService']
+      },
+      {
+        provide: ExplorationRecommendationsBackendApiService,
+        useValue: upgradedServices[
+          'ExplorationRecommendationsBackendApiService']
+      },
+      {
+        provide: ExplorationRecommendationsService,
+        useValue: upgradedServices['ExplorationRecommendationsService']
+      },
+      {
+        provide: ExplorationStatsBackendApiService,
+        useValue: upgradedServices['ExplorationStatsBackendApiService']
+      },
+      {
+        provide: ExplorationStatsService,
+        useValue: upgradedServices['ExplorationStatsService']
+      },
+      {
+        provide: ExpressionEvaluatorService,
+        useValue: upgradedServices['ExpressionEvaluatorService']
+      },
+      {
+        provide: ExpressionParserService,
+        useValue: upgradedServices['ExpressionParserService']
+      },
+      {
+        provide: ExpressionSyntaxTreeService,
+        useValue: upgradedServices['ExpressionSyntaxTreeService']
+      },
+      {
+        provide: ExtensionTagAssemblerService,
+        useValue: upgradedServices['ExtensionTagAssemblerService']
+      },
+      {
+        provide: ExternalSaveService,
+        useValue: upgradedServices['ExternalSaveService']
+      },
+      {
+        provide: FeedbackThreadObjectFactory,
+        useValue: upgradedServices['FeedbackThreadObjectFactory']
+      },
+      {
+        provide: FocusManagerService,
+        useValue: upgradedServices['FocusManagerService']
+      },
+      {
+        provide: FractionInputRulesService,
+        useValue: upgradedServices['FractionInputRulesService']
+      },
+      {
+        provide: FractionInputValidationService,
+        useValue: upgradedServices['FractionInputValidationService']
+      },
+      {
+        provide: FractionObjectFactory,
+        useValue: upgradedServices['FractionObjectFactory']
+      },
+      {
+        provide: GenerateContentIdService,
+        useValue: upgradedServices['GenerateContentIdService']
+      },
+      {
+        provide: GraphDetailService,
+        useValue: upgradedServices['GraphDetailService']
+      },
+      {
+        provide: GraphInputRulesService,
+        useValue: upgradedServices['GraphInputRulesService']
+      },
+      {
+        provide: GraphInputValidationService,
+        useValue: upgradedServices['GraphInputValidationService']
+      },
+      {
+        provide: GraphUtilsService,
+        useValue: upgradedServices['GraphUtilsService']
+      },
+      {
+        provide: GuestCollectionProgressService,
+        useValue: upgradedServices['GuestCollectionProgressService']
+      },
+      {
+        provide: HintObjectFactory,
+        useValue: upgradedServices['HintObjectFactory']
+      },
+      {
+        provide: HtmlEscaperService,
+        useValue: upgradedServices['HtmlEscaperService']
+      },
+      {
+        provide: I18nLanguageCodeService,
+        useValue: upgradedServices['I18nLanguageCodeService']
+      },
+      {
+        provide: IdGenerationService,
+        useValue: upgradedServices['IdGenerationService']
+      },
+      {
+        provide: ImageClickInputRulesService,
+        useValue: upgradedServices['ImageClickInputRulesService']
+      },
+      {
+        provide: ImageClickInputValidationService,
+        useValue: upgradedServices['ImageClickInputValidationService']
+      },
+      {
+        provide: ImprovementsService,
+        useValue: upgradedServices['ImprovementsService']
+      },
+      {
+        provide: InteractionAttributesExtractorService,
+        useValue: upgradedServices['InteractionAttributesExtractorService']
+      },
+      {
+        provide: InteractionDetailsCacheService,
+        useValue: upgradedServices['InteractionDetailsCacheService']
+      },
+      {
+        provide: InteractionObjectFactory,
+        useValue: upgradedServices['InteractionObjectFactory']
+      },
+      {
+        provide: InteractionRulesRegistryService,
+        useValue: upgradedServices['InteractionRulesRegistryService']
+      },
+      {
+        provide: InteractionSpecsService,
+        useValue: upgradedServices['InteractionSpecsService']
+      },
+      {
+        provide: InteractiveMapRulesService,
+        useValue: upgradedServices['InteractiveMapRulesService']
+      },
+      {
+        provide: InteractiveMapValidationService,
+        useValue: upgradedServices['InteractiveMapValidationService']
+      },
+      {
+        provide: ItemSelectionInputRulesService,
+        useValue: upgradedServices['ItemSelectionInputRulesService']
+      },
+      {
+        provide: ItemSelectionInputValidationService,
+        useValue: upgradedServices['ItemSelectionInputValidationService']
+      },
+      {
+        provide: LanguageUtilService,
+        useValue: upgradedServices['LanguageUtilService']
+      },
+      {
+        provide: LearnerActionObjectFactory,
+        useValue: upgradedServices['LearnerActionObjectFactory']
+      },
+      {
+        provide: LearnerAnswerDetailsBackendApiService,
+        useValue: upgradedServices['LearnerAnswerDetailsBackendApiService']
+      },
+      {
+        provide: LearnerDashboardBackendApiService,
+        useValue: upgradedServices['LearnerDashboardBackendApiService']
+      },
+      {
+        provide: LearnerDashboardIdsBackendApiService,
+        useValue: upgradedServices['LearnerDashboardIdsBackendApiService']
+      },
+      {
+        provide: LearnerParamsService,
+        useValue: upgradedServices['LearnerParamsService']
+      },
+      {
+        provide: LoaderService,
+        useValue: upgradedServices['LoaderService']
+      },
+      {
+        provide: LocalStorageService,
+        useValue: upgradedServices['LocalStorageService']
+      },
+      {
+        provide: LoggerService,
+        useValue: upgradedServices['LoggerService']
+      },
+      {
+        provide: LogicProofRulesService,
+        useValue: upgradedServices['LogicProofRulesService']
+      },
+      {
+        provide: LogicProofValidationService,
+        useValue: upgradedServices['LogicProofValidationService']
+      },
+      {
+        provide: LostChangeObjectFactory,
+        useValue: upgradedServices['LostChangeObjectFactory']
+      },
+      {
+        provide: MathEquationInputRulesService,
+        useValue: upgradedServices['MathEquationInputRulesService']
+      },
+      {
+        provide: MathEquationInputValidationService,
+        useValue: upgradedServices['MathEquationInputValidationService']
+      },
+      {
+        provide: MessengerService,
+        useValue: upgradedServices['MessengerService']
+      },
+      {
+        provide: MetaTagCustomizationService,
+        useValue: upgradedServices['MetaTagCustomizationService']
+      },
+      {
+        provide: MisconceptionObjectFactory,
+        useValue: upgradedServices['MisconceptionObjectFactory']
+      },
+      {
+        provide: MultipleChoiceInputRulesService,
+        useValue: upgradedServices['MultipleChoiceInputRulesService']
+      },
+      {
+        provide: MultipleChoiceInputValidationService,
+        useValue: upgradedServices['MultipleChoiceInputValidationService']
+      },
+      {
+        provide: MusicNotesInputRulesService,
+        useValue: upgradedServices['MusicNotesInputRulesService']
+      },
+      {
+        provide: MusicNotesInputValidationService,
+        useValue: upgradedServices['MusicNotesInputValidationService']
+      },
+      {
+        provide: MusicPhrasePlayerService,
+        useValue: upgradedServices['MusicPhrasePlayerService']
+      },
+      {
+        provide: NormalizeWhitespacePipe,
+        useValue: upgradedServices['NormalizeWhitespacePipe']
+      },
+      {
+        provide: NormalizeWhitespacePunctuationAndCasePipe,
+        useValue: upgradedServices['NormalizeWhitespacePunctuationAndCasePipe']
+      },
+      {
+        provide: NumberAttemptsService,
+        useValue: upgradedServices['NumberAttemptsService']
+      },
+      {
+        provide: NumberWithUnitsObjectFactory,
+        useValue: upgradedServices['NumberWithUnitsObjectFactory']
+      },
+      {
+        provide: NumberWithUnitsRulesService,
+        useValue: upgradedServices['NumberWithUnitsRulesService']
+      },
+      {
+        provide: NumberWithUnitsValidationService,
+        useValue: upgradedServices['NumberWithUnitsValidationService']
+      },
+      {
+        provide: NumericExpressionInputRulesService,
+        useValue: upgradedServices['NumericExpressionInputRulesService']
+      },
+      {
+        provide: NumericExpressionInputValidationService,
+        useValue: upgradedServices['NumericExpressionInputValidationService']
+      },
+      {
+        provide: NumericInputRulesService,
+        useValue: upgradedServices['NumericInputRulesService']
+      },
+      {
+        provide: NumericInputValidationService,
+        useValue: upgradedServices['NumericInputValidationService']
+      },
+      {
+        provide: OutcomeObjectFactory,
+        useValue: upgradedServices['OutcomeObjectFactory']
+      },
+      {
+        provide: PageTitleService,
+        useValue: upgradedServices['PageTitleService']
+      },
+      {
+        provide: ParamChangeObjectFactory,
+        useValue: upgradedServices['ParamChangeObjectFactory']
+      },
+      {
+        provide: ParamChangesObjectFactory,
+        useValue: upgradedServices['ParamChangesObjectFactory']
+      },
+      {
+        provide: ParamSpecObjectFactory,
+        useValue: upgradedServices['ParamSpecObjectFactory']
+      },
+      {
+        provide: ParamSpecsObjectFactory,
+        useValue: upgradedServices['ParamSpecsObjectFactory']
+      },
+      {
+        provide: ParamTypeObjectFactory,
+        useValue: upgradedServices['ParamTypeObjectFactory']
+      },
+      {
+        provide: PencilCodeEditorRulesService,
+        useValue: upgradedServices['PencilCodeEditorRulesService']
+      },
+      {
+        provide: PencilCodeEditorValidationService,
+        useValue: upgradedServices['PencilCodeEditorValidationService']
+      },
+      {
+        provide: PlatformFeatureAdminBackendApiService,
+        useValue: upgradedServices['PlatformFeatureAdminBackendApiService']
+      },
+      {
+        provide: PlatformFeatureBackendApiService,
+        useValue: upgradedServices['PlatformFeatureBackendApiService']
+      },
+      {
+        provide: PlatformFeatureDummyBackendApiService,
+        useValue: upgradedServices['PlatformFeatureDummyBackendApiService']
+      },
+      {
+        provide: PlatformFeatureService,
+        useValue: upgradedServices['PlatformFeatureService']
+      },
+      {
+        provide: PlayerCorrectnessFeedbackEnabledService,
+        useValue: upgradedServices['PlayerCorrectnessFeedbackEnabledService']
+      },
+      {
+        provide: PlayerPositionService,
+        useValue: upgradedServices['PlayerPositionService']
+      },
+      {
+        provide: PlayerTranscriptService,
+        useValue: upgradedServices['PlayerTranscriptService']
+      },
+      {
+        provide: PlaythroughBackendApiService,
+        useValue: upgradedServices['PlaythroughBackendApiService']
+      },
+      {
+        provide: PlaythroughIssueObjectFactory,
+        useValue: upgradedServices['PlaythroughIssueObjectFactory']
+      },
+      {
+        provide: PlaythroughIssuesBackendApiService,
+        useValue: upgradedServices['PlaythroughIssuesBackendApiService']
+      },
+      {
+        provide: PlaythroughObjectFactory,
+        useValue: upgradedServices['PlaythroughObjectFactory']
+      },
+      {
+        provide: PopulateRuleContentIdsService,
+        useValue: upgradedServices['PopulateRuleContentIdsService']
+      },
+      {
+        provide: PredictionAlgorithmRegistryService,
+        useValue: upgradedServices['PredictionAlgorithmRegistryService']
+      },
+      {
+        provide: PretestQuestionBackendApiService,
+        useValue: upgradedServices['PretestQuestionBackendApiService']
+      },
+      {
+        provide: PreventPageUnloadEventService,
+        useValue: upgradedServices['PreventPageUnloadEventService']
+      },
+      {
+        provide: ProfileLinkImageBackendApiService,
+        useValue: upgradedServices['ProfileLinkImageBackendApiService']
+      },
+      {
+        provide: ProfilePageBackendApiService,
+        useValue: upgradedServices['ProfilePageBackendApiService']
+      },
+      {
+        provide: PythonProgramTokenizer,
+        useValue: upgradedServices['PythonProgramTokenizer']
+      },
+      {
+        provide: QuestionBackendApiService,
+        useValue: upgradedServices['QuestionBackendApiService']
+      },
+      {
+        provide: QuestionValidationService,
+        useValue: upgradedServices['QuestionValidationService']
+      },
+      {
+        provide: RatingComputationService,
+        useValue: upgradedServices['RatingComputationService']
+      },
+      {
+        provide: RatioExpressionInputRulesService,
+        useValue: upgradedServices['RatioExpressionInputRulesService']
+      },
+      {
+        provide: RatioExpressionInputValidationService,
+        useValue: upgradedServices['RatioExpressionInputValidationService']
+      },
+      {
+        provide: ReadOnlyCollectionBackendApiService,
+        useValue: upgradedServices['ReadOnlyCollectionBackendApiService']
+      },
+      {
+        provide: ReadOnlySubtopicPageObjectFactory,
+        useValue: upgradedServices['ReadOnlySubtopicPageObjectFactory']
+      },
+      {
+        provide: ReadOnlyTopicObjectFactory,
+        useValue: upgradedServices['ReadOnlyTopicObjectFactory']
+      },
+      {
+        provide: RecordedVoiceoversObjectFactory,
+        useValue: upgradedServices['RecordedVoiceoversObjectFactory']
+      },
+      {
+        provide: ReviewTestBackendApiService,
+        useValue: upgradedServices['ReviewTestBackendApiService']
+      },
+      {
+        provide: ReviewTestEngineService,
+        useValue: upgradedServices['ReviewTestEngineService']
+      },
+      {
+        provide: RubricObjectFactory,
+        useValue: upgradedServices['RubricObjectFactory']
+      },
+      {
+        provide: RuleObjectFactory,
+        useValue: upgradedServices['RuleObjectFactory']
+      },
+      {
+        provide: SVMPredictionService,
+        useValue: upgradedServices['SVMPredictionService']
+      },
+      {
+        provide: SchemaDefaultValueService,
+        useValue: upgradedServices['SchemaDefaultValueService']
+      },
+      {
+        provide: SchemaFormSubmittedService,
+        useValue: upgradedServices['SchemaFormSubmittedService']
+      },
+      {
+        provide: SchemaUndefinedLastElementService,
+        useValue: upgradedServices['SchemaUndefinedLastElementService']
+      },
+      {
+        provide: SearchExplorationsBackendApiService,
+        useValue: upgradedServices['SearchExplorationsBackendApiService']
+      },
+      {
+        provide: SetInputRulesService,
+        useValue: upgradedServices['SetInputRulesService']
+      },
+      {
+        provide: SetInputValidationService,
+        useValue: upgradedServices['SetInputValidationService']
+      },
+      {
+        provide: ShortSkillSummaryObjectFactory,
+        useValue: upgradedServices['ShortSkillSummaryObjectFactory']
+      },
+      {
+        provide: SidebarStatusService,
+        useValue: upgradedServices['SidebarStatusService']
+      },
+      {
+        provide: SiteAnalyticsService,
+        useValue: upgradedServices['SiteAnalyticsService']
+      },
+      {
+        provide: SkillCreationBackendApiService,
+        useValue: upgradedServices['SkillCreationBackendApiService']
+      },
+      {
+        provide: SkillMasteryBackendApiService,
+        useValue: upgradedServices['SkillMasteryBackendApiService']
+      },
+      {
+        provide: SkillObjectFactory,
+        useValue: upgradedServices['SkillObjectFactory']
+      },
+      {
+        provide: SkillRightsBackendApiService,
+        useValue: upgradedServices['SkillRightsBackendApiService']
+      },
+      {
+        provide: SolutionObjectFactory,
+        useValue: upgradedServices['SolutionObjectFactory']
+      },
+      {
+        provide: SolutionValidityService,
+        useValue: upgradedServices['SolutionValidityService']
+      },
+      {
+        provide: SolutionVerificationService,
+        useValue: upgradedServices['SolutionVerificationService']
+      },
+      {
+        provide: SpeechSynthesisChunkerService,
+        useValue: upgradedServices['SpeechSynthesisChunkerService']
+      },
+      {
+        provide: StateCardObjectFactory,
+        useValue: upgradedServices['StateCardObjectFactory']
+      },
+      {
+        provide: StateClassifierMappingService,
+        useValue: upgradedServices['StateClassifierMappingService']
+      },
+      {
+        provide: StateContentService,
+        useValue: upgradedServices['StateContentService']
+      },
+      {
+        provide: StateCustomizationArgsService,
+        useValue: upgradedServices['StateCustomizationArgsService']
+      },
+      {
+        provide: StateEditorRefreshService,
+        useValue: upgradedServices['StateEditorRefreshService']
+      },
+      {
+        provide: StateEditorService,
+        useValue: upgradedServices['StateEditorService']
+      },
+      {
+        provide: StateGraphLayoutService,
+        useValue: upgradedServices['StateGraphLayoutService']
+      },
+      {
+        provide: StateHintsService,
+        useValue: upgradedServices['StateHintsService']
+      },
+      {
+        provide: StateInteractionIdService,
+        useValue: upgradedServices['StateInteractionIdService']
+      },
+      {
+        provide: StateInteractionStatsBackendApiService,
+        useValue: upgradedServices['StateInteractionStatsBackendApiService']
+      },
+      {
+        provide: StateInteractionStatsService,
+        useValue: upgradedServices['StateInteractionStatsService']
+      },
+      {
+        provide: StateNameService,
+        useValue: upgradedServices['StateNameService']
+      },
+      {
+        provide: StateNextContentIdIndexService,
+        useValue: upgradedServices['StateNextContentIdIndexService']
+      },
+      {
+        provide: StateObjectFactory,
+        useValue: upgradedServices['StateObjectFactory']
+      },
+      {
+        provide: StateParamChangesService,
+        useValue: upgradedServices['StateParamChangesService']
+      },
+      {
+        provide: StatePropertyService,
+        useValue: upgradedServices['StatePropertyService']
+      },
+      {
+        provide: StateRecordedVoiceoversService,
+        useValue: upgradedServices['StateRecordedVoiceoversService']
+      },
+      {
+        provide: StateSolicitAnswerDetailsService,
+        useValue: upgradedServices['StateSolicitAnswerDetailsService']
+      },
+      {
+        provide: StateSolutionService,
+        useValue: upgradedServices['StateSolutionService']
+      },
+      {
+        provide: StateTopAnswersStatsBackendApiService,
+        useValue: upgradedServices['StateTopAnswersStatsBackendApiService']
+      },
+      {
+        provide: StateTopAnswersStatsObjectFactory,
+        useValue: upgradedServices['StateTopAnswersStatsObjectFactory']
+      },
+      {
+        provide: StateTopAnswersStatsService,
+        useValue: upgradedServices['StateTopAnswersStatsService']
+      },
+      {
+        provide: StateWrittenTranslationsService,
+        useValue: upgradedServices['StateWrittenTranslationsService']
+      },
+      {
+        provide: StatesObjectFactory,
+        useValue: upgradedServices['StatesObjectFactory']
+      },
+      {
+        provide: StatsReportingBackendApiService,
+        useValue: upgradedServices['StatsReportingBackendApiService']
+      },
+      {
+        provide: StoryContentsObjectFactory,
+        useValue: upgradedServices['StoryContentsObjectFactory']
+      },
+      {
+        provide: StoryEditorNavigationService,
+        useValue: upgradedServices['StoryEditorNavigationService']
+      },
+      {
+        provide: StoryObjectFactory,
+        useValue: upgradedServices['StoryObjectFactory']
+      },
+      {
+        provide: StoryReferenceObjectFactory,
+        useValue: upgradedServices['StoryReferenceObjectFactory']
+      },
+      {
+        provide: StoryViewerBackendApiService,
+        useValue: upgradedServices['StoryViewerBackendApiService']
+      },
+      {
+        provide: SubtitledHtmlObjectFactory,
+        useValue: upgradedServices['SubtitledHtmlObjectFactory']
+      },
+      {
+        provide: SubtitledUnicodeObjectFactory,
+        useValue: upgradedServices['SubtitledUnicodeObjectFactory']
+      },
+      {
+        provide: SubtopicObjectFactory,
+        useValue: upgradedServices['SubtopicObjectFactory']
+      },
+      {
+        provide: SubtopicPageContentsObjectFactory,
+        useValue: upgradedServices['SubtopicPageContentsObjectFactory']
+      },
+      {
+        provide: SubtopicPageObjectFactory,
+        useValue: upgradedServices['SubtopicPageObjectFactory']
+      },
+      {
+        provide: SubtopicViewerBackendApiService,
+        useValue: upgradedServices['SubtopicViewerBackendApiService']
+      },
+      {
+        provide: SuggestionModalService,
+        useValue: upgradedServices['SuggestionModalService']
+      },
+      {
+        provide: SuggestionThreadObjectFactory,
+        useValue: upgradedServices['SuggestionThreadObjectFactory']
+      },
+      {
+        provide: SuggestionsService,
+        useValue: upgradedServices['SuggestionsService']
+      },
+      {
+        provide: TextInputPredictionService,
+        useValue: upgradedServices['TextInputPredictionService']
+      },
+      {
+        provide: TextInputRulesService,
+        useValue: upgradedServices['TextInputRulesService']
+      },
+      {
+        provide: TextInputTokenizer,
+        useValue: upgradedServices['TextInputTokenizer']
+      },
+      {
+        provide: TextInputValidationService,
+        useValue: upgradedServices['TextInputValidationService']
+      },
+      {
+        provide: ThreadStatusDisplayService,
+        useValue: upgradedServices['ThreadStatusDisplayService']
+      },
+      {
+        provide: TopicCreationBackendApiService,
+        useValue: upgradedServices['TopicCreationBackendApiService']
+      },
+      {
+        provide: TopicObjectFactory,
+        useValue: upgradedServices['TopicObjectFactory']
+      },
+      {
+        provide: TopicViewerBackendApiService,
+        useValue: upgradedServices['TopicViewerBackendApiService']
+      },
+      {
+        provide: TopicsAndSkillsDashboardBackendApiService,
+        useValue: upgradedServices['TopicsAndSkillsDashboardBackendApiService']
+      },
+      {
+        provide: TopicsAndSkillsDashboardPageService,
+        useValue: upgradedServices['TopicsAndSkillsDashboardPageService']
+      },
+      {
+        provide: TranslationsBackendApiService,
+        useValue: upgradedServices['TranslationsBackendApiService']
+      },
+      {
+        provide: UnitsObjectFactory,
+        useValue: upgradedServices['UnitsObjectFactory']
+      },
+      {
+        provide: UrlInterpolationService,
+        useValue: upgradedServices['UrlInterpolationService']
+      },
+      {
+        provide: UrlService,
+        useValue: upgradedServices['UrlService']
+      },
+      {
+        provide: UserBackendApiService,
+        useValue: upgradedServices['UserBackendApiService']
+      },
+      {
+        provide: UserExplorationPermissionsService,
+        useValue: upgradedServices['UserExplorationPermissionsService']
+      },
+      {
+        provide: UserService,
+        useValue: upgradedServices['UserService']
+      },
+      {
+        provide: UtilsService,
+        useValue: upgradedServices['UtilsService']
+      },
+      {
+        provide: ValidatorsService,
+        useValue: upgradedServices['ValidatorsService']
+      },
+      {
+        provide: VersionTreeService,
+        useValue: upgradedServices['VersionTreeService']
+      },
+      {
+        provide: VoiceoverObjectFactory,
+        useValue: upgradedServices['VoiceoverObjectFactory']
+      },
+      {
+        provide: WindowDimensionsService,
+        useValue: upgradedServices['WindowDimensionsService']
+      },
+      {
+        provide: WindowRef,
+        useValue: upgradedServices['WindowRef']
+      },
+      {
+        provide: WinnowingPreprocessingService,
+        useValue: upgradedServices['WinnowingPreprocessingService']
+      },
+      {
+        provide: WorkedExampleObjectFactory,
+        useValue: upgradedServices['WorkedExampleObjectFactory']
+      },
+      {
+        provide: WrittenTranslationObjectFactory,
+        useValue: upgradedServices['WrittenTranslationObjectFactory']
+      },
+      {
+        provide: WrittenTranslationsObjectFactory,
+        useValue: upgradedServices['WrittenTranslationsObjectFactory']
+      },
+      {
+        provide: baseInteractionValidationService,
+        useValue: upgradedServices['baseInteractionValidationService']
+      },
+    ];
+    UpgradedServices.ugs = upgradedServices;
+    UpgradedServices.providers = providers;
     /* eslint-enable dot-notation */
-    return upgradedServices;
+  }
+
+  getUpgradedServices(): Record<string, unknown> {
+    return UpgradedServices.ugs;
   }
 }
-
-angular.module('oppia').factory(
-  'UpgradedServices',
-  downgradeInjectable(UpgradedServices));

@@ -30,6 +30,8 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 
+const { UpgradedServices } = require('services/UpgradedServices');
+new UpgradedServices();
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
 require('App.ts');

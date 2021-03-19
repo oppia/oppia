@@ -30,6 +30,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
+const { UpgradedServices } = require('services/UpgradedServices');
+new UpgradedServices();
 require('pages/topic-viewer-page/topic-viewer-page.module.ts');
 require('App.ts');
 require('base-components/base-content.directive.ts');
