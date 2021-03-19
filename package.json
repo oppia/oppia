@@ -144,6 +144,7 @@
     "firebase": "^8.0.0",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
+    "globalthis": "^1.0.2",
     "hammerjs": "^2.0.8",
     "hash-wasm": "^4.4.1",
     "lodash": "^4.17.14",
