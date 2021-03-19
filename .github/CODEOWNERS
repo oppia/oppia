@@ -476,6 +476,7 @@
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
 /redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
+/.firebase.json @brianrodri
 
 
 # Miscellaneous.
