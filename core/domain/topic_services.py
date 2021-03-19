@@ -758,7 +758,7 @@ def delete_topic_summary(topic_id):
 
 
 def update_story_and_topic_summary(
-    committer_id, story_id, change_list, commit_message, topic_id):
+        committer_id, story_id, change_list, commit_message, topic_id):
     """Updates a story. Commits changes. Then generates a new
     topic summary.
 
@@ -778,6 +778,7 @@ def update_story_and_topic_summary(
     # make sure the TopicSummaryTile displays the correct number
     # of chapters on the classroom page.
     generate_topic_summary(topic_id)
+
 
 def generate_topic_summary(topic_id):
     """Creates and stores a summary of the given topic.
