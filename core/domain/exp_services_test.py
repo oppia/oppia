@@ -4125,7 +4125,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
 
-    OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
     UPGRADED_EXP_YAML = (
@@ -4221,11 +4220,6 @@ title: Old Title
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-
-        # Create exploration that uses a states schema version of 0 and ensure
-        # it is properly converted.
-        self.save_new_exp_with_states_schema_v0(
-            self.OLD_EXP_ID, self.albert_id, 'Old Title')
 
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
