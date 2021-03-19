@@ -1475,15 +1475,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_username': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
-
-        # Check that existing editor cannot be assigned to any other role.
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_OWNER
-            }, csrf_token=csrf_token,
-            expected_status_int=400)
         self.logout()
 
         # Check that viewer can access editor page but cannot edit.
@@ -1578,6 +1569,17 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
+        self.logout()
+
+        # Check that existing editor can be assigned to any other role.
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_OWNER
+            }, csrf_token=csrf_token)
         self.logout()
 
     def test_for_deassign_editor_role(self):

@@ -734,7 +734,9 @@ def _assign_role(
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
-        allow_assigning_any_role: bool. Flag to assign any role to exploration.
+        allow_assigning_any_role: bool. Whether to assign a role to the user
+            irrespective of whether they have any existing role in the activity.
+            The default value is false.
 
     Raises:
         Exception. The committer does not have rights to modify a role.

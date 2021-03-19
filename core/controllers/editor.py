@@ -275,6 +275,7 @@ class ExplorationRightsHandler(EditorHandler):
         if self.user.user_id == user_id:
             raise self.InvalidInputException(
                 'Sorry, users cannot remove their own roles.')
+
         rights_manager.deassign_role_for_exploration(
             self.user, exploration_id, user_id)
         self.render_json({

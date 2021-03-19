@@ -25,14 +25,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 import utils
-
-ROLE_OWNER = feconf.ROLE_OWNER
-ROLE_EDITOR = feconf.ROLE_EDITOR
-ROLE_VOICE_ARTIST = feconf.ROLE_VOICE_ARTIST
-ROLE_VIEWER = feconf.ROLE_VIEWER
-ROLE_NONE = feconf.ROLE_NONE
 
 
 class ActivityRightsTests(test_utils.GenericTestBase):
@@ -201,7 +194,8 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.viewer_ids = []
         self.activity_rights.voice_artist_ids = []
 
-        self.activity_rights.assign_role('123456', ROLE_VOICE_ARTIST)
+        self.activity_rights.assign_role(
+            '123456', rights_domain.ROLE_VOICE_ARTIST)
         self.assertTrue('123456' not in self.activity_rights.owner_ids)
         self.assertTrue('123456' in self.activity_rights.voice_artist_ids)
 
@@ -210,7 +204,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.editor_ids = []
         self.activity_rights.viewer_ids = []
 
-        self.activity_rights.assign_role('123456', ROLE_OWNER)
+        self.activity_rights.assign_role('123456', rights_domain.ROLE_OWNER)
         self.assertTrue('123456' in self.activity_rights.owner_ids)
 
 
