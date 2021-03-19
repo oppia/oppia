@@ -30,6 +30,8 @@ interface ObjectEditorCustomScope extends ng.IScope {
   getAlwaysEditable?: (() => boolean);
   getIsEditable?: (() => boolean);
   getSchema?: (() => CustomSchema);
+  updateValue: (unknown) => void;
+  value: unknown;
 }
 
 angular.module('oppia').directive('objectEditor', [
@@ -57,13 +59,17 @@ angular.module('oppia').directive('objectEditor', [
         scope.getIsEditable = function() {
           return scope.isEditable;
         };
+        scope.updateValue = function(e) {
+          scope.value = e;
+        };
         if (directiveName) {
           if (directiveName === 'algebraic-expression') {
             element.html(
               '<' + directiveName +
               '-editor get-always-editable="getAlwaysEditable()"' +
               ' get-init-args="getInitArgs()" get-is-editable="' +
-              'getIsEditable()" get-schema="getSchema()" [(value)]="value"></' +
+              // eslint-disable-next-line max-len
+              'getIsEditable()" get-schema="getSchema()" (value-changed)="updateValue($event)" [value]="value"></' +
               directiveName + '-editor>');
             $compile(element.contents())(scope);
           } else {

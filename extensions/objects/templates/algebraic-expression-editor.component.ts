@@ -77,8 +77,18 @@ export class AlgebraicExpressionEditor implements OnInit {
         if (eventType === 'change') {
           // Need to manually trigger the digest cycle to make any
           // 'watchers' aware of changes in answer.
+          this.currentValue = activeGuppyObject.guppyInstance.asciimath();
+          this.isCurrentAnswerValid();
           this.cdRef.markForCheck();
         }
+      }
+    });
+    Guppy.event('change', () => {
+      const activeGuppyObject = (
+        this.guppyInitializationService.findActiveGuppyObject());
+      if (activeGuppyObject) {
+        this.currentValue = activeGuppyObject.guppyInstance.asciimath();
+        this.isCurrentAnswerValid();
       }
     });
     if (eventType !== 'focus') {
