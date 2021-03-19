@@ -34,7 +34,7 @@ require(
   'alert-message.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'promo-bar.directive.ts');
+  'promo-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'side-navigation-bar.directive.ts');
@@ -73,8 +73,6 @@ require('google-analytics.initializer.ts');
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded *after* app.constants.ts.
 require('I18nFooter.ts');
-
-require('Polyfills.ts');
 
 // Default to passive event listeners.
 require('default-passive-events');
