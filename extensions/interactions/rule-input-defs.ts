@@ -218,9 +218,15 @@ export interface RatioInputHasNumberOfTermsEqualToRuleInputs {
   y: number;
 }
 
+export interface RatioInputHasSpecificTermEqualToRuleInputs {
+  x: number;
+  y: number;
+}
+
 export type RatioInputRuleInputs = (
   RatioInputEqualRuleInputs |
-  RatioInputHasNumberOfTermsEqualToRuleInputs);
+  RatioInputHasNumberOfTermsEqualToRuleInputs |
+  RatioInputHasSpecificTermEqualToRuleInputs);
 
 export interface BaseTranslatableObject {
   contentId: string | null;
