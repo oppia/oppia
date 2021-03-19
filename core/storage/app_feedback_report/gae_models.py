@@ -19,6 +19,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
+import python_utils
+import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -108,6 +110,48 @@ class FeedbackReportModel(base_models.BaseModel):
     # The schema version for the feedback report info
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
+
+
+    @classmethod
+    def create(cls, platform):
+        """Creates a new FeedbackReportModel instance and returns it.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            FeedbackReportModel. The newly created FeedbackReportModel instance.
+        """
+        entity_id = cls._generate_id(user_id, exploration_id)
+        return cls(
+            id=entity_id, user_id=user_id, exploration_id=exploration_id)
+
+    @classmethod
+    def _generate_id(cls, platform, submitted_on_sec):
+        """Generates key for the instance of FeedbackReportModel
+        class in the required format with the arguments provided.
+
+        Args:
+            platform: str. The platform the user is the report from.
+            submitted_on_sec: float. The timestamp that the report was submitted
+                on, in seconds since epoch (in UTC).
+
+        Returns:
+            str. The generated ID for this entity using platform,
+                submitted_on_sec, and a random string, of the form
+                '[user_id].[exploration_id].[random hash]'.
+        """
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            random_hash = utils.convert_to_hash(
+                python_utils.UNICODE(utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH))
+            new_id = '%s.%s.%s' % (platform, exploration_id, random_hash)
+            if not cls.get_by_id(new_id):
+                return new_id
+        raise Exception(
+            'The id generator for FeedbackReportModel is producing too'
+            'many collisions.')
 
     @staticmethod
     def get_deletion_policy():
