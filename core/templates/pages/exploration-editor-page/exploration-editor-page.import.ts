@@ -37,6 +37,8 @@ angular.module('oppia', [
   'ui.sortable', 'ui.tree', uiValidate,
 ]);
 
+require('Polyfills.ts');
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/exploration-editor-page/exploration-editor-page.module.ts');
