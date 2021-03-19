@@ -13,14 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for domain object which holds the statistics of a
+ * @fileoverview Model class for domain object which holds the statistics of a
  * particular answer from some particular state.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { InteractionAnswer } from
   'interactions/answer-defs';
@@ -84,12 +81,7 @@ export class AnswerStats {
       frequency: this.frequency
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AnswerStatsObjectFactory {
   /**
    * Returns a stale instance; specifically, {@link AnswerStats.isAddressed}
    * will always be false.
@@ -99,16 +91,13 @@ export class AnswerStatsObjectFactory {
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
    */
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: AnswerStatsBackendDict): AnswerStats {
-    // TODO(brianrodri): Use a proper service which takes the state's
-    // interaction type into account for generating the answer's HTML.
+  // TODO(brianrodri): Use a proper service which takes the state's
+  // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?
-      backendDict.answer : JSON.stringify(backendDict.answer);
+    backendDict.answer : JSON.stringify(backendDict.answer);
     return new AnswerStats(
       backendDict.answer, answerHtml, backendDict.frequency, false);
   }
 }
-
-angular.module('oppia').factory(
-  'AnswerStatsObjectFactory', downgradeInjectable(AnswerStatsObjectFactory));
