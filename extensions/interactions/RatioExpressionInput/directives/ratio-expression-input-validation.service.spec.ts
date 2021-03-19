@@ -297,6 +297,25 @@ describe('RatioExpressionInputValidationService', () => {
     }]);
   });
 
+  it('should catch integral value greater than 10 for # terms', () => {
+    customizationArgs.numberOfTerms.value = 11;
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'The number of terms in a ratio should not be greater than 10.'
+    }]);
+  });
+
+  it('should not catch integral value 10 for # terms', () => {
+    customizationArgs.numberOfTerms.value = 10;
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
   it('should not throw warnings on HasSpecificTermEqualTo when term number ' +
       'equals the expected number of terms', () => {
     let validHasSpecificTermEqualTo = rof.createFromBackendDict({
