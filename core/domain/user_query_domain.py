@@ -32,6 +32,9 @@ __attribute_names__ = [
 
 USER_QUERY_PARAMS = collections.namedtuple(
     'USER_QUERY_PARAMS', __attribute_names__)
+
+# TODO(#12275): In python 2, the default values in collection has to be assigned
+# to None. Once migrated to python 3, this has to be removed.
 USER_QUERY_PARAMS.__new__.__defaults__ = (None,) * len(
     USER_QUERY_PARAMS._fields)
 
