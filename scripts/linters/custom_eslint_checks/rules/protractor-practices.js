@@ -24,25 +24,25 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check  to follow good practices for writing proractor e2e test'),
+        'Lint check to follow good practices for writing protractor e2e test'),
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      disallowSleep: 'Please remove browser.sleep() call'
+      disallowSleep: 'Please do not use browser.sleep() in protractor files'
     },
   },
 
   create: function(context) {
     var checkSleepCall = function(node) {
       var callee = node.callee;
-      if (callee.property && callee.property.name !== 'sleep') {
+      if(callee.property && callee.property.name !== 'sleep') {
         return;
       }
 
-      if (callee.object && callee.object.name === 'browser') {
+      if (callee.object  && callee.object.name === 'browser'){
         context.report({
           node: node,
           loc: callee.loc,
