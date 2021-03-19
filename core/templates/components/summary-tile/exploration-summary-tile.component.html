@@ -32,18 +32,18 @@
       <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-align-space-between-center layout-row">
         <li>
           <span class="protractor-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !getAverageRating()}">
-            <span class="fas fa-star" uib-tooltip="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate " tooltip-placement="top">
+            <span class="fas fa-star" ngbTooltip="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate " placement="top">
               <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate"></span>
             </span>
             <span *ngIf="getAverageRating()">
-              {{ getAverageRating() | number:1 }}
+              {{ getAverageRating() }}
             </span>
             <span *ngIf="!getAverageRating()" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
             </span>
           </span>
         </li>
         <li>
-          <span class="far fa-eye" uib-tooltip="I18N_LIBRARY_VIEWS_TOOLTIP' | translate" tooltip-placement="top">
+          <span class="far fa-eye" ngbTooltip="I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top">
             <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"></span>
           </span>
           <span *ngIf="getNumViews">
