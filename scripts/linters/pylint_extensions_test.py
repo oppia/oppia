@@ -3298,7 +3298,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_empty_line_below_function_definition_raises_no_error(self):
+    def test_no_empty_line_below_function_definition_raises_no_error(self):
         node_no_empty_line_below_function_def = astroid.scoped_nodes.Function(
             name='test',
             doc='Custom test')
@@ -3309,6 +3309,115 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""
                 def sum(a,b):
+                    \"\"\" this  does something \"\"\"
+                    return a+b
+                """)
+        node_no_empty_line_below_function_def.file = filename
+        node_no_empty_line_below_function_def.path = filename
+        node_no_empty_line_below_function_def.fromlineno = 2
+
+        self.checker_test_object.checker.visit_functiondef(
+            node_no_empty_line_below_function_def)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_empty_line_below_multiple_line_function_raises_error(self):
+        node_empty_line_below_function_def = astroid.scoped_nodes.Function(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def sum(
+                    a,b):
+
+                    \"\"\" this  does something \"\"\"
+                    return a+b
+                """)
+        node_empty_line_below_function_def.file = filename
+        node_empty_line_below_function_def.path = filename
+        node_empty_line_below_function_def.fromlineno = 2
+
+        self.checker_test_object.checker.visit_functiondef(
+            node_empty_line_below_function_def)
+
+        message = testutils.Message(
+            msg_id='remove-blank-lines-below-function-definiton.',
+            node=node_empty_line_below_function_def)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_empty_line_below_multiple_line_function_raises_no_error(self):
+        node_no_empty_line_below_function_def = astroid.scoped_nodes.Function(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def sum(
+                    a,b):
+                    \"\"\" this  does something \"\"\"
+                    return a+b
+                """)
+        node_no_empty_line_below_function_def.file = filename
+        node_no_empty_line_below_function_def.path = filename
+        node_no_empty_line_below_function_def.fromlineno = 2
+
+        self.checker_test_object.checker.visit_functiondef(
+            node_no_empty_line_below_function_def)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_empty_line_below_function_definition_with_msg_raises_error(self):
+        node_empty_line_below_function_def = astroid.scoped_nodes.Function(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def sum(a,b):  #This returns the sum.
+
+                    \"\"\" this  does something \"\"\"
+                    return a+b
+                """)
+        node_empty_line_below_function_def.file = filename
+        node_empty_line_below_function_def.path = filename
+        node_empty_line_below_function_def.fromlineno = 2
+
+        self.checker_test_object.checker.visit_functiondef(
+            node_empty_line_below_function_def)
+
+        message = testutils.Message(
+            msg_id='remove-blank-lines-below-function-definiton.',
+            node=node_empty_line_below_function_def)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_empty_line_below_function_definition_with_msg_raises_no_error(
+            self):
+        node_no_empty_line_below_function_def = astroid.scoped_nodes.Function(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def sum(a,b):  #This returns the sum.
                     \"\"\" this  does something \"\"\"
                     return a+b
                 """)
