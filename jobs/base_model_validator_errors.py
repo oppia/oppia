@@ -74,11 +74,11 @@ class ModelTimestampRelationshipError(ModelValidationError):
         return self._message
 
 
-class ModelInvalidCommitStatus(ModelValidationError):
+class ModelInvalidCommitStatusError(ModelValidationError):
     """Error class for commit_status validation errors."""
 
     def __init__(self, model):
-        super(ModelInvalidCommitStatus, self).__init__(model)
+        super(ModelInvalidCommitStatusError, self).__init__(model)
         if model.post_commit_is_private:
             self._message = (
                 '%s Post commit status is public but '

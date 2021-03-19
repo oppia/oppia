@@ -84,10 +84,10 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
         model = jobs_utils.clone_model(input_model)
         if model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE and (
                 not model.post_commit_is_private):
-            yield errors.ModelInvalidCommitStatus(model)
+            yield errors.ModelInvalidCommitStatusError(model)
         if model.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC and (
                 model.post_commit_is_private):
-            yield errors.ModelInvalidCommitStatus(model)
+            yield errors.ModelInvalidCommitStatusError(model)
 
 
 class ValidateDeleted(beam.DoFn):
