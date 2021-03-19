@@ -46,7 +46,7 @@ describe('Voiceover upload features', function() {
 
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('Uploading translation file');
     await explorationEditorMainTab.setContent(await forms.toRichText(
@@ -64,9 +64,11 @@ describe('Voiceover upload features', function() {
     await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorPage.saveChanges(
       'Created exploration for voiceover upload.');
+    await users.logout();
   });
 
   beforeEach(async function() {
+    await users.login(TEST_EMAIL);
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     await explorationEditorPage.navigateToTranslationTab();
@@ -119,7 +121,6 @@ describe('Voiceover upload features', function() {
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-      await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();
@@ -141,7 +142,6 @@ describe('Voiceover upload features', function() {
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-      await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();
@@ -160,5 +160,6 @@ describe('Voiceover upload features', function() {
       '(Bad Request)', {status_code: 400,
         error: 'Audio files must be under 300 seconds in length.' +
        ' The uploaded file is 301.87 seconds long.'}]);
+    await users.logout();
   });
 });

@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import gae_auth_services
@@ -29,9 +31,23 @@ import webapp2
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
-class GaeAuthServicesTests(test_utils.GenericTestBase):
+class GaeAuthServicesTests(test_utils.AppEngineTestBase):
 
-    ENABLE_AUTH_SERVICES_STUB = False
+    def test_establish_auth_session_does_nothing(self):
+        request = webapp2.Request.blank('/')
+        response = webapp2.Response()
+        # Does not raise.
+        gae_auth_services.establish_auth_session(request, response)
+
+    def test_destroy_auth_session_deletes_cookies(self):
+        response = webapp2.Response()
+
+        gae_auth_services.destroy_auth_session(response)
+
+        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        self.assertTrue(
+            datetime.datetime.utcnow() > datetime.datetime.strptime(
+                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
 
     def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):
         request = webapp2.Request.blank('/')
@@ -44,11 +60,15 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
         request = webapp2.Request.blank('/')
         email = 'user@test.com'
 
-        with self.login_context('user@test.com'):
-            claims = gae_auth_services.get_auth_claims_from_request(request)
+        # Google App Engine uses environment variables to emulate user sessions.
+        self.testbed.setup_env(overwrite=True, user_email=email, user_id='gid')
+
+        claims = gae_auth_services.get_auth_claims_from_request(request)
+
+        self.testbed.setup_env(overwrite=True, user_email='', user_id='')
 
         self.assertIsNotNone(claims)
-        self.assertEqual(claims.auth_id, self.get_auth_id_from_email(email))
+        self.assertEqual(claims.auth_id, 'gid')
         self.assertEqual(claims.email, email)
         self.assertFalse(claims.role_is_super_admin)
 
@@ -56,11 +76,17 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
         request = webapp2.Request.blank('/')
         email = 'admin@test.com'
 
-        with self.login_context(email, is_super_admin=True):
-            claims = gae_auth_services.get_auth_claims_from_request(request)
+        # Google App Engine uses environment variables to emulate user sessions.
+        self.testbed.setup_env(
+            overwrite=True, user_email=email, user_id='gid', user_is_admin='1')
+
+        claims = gae_auth_services.get_auth_claims_from_request(request)
+
+        self.testbed.setup_env(
+            overwrite=True, user_email='', user_id='', user_is_admin='0')
 
         self.assertIsNotNone(claims)
-        self.assertEqual(claims.auth_id, self.get_auth_id_from_email(email))
+        self.assertEqual(claims.auth_id, 'gid')
         self.assertEqual(claims.email, email)
         self.assertTrue(claims.role_is_super_admin)
 

@@ -54,9 +54,6 @@ require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.component.ts');
 require('pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.component.ts');
 require('pages/exploration-editor-page/history-tab/history-tab.component.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
@@ -111,7 +108,9 @@ require(
   'exploration-param-changes.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-rights-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');

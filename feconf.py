@@ -433,12 +433,6 @@ REDISPORT = 6379
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
-# Used by the Admin SDK to connect with the Firebase Authentication emulator.
-# NOTE: this name is is NOT a typo despite the inclusion of the port number, it
-# is the environment variable expected to be set:
-# https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
-FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
-
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
@@ -1113,6 +1107,15 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+# The name of the cookie Oppia will place the session cookie into. The name is
+# arbitrary. If it is changed later on, then the cookie will live-on in the
+# users' browsers as garbage (although it would expire eventually, see MAX_AGE).
+FIREBASE_SESSION_COOKIE_NAME = 'session'
+# The duration a session cookie from Firebase should remain valid for. After the
+# duration expires, a new cookie will need to be generated. Generating a new
+# cookie requires the user to sign-in _explicitly_.
+FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=14)
+
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
 # these back to appropriate places (rights_domain, topic_domain).
 # The reserved prefix for keys that are automatically inserted into a
@@ -1143,6 +1146,10 @@ ROLE_EDITOR = 'editor'
 ROLE_VOICE_ARTIST = 'voice artist'
 ROLE_VIEWER = 'viewer'
 ROLE_NONE = 'none'
+
+# The list of entity types that do not require entity specific access control
+# when viewing respective suggestions.
+ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS = [ENTITY_TYPE_SKILL]
 
 # The allowed list of roles which can be used in change_role command.
 ALLOWED_ACTIVITY_ROLES = [

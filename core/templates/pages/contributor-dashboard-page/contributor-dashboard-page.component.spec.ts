@@ -15,12 +15,8 @@
 /**
  * @fileoverview Unit tests for contributor dashboard page component.
  */
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
@@ -38,14 +34,12 @@ describe('Contributor dashboard page', function() {
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
     can_review_questions: true
   };
+  var windowRef = new WindowRef();
 
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+    $provide.value('WindowRef', windowRef);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
@@ -130,6 +124,40 @@ describe('Contributor dashboard page', function() {
       ctrl.onTabClick(changedTab);
       expect(ctrl.activeTabName).toBe(changedTab);
       expect(ctrl.showLanguageSelector()).toBe(true);
+    });
+
+    it('should call scrollFunction on scroll', function() {
+      var e = document.createEvent('Event');
+      var scrollSpy = spyOn(ctrl, 'scrollFunction');
+      e.initEvent('scroll', true, true);
+
+      window.dispatchEvent(e);
+
+      expect(scrollSpy).toHaveBeenCalled();
+    });
+
+    it('should show default header if window pageYOffset is ' +
+      'less than 5', function() {
+      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+      nativeWindowSpy.and.returnValue({
+        pageYOffset: 4
+      });
+
+      ctrl.scrollFunction();
+
+      expect(ctrl.defaultHeaderVisible).toBe(true);
+    });
+
+    it('should show collapsed header if window pageYOffset is' +
+      ' scrolled greater than 5', function() {
+      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+      nativeWindowSpy.and.returnValue({
+        pageYOffset: 6
+      });
+
+      ctrl.scrollFunction();
+
+      expect(ctrl.defaultHeaderVisible).toBe(false);
     });
   });
 
