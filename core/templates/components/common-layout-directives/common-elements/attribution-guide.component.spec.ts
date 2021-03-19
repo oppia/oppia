@@ -20,6 +20,7 @@ import { TestBed, async, ComponentFixture } from
   '@angular/core/testing';
 
 import { AttributionGuideComponent } from './attribution-guide.component';
+import { ContextService } from 'services/context.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { AttributionService } from 'services/attribution.service';
@@ -71,6 +72,12 @@ class MockUrlService {
   }
 }
 
+class MockContextService {
+  getExplorationId() {
+    return 'expId';
+  }
+}
+
 describe('Attribution Guide Component', function() {
   let component: AttributionGuideComponent;
   let fixture: ComponentFixture<AttributionGuideComponent>;
@@ -81,7 +88,8 @@ describe('Attribution Guide Component', function() {
       providers: [
         { provide: AttributionService, useClass: MockAttributionService },
         { provide: BrowserCheckerService, useClass: MockBrowserCheckerService },
-        { provide: UrlService, useClass: MockUrlService }
+        { provide: UrlService, useClass: MockUrlService },
+        { provide: ContextService, useClass: MockContextService }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -125,6 +133,10 @@ describe('Attribution Guide Component', function() {
 
   it('should get authors', () => {
     expect(component.getAuthors()).toEqual('Ellie, Abby, Joel, Dina');
+  });
+
+  it('should get exploration ID', () => {
+    expect(component.getExplorationId()).toEqual('expId');
   });
 
   it('should get exploration title', () => {
