@@ -1011,8 +1011,8 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     app_feedback_report_model_class = (
         app_feedback_report_models.FeedbackReportModel)
 
-    feedback_report_models = app_feedback_report_model.query(
-        filter(FeedbackReportModel.scrubbed_by == user_id).fetch()
+    feedback_report_models = app_feedback_report_model_class.query(
+        filter(app_feedback_report_model_class.scrubbed_by == user_id).fetch()
     )
     report_ids = set([model.id for model in feedback_report_models])
 
