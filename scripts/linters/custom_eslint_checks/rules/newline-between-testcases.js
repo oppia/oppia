@@ -39,12 +39,19 @@ module.exports = {
     const lines = sourceCode.lines;
 
     var checkLineBreak = function(testMessageNode) {
-      var line = testMessageNode.loc.start.line-2;
+      var line = testMessageNode.loc.start.line - 2;
       //  For checking comments before it()
-      while(line>=0 && lines[line].trim().startsWith('/')){
+      while (line >= 0 && lines[line].trim().startsWith('/')) {
         line--;
       }
-      if (line>=0 && (lines[line] || lines[line] === '' && lines[line - 1] === '')) {
+      if (line >= 0 && lines[line] && !lines[line].trim().startsWith('desc')) {
+        context.report({
+          testMessageNode,
+          loc: testMessageNode.loc,
+          messageId: 'line'
+        });
+      }
+      if (line >= 0 && lines[line] === '' && lines[line - 1] === '') {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
