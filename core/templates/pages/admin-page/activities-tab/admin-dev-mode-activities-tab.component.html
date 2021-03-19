@@ -18,7 +18,7 @@
       <button type="button"
               class="btn btn-secondary protractor-test-reload-all-explorations-button"
               (click)="reloadAllExplorations()"
-              [disabled]="reloadingAllExplorationPossible">
+              [disabled]="!reloadingAllExplorationPossible">
         Reload All Explorations
       </button>
     </div>
