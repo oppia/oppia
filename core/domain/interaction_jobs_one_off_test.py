@@ -755,6 +755,227 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             self, interaction_jobs_one_off.ItemSelectionInteractionOneOffJob)
 
 
+class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(MultipleItemInteractionLtOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks output pairs are produced only for multiple choice
+        interactions having choices length less than 30.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        state4 = exploration.states['State4']
+
+        customization_args_dict1 = {
+            'choices': {'value': [{
+                'html': '<p>Oppia</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>Oppia contribute</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
+        }
+
+        state1.update_interaction_id('MultipleChoiceInput')
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MultipleItemInteractionLtOneOffJob job
+        # on sample exploration whose interaction is
+        # Multiple Choice Input Interaction.
+        job_id = (
+            interaction_jobs_one_off
+            .MultipleItemInteractionLtOneOffJob.
+            create_new())
+        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .MultipleItemInteractionLtOneOffJob.get_output(job_id))
+        expected_output = (2, 0)
+        self.assertEqual(actual_output, expected_output)
+
+        customization_args_dict2 = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }, {
+                'html': '<p>This is value3 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_2'
+            }, {
+                'html': '<p>This is value4 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_3'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
+        }
+
+        state2.update_interaction_id('MultipleChoiceInput')
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(4)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MultipleChoiceInteractionLimitOneOffJob job
+        # on sample exploration whose interaction is
+        # Multiple Choice Input Interaction.
+        job_id = (
+            interaction_jobs_one_off
+            .MultipleItemInteractionLtOneOffJob.
+            create_new())
+        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .MultipleItemInteractionLtOneOffJob.get_output(job_id))
+        expected_output = (4, 4)
+        self.assertEqual(actual_output, expected_output)
+
+        state3.update_interaction_id('ItemSelectionInput')
+        state3.update_interaction_customization_args(customization_args_dict1)
+        state3.update_next_content_id_index(6)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MultipleItemInputInteractionLtOneOffJob job
+        # on sample exploration whose interaction is
+        # Item Selection Input.
+        job_id = (
+            interaction_jobs_one_off
+            .MultipleItemInteractionLtOneOffJob.
+            create_new())
+        interaction_jobs_one_off.MultipleInputInteractionLtOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .MultipleInputInteractionLtOneOffJob.get_output(job_id))
+        expected_output = (2, 0)
+        self.assertEqual(actual_output, expected_output)
+
+        state4.update_interaction_id('ItemSelectionInput')
+        state4.update_interaction_customization_args(customization_args_dict1)
+        state4.update_next_content_id_index(8)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MultipleItemInputInteractionLtOneOffJob job
+        # on sample exploration whose interaction is
+        # Item Selection Input.
+        job_id = (
+            interaction_jobs_one_off
+            .MultipleItemInteractionLtOneOffJob.
+            create_new())
+        interaction_jobs_one_off.MultipleInputInteractionLtOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .MultipleInputInteractionLtOneOffJob.get_output(job_id))
+        expected_output = (4, 4)
+        self.assertEqual(actual_output, expected_output)
+
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations
+        whose interaction is Multiple Choice Input interaction."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('MultipleChoiceInput')
+
+        customization_args_dict1 = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, interaction_jobs_one_off.
+            MultipleItemInteractionLtOneOffJob)
+
+        """Test that no action is performed on deleted explorations
+        whose interaction is Item Selection Input interaction."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State2'])
+
+        state2 = exploration.states['State2']
+
+        state2.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict2 = {
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelectionInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelectionInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict2)
+        state1.update_next_content_id_index(4)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, interaction_jobs_one_off.
+            MultipleItemInteractionLtOneOffJob)
+
+
 class InteractionCustomizationArgsValidationOneOffJobTests(
         test_utils.GenericTestBase):
 
