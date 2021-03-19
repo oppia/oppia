@@ -176,7 +176,6 @@
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "Text shown in the footer. - Title of the teach/learn section. Must be in all capital letters for languages that use Latin, Cyrillic, and/or Greek scripts. This section has links to pages with content for teachers and students.",
 	"I18N_FOOTER_TEACH_PAGE": "Text shown in the footer. - Link to a page that contains Oppia's Teach page containg information for parents and teachers.",
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Text shown in the footer. - Link to a page that contains Oppia's terms of service.\n{{Identical|Terms of service}}",
-	"I18N_FOOTER_VOLUNTEER": "Text shown in the footer. - Link to a page that contains Oppia's Volunteer's page",
 	"I18N_FORMS_TYPE_NUMBER": "Text displayed in a number interaction. - The interaction is a input box when the user has a to enter a number. This text is shown inside the box when the user has not introduced anything yet.",
 	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Text displayed in a number interaction. - This text is shown in red when the user introduces a number that is less than <[minValue]>.",
 	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "Text displayed in a number interaction. - This text is shown in red when the user introduces a number that is greater than <[maxValue]>.",
@@ -200,6 +199,7 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9": "Text on the Get Started page that explains the process for creating an Oppia activity at a high level.\n{{Identical|Get started}}",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "Paragraph heading on the Get Started page that explains the process for creating an Oppia activity at a high level.\n{{Identical|Get started}}",
 	"I18N_GET_STARTED_PAGE_TITLE": "Title of the Get Started page that explains the process for creating an Oppia activity at a high level.\n{{Identical|Get started}}",
+	"I18N_HEADING_VOLUNTEER": "Text shown in the footer and navbar. - Link to a page that contains Oppia's Volunteer's page",
 	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Text displayed in the fractions interaction input as a placeholder.",
 	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Text displayed in the fractions interaction input as a placeholder when no integer part is allowed.",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "Text displayed in a button in a graph interaction inside the graph editor - When the user clicks the button, he can add a new line (edge) to the graph.",
@@ -655,7 +655,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Text displayed inside the Sign In dropdown. - When clicked, the user is signed in with Google Oauth - The text in the button needs to be less than 25 characters long",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the teach with oppia page is loaded which contains information specific for teachers who would like to create explorations.",
 	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Text displayed in the dropdown on the navbar for reaching the topics and skills dashboard.",
-	"I18N_TOPNAV_VOLUNTEER":"Text displayed in the dropdown on the navbar- lands user on Volunteer page",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Text displayed under the subscribers tab in creator dashboard. Tells the creator the total number of subscribers he/she has.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}",
 	"I18N_WORKED_EXAMPLE": "The text that is displayed on the button to view another worked example when a skill concept card is displayed in the exploration player."
