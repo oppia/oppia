@@ -28,6 +28,7 @@ describe('Topic summary model', () => {
       subtopic_count: 5,
       canonical_story_count: 4,
       total_skill_count: 10,
+      total_published_node_count: 3,
       uncategorized_skill_count: 3,
       language_code: 'en',
       description: 'description',
@@ -52,6 +53,7 @@ describe('Topic summary model', () => {
     expect(_sampleTopicSummary.getSubtopicCount()).toEqual(5);
     expect(_sampleTopicSummary.getCanonicalStoryCount()).toEqual(4);
     expect(_sampleTopicSummary.getTotalSkillCount()).toEqual(10);
+    expect(_sampleTopicSummary.getTotalPublishedNodeCount()).toEqual(3);
     expect(_sampleTopicSummary.getUncategorizedSkillCount()).toEqual(3);
     expect(_sampleTopicSummary.getLanguageCode()).toEqual('en');
     expect(_sampleTopicSummary.getDescription()).toEqual('description');

@@ -118,8 +118,10 @@ class EditableStoryDataHandler(base.BaseHandler):
             for change_dict in change_dicts
         ]
         try:
-            story_services.update_story(
-                self.user_id, story_id, change_list, commit_message)
+            # Update the Story and its corresponding TopicSummary.
+            topic_services.update_story_and_topic_summary(
+                self.user_id, story_id, change_list, commit_message,
+                story.corresponding_topic_id)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
