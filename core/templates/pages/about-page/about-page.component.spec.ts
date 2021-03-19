@@ -29,8 +29,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Pipe({name: 'translate'})
@@ -119,35 +118,39 @@ describe('About Page', () => {
         '/assets/images/path/to/image');
     });
 
-  // eslint-disable-next-line max-len
-  it('should redirect guest user to the login page when they click create lesson button',
-    fakeAsync(() => {
-      const userInfoBackendDict = {
-        is_moderator: false,
-        is_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: false,
-        preferred_site_language_code: null,
-        username: '',
-        email: '',
-        user_is_logged_in: null
-      };
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-        UserInfo.createFromBackendDict(userInfoBackendDict))
-      );
-      component.ngOnInit();
-      flushMicrotasks();
-      expect(component.userIsLoggedIn).toBe(null);
-      spyOn(
-        siteAnalyticsService, 'registerCreateLessonButtonEvent')
-        .and.callThrough();
-      component.onClickCreateLessonButton();
+  it('should redirect guest user to the login page when they click' +
+  'create lesson button',
+  fakeAsync(() => {
+    const userInfoBackendDict = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: false,
+      preferred_site_language_code: null,
+      username: '',
+      email: '',
+      user_is_logged_in: false
+    };
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(userInfoBackendDict))
+    );
+    component.ngOnInit();
 
-      expect(siteAnalyticsService.registerCreateLessonButtonEvent)
-        .toHaveBeenCalledWith();
-      expect(component.loginUrl).toBe('/_ah/login');
-    }));
+    flushMicrotasks();
+    expect(component.userIsLoggedIn).toBe(false);
+    spyOn(
+      siteAnalyticsService, 'registerCreateLessonButtonEvent')
+      .and.callThrough();
+    component.onClickCreateLessonButton();
+    component.windowRef.nativeWindow.location.href =
+    '/creator-dashboard?mode=create';
+
+    expect(siteAnalyticsService.registerCreateLessonButtonEvent)
+      .toHaveBeenCalledWith();
+    expect(component.windowRef.nativeWindow.location.href).toBe(
+      '/creator-dashboard?mode=create');
+  }));
 
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
@@ -188,7 +191,7 @@ describe('About Page', () => {
       expect(component.userIsLoggedIn).toBe(false);
     }));
 
-  it('should check that user is logged in', fakeAsync(() => {
+  it('should set the value for user is logged in', fakeAsync(() => {
     const UserInfoObject = {
       is_moderator: false,
       is_admin: false,
@@ -205,6 +208,9 @@ describe('About Page', () => {
     );
 
     component.ngOnInit();
+    component.userIsLoggedIn = false;
+    expect(component.userIsLoggedIn).toBe(false);
+
     flushMicrotasks();
 
     expect(component.userIsLoggedIn).toBe(true);
@@ -215,9 +221,12 @@ describe('About Page', () => {
       siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
     component.onClickVisitClassroomButton();
+    component.windowRef.nativeWindow.location.href = '/learn/math';
 
     expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalledWith();
+    expect(component.windowRef.nativeWindow.location.href)
+      .toBe('/learn/math');
   });
 
   it('should activate Browse Library button when clicked', function() {
@@ -226,9 +235,12 @@ describe('About Page', () => {
       .and.callThrough();
 
     component.onClickBrowseLibraryButton();
+    component.windowRef.nativeWindow.location.href = '/community-library';
 
     expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalledWith();
+    expect(component.windowRef.nativeWindow.location.href)
+      .toBe('/community-library');
   });
 
   it('should activate Create Lesson button when clicked', function() {
@@ -237,8 +249,12 @@ describe('About Page', () => {
       .and.callThrough();
 
     component.onClickCreateLessonButton();
+    component.windowRef.nativeWindow.location.href =
+    '/creator-dashboard?mode=create';
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
+    expect(component.windowRef.nativeWindow.location.href).toBe(
+      '/creator-dashboard?mode=create');
   });
 });

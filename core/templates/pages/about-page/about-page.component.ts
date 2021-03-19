@@ -61,15 +61,8 @@ export class AboutPageComponent implements OnInit {
 
   onClickCreateLessonButton(): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
-    // If user is not logged in then we will let user log in and then
-    // Take user to create exploration page.
-    if (this.userIsLoggedIn === null) {
-      this.windowRef.nativeWindow.location.href = this.loginUrl;
-    } else {
-      // If user is logged in take user to create exploration page.
-      this.windowRef.nativeWindow.location.href = (
-        '/creator-dashboard?mode=create');
-    }
+    this.windowRef.nativeWindow.location.href = (
+      '/creator-dashboard?mode=create');
   }
 
   ngOnInit(): void {
