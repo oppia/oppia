@@ -41,7 +41,7 @@ describe('Translation Modal Component', () => {
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalComponent>;
   let component: TranslationModalComponent;
-  let opportunity: TranslationOpportunity = {
+  const opportunity: TranslationOpportunity = {
     id: '1',
     heading: 'Heading',
     subheading: 'subheading',

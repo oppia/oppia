@@ -31,7 +31,7 @@ import { Subscription } from 'rxjs';
   styleUrls: []
 })
 export class OpportunitiesListComponent {
-  @Input() loadOpportunities: ()=>Promise<{
+  @Input() loadOpportunities: () => Promise<{
     opportunitiesDicts: ExplorationOpportunity[], more: boolean}>;
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
@@ -41,12 +41,12 @@ export class OpportunitiesListComponent {
   );
   @Input() opportunityHeadingTruncationLength: number;
 
-  loadingOpportunityData: boolean;
-  lastPageNumber: number;
+  loadingOpportunityData: boolean = true;
+  lastPageNumber: number = 1000;
   opportunities: ExplorationOpportunity[] = [];
   visibleOpportunities = [];
   directiveSubscriptions = new Subscription();
-  activePageNumber: number;
+  activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
 
   constructor(
@@ -79,12 +79,6 @@ export class OpportunitiesListComponent {
   }
 
   ngOnInit(): void {
-    this.opportunities = [];
-    this.visibleOpportunities = [];
-    this.activePageNumber = 1;
-    this.lastPageNumber = 1000;
-    this.loadingOpportunityData = true;
-
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       this.opportunities = opportunitiesDicts;
       // "more" returned from GAE storage is not always reliable if true.

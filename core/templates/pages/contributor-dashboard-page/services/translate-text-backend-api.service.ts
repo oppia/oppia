@@ -61,7 +61,7 @@ export class TranslateTextBackendApiService {
       }
     };
 
-    let body = new FormData();
+    const body = new FormData();
     body.append('payload', JSON.stringify(postData));
     imagesData.forEach(obj => body.append(obj.filename, obj.imageBlob));
     return this.http.post(

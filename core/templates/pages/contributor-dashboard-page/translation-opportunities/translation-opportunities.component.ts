@@ -56,7 +56,7 @@ export class TranslationOpportunitiesComponent {
     more: boolean;
   } {
     const opportunitiesDicts: TranslationOpportunity[] = [];
-    for (let index in opportunities) {
+    for (const index in opportunities) {
       const opportunity = opportunities[index];
       const subheading = opportunity.getOpportunitySubheading();
       const heading = opportunity.getOpportunityHeading();

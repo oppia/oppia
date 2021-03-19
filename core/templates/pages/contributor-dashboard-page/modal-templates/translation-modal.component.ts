@@ -108,7 +108,6 @@ export class TranslationModalComponent {
     };
   }
 
-
   close(): void {
     this.activeModal.close();
   }
