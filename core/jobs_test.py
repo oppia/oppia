@@ -350,9 +350,8 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """
-        Args:
-            item: *.A single element of the type given by entity_class().
+        """Args:
+               item: *.A single element of the type given by entity_class().
         """
         current_class = SampleMapReduceJobManager
         if current_class.entity_created_before_job_queued(item):
@@ -640,9 +639,8 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """
-        Args:
-            item: *.A single element of the type given by entity_class().
+        """Args:
+               item: *.A single element of the type given by entity_class().
         """
 
         yield ('sum', 1)
