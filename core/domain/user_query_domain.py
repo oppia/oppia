@@ -26,17 +26,17 @@ import feconf
 import python_utils
 import utils
 
-__attribute_names__ = [
+attribute_names = [ # pylint: disable=invalid-name
     predicate['backend_attr'] for predicate in (
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
-USER_QUERY_PARAMS = collections.namedtuple(
-    'USER_QUERY_PARAMS', __attribute_names__)
+UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
+    'UserQueryParams', attribute_names)
 
 # TODO(#12275): In python 2, the default values in collection has to be assigned
 # to None. Once migrated to python 3, this has to be removed.
-USER_QUERY_PARAMS.__new__.__defaults__ = (None,) * len(
-    USER_QUERY_PARAMS._fields)
+UserQueryParams.__new__.__defaults__ = (None,) * len(
+    UserQueryParams._fields)
 
 
 class UserQuery(python_utils.OBJECT):
@@ -50,7 +50,7 @@ class UserQuery(python_utils.OBJECT):
 
         Args:
             query_id: str. The id of the query.
-            query_params: USER_QUERY_PARAMS. The params of this query.
+            query_params: UserQueryParams. The params of this query.
             submitter_id: str. The ID of the user that submitted the query.
             query_status: str. The status of the query. Can only contain values
                 from feconf.ALLOWED_USER_QUERY_STATUSES.
@@ -74,7 +74,7 @@ class UserQuery(python_utils.OBJECT):
 
         Raises:
             ValidationError. Expected ID to be a string.
-            ValidationError. Expected params to be of type USER_QUERY_PARAMS.
+            ValidationError. Expected params to be of type UserQueryParams.
             ValidationError. Expected objective to be a string.
             ValidationError. Expected submitter ID to be a valid user ID.
             ValidationError. Expected status to be a string.
@@ -135,7 +135,7 @@ class UserQuery(python_utils.OBJECT):
 
         Args:
             query_id: str. The id of the query.
-            query_params: USER_QUERY_PARAMS. The params of this query.
+            query_params: UserQueryParams. The params of this query.
             submitter_id: str. The ID of the user that submitted the query.
 
         Returns:

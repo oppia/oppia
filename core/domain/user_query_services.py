@@ -41,7 +41,7 @@ def _get_user_query_from_model(user_query_model):
             user_query_model, predicate['backend_attr'])
         for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     }
-    user_query_params = user_query_domain.USER_QUERY_PARAMS(**attributes)
+    user_query_params = user_query_domain.UserQueryParams(**attributes)
 
     return user_query_domain.UserQuery(
         user_query_model.id,
@@ -132,13 +132,13 @@ def save_new_user_query(submitter_id, query_params):
 
     Args:
         submitter_id: str. ID of the UserQueryModel instance.
-        query_params: dict. Parameters of the USER_QUERY_PARAMS collection.
+        query_params: dict. Parameters of the UserQueryParams collection.
 
     Returns:
         str. The ID of the newly saved user query.
     """
     query_id = user_models.UserQueryModel.get_new_id('')
-    user_query_params = user_query_domain.USER_QUERY_PARAMS(**query_params)
+    user_query_params = user_query_domain.UserQueryParams(**query_params)
     user_query = (
         user_query_domain.UserQuery.create_default(
             query_id, user_query_params, submitter_id))
