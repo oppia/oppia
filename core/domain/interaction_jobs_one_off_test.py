@@ -905,10 +905,11 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         expected_output = (4, 4)
         self.assertEqual(actual_output, expected_output)
 
-
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations
-        whose interaction is Multiple Choice Input interaction."""
+        whose interaction is Multiple Choice Input interaction or
+        Item Selection Input interaction.
+        """
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -940,10 +941,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         run_job_for_deleted_exp(
             self, interaction_jobs_one_off.
             MultipleItemInteractionLtOneOffJob)
-
-        """Test that no action is performed on deleted explorations
-        whose interaction is Item Selection Input interaction."""
-
+        
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -964,8 +962,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
             'showChoicesInShuffledOrder': {'value': True}
         }
 
-        state1.update_interaction_customization_args(customization_args_dict2)
-        state1.update_next_content_id_index(4)
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(4)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
