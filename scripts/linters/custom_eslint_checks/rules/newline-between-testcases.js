@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ module.exports = {
   meta: {
     type: 'layout',
     docs: {
-      description: 'There Should be exacly on blank line after each test cases',
+      description: 'There should be a single newline between test cases.',
       category: 'Stylistic Issues',
       recommended: true
     },
     fixable: null,
     schema: [],
     messages: {
-      line: 'There should be a single line break before it'
+      line: 'There should be a single newline break before it()'
     }
   },
 
@@ -39,15 +39,12 @@ module.exports = {
     const lines = sourceCode.lines;
 
     var checkLineBreak = function(testMessageNode) {
-      var line = testMessageNode.loc.start.line;
-      if (line >= 2 && lines[line - 2]) {
-        context.report({
-          testMessageNode,
-          loc: testMessageNode.loc,
-          messageId: 'line'
-        });
+      var line = testMessageNode.loc.start.line-2;
+      //  For checking comments before it()
+      while(line>=0 && lines[line].trim().startsWith('/')){
+        line--;
       }
-      if (line >= 2 && lines[line - 2] === '' && lines[line - 3] === '') {
+      if (line>=0 && (lines[line] || lines[line] === '' && lines[line - 1] === '')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,

@@ -104,7 +104,7 @@
     "oppia/no-multiline-disable": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
-    "oppia/line-after-test": "error",
+    "oppia/newline-between-testcases": "error",
     "angular/di": [
       "error",
       "array"

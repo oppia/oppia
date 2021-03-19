@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the test-message-style.js file.
+ * @fileoverview Tests for the newline-between-testcases.js file.
  */
 
 'use strict';
 
-var rule = require('./line-after-test');
+var rule = require('./newline-between-testcases');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('line-after-test', rule, {
+ruleTester.run('newline-between-testcases', rule, {
   valid: [
     `it('should check for the line break')
 
@@ -35,7 +35,7 @@ ruleTester.run('line-after-test', rule, {
        `it('should check for the line break')
         it('should check for line break and multiline')`,
       errors: [{
-        message: ('There should be a single line break before it'),
+        message: ('There should be a single newline break before it()'),
         type: null
       }]
     },
@@ -46,7 +46,7 @@ ruleTester.run('line-after-test', rule, {
 
         it('should check for line break and multiline')`,
       errors: [{
-        message: ('There should be a single line break before it'),
+        message: ('There should be a single newline break before it()'),
         type: null
       }]
     },
