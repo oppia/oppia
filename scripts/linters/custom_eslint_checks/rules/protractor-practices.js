@@ -38,11 +38,11 @@ module.exports = {
   create: function(context) {
     var checkSleepCall = function(node) {
       var callee = node.callee;
-      if(callee.property && callee.property.name !== 'sleep') {
+      if (callee.property && callee.property.name !== 'sleep') {
         return;
       }
 
-      if (callee.object  && callee.object.name === 'browser'){
+      if (callee.object && callee.object.name === 'browser') {
         context.report({
           node: node,
           loc: callee.loc,
