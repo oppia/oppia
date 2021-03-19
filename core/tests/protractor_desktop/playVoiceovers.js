@@ -46,8 +46,7 @@ describe('Voiceover player', function() {
 
     await users.createAndLoginUser(
       'testVoiceovers@voiceovers.com', 'testVoiceovers');
-    await workflow.createExploration();
-    await explorationEditorMainTab.exitTutorial();
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'This is the first card.'));
