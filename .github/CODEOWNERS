@@ -242,8 +242,8 @@
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.html @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component*.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @srijanreddy98
 /core/templates/components/profile-link-directives/ @srijanreddy98
