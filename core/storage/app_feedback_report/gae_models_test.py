@@ -21,6 +21,7 @@ import datetime
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])
@@ -132,3 +133,9 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
             }
         }
         self.assertEqual(stored_data, expected_data)
+
+    def test_get_lowest_supported_role(self):
+        model = app_feedback_report_models.FeedbackReportModel
+        self.assertEqual(model.get_lowest_supported_role(),
+            feconf.ROLE_ID_MODERATOR
+        )

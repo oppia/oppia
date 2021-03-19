@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+import feconf
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -141,7 +142,6 @@ class FeedbackReportModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
-
     @classmethod
     def export_data(cls, user_id):
         """Exports the data from FeedbackReportModel
@@ -188,6 +188,11 @@ class FeedbackReportModel(base_models.BaseModel):
         are multiple reports relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role for feedback reports will be moderator"""
+        return feconf.ROLE_ID_MODERATOR
 
 
 class FeedbackReportTicketModel(base_models.BaseModel):
