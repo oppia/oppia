@@ -17,22 +17,22 @@
  */
 
 require(
-    'components/common-layout-directives/common-elements/' +
-    'confirm-or-cancel-modal.controller.ts');
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 
-  angular.module('oppia').controller(
-    'ReassignRoleConfirmationModalController', [
-      '$controller', '$scope', '$uibModalInstance', 'username', 'newRole',
-      'oldRole',
-      function(
-          $controller, $scope, $uibModalInstance, username, newRole,
-          oldRole) {
-        $controller('ConfirmOrCancelModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance
-        });
-        $scope.username = username;
-        $scope.newRole = newRole;
-        $scope.oldRole = oldRole;
-      }
-    ]);
+angular.module('oppia').controller(
+  'ReassignRoleConfirmationModalController', [
+    '$controller', '$scope', '$uibModalInstance', 'newRole', 'oldRole',
+    'username',
+    function(
+        $controller, $scope, $uibModalInstance, newRole, oldRole,
+        username) {
+      $controller('ConfirmOrCancelModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance
+      });
+      $scope.username = username;
+      $scope.newRole = newRole;
+      $scope.oldRole = oldRole;
+    }
+  ]);

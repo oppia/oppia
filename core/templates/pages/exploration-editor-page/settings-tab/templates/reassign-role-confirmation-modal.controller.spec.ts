@@ -16,34 +16,34 @@
  * @fileoverview Unit tests for ReassignRoleConfirmationModalController.
  */
 require(
-    'components/common-layout-directives/common-elements/' +
-    'confirm-or-cancel-modal.controller.ts');
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 
-  describe('Reassign Role Confirm Or Cancel Modal Controller ', function() {
-    var $scope = null;
-    var $uibModalInstance = null;
-    var testUsername = 'testUsername';
-    var testRole = 'testRole';
-    var testOldRole = 'testOldRole'
+describe('Reassign Role Confirm Or Cancel Modal Controller ', function() {
+  var $scope = null;
+  var $uibModalInstance = null;
+  var testUsername = 'testUsername';
+  var testRole = 'testRole';
+  var testOldRole = 'testOldRole';
 
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      var $rootScope = $injector.get('$rootScope');
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector, $controller) {
+    var $rootScope = $injector.get('$rootScope');
 
-      $scope = $rootScope.$new();
-      $controller('ReassignRoleConfirmationModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        username: testUsername,
-        newRole: testRole,
-        oldRole: testOldRole,
-      });
-    }));
+    $scope = $rootScope.$new();
+    $controller('ReassignRoleConfirmationModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance,
+      username: testUsername,
+      newRole: testRole,
+      oldRole: testOldRole,
+    });
+  }));
 
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.username).toBe(testUsername);
-        expect($scope.newRole).toBe(testRole);
-        expect($scope.oldRole).toBe(testOldRole);
-      });
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.username).toBe(testUsername);
+      expect($scope.newRole).toBe(testRole);
+      expect($scope.oldRole).toBe(testOldRole);
+    });
+});
