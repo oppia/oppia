@@ -335,7 +335,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_no_newline_below_class_docstring.file = filename
         node_no_newline_below_class_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_no_newline_below_class_docstring)
 
         message = testutils.Message(
@@ -365,7 +365,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_excessive_newline_below_class_docstring.file = filename
         node_excessive_newline_below_class_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_excessive_newline_below_class_docstring)
 
         message = testutils.Message(
@@ -395,7 +395,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_inline_comment_after_class_docstring.file = filename
         node_inline_comment_after_class_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_inline_comment_after_class_docstring)
 
         message = testutils.Message(
@@ -424,7 +424,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_multiline_class_argument_with_incorrect_style.file = filename
         node_multiline_class_argument_with_incorrect_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_multiline_class_argument_with_incorrect_style)
 
         message = testutils.Message(
@@ -454,7 +454,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_multiline_class_argument_with_correct_style.file = filename
         node_multiline_class_argument_with_correct_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_multiline_class_argument_with_correct_style)
 
         with self.checker_test_object.assertNoMessages():
@@ -478,7 +478,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
@@ -500,7 +500,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_class_with_no_docstring.file = filename
         node_class_with_no_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_class_with_no_docstring)
 
         with self.checker_test_object.assertNoMessages():
@@ -526,7 +526,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_newline_before_docstring_with_correct_style.file = filename
         node_newline_before_docstring_with_correct_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_newline_before_docstring_with_correct_style)
 
         with self.checker_test_object.assertNoMessages():
@@ -551,7 +551,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_newline_before_docstring_with_incorrect_style.file = filename
         node_newline_before_docstring_with_incorrect_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
+        self.checker_test_object.checker.visit_module(
             node_newline_before_docstring_with_incorrect_style)
 
         message = testutils.Message(
@@ -560,6 +560,54 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
+
+    def test_no_period_at_end_multiline_raises_error(self):
+        node_no_period_at_end_multiline_raises_error = astroid.extract_node(
+            u"""
+                class ClassName(dummy_class):
+
+                    \"\"\"This is a multiline
+                    docstring
+                    \"\"\"
+            """)
+
+        message = testutils.Message(
+            msg_id='no-period-used',
+            node=node_no_period_at_end_multiline_raises_error)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_classdef(
+                node_no_period_at_end_multiline_raises_error)
+
+    def test_no_period_at_end_single_line_raises_error(self):
+        node_no_period_at_end_single_line_raises_error = astroid.extract_node(
+            u"""
+                class ClassName(dummy_class):
+
+                    \"\"\"This is a single line docstring\"\"\"
+            """)
+
+        message = testutils.Message(
+            msg_id='no-period-used',
+            node=node_no_period_at_end_single_line_raises_error)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_classdef(
+                node_no_period_at_end_single_line_raises_error)
+
+    def test_period_at_end_does_not_raises_error(self):
+        node_period_at_end_does_not_raises_error = astroid.extract_node(
+            u"""
+                class ClassName(dummy_class):
+
+                    \"\"\"This is a multiline
+                    docstring.
+                    \"\"\"
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_classdef(
+                node_period_at_end_does_not_raises_error)
 
     def test_malformed_args_section(self):
         node_malformed_args_section = astroid.extract_node(
@@ -3019,7 +3067,7 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
 
 
 class DisallowedFunctionsCheckerTests(unittest.TestCase):
-    """Unit tests for DisallowedFunctionsChecker"""
+    """Unit tests for DisallowedFunctionsChecker."""
 
     def setUp(self):
         super(DisallowedFunctionsCheckerTests, self).setUp()
