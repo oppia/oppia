@@ -161,8 +161,11 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.changedImgDetails = function(originalElements, translatedElements) {
+      if(originalElements.length == 0) {
+        return false;
+      }
       const hasMatchingTranslatedElement = (element) => (
-        translatedElements.includes(element) && element !== '');
+        translatedElements.includes(element) && originalElements.length > 0);
       return originalElements.every(hasMatchingTranslatedElement);
     };
 
