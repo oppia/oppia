@@ -120,7 +120,7 @@ describe('Admin dev mode activities tab', () => {
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit)
-        .toHaveBeenCalledWith('Data reloaded successfully.');
+          .toHaveBeenCalledWith('Data reloaded successfully.');
       });
     }));
 
@@ -141,7 +141,7 @@ describe('Admin dev mode activities tab', () => {
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit)
-        .toHaveBeenCalledWith('Server error: Exploration not found.');
+          .toHaveBeenCalledWith('Server error: Exploration not found.');
       });
     }));
   });
@@ -221,28 +221,28 @@ describe('Admin dev mode activities tab', () => {
     }));
 
     it('should not reload all exploration if exploration ID is wrong',
-    async(() => {
-      const demoExplorationIds = ['wrongId'];
-      component.demoExplorationIds = demoExplorationIds;
-      component.reloadingAllExplorationPossible = true;
+      async(() => {
+        const demoExplorationIds = ['wrongId'];
+        component.demoExplorationIds = demoExplorationIds;
+        component.reloadingAllExplorationPossible = true;
 
-      spyOn(adminBackendApiService, 'reloadExplorationAsync')
-        .and.returnValue(Promise.reject({
-          data: {
-            error: 'Exploration not found.'
-          }
-        }));
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
-      spyOn(component.setStatusMessage, 'emit');
+        spyOn(adminBackendApiService, 'reloadExplorationAsync')
+          .and.returnValue(Promise.reject({
+            data: {
+              error: 'Exploration not found.'
+            }
+          }));
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
+        spyOn(component.setStatusMessage, 'emit');
 
-      component.reloadAllExplorations();
-      mockConfirmResult(true);
+        component.reloadAllExplorations();
+        mockConfirmResult(true);
 
-      fixture.whenStable().then(() => {
-        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
-          'Reloaded 1 explorations: 0 succeeded, 1 failed.');
-      });
-    }));
+        fixture.whenStable().then(() => {
+          expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+            'Reloaded 1 explorations: 0 succeeded, 1 failed.');
+        });
+      }));
   });
 
   describe('.generateDummyExploration', () => {
@@ -345,8 +345,8 @@ describe('Admin dev mode activities tab', () => {
       'is not generated', async(() => {
       spyOn(adminBackendApiService, 'generateDummyNewSkillDataAsync')
         .and.returnValue(Promise.reject({
-          data :{
-            error: "New skill data not generated."
+          data: {
+            error: 'New skill data not generated.'
           }
         }));
       spyOn(component.setStatusMessage, 'emit');
@@ -396,9 +396,9 @@ describe('Admin dev mode activities tab', () => {
       spyOn(adminBackendApiService, 'reloadCollectionAsync')
         .and.returnValue(Promise.reject({
           data: {
-            error: "Wrong collection ID."
+            error: 'Wrong collection ID.'
           }
-        }))
+        }));
       spyOn(component.setStatusMessage, 'emit');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       component.reloadCollection(wrongCollectionId);
