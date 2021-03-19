@@ -28,18 +28,18 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
-    'question', 'recommendations', 'skill', 'statistics', 'story', 'subtopic',
-    'suggestion', 'topic', 'user')
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
+    'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
+    'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
+    'story', 'subtopic', 'suggestion', 'topic', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
-    NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
-    NAMES.question, NAMES.skill, NAMES.story, NAMES.subtopic, NAMES.suggestion,
-    NAMES.topic)
+    NAMES.app_feedback_report, NAMES.collection, NAMES.config, NAMES.exploration,
+    NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story, NAMES.subtopic,
+    NAMES.suggestion, NAMES.topic)
 
 GAE_PLATFORM = 'gae'
 
@@ -83,6 +83,9 @@ class _Gae(Platform):
             if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
+            elif name == NAMES.app_feedback_report:
+                from core.storage.app_feedback_report import gae_models as app_feedback_report_models # pylint: disable=line-too-long
+                returned_models.append(app_feedback_report_models)
             elif name == NAMES.audit:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
