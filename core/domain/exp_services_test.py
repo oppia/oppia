@@ -1007,16 +1007,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_get_multiple_explorations_from_model_by_id(self):
         self.save_new_valid_exploration(
             'exp_id_1', self.owner_id, title='title 1',
-            category='category 1',
-            objective='objective 1',
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
-        )
+            category='category 1', objective='objective 1')
         self.save_new_valid_exploration(
             'exp_id_2', self.owner_id, title='title 2',
-            category='category 2',
-            objective='objective 2',
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
-        )
+            category='category 2', objective='objective 2')
 
         explorations = exp_fetchers.get_multiple_explorations_by_id(
             ['exp_id_1', 'exp_id_2'])
@@ -1158,75 +1152,111 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 23
+schema_version: 47
 states:
   Introduction:
     classifier_model_id: null
     content:
-      audio_translations:
-        en:
-            filename: %s
-            file_size_bytes: 99999
-            needs_update: false
+      content_id: content
       html: ''
     interaction:
       answer_groups:
       - outcome:
           dest: New state
           feedback:
-            audio_translations:
-                en:
-                    filename: %s
-                    file_size_bytes: 99999
-                    needs_update: false
-            html: Correct!
+            content_id: feedback_1
+            html: <p>Correct!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: Introduction
         feedback:
-          audio_translations:
-            en:
-                filename: %s
-                file_size_bytes: 99999
-                needs_update: false
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
-        - hint_content:
-            html: hint one,
-            audio_translations:
-                en:
-                    filename: %s
-                    file_size_bytes: 99999
-                    needs_update: false
+      - hint_content:
+          content_id: hint_1
+          html: <p>hint one,</p>
       id: TextInput
       solution:
         answer_is_exclusive: false
         correct_answer: helloworld!
         explanation:
-            html: hello_world is a string
-            audio_translations:
-                en:
-                    filename: %s
-                    file_size_bytes: 99999
-                    needs_update: false
+          content_id: solution
+          html: <p>hello_world is a string</p>
+    next_content_id_index: 4
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: %s
+            needs_update: false
+        default_outcome:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: %s
+            needs_update: false
+        feedback_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: %s
+            needs_update: false
+        hint_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: %s
+            needs_update: false
+        rule_input_3: {}
+        solution:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: %s
+            needs_update: false
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
+        solution: {}
   New state:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
     interaction:
       answer_groups: []
@@ -1235,7 +1265,7 @@ states:
       default_outcome:
         dest: New state
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1244,12 +1274,22 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
-states_schema_version: 18
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
 tags: []
 title: Title
 """) % (
-    INTRO_AUDIO_FILE, ANSWER_GROUP_AUDIO_FILE, DEFAULT_OUTCOME_AUDIO_FILE,
+    INTRO_AUDIO_FILE, DEFAULT_OUTCOME_AUDIO_FILE, ANSWER_GROUP_AUDIO_FILE,
     HINT_AUDIO_FILE, SOLUTION_AUDIO_FILE)
 
     def setUp(self):
