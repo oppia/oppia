@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import types
 
 from core.domain import feedback_domain
@@ -528,13 +529,13 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReport class."""
 
     PLATFORM = 'android'
-    # Timestamp in ms since epoch for Mar 19 2021 04:21:55 UTC
-    REPORT_SUBMITTED_TIMESTAMP = 1616127715097
+    # Timestamp in ms since epoch for Mar 19 2021 04:21 UTC
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(16161277150)
+    # Timestamp in ms since epoch for Mar 18 2021 20:40 UTC
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(16161000000)
     TICKET_ID = '%s.%s.%s' % (
-                'random_hash', self.TICKET_CREATION_TIMESTAMP,
+                'random_hash', TICKET_CREATION_TIMESTAMP,
                 '16CharString1234')
-    # Timestamp in ms since epoch for Mar 18 2021 20:40:00 UTC
-    TICKET_CREATION_TIMESTAMP = 1616100000000
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION='suggestion'
     CATEGORY_OTHER='other'
@@ -564,7 +565,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up  models in datastore for use in testing."""
-        super(AppFeedbackReportModelTest, self).setUp()
+        super(AppFeedbackReportModelTests, self).setUp()
         self.feedback_report_model = feedback_models.AppFeedbackReportModel(
             id='%s.%s.%s' % (
                 self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP,
@@ -575,7 +576,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 'random_hash', self.TICKET_CREATION_TIMESTAMP,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-            report_type=self.REPORT_TYPE_Suggestion,
+            report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
             country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,

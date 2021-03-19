@@ -856,8 +856,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
     platform = datastore_services.StringProperty(
         required=True, indexed=True, choices=PLATFORM_CHOICES)
     # The ID of the user that scrubbed this report, if it has been scrubbed
-    scrubbed_by = datastore_services.TextProperty(
-        required=False, indexed=False)
+    scrubbed_by = datastore_services.StringProperty(
+        required=False, indexed=True)
     # Unique ID for the ticket this report is assigned to (see 
     # FeedbackReportTicketModel for how this is constructed)
     ticket_id = datastore_services.TextProperty(required=True, indexed=False)
@@ -908,7 +908,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=False)
     # The schema version for the feedback report info
     android_report_info_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=False)
+        required=False, indexed=False)
     # The rest of the report info collected. Using the JSON here allows us to
     # iterate on the report structure without requiring backend updates each
     # time the frontend structure is changed, allowing for better backwards
@@ -917,7 +917,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=False)
     # The schema version for the feedback report info
     web_report_info_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=False)
+        required=False, indexed=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -946,6 +946,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'audio_language': base_models.EXPORT_POLICY.EXPORTED,
             'android_report_info': base_models.EXPORT_POLICY.EXPORTED,
             'android_report_info_schema_version': 
+                base_models.EXPORT_POLICY.EXPORTED,
+            'web_report_info': base_models.EXPORT_POLICY.EXPORTED,
+            'web_report_info_schema_version': 
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -982,7 +985,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 'audio_language': report_model.audio_language,
                 'anroid_report_info': report_model.android_report_info,
                 'android_report_info_schema_version': 
-                    repoort_model.android_report_info_schema_version
+                    report_model.android_report_info_schema_version,
+                'web_report_info':report_model.web_report_info,
+                'web_report_info_schema_version': 
+                    report_model.web_report_info_schema_version,
             }
         return user_data
 
