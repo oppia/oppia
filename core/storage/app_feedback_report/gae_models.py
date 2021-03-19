@@ -121,6 +121,7 @@ class FeedbackReportModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains data referencing user and will be exported."""
         return dict(super(cls, cls).get_export_policy(), **{
+            'id':base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'platform': base_models.EXPORT_POLICY.EXPORTED,
             'scrubbed_by': base_models.EXPORT_POLICY.EXPORTED,
             'ticket_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -130,7 +131,7 @@ class FeedbackReportModel(base_models.BaseModel):
             'platform_version': base_models.EXPORT_POLICY.EXPORTED,
             'country_locale_code': base_models.EXPORT_POLICY.EXPORTED,
             'android_device_model': base_models.EXPORT_POLICY.EXPORTED,
-            'android_sdk_versoin': base_models.EXPORT_POLICY.EXPORTED,
+            'android_sdk_version': base_models.EXPORT_POLICY.EXPORTED,
             'entry_point': base_models.EXPORT_POLICY.EXPORTED,
             'text_language_code': base_models.EXPORT_POLICY.EXPORTED,
             'audio_language': base_models.EXPORT_POLICY.EXPORTED,
@@ -244,6 +245,13 @@ class FeedbackReportTicketModel(base_models.BaseModel):
         """Model doesn't contain any user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role for feedback report tickets will be
+        moderator
+        """
+        return feconf.ROLE_ID_MODERATOR
+
 
 class FeedbackReportStatsModel(base_models.VersionedModel):
     """Model for storing aggregate report stats on the tickets created.
@@ -263,9 +271,6 @@ class FeedbackReportStatsModel(base_models.VersionedModel):
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model
     stats_tracking_date = datastore_services.DateProperty(
-        required=True, indexed=False)
-    # The schema version for parameter statistics in this entity
-    daily_ticket_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=False)
     # JSON struct that maps the daily statistics for this ticket on the date
     # specified in stats_tracking_date. The JSON will look contain two keys:
@@ -288,6 +293,9 @@ class FeedbackReportStatsModel(base_models.VersionedModel):
     #   daily_total_reports_submitted : total_reports_count
     #
     daily_ticket_stats = datastore_services.JsonProperty(
+        required=True, indexed=False)
+    # The schema version for parameter statistics in this entity
+    daily_ticket_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=False)
 
     @staticmethod
@@ -313,3 +321,10 @@ class FeedbackReportStatsModel(base_models.VersionedModel):
     def get_model_association_to_user():
         """Model doesn't contain any user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role for feedback reports stats will be
+        moderator
+        """
+        return feconf.ROLE_ID_MODERATOR

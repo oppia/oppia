@@ -31,7 +31,7 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
     """Tests for the FeedbackReportModel class."""
 
     PLATFORM = 'android'
-    # Timestamp in sec since epoch for Mar 17 2021 21:17:16 UTC
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
@@ -93,7 +93,6 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION
             )
         )
-
         self.feedback_report_model.update_timestamps()
         self.feedback_report_model.put()
 
@@ -103,7 +102,6 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_export_data_nontrivial(self):
-        self.maxDiff=None
         stored_data = (
             app_feedback_report_models.FeedbackReportModel.export_data(
                 self.USER_ID))
@@ -133,6 +131,69 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
             }
         }
         self.assertEqual(stored_data, expected_data)
+
+    def test_get_lowest_supported_role(self):
+        model = app_feedback_report_models.FeedbackReportModel
+        self.assertEqual(model.get_lowest_supported_role(),
+            feconf.ROLE_ID_MODERATOR
+        )
+
+
+class FeedbackReportTicketModelTests(test_utils.GenericTestBase):
+    """Tests for the FeedbackReportTicketModel class."""
+
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
+    NEWEST_REPORT_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+
+    PLATFORM = 'android'
+    PLATFORM_VERSION='0.1-alpha-abcdef1234'
+    TICKET_NAME = 'example ticket name'
+    TICKET_ID = '%s.%s.%s' % ('random_hash', TICKET_CREATION_TIMESTAMP.second,
+        '16CharString1234')
+    REPORT_IDS=['%s.%s.%s' % (PLATFORM, REPORT_SUBMITTED_TIMESTAMP.second,
+        'randomInteger123')]
+
+    def setUp(self):
+        """Set up  models in datastore for use in testing."""
+        super(FeedbackReportTicketModelTests, self).setUp()
+
+        self.ticket_model = (
+            app_feedback_report_models.FeedbackReportTicketModel(
+                id=self.TICKET_ID,
+                ticket_name=self.TICKET_NAME,
+                github_issue_number=0,
+                is_archived=False,
+                newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
+                report_ids=self.REPORT_IDS
+            )
+        )
+        self.ticket_model.update_timestamps()
+        self.ticket_model.put()
+
+
+    def test_get_deletion_policy(self):
+        model = app_feedback_report_models.FeedbackReportTicketModel()
+        self.assertEqual(model.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_lowest_supported_role(self):
+        model = app_feedback_report_models.FeedbackReportModel
+        self.assertEqual(model.get_lowest_supported_role(),
+            feconf.ROLE_ID_MODERATOR
+        )
+
+
+class FeedbackReportStatsModelTests(test_utils.GenericTestBase):
+    """Tests for the FeedbackReportStatsModel class."""
+
+    def test_get_deletion_policy(self):
+        model = app_feedback_report_models.FeedbackReportStatsModel()
+        self.assertEqual(model.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_lowest_supported_role(self):
         model = app_feedback_report_models.FeedbackReportModel
