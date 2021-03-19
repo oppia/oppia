@@ -58,8 +58,6 @@ INVALID_SPACE_AFTER_ATTRIBUTE_KEY_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_space_after_attribute_key.html')
 
 
-
-
 class CustomHTMLParserTests(test_utils.LinterTestBase):
     """Tests for CustomHTMLParser class."""
 

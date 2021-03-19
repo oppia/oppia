@@ -110,14 +110,15 @@ class CustomHTMLParser(html.parser.HTMLParser):
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
 
-        # Check whether there is space around attributes. An = is followed either by " or {.
-        tag_substrings = starttag_text.split(" ")
+        # Check whether there is space around attributes.
+        # An = is followed either by " or {.
+        tag_substrings = starttag_text.split(' ')
         required_attribute_suffix = ['"', '{']
         conditional_statement_chars = ['=', '>', '<', '!']
         for key, value in enumerate(tag_substrings):
             error_message = None
             if key < len(tag_substrings) - 1:
-                next_value = tag_substrings[key+1]
+                next_value = tag_substrings[key + 1]
                 next_value_first_char = next_value[0] if next_value else None
             else:
                 next_value_first_char = None
