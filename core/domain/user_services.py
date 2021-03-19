@@ -545,7 +545,7 @@ def get_user_ids_by_role(role):
 
 
 def get_user_actions_info(user_id):
-    """Get user actions info for a user.
+    """Gets user actions info for a user.
 
     Args:
         user_id: str|None. The user ID of the user we want to get actions for.
