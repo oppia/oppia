@@ -16,7 +16,7 @@
  * @fileoverview Component for a collection summary tile.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -30,7 +30,6 @@ import { UserService } from 'services/user.service';
   templateUrl: './collection-summary-tile.component.html',
 })
 export class CollectionSummaryTileComponent implements OnInit {
-
   @Input() getCollectionId: string;
   @Input() getCollectionTitle: string;
   @Input() getLastUpdatedMsec: number;
@@ -74,7 +73,7 @@ export class CollectionSummaryTileComponent implements OnInit {
       this.isLinkedToEditorPage ?
         CollectionSummaryTileConstants.COLLECTION_EDITOR_URL :
         CollectionSummaryTileConstants.COLLECTION_VIEWER_URL
-      );
+    );
     return this.urlInterpolationService.interpolateUrl(
       targetUrl, {
         collection_id: this.getCollectionId
@@ -85,7 +84,7 @@ export class CollectionSummaryTileComponent implements OnInit {
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.getThumbnailIconUrl);
-  };
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);

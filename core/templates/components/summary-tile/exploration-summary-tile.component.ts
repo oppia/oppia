@@ -28,6 +28,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { Subscription } from 'rxjs';
 
 
 
@@ -66,15 +67,13 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() isContainerNarrow: boolean;
   @Input() isOwnedByCurrentUser: boolean;
 
-  // this.
-  activityType;
-  resizeSubscription;
+  activityType: string;
+  resizeSubscription: Subscription;
   explorationIsCurrentlyHoveredOver: boolean;
   isWindowLarge: boolean;
   userIsLoggedIn: boolean;
   isRefresherExploration: boolean;
-
-  contributors;
+  contributors: object;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -85,7 +84,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
   ) {}
-  
+
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
@@ -128,7 +127,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
   }
 
-  setHoverState(hoverState): void {
+  setHoverState(hoverState: boolean): void {
     this.explorationIsCurrentlyHoveredOver = hoverState;
   }
 
