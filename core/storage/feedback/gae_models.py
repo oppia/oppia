@@ -861,7 +861,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # Unique ID for the ticket this report is assigned to (see 
     # FeedbackReportTicketModel for how this is constructed)
     ticket_id = datastore_services.TextProperty(required=True, indexed=False)
-    # Timestamp in UTC of when the report was submitted by the user on their
+    # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
     submitted_on = datastore_services.DateTimeProperty(
@@ -955,14 +955,15 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Exports the data from GeneralFeedbackThreadModel
+        """Exports the data from AppFeedbackReportModel
         into dict format for Takeout.
 
         Args:
-            user_id: str. The ID of the user whose data should be exported.
+            user_id: str. The ID of the user whose data should be exported;
+            this would be the ID of the user who has scrubbed the report.
 
         Returns:
-            dict. Dictionary of the data from GeneralFeedbackThreadModel.
+            dict. Dictionary of the data from AppFeedbackReportModel.
         """
 
         user_data = dict()
@@ -979,16 +980,16 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 'platform_version': report_model.platform_version,
                 'country_locale_code': report_model.country_locale_code,
                 'android_device_model': report_model.android_device_model,
-                'android_sdk_versoin': report_model.android_sdk_version,
+                'android_sdk_version': report_model.android_sdk_version,
                 'entry_point': report_model.entry_point,
                 'text_language_code': report_model.text_language_code,
                 'audio_language': report_model.audio_language,
-                'anroid_report_info': report_model.android_report_info,
+                'android_report_info': report_model.android_report_info,
                 'android_report_info_schema_version': 
                     report_model.android_report_info_schema_version,
                 'web_report_info':report_model.web_report_info,
                 'web_report_info_schema_version': 
-                    report_model.web_report_info_schema_version,
+                    report_model.web_report_info_schema_version
             }
         return user_data
 
@@ -1019,8 +1020,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # Whether this ticket has been archived
     is_archived = datastore_services.BooleanProperty(
         required=True, indexed=False)
-    # The date in UTC that the newest report in this ticket was created on, to
-    # help with sorting tickets.
+    # The datetime in UTC that the newest report in this ticket was created on,
+    # to help with sorting tickets.
     newest_report_timestamp = datastore_services.DateTimeProperty(
         required=True, indexed=True)
     # A list of report IDs associated with this ticket

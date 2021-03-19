@@ -529,12 +529,12 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReport class."""
 
     PLATFORM = 'android'
-    # Timestamp in ms since epoch for Mar 19 2021 04:21 UTC
-    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(16161277150)
-    # Timestamp in ms since epoch for Mar 18 2021 20:40 UTC
-    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(16161000000)
+    # Timestamp in sec since epoch for Mar 17 2021 21:17:16 UTC
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_ID = '%s.%s.%s' % (
-                'random_hash', TICKET_CREATION_TIMESTAMP,
+                'random_hash', TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234')
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION='suggestion'
@@ -568,12 +568,12 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         super(AppFeedbackReportModelTests, self).setUp()
         self.feedback_report_model = feedback_models.AppFeedbackReportModel(
             id='%s.%s.%s' % (
-                self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP,
+                self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP.second,
                 'randomInteger123'),
             platform=self.PLATFORM,
             scrubbed_by=self.USER_ID,
             ticket_id='%s.%s.%s' % (
-                'random_hash', self.TICKET_CREATION_TIMESTAMP,
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             report_type=self.REPORT_TYPE_SUGGESTION,
@@ -598,13 +598,14 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_export_data_nontrivial(self):
+        self.maxDiff=None
         stored_data = (
             feedback_models
             .AppFeedbackReportModel.export_data(self.USER_ID))
         report_id = '%s.%s.%s' % (
-                self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP,
-                'randomInteger123'),
-        test_data = {
+                self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP.second,
+                'randomInteger123')
+        expected_data = {
             report_id: {
                 'platform': self.PLATFORM,
                 'ticket_id': self.TICKET_ID,
@@ -614,13 +615,15 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 'platform_version': self.PLATFORM_VERSION,
                 'country_locale_code': self.COUNTRY_LOCALE_CODE_INDIA,
                 'android_device_model': self.ANDROID_DEVICE_MODEL,
-                'android_sdk_versoin': self.ANDROID_SDK_VERSION,
+                'android_sdk_version': self.ANDROID_SDK_VERSION,
                 'entry_point': self.ENTRY_POINT_NAVIGATION_DRAWER,
                 'text_language_code': self.TEXT_LANGUAGE_CODE_ENGLISH,
                 'audio_language': self.AUDIO_LANGUAGE_ENGLISH,
                 'android_report_info': self.ANDROID_REPORT_INFO,
                 'android_report_info_schema_version': 
-                    self.ANDROID_REPORT_INFO_SCHEMA_VERSION
+                    self.ANDROID_REPORT_INFO_SCHEMA_VERSION,
+                'web_report_info': None,
+                'web_report_info_schema_version': None
             }
         }
-        self.assertEqual(stored_data, test_data)
+        self.assertEqual(stored_data, expected_data)
