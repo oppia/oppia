@@ -33,7 +33,7 @@ import feconf
 
 
 class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that audits and validates description length"""
+    """Job that audits and validates description length."""
 
     @classmethod
     def entity_classes_to_map_over(cls):

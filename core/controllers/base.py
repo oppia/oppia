@@ -635,7 +635,8 @@ class CsrfTokenHandler(BaseHandler):
 
 
 class OppiaMLVMHandler(BaseHandler):
-    """Base class for the handlers that communicate with Oppia-ML VM instances.
+    """Base class for the handlers that communicate with Oppia-ML VM
+     instances.
     """
 
     def extract_request_message_vm_id_and_signature(self):

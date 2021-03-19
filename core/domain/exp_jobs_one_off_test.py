@@ -257,7 +257,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
 class MockExplorationRightsModelWithDeprecatedFields(
         exp_models.ExplorationRightsModel):
     """Mock ExplorationRightsModel to be able to set translator_ids,
-    all_viewer_ids
+    all_viewer_ids.
     """
 
     translator_ids = (

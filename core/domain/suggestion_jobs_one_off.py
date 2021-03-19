@@ -108,7 +108,8 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class SuggestionSvgFilenameValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that checks the html content of a suggestion and validates the
-    svg_filename fields in each math rich-text components."""
+    svg_filename fields in each math rich-text components.
+    """
 
     _ERROR_KEY = 'invalid-math-content-attribute-in-math-tag'
     _INVALID_SVG_FILENAME_KEY = (

@@ -1436,7 +1436,7 @@ class MockUserSettingsModelWithGaeId(user_models.UserSettingsModel):
 
 class MockUserSubscriptionsModelWithActivityIDs(
         user_models.UserSubscriptionsModel):
-    """Mock UserSubscriptionsModel so that it allows to set 'activity_ids'. """
+    """Mock UserSubscriptionsModel so that it allows to set 'activity_ids'."""
 
     activity_ids = (
         datastore_services.StringProperty(indexed=True, repeated=True))

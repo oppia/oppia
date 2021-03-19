@@ -1683,8 +1683,7 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
 
 class ReviewableSuggestionEmailInfoUnitTests(
         test_utils.GenericTestBase):
-    """Tests the methods related to the ReviewableSuggestionEmailInfo class.
-    """
+    """Tests the methods related to the ReviewableSuggestionEmailInfo class."""
 
     target_id = 'exp1'
     skill_id = 'skill1'
