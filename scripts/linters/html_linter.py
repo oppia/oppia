@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import html.parser
 import os
-import re
 import subprocess
 
 import python_utils
@@ -38,10 +37,6 @@ class TagMismatchException(Exception):
 
 class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
-
-    _SPACE_AROUND_ATTRIBUTE_REGEX = re.compile(
-        r' += +["{]| +=["{]|[^=]= +["{]'
-    )
 
     def __init__(self, filepath, file_lines, failed=False):
         """Define various variables to parse HTML.
@@ -115,13 +110,27 @@ class CustomHTMLParser(html.parser.HTMLParser):
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
 
-        if self._SPACE_AROUND_ATTRIBUTE_REGEX.search(starttag_text):
-            error_message = (
-                '%s --> Attribute for tag %s on line '
-                '%s has unwanted white spaces around it' % (
-                    self.filepath, tag, line_number))
-            self.error_messages.append(error_message)
-            self.failed = True
+        # Check whether there is space around attributes. An = is followed either by " or {.
+        for value in starttag_text.split(" "):
+            error_message = None
+            if value == '=':
+                error_message = (
+                    '%s --> Attribute for tag %s on line '
+                    '%s has unwanted white spaces around it' % (
+                        self.filepath, tag, line_number))
+            elif value.startswith('=') and value[1] in ['"', '{']:
+                error_message = (
+                    '%s --> Attribute for tag %s on line '
+                    '%s has unwanted white spaces before %s' % (
+                        self.filepath, tag, line_number, value))
+            elif value.endswith('=') and value[-2] not in ['=', '>', '<', '!']:
+                error_message = (
+                    '%s --> Attribute for tag %s on line '
+                    '%s has unwanted white spaces after %s' % (
+                        self.filepath, tag, line_number, value))
+            if error_message:
+                self.failed = True
+                self.error_messages.append(error_message)
 
         # Check whether the values of all attributes are placed
         # in double quotes.
