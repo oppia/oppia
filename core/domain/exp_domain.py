@@ -1741,10 +1741,7 @@ class Exploration(python_utils.OBJECT):
                 'a zip file. The YAML parser returned the following error: %s'
                 % e)
 
-        exploration_schema_version = exploration_dict.get('schema_version')
-        if exploration_schema_version is None:
-            raise utils.InvalidInputException(
-                'Invalid YAML file: no schema version specified.')
+        exploration_schema_version = exploration_dict['schema_version']
         if not (cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION <=
                 exploration_schema_version
                 <= cls.CURRENT_EXP_SCHEMA_VERSION):

@@ -62,8 +62,6 @@ def _migrate_states_schema(versioned_exploration_states):
     """
     states_schema_version = versioned_exploration_states[
         'states_schema_version']
-    if states_schema_version is None or states_schema_version < 1:
-        states_schema_version = 0
 
     if not (feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION
             <= states_schema_version
