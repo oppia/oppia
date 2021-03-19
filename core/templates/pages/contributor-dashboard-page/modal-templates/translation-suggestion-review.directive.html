@@ -1,5 +1,9 @@
 <div class="modal-header">
   <h3>Review translation</h3>
+  <span title="<[subheading]>"
+        class="protractor-translation-suggestion-review-subheading"
+        aria-hidden="false"> <[subheading]>
+  </span>
   <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -24,7 +28,7 @@
   </section>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
+    <textarea class="protractor-test-suggestion-review-message w-100" rows="3" ng-model="reviewMessage"></textarea>
   </div>
   <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
     <strong>Review message: </strong><[reviewMessage]>

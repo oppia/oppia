@@ -122,9 +122,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-input-validation.service.ts',
     'graph-layout.service.ts',
     'graph-property-editor.directive.ts',
-    'graph-viz.directive.ts',
+    'graph-viz.component.ts',
     'hint-and-solution-buttons.directive.ts',
-    'hint-and-solution-modal.service.ts',
     'hint-editor.directive.ts',
     'html-editor.directive.ts',
     'html-escaper.service.ts',
@@ -167,7 +166,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-drag-and-drop-sort-input.directive.ts',
     'oppia-interactive-end-exploration.directive.ts',
     'oppia-interactive-fraction-input.component.ts',
-    'oppia-interactive-graph-input.directive.ts',
+    'oppia-interactive-graph-input.component.ts',
     'oppia-interactive-image-click-input.directive.ts',
     'oppia-interactive-interactive-map.directive.ts',
     'oppia-interactive-item-selection-input.directive.ts',
@@ -191,7 +190,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-response-drag-and-drop-sort-input.directive.ts',
     'oppia-response-end-exploration.directive.ts',
     'oppia-response-fraction-input.component.ts',
-    'oppia-response-graph-input.directive.ts',
+    'oppia-response-graph-input.component.ts',
     'oppia-response-image-click-input.directive.ts',
     'oppia-response-interactive-map.directive.ts',
     'oppia-response-item-selection-input.directive.ts',
@@ -209,7 +208,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-drag-and-drop-sort-input.directive.ts',
     'oppia-short-response-end-exploration.directive.ts',
     'oppia-short-response-fraction-input.component.ts',
-    'oppia-short-response-graph-input.directive.ts',
+    'oppia-short-response-graph-input.component.ts',
     'oppia-short-response-image-click-input.directive.ts',
     'oppia-short-response-interactive-map.directive.ts',
     'oppia-short-response-item-selection-input.directive.ts',
@@ -287,7 +286,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-concept-card-editor.directive.ts',
     'skill-creation.service.ts',
     'skill-description-editor.directive.ts',
-    'skill-editor-navbar-breadcrumb.directive.ts',
+    'skill-editor-navbar-breadcrumb.component.ts',
     'skill-editor-navbar.directive.ts',
     'skill-editor-state.service.ts',
     'skill-mastery.component.ts',
@@ -332,7 +331,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
-    'suggestion-modal-for-exploration-player.service.ts',
     'summary-list-header.component.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
@@ -523,6 +521,7 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when check_frontend_coverage.py is used as a script.
+# it will only be called when check_frontend_test_coverage.py
+# is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()
