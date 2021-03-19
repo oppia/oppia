@@ -856,11 +856,11 @@ class AppFeedbackReportModel(base_models.BaseModel):
     platform = datastore_services.StringProperty(
         required=True, indexed=True, choices=PLATFORM_CHOICES)
     # The ID of the user that scrubbed this report, if it has been scrubbed
-    scrubbed_by = datastore_services.StringProperty(
+    scrubbed_by = datastore_services.TextProperty(
         required=False, indexed=False)
     # Unique ID for the ticket this report is assigned to (see 
     # FeedbackReportTicketModel for how this is constructed)
-    ticket_id = datastore_services.StringProperty(required=True, indexed=False)
+    ticket_id = datastore_services.TextProperty(required=True, indexed=False)
     # Timestamp in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
@@ -872,7 +872,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # updates.
     report_type = datastore_services.StringProperty(required=True, indexed=True)
     # The category that this feedback is for
-    category = datastore_services.StringProperty(required=True, indexed=False)
+    category = datastore_services.TextProperty(required=True, indexed=False)
     # The version of the app; on Android this is the package version name (e.g.
     # 1.0-release-arm...) and on web this is the release version (e.g. 3.0.8)
     platform_version = datastore_services.StringProperty(
@@ -908,6 +908,15 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=False)
     # The schema version for the feedback report info
     android_report_info_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=False)
+    # The rest of the report info collected. Using the JSON here allows us to
+    # iterate on the report structure without requiring backend updates each
+    # time the frontend structure is changed, allowing for better backwards
+    # compatibility with Android report structures.
+    web_report_info = datastore_services.JsonProperty(
+        required=False, indexed=False)
+    # The schema version for the feedback report info
+    web_report_info_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=False)
 
     @staticmethod
@@ -1009,8 +1018,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     newest_report_timestamp = datastore_services.DateTimeProperty(
         required=True, indexed=True)
     # A list of report IDs associated with this ticket
-    report_ids = datastore_services.StringProperty(
-        required=True, indexed=True, repeated=True)
+    report_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -1049,7 +1057,7 @@ class AppFeebdackReportStatsModel(base_models.VersionedModel):
     # The unique ticket ID that this entity is aggregating for
     ticket_id = datastore_services.StringProperty(required=True, indexed=True)
     # The platform that these statistics are for
-    platform = datastore_services.StringProperty(
+    platform = datastore_services.TextProperty(
         required=True, indexed=False, choices=PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model

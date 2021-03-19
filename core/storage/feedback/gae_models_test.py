@@ -549,8 +549,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         'user_feedback_other_text_input':'add an admin',
         'event_logs':['event1', 'event2'],
         'logcat_logs':['logcat1', 'logcat2'],
-        'package_version_code':1
-        'language_locale':,
+        'package_version_code':1,
+        'language_locale_code':'en',
         'entry_point_info': {
             'entry_point_name':'crash',
         },
@@ -570,7 +570,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP,
                 'randomInteger123'),
             platform=self.PLATFORM,
-            scrubbed_by=self.USER_ID
+            scrubbed_by=self.USER_ID,
             ticket_id='%s.%s.%s' % (
                 'random_hash', self.TICKET_CREATION_TIMESTAMP,
                 '16CharString1234'),
