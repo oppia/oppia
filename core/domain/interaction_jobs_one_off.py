@@ -152,6 +152,42 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class MultipleItemInteractionLtOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces total number of all (exploration, state) pairs that use the
+    Multiple choice interaction or Item selection Interaction and total number of all
+    (exploration, state) pairs that use the Multiple choice interaction or
+    Item selection Interaction whose choice length is less than 30.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        interactions_to_check = ('MultipleChoiceInput', 'ItemSelectionInput')
+        for state in exploration.states.items():
+            if state.interaction.id in interactions_to_check:
+                choices = state.interaction.customization_args['choices']
+                for choice in choices.value:
+                    choice_length = len(choice)
+                    if choice_length > 30:
+                        yield ('LONGER_THAN_30', (item.id, choice_length))
+        yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
 class InteractionCustomizationArgsValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs and validates
