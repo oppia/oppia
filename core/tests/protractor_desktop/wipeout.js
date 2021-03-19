@@ -57,7 +57,7 @@ describe('When account is deleted it', function() {
   it('should delete private exploration', async function() {
     await users.createUser('voiceArtist@oppia.com', 'voiceArtist');
     await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voice artists');
@@ -69,7 +69,7 @@ describe('When account is deleted it', function() {
     await users.logout();
 
     await users.login('voiceArtist@oppia.com');
-    await general.openEditor(explorationId);
+    await general.openEditor(explorationId, false);
     await general.expect404Error();
     expectedConsoleErrors = [
       'Failed to load resource: the server responded with a status of 404'];
@@ -81,7 +81,9 @@ describe('When account is deleted it', function() {
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
-      EXPLORATION_OBJECTIVE
+      EXPLORATION_OBJECTIVE,
+      'English',
+      true
     );
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
@@ -91,14 +93,14 @@ describe('When account is deleted it', function() {
     await users.logout();
 
     await users.login('user@check.com');
-    await general.openEditor(explorationId);
+    await general.openEditor(explorationId, true);
     await workflow.isExplorationCommunityOwned();
   });
 
   it('should keep published exploration with other owner', async function() {
     await users.createUser('secondOwner@check.com', 'secondOwner');
     await users.createAndLoginUser('user4@delete.com', 'userToDelete4');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('second owner');
@@ -110,7 +112,7 @@ describe('When account is deleted it', function() {
     await users.logout();
 
     await users.login('secondOwner@check.com');
-    await general.openEditor(explorationId);
+    await general.openEditor(explorationId, true);
     await explorationEditorPage.navigateToSettingsTab();
     expect(await workflow.getExplorationManagers()).toEqual(['secondOwner']);
   });
