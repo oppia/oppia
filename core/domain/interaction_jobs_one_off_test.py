@@ -941,7 +941,6 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         run_job_for_deleted_exp(
             self, interaction_jobs_one_off.
             MultipleItemInteractionLtOneOffJob)
-        
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
