@@ -111,23 +111,35 @@ class CustomHTMLParser(html.parser.HTMLParser):
         starttag_text = self.get_starttag_text()
 
         # Check whether there is space around attributes. An = is followed either by " or {.
-        for value in starttag_text.split(" "):
+        tag_substrings = starttag_text.split(" ")
+        required_attribute_suffix = ['"', '{']
+        conditional_statement_chars = ['=', '>', '<', '!']
+        for key, value in enumerate(tag_substrings):
             error_message = None
+            if key < len(tag_substrings) - 1:
+                next_value = tag_substrings[key+1]
+                next_value_first_char = next_value[0] if next_value else None
+            else:
+                next_value_first_char = None
             if value == '=':
-                error_message = (
-                    '%s --> Attribute for tag %s on line '
-                    '%s has unwanted white spaces around it' % (
-                        self.filepath, tag, line_number))
-            elif value.startswith('=') and value[1] in ['"', '{']:
-                error_message = (
-                    '%s --> Attribute for tag %s on line '
-                    '%s has unwanted white spaces before %s' % (
-                        self.filepath, tag, line_number, value))
-            elif value.endswith('=') and value[-2] not in ['=', '>', '<', '!']:
-                error_message = (
-                    '%s --> Attribute for tag %s on line '
-                    '%s has unwanted white spaces after %s' % (
-                        self.filepath, tag, line_number, value))
+                if next_value_first_char in required_attribute_suffix:
+                    error_message = (
+                        '%s --> Attribute for tag %s on line '
+                        '%s has unwanted white spaces around it' % (
+                            self.filepath, tag, line_number))
+            elif value.startswith('='):
+                if value[1] in required_attribute_suffix:
+                    error_message = (
+                        '%s --> Attribute for tag %s on line '
+                        '%s has unwanted white spaces before %s' % (
+                            self.filepath, tag, line_number, value))
+            elif value.endswith('='):
+                if (next_value_first_char in required_attribute_suffix and
+                        value[-2] not in conditional_statement_chars):
+                    error_message = (
+                        '%s --> Attribute for tag %s on line '
+                        '%s has unwanted white spaces after %s' % (
+                            self.filepath, tag, line_number, value))
             if error_message:
                 self.failed = True
                 self.error_messages.append(error_message)
