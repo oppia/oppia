@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -525,6 +525,7 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { QuestionValidationService } from './question-validation.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -797,6 +798,10 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
+    upgradedServices['QuestionValidationService'] =
+    new QuestionValidationService(
+      upgradedServices['StateEditorService']
+    );
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['baseInteractionValidationService']);
