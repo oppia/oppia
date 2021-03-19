@@ -2114,7 +2114,7 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
     below function definition.
     """
 
-    __implements__ = interfaces.IAstroidChecker
+    _implements_ = interfaces.IAstroidChecker
     name = 'disallow-blank-lines-below-function-definition'
     priority = -1
     msgs = {
@@ -2134,6 +2134,12 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
                 definition in the AST.
         """
         line_number = node.fromlineno
+        while True:
+            line = linecache.getline(node.root().file, line_number).strip()
+            if re.search(r':', line):
+                break
+            else:
+                line_number += 1
         line_after_function_def = linecache.getline(
             node.root().file, line_number + 1).strip()
         if len(line_after_function_def.strip()) == 0:
