@@ -33,6 +33,7 @@ import re
 
 from core.domain import cron_services
 from core.platform import models
+import feconf
 from jobs import base_model_validator_errors as errors
 from jobs import jobs_utils
 
@@ -64,6 +65,29 @@ class ValidateModelIdWithRegex(beam.DoFn):
 
         if not regex.match(model.id):
             yield errors.ModelInvalidIdError(model)
+
+
+class ValidatePostCommitIsPrivate(beam.DoFn):
+    """DoFn to check if post_commmit_status is private when
+    post_commit_is_private is true and vice-versa."""
+
+    def process(self, input_model):
+        """Function validates that post_commit_is_private is true iff
+        post_commit_status is private
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Yields:
+            ModelInvalidCommitStatus. Error for commit_type validation.
+        """
+        model = jobs_utils.clone_model(input_model)
+        if model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE and (
+                not model.post_commit_is_private):
+            yield errors.ModelInvalidCommitStatus(model)
+        if model.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC and (
+                model.post_commit_is_private):
+            yield errors.ModelInvalidCommitStatus(model)
 
 
 class ValidateDeleted(beam.DoFn):
