@@ -37,15 +37,16 @@ import feconf
 import python_utils
 
 (
-    base_models, collection_models, config_models,
+    app_feedback_report_models, base_models, collection_models, config_models,
     exp_models, feedback_models, question_models,
     skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
+    models.NAMES.app_feedback_report, models.NAMES.base_model,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.subtopic,  models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user,
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -275,6 +276,7 @@ def delete_user(pending_deletion_request):
     if user_role != feconf.ROLE_ID_LEARNER:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
+        _pseudonymize_app_feedback_report_models(pending_deletion_request)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
@@ -995,6 +997,61 @@ def _remove_user_id_from_contributors_in_summary_models(
             _remove_user_id_from_models,
             related_summary_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
+
+
+def _pseudonymize_app_feedback_report_models(pending_deletion_request):
+    """Pseudonymize the app feedback report models for the user with user_id
+    if they scrubbed a feedback report.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
+    app_feedback_report_model_class = (
+        app_feedback_report_models.FeedbackReportModel)
+
+    feedback_report_models = app_feedback_report_model.query(
+        filter(FeedbackReportModel.scrubbed_by == user_id).fetch()
+    )
+    report_ids = set([model.id for model in feedback_report_models])
+
+    _save_pseudonymizable_entity_mappings(
+        pending_deletion_request, models.NAMES.app_feedback_report, report_ids)
+
+    def _pseudonymize_models(feedback_report_models, pseudonymized_id):
+        """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        feedback_report_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
+        Args:
+            feedback_report_models: list(FeedbackReportModel). Models to redact
+                user IDs from in the 'scrubbed_by' field.
+            pseudonymized_id: str. New pseudonymized user ID to be used for
+                the models.
+        """
+        for report_model in feedback_report_models:
+            if report_model.scrubbed_by == user_id:
+                report_model.scrubbed_by = (
+                    report_ids_to_pids[report_model.id]
+                )
+        app_feedback_report_model_class.update_timestamps_multi(
+            feedback_report_models)
+        app_feedback_report_model_class.put_multi(feedback_report_models)
+
+    report_ids_to_pids = (
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.app_feedback_report])
+    for i in python_utils.RANGE(
+            0,
+            len(feedback_report_models),
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        transaction_services.run_in_transaction(
+            _pseudonymize_models,
+            feedback_report_models[
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
+        )
 
 
 def _pseudonymize_feedback_models(pending_deletion_request):
