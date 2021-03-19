@@ -40,7 +40,7 @@ ruleTester.run('protractor-practices', rule, {
         browser.sleep();
       });`,
       errors: [{
-        message: 'Please remove browser.sleep() call',
+        message: 'Please do not use browser.sleep() in protractor files',
         type: 'CallExpression',
       }],
     },
