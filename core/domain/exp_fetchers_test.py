@@ -19,14 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import copy
-
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -295,7 +292,7 @@ title: Old Title
         swap_exp_schema_46 = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_41, swap_exp_schema_46:
-            exploration = self.save_new_valid_exploration(
+            self.save_new_valid_exploration(
                 self.OLD_EXP_ID, self.albert_id, title='Old Title',
                 end_state_name='End')
 

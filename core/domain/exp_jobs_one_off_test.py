@@ -1167,7 +1167,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                                 'rule_specs': [{
                                     'inputs': {
                                         'x': {
-                                            'contentId': 'rule_input_1',
+                                            'contentId': 'rule_input_3',
                                             'normalizedStrSet': ['InputString']
                                         }
                                     },
@@ -1182,7 +1182,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                             'customization_args': {
                                 'placeholder': {
                                     'value': {
-                                        'content_id': 'ca_placeholder_3',
+                                        'content_id': 'ca_placeholder_2',
                                         'unicode_str': '',
                                     },
                                 },
@@ -1207,21 +1207,21 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                         'param_changes': [],
                         'recorded_voiceovers': {
                             'voiceovers_mapping': {
-                                'ca_placeholder_3': {},
+                                'ca_placeholder_2': {},
                                 'content': {},
                                 'default_outcome': {},
                                 'feedback_1': {},
-                                'rule_input_1': {},
+                                'rule_input_3': {},
                             }
                         },
                         'solicit_answer_details': False,
                         'written_translations': {
                             'translations_mapping': {
-                                'ca_placeholder_3': {},
+                                'ca_placeholder_2': {},
                                 'content': {},
                                 'default_outcome': {},
                                 'feedback_1': {},
-                                'rule_input_1': {},
+                                'rule_input_3': {},
                             }
                         },
                     },
