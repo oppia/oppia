@@ -69,7 +69,9 @@ require(
   'exploration-param-changes.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-rights-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -156,7 +158,7 @@ angular.module('oppia').component('settingsTab', {
           controller: 'ReassignRoleConfirmationModalController'
         }).result.then(function() {
           ExplorationRightsService.saveRoleChanges(
-            username, newRole);
+            username, newRole, $rootScope.$applyAsync);
           ctrl.closeRolesForm();
         });
       };
@@ -283,7 +285,7 @@ angular.module('oppia').component('settingsTab', {
         if (!ExplorationRightsService.checkUserAlreadyHasRoles(
           newMemberUsername)) {
           ExplorationRightsService.saveRoleChanges(
-            newMemberUsername, newMemberRole);
+            newMemberUsername, newMemberRole, $rootScope.$applyAsync);
           return;
         }
         let oldRole = ExplorationRightsService.getOldRole(
@@ -305,14 +307,17 @@ angular.module('oppia').component('settingsTab', {
           },
           controller: 'RemoveRoleConfirmationModalController'
         }).result.then(function() {
-          ExplorationRightsService.removeRoleAsync(memberUsername);
+          ExplorationRightsService.removeRoleAsync(
+            memberUsername, $rootScope.$applyAsync);
         });
         ctrl.closeRolesForm();
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
         ExplorationRightsService.setViewability(
-          !ExplorationRightsService.viewableIfPrivate());
+          !ExplorationRightsService.viewableIfPrivate(),
+          $rootScope.$applyAsync
+        );
       };
 
       ctrl._successCallback = () => {
@@ -365,7 +370,7 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          ExplorationRightsService.makeCommunityOwned();
+          ExplorationRightsService.makeCommunityOwned($rootScope.$applyAsync);
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -411,7 +416,7 @@ angular.module('oppia').component('settingsTab', {
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
             ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody);
+              emailBody, $rootScope.$applyAsync);
           }, function() {
             AlertsService.clearWarnings();
           });

@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import { AdminBackendApiService } from
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from
-  'pages/admin-page/services/admin-router.service.ts';
+  'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AlertsService } from 'services/alerts.service';
@@ -47,8 +47,6 @@ import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { AssetsBackendApiService } from
   'services/assets-backend-api.service';
@@ -162,12 +160,12 @@ import { ExpressionEvaluatorService } from
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/exploration-recommendations.service.ts';
+  'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
-import { ExternalSaveService } from 'services/external-save.service.ts';
+import { ExternalSaveService } from 'services/external-save.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -279,7 +277,7 @@ import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import { NumberWithUnitsValidationService } from
   // eslint-disable-next-line max-len
-  'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
+  'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import { NumericExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
@@ -338,7 +336,7 @@ import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service.ts';
+  'domain/question/question-backend-api.service';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { RatioExpressionInputRulesService } from
@@ -358,7 +356,7 @@ import { RecordedVoiceoversObjectFactory } from
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
-  'pages/review-test-page/review-test-engine.service.ts';
+  'pages/review-test-page/review-test-engine.service';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -385,7 +383,7 @@ import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
-  'domain/skill/skill-rights-backend-api.service.ts';
+  'domain/skill/skill-rights-backend-api.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -483,15 +481,11 @@ import { TextInputRulesService } from
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
-import { ThreadMessageObjectFactory } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts';
+  'domain/topic/topic-creation-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
@@ -531,6 +525,7 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { QuestionValidationService } from './question-validation.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -556,8 +551,6 @@ export class UpgradedServices {
     upgradedServices['AlgebraicExpressionInputRulesService'] =
       new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
-    upgradedServices['AnswerStatsObjectFactory'] =
-      new AnswerStatsObjectFactory();
     upgradedServices['AppService'] = new AppService();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
     upgradedServices['AudioTranslationManagerService'] =
@@ -669,8 +662,6 @@ export class UpgradedServices {
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
-    upgradedServices['ThreadMessageSummaryObjectFactory'] =
-      new ThreadMessageSummaryObjectFactory();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
@@ -718,8 +709,7 @@ export class UpgradedServices {
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+      new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(
         upgradedServices['FractionObjectFactory'],
@@ -808,6 +798,10 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
+    upgradedServices['QuestionValidationService'] =
+    new QuestionValidationService(
+      upgradedServices['StateEditorService']
+    );
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['baseInteractionValidationService']);
@@ -820,8 +814,7 @@ export class UpgradedServices {
     upgradedServices['SkillCreationBackendApiService'] =
         new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['StateTopAnswersStatsObjectFactory'] =
-        new StateTopAnswersStatsObjectFactory(
-          upgradedServices['AnswerStatsObjectFactory']);
+        new StateTopAnswersStatsObjectFactory();
     upgradedServices['SpeechSynthesisChunkerService'] =
         new SpeechSynthesisChunkerService(
           upgradedServices['HtmlEscaperService']);
@@ -844,9 +837,6 @@ export class UpgradedServices {
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['ThreadMessageObjectFactory'] =
-      new ThreadMessageObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
     upgradedServices['TopicCreationBackendApiService'] =
         new TopicCreationBackendApiService(
           upgradedServices['HttpClient']);
@@ -962,8 +952,7 @@ export class UpgradedServices {
     upgradedServices['StoryObjectFactory'] =
       new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
-      new SuggestionThreadObjectFactory(
-        upgradedServices['ThreadMessageSummaryObjectFactory']);
+      new SuggestionThreadObjectFactory();
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
