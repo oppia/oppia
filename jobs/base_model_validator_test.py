@@ -40,6 +40,7 @@ datastore_services = models.Registry.import_datastore_services()
 class MockModel(base_models.BaseModel):
     pass
 
+
 class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     pass
 
@@ -178,7 +179,7 @@ class ValidatePostCommitIsPrivateTests(BaseModelValidatorTests):
     def test_validate_post_commit_is_private(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             invalid_commit_status = MockCommitLogEntryModel(
-                id="123",
+                id='123',
                 created_on=self.year_ago,
                 last_updated=self.now,
                 commit_type='invalid-type',

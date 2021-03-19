@@ -171,7 +171,7 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
 class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
     def test_model_invalid_commit_status(self):
         model1 = MockCommitLogEntryModel(
-            id="123",
+            id='123',
             created_on=self.year_ago,
             last_updated=self.now,
             commit_type='invalid-type',
@@ -181,7 +181,7 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
             commit_cmds=[])
         error1 = errors.ModelInvalidCommitStatusError(model1)
         model2 = MockCommitLogEntryModel(
-            id="124",
+            id=124,
             created_on=self.year_ago,
             last_updated=self.now,
             commit_type='invalid-type',
@@ -190,11 +190,11 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
             post_commit_is_private=True,
             commit_cmds=[])
         error2 = errors.ModelInvalidCommitStatusError(model2)
-        msg1 = ('Entity id %s: Post commit status is private but '
-                'post_commit_is_private is False' % model1.id)
-        msg2 = ('Entity id %s: Post commit status is public but '
-                'post_commit_is_private is True' % model2.id)
+        msg1 = (
+            'Entity id %s: Post commit status is private but '
+            'post_commit_is_private is False' % model1.id)
+        msg2 = (
+            'Entity id %s: Post commit status is public but '
+            'post_commit_is_private is True' % model2.id)
         self.assertEqual(error1.message, msg1)
         self.assertEqual(error2.message, msg2)
-
-
