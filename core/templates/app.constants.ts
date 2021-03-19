@@ -82,7 +82,7 @@ export const AppConstants = {
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
   // Feature still in development.
   // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-  ENABLE_ML_CLASSIFIERS: true,
+  ENABLE_ML_CLASSIFIERS: false,
   // Feature still in development.
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION: (
     'The current solution does not lead to another card.'),
