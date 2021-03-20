@@ -68,9 +68,6 @@ def string_io(buffer_value=b''):
 
     Returns:
         StringIO.StringIO or io.StringIO. The StringIO object.
-
-    Raises:
-        ImportError. If StringIO was not imported.
     """
     try:
         from StringIO import StringIO  # pylint: disable=import-only-modules
