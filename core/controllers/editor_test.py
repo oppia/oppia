@@ -1665,6 +1665,28 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             response['error'], 'Sorry, users cannot remove their own roles.')
         self.logout()
 
+    def test_users_cannot_assign_other_role_to_itself(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.OWNER_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+                'Users are not allowed to assign other roles to themselves')
+        self.logout()
+
     def test_for_deassign_viewer_role_from_exploration(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'

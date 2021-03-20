@@ -763,72 +763,82 @@ def _assign_role(
     assignee_username = user_services.get_username(assignee_id)
     old_role = rights_domain.ROLE_NONE
 
-    if allow_assigning_any_role:
-        if new_role not in [
-                rights_domain.ROLE_OWNER,
-                rights_domain.ROLE_EDITOR,
-                rights_domain.ROLE_VOICE_ARTIST,
-                rights_domain.ROLE_VIEWER
-        ]:
-            raise Exception('Invalid role: %s' % new_role)
-        old_role = activity_rights.assign_role(assignee_id, new_role)
-    elif new_role == rights_domain.ROLE_OWNER:
+
+    if new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):
             raise Exception('This user already owns this %s.' % activity_type)
 
-        activity_rights.owner_ids.append(assignee_id)
+        if allow_assigning_any_role:
+            old_role = activity_rights.assign_role(assignee_id, new_role)
 
-        if assignee_id in activity_rights.viewer_ids:
-            activity_rights.viewer_ids.remove(assignee_id)
-            old_role = rights_domain.ROLE_VIEWER
-        if assignee_id in activity_rights.editor_ids:
-            activity_rights.editor_ids.remove(assignee_id)
-            old_role = rights_domain.ROLE_EDITOR
-        if assignee_id in activity_rights.voice_artist_ids:
-            activity_rights.voice_artist_ids.remove(assignee_id)
-            old_role = rights_domain.ROLE_VOICE_ARTIST
+        else:
+            activity_rights.owner_ids.append(assignee_id)
+
+            if assignee_id in activity_rights.viewer_ids:
+                activity_rights.viewer_ids.remove(assignee_id)
+                old_role = rights_domain.ROLE_VIEWER
+            if assignee_id in activity_rights.editor_ids:
+                activity_rights.editor_ids.remove(assignee_id)
+                old_role = rights_domain.ROLE_EDITOR
+            if assignee_id in activity_rights.voice_artist_ids:
+                activity_rights.voice_artist_ids.remove(assignee_id)
+                old_role = rights_domain.ROLE_VOICE_ARTIST
 
     elif new_role == rights_domain.ROLE_EDITOR:
-        if (activity_rights.is_editor(assignee_id) or
-                activity_rights.is_owner(assignee_id)):
-            raise Exception(
-                'This user already can edit this %s.' % activity_type)
 
-        activity_rights.editor_ids.append(assignee_id)
+        if allow_assigning_any_role:
+            old_role = activity_rights.assign_role(assignee_id, new_role)
 
-        if assignee_id in activity_rights.voice_artist_ids:
-            activity_rights.voice_artist_ids.remove(assignee_id)
-            old_role = rights_domain.ROLE_VOICE_ARTIST
+        else:
 
-        if assignee_id in activity_rights.viewer_ids:
-            activity_rights.viewer_ids.remove(assignee_id)
-            old_role = rights_domain.ROLE_VIEWER
+            if (activity_rights.is_editor(assignee_id) or
+                    activity_rights.is_owner(assignee_id)):
+                raise Exception(
+                    'This user already can edit this %s.' % activity_type)
+
+            activity_rights.editor_ids.append(assignee_id)
+
+            if assignee_id in activity_rights.voice_artist_ids:
+                activity_rights.voice_artist_ids.remove(assignee_id)
+                old_role = rights_domain.ROLE_VOICE_ARTIST
+
+            if assignee_id in activity_rights.viewer_ids:
+                activity_rights.viewer_ids.remove(assignee_id)
+                old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VOICE_ARTIST:
-        if (activity_rights.is_editor(assignee_id) or
-                activity_rights.is_voice_artist(assignee_id) or
-                activity_rights.is_owner(assignee_id)):
-            raise Exception(
-                'This user already can voiceover this %s.' % activity_type)
+        if allow_assigning_any_role:
+            old_role = activity_rights.assign_role(assignee_id, new_role)
 
-        activity_rights.voice_artist_ids.append(assignee_id)
+        else:
+            if (activity_rights.is_editor(assignee_id) or
+                    activity_rights.is_voice_artist(assignee_id) or
+                    activity_rights.is_owner(assignee_id)):
+                raise Exception(
+                    'This user already can voiceover this %s.' % activity_type)
+
+            activity_rights.voice_artist_ids.append(assignee_id)
 
         if assignee_id in activity_rights.viewer_ids:
             activity_rights.viewer_ids.remove(assignee_id)
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VIEWER:
-        if (activity_rights.is_owner(assignee_id) or
-                activity_rights.is_editor(assignee_id) or
-                activity_rights.is_viewer(assignee_id)):
-            raise Exception(
-                'This user already can view this %s.' % activity_type)
+        if allow_assigning_any_role:
+            old_role = activity_rights.assign_role(assignee_id, new_role)
 
-        if activity_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
-            raise Exception(
-                'Public %ss can be viewed by anyone.' % activity_type)
+        else:
+            if (activity_rights.is_owner(assignee_id) or
+                    activity_rights.is_editor(assignee_id) or
+                    activity_rights.is_viewer(assignee_id)):
+                raise Exception(
+                    'This user already can view this %s.' % activity_type)
 
-        activity_rights.viewer_ids.append(assignee_id)
+            if activity_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
+                raise Exception(
+                    'Public %ss can be viewed by anyone.' % activity_type)
+
+            activity_rights.viewer_ids.append(assignee_id)
 
     else:
         raise Exception('Invalid role: %s' % new_role)
