@@ -49,7 +49,8 @@ def mock_validate(unused_self):
 
 
 def start_multiple_item_interaction_lt_one_off_job(self, job_class):
-    """Helper function to start MultipleItemInteractionLtOneOffJob"""
+    """Helper function to start MultipleItemInteractionLtOneOffJob
+    """
     job_id = job_class.create_new()
     job_class.enqueue(job_id)
     self.process_and_flush_pending_mapreduce_tasks()
@@ -780,7 +781,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
 
-    def test_expID_length_pairs_are_produced_only_for_desired_interactions(self):
+    def test_expID_len_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for multiple choice
         interactions having choices length less than 30.
         """
@@ -854,7 +855,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', (exp_id0, 38))
+        expected_output = ('LONGER THAN 30', (u'[u\'exp_id0\', ' 38))
 
         self.assertEqual(actual_output, expected_output)
 
@@ -869,7 +870,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Item Selection Input.
         job_id = start_multiple_item_interaction_lt_one_off_job(
             self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
-    
+
         actual_output = (
             interaction_jobs_one_off
             .MultipleInputInteractionLtOneOffJob.get_output(job_id))
@@ -877,7 +878,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
         state4.update_interaction_id('ItemSelectionInput')
-        state4.update_interaction_customization_args(customization_args_dict1)
+        state4.update_interaction_customization_args(customization_args_dict2)
         state4.update_next_content_id_index(8)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -891,7 +892,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', (exp_id0, 38))
+        expected_output = ('LONGER THAN 30', (u'[u\'exp_id0\', ' 38))
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
