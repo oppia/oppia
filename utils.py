@@ -728,7 +728,7 @@ def require_valid_meta_tag_content(meta_tag_content):
 
         Raises:
             Exception. Meta tag content is not a string.
-            Exception. Meta tag content is long.
+            Exception. Meta tag content is longer than expected.
         """
     if not isinstance(meta_tag_content, python_utils.BASESTRING):
         raise ValidationError(
