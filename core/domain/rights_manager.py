@@ -763,7 +763,6 @@ def _assign_role(
     assignee_username = user_services.get_username(assignee_id)
     old_role = rights_domain.ROLE_NONE
 
-
     if new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):
             raise Exception('This user already owns this %s.' % activity_type)
