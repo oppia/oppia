@@ -578,14 +578,14 @@ def can_access_admin_page(handler):
 
 
 def can_delete_any_user(handler):
-    """Decorator that checks if the current user is a primary admin.
+    """Decorator that checks if the current user can delete any user.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if the user
-        is a primary admin.
+        can delete any user.
     """
 
     def test_primary_admin(self, **kwargs):
@@ -609,7 +609,7 @@ def can_delete_any_user(handler):
         email = user_services.get_email_from_user_id(self.user_id)
         if email != feconf.SYSTEM_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
-                '%s is not a primary admin of this application' % self.user_id)
+                '%s cannot delete any user.' % self.user_id)
 
         return handler(self, **kwargs)
     test_primary_admin.__wrapped__ = True

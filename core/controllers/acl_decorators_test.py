@@ -1005,6 +1005,10 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
+    def test_not_logged_user_cannot_delete_any_user(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/', expected_status_int=401)
+
     def test_primary_admin_can_delete_any_user(self):
         self.login(feconf.SYSTEM_EMAIL_ADDRESS)
         with self.swap(self, 'testapp', self.mock_testapp):
