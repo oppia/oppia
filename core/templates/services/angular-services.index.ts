@@ -340,6 +340,7 @@ import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { QuestionValidationService } from './question-validation.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
+import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -417,6 +418,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
+  ['ExplorationCreationBackendApiService',
+    ExplorationCreationBackendApiService],
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
