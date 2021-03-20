@@ -31,7 +31,7 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 
 
-class FeedbackReportModel(base_models.BaseModel):
+class AppFeedbackReportModel(base_models.BaseModel):
     """Model for storing feedback reports sent from learners.
 
     Instances of this model contain information about learner's device and Oppia
@@ -51,7 +51,7 @@ class FeedbackReportModel(base_models.BaseModel):
     scrubbed_by = datastore_services.StringProperty(
         required=False, indexed=True)
     # Unique ID for the ticket this report is assigned to (see 
-    # FeedbackReportTicketModel for how this is constructed)
+    # AppFeedbackReportTicketModel for how this is constructed)
     ticket_id = datastore_services.TextProperty(required=True, indexed=False)
     # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
@@ -71,40 +71,55 @@ class FeedbackReportModel(base_models.BaseModel):
         required=True, indexed=True)
     # The user's country locale represented as a ISO-3166 code; the locale is
     # determined by the user's Android device settings.
-    country_locale_code = datastore_services.StringProperty(
+    device_country_locale_code = datastore_services.StringProperty(
         required=True, indexed=True)
+    # The entry point location that the user is accessing the feedback report 
+    # from on both web & Android devices. On Android, this could be
+    # navigation_drawer, lesson_player, revision_card, or crash.
+    entry_point = datastore_services.StringProperty(required=True, indexed=True)
+    # Additional topic / story / exploration IDs that may be collected depending on
+    # the entry_point used to send the report; lesson player will have topic_id,
+    # story_id, and exploration_id, while revision card while have topic_id and
+    # subtopic_id
+    entry_point_topic_id = datastore_services.StringProperty(
+        required=False, indexed=False)
+    entry_point_story_id = datastore_services.StringProperty(
+        required=False, indexed=False)
+    entry_point_exploration_id = datastore_services.StringProperty(
+        required=False, indexed=False)
+    entry_point_subtopic_id = datastore_services.StringProperty(
+        required=False, indexed=False)
+
+    # The text language on Oppia set by the user in its ISO-639 language code;
+    # this is set by the user in Oppia's app preferences. Current languages on
+    # Android can be: EN, FR, HI, or ZH
+    text_language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The audio language ISO-639 code on Oppia set by the user as declared in
+    # the app. Current supported languages: English, Hindi, and Hinglish
+    audio_language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+
     # The Android device model used to submit the report
     android_device_model = datastore_services.StringProperty(
         required=False, indexed=True)
     # The Android SDK version on the user's device
     android_sdk_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
-    # The entry point location that the user is accessing the feedback report 
-    # from on both web & Android devices. On Android, this could be
-    # navigation_drawer, lesson_player, revision_card, or crash
-    entry_point = datastore_services.StringProperty(required=True, indexed=True)
-    # The text language on Oppia set by the user in its ISO-639 language code;
-    # this is set by the user in Oppia's app preferences. Current languages on
-    # Android can be: EN, FR, HI, or ZH
-    text_language_code = datastore_services.StringProperty(
-        required=True, indexed=True)
-    # The audio language on Oppia set by the user as declared in the Android
-    # app. Current supported languages: English, Hindi, and Hinglish
-    audio_language = datastore_services.StringProperty(
-        required=True, indexed=True)
-    # The rest of the report info collected. Using the JSON here allows us to
-    # iterate on the report structure without requiring backend updates each
-    # time the frontend structure is changed, allowing for better backwards
-    # compatibility with Android report structures.
+    # The rest of the report info collected on Android. Using the JSON here
+    # allows us to iterate on the report structure without requiring backend
+    # updates each time the frontend structure is changed, allowing for better
+    # backwards compatibility with Android report structures, as well as
+    # greater specificity between web and Android feedback.
     android_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info
     android_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
-    # The rest of the report info collected. Using the JSON here allows us to
-    # iterate on the report structure without requiring backend updates each
-    # time the frontend structure is changed, allowing for better backwards
-    # compatibility with Android report structures.
+
+    # The rest of the web report info collected. Using a JSON here allows us to
+    # iterate on the report structure allows for better backwards
+    # compatibility and specificity between web and Android feedback.
     web_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info
@@ -114,14 +129,15 @@ class FeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, platform):
-        """Creates a new FeedbackReportModel instance and returns it.
+        """Creates a new AppFeedbackReportModel instance and returns it.
 
         Args:
             user_id: str. The id of the user.
             exploration_id: str. The id of the exploration.
 
         Returns:
-            FeedbackReportModel. The newly created FeedbackReportModel instance.
+            AppFeedbackReportModel. The newly created AppFeedbackReportModel
+            instance.
         """
         entity_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -129,7 +145,7 @@ class FeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, platform, submitted_on_sec):
-        """Generates key for the instance of FeedbackReportModel
+        """Generates key for the instance of AppFeedbackReportModel
         class in the required format with the arguments provided.
 
         Args:
@@ -150,7 +166,7 @@ class FeedbackReportModel(base_models.BaseModel):
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
-            'The id generator for FeedbackReportModel is producing too'
+            'The id generator for AppFeedbackReportModel is producing too'
             'many collisions.')
 
     @staticmethod
@@ -189,7 +205,7 @@ class FeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Exports the data from FeedbackReportModel
+        """Exports the data from AppFeedbackReportModel
         into dict format for Takeout.
 
         Args:
@@ -197,7 +213,7 @@ class FeedbackReportModel(base_models.BaseModel):
             this would be the ID of the user who has scrubbed the report.
 
         Returns:
-            dict. Dictionary of the data from FeedbackReportModel.
+            dict. Dictionary of the data from AppFeedbackReportModel.
         """
 
         user_data = dict()
@@ -212,18 +228,24 @@ class FeedbackReportModel(base_models.BaseModel):
                 'report_type': report_model.report_type,
                 'category': report_model.category,
                 'platform_version': report_model.platform_version,
-                'country_locale_code': report_model.country_locale_code,
+                'device_country_locale_code': (
+                    report_model.device_country_locale_code),
                 'android_device_model': report_model.android_device_model,
                 'android_sdk_version': report_model.android_sdk_version,
                 'entry_point': report_model.entry_point,
+                'entry_point_topic_id': report_model.entry_point_story_id,
+                'entry_point_story_id': report_model.entry_point_story_id,
+                'entry_point_exploration_id': (
+                    report_model.entry_point_exploration_id),
+                'entry_point_subtopic_id': entry_point_subtopic_id,
                 'text_language_code': report_model.text_language_code,
-                'audio_language': report_model.audio_language,
+                'audio_language_code': report_model.audio_language_code,
                 'android_report_info': report_model.android_report_info,
-                'android_report_info_schema_version': 
-                    report_model.android_report_info_schema_version,
+                'android_report_info_schema_version': (
+                    report_model.android_report_info_schema_version),
                 'web_report_info':report_model.web_report_info,
-                'web_report_info_schema_version': 
-                    report_model.web_report_info_schema_version
+                'web_report_info_schema_version': (
+                    report_model.web_report_info_schema_version)
             }
         return user_data
 
@@ -240,7 +262,7 @@ class FeedbackReportModel(base_models.BaseModel):
         return feconf.ROLE_ID_MODERATOR
 
 
-class FeedbackReportTicketModel(base_models.BaseModel):
+class AppFeedbackReportTicketModel(base_models.BaseModel):
     """Model for storing tickets created to triage feedback reports.
 
     Instances of this model contain information about ticket and associated
@@ -297,7 +319,7 @@ class FeedbackReportTicketModel(base_models.BaseModel):
         return feconf.ROLE_ID_MODERATOR
 
 
-class FeedbackReportStatsModel(base_models.VersionedModel):
+class AppFeedbackReportStatsModel(base_models.VersionedModel):
     """Model for storing aggregate report stats on the tickets created.
 
     Instances of this model contain statistics for different report types based

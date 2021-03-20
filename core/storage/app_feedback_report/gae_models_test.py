@@ -27,8 +27,8 @@ import feconf
     [models.NAMES.base_model, models.NAMES.app_feedback_report])
 
 
-class FeedbackReportModelTests(test_utils.GenericTestBase):
-    """Tests for the FeedbackReportModel class."""
+class AppFeedbackReportModelTests(test_utils.GenericTestBase):
+    """Tests for the AppFeedbackReportModel class."""
 
     PLATFORM = 'android'
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
@@ -41,7 +41,7 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
     REPORT_TYPE_SUGGESTION='suggestion'
     CATEGORY_OTHER='other'
     PLATFORM_VERSION='0.1-alpha-abcdef1234'
-    COUNTRY_LOCALE_CODE_INDIA='in'
+    DEVICE_COUNTRY_LOCALE_CODE_INDIA='in'
     ANDROID_DEVICE_MODEL='Pixel 4a'
     ANDROID_SDK_VERSION=22
     ENTRY_POINT_NAVIGATION_DRAWER='navigation_drawer'
@@ -66,10 +66,10 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up  models in datastore for use in testing."""
-        super(FeedbackReportModelTests, self).setUp()
+        super(AppFeedbackReportModelTests, self).setUp()
 
         self.feedback_report_model = (
-            app_feedback_report_models.FeedbackReportModel(
+            app_feedback_report_models.AppFeedbackReportModel(
                 id='%s.%s.%s' % (
                     self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP.second,
                     'randomInteger123'),
@@ -82,7 +82,8 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.PLATFORM_VERSION,
-                country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+                device_country_locale_code=(
+                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
                 entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -97,13 +98,13 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
         self.feedback_report_model.put()
 
     def test_get_deletion_policy(self):
-        model = app_feedback_report_models.FeedbackReportModel
+        model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(model.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_export_data_nontrivial(self):
         stored_data = (
-            app_feedback_report_models.FeedbackReportModel.export_data(
+            app_feedback_report_models.AppFeedbackReportModel.export_data(
                 self.USER_ID))
 
         report_id = '%s.%s.%s' % (
@@ -117,7 +118,8 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
                 'report_type': self.REPORT_TYPE_SUGGESTION,
                 'category': self.CATEGORY_OTHER,
                 'platform_version': self.PLATFORM_VERSION,
-                'country_locale_code': self.COUNTRY_LOCALE_CODE_INDIA,
+                'device_country_locale_code': (
+                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 'android_device_model': self.ANDROID_DEVICE_MODEL,
                 'android_sdk_version': self.ANDROID_SDK_VERSION,
                 'entry_point': self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -133,14 +135,14 @@ class FeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(stored_data, expected_data)
 
     def test_get_lowest_supported_role(self):
-        model = app_feedback_report_models.FeedbackReportModel
+        model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(model.get_lowest_supported_role(),
             feconf.ROLE_ID_MODERATOR
         )
 
 
-class FeedbackReportTicketModelTests(test_utils.GenericTestBase):
-    """Tests for the FeedbackReportTicketModel class."""
+class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
+    """Tests for the AppFeedbackReportTicketModel class."""
 
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
@@ -159,10 +161,10 @@ class FeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up  models in datastore for use in testing."""
-        super(FeedbackReportTicketModelTests, self).setUp()
+        super(AppFeedbackReportTicketModelTests, self).setUp()
 
         self.ticket_model = (
-            app_feedback_report_models.FeedbackReportTicketModel(
+            app_feedback_report_models.AppFeedbackReportTicketModel(
                 id=self.TICKET_ID,
                 ticket_name=self.TICKET_NAME,
                 github_issue_number=0,
@@ -176,27 +178,27 @@ class FeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
 
     def test_get_deletion_policy(self):
-        model = app_feedback_report_models.FeedbackReportTicketModel()
+        model = app_feedback_report_models.AppFeedbackReportTicketModel()
         self.assertEqual(model.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_lowest_supported_role(self):
-        model = app_feedback_report_models.FeedbackReportModel
+        model = app_feedback_report_models.AppFeedbackReportTicketModel
         self.assertEqual(model.get_lowest_supported_role(),
             feconf.ROLE_ID_MODERATOR
         )
 
 
-class FeedbackReportStatsModelTests(test_utils.GenericTestBase):
-    """Tests for the FeedbackReportStatsModel class."""
+class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
+    """Tests for the AppFeedbackReportStatsModel class."""
 
     def test_get_deletion_policy(self):
-        model = app_feedback_report_models.FeedbackReportStatsModel()
+        model = app_feedback_report_models.AppFeedbackReportStatsModel()
         self.assertEqual(model.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_lowest_supported_role(self):
-        model = app_feedback_report_models.FeedbackReportModel
+        model = app_feedback_report_models.AppFeedbackReportStatsModel
         self.assertEqual(model.get_lowest_supported_role(),
             feconf.ROLE_ID_MODERATOR
         )
