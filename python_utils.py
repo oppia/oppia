@@ -113,7 +113,7 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
         _io.TextIOWrapper. The file object.
 
     Raises:
-        IOError. If the file is unable to open.
+        IOError. If the file can't be opened.
     """
     # The try/except is needed here to unify the errors because io.open in
     # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
