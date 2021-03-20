@@ -18,12 +18,12 @@
  */
 
 import { Component, Output, OnInit, EventEmitter } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
+import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',

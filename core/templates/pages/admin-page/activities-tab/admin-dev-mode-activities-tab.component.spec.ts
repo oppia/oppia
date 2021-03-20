@@ -27,7 +27,7 @@ import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 import { AdminDevModeActivitiesTabComponent } from './admin-dev-mode-activities-tab.component';
 
-describe('Admin dev mode activities tab', () => {
+fdescribe('Admin dev mode activities tab', () => {
   let component: AdminDevModeActivitiesTabComponent;
   let fixture: ComponentFixture<AdminDevModeActivitiesTabComponent>;
   let adminBackendApiService: AdminBackendApiService;
@@ -97,14 +97,22 @@ describe('Admin dev mode activities tab', () => {
 
   describe('.reloadExploration', () => {
     it('should not reload a specific exploration if task is running', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'reloadExplorationAsync');
       spyOn(
         adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
       expect(component.reloadExploration('expId')).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
     it('should not procees if user doesn\'t confirm', () => {
       mockConfirmResult(false);
+
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'reloadExplorationAsync');
+
       expect(component.reloadExploration('expId')).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
     it('should load explorations', async(() => {
@@ -115,8 +123,11 @@ describe('Admin dev mode activities tab', () => {
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
 
-      component.reloadExploration(expId);
       mockConfirmResult(true);
+      component.reloadExploration(expId);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit)
@@ -136,8 +147,11 @@ describe('Admin dev mode activities tab', () => {
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
 
-      component.reloadExploration(expId);
       mockConfirmResult(true);
+      component.reloadExploration(expId);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit)
@@ -178,29 +192,40 @@ describe('Admin dev mode activities tab', () => {
 
   describe('.reloadAllExplorations', () => {
     it('should not reload all exploration if' +
-      'reloading all exploration is possible', () => {
+      'reloading all exploration is not possible', () => {
       component.reloadingAllExplorationPossible = false;
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'reloadExplorationAsync');
 
       component.reloadAllExplorations();
 
+      expect(adminBackendSpy).not.toHaveBeenCalled();
       expect(component.reloadAllExplorations()).toBeUndefined();
     });
 
     it('should not reload all exploration if any task is running', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'reloadExplorationAsync');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
       component.reloadAllExplorations();
 
       expect(component.reloadAllExplorations()).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
     it('should not reload all exploration without user\'s confirmation', () => {
-      component.reloadingAllExplorationPossible = true;
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'reloadExplorationAsync');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
-      component.reloadAllExplorations();
+
+      component.reloadingAllExplorationPossible = true;
       mockConfirmResult(false);
 
+      component.reloadAllExplorations();
+
       expect(component.reloadAllExplorations()).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
     it('should reload all explorations', async(() => {
@@ -213,8 +238,11 @@ describe('Admin dev mode activities tab', () => {
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
 
-      component.reloadAllExplorations();
       mockConfirmResult(true);
+      component.reloadAllExplorations();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -237,8 +265,11 @@ describe('Admin dev mode activities tab', () => {
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
         spyOn(component.setStatusMessage, 'emit');
 
-        component.reloadAllExplorations();
         mockConfirmResult(true);
+        component.reloadAllExplorations();
+
+        expect(component.setStatusMessage.emit)
+          .toHaveBeenCalledWith('Processing...');
 
         fixture.whenStable().then(() => {
           expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -250,6 +281,9 @@ describe('Admin dev mode activities tab', () => {
   describe('.generateDummyExploration', () => {
     it('should not generate dummy exploration if publish count is greater' +
       'than generate count', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'generateDummyExplorationsAsync');
+
       component.numDummyExpsToPublish = 2;
       component.numDummyExpsToGenerate = 1;
 
@@ -259,6 +293,7 @@ describe('Admin dev mode activities tab', () => {
 
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
         'Publish count should be less than or equal to generate count');
+      expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
     it('should generate dummy explorations', async(() => {
@@ -270,6 +305,9 @@ describe('Admin dev mode activities tab', () => {
       spyOn(component.setStatusMessage, 'emit');
 
       component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -292,6 +330,9 @@ describe('Admin dev mode activities tab', () => {
 
       component.generateDummyExplorations();
 
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
           'Server error: Dummy explorations not generated.');
@@ -305,6 +346,9 @@ describe('Admin dev mode activities tab', () => {
         .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
       component.loadNewStructuresData();
+
+      expect(component.setStatusMessage.emit)
+      .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -323,6 +367,9 @@ describe('Admin dev mode activities tab', () => {
       spyOn(component.setStatusMessage, 'emit');
       component.loadNewStructuresData();
 
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
           'Server error: New structures not generated.');
@@ -336,6 +383,9 @@ describe('Admin dev mode activities tab', () => {
         .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
       component.generateNewSkillData();
+
+      expect(component.setStatusMessage.emit)
+      .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -354,6 +404,9 @@ describe('Admin dev mode activities tab', () => {
       spyOn(component.setStatusMessage, 'emit');
       component.generateNewSkillData();
 
+      expect(component.setStatusMessage.emit)
+      .toHaveBeenCalledWith('Processing...');
+
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
           'Server error: New skill data not generated.');
@@ -363,19 +416,26 @@ describe('Admin dev mode activities tab', () => {
 
   describe('.reloadCollection', () => {
     it('should not reload collection if a task is already running', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'reloadCollectionAsync');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
       expect(component.reloadCollection(component.DEMO_COLLECTIONS[0][0]))
         .toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
     it('should not reload collection without user\'s confirmation', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, 'reloadCollectionAsync');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
-      component.reloadCollection(component.DEMO_COLLECTIONS[0][0]);
+
       mockConfirmResult(false);
+      component.reloadCollection(component.DEMO_COLLECTIONS[0][0]);
 
       expect(component.reloadCollection(component.DEMO_COLLECTIONS[0][0]))
         .toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
     it('should reload collection', async(() => {
@@ -383,8 +443,12 @@ describe('Admin dev mode activities tab', () => {
         .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
-      component.reloadCollection(component.DEMO_COLLECTIONS[0][0]);
+
       mockConfirmResult(true);
+      component.reloadCollection(component.DEMO_COLLECTIONS[0][0]);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -403,8 +467,12 @@ describe('Admin dev mode activities tab', () => {
         }));
       spyOn(component.setStatusMessage, 'emit');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
-      component.reloadCollection(wrongCollectionId);
+
       mockConfirmResult(true);
+      component.reloadCollection(wrongCollectionId);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
