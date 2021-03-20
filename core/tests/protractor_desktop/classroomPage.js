@@ -41,6 +41,7 @@ describe('Classroom page functionality', function() {
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
+    await users.logout();
   });
 
   beforeEach(async function() {
@@ -52,7 +53,8 @@ describe('Classroom page functionality', function() {
       'Exploration Title',
       'Algorithms',
       'This is the objective.',
-      'English');
+      'English',
+      true);
     await classroomPage.get('math');
     await libraryPage.findExploration('Title');
     await libraryPage.expectExplorationToBeVisible('Exploration Title');
@@ -62,10 +64,10 @@ describe('Classroom page functionality', function() {
 
     await libraryPage.selectCategories(['Algorithms']);
     await libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
-    await users.logout();
   });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });
