@@ -126,7 +126,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
 
-
     @classmethod
     def create(
         cls, platform, submitted_on, report_type, category, platform_version,
@@ -175,13 +174,12 @@ class AppFeedbackReportModel(base_models.BaseModel):
         entity_id = cls._generate_id(user_id, platform)
         android_schema_version = None
         web_schema_version = None
-        if (platform == PLATFORM_CHOICE_ANDROID) {
+        if (platform == PLATFORM_CHOICE_ANDROID):
             android_schema_version = (
                 feconf.CURRENT_APP_FEEDBACK_REPORT_ANDROID_SCHEMA_VERSION)
-        } else {
+        else:
             web_schema_version = (
                 feconf.CURRENT_APP_FEEDBACK_REPORT_WEB_SCHEMA_VERSION)
-        }
         report_entity = cls(
             id=entity_id, platform=platform, submitted_on=submitted_on,
             report_type=report_type, category=category,
@@ -349,6 +347,71 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         required=True, indexed=True)
     # A list of report IDs associated with this ticket
     report_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+
+    @classmethod
+    def create(
+        cls, ticket_name, github_issue_number, newest_report_timestamp,
+        report_ids):
+        """Creates a new AppFeedbackReportTicketModel instance and returns its
+        ID.
+
+        Args:
+            ticket_name: str. The name assigned to the ticket by the moderator.
+            github_issue_number: int|None. The Github issue number associated
+                with the ticket, if it has one.
+            newest_report_timestamp: datetime.datetime. The date and time of the
+                newest report that is a part of this ticket
+            report_ids: list(str). The report_ids that are a part of this
+                ticket.
+        Returns:
+            AppFeedbackReportModel. The newly created AppFeedbackReportModel
+            instance.
+        """
+        ticket_id = cls._generate_id(user_id, platform)
+        latest_timestamp = None
+        for report_id in report_ids:
+            report_model = AppFeedbackReportModel.get(report_id)
+            if (
+                latest_timestamp is None or 
+                report_model.submitted_on > latest_timestamp):
+                latest_timestamp = report_model.submitted_on
+        ticket_entity = cls(
+            id=ticket_id, ticket_name=ticket_name,
+            github_issue_number=github_issue_number, is_archived=False,
+            newest_report_timestamp=latest_timestamp, report_ids=report_ids)
+        ticket_entity.update_timestamps()
+        ticket_entity.put()
+        return ticket_id
+
+    @classmethod
+    def _generate_id(cls, ticket_name):
+        """Generates key for the instance of AppFeedbackReportTicketModel
+        class in the required format with the arguments provided.
+
+        Args:
+            ticket_name: str. The name assigned to the ticket on creation.
+
+        Returns:
+            str. The generated ID for this entity using the current datetime in
+                seconds (as the entity's creation timestamp), a SHA1 hash of the
+                ticket_name, and a random string, of the form
+                '[creation_datetime]:hash([ticket_name]):[random hash]'.
+        """
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            name_hash = utils.convert_to_hash(
+                ticket_name, base_models.ID_LENGTH))
+            random_hash = utils.convert_to_hash(
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH))
+            new_id = '%s:%s:%s' % (
+                datetime.utcnow().second, name_hash, random_hash)
+            if not cls.get_by_id(new_id):
+                return new_id
+        raise Exception(
+            'The id generator for AppFeedbackReportModel is producing too'
+            'many collisions.')
+
 
     @staticmethod
     def get_deletion_policy():
