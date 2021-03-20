@@ -294,14 +294,14 @@
     search-bar .oppia-search-bar-category-selector {
       margin-top: 95px;
       right: 9px;
-      transform: translateX(-273px);
+      transform: translate(-321px,1px);
       width: 0;
       z-index: 101;
     }
 
     search-bar .oppia-search-bar-language-selector {
       margin-top: 95px;
-      transform: translateX(-147px);
+      transform: translate(-194px,1px);
       width: 0;
       z-index: 101;
     }
@@ -366,6 +366,9 @@
   }
 
   @media (max-width: 500px) {
+    search-bar .oppia-input-group.classroom-page-input-group {
+      width: 17em;
+    }
     search-bar .oppia-search-bar-category-selector {
       margin-top: 95px;
       position: relative;
@@ -380,10 +383,9 @@
     }
   }
 
-  @media (max-width: 431px) {
-    search-bar .oppia-search-button {
-      transform: translate(15px,-22px);
-      width: 48px;
+  @media (max-width: 378px) {
+    search-bar .oppia-search-bar-form {
+      padding-left: 0;
     }
   }
 
