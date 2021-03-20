@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview Service for managing images in localStorage.
  */
@@ -96,9 +97,11 @@ export class ImageLocalStorageService {
   setThumbnailBgColor(bgColor: string): void {
     this.thumbnailBgColor = bgColor;
   }
+
   getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
   }
+
   flushStoredImagesData(): void {
     this.windowRef.nativeWindow.sessionStorage.clear();
     this.storedImageFilenames.length = 0;
