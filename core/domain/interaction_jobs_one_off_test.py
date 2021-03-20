@@ -814,7 +814,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
-        job_id=start_multiple_item_interaction_lt_one_off_job(
+        job_id = start_multiple_item_interaction_lt_one_off_job(
             self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
 
         actual_output = (
@@ -849,13 +849,13 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleChoiceInteractionLimitOneOffJob job
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
-        job_id=start_multiple_item_interaction_lt_one_off_job(
+        job_id = start_multiple_item_interaction_lt_one_off_job(
             self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
 
         actual_output = (
             interaction_jobs_one_off
             .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', (u'[u\'exp_id0\', '], 38))
+        expected_output = ('LONGER THAN 30', (VALID_EXP_ID, 38))
 
         self.assertEqual(actual_output, expected_output)
 
@@ -868,7 +868,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInputInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Item Selection Input.
-        job_id=start_multiple_item_interaction_lt_one_off_job(
+        job_id = start_multiple_item_interaction_lt_one_off_job(
             self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
 
         actual_output = (
@@ -886,13 +886,13 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInputInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Item Selection Input.
-        job_id=start_multiple_item_interaction_lt_one_off_job(
+        job_id = start_multiple_item_interaction_lt_one_off_job(
             self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
 
         actual_output = (
             interaction_jobs_one_off
             .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', (u'[u\'exp_id0\', '], 38))
+        expected_output = ('LONGER THAN 30', (VALID_EXP_ID, 38))
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
