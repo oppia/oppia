@@ -27,7 +27,7 @@ import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 import { AdminDevModeActivitiesTabComponent } from './admin-dev-mode-activities-tab.component';
 
-fdescribe('Admin dev mode activities tab', () => {
+describe('Admin dev mode activities tab', () => {
   let component: AdminDevModeActivitiesTabComponent;
   let fixture: ComponentFixture<AdminDevModeActivitiesTabComponent>;
   let adminBackendApiService: AdminBackendApiService;
@@ -348,7 +348,7 @@ fdescribe('Admin dev mode activities tab', () => {
       component.loadNewStructuresData();
 
       expect(component.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Processing...');
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -385,7 +385,7 @@ fdescribe('Admin dev mode activities tab', () => {
       component.generateNewSkillData();
 
       expect(component.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Processing...');
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
@@ -405,7 +405,7 @@ fdescribe('Admin dev mode activities tab', () => {
       component.generateNewSkillData();
 
       expect(component.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Processing...');
+        .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
