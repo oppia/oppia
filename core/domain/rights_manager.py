@@ -764,6 +764,13 @@ def _assign_role(
     old_role = rights_domain.ROLE_NONE
 
     if allow_assigning_any_role:
+        if new_role not in [
+                rights_domain.ROLE_OWNER,
+                rights_domain.ROLE_EDITOR,
+                rights_domain.ROLE_VOICE_ARTIST,
+                rights_domain.ROLE_VIEWER
+        ]:
+            raise Exception('Invalid role: %s' % new_role)
         old_role = activity_rights.assign_role(assignee_id, new_role)
     elif new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):

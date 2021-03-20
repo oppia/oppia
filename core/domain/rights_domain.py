@@ -246,6 +246,10 @@ class ActivityRights(python_utils.OBJECT):
             str. The previous role of the user.
         """
         old_role = ROLE_NONE
+        if new_role == ROLE_VIEWER:
+            if self.status != ACTIVITY_STATUS_PRIVATE:
+                raise Exception(
+                    'Public explorations can be viewed by anyone.')
         for role, user_ids in python_utils.ZIP(
                 [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
                 [self.owner_ids, self.editor_ids, self.viewer_ids,
@@ -254,8 +258,22 @@ class ActivityRights(python_utils.OBJECT):
                 user_ids.remove(user_id)
                 old_role = role
 
-            if new_role == role:
+            if new_role == role and old_role != new_role:
                 user_ids.append(user_id)
+
+        if old_role == new_role:
+            if old_role == ROLE_OWNER:
+                raise Exception(
+                    'This user already owns this exploration.')
+            elif old_role == ROLE_EDITOR:
+                raise Exception(
+                    'This user already can edit this exploartion.')
+            elif old_role == ROLE_VOICE_ARTIST:
+                raise Exception(
+                    'This user already can voiceover this exploration.')
+            elif old_role == ROLE_VIEWER:
+                raise Exception(
+                    'This user already can view this exploration.')
 
         return old_role
 
