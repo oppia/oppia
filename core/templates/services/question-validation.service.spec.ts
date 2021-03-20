@@ -16,16 +16,7 @@
  * @fileoverview Unit tests for QuestionValidationService.
  */
 
-<<<<<<< HEAD
 import { TestBed } from '@angular/core/testing';
-=======
-// TODO(#7222): Remove the following block of unnecessary imports once
-// question-misconception-editor.component.ts is upgraded to Angular 8.
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
->>>>>>> ee406e9ca... Changes
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
