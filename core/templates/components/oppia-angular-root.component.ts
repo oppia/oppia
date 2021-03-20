@@ -155,6 +155,8 @@ import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
+import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
+import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -550,6 +552,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static endExplorationRulesService: EndExplorationRulesService;
   static endExplorationValidationService: EndExplorationValidationService;
   static explorationDiffService: ExplorationDiffService;
+  static explorationCreationBackendApiService:
+    ExplorationCreationBackendApiService;
+  static explorationCreationService: ExplorationCreationService;
   static explorationFeaturesBackendApiService:
     ExplorationFeaturesBackendApiService;
   static explorationFeaturesService: ExplorationFeaturesService;
@@ -838,6 +843,10 @@ private emailDashboardDataService: EmailDashboardDataService,
 private endExplorationRulesService: EndExplorationRulesService,
 private endExplorationValidationService: EndExplorationValidationService,
 private explorationDiffService: ExplorationDiffService,
+private explorationCreationBackendApiService:
+  ExplorationCreationBackendApiService,
+private explorationCreationService:
+  ExplorationCreationService,
 private explorationFeaturesBackendApiService:
   ExplorationFeaturesBackendApiService,
 private explorationFeaturesService: ExplorationFeaturesService,
@@ -1169,6 +1178,10 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.endExplorationValidationService);
     OppiaAngularRootComponent.explorationDiffService = (
       this.explorationDiffService);
+    OppiaAngularRootComponent.explorationCreationBackendApiService = (
+      this.explorationCreationBackendApiService);
+    OppiaAngularRootComponent.explorationCreationService = (
+      this.explorationCreationService);
     OppiaAngularRootComponent.explorationFeaturesBackendApiService = (
       this.explorationFeaturesBackendApiService);
     OppiaAngularRootComponent.explorationFeaturesService = (

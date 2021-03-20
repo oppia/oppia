@@ -341,6 +341,7 @@ import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.servic
 import { QuestionValidationService } from './question-validation.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
+import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -420,6 +421,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationCreationBackendApiService',
     ExplorationCreationBackendApiService],
+  ['ExplorationCreationService',
+    ExplorationCreationService],
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
