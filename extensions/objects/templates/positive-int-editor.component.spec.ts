@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for the positive int component.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('PositiveInt', function() {
   var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('positiveIntEditor');
     ctrl.$onInit();

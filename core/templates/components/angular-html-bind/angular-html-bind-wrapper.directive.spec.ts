@@ -18,7 +18,7 @@
 
 import { destroyPlatform } from '@angular/core';
 import { waitForAsync } from '@angular/core/testing';
-import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { importAllAngularServices, setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
 
 describe('Angular Html Bind Wrapper Directive', () => {
@@ -47,6 +47,7 @@ describe('Angular Html Bind Wrapper Directive', () => {
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(angular.mock.module('oppia'));
+    importAllAngularServices();
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, $compile, $injector) {

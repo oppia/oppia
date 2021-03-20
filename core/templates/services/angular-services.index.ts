@@ -21,7 +21,7 @@ import { Type } from '@angular/core';
 import { ExternalRteSaveService } from './external-rte-save.service';
 import { ExternalSaveService } from './external-save.service';
 import { PlatformFeatureService } from './platform-feature.service';
-import { MockCsrfTokenService, RequestInterceptor } from './request-interceptor.service';
+import { RequestInterceptor } from './request-interceptor.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
@@ -506,7 +506,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MessengerService', MessengerService],
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
-  ['MockCsrfTokenService', MockCsrfTokenService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
   ['MultipleChoiceInputValidationService',
     MultipleChoiceInputValidationService],

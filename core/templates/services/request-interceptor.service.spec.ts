@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for RequestInterceptorService.
  */
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController
@@ -23,42 +23,48 @@ import {
 import {HTTP_INTERCEPTORS, HttpClient} from '@angular/common/http';
 
 import {
-  MockCsrfTokenService,
   RequestInterceptor
 } from 'services/request-interceptor.service';
+import { CsrfTokenService } from './csrf-token.service';
 
-describe('Request Interceptor Service', () => {
-  let mcts: MockCsrfTokenService = null;
+
+fdescribe('Request Interceptor Service', () => {
+  let csrfService: CsrfTokenService = null;
   let httpClient: HttpClient = null;
   let httpTestingController: HttpTestingController = null;
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{
-        provide: HTTP_INTERCEPTORS,
-        useClass: RequestInterceptor,
-        multi: true
-      }]
+      providers: [
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: RequestInterceptor,
+          multi: true
+        }
+      ]
     });
 
-    mcts = TestBed.get(MockCsrfTokenService);
-    httpClient = TestBed.get(HttpClient);
-    httpTestingController = TestBed.get(HttpTestingController);
-    // This throws "Argument of type 'string[]' is not assignable to parameter
-    // of type 'PromiseLike<string>'.". We need to suppress this error because
-    // we need to mock the `getTokenAsync` function for testing purposes.
-    // @ts-expect-error
-    spyOn(mcts, 'getTokenAsync').and.returnValue(['sample-csrf-token']);
-  });
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpClient = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      console.log('Called');
+      return Promise.resolve('sample-csrf-token');
+    });
+  }));
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should expect request body to be a FormData constructor', () => {
+  it('should expect request body to be a FormData constructor', (done) => {
     httpClient.post('/api', {data: 'test'}).subscribe(
-      response => expect(response).toBeTruthy());
+      response => {
+        expect(response).toBeTruthy();
+        done();
+      }
+    );
 
     let req = httpTestingController.expectOne('/api');
     expect(req.request.method).toEqual('POST');

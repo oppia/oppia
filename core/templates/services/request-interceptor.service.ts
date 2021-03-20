@@ -26,88 +26,45 @@ import { CsrfTokenService } from './csrf-token.service';
 @Injectable({
   providedIn: 'root'
 })
-export class MockCsrfTokenService {
-  tokenPromise: PromiseLike<string> = null;
-
-  initializeToken(): void {
-    if (this.tokenPromise !== null) {
-      throw new Error('Token request has already been made');
-    }
-    // TODO(#8035): Remove the use of $.ajax and hence the ts-ignore
-    // in csrf-token.service.spec.ts once all the services are migrated
-    // We use jQuery here instead of Angular's $http, since the latter creates
-    // a circular dependency.
-    this.tokenPromise = $.ajax({
-      url: '/csrfhandler',
-      type: 'GET',
-      dataType: 'text',
-      dataFilter: function(data: string) {
-        // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-        let actualData = data.substring(5);
-        return JSON.parse(actualData);
-      },
-    }).then(function(response: {token: string}) {
-      return response.token;
-    });
-  }
-
-  getTokenAsync(): PromiseLike<string> {
-    if (this.tokenPromise === null) {
-      throw new Error('Token needs to be initialized');
-    }
-    return this.tokenPromise;
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
 export class RequestInterceptor implements HttpInterceptor {
   constructor(private csrf: CsrfTokenService) {}
   intercept(
       request: HttpRequest<FormData>, next: HttpHandler
   ): Observable<HttpEvent<FormData>> {
-    var csrf = this.csrf;
     try {
-      csrf.initializeToken();
+      this.csrf.initializeToken();
     } catch (e) {
       if (e.message !== 'Token request has already been made') {
         throw e;
       }
     }
-
     if (request.body) {
       return from(this.csrf.getTokenAsync())
         .pipe(
           switchMap((token: string) => {
+            let newRequest;
             if (request.method === 'POST' || request.method === 'PUT') {
               // If the body of the http request created is already in FormData
               // form, no need to create the FormData object here.
+              let body = new FormData();
               if (!(request.body instanceof FormData)) {
-                var body = new FormData();
                 body.append('payload', JSON.stringify(request.body));
-                // This throws "Cannot assign to 'body' because it is
-                // a read-only property". We need to manually suprress this
-                // error because this is a request interceptor and we need to
-                // to modify the contents of the request.
-                // @ts-ignore
-                request.body = body;
               }
-              request.body.append('csrf_token', token);
-              request.body.append('source', document.URL);
+              body.append('csrf_token', token);
+              body.append('source', document.URL);
+              newRequest = request.clone({
+                body: body
+              });
             } else {
-              // This throws "Cannot assign to 'body' because it is
-              // a read-only property". We need to manually suprress this
-              // error because this is a request interceptor and we need to
-              // to modify the contents of the request.
-              // @ts-ignore
-              request.body = {
-                csrf_token: token,
-                source: document.URL,
-                payload: JSON.stringify(request.body)
-              };
+              newRequest = request.clone({
+                body: {
+                  csrf_token: token,
+                  source: document.URL,
+                  payload: JSON.stringify(request.body)
+                }
+              });
             }
-            return next.handle(request);
+            return next.handle(newRequest);
           })
         );
     } else {
