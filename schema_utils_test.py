@@ -198,7 +198,15 @@ VALIDATOR_SPECS = {
 
 
 def _validate_ui_config(obj_type, ui_config):
-    """Validates the value of a UI configuration."""
+    """Validates the value of a UI configuration.
+
+        Args:
+            obj_type: str. UI config spec type.
+            ui_config: dict. The UI config that needs to be validated.
+
+        Raises:
+            AssertionError. The object fails to validate against the schema.
+    """
     reference_dict = UI_CONFIG_SPECS[obj_type]
     assert set(ui_config.keys()) <= set(reference_dict.keys()), (
         'Missing keys: %s, Extra keys: %s' % (
@@ -210,7 +218,14 @@ def _validate_ui_config(obj_type, ui_config):
 
 
 def _validate_validator(obj_type, validator):
-    """Validates the value of a 'validator' field."""
+    """Validates the value of a 'validator' field.
+       Args:
+            obj_type: str. UI config spec type.
+            validator: dict. The Specs that needs to be validated.
+
+        Raises:
+            AssertionError. The object fails to validate against the schema.
+    """
     reference_dict = VALIDATOR_SPECS[obj_type]
     assert 'id' in validator, 'id is not present in validator'
     assert validator['id'] in reference_dict, (
@@ -253,8 +268,13 @@ def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
     """Checks that all of the required keys, and possibly some of the optional
     keys, are in the given dict.
 
+    Args:
+        dict_to_check: dict. Dictionary for which keys are checked
+        required_keys: list. Keys which are required to be in the dictionary.
+        optional_keys: list. Keys which are optionals in the dictionary
+
     Raises:
-        AssertionError. The validation fails.
+        AssertionError. The validation fails if there are extra keys.
     """
     assert set(required_keys) <= set(dict_to_check.keys()), (
         'Missing keys: %s' % dict_to_check)
@@ -279,6 +299,8 @@ def validate_schema(schema):
     There may also be an optional 'post_normalizers' key whose value is a list
     of normalizers.
 
+    Args:
+        schema: dict. Schema that needs to be validated.
     Raises:
         AssertionError. The schema is not valid.
     """

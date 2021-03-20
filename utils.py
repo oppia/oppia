@@ -688,6 +688,13 @@ def require_valid_thumbnail_filename(thumbnail_filename):
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
+
+        Raises:
+            Exception. Thumbnail filename is not a string.
+            Exception. Thumbnail filename does not start with a dot.
+            Exception. Thumbnail filename includes slashes or consecutive dots.
+            Exception. Thumbnail filename does not include an extension.
+            Exception. Thumbnail filename extension is not svg.
         """
     if thumbnail_filename is not None:
         if not isinstance(thumbnail_filename, python_utils.BASESTRING):
@@ -718,6 +725,10 @@ def require_valid_meta_tag_content(meta_tag_content):
 
         Args:
             meta_tag_content: str. The meta tag content to validate.
+
+        Raises:
+            Exception. Meta tag content is not a string.
+            Exception. Meta tag content is long.
         """
     if not isinstance(meta_tag_content, python_utils.BASESTRING):
         raise ValidationError(
