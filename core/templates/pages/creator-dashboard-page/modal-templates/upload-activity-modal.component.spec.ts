@@ -12,51 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AlertsService } from 'services/alerts.service';
-import { TestBed } from
-  '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UploadActivityModalComponent } from './upload-activity-modal.component';
 /**
  * @fileoverview Unit tests for UploadActivityModalComponent.
  */
 
+import { AlertsService } from 'services/alerts.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { UploadActivityModalComponent } from './upload-activity-modal.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 class MockActiveModal {
-  close(value): void {
+  dismiss(): void {
     return;
   }
 }
 
+class MockAlertsService {
+  addWarning() {
+    return null;
+  }
+}
+
 xdescribe('Upload Activity Modal Controller', () => {
-  let uploadActivityModalComponent = null;
+  let component: UploadActivityModalComponent;
+  let fixture: ComponentFixture<UploadActivityModalComponent>;
   let alertsService: AlertsService;
   let ngbActiveModal: NgbActiveModal;
-  let closeSpy: jasmine.Spy;
 
   beforeEach(() => {
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    alertsService = TestBed.get(AlertsService);
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [UploadActivityModalComponent],
       providers: [
         {
           provide: NgbActiveModal, useClass: MockActiveModal
+        },
+        {
+          provide: AlertsService, useClass: MockAlertsService
         }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-    let fixture = TestBed.createComponent(UploadActivityModalComponent);
-    uploadActivityModalComponent = fixture.componentInstance;
-  });
-
-  beforeEach(() => {
-    let fixture = TestBed.createComponent(UploadActivityModalComponent);
-    uploadActivityModalComponent = fixture.componentInstance;
+      ]
+    }).compileComponents().then(() => {
+      fixture = TestBed.createComponent(
+        UploadActivityModalComponent);
+      component = fixture.componentInstance;
+    });
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    alertsService = TestBed.get(AlertsService);
   });
 
   it('should close modal when saving activity', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
     var file = {
       size: 100,
       name: 'file.mp3'
@@ -74,14 +81,15 @@ xdescribe('Upload Activity Modal Controller', () => {
         files: [file]
       };
     });
-    uploadActivityModalComponent.save();
+    component.save();
 
-    expect(closeSpy).toHaveBeenCalledWith({
+    expect(dismissSpy).toHaveBeenCalledWith({
       yamlFile: file
     });
   });
 
   it('should not save activity when file is empty', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     spyOn(alertsService, 'addWarning').and.callThrough();
     // TODO(#10113): Refactor the code to not use the DOM methods.
     // This throws "Argument of type '() => { files: { size: number;
@@ -91,15 +99,15 @@ xdescribe('Upload Activity Modal Controller', () => {
     // We need to suppress this error because we need only "files"
     // property for testing.
     // @ts-expect-error
-    spyOn(document, 'getElementById').and.callFake(function() {
+    spyOn(document, 'getElementById').and.callFake(() => {
       return {
         files: []
       };
     });
-    uploadActivityModalComponent.save();
+    component.save();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Empty file detected.');
-    expect(closeSpy).not.toHaveBeenCalled();
+    expect(dismissSpy).not.toHaveBeenCalled();
   });
 });

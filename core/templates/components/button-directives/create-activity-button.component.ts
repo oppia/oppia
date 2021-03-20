@@ -25,6 +25,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { AppConstants } from 'app.constants';
 
  @Component({
    selector: 'create-activity-bbutton',
@@ -35,7 +36,6 @@ export class CreateActivityButtonComponent implements OnInit {
    canCreateCollections: boolean = false;
    allowYamlFileUpload: boolean;
    userIsLoggedIn = null;
-   ALLOW_YAML_FILE_UPLOAD: boolean = false;
 
    constructor(
      private userService: UserService,
@@ -83,7 +83,7 @@ export class CreateActivityButtonComponent implements OnInit {
    }
    ngOnInit(): void {
      this.creationInProgress = false;
-     this.allowYamlFileUpload = this.ALLOW_YAML_FILE_UPLOAD;
+     this.allowYamlFileUpload = AppConstants.ALLOW_YAML_FILE_UPLOAD;
 
      this.userService.getUserInfoAsync().then((userInfo) => {
        this.canCreateCollections = userInfo.canCreateCollections();

@@ -6,24 +6,18 @@
   <p>
     This form allows you to upload the YAML file corresponding to an exploration. However, you will need to manually upload any additional image files separately.
   </p>
-
-  <br>
-  <br>
-
-  <p>
-    <form role="form" class="form-horizontal">
-      <fieldset>
-        <div class="form-group">
-          <label for="newFileInput" class="col-lg-2 col-md-2 col-sm-2">
-            Upload YAML file
-          </label>
-          <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="newFileInput" type="file">
-          </div>
+  <form role="form" class="form-horizontal">
+    <fieldset>
+      <div class="form-group">
+        <label for="newFileInput">
+          Upload YAML file
+        </label>
+        <div class="col-lg-10 col-md-10 col-sm-10">
+          <input id="newFileInput" type="file">
         </div>
-      </fieldset>
-    </form>
-  </p>
+      </div>
+    </fieldset>
+  </form>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary protractor-test-cancel-create" (click)="cancel()">Cancel</button>

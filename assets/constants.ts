@@ -5455,7 +5455,7 @@ export default {
   "FIREBASE_CONFIG_STORAGE_BUCKET": "",
   "FIREBASE_EMULATOR_ENABLED": true,
 
-  "ALLOW_YAML_FILE_UPLOAD": false,
+  "ALLOW_YAML_FILE_UPLOAD": true,
 
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",

@@ -114,7 +114,7 @@ export class ExplorationCreationService {
           this.loaderService.hideLoadingScreen();
         });
       });
-    }, function() {
+    }, () => {
       this.alertsService.clearWarnings();
       // Note to developers:
       // This callback is triggered when the Cancel button is

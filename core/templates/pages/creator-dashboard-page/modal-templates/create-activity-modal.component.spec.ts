@@ -16,64 +16,72 @@
  * @fileoverview Unit tests for CreateActivityModalComponent.
  */
 
-import { ComponentFixture, TestBed } from
+import { ComponentFixture, TestBed, fakeAsync } from
   '@angular/core/testing';
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
-import { UserService } from 'services/user.service';
 import { CreateActivityModalComponent } from './create-activity-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UserInfo } from 'domain/user/user-info.model';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Pipe } from '@angular/core';
+
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
 
 class MockActiveModal {
-  close(value): void {
+  dismiss(): void {
     return;
   }
 }
 
-xdescribe('Create Activity Modal Component', () =>{
+class MockExplorationCreationService {
+  createNewExploration(): void {
+    return null;
+  }
+}
+
+class MockCollectionCreationService {
+  createNewCollection(): void {
+    return null;
+  }
+}
+
+describe('Create Activity Modal Component', () =>{
   let component: CreateActivityModalComponent;
   let fixture: ComponentFixture<CreateActivityModalComponent>;
   let collectionCreationService: CollectionCreationService;
   let explorationCreationService: ExplorationCreationService;
-  let userService: UserService;
   let ngbActiveModal: NgbActiveModal;
-  let closeSpy: jasmine.Spy;
 
-  beforeEach(() => {
-    collectionCreationService = TestBed.get(CollectionCreationService);
-    explorationCreationService = TestBed.get(ExplorationCreationService);
-    userService = TestBed.get(UserService);
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [CreateActivityModalComponent],
+      imports: [HttpClientTestingModule],
+      declarations: [CreateActivityModalComponent, MockTranslatePipe],
       providers: [
-        { provide: NgbActiveModal, useClass: MockActiveModal }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-    closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    const UserInfoObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: true
-    };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject)));
-  });
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(CreateActivityModalComponent);
-    component = fixture.componentInstance;
-  });
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal },
+        {
+          provide: ExplorationCreationService,
+          useClass: MockExplorationCreationService
+        },
+        { provide: CollectionCreationService,
+          useClass: MockCollectionCreationService
+        }
+      ]
+    }).compileComponents().then(() => {
+      fixture = TestBed.createComponent(
+        CreateActivityModalComponent);
+      component = fixture.componentInstance;
+    });
+    ngbActiveModal = TestBed.get(NgbActiveModal);
+    explorationCreationService = TestBed.get(ExplorationCreationService);
+    collectionCreationService = TestBed.get(CollectionCreationService);
+  }));
 
   it('should evalute component properties after controller is initialized',
     () => {
@@ -87,17 +95,19 @@ xdescribe('Create Activity Modal Component', () =>{
 
   it('should create new exploration when choosing exploration as the new' +
     ' activity', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     spyOn(explorationCreationService, 'createNewExploration').and.callThrough();
     component.chooseExploration();
     expect(explorationCreationService.createNewExploration).toHaveBeenCalled();
-    expect(closeSpy).toHaveBeenCalled();
+    expect(dismissSpy).toHaveBeenCalled();
   });
 
   it('should create new collection when choosing collection as the new' +
     ' activity', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     spyOn(collectionCreationService, 'createNewCollection').and.callThrough();
     component.chooseCollection();
     expect(collectionCreationService.createNewCollection).toHaveBeenCalled();
-    expect(closeSpy).toHaveBeenCalled();
+    expect(dismissSpy).toHaveBeenCalled();
   });
 });

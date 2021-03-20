@@ -68,6 +68,8 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -103,6 +105,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AttributionGuideComponent,
     BackgroundBannerComponent,
     CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
@@ -123,6 +126,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
     TruncatePipe,
+    UploadActivityModalComponent,
     PromoBarComponent
   ],
 
@@ -130,6 +134,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
@@ -142,6 +147,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    UploadActivityModalComponent,
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -158,6 +164,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
     SharingLinksComponent,
@@ -169,6 +176,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
+    UploadActivityModalComponent,
     PromoBarComponent
   ],
 })
