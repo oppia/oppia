@@ -691,7 +691,7 @@ def require_valid_thumbnail_filename(thumbnail_filename):
 
         Raises:
             Exception. Thumbnail filename is not a string.
-            Exception. Thumbnail filename does not start with a dot.
+            Exception. Thumbnail filename does start with a dot.
             Exception. Thumbnail filename includes slashes or consecutive dots.
             Exception. Thumbnail filename does not include an extension.
             Exception. Thumbnail filename extension is not svg.
