@@ -147,7 +147,7 @@ def get_multi_topic_rights(topic_ids):
     """
     topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
     topic_rights = [
-        get_topic_rights_from_model(rights) if rights else None
+        topic_fetchers.get_topic_rights_from_model(rights) if rights else None
         for rights in topic_rights_models]
     return topic_rights
 
@@ -164,7 +164,7 @@ def get_topic_rights_with_user(user_id):
     """
     topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
     return [
-        get_topic_rights_from_model(model)
+        topic_fetchers.get_topic_rights_from_model(model)
         for model in topic_rights_models
         if model is not None]
 
@@ -179,7 +179,7 @@ def get_all_topic_rights():
     topic_rights_models = topic_models.TopicRightsModel.get_all()
     topic_rights = {}
     for model in topic_rights_models:
-        rights = get_topic_rights_from_model(model)
+        rights = topic_fetchers.get_topic_rights_from_model(model)
         topic_rights[rights.id] = rights
     return topic_rights
 
@@ -1159,7 +1159,7 @@ def filter_published_topic_ids(topic_ids):
     for ind, model in enumerate(topic_rights_models):
         if model is None:
             continue
-        rights = topic_fetchers.get_topic_rights_from_model(model)
+        rights = topic_fetchers.topic_fetchers.get_topic_rights_from_model(model)
         if rights.topic_is_published:
             published_topic_ids.append(topic_ids[ind])
     return published_topic_ids
