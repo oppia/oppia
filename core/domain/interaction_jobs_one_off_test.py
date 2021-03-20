@@ -48,6 +48,14 @@ def mock_validate(unused_self):
     pass
 
 
+def start_multiple_item_interaction_lt_one_off_job(self, job_class):
+    """Helper function to start MultipleItemInteractionLtOneOffJob"""
+    job_id = job_class.create_new()
+    job_class.enqueue(job_id)
+    self.process_and_flush_pending_mapreduce_tasks()
+    return job_id
+
+
 def run_job_for_deleted_exp(
         self, job_class, check_error=False,
         error_type=None, error_msg=None, function_to_be_called=None,
@@ -772,14 +780,14 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
 
-    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+    def test_expID_length_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for multiple choice
         interactions having choices length less than 30.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2'])
+        exploration.add_states(['State1', 'State2', 'State3', 'State4'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
@@ -805,18 +813,13 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
-        job_id = (
-            interaction_jobs_one_off
-            .MultipleItemInteractionLtOneOffJob.
-            create_new())
-        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
+        job_id = start_multiple_item_interaction_lt_one_off_job(
+            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
 
         actual_output = (
             interaction_jobs_one_off
             .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = (2, 0)
+        expected_output = ('SUCCESS', 1)
         self.assertEqual(actual_output, expected_output)
 
         customization_args_dict2 = {
@@ -845,18 +848,14 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleChoiceInteractionLimitOneOffJob job
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
-        job_id = (
-            interaction_jobs_one_off
-            .MultipleItemInteractionLtOneOffJob.
-            create_new())
-        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
+        job_id = start_multiple_item_interaction_lt_one_off_job(
+            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
 
         actual_output = (
             interaction_jobs_one_off
             .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = (4, 4)
+        expected_output = ('LONGER THAN 30', (exp_id0, 38))
+
         self.assertEqual(actual_output, expected_output)
 
         state3.update_interaction_id('ItemSelectionInput')
@@ -868,18 +867,13 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInputInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Item Selection Input.
-        job_id = (
-            interaction_jobs_one_off
-            .MultipleItemInteractionLtOneOffJob.
-            create_new())
-        interaction_jobs_one_off.MultipleInputInteractionLtOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
+        job_id = start_multiple_item_interaction_lt_one_off_job(
+            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
+    
         actual_output = (
             interaction_jobs_one_off
             .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = (2, 0)
+        expected_output = ('SUCCESS', 1)
         self.assertEqual(actual_output, expected_output)
 
         state4.update_interaction_id('ItemSelectionInput')
@@ -891,18 +885,13 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInputInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Item Selection Input.
-        job_id = (
-            interaction_jobs_one_off
-            .MultipleItemInteractionLtOneOffJob.
-            create_new())
-        interaction_jobs_one_off.MultipleInputInteractionLtOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
+        job_id = start_multiple_item_interaction_lt_one_off_job(
+            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
 
         actual_output = (
             interaction_jobs_one_off
             .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = (4, 4)
+        expected_output = ('LONGER THAN 30', (exp_id0, 38))
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
