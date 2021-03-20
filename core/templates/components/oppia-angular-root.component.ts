@@ -237,6 +237,8 @@ import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { LearnerPlaylistBackendApiService } from
+  'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerParamsService } from
@@ -608,6 +610,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static learnerAnswerDetailsBackendApiService:
     LearnerAnswerDetailsBackendApiService;
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  static learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService;
   static learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService;
   static learnerParamsService: LearnerParamsService;
@@ -896,6 +899,7 @@ private learnerActionObjectFactory: LearnerActionObjectFactory,
 private learnerAnswerDetailsBackendApiService:
   LearnerAnswerDetailsBackendApiService,
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
+private learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService,
 private learnerDashboardIdsBackendApiService:
   LearnerDashboardIdsBackendApiService,
 private learnerParamsService: LearnerParamsService,
@@ -1258,6 +1262,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.learnerAnswerDetailsBackendApiService);
     OppiaAngularRootComponent.learnerDashboardBackendApiService = (
       this.learnerDashboardBackendApiService);
+    OppiaAngularRootComponent.learnerPlaylistBackendApiService  = (
+      this.learnerPlaylistBackendApiService);
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = (
       this.learnerDashboardIdsBackendApiService);
     OppiaAngularRootComponent.learnerParamsService = this.learnerParamsService;

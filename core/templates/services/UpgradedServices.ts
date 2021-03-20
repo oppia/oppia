@@ -222,6 +222,8 @@ import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { LearnerPlaylistBackendApiService } from
+  'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerParamsService } from
@@ -1074,6 +1076,12 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardBackendApiService'] =
       new LearnerDashboardBackendApiService(
         upgradedServices['HttpClient']);
+    upgradedServices['LearnerPlaylistBackendApiService'] =
+        new LearnerPlaylistBackendApiService(
+          upgradedServices['AlertsService'],
+          upgradedServices['HttpClient'],
+          upgradedServices['NgbModal'],
+          upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient']);
