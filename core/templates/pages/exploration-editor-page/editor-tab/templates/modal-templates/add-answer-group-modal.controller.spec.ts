@@ -27,7 +27,6 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Add Answer Group Modal Controller', function() {
   importAllAngularServices();
