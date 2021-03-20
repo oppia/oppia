@@ -83,7 +83,7 @@
 }
 .oppia-visualization-sorted-tile-tooltip > p.frequency {
   background: #323232;
-  box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.24), 0px 0px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.24), 0 0 6px rgba(0, 0, 0, 0.12);
   color: rgba(255, 255, 255, 0.7);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 12px;
