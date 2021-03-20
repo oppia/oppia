@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
@@ -48,13 +48,17 @@ import { ProfileLinkImageComponent } from 'components/profile-link-directives/pr
 import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
+import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
+import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
 import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
+import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
+
 
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -77,8 +81,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BrowserModule,
     DynamicContentModule,
     NgbTooltipModule,
-    FormsModule,
     NgbModalModule,
+    FormsModule,
     MaterialModule,
     ...firebaseAuthModules,
   ],
@@ -88,6 +92,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   ],
 
   declarations: [
+    AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileComponent,
@@ -106,17 +111,20 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
-    ThreadTableComponent,
     ThumbnailDisplayComponent,
+    ThreadTableComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
     LearnerDashboardIconsComponent,
-    LearnerPlaylistModalComponent
+    LearnerPlaylistModalComponent,
+    PromoBarComponent
   ],
 
   entryComponents: [
+    AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
@@ -131,10 +139,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
-    ThreadTableComponent,
     ThumbnailDisplayComponent,
     LearnerDashboardIconsComponent,
-    LearnerPlaylistModalComponent
+    LearnerPlaylistModalComponent,
+    PromoBarComponent,
+    ThreadTableComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
   ],
 
   exports: [
@@ -143,22 +153,27 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
+    NgbModalModule,
     // Components, directives, and pipes.
+    AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     FocusOnDirective,
     SharingLinksComponent,
+    SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     LearnerDashboardIconsComponent,
-    LearnerPlaylistModalComponent
+    LearnerPlaylistModalComponent,
+    PromoBarComponent
   ],
 })
 
