@@ -67,7 +67,10 @@ def get_all_skill_ids_assigned_to_some_topic():
     """
     skill_ids = set([])
     all_topic_models = topic_models.TopicModel.get_all()
-    all_topics = [get_topic_from_model(topic) for topic in all_topic_models]
+    all_topics = [
+        topic_fetchers.get_topic_from_model(topic)
+        for topic in all_topic_models
+    ]
     for topic in all_topics:
         skill_ids.update(topic.get_all_skill_ids())
     return skill_ids
@@ -1159,7 +1162,7 @@ def filter_published_topic_ids(topic_ids):
     for ind, model in enumerate(topic_rights_models):
         if model is None:
             continue
-        rights = topic_fetchers.topic_fetchers.get_topic_rights_from_model(model)
+        rights = topic_fetchers.get_topic_rights_from_model(model)
         if rights.topic_is_published:
             published_topic_ids.append(topic_ids[ind])
     return published_topic_ids
