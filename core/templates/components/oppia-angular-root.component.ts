@@ -1262,7 +1262,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.learnerAnswerDetailsBackendApiService);
     OppiaAngularRootComponent.learnerDashboardBackendApiService = (
       this.learnerDashboardBackendApiService);
-    OppiaAngularRootComponent.learnerPlaylistBackendApiService  = (
+    OppiaAngularRootComponent.learnerPlaylistBackendApiService = (
       this.learnerPlaylistBackendApiService);
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = (
       this.learnerDashboardIdsBackendApiService);
