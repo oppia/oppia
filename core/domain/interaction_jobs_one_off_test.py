@@ -50,6 +50,7 @@ def mock_validate(unused_self):
 
 def start_multiple_item_interaction_lt_one_off_job(self, job_class):
     """Helper function to start MultipleItemInteractionLtOneOffJob
+    Job
     """
     job_id = job_class.create_new()
     job_class.enqueue(job_id)
@@ -124,7 +125,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'html': '<p>This is value1 for DragAndDropSortInput</p>',
                 'content_id': 'ca_choices_0'
             }, {
-                'html': '<p>This is value2 for DragAndDropSortInput</p>',
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',4
                 'content_id': 'ca_choices_1'
             }]},
             'allowMultipleItemsInSamePosition': {'value': True}
@@ -855,7 +856,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', (VALID_EXP_ID, 38))
+        expected_output = ('LONGER THAN 30', 38))
 
         self.assertEqual(actual_output, expected_output)
 
@@ -892,7 +893,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', (VALID_EXP_ID, 38))
+        expected_output = ('LONGER THAN 30', 38))
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
