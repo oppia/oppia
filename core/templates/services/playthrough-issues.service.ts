@@ -92,11 +92,11 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
         explorationVersion = newExplorationVersion;
       },
       getIssues: function() {
-        return PlaythroughIssuesBackendApiService.fetchIssues(
+        return PlaythroughIssuesBackendApiService.fetchIssuesAsync(
           explorationId, explorationVersion);
       },
       getPlaythrough: function(playthroughId) {
-        return PlaythroughIssuesBackendApiService.fetchPlaythrough(
+        return PlaythroughIssuesBackendApiService.fetchPlaythroughAsync(
           explorationId, playthroughId);
       },
       renderIssueStatement: function(issue) {
@@ -125,7 +125,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
         }
       },
       resolveIssue: function(issue) {
-        return PlaythroughIssuesBackendApiService.resolveIssue(
+        return PlaythroughIssuesBackendApiService.resolveIssueAsync(
           issue, explorationId, explorationVersion);
       },
       openPlaythroughModal: function(playthroughId, index) {
