@@ -111,8 +111,8 @@ def create_suggestion(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
             raise Exception(
-                'The given content_html does not match the content of the '
-                'exploration.')
+                'The Exploration content has changed since this translation '
+                'was submitted.')
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
@@ -379,7 +379,7 @@ def accept_suggestion(
 
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
-        None, review_message)
+        None, review_message, should_send_email=False)
 
     # When recording of scores is enabled, the author of the suggestion gets an
     # increase in their score for the suggestion category.
@@ -469,7 +469,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
 
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
-        None, review_message
+        None, review_message, should_send_email=False
     )
 
 

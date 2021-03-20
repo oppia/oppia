@@ -15,19 +15,16 @@
 /**
  * @fileoverview Directive for the skill misconceptions editor.
  */
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 
-require(
-  'components/state-directives/answer-group-editor/' +
-  'summary-list-header.directive.ts');
+
 require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
   'misconception-editor.directive.ts');
 require(
   'pages/skill-editor-page/modal-templates/' +
   'add-misconception-modal.controller.ts');
-require(
-  'pages/skill-editor-page/modal-templates/' +
-  'delete-misconception-modal.controller.ts');
 
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
@@ -36,6 +33,7 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -50,9 +48,11 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'WindowDimensionsService',
+        '$rootScope', '$scope', '$uibModal', 'NgbModal',
+        'WindowDimensionsService',
         function(
-            $scope, $uibModal, WindowDimensionsService) {
+            $rootScope, $scope, $uibModal, NgbModal,
+            WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.isEditable = function() {
@@ -72,19 +72,16 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           };
 
           $scope.openDeleteMisconceptionModal = function(index, evt) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/modal-templates/' +
-                'delete-misconception-modal.directive.html'),
-              backdrop: 'static',
-              resolve: {
-                index: () => index
-              },
-              controller: 'DeleteMisconceptionModalController'
-            }).result.then(function(result) {
+            let modalInstance: NgbModalRef = NgbModal.open(
+              DeleteMisconceptionModalComponent, {
+                backdrop: 'static',
+              });
+            modalInstance.componentInstance.index = index;
+            modalInstance.result.then((result) => {
               SkillUpdateService.deleteMisconception($scope.skill, result.id);
               $scope.misconceptions = $scope.skill.getMisconceptions();
               $scope.activeMisconceptionIndex = null;
+              $rootScope.$apply();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

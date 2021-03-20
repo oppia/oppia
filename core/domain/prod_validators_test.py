@@ -19,12 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 
 from constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import prod_validation_jobs_one_off
 from core.domain import rating_services
 from core.domain import rights_domain
@@ -44,13 +41,9 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
 (
-    collection_models, exp_models, feedback_models,
-    story_models, subtopic_models,
-    suggestion_models, topic_models, user_models
+    subtopic_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.NAMES.subtopic, models.NAMES.topic, models.NAMES.user
 ])
 
 
