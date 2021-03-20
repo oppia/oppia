@@ -207,6 +207,11 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
+# The current version of the Android feedback report info blob schema.
+CURRENT_APP_FEEDBACK_REPORT_ANDROID_SCHEMA_VERSION = 1
+# The current version of the web feedback report info blob schema.
+CURRENT_APP_FEEDBACK_REPORT_WEB_SCHEMA_VERSION = 1
+
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
 # this version number must be changed.

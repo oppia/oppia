@@ -128,20 +128,78 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
 
     @classmethod
-    def create(cls, platform):
-        """Creates a new AppFeedbackReportModel instance and returns it.
+    def create(
+        cls, platform, submitted_on, report_type, category, platform_version,
+        device_country_locale_code, android_sdk_version, android_device_model,
+        entry_point, entry_point_topic_id, entry_point_story_id,
+        entry_point_exploration_id, entry_point_subtopic_id, text_language_code,
+        audio_language_code, android_report_info, web_report_info):
+        """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
-            user_id: str. The id of the user.
-            exploration_id: str. The id of the exploration.
-
+            platform: str. The platform the report is submitted on.
+            submitted_on: datetime.datetime. The date and time the report was
+                submitted, in UTC.
+            report_type: str. The type of report.
+            category: str. The category the report is providing feedback on.
+            platform_version: str. The version of Oppia that the report was
+                submitted on.
+            device_country_locale_code: str. The ISO-3166 code for the user's
+                country locale.
+            android_sdk_version: int|None. The SDK version running when on the
+                device or None if its a web report.
+            android_device_model: str|None. The device model of the Android
+                devie, or None if it's a web report.
+            entry_point: str. The entry point used to start the report.
+            entry_point_topic_id: str|None. The current topic ID depending on
+                the type of entry point used.
+            entry_point_story_id: str|None. The current story ID depending on
+                the type of entry point used.
+            entry_point_exploration_id: str|None. The current exploration ID
+                dependingon the type of entry point used.
+            entry_point_subtopic_id: str|None. The current subtopic ID depending
+                on the type of entry point used.
+            text_language_code: str. The ISO-639 language code for the text
+                language set by the user on the Oppia app.
+            audio_language_code: str. The language code for the audio language
+                set by the user on the Oppia app, as defined by Oppia (not
+                necessarily an ISO-639 code).
+            android_report_info: dict|None. The information collected as part
+                of the Android-specific feedback report.
+            web_report_info: dict|None. The information collected as part of the
+                web-specific feedback report.
         Returns:
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        entity_id = cls._generate_id(user_id, exploration_id)
-        return cls(
-            id=entity_id, user_id=user_id, exploration_id=exploration_id)
+        entity_id = cls._generate_id(user_id, platform)
+        android_schema_version = None
+        web_schema_version = None
+        if (platform == PLATFORM_CHOICE_ANDROID) {
+            android_schema_version = (
+                feconf.CURRENT_APP_FEEDBACK_REPORT_ANDROID_SCHEMA_VERSION)
+        } else {
+            web_schema_version = (
+                feconf.CURRENT_APP_FEEDBACK_REPORT_WEB_SCHEMA_VERSION)
+        }
+        report_entity = cls(
+            id=entity_id, platform=platform, submitted_on=submitted_on,
+            report_type=report_type, category=category,
+            platform_version=platform_version,
+            device_country_locale_code=device_country_locale_code,
+            android_sdk_version=android_sdk_version,
+            android_device_model=android_device_model, entry_point=entry_point,
+            entry_point_topic_id=entry_point_topic_id,
+            entry_point_subtopic_id=entry_point_subtopic_id,
+            text_language_code=text_language_code,
+            audio_language_code=audio_language_code,
+            android_report_info=android_report_info,
+            android_report_info_schema_version = android_schema_version,
+            web_report_info=web_report_info,
+            web_report_info_schema_version=web_schema_version)
+        report_entity.update_timestamps()
+        report_entity.put()
+        return entity_id
 
     @classmethod
     def _generate_id(cls, platform, submitted_on_sec):
@@ -193,6 +251,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'android_device_model': base_models.EXPORT_POLICY.EXPORTED,
             'android_sdk_version': base_models.EXPORT_POLICY.EXPORTED,
             'entry_point': base_models.EXPORT_POLICY.EXPORTED,
+            'entry_point_topic_id': base_models.EXPORT_POLICY.EXPORTED,
+            'entry_point_story_id': base_models.EXPORT_POLICY.EXPORTED,
+            'entry_point_exploration_id': base_models.EXPORT_POLICY.EXPORTED,
+            'entry_point_subtopic_id': base_models.EXPORT_POLICY.EXPORTED,
             'text_language_code': base_models.EXPORT_POLICY.EXPORTED,
             'audio_language': base_models.EXPORT_POLICY.EXPORTED,
             'android_report_info': base_models.EXPORT_POLICY.EXPORTED,
