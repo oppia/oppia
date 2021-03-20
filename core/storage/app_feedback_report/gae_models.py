@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core.platform import models
 import feconf
 import python_utils
@@ -52,7 +54,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=True)
     # Unique ID for the ticket this report is assigned to (see 
     # AppFeedbackReportTicketModel for how this is constructed)
-    ticket_id = datastore_services.TextProperty(required=True, indexed=False)
+    ticket_id = datastore_services.TextProperty(default=None, indexed=False)
     # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
@@ -77,18 +79,18 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # from on both web & Android devices. On Android, this could be
     # navigation_drawer, lesson_player, revision_card, or crash.
     entry_point = datastore_services.StringProperty(required=True, indexed=True)
-    # Additional topic / story / exploration IDs that may be collected depending on
-    # the entry_point used to send the report; lesson player will have topic_id,
-    # story_id, and exploration_id, while revision card while have topic_id and
-    # subtopic_id
+    # Additional topic / story / exploration IDs that may be collected depending
+    # on  the entry_point used to send the report; lesson player will have
+    # topic_id, story_id, and exploration_id, while revision card while have
+    # topic_id and subtopic_id.
     entry_point_topic_id = datastore_services.StringProperty(
-        required=False, indexed=False)
+        required=False, indexed=True)
     entry_point_story_id = datastore_services.StringProperty(
-        required=False, indexed=False)
+        required=False, indexed=True)
     entry_point_exploration_id = datastore_services.StringProperty(
-        required=False, indexed=False)
+        required=False, indexed=True)
     entry_point_subtopic_id = datastore_services.StringProperty(
-        required=False, indexed=False)
+        required=False, indexed=True)
 
     # The text language on Oppia set by the user in its ISO-639 language code;
     # this is set by the user in Oppia's app preferences. Current languages on
@@ -171,7 +173,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        entity_id = cls._generate_id(user_id, platform)
+        entity_id = cls._generate_id(platform, submitted_on.second)
         android_schema_version = None
         web_schema_version = None
         if (platform == PLATFORM_CHOICE_ANDROID):
@@ -188,6 +190,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
             android_sdk_version=android_sdk_version,
             android_device_model=android_device_model, entry_point=entry_point,
             entry_point_topic_id=entry_point_topic_id,
+            entry_point_exploration_id=entry_point_exploration_id,
+            entry_point_story_id=entry_point_story_id,
             entry_point_subtopic_id=entry_point_subtopic_id,
             text_language_code=text_language_code,
             audio_language_code=audio_language_code,
@@ -212,13 +216,14 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             str. The generated ID for this entity using platform,
                 submitted_on_sec, and a random string, of the form
-                '[user_id].[exploration_id].[random hash]'.
+                '[user_id].[submitted_on_sec].[random hash]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
-                python_utils.UNICODE(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH))
-            new_id = '%s.%s.%s' % (platform, exploration_id, random_hash)
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH)
+            new_id = '%s.%s.%s' % (platform, submitted_on_sec, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -297,7 +302,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 'entry_point_story_id': report_model.entry_point_story_id,
                 'entry_point_exploration_id': (
                     report_model.entry_point_exploration_id),
-                'entry_point_subtopic_id': entry_point_subtopic_id,
+                'entry_point_subtopic_id': report_model.entry_point_subtopic_id,
                 'text_language_code': report_model.text_language_code,
                 'audio_language_code': report_model.audio_language_code,
                 'android_report_info': report_model.android_report_info,
@@ -337,7 +342,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
     # Github issue number that applies to this ticket
     github_issue_number = datastore_services.IntegerProperty(
-        required=True, indexed=True)
+        default=None, indexed=True)
     # Whether this ticket has been archived
     is_archived = datastore_services.BooleanProperty(
         required=True, indexed=False)
@@ -367,18 +372,12 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        ticket_id = cls._generate_id(user_id, platform)
-        latest_timestamp = None
-        for report_id in report_ids:
-            report_model = AppFeedbackReportModel.get(report_id)
-            if (
-                latest_timestamp is None or 
-                report_model.submitted_on > latest_timestamp):
-                latest_timestamp = report_model.submitted_on
+        ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
             id=ticket_id, ticket_name=ticket_name,
             github_issue_number=github_issue_number, is_archived=False,
-            newest_report_timestamp=latest_timestamp, report_ids=report_ids)
+            newest_report_timestamp=newest_report_timestamp,
+            report_ids=report_ids)
         ticket_entity.update_timestamps()
         ticket_entity.put()
         return ticket_id
@@ -399,13 +398,13 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
-                ticket_name, base_models.ID_LENGTH))
+                ticket_name, base_models.ID_LENGTH)
             random_hash = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH))
+                base_models.ID_LENGTH)
             new_id = '%s:%s:%s' % (
-                datetime.utcnow().second, name_hash, random_hash)
+                datetime.datetime.utcnow().second, name_hash, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -473,7 +472,7 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
     #
     #   daily_param_stats : { param_name1 : { param_value1 : report_count1,
     #                                         param_value2 : report_count2,
-    #                                         param_value3 : report_count3 } ,
+    #                                         param_value3 : report_count3 },
     #                         param_name2 : { param_value1 : report_count1,
     #                                         param_value2 : report_count2,
     #                                         param_value3 : report_count3 } }
@@ -488,6 +487,64 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
     # The schema version for parameter statistics in this entity
     daily_ticket_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=False)
+
+    # @classmethod
+    # def create(
+    #     cls, ticket_name, github_issue_number, newest_report_timestamp,
+    #     report_ids):
+    #     """Creates a new AppFeedbackReportTicketModel instance and returns its
+    #     ID.
+
+    #     Args:
+    #         ticket_name: str. The name assigned to the ticket by the moderator.
+    #         github_issue_number: int|None. The Github issue number associated
+    #             with the ticket, if it has one.
+    #         newest_report_timestamp: datetime.datetime. The date and time of the
+    #             newest report that is a part of this ticket
+    #         report_ids: list(str). The report_ids that are a part of this
+    #             ticket.
+    #     Returns:
+    #         AppFeedbackReportModel. The newly created AppFeedbackReportModel
+    #         instance.
+    #     """
+    #     ticket_id = cls._generate_id(user_id, platform)
+    #     ticket_entity = cls(
+    #         id=ticket_id, ticket_name=ticket_name,
+    #         github_issue_number=github_issue_number, is_archived=False,
+    #         newest_report_timestamp=newest_report_timestamp,
+    #         report_ids=report_ids)
+    #     ticket_entity.update_timestamps()
+    #     ticket_entity.put()
+    #     return ticket_id
+
+    # @classmethod
+    # def _generate_id(cls, ticket_name):
+    #     """Generates key for the instance of AppFeedbackReportTicketModel
+    #     class in the required format with the arguments provided.
+
+    #     Args:
+    #         ticket_name: str. The name assigned to the ticket on creation.
+
+    #     Returns:
+    #         str. The generated ID for this entity using the current datetime in
+    #             seconds (as the entity's creation timestamp), a SHA1 hash of the
+    #             ticket_name, and a random string, of the form
+    #             '[creation_datetime]:hash([ticket_name]):[random hash]'.
+    #     """
+    #     for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+    #         name_hash = utils.convert_to_hash(
+    #             ticket_name, base_models.ID_LENGTH)
+    #         random_hash = utils.convert_to_hash(
+    #             python_utils.UNICODE(
+    #                 utils.get_random_int(base_models.RAND_RANGE)),
+    #             base_models.ID_LENGTH)
+    #         new_id = '%s:%s:%s' % (
+    #             datetime.utcnow().second, name_hash, random_hash)
+    #         if not cls.get_by_id(new_id):
+    #             return new_id
+    #     raise Exception(
+    #         'The id generator for AppFeedbackReportModel is producing too'
+    #         'many collisions.')
 
     @staticmethod
     def get_deletion_policy():

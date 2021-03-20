@@ -90,7 +90,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 android_sdk_version=self.ANDROID_SDK_VERSION,
                 entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
                 text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+                audio_language_code=self.AUDIO_LANGUAGE_ENGLISH,
                 android_report_info=self.ANDROID_REPORT_INFO,
                 android_report_info_schema_version=
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION
@@ -108,7 +108,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
                 self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
                 self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_ENGLISH,
-                self.ANDROID_REPORT_INFO, None)
+                self.ANDROID_REPORT_INFO, None))
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
@@ -126,6 +126,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_export_data_nontrivial(self):
+        self.maxDiff=None
         stored_data = (
             app_feedback_report_models.AppFeedbackReportModel.export_data(
                 self.USER_ID))
@@ -146,8 +147,12 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 'android_device_model': self.ANDROID_DEVICE_MODEL,
                 'android_sdk_version': self.ANDROID_SDK_VERSION,
                 'entry_point': self.ENTRY_POINT_NAVIGATION_DRAWER,
+                'entry_point_topic_id': None,
+                'entry_point_exploration_id': None,
+                'entry_point_story_id': None,
+                'entry_point_subtopic_id': None,
                 'text_language_code': self.TEXT_LANGUAGE_CODE_ENGLISH,
-                'audio_language': self.AUDIO_LANGUAGE_ENGLISH,
+                'audio_language_code': self.AUDIO_LANGUAGE_ENGLISH,
                 'android_report_info': self.ANDROID_REPORT_INFO,
                 'android_report_info_schema_version': 
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION,
@@ -182,23 +187,40 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     REPORT_IDS=['%s.%s.%s' % (PLATFORM, REPORT_SUBMITTED_TIMESTAMP.second,
         'randomInteger123')]
 
-    def setUp(self):
-        """Set up  models in datastore for use in testing."""
-        super(AppFeedbackReportTicketModelTests, self).setUp()
+    # def setUp(self):
+    #     """Set up  models in datastore for use in testing."""
+    #     super(AppFeedbackReportTicketModelTests, self).setUp()
 
-        self.ticket_model = (
-            app_feedback_report_models.AppFeedbackReportTicketModel(
-                id=self.TICKET_ID,
+    #     self.ticket_model = (
+    #         app_feedback_report_models.AppFeedbackReportTicketModel(
+    #             id=self.TICKET_ID,
+    #             ticket_name=self.TICKET_NAME,
+    #             github_issue_number=0,
+    #             is_archived=False,
+    #             newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
+    #             report_ids=self.REPORT_IDS
+    #         )
+    #     )
+    #     self.ticket_model.update_timestamps()
+    #     self.ticket_model.put()
+
+    def test_create_and_get_ticket_models(self):
+        ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.create(
                 ticket_name=self.TICKET_NAME,
-                github_issue_number=0,
-                is_archived=False,
+                github_issue_number=None,
                 newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
-                report_ids=self.REPORT_IDS
-            )
-        )
-        self.ticket_model.update_timestamps()
-        self.ticket_model.put()
+                report_ids=self.REPORT_IDS))
 
+        ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get(
+                ticket_id))
+
+        self.assertEqual(ticket_model.id, ticket_id)
+        self.assertEqual(
+            ticket_model.newest_report_timestamp, self.NEWEST_REPORT_TIMESTAMP)
+        self.assertEqual(ticket_model.ticket_name, self.TICKET_NAME)
+        self.assertEqual(ticket_model.report_ids, self.REPORT_IDS)
 
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportTicketModel()
