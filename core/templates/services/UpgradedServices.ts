@@ -228,7 +228,6 @@ import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
-import { LearnerViewInfoBackendApiService } from 'pages/exploration-player-page/services/learner-view-info-backend-api.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -1257,9 +1256,6 @@ export class UpgradedServices {
       upgradedServices['LoggerService'],
       upgradedServices['UrlService'],
       upgradedServices['BrowserCheckerService']);
-    upgradedServices['LearnerViewInfoBackendApiService'] =
-      new LearnerViewInfoBackendApiService(
-        upgradedServices['HttpClient']);
     upgradedServices['PopulateRuleContentIdsService'] =
       new PopulateRuleContentIdsService(
         upgradedServices['GenerateContentIdService']);

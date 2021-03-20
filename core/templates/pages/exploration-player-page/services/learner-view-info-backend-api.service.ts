@@ -20,8 +20,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 
-interface LearnerViewResposne{
-  summaries;
+interface LearnerViewBackendDict {
+  'summaries': string[];
+}
+
+interface LearnerViewResposne {
+  summaries: string[];
 }
 
 @Injectable({
@@ -35,11 +39,12 @@ export class LearnerViewInfoBackendApiService {
   fetchLearnerInfo(
       stringifiedExpIds: string,
       includePrivateExplorations: string): Promise<LearnerViewResposne> {
-    return this.http.get(AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-      params: {
-        stringified_exp_ids: stringifiedExpIds,
-        include_private_explorations: includePrivateExplorations
-      }}).toPromise();
+    return this.http.get<LearnerViewBackendDict>(
+      AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+        params: {
+          stringified_exp_ids: stringifiedExpIds,
+          include_private_explorations: includePrivateExplorations
+        }}).toPromise();
   }
 }
 
