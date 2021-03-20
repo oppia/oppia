@@ -54,12 +54,14 @@ describe('Topic and Story viewer functionality', function() {
       objective: 'The goal is to check story viewer functionality.',
       language: 'English'
     };
+
     for (var i = 1; i <= 3; i++) {
       await workflow.createAndPublishTwoCardExploration(
         `Exploration TASV1 - ${i}`,
         EXPLORATION.category,
         EXPLORATION.objective,
         EXPLORATION.language,
+        i === 1,
         true
       );
       dummyExplorationIds.push(await general.getExplorationIdFromEditor());
