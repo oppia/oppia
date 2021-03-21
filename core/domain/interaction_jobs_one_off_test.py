@@ -125,7 +125,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'html': '<p>This is value1 for DragAndDropSortInput</p>',
                 'content_id': 'ca_choices_0'
             }, {
-                'html': '<p>This is value2 for DragAndDropSortInput</p>',4
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',
                 'content_id': 'ca_choices_1'
             }]},
             'allowMultipleItemsInSamePosition': {'value': True}
