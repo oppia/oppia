@@ -57,8 +57,13 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """Args:
-               item: *. A single element of type given by entity_class().
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: *. A single element of type given by entity_class().
+
+        Yields:
+            One might yield (exploration.id, 1).
         """
         current_class = MockJobManagerOne
         if current_class.entity_created_before_job_queued(item):
@@ -66,10 +71,15 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, values):
-        """Args :
-               key:*. A key value as emitted from the map() fuction, above.
-               values : list(*). a list of all values from all mappers that were
+        """Implements the reduce function. Must be declared @staticmethod.
+
+        Args:
+            key:*. A key value as emitted from the map() fuction, above.
+            values : list(*). a list of all values from all mappers that were
                 tagged with the given key.
+        
+        Yields:
+            It will yield a string value.
         """
         yield (key, sum([int(value) for value in values]))
 
