@@ -856,7 +856,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', 38))
+        expected_output = ('LONGER THAN 30', 38)
 
         self.assertEqual(actual_output, expected_output)
 
@@ -893,7 +893,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', 38))
+        expected_output = ('LONGER THAN 30', 38)
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
