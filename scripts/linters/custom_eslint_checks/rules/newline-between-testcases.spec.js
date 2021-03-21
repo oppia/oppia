@@ -24,16 +24,41 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester();
 ruleTester.run('newline-between-testcases', rule, {
   valid: [
-    `it('should check for the line break')
+    `it('should transform all key value pairs to angular constants',
+       function() {
+         for (var constantName in constants) {
+         expect($injector.has(constantName)).toBe(true);
+         expect($injector.get(constantName)).toEqual(constants[constantName]);
+     }
+     });
 
-     it('should check for line break and multiline')
-     `
+     it('should transform all key value pairs to angular constants',
+      function() {
+        for (var constantName in constants) {
+          expect($injector.has(constantName)).toBe(true);
+          expect($injector.get(constantName)).toEqual(constants[constantName]);
+      }
+     });
+    `
   ],
   invalid: [
     {
       code:
-       `it('should check for the line break')
-        it('should check for line break and multiline')`,
+      `it('should transform all key value pairs to angular constants',
+       function() {
+        for (var constantName in constants) {
+          expect($injector.has(constantName)).toBe(true);
+          expect($injector.get(constantName)).toEqual(constants[constantName]);
+        }
+        });
+      it('should transform all key value pairs to angular constants',
+      function() {
+        for (var constantName in constants) {
+          expect($injector.has(constantName)).toBe(true);
+          expect($injector.get(constantName)).toEqual(constants[constantName]);
+      }
+      });
+    `,
       errors: [{
         message: ('There should be a single newline break before it()'),
         type: null
@@ -41,14 +66,27 @@ ruleTester.run('newline-between-testcases', rule, {
     },
     {
       code:
-       `it('should check for the line break')
+      `it('should transform all key value pairs to angular constants',
+      function() {
+      for (var constantName in constants) {
+         expect($injector.has(constantName)).toBe(true);
+         expect($injector.get(constantName)).toEqual(constants[constantName]);
+     }
+     });
 
 
-        it('should check for line break and multiline')`,
+     it('should transform all key value pairs to angular constants',
+      function() {
+      for (var constantName in constants) {
+         expect($injector.has(constantName)).toBe(true);
+         expect($injector.get(constantName)).toEqual(constants[constantName]);
+     }
+     });
+    `,
       errors: [{
         message: ('There should be a single newline break before it()'),
         type: null
       }]
-    },
+    }
   ]
 });

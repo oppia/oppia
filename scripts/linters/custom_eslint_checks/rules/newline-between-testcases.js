@@ -38,23 +38,13 @@ module.exports = {
     const sourceCode = context.getSourceCode();
     const lines = sourceCode.lines;
 
-    var checkLineBreak = function(testMessageNode) {
-      var line = testMessageNode.loc.start.line - 2;
-      //  For checking comments before it()
-      while (line >= 0 && lines[line].trim().startsWith('/')) {
-        line--;
-      }
-      if (line >= 0 && lines[line] && !lines[line].trim().startsWith('desc')) {
+    var checkLineBreak = function(node) {
+      var line = node.loc.end.line;
+      if (lines[line].trim() !== '' && !lines[line].trim().startsWith('}') ||
+        lines[line] === '' && lines[line + 1] === '') {
         context.report({
-          testMessageNode,
-          loc: testMessageNode.loc,
-          messageId: 'line'
-        });
-      }
-      if (line >= 0 && lines[line] === '' && lines[line - 1] === '') {
-        context.report({
-          testMessageNode,
-          loc: testMessageNode.loc,
+          node,
+          loc: node.loc.end,
           messageId: 'line'
         });
       }
@@ -63,8 +53,7 @@ module.exports = {
     return {
       CallExpression(node) {
         if (node.callee.name === 'it') {
-          const testMessageNode = node.arguments[0];
-          checkLineBreak(testMessageNode);
+          checkLineBreak(node);
         }
       }
     };
