@@ -75,7 +75,7 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values : list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -111,7 +111,7 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values : list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that 
                 were tagged with the given key.
 
         Yields:
@@ -147,7 +147,7 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values : list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that 
                 were tagged with the given key.
 
         Yields:
@@ -337,7 +337,7 @@ class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
     @classmethod
     def _post_failure_hook(cls, job_id):
         """Args:
-               job_id : str.The ID of the Job to enqueue.
+               job_id: str.The ID of the Job to enqueue.
         """
         model = MockSumModel.get_by_id(SUM_MODEL_ID)
         model.failed = True
@@ -395,7 +395,7 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values : list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that 
                 were tagged with the given key.
 
         Yields:
@@ -693,7 +693,7 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values : list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that 
                 were tagged with the given key.
 
         Yields:
@@ -774,7 +774,7 @@ class MockStartExplorationMRJobManager(
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            stringified_values : str. Returns a string from JSON object
+            stringified_values: str. Returns a string from JSON object
         """
         started_count = 0
         for value_str in stringified_values:
