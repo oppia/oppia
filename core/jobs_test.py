@@ -111,7 +111,7 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
 
         Args:
             key: *. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that
+            values: list(*). A list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -147,7 +147,7 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key: *. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that
+            values: list(*). A list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -397,7 +397,7 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that
+            values: list(*). A list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -695,7 +695,7 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key: *. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that
+            values: list(*). A list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -824,7 +824,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
                 layer.
             event_type: str. The event triggered by a student.
             exp_id: int. The experiment id.
-            unused_exp_version: float .The unused experiment version.
+            unused_exp_version: int.The unused experiment version.
             unused_state_name: str. The unused state name.
             unused_session_id: int. The unused session id.
             unused_params: list(*). Unused parameters.
