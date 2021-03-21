@@ -58,12 +58,12 @@ export class ExplorationCreationService {
     this.explorationCreationBackendApiService.registerNewExploration()
       .then((response) => {
         this.siteAnalyticsService.registerCreateNewExplorationEvent(
-          response.exploration_id);
+          response.explorationId);
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href =
         this.urlInterpolationService.interpolateUrl(
           this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-            exploration_id: response.exploration_id
+            exploration_id: response.explorationId
           }
         );
         }, 150);
@@ -103,7 +103,7 @@ export class ExplorationCreationService {
           this.windowRef.nativeWindow.location.href =
           this.urlInterpolationService.interpolateUrl(
             this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-              exploration_id: data.exploration_id
+              exploration_id: data.explorationId
             }
           );
         }).fail((data) => {
