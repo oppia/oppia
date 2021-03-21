@@ -17,6 +17,8 @@
  * with protractor.
  */
 
+var _ = require('lodash');
+
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
@@ -39,7 +41,16 @@ var scrollToTop = async function() {
 
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
-var CONSOLE_ERRORS_TO_IGNORE = [];
+var CONSOLE_ERRORS_TO_IGNORE = [
+  // These are errors related to communicating with the Firebase emulator
+  // (localhost:9099), which would never occur in production.
+  _.escapeRegExp(
+    'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
+    'relyingparty/getAccountInfo?key=fake-api-key'),
+  _.escapeRegExp(
+    'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
+    'relyingparty/verifyPassword?key=fake-api-key'),
+];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);

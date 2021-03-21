@@ -52,11 +52,7 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(
-      ADMIN_URL, { waitUntil: networkIdle});
-    await page.waitForSelector('#admin', {visible: true});
-    await page.click('#admin');
-    await page.click('#submit-login');
+    await page.goto(ADMIN_URL, { waitUntil: networkIdle});
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, {visible: true});
