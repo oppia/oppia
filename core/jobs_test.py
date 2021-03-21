@@ -74,7 +74,7 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
         """Implements the reduce function. Must be declared @staticmethod.
 
         Args:
-            key:*. A key value as emitted from the map() fuction, above.
+            key: *. A key value as emitted from the map() fuction, above.
             values: list(*). a list of all values from all mappers that
                 were tagged with the given key.
 
@@ -110,7 +110,7 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
         """Implements the reduce function. Must be declared @staticmethod.
 
         Args:
-            key:*. A key value as emitted from the map() fuction, above.
+            key: *. A key value as emitted from the map() fuction, above.
             values: list(*). a list of all values from all mappers that 
                 were tagged with the given key.
 
@@ -146,7 +146,7 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
         """Implements the reduce function. Must be declared @staticmethod.
 
         Args:
-            key:*. A key value as emitted from the map() fuction, above.
+            key: *. A key value as emitted from the map() fuction, above.
             values: list(*). a list of all values from all mappers that 
                 were tagged with the given key.
 
@@ -336,8 +336,10 @@ class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _post_failure_hook(cls, job_id):
-        """Args:
-               job_id: str.The ID of the Job to enqueue.
+        """Post failure Hook.
+
+        Args:
+            job_id: str. The ID of the Job to enqueue.
         """
         model = MockSumModel.get_by_id(SUM_MODEL_ID)
         model.failed = True
@@ -692,7 +694,7 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
         """Implements the reduce function. Must be declared @staticmethod.
 
         Args:
-            key:*. A key value as emitted from the map() fuction, above.
+            key: *. A key value as emitted from the map() fuction, above.
             values: list(*). a list of all values from all mappers that 
                 were tagged with the given key.
 
@@ -773,8 +775,8 @@ class MockStartExplorationMRJobManager(
         """Implements the reduce function. Must be declared @staticmethod.
 
         Args:
-            key:*. A key value as emitted from the map() fuction, above.
-            stringified_values: str. Returns a string from JSON object
+            key: *. A key value as emitted from the map() fuction, above.
+            stringified_values: str. Returns a string from JSON object.
         """
         started_count = 0
         for value_str in stringified_values:
