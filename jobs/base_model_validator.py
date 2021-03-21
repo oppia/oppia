@@ -84,12 +84,6 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
             ModelInvalidCommitStatus. Error for commit_type validation.
         """
         model = jobs_utils.clone_model(input_model)
-        if model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE and (
-                not model.post_commit_is_private):
-            yield errors.ModelInvalidCommitStatusError(model)
-        if model.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC and (
-                model.post_commit_is_private):
-            yield errors.ModelInvalidCommitStatusError(model)
         expected_post_commit_is_private = (
             model.post_commit_status ==
             feconf.POST_COMMIT_STATUS_PRIVATE)
