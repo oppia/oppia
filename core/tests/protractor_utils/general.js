@@ -68,7 +68,7 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
       browserLog.level.value > CONSOLE_LOG_THRESHOLD &&
       errorsToIgnore.every(e => browserLog.message.match(e) === null));
   });
-  expect(fatalErrors).toHaveSize(0);
+  expect(fatalErrors).toEqual([]);
 };
 
 var isInDevMode = function() {
