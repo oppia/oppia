@@ -824,7 +824,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
                 layer.
             event_type: str. The event triggered by a student.
             exp_id: int. The experiment id.
-            unused_exp_version: int.The unused experiment version.
+            unused_exp_version: int. The unused experiment version.
             unused_state_name: str. The unused state name.
             unused_session_id: int. The unused session id.
             unused_params: list(*). Unused parameters.
