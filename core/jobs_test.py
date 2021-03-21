@@ -111,7 +111,7 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
 
         Args:
             key: *. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -147,7 +147,7 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key: *. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -397,7 +397,7 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -695,7 +695,7 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key: *. A key value as emitted from the map() fuction, above.
-            values: list(*). a list of all values from all mappers that 
+            values: list(*). a list of all values from all mappers that
                 were tagged with the given key.
 
         Yields:
@@ -1090,7 +1090,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
         def _mock_logging_function(msg, *args):
             """Mocks logging.error().
-            
+
             Args:
                 msg: str. The incomming message.
                 *args: list(*). Rest arguments.
@@ -1117,8 +1117,8 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
         def _mock_logging_function(msg, *args):
             """Mocks logging.error().
-            
-            Args:
+
+           Args:
                 msg: str. The incomming message.
                 *args: list(*). Rest of the arguments.
             """
