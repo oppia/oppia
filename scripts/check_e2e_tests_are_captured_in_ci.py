@@ -33,7 +33,7 @@ TEST_SUITES_NOT_RUN_IN_CI = [
     'featureGating', 'fileUploadExtensions', 'fileUploadFeatures', 'library',
     'navigation', 'playVoiceovers', 'preferences', 'profileFeatures',
     'profileMenu', 'publication', 'subscriptions', 'topicsAndSkillsDashboard',
-    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users',
+    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures',
     'topicAndStoryViewer', 'wipeout']
 
 
