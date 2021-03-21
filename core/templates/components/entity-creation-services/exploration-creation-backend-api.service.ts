@@ -21,22 +21,42 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface ExplorationResponse {
+interface ExplorationCreationBackendDict {
   'exploration_id': string
+}
+
+interface ExplorationCreationResponse {
+  explorationId: string
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationCreationBackendApiService {
-  constructor(
-    private http: HttpClient,
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  registerNewExploration(): Promise<ExplorationResponse> {
-    return this.http.post<ExplorationResponse>(
-      '/contributehandler/create_new', {
-      }).toPromise();
+  private _createExploration(
+      successCallback: (value: ExplorationCreationResponse) => void,
+      errorCallback: (reason: string) => void): void {
+    this.http.post<ExplorationCreationBackendDict>(
+      '/contributehandler/create_new', {}).toPromise()
+      .then(response => {
+        if (successCallback) {
+          successCallback({
+            explorationId: response.exploration_id
+          });
+        }
+      }, errorResponse => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error.error);
+        }
+      });
+  }
+
+  async registerNewExploration(): Promise<ExplorationCreationResponse> {
+    return new Promise((resolve, reject) => {
+      this._createExploration(resolve, reject);
+    });
   }
 }
 
