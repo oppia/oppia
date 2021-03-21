@@ -41,12 +41,6 @@ class MockModel(base_models.BaseModel):
     pass
 
 
-class BaseCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Base class for commit model error tests """
-
-    pass
-
-
 class BaseModelValidatorTests(unittest.TestCase):
 
     def setUp(self):
@@ -180,7 +174,7 @@ class ValidateModelIdTests(BaseModelValidatorTests):
 class ValidatePostCommitIsPrivateTests(BaseModelValidatorTests):
     def test_validate_post_commit_is_private_when_status_is_public(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            invalid_commit_status = BaseCommitLogEntryModel(
+            invalid_commit_status = base_models.BaseCommitLogEntryModel(
                 id='123',
                 created_on=self.year_ago,
                 last_updated=self.now,
@@ -205,7 +199,7 @@ class ValidatePostCommitIsPrivateTests(BaseModelValidatorTests):
 
     def test_validate_post_commit_is_private_when_status_is_private(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            invalid_commit_status = BaseCommitLogEntryModel(
+            invalid_commit_status = base_models.BaseCommitLogEntryModel(
                 id='123',
                 created_on=self.year_ago,
                 last_updated=self.now,
