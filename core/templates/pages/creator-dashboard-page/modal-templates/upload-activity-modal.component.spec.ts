@@ -34,7 +34,7 @@ class MockAlertsService {
   }
 }
 
-xdescribe('Upload Activity Modal Controller', () => {
+xdescribe('Upload Activity Modal Component', () => {
   let component: UploadActivityModalComponent;
   let fixture: ComponentFixture<UploadActivityModalComponent>;
   let alertsService: AlertsService;

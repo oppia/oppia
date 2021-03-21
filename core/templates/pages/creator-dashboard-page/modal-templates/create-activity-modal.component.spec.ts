@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CreateActivityModalComponent.
  */
 
-import { ComponentFixture, TestBed, fakeAsync } from
+import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
@@ -24,6 +24,8 @@ import { CreateActivityModalComponent } from './create-activity-modal.component'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Pipe } from '@angular/core';
+import { UserService } from 'services/user.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -56,6 +58,7 @@ describe('Create Activity Modal Component', () =>{
   let collectionCreationService: CollectionCreationService;
   let explorationCreationService: ExplorationCreationService;
   let ngbActiveModal: NgbActiveModal;
+  let userService: UserService;
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
@@ -81,6 +84,27 @@ describe('Create Activity Modal Component', () =>{
     ngbActiveModal = TestBed.get(NgbActiveModal);
     explorationCreationService = TestBed.get(ExplorationCreationService);
     collectionCreationService = TestBed.get(CollectionCreationService);
+    userService = TestBed.get(UserService);
+  }));
+
+  it('should check if user is logged in or not', fakeAsync(() => {
+    const UserInfoObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject))
+    );
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.canCreateCollections).toBe(true);
   }));
 
   it('should evalute component properties after controller is initialized',

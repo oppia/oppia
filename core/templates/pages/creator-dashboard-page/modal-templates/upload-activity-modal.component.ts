@@ -31,10 +31,10 @@ export class UploadActivityModalComponent {
      private activeModal: NgbActiveModal
   ) {}
   save(): void {
-    var returnObj = {
+    let returnObj = {
       yamlFile: null
     };
-    var file = (
+    let file = (
        <HTMLInputElement>document.getElementById('newFileInput')
     ).files[0];
     if (!file || !file.size) {
@@ -43,6 +43,7 @@ export class UploadActivityModalComponent {
     }
     returnObj.yamlFile = file;
   }
+
   cancel(): void {
     this.activeModal.dismiss();
   }

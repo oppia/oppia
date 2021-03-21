@@ -357,6 +357,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'unicode-string-editor.directive.ts',
     'unit-test-utils.ts', # Please don't try to cover this file.
     'url-interpolation.service.ts',
+    'upload-activity-modal.component.ts',
     'utils.service.ts',
     'version-diff-visualization.directive.ts',
     'version-tree.service.ts',
