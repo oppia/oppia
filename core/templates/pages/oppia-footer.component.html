@@ -2,7 +2,7 @@
   <div class="oppia-footer-container">
     <div class="row row-cols-2">
       <div class="col">
-        <h4 [innerHTML]="'I18N_FOOTER_ABOUT_ALL_CAPS' | translate"></h4>
+        <h3 [innerHTML]="'I18N_FOOTER_ABOUT_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
             <a href="/about"
@@ -32,7 +32,7 @@
         </ul>
       </div>
       <div class="col">
-        <h4 [innerHTML]="'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate"></h4>
+        <h3 [innerHTML]="'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
             <a href="/get-started"
@@ -41,12 +41,12 @@
             </a>
           </li>
           <li>
-            <a href="/creator-guidelines"
+            <a href="/creator-guidelines" aria-label="Creator Guidelines"
                [innerHTML]="'I18N_PLAYBOOK_HEADING' | translate">
             </a>
           </li>
           <li>
-            <a href="/teach"
+            <a href="/teach" aria-label="Teach"
                [innerHTML]="'I18N_FOOTER_TEACH_PAGE' | translate">
             </a>
           </li>
@@ -63,7 +63,7 @@
         </ul>
       </div>
       <div class="col">
-        <h4 [innerHTML]="'I18N_FOOTER_CONTRIBUTE_ALL_CAPS' | translate"></h4>
+        <h3 [innerHTML]="'I18N_FOOTER_CONTRIBUTE_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
             <a href="https://oppiafoundation.org/volunteer"
@@ -98,7 +98,7 @@
         </ul>
       </div>
       <div class="col">
-        <h4><span [innerHTML]="'I18N_LANGUAGE_FOOTER_VIEW_IN' | translate"></span></h4>
+        <h3><span [innerHTML]="'I18N_LANGUAGE_FOOTER_VIEW_IN' | translate"></span></h3>
         <oppia-i18n-footer></oppia-i18n-footer>
         <social-buttons></social-buttons>
       </div>
