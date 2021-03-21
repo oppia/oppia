@@ -103,6 +103,51 @@ class ModelInvalidIdError(ModelValidationError):
         return self._message
 
 
+class ModelDomainObjectValidateError(ModelValidationError):
+    """Error class for domain object validation errors."""
+
+    def __init__(self, model, error_message):
+        super(ModelDomainObjectValidateError, self).__init__(model)
+        self._message = (
+            'Entity id %s: Entity fails domain validation with the '
+            'error %s' % (model.id, error_message))
+
+    @property
+    def message(self):
+        return self._message
+
+
+class IdsInModelFieldValidationError(ModelValidationError):
+    """Error class for domain object validation errors."""
+
+    def __init__(self, model, error_message):
+        super(IdsInModelFieldValidationError, self).__init__(model)
+        self._message = (
+            'Entity id %s: Entity fails validation of ids in fields with the '
+            'error %s' % (model.id, error_message))
+
+    @property
+    def message(self):
+        return self._message
+
+
+class ModelFieldCheckValidateError(ModelValidationError):
+    """Error class for field check validation errors."""
+
+    def __init__(self, item, field_name, model_id, model_class):
+        super(ModelFieldCheckValidateError, self).__init__(item)
+        self._message = (
+            'Entity id %s: based on field %s having'
+            ' value %s, expected model %s with id %s but it '
+            'doesn\'t exist' % (
+                item.id, field_name, model_id,
+                model_class.__name__, model_id))
+
+    @property
+    def message(self):
+        return self._message
+
+
 class ModelExpiredError(ModelValidationError):
     """Error class for stale deletion validation errors."""
 
