@@ -63,7 +63,7 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            One might yield (exploration.id, 1).
+            str. One might yield (exploration.id, 1).
         """
         current_class = MockJobManagerOne
         if current_class.entity_created_before_job_queued(item):
@@ -75,9 +75,9 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-            values : list(*). a list of all values from all mappers that were
-                tagged with the given key.
-        
+                values : list(*). a list of all values from all mappers that were
+                    tagged with the given key.
+
         Yields:
             It will yield a string value.
         """
@@ -93,20 +93,29 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """Args:
-               item:*.A single element of type given by entity_class().
-        """
+        """Implements the map function. Must be declared @staticmethod.
 
+        Args:
+            item: *. A single element of type given by entity_class().
+
+        Yields:
+            str. One might yield (exploration.id, 1).
+        """
         current_class = MockJobManagerTwo
         if current_class.entity_created_before_job_queued(item):
             yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
-        """Args :
-               key:*. A key value as emitted from the map() fuction, above.
-               values : list(*). a list of all values from all mappers that were
-                tagged with the given key.
+        """Implements the reduce function. Must be declared @staticmethod.
+
+        Args:
+            key:*. A key value as emitted from the map() fuction, above.
+                values : list(*). a list of all values from all mappers that were
+                    tagged with the given key.
+
+        Yields:
+            It will yield a string value.
         """
 
         yield (key, sum([int(value) for value in values]))
@@ -120,22 +129,30 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """Args:
-               item:*.A single element of type given by entity_class().
-        """
+        """Implements the map function. Must be declared @staticmethod.
 
+        Args:
+            item: *. A single element of type given by entity_class().
+
+        Yields:
+            str. One might yield (exploration.id, 1).
+        """
         current_class = MockFailingJobManager
         if current_class.entity_created_before_job_queued(item):
             yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
-        """Args :
-               key:*. A key value as emitted from the map() fuction, above.
-               values : list(*). a list of all values from all mappers that were
-                tagged with the given key.
-        """
+        """Implements the reduce function. Must be declared @staticmethod.
 
+        Args:
+            key:*. A key value as emitted from the map() fuction, above.
+                values : list(*). a list of all values from all mappers that were
+                    tagged with the given key.
+
+        Yields:
+            It will yield a string value.
+        """
         yield (key, sum([int(value) for value in values]))
 
 
@@ -360,8 +377,13 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """Args:
-               item: *.A single element of the type given by entity_class().
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: *. A single element of type given by entity_class().
+
+        Yields:
+            str. One might yield (exploration.id, 1).
         """
         current_class = SampleMapReduceJobManager
         if current_class.entity_created_before_job_queued(item):
@@ -369,10 +391,15 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, values):
-        """Args:
-               key:*.A key value as emitted from the map() fuction , above.
-               values :list(*).A list of all values from all mappers that were
-            tagged with the given key.
+        """Implements the reduce function. Must be declared @staticmethod.
+
+        Args:
+            key:*. A key value as emitted from the map() fuction, above.
+                values : list(*). a list of all values from all mappers that were
+                    tagged with the given key.
+
+        Yields:
+            It will yield a string value.
         """
         yield (key, sum([int(value) for value in values]))
 
@@ -386,10 +413,14 @@ class MapReduceJobForCheckingParamNames(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        """Args:
-               item: *.A single element of the type given by entity_class().
-        """
+        """Implements the map function. Must be declared @staticmethod.
 
+        Args:
+            item: *. A single element of type given by entity_class().
+
+        Yields:
+            str. One might yield (exploration.id, 1).
+        """
         jobs.BaseMapReduceOneOffJobManager.get_mapper_param('exp_id')
 
 
@@ -649,20 +680,28 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """Args:
-               item: *.A single element of the type given by entity_class().
-        """
+        """Implements the map function. Must be declared @staticmethod.
 
+        Args:
+            item: *. A single element of type given by entity_class().
+
+        Yields:
+            str. One might yield (exploration.id, 1).
+        """
         yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
-        """Args:
-               key:*.A key value as emitted from map() fuction , above.
-               values:list(*).A list of all values from all mappers that were
-                tagged with the given key;
-        """
+        """Implements the reduce function. Must be declared @staticmethod.
 
+        Args:
+            key:*. A key value as emitted from the map() fuction, above.
+                values : list(*). a list of all values from all mappers that were
+                    tagged with the given key.
+
+        Yields:
+            It will yield a string value.
+        """
         yield [key, sum([int(value) for value in values])]
 
 
@@ -717,8 +756,13 @@ class MockStartExplorationMRJobManager(
 
     @staticmethod
     def map(item):
-        """Args :
-               item:*.A single element of type given by entity_class().
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: *. A single element of type given by entity_class().
+
+        Yields:
+            str. One might yield (exploration.id, 1).
         """
         current_class = MockStartExplorationMRJobManager
         if current_class.entity_created_before_job_queued(item):
@@ -729,9 +773,15 @@ class MockStartExplorationMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Args:
-               key: *. A key value as emitted from map() fuction, above.
-               stringified_values: list(*). All the Stringified value strings.
+        """Implements the reduce function. Must be declared @staticmethod.
+
+        Args:
+            key:*. A key value as emitted from the map() fuction, above.
+                values : list(*). a list of all values from all mappers that were
+                    tagged with the given key.
+
+        Yields:
+            It will yield a string value.
         """
         started_count = 0
         for value_str in stringified_values:
@@ -772,10 +822,12 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             cls, active_realtime_layer, event_type, exp_id, unused_exp_version,
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
-        """Args:
-               active_realtime_layer:int.The currently active realtime datastore
+        """
+
+        Args:
+            active_realtime_layer: int. The currently active realtime datastore
                 layer.
-               event_type :str.The event triggered by a student.
+            event_type: str. The event triggered by a student.
 
         """
 
