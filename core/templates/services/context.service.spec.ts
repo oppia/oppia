@@ -167,12 +167,12 @@ describe('Context service', () => {
       });
 
     it('should correctly affirm that page contains reference to skills',
-    () => {
-      expect(ecs.getPageContext()).toBe('editor');
-      expect(ecs.canEntityReferToSkills()).toBe(false);
-      ecs.setExplorationIsLinkedToStory();
-      expect(ecs.canEntityReferToSkills()).toBe(true);
-    });
+      () => {
+        expect(ecs.getPageContext()).toBe('editor');
+        expect(ecs.canEntityReferToSkills()).toBe(false);
+        ecs.setExplorationIsLinkedToStory();
+        expect(ecs.canEntityReferToSkills()).toBe(true);
+      });
   });
 
   describe('behavior in the topic editor view', () => {
@@ -236,7 +236,7 @@ describe('Context service', () => {
       spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
 
       expect(ecs.getEntityType()).toBe('question');
-      expect(ecs.getEntityId()).toBe('questionId');  
+      expect(ecs.getEntityId()).toBe('questionId');
     });
 
     it('should correctly affirm that page contains reference to skills',
@@ -245,7 +245,7 @@ describe('Context service', () => {
         expect(ecs.getPageContext()).toBe('skill_editor');
         expect(ecs.canEntityReferToSkills()).toBe(true);
       });
-    
+
     it('should affirm the page context to be exploration player or editor',
       ()=> {
         expect(ecs.isInExplorationContext()).toBe(false);
@@ -282,12 +282,12 @@ describe('Context service', () => {
       () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
-    
+
     it('should correctly affirm that page contains reference to skills',
-    () => {
-      expect(ecs.getPageContext()).toBe('story_editor');
-      expect(ecs.canEntityReferToSkills()).toBe(false);
-    });
+      () => {
+        expect(ecs.getPageContext()).toBe('story_editor');
+        expect(ecs.canEntityReferToSkills()).toBe(false);
+      });
   });
 
   describe('behavior in the skill editor view', () => {
@@ -319,12 +319,12 @@ describe('Context service', () => {
       () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
-    
+
     it('should correctly affirm that page contains reference to skills',
-    () => {
-      expect(ecs.getPageContext()).toBe('skill_editor');
-      expect(ecs.canEntityReferToSkills()).toBe(true);
-    });
+      () => {
+        expect(ecs.getPageContext()).toBe('skill_editor');
+        expect(ecs.canEntityReferToSkills()).toBe(true);
+      });
   });
 
   describe('behavior in different pages', () => {
