@@ -39,11 +39,12 @@ var scrollToTop = async function() {
   await browser.executeScript('window.scrollTo(0,0);');
 };
 
-// We will report all console logs of level greater than this.
+// The minimum log level we will report as an error.
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [
-  // These are errors related to communicating with the Firebase emulator
-  // (localhost:9099), which would never occur in production.
+  // These "localhost:9099" are errors related to communicating with the
+  // Firebase emulator, which would never occur in production, so we just ignore
+  // them.
   _.escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
     'relyingparty/getAccountInfo?key=fake-api-key'),
@@ -53,32 +54,21 @@ var CONSOLE_ERRORS_TO_IGNORE = [
 ];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {
-  var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
-  var browserLogs = await browser.manage().logs().get('browser');
-  var fatalErrors = [];
+  errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
   if (browser.isMobile) {
-    browserLogs = browserLogs.filter(function(browserLog) {
-      return !(browserLog.message.includes(' Slow network is detected.'));
-    });
+    errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
-  for (var i = 0; i < browserLogs.length; i++) {
-    if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
-      var errorFatal = true;
-      for (var j = 0; j < irrelevantErrors.length; j++) {
-        if (browserLogs[i].message.match(irrelevantErrors[j])) {
-          errorFatal = false;
-        }
-      }
-      if (errorFatal) {
-        fatalErrors.push(browserLogs[i]);
-      }
-    }
-  }
-  expect(fatalErrors).toEqual([]);
+  const browserLogs = await browser.manage().logs().get('browser');
+  const fatalErrors = browserLogs.filter(browserLog => {
+    return (
+      browserLog.level.value > CONSOLE_LOG_THRESHOLD &&
+      errorsToIgnore.every(e => browserLog.message.match(e) === null));
+  });
+  expect(fatalErrors).toHaveSize(0);
 };
 
 var isInDevMode = function() {

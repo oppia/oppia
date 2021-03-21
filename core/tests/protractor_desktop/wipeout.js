@@ -16,8 +16,6 @@
  * @fileoverview End-to-end tests for wipeout.
  */
 
-var _ = require('lodash');
-
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -44,8 +42,7 @@ describe('When account is deleted it', function() {
       // login to a disabled user, the Firebase SDK emits an error log. We
       // cannot suppress the error without patching the library, so instead we
       // just ignore it here.
-      _.escapeRegExp(
-        'Uncaught t: The user account has been disabled by an administrator.'),
+      'The user account has been disabled by an administrator',
     ];
   });
 
