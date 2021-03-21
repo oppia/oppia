@@ -146,6 +146,7 @@ describe('Editable story backend API service', () => {
       expect(failHandler).toHaveBeenCalledWith('Error loading story 2.');
     }
     ));
+
   it('should update a story after fetching it from the backend',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
@@ -186,6 +187,7 @@ describe('Editable story backend API service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     }
     ));
+
   it('should use the rejection handler if the story to update doesn\'t exist',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
@@ -211,6 +213,7 @@ describe('Editable story backend API service', () => {
         'Story with given id doesn\'t exist.');
     }
     ));
+
   it('should publish a story', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');

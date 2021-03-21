@@ -167,7 +167,6 @@ describe('Question opportunities component', function() {
     expect($uibModal.open).not.toHaveBeenCalled();
   });
 
-
   it('should open select skill and skill difficulty modal when clicking' +
     ' on suggesting question button', function() {
     spyOn($uibModal, 'open').and.callThrough();

@@ -297,7 +297,6 @@ privateCollectionRightsObject;
     });
   });
 
-
   it('should return the last collection rights loaded as the same object',
     () => {
       let previousCollectionRights = (
@@ -362,7 +361,6 @@ privateCollectionRightsObject;
       expect(actualCollectionRights).not.toBe(expectedCollectionRights);
     }
   );
-
 
   it('should fire an update event after setting the new collection',
     () => {

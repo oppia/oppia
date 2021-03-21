@@ -47,10 +47,12 @@ describe('Preview Summary Tile Modal Controller', function() {
     ExplorationTitleService.init('Exploration Title');
     expect($scope.getExplorationTitle()).toBe('Exploration Title');
   });
+
   it('should get exploration objective', function() {
     ExplorationObjectiveService.init('Exploration Objective');
     expect($scope.getExplorationObjective()).toBe('Exploration Objective');
   });
+
   it('should get exploration category', function() {
     ExplorationCategoryService.init('Exploration Category');
     expect($scope.getExplorationCategory()).toBe('Exploration Category');

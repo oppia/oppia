@@ -59,7 +59,6 @@ describe('SidebarStatusService', () => {
     expect(sss.isSidebarShown()).toBe(false);
   });
 
-
   it('should falsify pendingSidebarClick on document click', () => {
     sss.openSidebar();
     sss.onDocumentClick();

@@ -204,7 +204,6 @@ describe('Exploration translation and voiceover tab', function() {
       await users.logout();
     });
 
-
   it('should change translation language correctly', async function() {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();

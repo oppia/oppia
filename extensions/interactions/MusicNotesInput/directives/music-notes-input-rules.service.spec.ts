@@ -614,6 +614,7 @@ describe('Music Notes Input rules service', () => {
       })).toBe(false);
     }
   );
+
   it('should have a correct \'is longer than\' rule', () => {
     expect(mnirs.IsLongerThan([{
       readableNoteName: 'A4',
@@ -653,6 +654,7 @@ describe('Music Notes Input rules service', () => {
       k: 5
     })).toBe(false);
   });
+
   it('should have a correct \'has length inclusively between\' rule',
     () => {
       expect(mnirs.HasLengthInclusivelyBetween([{

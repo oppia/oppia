@@ -50,6 +50,7 @@ describe('Collection Permissions Card component', () => {
     ctrl.$onInit();
     expect(getCollectionRights).toHaveBeenCalled();
   });
+
   it('should check if the collections have been loaded.', () => {
     ctrl.hasPageLoaded();
     expect(hasLoadedCollection).toHaveBeenCalled();

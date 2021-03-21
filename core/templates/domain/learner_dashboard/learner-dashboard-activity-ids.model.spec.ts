@@ -50,7 +50,6 @@ describe('Learner dashboard activity ids model', () => {
     expect(learnerDashboardActivityIds.includesActivity('14')).toEqual(false);
   });
 
-
   it('should add exploration to learner playlist', () => {
     var learnerDashboardActivityIds = (
       LearnerDashboardActivityIds.createFromBackendDict(

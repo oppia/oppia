@@ -117,6 +117,7 @@ describe('Build line templates', function() {
     ).toThrowError(
       'p yields a boolean but you are trying to use it to give a element.');
   });
+
   describe('Build mistake entry', function() {
     var buildThenDisplay = function(nameString, occursString, messageStrings) {
       return logicProofTeacher2.displayMistakeEntry(

@@ -98,6 +98,7 @@ describe('Pre-parse lines', function() {
       errorWrapper(preParse, 'from p and p{q we see q', false)
     ).toThrowError('The symbol { was not recognised.');
   });
+
   describe('Parse lines', function() {
     var parse = function(lineString, isTemplate) {
       return logicProofShared.parseLineString(

@@ -523,7 +523,6 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(PREFERENCES_URL);
     });
 
-
   it('should test the action shortcuts in library page',
     async function() {
       // Should test the skip to main content shortcut.

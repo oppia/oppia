@@ -182,6 +182,7 @@ describe('Topics and Skills Dashboard Page', function() {
       ctrl.toggleFilterBox();
       expect(ctrl.filterBoxIsShown).toEqual(false);
     });
+
     it('should go to Page Number', function() {
       expect(ctrl.topicPageNumber).toEqual(0);
       expect(ctrl.pageNumber).toEqual(0);

@@ -978,7 +978,6 @@ describe('State translation component', function() {
       expect($scope.isDisabled('hint')).toBe(true);
     });
 
-
     it('should evaluate solution tab as disabled', function() {
       expect($scope.isDisabled('solution')).toBe(true);
     });

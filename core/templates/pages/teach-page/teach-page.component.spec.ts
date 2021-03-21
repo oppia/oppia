@@ -115,6 +115,7 @@ describe('Teach Page', () => {
     () => {
       expect(component).toBeDefined();
     });
+
   it('should get static image url', function() {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
@@ -175,7 +176,6 @@ describe('Teach Page', () => {
     expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalled();
   });
-
 
   it('should record analytics when Browse Library is clicked', function() {
     spyOn(

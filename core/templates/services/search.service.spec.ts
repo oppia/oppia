@@ -75,6 +75,7 @@ describe('Search Service', () => {
         Mathematics: true
       });
     });
+
     it('should find one category and two languages if given in url search',
       () => {
         urlComponent = '?q=test&category=("Mathematics")&' +
@@ -90,6 +91,7 @@ describe('Search Service', () => {
         });
       }
     );
+
     it('should find one category and one language if given in url search',
       () => {
         urlComponent =
@@ -104,6 +106,7 @@ describe('Search Service', () => {
         });
       }
     );
+
     it('should find no categories and one language if given in url search',
       () => {
         urlComponent = '?q=test&language_code=("en")';

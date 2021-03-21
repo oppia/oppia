@@ -472,6 +472,7 @@ describe('Match expression to expression template', function() {
       'This line could not be identified as valid - please check the list ' +
       'of possible lines.');
   });
+
   describe('Substitute into expression', function() {
     it('should substitute examples correctly', function() {
       expect(
@@ -703,6 +704,7 @@ describe('Match expression to expression template', function() {
         ' the line, but this line starts with an odd number of spaces.'
       );
     });
+
     describe('Build, validate and display proof', function() {
       var displayProof = function(proof, operators) {
         var output = [];
@@ -765,6 +767,7 @@ describe('Match expression to expression template', function() {
             'The conclusion you are allowed to make here is \'From' +
             ' a and b we have a\u2227b\'.', 1, 'and_introduce_e4', 'line'));
       });
+
       describe('Check proof makes no mistakes from the mistake table',
         function() {
           var testCheck = function(proofString) {
