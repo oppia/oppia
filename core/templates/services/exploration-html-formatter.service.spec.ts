@@ -30,7 +30,7 @@ import { SubtitledHtml } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-describe('Exploration Html Formatter Service', () => {
+fdescribe('Exploration Html Formatter Service', () => {
   let ehfs: ExplorationHtmlFormatterService = null;
   let sof, solution;
 
@@ -87,7 +87,7 @@ describe('Exploration Html Formatter Service', () => {
       var interactionId = 'TextInput';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-text-input ' +
-        'last-answer="null" label-for-focus-target="' + focusLabel + '">' +
+        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
         '</oppia-interactive-text-input>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, null)
@@ -99,9 +99,8 @@ describe('Exploration Html Formatter Service', () => {
       var interactionId = 'TextInput';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-text-input ' +
-        'last-answer="null" ' +
         'saved-solution="&quot;This is a correct answer!&quot;" ' +
-        'label-for-focus-target="' + focusLabel + '">' +
+        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
         '</oppia-interactive-text-input>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, solution)

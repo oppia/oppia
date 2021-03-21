@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('TrainingDataEditorPanelServiceModalController', function() {
+fdescribe('TrainingDataEditorPanelServiceModalController', function() {
   importAllAngularServices();
 
   var $scope = null;
@@ -181,7 +181,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         expect($scope.answerGroupHasNonEmptyRules).toBe(true);
         expect($scope.inputTemplate).toBe(
           '<oppia-interactive-text-input ' +
-          'last-answer="null" label-for-focus-target="testInteractionInput">' +
+          'label-for-focus-target="testInteractionInput" last-answer="null">' +
           '</oppia-interactive-text-input>');
       });
 
