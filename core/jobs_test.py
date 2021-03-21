@@ -63,7 +63,7 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            str. One might yield (exploration.id, 1).
+            int. It will yield a integer value.
         """
         current_class = MockJobManagerOne
         if current_class.entity_created_before_job_queued(item):
@@ -75,11 +75,11 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-                values : list(*). a list of all values from all mappers that were
-                    tagged with the given key.
+            values : list(*). a list of all values from all mappers that 
+                were tagged with the given key.
 
         Yields:
-            It will yield a string value.
+            str. It will yield a Json string.
         """
         yield (key, sum([int(value) for value in values]))
 
@@ -99,7 +99,7 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            str. One might yield (exploration.id, 1).
+            int. It will yield a integer value.
         """
         current_class = MockJobManagerTwo
         if current_class.entity_created_before_job_queued(item):
@@ -111,11 +111,11 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-                values : list(*). a list of all values from all mappers that were
-                    tagged with the given key.
+            values : list(*). a list of all values from all mappers that 
+                were tagged with the given key.
 
         Yields:
-            It will yield a string value.
+            str. It will yield a string value.
         """
 
         yield (key, sum([int(value) for value in values]))
@@ -135,7 +135,7 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            str. One might yield (exploration.id, 1).
+            int. One might yield (exploration.id, 1).
         """
         current_class = MockFailingJobManager
         if current_class.entity_created_before_job_queued(item):
@@ -147,11 +147,11 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-                values : list(*). a list of all values from all mappers that were
-                    tagged with the given key.
+            values : list(*). a list of all values from all mappers that 
+                were tagged with the given key.
 
         Yields:
-            It will yield a string value.
+            str. It will yield a string value.
         """
         yield (key, sum([int(value) for value in values]))
 
@@ -395,11 +395,11 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-                values : list(*). a list of all values from all mappers that were
-                    tagged with the given key.
+            values : list(*). a list of all values from all mappers that 
+                were tagged with the given key.
 
         Yields:
-            It will yield a string value.
+            str. It will yield a string value.
         """
         yield (key, sum([int(value) for value in values]))
 
@@ -417,9 +417,6 @@ class MapReduceJobForCheckingParamNames(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             item: *. A single element of type given by entity_class().
-
-        Yields:
-            str. One might yield (exploration.id, 1).
         """
         jobs.BaseMapReduceOneOffJobManager.get_mapper_param('exp_id')
 
@@ -696,11 +693,11 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-                values : list(*). a list of all values from all mappers that were
-                    tagged with the given key.
+            values : list(*). a list of all values from all mappers that 
+                were tagged with the given key.
 
         Yields:
-            It will yield a string value.
+            str. It will yield a string value.
         """
         yield [key, sum([int(value) for value in values])]
 
@@ -777,11 +774,7 @@ class MockStartExplorationMRJobManager(
 
         Args:
             key:*. A key value as emitted from the map() fuction, above.
-                values : list(*). a list of all values from all mappers that were
-                    tagged with the given key.
-
-        Yields:
-            It will yield a string value.
+            stringified_values : str. Returns a string from JSON object
         """
         started_count = 0
         for value_str in stringified_values:
@@ -822,13 +815,18 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             cls, active_realtime_layer, event_type, exp_id, unused_exp_version,
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
-        """
+        """Records incoming events in the given realtime layer.
 
         Args:
             active_realtime_layer: int. The currently active realtime datastore
                 layer.
             event_type: str. The event triggered by a student.
-
+            exp_id: int. The experiment id.
+            unused_exp_version: float .The unused experiment version.
+            unused_state_name: str. The unused state name.
+            unused_session_id: int. The unused session id.
+            unused_params: list(*). Unused parameters.
+            unused_play_type: *. Unsed play type.
         """
 
         @transaction_services.run_in_transaction_wrapper
@@ -1090,9 +1088,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
         def _mock_logging_function(msg, *args):
             """Mocks logging.error().
+            
             Args:
-                msg:str.The incomming message.
-                *args:list(*).
+                msg: str. The incomming message.
+                *args: list(*). Rest arguments.
             """
             observed_log_messages.append(msg % args)
 
@@ -1116,9 +1115,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
         def _mock_logging_function(msg, *args):
             """Mocks logging.error().
-                Args:
-                msg:str.The incomming message.
-                *args:list(*).
+            
+            Args:
+                msg: str. The incomming message.
+                *args: list(*). Rest of the arguments.
             """
             observed_log_messages.append(msg % args)
 
