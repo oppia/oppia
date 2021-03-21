@@ -17,7 +17,6 @@
  */
 
 import { Component } from '@angular/core';
-
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
