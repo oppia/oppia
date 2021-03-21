@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-fdescribe('TrainingDataEditorPanelServiceModalController', function() {
+describe('TrainingDataEditorPanelServiceModalController', function() {
   importAllAngularServices();
 
   var $scope = null;

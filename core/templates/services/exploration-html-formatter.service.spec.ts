@@ -30,7 +30,7 @@ import { SubtitledHtml } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-fdescribe('Exploration Html Formatter Service', () => {
+describe('Exploration Html Formatter Service', () => {
   let ehfs: ExplorationHtmlFormatterService = null;
   let sof, solution;
 

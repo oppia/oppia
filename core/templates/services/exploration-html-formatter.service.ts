@@ -76,6 +76,9 @@ export class ExplorationHtmlFormatterService {
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
     if (savedSolution) {
+      // TODO(#12292): Refactor this once all interactions have been migrated to
+      // Angular 2+, such that we don't need to parse the string in the
+      // interaction directives/components.
       element.attr(
         'saved-solution', JSON.stringify(savedSolution.correctAnswer));
     }
