@@ -49,9 +49,7 @@ def mock_validate(unused_self):
 
 
 def start_multiple_item_interaction_lt_one_off_job(self, job_class):
-    """Helper function to start MultipleItemInteractionLtOneOffJob
-    Job
-    """
+    """Helper function to start MultipleItemInteractionLtOneOffJob."""
     job_id = job_class.create_new()
     job_class.enqueue(job_id)
     self.process_and_flush_pending_mapreduce_tasks()
@@ -782,7 +780,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
 
-    def test_expID_len_pairs_are_produced_only_for_desired_interactions(self):
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for multiple choice
         interactions having choices length less than 30.
         """
