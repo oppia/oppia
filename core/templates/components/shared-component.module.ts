@@ -170,6 +170,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
     TruncateAndCapitalizePipe,
+    TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
