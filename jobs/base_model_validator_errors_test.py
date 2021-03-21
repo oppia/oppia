@@ -34,12 +34,6 @@ class MockModel(base_models.BaseModel):
     pass
 
 
-class BaseCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Base class for commit model validator tests """
-
-    pass
-
-
 class ValidatorErrorTestBase(unittest.TestCase):
     """Base class for validator error tests."""
 
@@ -172,7 +166,7 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
 
 class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
     def test_model_invalid_commit_status(self):
-        model1 = BaseCommitLogEntryModel(
+        model1 = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.year_ago,
             last_updated=self.now,
@@ -182,7 +176,7 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
             post_commit_is_private=False,
             commit_cmds=[])
         error1 = errors.ModelInvalidCommitStatusError(model1)
-        model2 = BaseCommitLogEntryModel(
+        model2 = base_models.BaseCommitLogEntryModel(
             id=124,
             created_on=self.year_ago,
             last_updated=self.now,
