@@ -80,6 +80,13 @@ var roleSelect = '.protractor-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {
+  page.on('dialog', async dialog => {
+    if (dialog.message() === 'Please enter the email address to sign-in with') {
+      await dialog.accept('testadmin@example.com');
+    } else {
+      await dialog.dismiss();
+    }
+  });
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -278,13 +285,6 @@ const main = async function() {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
-  page.on('dialog', async dialog => {
-    if (dialog.message() === 'Please enter the email address to sign-in with') {
-      await dialog.accept('testadmin@example.com');
-    } else {
-      await dialog.dismiss();
-    }
-  });
   await page.setViewport({
     width: 1920,
     height: 1080
