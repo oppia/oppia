@@ -112,7 +112,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         # Check whether there is space around attributes.
         # An = is followed either by " or {.
-        tag_substrings = starttag_text.split(' ')
+        tag_substrings = filter(
+            lambda sub_string: sub_string, starttag_text.split(' '))
         required_attribute_suffix = ['"', '{']
         conditional_statement_chars = ['=', '>', '<', '!']
         for key, value in enumerate(tag_substrings):
