@@ -95,21 +95,6 @@ class SeedFirebaseHandler(webapp2.RequestHandler):
             self.redirect('/')
 
 
-class LogoutPage(webapp2.RequestHandler):
-    """Class which handles the logout URL."""
-
-    def get(self):
-        """Logs the user out, and returns them to a specified follow-up
-        page (or the home page if no follow-up page is specified).
-        """
-
-        auth_services.destroy_auth_session(self.response)
-        url_to_redirect_to = (
-            python_utils.convert_to_bytes(
-                self.request.get('redirect_url', '/')))
-        self.redirect(url_to_redirect_to)
-
-
 class UserFacingExceptions(python_utils.OBJECT):
     """This class contains all the exception class definitions used."""
 

@@ -20,26 +20,8 @@ import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } fr
 import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { MockWindowRef } from 'tests/unit-test-utils';
 import { LoginPageComponent } from './login-page.component';
-
-class MockWindowRef {
-  constructor(
-      public location: string = null, public searchParams: string = '') {}
-
-  get nativeWindow() {
-    const that = this;
-    return {
-      location: {
-        get search() {
-          return that.searchParams;
-        },
-        assign: (url: string) => {
-          that.location = url;
-        },
-      }
-    };
-  }
-}
 
 class PendingPromise<T = void> {
   public readonly promise: Promise<T>;

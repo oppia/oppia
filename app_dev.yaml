@@ -197,6 +197,17 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+- url: /logout
+  static_files: webpack_bundles/logout-page.mainpage.html
+  upload: webpack_bundles/logout-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
 - url: /creator-guidelines
   static_files: webpack_bundles/playbook.mainpage.html
   upload: webpack_bundles/playbook.mainpage.html

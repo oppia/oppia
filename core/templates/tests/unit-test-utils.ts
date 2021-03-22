@@ -159,3 +159,22 @@ export const setupAndGetUpgradedComponent = (
     platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
     () => multiTrim(element.textContent));
 };
+
+export class MockWindowRef {
+  constructor(
+      public location: string = null, public searchParams: string = '') {}
+
+  get nativeWindow() {
+    const that = this;
+    return {
+      location: {
+        get search() {
+          return that.searchParams;
+        },
+        assign: (url: string) => {
+          that.location = url;
+        },
+      }
+    };
+  }
+}

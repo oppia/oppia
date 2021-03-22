@@ -809,7 +809,6 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.VerifyUserModelsDeletedHandler),
     get_redirect_route(r'/deleteuserhandler', admin.DeleteUserHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
-    get_redirect_route(r'/logout', base.LogoutPage),
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
     get_redirect_route(r'/session_end', base.SessionEndHandler),
