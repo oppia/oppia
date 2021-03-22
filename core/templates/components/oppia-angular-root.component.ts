@@ -61,8 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
-import { createCustomElement } from '@angular/elements';
+import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -76,8 +75,6 @@ import { ReviewTestBackendApiService } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { TranslateService } from 'services/translate.service';
-import { NoninteractiveCollapsible } from 'interactions/../rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
-import { NoninteractiveVideo } from 'interactions/../rich_text_components/Video/directives/oppia-noninteractive-video.component';
 @Component({
   selector: 'oppia-angular-root',
   template: ''
@@ -96,25 +93,13 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    injector: Injector,
     private pageTitleService: PageTitleService,
     private profilePageBackendApiService: ProfilePageBackendApiService,
     private ratingComputationService: RatingComputationService,
     private reviewTestBackendApiService: ReviewTestBackendApiService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private translateService: TranslateService,
-  ) {
-    // Convert `PopupComponent` to a custom element.
-    const NoninteractiveCollapsibleElement = createCustomElement(
-      NoninteractiveCollapsible, {injector});
-    // Register the custom element with the browser.
-    customElements.define(
-      'noninteractive-collapsible', NoninteractiveCollapsibleElement);
-    const NoninteractiveVideoEl = createCustomElement(
-      NoninteractiveVideo, {injector});
-    customElements.define(
-      'noninteractive-video', NoninteractiveVideoEl);
-  }
+  ) {}
 
   public ngAfterViewInit(): void {
     OppiaAngularRootComponent.classroomBackendApiService = (
