@@ -145,11 +145,11 @@ describe('Context service', () => {
 
     it('should correctly affirm exploration editor can only refer to skills' +
       ' only if exploration linked to story', () => {
-        expect(ecs.getPageContext()).toBe('editor');
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-        ecs.setExplorationIsLinkedToStory();
-        expect(ecs.canEntityReferToSkills()).toBe(true);
-      });
+      expect(ecs.getPageContext()).toBe('editor');
+      expect(ecs.canEntityReferToSkills()).toBe(false);
+      ecs.setExplorationIsLinkedToStory();
+      expect(ecs.canEntityReferToSkills()).toBe(true);
+    });
   });
 
   describe('behavior in the topic editor view', () => {
@@ -190,8 +190,8 @@ describe('Context service', () => {
 
     it('should affirm the page context other than exploration editor ' +
       'and player', ()=> {
-        expect(ecs.isInExplorationContext()).toBe(false);
-      });
+      expect(ecs.isInExplorationContext()).toBe(false);
+    });
   });
 
   describe('behavior in question editor modal', () => {
@@ -341,11 +341,11 @@ describe('Context service', () => {
 
     it('should correctly retrieve the page context as ' +
       'topics and skills dashboard', () => {
-        expect(ecs.getPageContext()).toBe('other');
-        spyOn(urlService, 'getPathname').and.returnValue(
-          '/topics-and-skills-dashboard/123');
-        expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
-      });
+      expect(ecs.getPageContext()).toBe('other');
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/topics-and-skills-dashboard/123');
+      expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
+    });
 
     it('should correctly retrieve the page context as contributor dashboard',
       () => {
