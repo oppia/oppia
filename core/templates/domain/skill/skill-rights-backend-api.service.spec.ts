@@ -27,7 +27,7 @@ import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 
 describe('Skill rights backend API service', () => {
-  let skillRightsBackendApiService:SkillRightsBackendApiService = null;
+  let skillRightsBackendApiService: SkillRightsBackendApiService = null;
   let httpTestingController: HttpTestingController = null;
   let sampleSkillRights: SkillRightsBackendDict = {
     skill_id: '0',

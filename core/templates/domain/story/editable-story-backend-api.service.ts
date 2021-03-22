@@ -63,7 +63,7 @@ interface ValidationExplorationBackendResponse {
 export class EditableStoryBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolationService : UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService) {}
 
   private _fetchStory(
       storyId: string,

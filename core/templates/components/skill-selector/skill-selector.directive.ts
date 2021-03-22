@@ -107,7 +107,7 @@ angular.module('oppia').directive('selectSkill', [
                 for (var i = 0; i < $scope.topicFilterList.length; i++) {
                   if ($scope.topicFilterList[i].checked) {
                     var categorizedSkills = $scope.getCategorizedSkills();
-                    var topicName:string = $scope.topicFilterList[i].topicName;
+                    var topicName: string = $scope.topicFilterList[i].topicName;
                     updatedSkillsDict[topicName] = (
                       categorizedSkills[topicName]);
                     isAnyTopicChecked = true;

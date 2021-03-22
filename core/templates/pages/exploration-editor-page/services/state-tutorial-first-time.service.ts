@@ -39,7 +39,7 @@ export class StateTutorialFirstTimeService {
   private _openTranslationTutorialEventEmitter = new EventEmitter();
 
   constructor(
-    private editorFirstTimeEventsService : EditorFirstTimeEventsService,
+    private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private tutorialEventsBackendApiService: TutorialEventsBackendApiService) {}
 
   initEditor(firstTime: boolean, expId: string): void {

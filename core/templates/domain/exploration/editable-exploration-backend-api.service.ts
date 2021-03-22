@@ -88,7 +88,7 @@ export class EditableExplorationBackendApiService {
     );
   }
 
-  fetchExploration(explorationId: string):Promise<ExplorationBackendDict> {
+  fetchExploration(explorationId: string): Promise<ExplorationBackendDict> {
     return this._fetchExploration(explorationId, false);
   }
 

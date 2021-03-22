@@ -223,7 +223,7 @@ export class AdminBackendApiService {
   }
 
   private _postRequestAsync(
-      handlerUrl:string, payload?:Object, action?:string): Promise<void> {
+      handlerUrl: string, payload?: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()

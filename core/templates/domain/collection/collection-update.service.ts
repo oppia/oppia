@@ -92,8 +92,8 @@ export class CollectionUpdateService {
   addCollectionNode(
       collection: Collection,
       explorationId: string,
-      explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict)
-      : void {
+      explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict
+  ): void {
     let oldSummaryBackendObject = cloneDeep(explorationSummaryBackendObject);
     this._applyChange(
       collection,

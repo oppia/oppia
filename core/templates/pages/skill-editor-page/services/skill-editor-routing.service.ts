@@ -67,7 +67,7 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
       },
       // To navigate directly to question-editor interface
       // from skill editor page.
-      creatingNewQuestion: function(editorIsOpen:boolean) {
+      creatingNewQuestion: function(editorIsOpen: boolean) {
         if (editorIsOpen) {
           ctrl.questionIsBeingCreated = true;
         } else {

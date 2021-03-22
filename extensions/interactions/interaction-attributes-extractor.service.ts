@@ -45,7 +45,7 @@ export class InteractionAttributesExtractorService {
 
   getValuesFromAttributes(
       interactionId: string, attributes: Object
-  ) : InteractionCustomizationArgs {
+  ): InteractionCustomizationArgs {
     const caBackendDict = {};
     const caSpecs = (
       INTERACTION_SPECS[interactionId].customization_arg_specs);

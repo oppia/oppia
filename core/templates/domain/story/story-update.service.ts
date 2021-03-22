@@ -34,15 +34,15 @@ import { StoryContents } from 'domain/story/StoryContentsObjectFactory.ts';
 import { StoryNode } from './story-node.model';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
-type StoryUpdateReverse = (storyChange : StoryChange, story: Story) => void;
+type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
 
 interface Params {
-  'node_id' ?: string;
-  'title' ?: string;
-  'old_value' ?: string | string[] | boolean | number;
-  'new_value' ?: string | string[] | boolean | number;
-  'property_name' ?: string;
-  'cmd' ?: string;
+  'node_id'?: string;
+  'title'?: string;
+  'old_value'?: string | string[] | boolean | number;
+  'new_value'?: string | string[] | boolean | number;
+  'property_name'?: string;
+  'cmd'?: string;
 }
 
 type Command = BackendChangeObject['cmd'];
@@ -118,7 +118,7 @@ export class StoryUpdateService {
       story: Story, propertyName: string,
       nodeId: string, oldValue: string | string[],
       newValue: string | string[],
-      apply: StoryUpdateApply, reverse: StoryUpdateReverse):void {
+      apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
         node_id: nodeId,

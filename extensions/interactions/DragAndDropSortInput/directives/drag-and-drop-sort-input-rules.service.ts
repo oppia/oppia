@@ -35,9 +35,9 @@ export class DragAndDropSortInputRulesService {
   static checkEquality(
       answer: DragAndDropAnswer,
       inputs: DragAndDropCheckEqualityRuleInputs): boolean {
-    for (var i:number = 0; i < answer.length; i++) {
+    for (var i: number = 0; i < answer.length; i++) {
       if (answer[i].length === inputs.x[i].length) {
-        for (var j:number = 0; j < answer[i].length; j++) {
+        for (var j: number = 0; j < answer[i].length; j++) {
           if (inputs.x[i].indexOf(answer[i][j]) === -1) {
             return false;
           }
@@ -53,9 +53,9 @@ export class DragAndDropSortInputRulesService {
       answer: DragAndDropAnswer,
       inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     var noOfMismatches: number = 0;
-    for (var i:number = 0; i < Math.min(inputs.x.length, answer.length); i++) {
+    for (var i: number = 0; i < Math.min(inputs.x.length, answer.length); i++) {
       for (
-        var j:number = 0; j < Math.max(answer[i].length,
+        var j: number = 0; j < Math.max(answer[i].length,
           inputs.x[i].length); j++) {
         if (inputs.x[i].length > answer[i].length) {
           if (answer[i].indexOf(inputs.x[i][j]) === -1) {
@@ -73,7 +73,7 @@ export class DragAndDropSortInputRulesService {
 
   IsEqualToOrdering(
       answer: DragAndDropAnswer,
-      inputs: DragAndDropCheckEqualityRuleInputs):boolean {
+      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     return answer.length === inputs.x.length && (
       DragAndDropSortInputRulesService.checkEquality(
         answer, inputs));
@@ -89,7 +89,7 @@ export class DragAndDropSortInputRulesService {
   HasElementXAtPositionY(
       answer: DragAndDropAnswer,
       inputs: DragAndDropHasElementXAtPositionYRuleInputs): boolean {
-    for (var i:number = 0; i < answer.length; i++) {
+    for (var i: number = 0; i < answer.length; i++) {
       var index = answer[i].indexOf(inputs.x);
       if (index !== -1) {
         return ((i + 1) === inputs.y);
@@ -103,7 +103,7 @@ export class DragAndDropSortInputRulesService {
       inputs: DragAndDropHasElementXBeforeElementYRuleInputs): boolean {
     var indX = -1;
     var indY = -1;
-    for (var i:number = 0; i < answer.length; i++) {
+    for (var i: number = 0; i < answer.length; i++) {
       var index = answer[i].indexOf(inputs.x);
       if (index !== -1) {
         indX = i;

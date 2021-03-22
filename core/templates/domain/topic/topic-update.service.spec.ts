@@ -33,13 +33,13 @@ import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TestBed } from '@angular/core/testing';
 
 describe('Topic update service', function() {
-  let recordedVoiceoversObjectFactory :RecordedVoiceoversObjectFactory = null;
-  let topicUpdateService :TopicUpdateService;
-  let topicObjectFactory :TopicObjectFactory = null;
-  let skillSummaryObjectFactory :ShortSkillSummaryObjectFactory = null;
-  let subtitledHtmlObjectFactory :SubtitledHtmlObjectFactory = null;
-  let subtopicPageObjectFactory :SubtopicPageObjectFactory = null;
-  let undoRedoService :UndoRedoService = null;
+  let recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory = null;
+  let topicUpdateService: TopicUpdateService;
+  let topicObjectFactory: TopicObjectFactory = null;
+  let skillSummaryObjectFactory: ShortSkillSummaryObjectFactory = null;
+  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
+  let subtopicPageObjectFactory: SubtopicPageObjectFactory = null;
+  let undoRedoService: UndoRedoService = null;
   let _sampleTopic = null;
   let _firstSkillSummary = null;
   let _secondSkillSummary = null;

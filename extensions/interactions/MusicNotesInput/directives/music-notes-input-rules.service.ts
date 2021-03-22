@@ -64,7 +64,7 @@ export class MusicNotesInputRulesService {
   HasLengthInclusivelyBetween(
       answer: MusicNotesAnswer[],
       inputs: {a: number, b: number}): boolean {
-    var answerLength:number = (
+    var answerLength: number = (
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
     return answerLength >= inputs.a && answerLength <= inputs.b;
   }
