@@ -35,8 +35,14 @@ export class LogoutPageComponent implements OnInit {
     } catch (error) {
       console.error(error);
     } finally {
-      this.windowRef.nativeWindow.location.assign('/');
+      this.windowRef.nativeWindow.location.assign(this.getRedirectUrl());
     }
+  }
+
+  private getRedirectUrl(): string {
+    const searchParams = (
+      new URLSearchParams(this.windowRef.nativeWindow.location.search));
+    return searchParams.get('redirect_url') ?? '/';
   }
 }
 

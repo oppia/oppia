@@ -77,6 +77,19 @@ describe('Logout Page', () => {
     expect(windowRef.location).toEqual('/');
   }));
 
+  it('should redirect to specified url', fakeAsync(async() => {
+    windowRef.searchParams = '?redirect_url=sampleUrl';
+    const initPromise = component.ngOnInit();
+
+    expect(authService.signOutAsync).toHaveBeenCalled();
+    expect(windowRef.location).toBeNull();
+
+    flush();
+
+    await expectAsync(initPromise).toBeResolved();
+    expect(windowRef.location).toEqual('sampleUrl');
+  }));
+
   it('should redirects even if sign out failed', fakeAsync(async() => {
     const logSpy = spyOn(console, 'error');
     const error = new Error('uh-oh!');
