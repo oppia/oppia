@@ -405,12 +405,12 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
-            new_id = '%s:%s:%s' % (
+            new_id = '%s.%s.%s' % (
                 datetime.datetime.utcnow().second, name_hash, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
-            'The id generator for AppFeedbackReportModel is producing too'
+            'The id generator for AppFeedbackReportTicketModel is producing too'
             'many collisions.')
 
 
@@ -490,63 +490,57 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
     daily_ticket_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=False)
 
-    # @classmethod
-    # def create(
-    #     cls, ticket_name, github_issue_number, newest_report_timestamp,
-    #     report_ids):
-    #     """Creates a new AppFeedbackReportTicketModel instance and returns its
-    #     ID.
+    @classmethod
+    def create(
+            cls, ticket_id, platform, state_tracking_date, daily_ticket_stats):
+        """Creates a new AppFeedbackReportStatsModel instance and returns its
+        ID.
 
-    #     Args:
-    #         ticket_name: str. The name assigned to the ticket by the moderator.
-    #         github_issue_number: int|None. The Github issue number associated
-    #             with the ticket, if it has one.
-    #         newest_report_timestamp: datetime.datetime. The date and time of the
-    #             newest report that is a part of this ticket
-    #         report_ids: list(str). The report_ids that are a part of this
-    #             ticket.
-    #     Returns:
-    #         AppFeedbackReportModel. The newly created AppFeedbackReportModel
-    #         instance.
-    #     """
-    #     ticket_id = cls._generate_id(user_id, platform)
-    #     ticket_entity = cls(
-    #         id=ticket_id, ticket_name=ticket_name,
-    #         github_issue_number=github_issue_number, is_archived=False,
-    #         newest_report_timestamp=newest_report_timestamp,
-    #         report_ids=report_ids)
-    #     ticket_entity.update_timestamps()
-    #     ticket_entity.put()
-    #     return ticket_id
+        Args:
+            ticket_id: str. The ID for the ticket these stats aggregate on.
+            platform: str. The platform the stats are aggregating for.
+            state_tracking_date: date. The date in UTC that this entity is
+                tracking stats for.
+            daily_ticket_stats: dict. The daily stats for this entity, keyed
+                by the parameter witch each value mapping a parameter value to
+                the number of reports that satisfy that parameter value.
+        Returns:
+            AppFeedbackReportStatsModel. The newly created 
+            AppFeedbackReportStatsModel
+            instance.
+        """
+        entity_id = cls._generate_id(user_id, platform)
+        ticket_entity = cls(
+            id=ticket_id, ticket_name=ticket_name,
+            github_issue_number=github_issue_number, is_archived=False,
+            newest_report_timestamp=newest_report_timestamp,
+            report_ids=report_ids)
+        ticket_entity.update_timestamps()
+        ticket_entity.put()
+        return ticket_id
 
-    # @classmethod
-    # def _generate_id(cls, ticket_name):
-    #     """Generates key for the instance of AppFeedbackReportTicketModel
-    #     class in the required format with the arguments provided.
+    @classmethod
+    def _generate_id(cls, platform, ticket_id, stats_tracking_date):
+        """Generates key for the instance of AppFeedbackReportStatsModel
+        class in the required format with the arguments provided.
 
-    #     Args:
-    #         ticket_name: str. The name assigned to the ticket on creation.
+        Args:
+            platform: str. The platform this entity is aggregating on.
+            ticket_id: str. The ID for the ticket these stats aggregate on.
+            stats_tracking_date: date. The date these stats are tracking on.
 
-    #     Returns:
-    #         str. The generated ID for this entity using the current datetime in
-    #             seconds (as the entity's creation timestamp), a SHA1 hash of the
-    #             ticket_name, and a random string, of the form
-    #             '[creation_datetime]:hash([ticket_name]):[random hash]'.
-    #     """
-    #     for _ in python_utils.RANGE(base_models.MAX_RETRIES):
-    #         name_hash = utils.convert_to_hash(
-    #             ticket_name, base_models.ID_LENGTH)
-    #         random_hash = utils.convert_to_hash(
-    #             python_utils.UNICODE(
-    #                 utils.get_random_int(base_models.RAND_RANGE)),
-    #             base_models.ID_LENGTH)
-    #         new_id = '%s:%s:%s' % (
-    #             datetime.utcnow().second, name_hash, random_hash)
-    #         if not cls.get_by_id(new_id):
-    #             return new_id
-    #     raise Exception(
-    #         'The id generator for AppFeedbackReportModel is producing too'
-    #         'many collisions.')
+        Returns:
+            str. The generated ID for this entity of the form
+                '[platform]:[ticket_id]:[date.seconds]'.
+        """
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            new_id = '%s:%s:%s' % (
+                platform, ticket_id, stats_tracking_date.second)
+            if not cls.get_by_id(new_id):
+                return new_id
+        raise Exception(
+            'The id generator for AppFeedbackReportStatsModel is producing too'
+            'many collisions.')
 
     @staticmethod
     def get_deletion_policy():

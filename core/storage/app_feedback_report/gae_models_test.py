@@ -187,23 +187,6 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     REPORT_IDS=['%s.%s.%s' % (PLATFORM, REPORT_SUBMITTED_TIMESTAMP.second,
         'randomInteger123')]
 
-    # def setUp(self):
-    #     """Set up  models in datastore for use in testing."""
-    #     super(AppFeedbackReportTicketModelTests, self).setUp()
-
-    #     self.ticket_model = (
-    #         app_feedback_report_models.AppFeedbackReportTicketModel(
-    #             id=self.TICKET_ID,
-    #             ticket_name=self.TICKET_NAME,
-    #             github_issue_number=0,
-    #             is_archived=False,
-    #             newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
-    #             report_ids=self.REPORT_IDS
-    #         )
-    #     )
-    #     self.ticket_model.update_timestamps()
-    #     self.ticket_model.put()
-
     def test_create_and_get_ticket_models(self):
         ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
