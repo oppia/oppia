@@ -46,14 +46,14 @@ class AppFeedbackReportModel(base_models.BaseModel):
     """
 
     # The platform (web or Android) that the report is sent from and that the 
-    # feedback corresponds to
+    # feedback corresponds to.
     platform = datastore_services.StringProperty(
         required=True, indexed=True, choices=PLATFORM_CHOICES)
-    # The ID of the user that scrubbed this report, if it has been scrubbed
+    # The ID of the user that scrubbed this report, if it has been scrubbed.
     scrubbed_by = datastore_services.StringProperty(
         required=False, indexed=True)
-    # Unique ID for the ticket this report is assigned to (see 
-    # AppFeedbackReportTicketModel for how this is constructed)
+    # Unique ID for the ticket this report is assigned to (see
+    # AppFeedbackReportTicketModel for how this is constructed).
     ticket_id = datastore_services.TextProperty(default=None, indexed=False)
     # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
@@ -65,17 +65,17 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # rely on the backend updates to fully sync with the frontend report
     # updates.
     report_type = datastore_services.StringProperty(required=True, indexed=True)
-    # The category that this feedback is for
+    # The category that this feedback is for.
     category = datastore_services.TextProperty(required=True, indexed=False)
     # The version of the app; on Android this is the package version name (e.g.
-    # 1.0-release-arm...) and on web this is the release version (e.g. 3.0.8)
+    # 1.0-release-arm...) and on web this is the release version (e.g. 3.0.8).
     platform_version = datastore_services.StringProperty(
         required=True, indexed=True)
     # The user's country locale represented as a ISO-3166 code; the locale is
     # determined by the user's Android device settings.
     device_country_locale_code = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The entry point location that the user is accessing the feedback report 
+    # The entry point location that the user is accessing the feedback report
     # from on both web & Android devices. On Android, this could be
     # navigation_drawer, lesson_player, revision_card, or crash.
     entry_point = datastore_services.StringProperty(required=True, indexed=True)
@@ -94,18 +94,18 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     # The text language on Oppia set by the user in its ISO-639 language code;
     # this is set by the user in Oppia's app preferences. Current languages on
-    # Android can be: EN, FR, HI, or ZH
+    # Android can be: EN, FR, HI, or ZH.
     text_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
     # The audio language ISO-639 code on Oppia set by the user as declared in
-    # the app. Current supported languages: English, Hindi, and Hinglish
+    # the app. Current supported languages: English, Hindi, and Hinglish.
     audio_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
 
-    # The Android device model used to submit the report
+    # The Android device model used to submit the report.
     android_device_model = datastore_services.StringProperty(
         required=False, indexed=True)
-    # The Android SDK version on the user's device
+    # The Android SDK version on the user's device.
     android_sdk_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
     # The rest of the report info collected on Android. Using the JSON here
@@ -124,17 +124,18 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # compatibility and specificity between web and Android feedback.
     web_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
-    # The schema version for the feedback report info
+    # The schema version for the feedback report info.
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
 
     @classmethod
     def create(
-        cls, platform, submitted_on, report_type, category, platform_version,
-        device_country_locale_code, android_sdk_version, android_device_model,
-        entry_point, entry_point_topic_id, entry_point_story_id,
-        entry_point_exploration_id, entry_point_subtopic_id, text_language_code,
-        audio_language_code, android_report_info, web_report_info):
+            cls, platform, submitted_on, report_type, category,
+            platform_version, device_country_locale_code, android_sdk_version,
+            android_device_model, entry_point, entry_point_topic_id,
+            entry_point_story_id, entry_point_exploration_id,
+            entry_point_subtopic_id, text_language_code, audio_language_code,
+            android_report_info, web_report_info):
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
@@ -169,6 +170,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 of the Android-specific feedback report.
             web_report_info: dict|None. The information collected as part of the
                 web-specific feedback report.
+
         Returns:
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
@@ -176,7 +178,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         entity_id = cls._generate_id(platform, submitted_on.second)
         android_schema_version = None
         web_schema_version = None
-        if (platform == PLATFORM_CHOICE_ANDROID):
+        if platform == PLATFORM_CHOICE_ANDROID:
             android_schema_version = (
                 feconf.CURRENT_APP_FEEDBACK_REPORT_ANDROID_SCHEMA_VERSION)
         else:
@@ -196,7 +198,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             text_language_code=text_language_code,
             audio_language_code=audio_language_code,
             android_report_info=android_report_info,
-            android_report_info_schema_version = android_schema_version,
+            android_report_info_schema_version=android_schema_version,
             web_report_info=web_report_info,
             web_report_info_schema_version=web_schema_version)
         report_entity.update_timestamps()
@@ -261,10 +263,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'text_language_code': base_models.EXPORT_POLICY.EXPORTED,
             'audio_language': base_models.EXPORT_POLICY.EXPORTED,
             'android_report_info': base_models.EXPORT_POLICY.EXPORTED,
-            'android_report_info_schema_version': 
+            'android_report_info_schema_version':
                 base_models.EXPORT_POLICY.EXPORTED,
             'web_report_info': base_models.EXPORT_POLICY.EXPORTED,
-            'web_report_info_schema_version': 
+            'web_report_info_schema_version':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -340,23 +342,23 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # A name for the ticket given by the maintainer, limited to 100 characters.
     # Tickets with the same ID must have the same name.
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
-    # Github issue number that applies to this ticket
+    # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
         default=None, indexed=True)
-    # Whether this ticket has been archived
+    # Whether this ticket has been archived.
     is_archived = datastore_services.BooleanProperty(
         required=True, indexed=False)
     # The datetime in UTC that the newest report in this ticket was created on,
     # to help with sorting tickets.
     newest_report_timestamp = datastore_services.DateTimeProperty(
         required=True, indexed=True)
-    # A list of report IDs associated with this ticket
+    # A list of report IDs associated with this ticket.
     report_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     @classmethod
     def create(
-        cls, ticket_name, github_issue_number, newest_report_timestamp,
-        report_ids):
+            cls, ticket_name, github_issue_number, newest_report_timestamp,
+            report_ids):
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
@@ -452,14 +454,14 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
     The id of each model instance is calculated by concatenating the platform,
     ticket ID, and the date (in isoformat) this entity is tracking stats for.
     """
-    
-    # The unique ticket ID that this entity is aggregating for
+
+    # The unique ticket ID that this entity is aggregating for.
     ticket_id = datastore_services.StringProperty(required=True, indexed=True)
-    # The platform that these statistics are for
+    # The platform that these statistics are for.
     platform = datastore_services.TextProperty(
         required=True, indexed=False, choices=PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
-    # to the creation date of the reports aggregated in this model
+    # to the creation date of the reports aggregated in this model.
     stats_tracking_date = datastore_services.DateProperty(
         required=True, indexed=False)
     # JSON struct that maps the daily statistics for this ticket on the date
@@ -468,7 +470,7 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
     # The daily_param_stats will map each param_name (defined below
     # by the const ALLOWED_STATS_PARAM_NAMES) to a dictionary of all the
     # possible param_values for that parameter and the number of reports
-    # submitted on that day that satisfy that param value"
+    # submitted on that day that satisfy that param value".
     #
     #   daily_param_stats : { param_name1 : { param_value1 : report_count1,
     #                                         param_value2 : report_count2,
@@ -484,7 +486,7 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
     #
     daily_ticket_stats = datastore_services.JsonProperty(
         required=True, indexed=False)
-    # The schema version for parameter statistics in this entity
+    # The schema version for parameter statistics in this entity.
     daily_ticket_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=False)
 

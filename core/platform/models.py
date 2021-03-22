@@ -37,9 +37,9 @@ NAMES = utils.create_enum(
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
-    NAMES.app_feedback_report, NAMES.collection, NAMES.config, NAMES.exploration,
-    NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story, NAMES.subtopic,
-    NAMES.suggestion, NAMES.topic)
+    NAMES.app_feedback_report, NAMES.collection, NAMES.config,
+    NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
+    NAMES.subtopic, NAMES.suggestion, NAMES.topic)
 
 GAE_PLATFORM = 'gae'
 

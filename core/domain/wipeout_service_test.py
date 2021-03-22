@@ -582,18 +582,18 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
 
 class WipeoutServiceDeleteAppFeedbackReportModelsTests(
-    test_utils.GenericTestBase): 
+    test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
     USER_1_EMAIL = 'some@email.com'
     USER_1_USERNAME = 'username1'
     USER_2_EMAIL = 'some-other@email.com'
     USER_2_USERNAME = 'username2'
-    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
+    # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
-    # Timestamp in sec since epoch for Mar 8 2021 10:7:16 UTC
+    # The timestamp in sec since epoch for Mar 8 2021 10:7:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615199836)
-    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC
+    # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
 
 
@@ -606,16 +606,16 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         'randomInteger321')
     TICKET_ID = '%s.%s.%s' % (
         'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
-    REPORT_TYPE_SUGGESTION='suggestion'
-    CATEGORY_OTHER='other'
-    PLATFORM_VERSION='0.1-alpha-abcdef1234'
-    COUNTRY_LOCALE_CODE_INDIA='in'
-    ANDROID_DEVICE_MODEL='Pixel 4a'
-    ANDROID_SDK_VERSION=22
-    ENTRY_POINT_NAVIGATION_DRAWER='navigation_drawer'
-    TEXT_LANGUAGE_CODE_ENGLISH='en'
-    AUDIO_LANGUAGE_ENGLISH='english'
-    ANDROID_REPORT_INFO={
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 22
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_ENGLISH = 'english'
+    ANDROID_REPORT_INFO = {
         'user_feedback_other_text_input':'add an admin',
         'event_logs':['event1', 'event2'],
         'logcat_logs':['logcat1', 'logcat2'],
@@ -629,7 +629,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         'automatically_update_topics':False,
         'is_admin':False
     }
-    ANDROID_REPORT_INFO_SCHEMA_VERSION=1
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
     def setUp(self):
         super(WipeoutServiceDeleteAppFeedbackReportModelsTests, self).setUp()
@@ -655,8 +655,8 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language=self.AUDIO_LANGUAGE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            android_report_info_schema_version=
-                self.ANDROID_REPORT_INFO_SCHEMA_VERSION
+            android_report_info_schema_version= (
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
         app_feedback_report_models.FeedbackReportModel(
             id=self.REPORT_ID_2,
@@ -676,8 +676,8 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language=self.AUDIO_LANGUAGE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            android_report_info_schema_version=
-                self.ANDROID_REPORT_INFO_SCHEMA_VERSION
+            android_report_info_schema_version= (
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()

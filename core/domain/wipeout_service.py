@@ -45,7 +45,7 @@ import python_utils
     models.NAMES.app_feedback_report, models.NAMES.base_model,
     models.NAMES.collection, models.NAMES.config, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic,  models.NAMES.suggestion,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
     models.NAMES.topic, models.NAMES.user,
 ])
 
@@ -1019,7 +1019,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     _save_pseudonymizable_entity_mappings(
         pending_deletion_request, models.NAMES.app_feedback_report, report_ids)
 
-    def _pseudonymize_models(feedback_report_models, pseudonymized_id):
+    def _pseudonymize_models(feedback_report_models):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1028,8 +1028,6 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
         Args:
             feedback_report_models: list(FeedbackReportModel). Models to redact
                 user IDs from in the 'scrubbed_by' field.
-            pseudonymized_id: str. New pseudonymized user ID to be used for
-                the models.
         """
         for report_model in feedback_report_models:
             if report_model.scrubbed_by == user_id:
