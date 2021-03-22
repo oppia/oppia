@@ -26,8 +26,8 @@ angular.module('oppia').directive('conceptCard', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getSkillIds: '&skillIds',
-        index: '='
+        skillIds: '<',
+        index: '<'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/concept-card/concept-card.template.html'),
@@ -62,7 +62,7 @@ angular.module('oppia').directive('conceptCard', [
               }
             });
             ConceptCardBackendApiService.loadConceptCardsAsync(
-              ctrl.getSkillIds()
+              ctrl.skillIds()
             ).then(function(conceptCardObjects) {
               conceptCardObjects.forEach(function(conceptCardObject) {
                 ctrl.conceptCards.push(conceptCardObject);
@@ -81,3 +81,18 @@ angular.module('oppia').directive('conceptCard', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'concept-card'
+})
+export class ConceptCardComponent extends UpgradeComponent {
+  @Input() skillIds;
+  @Input() index;
+
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('conceptCard', elementRef, injector);
+  }
+}

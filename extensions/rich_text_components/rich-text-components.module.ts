@@ -23,7 +23,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
-import { NgbAccordionModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.component';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
@@ -32,6 +32,9 @@ import { NoninteractiveMath } from './Math/directives/oppia-noninteractive-math.
 import { NoninteractiveSvgdiagram } from './Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-video.component';
+import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
+import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
 
 
 @NgModule({
@@ -41,36 +44,45 @@ import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-vid
     DynamicContentModule,
     MatButtonModule,
     NgbAccordionModule,
+    NgbModalModule,
     NgbNavModule,
     NgbTooltipModule,
     YouTubePlayerModule
   ],
   declarations: [
+    ConceptCardComponent,
     NoninteractiveCollapsible,
     NoninteractiveImage,
     NoninteractiveLink,
     NoninteractiveMath,
+    NoninteractiveSkillreview,
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
-    NoninteractiveVideo
+    NoninteractiveVideo,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
   entryComponents: [
     NoninteractiveCollapsible,
     NoninteractiveImage,
     NoninteractiveLink,
     NoninteractiveMath,
+    NoninteractiveSkillreview,
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
-    NoninteractiveVideo
+    NoninteractiveVideo,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
   exports: [
+    ConceptCardComponent,
     NoninteractiveCollapsible,
     NoninteractiveImage,
     NoninteractiveLink,
     NoninteractiveMath,
+    NoninteractiveSkillreview,
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
-    NoninteractiveVideo
+    NoninteractiveVideo,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
 })
 
