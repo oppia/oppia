@@ -384,6 +384,7 @@
     "@typescript-eslint/prefer-as-const": ["error"],
     "@typescript-eslint/no-array-constructor": ["error"],
     "@typescript-eslint/no-extra-semi": ["error"],
+    "@typescript-eslint/type-annotation-spacing": ["error"],
     "wrap-iife": [
       "error",
       "any"
