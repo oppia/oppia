@@ -16,71 +16,82 @@
  * @fileoverview Unit tests for opportunitiesListItem.
  */
 
-describe('Opportunities List Item Component', function() {
-  var ctrl = null;
-  var $scope = null;
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
-  beforeEach(angular.mock.module('oppia'));
+import { OpportunitiesListItemComponent } from './opportunities-list-item.component';
 
-  describe('when opportunity is provided', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      var $rootScope = $injector.get('$rootScope');
+describe('Opportunities List Item Component', () => {
+  let component: OpportunitiesListItemComponent;
+  let fixture: ComponentFixture<OpportunitiesListItemComponent>;
 
-      $scope = $rootScope.$new();
-      ctrl = $componentController('opportunitiesListItem', {
-        $scope: $scope,
-      }, {
-        opportunity: {
-          labelText: 'Label text',
-          labelColor: '#fff',
-          progressPercentage: 50
-        },
-        onClickActionButton: () => jasmine.createSpy('click', () => {}),
-        labelRequired: true,
-        progressBarRequired: true,
-        opportunityHeadingTruncationLength: 35
-      });
-      ctrl.$onInit();
-    }));
+  beforeEach(fakeAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [],
+      declarations: [
+        OpportunitiesListItemComponent,
+        LazyLoadingComponent,
+        WrapTextWithEllipsisPipe
+      ]
+    }).compileComponents().then(() => {
+      fixture = TestBed.createComponent(
+        OpportunitiesListItemComponent);
+      component = fixture.componentInstance;
+    });
+  }));
+
+
+  describe('when opportunity is provided', () => {
+    beforeEach(() => {
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 50
+      };
+      component.clickActionButton.emit =
+        () => jasmine.createSpy('click', () => {});
+      component.labelRequired = true;
+      component.progressBarRequired = true;
+      component.opportunityHeadingTruncationLength = 35;
+      fixture.detectChanges();
+      component.ngOnInit();
+    });
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect(ctrl.opportunityDataIsLoading).toBe(false);
-        expect(ctrl.labelText).toBe('Label text');
-        expect(ctrl.labelStyle).toEqual({
+      () => {
+        expect(component.opportunityDataIsLoading).toBe(false);
+        expect(component.labelText).toBe('Label text');
+        expect(component.labelStyle).toEqual({
           'background-color': '#fff'
         });
-        expect(ctrl.opportunityHeadingTruncationLength).toBe(35);
-        expect(ctrl.progressPercentage).toBe('50%');
-        expect(ctrl.progressBarStyle).toEqual({
+        expect(component.opportunityHeadingTruncationLength).toBe(35);
+        expect(component.progressPercentage).toBe('50%');
+        expect(component.progressBarStyle).toEqual({
           width: '50%'
         });
       });
   });
 
-  describe('when opportunity is not provided', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      var $rootScope = $injector.get('$rootScope');
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('opportunitiesListItem', {
-        $scope: $scope,
-      }, {
-        opportunity: null,
-        onClickActionButton: () => jasmine.createSpy('click', () => {}),
-        labelRequired: true,
-        progressBarRequired: true,
-        opportunityHeadingTruncationLength: null
-      });
-      ctrl.$onInit();
-    }));
+  describe('when opportunity is not provided', () => {
+    beforeEach(() => {
+      component.opportunity = null;
+      component.clickActionButton.emit =
+        () => jasmine.createSpy('click', () => {});
+      component.labelRequired = true;
+      component.progressBarRequired = true;
+      component.opportunityHeadingTruncationLength = null;
+      fixture.detectChanges();
+      component.ngOnInit();
+    });
 
     it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect(ctrl.opportunityDataIsLoading).toBe(true);
-        expect(ctrl.labelText).toBe(undefined);
-        expect(ctrl.labelStyle).toBe(undefined);
-        expect(ctrl.opportunityHeadingTruncationLength).toBe(40);
+      () => {
+        expect(component.opportunityDataIsLoading).toBe(true);
+        expect(component.labelText).toBe(undefined);
+        expect(component.labelStyle).toBe(undefined);
+        expect(component.opportunityHeadingTruncationLength).toBe(40);
       });
   });
 });
