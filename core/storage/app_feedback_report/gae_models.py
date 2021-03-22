@@ -445,7 +445,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         return feconf.ROLE_ID_MODERATOR
 
 
-class AppFeedbackReportStatsModel(base_models.VersionedModel):
+class AppFeedbackReportStatsModel(base_models.BaseModel):
     """Model for storing aggregate report stats on the tickets created.
 
     Instances of this model contain statistics for different report types based
@@ -492,7 +492,7 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, ticket_id, platform, state_tracking_date, daily_ticket_stats):
+            cls, platform, ticket_id, stats_tracking_date, daily_ticket_stats):
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 
@@ -509,15 +509,16 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
             AppFeedbackReportStatsModel
             instance.
         """
-        entity_id = cls._generate_id(user_id, platform)
-        ticket_entity = cls(
-            id=ticket_id, ticket_name=ticket_name,
-            github_issue_number=github_issue_number, is_archived=False,
-            newest_report_timestamp=newest_report_timestamp,
-            report_ids=report_ids)
-        ticket_entity.update_timestamps()
-        ticket_entity.put()
-        return ticket_id
+        entity_id = cls._generate_id(platform, ticket_id, stats_tracking_date)
+        stats_entity = cls(
+            id=entity_id, ticket_id=ticket_id, platform=platform,
+            stats_tracking_date=stats_tracking_date,
+            daily_ticket_stats=daily_ticket_stats,
+            daily_ticket_stats_schema_version=(
+                feconf.CURRENT_APP_FEEDBACK_REPORT_DAILY_STATS_SCHEMA_VERSION))
+        stats_entity.update_timestamps()
+        stats_entity.put()
+        return entity_id
 
     @classmethod
     def _generate_id(cls, platform, ticket_id, stats_tracking_date):
@@ -535,7 +536,7 @@ class AppFeedbackReportStatsModel(base_models.VersionedModel):
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (
-                platform, ticket_id, stats_tracking_date.second)
+                platform, ticket_id, stats_tracking_date.isoformat())
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(

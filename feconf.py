@@ -209,6 +209,10 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The current version of the Android feedback report info blob schema.
 CURRENT_APP_FEEDBACK_REPORT_ANDROID_SCHEMA_VERSION = 1
+
+# The current version of the app feedback report daily stats blob schema.
+CURRENT_APP_FEEDBACK_REPORT_DAILY_STATS_SCHEMA_VERSION = 1
+
 # The current version of the web feedback report info blob schema.
 CURRENT_APP_FEEDBACK_REPORT_WEB_SCHEMA_VERSION = 1
 

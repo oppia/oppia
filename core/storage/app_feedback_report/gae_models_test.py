@@ -31,11 +31,11 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportModel class."""
 
     PLATFORM = 'android'
-    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
-    # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC
+    # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
     REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615519337)
-    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC
+    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_ID = '%s.%s.%s' % (
         'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
@@ -99,7 +99,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.feedback_report_model.update_timestamps()
         self.feedback_report_model.put()
 
-    def test_create_and_get_report_models(self):
+    def test_create_and_get_report_model(self):
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.create(
                 self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP_2,
@@ -172,11 +172,11 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportTicketModel class."""
 
-    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
-    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     NEWEST_REPORT_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
-    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC
+    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
 
     PLATFORM = 'android'
@@ -187,7 +187,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     REPORT_IDS=['%s.%s.%s' % (PLATFORM, REPORT_SUBMITTED_TIMESTAMP.second,
         'randomInteger123')]
 
-    def test_create_and_get_ticket_models(self):
+    def test_create_and_get_ticket_model(self):
         ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
                 ticket_name=self.TICKET_NAME,
@@ -219,6 +219,36 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
 class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportStatsModel class."""
+
+    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_ID = '%s.%s.%s' % ('random_hash', TICKET_CREATION_TIMESTAMP.second,
+        '16CharString1234')
+    # Timestamp date in sec since epoch for Mar 19 2021 UTC.
+    STATS_DATE_TIMESTAMP = datetime.date.fromtimestamp(1616173836)
+    DAILY_STATS = {'daily_param_stats': {
+                        'report_type': {
+                            'suggestion': 1, 'issue': 1, 'crash': 1 } },
+                    'daily_total_report_submitted': 3 }
+
+    def test_create_and_get_stats_model(self):
+        entity_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.create(
+                platform='android',
+                ticket_id=self.TICKET_ID,
+                stats_tracking_date=self.STATS_DATE_TIMESTAMP,
+                daily_ticket_stats=self.DAILY_STATS))
+
+        stats_model = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get(
+                entity_id))
+
+        self.assertEqual(stats_model.id, '%s:%s:%s' % (
+            'android', self.TICKET_ID, self.STATS_DATE_TIMESTAMP.isoformat()))
+        self.assertEqual(stats_model.platform, 'android')
+        self.assertEqual(
+            stats_model.stats_tracking_date, self.STATS_DATE_TIMESTAMP)
+        self.assertEqual(stats_model.daily_ticket_stats, self.DAILY_STATS)
 
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportStatsModel()
