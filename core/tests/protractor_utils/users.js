@@ -68,11 +68,8 @@ var login = async function(email, manualNavigation = true) {
 };
 
 var logout = async function() {
-  await browser.driver.get(general.SERVER_URL_PREFIX + '/');
-
-  await general.openProfileDropdown();
-  const logoutLink = element(by.css('.protractor-test-logout-link'));
-  await action.click('Logout link', logoutLink);
+  await browser.driver.get(
+    general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
   await waitFor.pageToFullyLoad();
 };
 
