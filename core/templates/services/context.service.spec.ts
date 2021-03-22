@@ -70,12 +70,7 @@ describe('Context service', () => {
         expect(ecs.isInExplorationContext()).toBe(true);
       });
 
-    it('should correctly set and retrive the exploration id', () => {
-      ecs.setExplorationId('1000');
-      expect(ecs.getExplorationId()).toBe('1000');
-    });
-
-    it('should correctly affirm that page contains reference to skills',
+    it('should affirm that exploration player cannot refer to skills',
       () => {
         expect(ecs.getPageContext()).toBe('learner');
         expect(ecs.canEntityReferToSkills()).toBe(false);
@@ -114,22 +109,9 @@ describe('Context service', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
 
-    it('should affirm the page context to be exploration player or editor',
-      ()=> {
-        expect(ecs.isInExplorationContext()).toBe(true);
-      });
-
     it('should affirm that the page forbids editing of RTE components', () => {
       expect(ecs.canAddOrEditComponents()).toBe(false);
     });
-
-    it('should correctly affirm that page contains reference to skills',
-      () => {
-        expect(ecs.getPageContext()).toBe('learner');
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-        ecs.setExplorationIsLinkedToStory();
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-      });
   });
 
   describe('behavior in the exploration editor view', () => {
@@ -161,13 +143,8 @@ describe('Context service', () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
 
-    it('should affirm the page context to be exploration player or editor',
-      ()=> {
-        expect(ecs.isInExplorationContext()).toBe(true);
-      });
-
-    it('should correctly affirm that page contains reference to skills',
-      () => {
+    it('should correctly affirm exploration editor can only refer to skills' +
+      ' only if exploration linked to story', () => {
         expect(ecs.getPageContext()).toBe('editor');
         expect(ecs.canEntityReferToSkills()).toBe(false);
         ecs.setExplorationIsLinkedToStory();
@@ -211,8 +188,8 @@ describe('Context service', () => {
         expect(ecs.canEntityReferToSkills()).toBe(true);
       });
 
-    it('should affirm the page context to be exploration player or editor',
-      ()=> {
+    it('should affirm the page context other than exploration editor ' +
+      'and player', ()=> {
         expect(ecs.isInExplorationContext()).toBe(false);
       });
   });
@@ -239,17 +216,26 @@ describe('Context service', () => {
       expect(ecs.getEntityId()).toBe('questionId');
     });
 
-    it('should correctly affirm that page contains reference to skills',
+    it('should correctly affirm that skill editor can refer to skills',
       () => {
+        expect(ecs.getPageContext()).toBe('other');
+        expect(ecs.canEntityReferToSkills()).toBe(false);
         spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
         expect(ecs.getPageContext()).toBe('skill_editor');
         expect(ecs.canEntityReferToSkills()).toBe(true);
       });
 
-    it('should affirm the page context to be exploration player or editor',
+    it('should affirm the exploration context for exploration player',
       ()=> {
         expect(ecs.isInExplorationContext()).toBe(false);
         spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
+        expect(ecs.isInExplorationContext()).toBe(true);
+      });
+
+    it('should affirm the exploration context for exploration editor',
+      ()=> {
+        expect(ecs.isInExplorationContext()).toBe(false);
+        spyOn(urlService, 'getPathname').and.returnValue('/create/123');
         expect(ecs.isInExplorationContext()).toBe(true);
       });
   });
@@ -283,7 +269,7 @@ describe('Context service', () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
 
-    it('should correctly affirm that page contains reference to skills',
+    it('should correctly affirm that story editor cannot refer to skills',
       () => {
         expect(ecs.getPageContext()).toBe('story_editor');
         expect(ecs.canEntityReferToSkills()).toBe(false);
@@ -320,7 +306,7 @@ describe('Context service', () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
 
-    it('should correctly affirm that page contains reference to skills',
+    it('should correctly affirm that skill can refer to skills',
       () => {
         expect(ecs.getPageContext()).toBe('skill_editor');
         expect(ecs.canEntityReferToSkills()).toBe(true);
@@ -333,38 +319,41 @@ describe('Context service', () => {
       urlService = TestBed.get(UrlService);
     });
 
-    it('should correctly retrieve the page context', () => {
+    it('should correctly retrieve the page context as question editor', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
       expect(ecs.getPageContext()).toBe('question_editor');
     });
 
-    it('should correctly retrieve the page context', () => {
+    it('should correctly retrieve the page context as question player', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue('/session/123');
       expect(ecs.getPageContext()).toBe('question_player');
     });
 
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/collection_editor/123');
-      expect(ecs.getPageContext()).toBe('collection_editor');
-    });
+    it('should correctly retrieve the page context as collection editor',
+      () => {
+        expect(ecs.getPageContext()).toBe('other');
+        spyOn(urlService, 'getPathname').and.returnValue(
+          '/collection_editor/123');
+        expect(ecs.getPageContext()).toBe('collection_editor');
+      });
 
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/topics-and-skills-dashboard/123');
-      expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
-    });
+    it('should correctly retrieve the page context as ' +
+      'topics and skills dashboard', () => {
+        expect(ecs.getPageContext()).toBe('other');
+        spyOn(urlService, 'getPathname').and.returnValue(
+          '/topics-and-skills-dashboard/123');
+        expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
+      });
 
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/contributor-dashboard/123');
-      expect(ecs.getPageContext()).toBe('contributor_dashboard');
-    });
+    it('should correctly retrieve the page context as contributor dashboard',
+      () => {
+        expect(ecs.getPageContext()).toBe('other');
+        spyOn(urlService, 'getPathname').and.returnValue(
+          '/contributor-dashboard/123');
+        expect(ecs.getPageContext()).toBe('contributor_dashboard');
+      });
   });
 
   describe('behavior in other pages', () => {
