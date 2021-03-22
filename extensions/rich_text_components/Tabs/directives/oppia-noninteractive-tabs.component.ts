@@ -46,12 +46,7 @@ export class NoninteractiveTabs implements OnInit {
   }
 }
 
-require('directives/angular-html-bind.directive.ts');
-
-require('services/html-escaper.service.ts');
-
 angular.module('oppia').directive(
   'oppiaNoninteractiveTabs', downgradeComponent({
     component: NoninteractiveTabs
   }) as angular.IDirectiveFactory);
-  // autoplay-with-value="true" end-with-value="10" start-with-value="2" video_id-with-value="&amp;quot;rOCipr_8N6A&amp;quot;"
