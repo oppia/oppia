@@ -637,7 +637,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        app_feedback_report_models.FeedbackReportModel(
+        app_feedback_report_models.AppFeedbackReportModel(
             id=self.REPORT_ID_1,
             platform=self.PLATFORM_ANDROID,
             scrubbed_by=self.user_1_id,
@@ -658,7 +658,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             android_report_info_schema_version= (
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
-        app_feedback_report_models.FeedbackReportModel(
+        app_feedback_report_models.AppFeedbackReportModel(
             id=self.REPORT_ID_2,
             platform=self.PLATFORM_ANDROID,
             scrubbed_by=self.user_2_id,
@@ -693,7 +693,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
 
         # Verify user is pseudonymized.
         report_model = (
-            app_feedback_report_models.FeedbackReportModel.get_by_id(
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.REPORT_ID_1)
         )
         self.assertEqual(
