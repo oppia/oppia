@@ -101,9 +101,9 @@ angular.module('oppia').component('translationOpportunities', {
           controller: 'TranslationModalController'
         }).result.then(function() {
           ctrl.resetCursorStyle();
-          // This function call is used to reset cursor style to normal 
+          // This function call is used to reset cursor style to normal
           // if copy mode is left on and the translation modal is closed down
-          // or the Cancel button is pressed
+          // or the Cancel button is pressed.
         }, function() {
           ctrl.resetCursorStyle();
           // Note to developers:
