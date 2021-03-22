@@ -19,8 +19,26 @@
 import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockWindowRef } from 'tests/unit-test-utils';
 import { LogoutPageComponent } from './logout-page.component';
+
+class MockWindowRef {
+  constructor(
+      public location: string = null, public searchParams: string = '') {}
+
+  get nativeWindow() {
+    const that = this;
+    return {
+      location: {
+        get search() {
+          return that.searchParams;
+        },
+        assign: (url: string) => {
+          that.location = url;
+        },
+      }
+    };
+  }
+}
 
 describe('Logout Page', () => {
   let authService: jasmine.SpyObj<AuthService>;
@@ -47,7 +65,7 @@ describe('Logout Page', () => {
     component = fixture.componentInstance;
   });
 
-  it('sign out and then redirect', fakeAsync(async() => {
+  it('should sign out and then redirect', fakeAsync(async() => {
     const initPromise = component.ngOnInit();
 
     expect(authService.signOutAsync).toHaveBeenCalled();
@@ -59,7 +77,7 @@ describe('Logout Page', () => {
     expect(windowRef.location).toEqual('/');
   }));
 
-  it('redirects even if sign out failed', fakeAsync(async() => {
+  it('should redirects even if sign out failed', fakeAsync(async() => {
     const logSpy = spyOn(console, 'error');
     const error = new Error('uh-oh!');
     authService.signOutAsync.and.rejectWith(error);
