@@ -70,48 +70,52 @@ export class ContextService {
   // If the current page is not one in either EXPLORATION_EDITOR or
   // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER.
   getPageContext(): string {
-    let pathnameArray = this.urlService.getPathname().split('/');
-    for (let i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'explore' ||
-          (pathnameArray[i] === 'embed' &&
-              pathnameArray[i + 1] === 'exploration')) {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
-        return ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
-      } else if (pathnameArray[i] === 'create') {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR;
-        return ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR;
-      } else if (pathnameArray[i] === 'question_editor') {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR;
-        return ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR;
-      } else if (pathnameArray[i] === 'topic_editor') {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR;
-        return ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR;
-      } else if (pathnameArray[i] === 'story_editor') {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.STORY_EDITOR;
-        return ServicesConstants.PAGE_CONTEXT.STORY_EDITOR;
-      } else if (pathnameArray[i] === 'skill_editor') {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
-        return ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
-      } else if (
-        pathnameArray[i] === 'session' ||
-          pathnameArray[i] === 'review-test') {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
-        return ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
-      } else if (pathnameArray[i] === 'collection_editor') {
-        this.pageContext = ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
-        return ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
-      } else if (pathnameArray[i] === 'topics-and-skills-dashboard') {
-        this.pageContext = (
-          ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
-        return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
-      } else if (pathnameArray[i] === 'contributor-dashboard') {
-        this.pageContext = (
-          ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
-        return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
+    if (this.pageContext) {
+      return this.pageContext;
+    } else {
+      let pathnameArray = this.urlService.getPathname().split('/');
+      for (let i = 0; i < pathnameArray.length; i++) {
+        if (pathnameArray[i] === 'explore' ||
+            (pathnameArray[i] === 'embed' &&
+                pathnameArray[i + 1] === 'exploration')) {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
+          return ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
+        } else if (pathnameArray[i] === 'create') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR;
+          return ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR;
+        } else if (pathnameArray[i] === 'question_editor') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR;
+          return ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR;
+        } else if (pathnameArray[i] === 'topic_editor') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR;
+          return ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR;
+        } else if (pathnameArray[i] === 'story_editor') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.STORY_EDITOR;
+          return ServicesConstants.PAGE_CONTEXT.STORY_EDITOR;
+        } else if (pathnameArray[i] === 'skill_editor') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
+          return ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
+        } else if (
+          pathnameArray[i] === 'session' ||
+            pathnameArray[i] === 'review-test') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
+          return ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
+        } else if (pathnameArray[i] === 'collection_editor') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
+          return ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
+        } else if (pathnameArray[i] === 'topics-and-skills-dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
+        } else if (pathnameArray[i] === 'contributor-dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
+        }
       }
-    }
 
-    return ServicesConstants.PAGE_CONTEXT.OTHER;
+      return ServicesConstants.PAGE_CONTEXT.OTHER;
+    }
   }
   // This is required in cases like when we need to access question player
   // from the skill editor preview tab.
@@ -214,9 +218,7 @@ export class ContextService {
   // Returns a string representing the explorationId (obtained from the
   // URL).
   getExplorationId(): string {
-    if (this.explorationId) {
-      return this.explorationId;
-    } else if (!this.isInQuestionPlayerMode()) {
+    if (!this.isInQuestionPlayerMode()) {
       // The pathname should be one of /explore/{exploration_id} or
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.
       let pathnameArray = this.urlService.getPathname().split('/');
