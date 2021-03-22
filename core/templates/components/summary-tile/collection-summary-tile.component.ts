@@ -16,7 +16,7 @@
  * @fileoverview Component for a collection summary tile.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -28,6 +28,7 @@ import { UserService } from 'services/user.service';
 @Component({
   selector: 'collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
+  encapsulation: ViewEncapsulation.None
 })
 export class CollectionSummaryTileComponent implements OnInit {
   @Input() getCollectionId: string;
