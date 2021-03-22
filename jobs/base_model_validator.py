@@ -129,6 +129,9 @@ class ValidateCommitType(beam.DoFn):
             ModelCommitTypeError. Error for commit_type validation.
         """
         model = jobs_utils.clone_model(input_model)
+        if not hasattr(model, 'commit_type'):
+            return
+
         if (model.commit_type not in
                 base_models.VersionedModel.COMMIT_TYPE_CHOICES):
             yield errors.ModelInvalidCommitTypeError(model)

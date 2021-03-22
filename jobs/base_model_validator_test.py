@@ -41,10 +41,6 @@ class MockModel(base_models.BaseModel):
     pass
 
 
-class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    pass
-
-
 class BaseModelValidatorTests(unittest.TestCase):
 
     def setUp(self):
@@ -178,7 +174,7 @@ class ValidateModelIdTests(BaseModelValidatorTests):
 class ValidateCommitTypeTests(BaseModelValidatorTests):
     def test_validate_commit_type(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            invalid_commit_type_model = MockCommitLogEntryModel(
+            invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
                 id='123',
                 created_on=self.year_ago,
                 last_updated=self.now,

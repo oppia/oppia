@@ -34,10 +34,6 @@ class MockModel(base_models.BaseModel):
     pass
 
 
-class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    pass
-
-
 class ValidatorErrorTestBase(unittest.TestCase):
     """Base class for valiator error tests."""
 
@@ -170,7 +166,7 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
 
 class ModelInvalidCommitTypeErrorTests(ValidatorErrorTestBase):
     def test_model_invalid_id_error(self):
-        model = MockCommitLogEntryModel(
+        model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.year_ago,
             last_updated=self.now,
