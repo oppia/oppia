@@ -2114,7 +2114,7 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
     below function definition.
     """
 
-    _implements_ = interfaces.IAstroidChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'disallow-blank-lines-below-function-definition'
     priority = -1
     msgs = {

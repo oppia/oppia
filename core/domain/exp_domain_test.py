@@ -10789,6 +10789,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 },
                 'param_changes': [],
             }
+
         self.assertEqual(exploration.to_player_dict(), {
             'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'title': exp_title,
