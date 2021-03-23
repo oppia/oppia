@@ -1025,8 +1025,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
         app_feedback_report_models.AppFeedbackReportModel)
 
     feedback_report_models = app_feedback_report_model_class.query(
-        filter(app_feedback_report_model_class.scrubbed_by == user_id).fetch()
-    )
+        app_feedback_report_model_class.scrubbed_by == user_id).fetch()
     report_ids = set([model.id for model in feedback_report_models])
 
     _save_pseudonymizable_entity_mappings(

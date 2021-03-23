@@ -48,7 +48,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     string representation of a random int.
     """
 
-    # The platform (web or Android) that the report is sent from and that the 
+    # The platform (web or Android) that the report is sent from and that the
     # feedback corresponds to.
     platform = datastore_services.StringProperty(
         required=True, indexed=True, choices=PLATFORM_CHOICES)
@@ -118,7 +118,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # greater specificity between web and Android feedback.
     android_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
-    # The schema version for the feedback report info
+    # The schema version for the feedback report info.
     android_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
 
@@ -210,8 +210,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, platform, submitted_on_sec):
-        """Generates key for the instance of AppFeedbackReportModel
-        class in the required format with the arguments provided.
+    """Generates key for the instance of AppFeedbackReportModel class in the
+        required format with the arguments provided.
 
         Args:
             platform: str. The platform the user is the report from.
@@ -235,7 +235,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'The id generator for AppFeedbackReportModel is producing too'
             'many collisions.')
 
-
     @classmethod
     def scrub_report(cls, report_id, scrubbed_by):
         """Scrubs the instance of AppFeedbackReportModel with given ID, removing
@@ -243,6 +242,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
         Args:
             report_id: str. The id of the model entity to scrub.
+            scrubbed_by: str. The id of the user or cron job that is intiating
+                scrubbing this report.
         """
         report_entity = cls.get_by_id(report_id)
         if not report_entity:
@@ -253,11 +254,11 @@ class AppFeedbackReportModel(base_models.BaseModel):
             scrubbed_report_info = cls._scrub_report_info(
                 report_entity.android_report_info)
             report_entity.android_report_info = scrubbed_report_info
-        else: 
+        else:
             scrubbed_report_info = cls._scrub_report_info(
                 report_entity.web_report_info)
             report_entity.web_report_info = scrubbed_report_info
-        report_entity.scrubbed_by=scrubbed_by
+        report_entity.scrubbed_by = scrubbed_by
         report_entity.update_timestamps()
         report_entity.put()
 
@@ -276,7 +277,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 new_report_info[key] = report_info_dict[key]
         return new_report_info
 
-
     @staticmethod
     def get_deletion_policy():
         """Model stores the user ID of who has scrubbed this report for auditing
@@ -289,7 +289,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains data referencing user and will be exported."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'id':base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+            'id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'platform': base_models.EXPORT_POLICY.EXPORTED,
             'scrubbed_by': base_models.EXPORT_POLICY.EXPORTED,
             'ticket_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -317,12 +317,12 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Exports the data from AppFeedbackReportModel
-        into dict format for Takeout.
+        """Exports the data from AppFeedbackReportModel into dict format for
+        Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported;
-            this would be the ID of the user who has scrubbed the report.
+                this would be the ID of the user who has scrubbed the report.
 
         Returns:
             dict. Dictionary of the data from AppFeedbackReportModel.
@@ -355,7 +355,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 'android_report_info': report_model.android_report_info,
                 'android_report_info_schema_version': (
                     report_model.android_report_info_schema_version),
-                'web_report_info':report_model.web_report_info,
+                'web_report_info': report_model.web_report_info,
                 'web_report_info_schema_version': (
                     report_model.web_report_info_schema_version)
             }
@@ -370,7 +370,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @staticmethod
     def get_lowest_supported_role():
-        """The lowest supported role for feedback reports will be moderator"""
+        """The lowest supported role for feedback reports will be moderator."""
         return feconf.ROLE_ID_MODERATOR
 
 
@@ -415,6 +415,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
                 newest report that is a part of this ticket
             report_ids: list(str). The report_ids that are a part of this
                 ticket.
+
         Returns:
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
@@ -458,7 +459,6 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             'The id generator for AppFeedbackReportTicketModel is producing too'
             'many collisions.')
 
-
     @staticmethod
     def get_deletion_policy():
         """Model doesn't contain any information directly corresponding to a
@@ -485,7 +485,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     @staticmethod
     def get_lowest_supported_role():
         """The lowest supported role for feedback report tickets will be
-        moderator
+        moderator.
         """
         return feconf.ROLE_ID_MODERATOR
 
@@ -515,7 +515,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # The daily_param_stats will map each param_name (defined below
     # by the const ALLOWED_STATS_PARAM_NAMES) to a dictionary of all the
     # possible param_values for that parameter and the number of reports
-    # submitted on that day that satisfy that param value".
+    # submitted on that day that satisfy that param value":
     #
     #   daily_param_stats : { param_name1 : { param_value1 : report_count1,
     #                                         param_value2 : report_count2,
@@ -525,10 +525,9 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     #                                         param_value3 : report_count3 } }
     #
     # The second key in the JSON -- daily_total_reports_submitted -- simply has
-    # the total number of reports submitted on this date.
+    # the total number of reports submitted on this date:
     #
-    #   daily_total_reports_submitted : total_reports_count
-    #
+    #   daily_total_reports_submitted : total_reports_count.
     daily_ticket_stats = datastore_services.JsonProperty(
         required=True, indexed=False)
     # The schema version for parameter statistics in this entity.
@@ -544,15 +543,15 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         Args:
             ticket_id: str. The ID for the ticket these stats aggregate on.
             platform: str. The platform the stats are aggregating for.
-            state_tracking_date: date. The date in UTC that this entity is
+            stats_tracking_date: date. The date in UTC that this entity is
                 tracking stats for.
             daily_ticket_stats: dict. The daily stats for this entity, keyed
                 by the parameter witch each value mapping a parameter value to
                 the number of reports that satisfy that parameter value.
+
         Returns:
-            AppFeedbackReportStatsModel. The newly created 
-            AppFeedbackReportStatsModel
-            instance.
+            AppFeedbackReportStatsModel. The newly created
+                AppFeedbackReportStatsModel instance.
         """
         entity_id = cls._generate_id(platform, ticket_id, stats_tracking_date)
         stats_entity = cls(
@@ -615,6 +614,6 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     @staticmethod
     def get_lowest_supported_role():
         """The lowest supported role for feedback reports stats will be
-        moderator
+        moderator.
         """
         return feconf.ROLE_ID_MODERATOR
