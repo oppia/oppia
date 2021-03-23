@@ -29,12 +29,11 @@ import utils
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
 TEST_SUITES_NOT_RUN_IN_CI = [
     'full', 'accessibility', 'adminPage',
-    'classroomPageFileUploadFeatures', 'collections', 'contributorDashboard',
-    'featureGating', 'fileUploadExtensions', 'fileUploadFeatures', 'library',
-    'navigation', 'playVoiceovers', 'preferences', 'profileFeatures',
-    'profileMenu', 'publication', 'subscriptions', 'topicsAndSkillsDashboard',
-    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures',
-    'topicAndStoryViewer', 'wipeout']
+    'classroomPageFileUploadFeatures', 'collections',
+    'contributorDashboard', 'featureGating', 'fileUploadExtensions',
+    'fileUploadFeatures', 'library', 'navigation', 'playVoiceovers',
+    'publication', 'topicsAndSkillsDashboard', 'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures', 'topicAndStoryViewer']
 
 
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
@@ -193,6 +192,7 @@ def main():
             .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
     if protractor_test_suites != ci_suite_names:
+        import pdb; pdb.set_trace()
         raise Exception(
             'Protractor test suites and CI test suites are not in sync. '
             'Following suites are not in sync: {}'.format(
