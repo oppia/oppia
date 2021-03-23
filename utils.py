@@ -693,7 +693,8 @@ def require_valid_thumbnail_filename(thumbnail_filename):
         Raises:
             ValidationError. Thumbnail filename is not a string.
             ValidationError. Thumbnail filename does start with a dot.
-            ValidationError. Thumbnail filename includes slashes or consecutive dots.
+            ValidationError. Thumbnail filename includes slashes
+                or consecutive dots.
             ValidationError. Thumbnail filename does not include an extension.
             ValidationError. Thumbnail filename extension is not svg.
         """
