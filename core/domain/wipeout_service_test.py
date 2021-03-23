@@ -47,31 +47,18 @@ import feconf
 import python_utils
 
 (
-<<<<<<< HEAD
-    app_feedback_report_models, collection_models, config_models, email_models,
-    exp_models, feedback_models, improvements_models,
+    app_feedback_report_models, auth_models, collection_models, config_models,
+    email_models, exp_models, feedback_models, improvements_models,
     question_models, skill_models, story_models,
     subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report, models.NAMES.collection,
-    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
-=======
-    auth_models, collection_models, config_models,
-    email_models, exp_models, feedback_models,
-    improvements_models, question_models, skill_models,
-    story_models, subtopic_models, suggestion_models,
-    topic_models, user_models
-) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
->>>>>>> upstream/develop
+    models.NAMES.app_feedback_report, models.NAMES.auth,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 datastore_services = models.Registry.import_datastore_services()
