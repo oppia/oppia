@@ -348,7 +348,7 @@ describe('Interaction object factory', () => {
     });
   });
 
-  it('should correctly set customization arguments for ' +
+  /*it('should correctly set customization arguments for ' +
      'NumericInput', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
@@ -373,9 +373,9 @@ describe('Interaction object factory', () => {
           'Type input greater than or equal to zero.', 'ca_placeholder_0')
       }
     });
-  });
+  });*/
 
-  it('should correctly set customization arguments for ' +
+  /*it('should correctly set customization arguments for ' +
      'NumericInput', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
@@ -388,7 +388,7 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({});
-  });
+  });*/
 
   it('should correctly set customization arguments for ' +
      'PencilCodeEditor', () => {

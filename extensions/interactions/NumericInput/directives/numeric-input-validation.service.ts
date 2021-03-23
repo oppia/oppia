@@ -40,7 +40,19 @@ export class NumericInputValidationService {
 
   getCustomizationArgsWarnings(
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
-    return [];
+    //return [];
+    let warningsList = [];
+
+    //let allowedLettersLimit = AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK;
+    if (customizationArgs.placeholder.value === true) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'The input should be greater than or equal to 0')
+      });
+    }
+
+    return warningsList;
   }
 
   getAllWarnings(
