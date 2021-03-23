@@ -39,6 +39,258 @@ auth_models, user_models = (
 ID_HASHING_FUNCTION = hash
 
 
+class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to sync Firebase accounts with Oppia's user accounts.
+
+    This job does not print aggregated success output, because the reduce phase
+    is sharded by auth_id and could potentially generate 1000s of
+    privacy-sensitive outputs. Instead, success is interpreted as an output
+    without any ERRORs.
+
+    This job is idempotent.
+
+    Pre-conditions:
+        - The models on Oppia reflect the most up-to-date values. Specifically,
+          a user is considered to "exist" IF AND ONLY IF a UserSettingsModel
+          exists.
+        - Exactly 1 FirebaseSeedModel exists.
+        - SeedFirebaseOneOffJob has succeeded AT LEAST ONCE in the history of
+          the database. This includes backups of the database created _after_
+          the job is run.
+        - PopulateFirebaseAccountsOneOffJob has succeeded AT LEAST ONCE in the
+          history of the database, WITHOUT creating any new accounts, AFTER
+          BOTH:
+              1. SeedFirebaseOneOffJob has succeeded.
+              2. Firebase user authentication has been deployed to the server.
+
+    Post-conditions:
+        - There is a 1-to-1-to-1 mapping between UserAuthDetailsModel,
+          UserIdByFirebaseAuthIdModel, and individual Firebase accounts; using
+          firebase_auth_id as the key. The sole exception is:
+              UserAuthDetailsModel(gae_id=feconf.SYSTEM_COMMITTER_ID)
+        - UserAuthDetailsModel.deleted,
+          UserIdByFirebaseAuthIdModel.deleted, and
+          firebase_admin.auth.ExportedUserRecord.disabled each have the same
+          respective boolean value.
+      """
+
+    SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
+
+    EMPTY_AUTH_ID_KEY = '<EMPTY_AUTH_ID_KEY>'
+    ASSOC_BY_AUTH_ID_KEY = 'assoc_by_auth_id'
+    ASSOC_BY_USER_ID_KEY = 'assoc_by_user_id'
+    FIREBASE_ACCOUNT_DISABLED_KEY = 'firebase_account_disabled'
+
+    ERROR_ASSOC_INCONSISTENCIES = (
+        'ERROR: Found inconsistency in models and/or Firebase account')
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [auth_models.UserIdByFirebaseAuthIdModel,
+                auth_models.UserAuthDetailsModel,
+                auth_models.FirebaseSeedModel]
+
+    @staticmethod
+    def map(item):
+        # The map() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = SyncFirebaseAccountsOneOffJob
+
+        if isinstance(item, auth_models.UserIdByFirebaseAuthIdModel):
+            auth_id, assoc_info = (
+                item.id,
+                (cls.ASSOC_BY_AUTH_ID_KEY, (item.user_id, item.deleted)))
+            yield (auth_id, assoc_info)
+            return
+
+        if isinstance(item, auth_models.UserAuthDetailsModel):
+            if item.gae_id == feconf.SYSTEM_COMMITTER_ID:
+                yield (cls.SYSTEM_COMMITTER_ACK, item.id)
+                return
+            auth_id, assoc_info = (
+                item.firebase_auth_id or cls.EMPTY_AUTH_ID_KEY,
+                (cls.ASSOC_BY_USER_ID_KEY, (item.id, item.deleted)))
+            yield (auth_id, assoc_info)
+            return
+
+        for user in firebase_admin.auth.list_users().iterate_all():
+            auth_id, assoc_info = (
+                user.uid, (cls.FIREBASE_ACCOUNT_DISABLED_KEY, user.disabled))
+            yield (auth_id, assoc_info)
+
+    @staticmethod
+    def reduce(key, values):
+        # The reduce() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = SyncFirebaseAccountsOneOffJob
+
+        if key == cls.SYSTEM_COMMITTER_ACK:
+            yield (key, values)
+            return
+
+        assoc_info_pairs = [ast.literal_eval(s) for s in values]
+
+        if key == cls.EMPTY_AUTH_ID_KEY:
+            for report in cls.report_assocs_missing(assoc_info_pairs):
+                yield (cls.ERROR_ASSOC_INCONSISTENCIES, report)
+            return
+        # Else: key is a non-empty auth_id.
+
+        auth_id = key
+
+        reports = list(cls.report_assoc_collisions(auth_id, assoc_info_pairs))
+        if reports:
+            for report in reports:
+                yield (cls.ERROR_ASSOC_INCONSISTENCIES, report)
+            return
+        # Else: 1 <= len(assoc_info_pairs) <= 3.
+
+        assoc_info = dict(assoc_info_pairs)
+
+        reports = list(cls.report_assoc_inconsistencies(auth_id, **assoc_info))
+        if reports:
+            for report in reports:
+                yield (cls.ERROR_ASSOC_INCONSISTENCIES, report)
+            return
+        # Else: assoc_by_auth_id and assoc_by_user_id are either:
+        #   1. Both deleted.
+        #   2. Both present and contain consistent values.
+
+        # NOTE: This is an arbitrary choice, could use ASSOC_BY_USER_ID_KEY too.
+        assoc_key = cls.ASSOC_BY_AUTH_ID_KEY
+
+        user_is_permanently_deleted, firebase_account_exists = (
+            assoc_key not in assoc_info,
+            cls.FIREBASE_ACCOUNT_DISABLED_KEY in assoc_info)
+
+        if user_is_permanently_deleted:
+            if firebase_account_exists:
+                firebase_admin.auth.update_user(auth_id, disabled=True)
+                firebase_admin.auth.delete_user(auth_id)
+            return
+        # Else: assoc_by_auth_id and assoc_by_user_id are both present and have
+        # consistent values.
+
+        user_id, marked_as_deleted = assoc_info[assoc_key]
+
+        if not firebase_account_exists:
+            user_settings = user_models.UserSettingsModel.get(user_id)
+            firebase_admin.auth.create_user(
+                uid=auth_id, email=user_settings.email,
+                # NOTE: Even though the user might be marked for deletion, it's
+                # important to create a disabled Firebase account anyway so that
+                # the same email can not be claimed while the deletion request
+                # is pending.
+                disabled=marked_as_deleted)
+        elif marked_as_deleted != assoc_info[cls.FIREBASE_ACCOUNT_DISABLED_KEY]:
+            firebase_admin.auth.update_user(auth_id, disabled=marked_as_deleted)
+
+    @classmethod
+    def report_assocs_missing(cls, assoc_info_pairs):
+        """Yields debug information for each of the given associations.
+
+        NOTE: Since assoc_by_auth_id and Firebase accounts are keyed by auth_id,
+        the only kinds of associations that could ever hit this function are
+        UserAuthDetailsModel.
+
+        Args:
+            assoc_info_pairs: list(tuple(str, (str, bool))). The list of
+                associations that do not correspond to any auth_id.
+
+        Yields:
+            str. A debug string for each association.
+        """
+        for _, (user_id, _) in assoc_info_pairs:
+            yield (
+                'UserAuthDetailsModel(id="%s") does not correspond to a unique '
+                'firebase_auth_id' % user_id)
+
+    @classmethod
+    def report_assoc_collisions(cls, auth_id, assoc_info_pairs):
+        """Yields debug information for associations mapped to the same auth_id.
+
+        NOTE: Since assoc_by_auth_id and Firebase accounts are keyed by auth_id,
+        and are therefore guaranteed to have no collisions, the associations
+        reported will always come from UserAuthDetailsModel.
+
+        Args:
+            auth_id: str. The auth_id to check.
+            assoc_info_pairs: list(tuple(str, (str, bool))). The list of
+                associations that do not correspond to any auth_id.
+
+        Yields:
+            str. A debug string for the associations with collisions.
+        """
+        user_id_collisions = sorted(
+            '"%s"' % info[0] for assoc_key, info in assoc_info_pairs
+            if assoc_key == cls.ASSOC_BY_USER_ID_KEY)
+
+        if len(user_id_collisions) > 1:
+            yield '%d UserAuthDetailsModels have auth_id="%s": %s' % (
+                len(user_id_collisions), auth_id, ', '.join(user_id_collisions))
+
+    @classmethod
+    def report_assoc_inconsistencies(
+            cls, auth_id, assoc_by_auth_id=None, assoc_by_user_id=None,
+            firebase_account_disabled=None):
+        """Reports inconsistencies between the given values.
+
+        IMPORTANT: The names of the keyword arguments MUST match the values of
+        their corresponding class keys: ASSOC_BY_AUTH_ID_KEY,
+        ASSOC_BY_USER_ID_KEY, FIREBASE_ACCOUNT_DISABLED_KEY.
+
+        Args:
+            auth_id: str. The auth_id of the user.
+            assoc_by_auth_id: tuple|None. The (user_id, deleted) properties from
+                the UserIdByFirebaseAuthIdModel corresponding to auth_id. NOTE:
+                UserIdByFirebaseAuthIdModel is keyed by auth_id,
+                so this argument will never use the default value of None.
+            assoc_by_user_id: tuple|None. The (user_id, deleted) properties from
+                the UserAuthDetailsModel corresponding to auth_id, or None if
+                one does not exist.
+            firebase_account_disabled: bool|None. Whether the Firebase account
+                corresponding to auth_id is disabled, or None if an account does
+                not exist.
+
+        Yields:
+            str. Debug information about a discovered inconsistency.
+        """
+        if assoc_by_auth_id is None and assoc_by_user_id is None:
+            # User is deleted and will be managed by resolve_user_conflicts().
+            return
+
+        distinct_user_ids = {assoc_by_auth_id[0]}
+        distinct_deleted_bools = {assoc_by_auth_id[1]}
+
+        if assoc_by_user_id is None:
+            yield (
+                'UserIdByFirebaseAuthIdModel(id="%s") does not correspond to a '
+                'unique UserAuthDetailsModel' % auth_id)
+        else:
+            distinct_user_ids.add(assoc_by_user_id[0])
+            distinct_deleted_bools.add(assoc_by_user_id[1])
+
+        if len(distinct_user_ids) == 2:
+            yield (
+                'auth_id="%s" has inconsistent `user_id` assignments: '
+                'UserIdByFirebaseAuthIdModel(user_id="%s") does not match '
+                'UserAuthDetailsModel(id="%s")' % (
+                    auth_id, assoc_by_auth_id[0], assoc_by_user_id[0]))
+
+        if len(distinct_deleted_bools) == 2:
+            yield (
+                'auth_id="%s" has inconsistent `deleted` assignments: '
+                'UserIdByFirebaseAuthIdModel(user_id="%s", deleted=%r) does '
+                'not match UserAuthDetailsModel(id="%s", deleted=%r)' % (
+                    auth_id, assoc_by_auth_id[0], assoc_by_auth_id[1],
+                    assoc_by_user_id[0], assoc_by_user_id[1]))
+
+        elif firebase_account_disabled and not any(distinct_deleted_bools):
+            yield (
+                'Firebase account with auth_id="%s" is disabled, but the user '
+                'is not marked for deletion on Oppia' % auth_id)
+
+
 class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Brings Firebase accounts and association models to a deterministic state.
 
