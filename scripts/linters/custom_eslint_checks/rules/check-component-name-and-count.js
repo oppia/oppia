@@ -44,7 +44,7 @@ module.exports ={
     const fileName = context.getFilename();
     const componentsToCheck = ['controller', 'directive', 'factory', 'filter']
     let numComponents = 0;
-    console.log(fileName);
+    console.info(fileName);
     return {
       CallExpression: function checkExpression(node) {
         if(!((fileName.endsWith('.js')) || (fileName.endsWith('.ts')))) {
@@ -54,17 +54,15 @@ module.exports ={
         if (node.callee.type !== 'MemberExpression') {
           return;
         }
-
         if (componentsToCheck.includes(node.callee.property.name)) {
           numComponents++;
           if(numComponents>1){
-            break;
+            context.report({
+              node: node.callee,
+              loc: node.callee.loc,
+              messageId: 'multipleComponents',
+            });
           }
-          context.report({
-            node: node.callee,
-            loc: node.callee.loc,
-            messageId: 'multipleComponents',
-          });
         }
       }
     };
