@@ -622,18 +622,18 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_ENGLISH = 'english'
     ANDROID_REPORT_INFO = {
-        'user_feedback_other_text_input':'add an admin',
-        'event_logs':['event1', 'event2'],
-        'logcat_logs':['logcat1', 'logcat2'],
-        'package_version_code':1,
-        'language_locale_code':'en',
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
         'entry_point_info': {
-            'entry_point_name':'crash',
+            'entry_point_name': 'crash',
         },
-        'text_size':'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi':True,
-        'automatically_update_topics':False,
-        'is_admin':False
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -661,7 +661,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language=self.AUDIO_LANGUAGE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            android_report_info_schema_version= (
+            android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
         app_feedback_report_models.AppFeedbackReportModel(
@@ -682,7 +682,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language=self.AUDIO_LANGUAGE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            android_report_info_schema_version= (
+            android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -741,18 +741,18 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_ENGLISH = 'english'
     ANDROID_REPORT_INFO = {
-        'user_feedback_other_text_input':'add an admin',
-        'event_logs':['event1', 'event2'],
-        'logcat_logs':['logcat1', 'logcat2'],
-        'package_version_code':1,
-        'language_locale_code':'en',
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
         'entry_point_info': {
-            'entry_point_name':'crash',
+            'entry_point_name': 'crash',
         },
-        'text_size':'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi':True,
-        'automatically_update_topics':False,
-        'is_admin':False
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -780,7 +780,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language=self.AUDIO_LANGUAGE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            android_report_info_schema_version= (
+            android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
         app_feedback_report_models.AppFeedbackReportModel(
@@ -801,7 +801,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language=self.AUDIO_LANGUAGE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            android_report_info_schema_version= (
+            android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -835,7 +835,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language=self.AUDIO_LANGUAGE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            android_report_info_schema_version= (
+            android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
 
@@ -844,7 +844,6 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 
 class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
