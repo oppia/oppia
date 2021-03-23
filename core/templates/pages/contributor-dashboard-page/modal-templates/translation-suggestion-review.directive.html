@@ -28,7 +28,7 @@
   </section>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
+    <textarea class="protractor-test-suggestion-review-message w-100" rows="3" ng-model="reviewMessage"></textarea>
   </div>
   <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
     <strong>Review message: </strong><[reviewMessage]>

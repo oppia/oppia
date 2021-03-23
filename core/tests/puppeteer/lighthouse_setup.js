@@ -16,6 +16,7 @@
  * @fileoverview Puppeteer script to collects dynamic urls for lighthouse tests.
  */
 
+var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
 
@@ -79,13 +80,17 @@ var roleSelect = '.protractor-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {
+  page.on('dialog', async dialog => {
+    if (dialog.message() === 'Please enter the email address to sign-in with') {
+      await dialog.accept('testadmin@example.com');
+    } else {
+      await dialog.dismiss();
+    }
+  });
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
       ADMIN_URL, { waitUntil: networkIdle});
-    await page.waitForSelector('#admin', {visible: true});
-    await page.click('#admin');
-    await page.click('#submit-login');
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, {visible: true});
@@ -275,6 +280,8 @@ const getSkillEditorUrl = async function(browser, page) {
 };
 
 const main = async function() {
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+  FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();

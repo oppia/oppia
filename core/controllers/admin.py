@@ -25,6 +25,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_services
 from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -50,6 +51,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -80,7 +82,7 @@ class AdminHandler(base.BaseHandler):
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
         for job in unfinished_job_data:
@@ -413,8 +415,8 @@ class AdminHandler(base.BaseHandler):
             if self.user.role != feconf.ROLE_ID_ADMIN:
                 raise Exception(
                     'User does not have enough rights to generate data.')
-            topic_id_1 = topic_services.get_new_topic_id()
-            topic_id_2 = topic_services.get_new_topic_id()
+            topic_id_1 = topic_fetchers.get_new_topic_id()
+            topic_id_2 = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
@@ -726,6 +728,56 @@ class AdminRoleHandler(base.BaseHandler):
                 topic_domain.ROLE_MANAGER, topic_id)
 
         self.render_json({})
+
+
+class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
+    """Handler for granting a user super admin privileges."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException('No such user exists')
+
+        auth_services.grant_super_admin_privileges(user_id)
+        self.render_json(self.values)
+
+
+class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
+    """Handler for revoking a user's super admin privileges."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if user_settings is None:
+            raise self.InvalidInputException('No such user exists')
+
+        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.InvalidInputException(
+                'Cannot revoke privileges from the default super admin account')
+
+        auth_services.revoke_super_admin_privileges(user_settings.user_id)
+        self.render_json(self.values)
 
 
 class AdminJobOutputHandler(base.BaseHandler):
