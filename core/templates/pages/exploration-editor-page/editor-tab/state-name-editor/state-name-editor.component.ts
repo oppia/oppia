@@ -38,12 +38,12 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('stateNameEditor', {
   template: require('./state-name-editor.component.html'),
   controller: [
-    '$filter', '$rootScope', '$window', 'EditabilityService',
+    '$filter', 'EditabilityService',
     'ExplorationStatesService',
     'ExternalSaveService', 'FocusManagerService', 'RouterService',
     'StateEditorService', 'StateNameService', 'MAX_STATE_NAME_LENGTH',
     function(
-        $filter, $rootScope, $window, EditabilityService,
+        $filter, EditabilityService,
         ExplorationStatesService,
         ExternalSaveService, FocusManagerService, RouterService,
         StateEditorService, StateNameService, MAX_STATE_NAME_LENGTH) {
@@ -107,31 +107,7 @@ angular.module('oppia').component('stateNameEditor', {
           RouterService.navigateToMainTab(normalizedStateName);
         }
       };
-
-      ctrl.windowOnload = function() {
-        ctrl.TabName = RouterService.getActiveTabName();
-        if (ctrl.TabName === 'main') {
-          FocusManagerService.setFocus('oppiaEditableSection');
-        }
-        if (ctrl.TabName === 'feedback') {
-          FocusManagerService.setFocus('newThreadButton');
-        }
-        if (ctrl.TabName === 'history') {
-          FocusManagerService.setFocus('usernameInputField');
-        }
-      };
-
       ctrl.$onInit = function() {
-        // If-user refreshes the tab.
-        $window.onload = ctrl.windowOnload();
-
-        $rootScope.$watch(
-          () => RouterService.getActiveTabName(),
-          (newValue) => {
-            if (newValue === 'main') {
-              FocusManagerService.setFocus('oppiaEditableSection');
-            }
-          });
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(
             () => {

@@ -31,7 +31,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
 
 describe('State Name Editor component', function() {
   var ctrl = null;
@@ -40,7 +39,6 @@ describe('State Name Editor component', function() {
   var $scope = null;
   var editabilityService = null;
   var explorationStatesService = null;
-  var focusManagerService = null;
   var routerService = null;
   var stateEditorService = null;
   var stateNameService = null;
@@ -67,7 +65,6 @@ describe('State Name Editor component', function() {
     editabilityService = TestBed.get(EditabilityService);
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -91,7 +88,6 @@ describe('State Name Editor component', function() {
     $rootScope = $injector.get('$rootScope');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
-    focusManagerService = $injector.get('FocusManagerService');
     spyOn(mockExplorationData, 'autosaveChangeList');
     spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
 
@@ -303,33 +299,4 @@ describe('State Name Editor component', function() {
     mockExternalSaveEventEmitter.emit();
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
-
-  it('should apply autofocus to elements', fakeAsync(() => {
-    spyOn(routerService, 'getActiveTabName').and.returnValues(
-      'main', 'feedback', 'history');
-    spyOn(focusManagerService, 'setFocus');
-    ctrl.windowOnload();
-    expect(ctrl.TabName).toBe('main');
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'oppiaEditableSection');
-    ctrl.windowOnload();
-    expect(ctrl.TabName).toBe('feedback');
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'newThreadButton');
-    ctrl.windowOnload();
-    expect(ctrl.TabName).toBe('history');
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'usernameInputField');
-  }));
-
-  it('should apply autofocus when tabs are switched in exploration editor',
-    function() {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValues('feedback', 'main');
-      spyOn(focusManagerService, 'setFocus');
-      $rootScope.$apply(routerService.getActiveTabName());
-      $rootScope.$apply(routerService.getActiveTabName());
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-        'oppiaEditableSection');
-    });
 });

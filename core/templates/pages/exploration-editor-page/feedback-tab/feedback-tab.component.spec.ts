@@ -29,7 +29,6 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -47,8 +46,6 @@ describe('Feedback Tab Component', function() {
   var dateTimeFormatService = null;
   var editabilityService = null;
   var explorationStatesService = null;
-  var focusManagerService = null;
-  var routerService = null;
   var suggestionModalForExplorationEditorService = null;
   var suggestionThreadObjectFactory = null;
   var threadDataBackendApiService = null;
@@ -66,7 +63,6 @@ describe('Feedback Tab Component', function() {
     alertsService = TestBed.get(AlertsService);
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
     suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -94,8 +90,6 @@ describe('Feedback Tab Component', function() {
     threadDataBackendApiService = (
       $injector.get('ThreadDataBackendApiService'));
     userService = $injector.get('UserService');
-    focusManagerService = $injector.get('FocusManagerService');
-    routerService = $injector.get('RouterService');
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
@@ -485,28 +479,4 @@ describe('Feedback Tab Component', function() {
     isEditableSpy.and.returnValue(false);
     expect(ctrl.isExplorationEditable()).toBe(false);
   });
-
-  it('should apply autofocus to feedback element when tab is in active thread',
-    function() {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValues('history', 'feedback');
-      spyOn(focusManagerService, 'setFocus');
-      ctrl.activeThread = false;
-      $rootScope.$apply(routerService.getActiveTabName());
-      $rootScope.$apply(routerService.getActiveTabName());
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-        'newThreadButton');
-    });
-
-  it('should apply focus to feedback element when tab is not in active thread',
-    function() {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValues('history', 'feedback');
-      spyOn(focusManagerService, 'setFocus');
-      ctrl.activeThread = true;
-      $rootScope.$apply(routerService.getActiveTabName());
-      $rootScope.$apply(routerService.getActiveTabName());
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-        'tmpMessageText');
-    });
 });

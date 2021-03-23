@@ -47,14 +47,14 @@ angular.module('oppia').component('feedbackTab', {
   controller: [
     '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
-    'FocusManagerService', 'LoaderService', 'RouterService',
+    'FocusManagerService', 'LoaderService',
     'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     function(
         $q, $rootScope, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
-        FocusManagerService, LoaderService, RouterService,
+        FocusManagerService, LoaderService,
         SuggestionModalForExplorationEditorService,
         ThreadDataBackendApiService, ThreadStatusDisplayService,
         UrlInterpolationService, UserService) {
@@ -219,18 +219,6 @@ angular.module('oppia').component('feedbackTab', {
       };
 
       ctrl.$onInit = function() {
-        $rootScope.$watch(
-          () => RouterService.getActiveTabName(),
-          (newValue) => {
-            if (newValue === 'feedback') {
-              if (!ctrl.activeThread) {
-                FocusManagerService.setFocus('newThreadButton');
-              }
-              if (ctrl.activeThread) {
-                FocusManagerService.setFocus('tmpMessageText');
-              }
-            }
-          });
         ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
         ctrl.activeThread = null;
         ctrl.userIsLoggedIn = null;

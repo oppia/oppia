@@ -33,7 +33,6 @@ require(
 require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
@@ -43,13 +42,13 @@ angular.module('oppia').component('historyTab', {
   controller: [
     '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'FocusManagerService', 'LoaderService', 'RouterService',
+    'LoaderService', 'RouterService',
     'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
         $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        FocusManagerService, LoaderService, RouterService,
+        LoaderService, RouterService,
         UrlInterpolationService,
         VersionTreeService, WindowRef) {
       var ctrl = this;
@@ -283,13 +282,6 @@ angular.module('oppia').component('historyTab', {
       };
 
       ctrl.$onInit = function() {
-        $rootScope.$watch(
-          () => RouterService.getActiveTabName(),
-          (newValue) => {
-            if (newValue === 'history') {
-              FocusManagerService.setFocus('usernameInputField');
-            }
-          });
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshVersionHistory.subscribe((data) => {
             if (
