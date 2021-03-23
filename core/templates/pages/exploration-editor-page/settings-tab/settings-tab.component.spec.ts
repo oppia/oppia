@@ -431,7 +431,7 @@ describe('Settings Tab Component', () => {
       $scope.$apply();
 
       expect(explorationRightsService.saveModeratorChangeToBackend)
-        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
+        .toHaveBeenCalledWith('Email body');
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
@@ -490,7 +490,7 @@ describe('Settings Tab Component', () => {
       ctrl.editRole('Username1', 'editor');
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
-        'Username1', 'editor', jasmine.any(Function));
+        'Username1', 'editor');
       expect(ctrl.isRolesFormOpen).toBe(false);
     });
 
@@ -567,7 +567,7 @@ describe('Settings Tab Component', () => {
       ctrl.toggleViewabilityIfPrivate();
 
       expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
-        true, jasmine.any(Function));
+        true);
     });
 
     it('should refresh settings tab when refreshSettingsTab event occurs',

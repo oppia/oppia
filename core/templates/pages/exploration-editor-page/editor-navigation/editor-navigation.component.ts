@@ -23,9 +23,7 @@ require(
   'thread-data-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/modal-templates/help-modal.controller.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-rights-backend-api.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');

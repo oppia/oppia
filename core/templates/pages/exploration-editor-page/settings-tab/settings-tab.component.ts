@@ -63,9 +63,7 @@ require(
   'exploration-param-changes.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-rights-backend-api.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -256,14 +254,12 @@ angular.module('oppia').component('settingsTab', {
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
         ctrl.closeRolesForm();
         ExplorationRightsService.saveRoleChanges(
-          newMemberUsername, newMemberRole, $rootScope.$applyAsync);
+          newMemberUsername, newMemberRole);
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
         ExplorationRightsService.setViewability(
-          !ExplorationRightsService.viewableIfPrivate(),
-          $rootScope.$applyAsync
-        );
+          !ExplorationRightsService.viewableIfPrivate());
       };
 
       ctrl._successCallback = () => {
@@ -316,7 +312,7 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          ExplorationRightsService.makeCommunityOwned($rootScope.$applyAsync);
+          ExplorationRightsService.makeCommunityOwned();
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -362,7 +358,7 @@ angular.module('oppia').component('settingsTab', {
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
             ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody, $rootScope.$applyAsync);
+              emailBody);
           }, function() {
             AlertsService.clearWarnings();
           });

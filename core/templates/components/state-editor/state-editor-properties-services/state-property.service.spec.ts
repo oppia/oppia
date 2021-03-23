@@ -21,15 +21,12 @@ import { fakeAsync, tick } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-property.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
-
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 
 describe('Change list service', function() {
-  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -230,7 +227,6 @@ describe('Change list service', function() {
 });
 
 describe('Exploration title service', function() {
-  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
