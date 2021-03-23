@@ -34,7 +34,7 @@ module.exports ={
     schema: [],
     messages: {
       multipleComponents: (
-        '{{fileName}} -> Please ensure that there is exactly one' +
+        'Please ensure that there is exactly one' +
         'component in the file.')
     }
   },
@@ -43,28 +43,30 @@ module.exports ={
     const sourceCode = context.getSourceCode();
     const fileName = context.getFilename();
     const componentsToCheck = ['controller', 'directive', 'factory', 'filter']
-
-    var reportMultipleComponentsError = function(file) {
-      context.report({
-        file,
-        messageId: 'multipleComponents',
-        data: {
-          fileName: fileName,
+    let numComponents = 0;
+    console.log(fileName);
+    return {
+      CallExpression: function checkExpression(node) {
+        if(!((fileName.endsWith('.js')) || (fileName.endsWith('.ts')))) {
+          return;
         }
-      });
-    };
+        
+        if (node.callee.type !== 'MemberExpression') {
+          return;
+        }
 
-    var countComponent = function(){
-      var numOfComponents = 0;
-
-      for (component in componentsToCheck) {
-        if (numOfComponents > 1) {
-          break;
+        if (componentsToCheck.includes(node.callee.property.name)) {
+          numComponents++;
+          if(numComponents>1){
+            break;
+          }
+          context.report({
+            node: node.callee,
+            loc: node.callee.loc,
+            messageId: 'multipleComponents',
+          });
         }
       }
     };
-
   }
-
-
 };

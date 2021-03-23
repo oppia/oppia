@@ -24,6 +24,37 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester();
 ruleTester.run('check-component-name-and-count', rule, {
   valid: [
-  
+    `angular.module('oppia').component('loadingMessage', {
+      template: require('./loading-message.component.html'),
+      bindings: {
+        message: '<'
+      }
+    });`
+  ],
+
+  invalid: [
+    {
+      code:
+      `angular.module('oppia').component('loadingMessage', {
+        template: require('./loading-message.component.html'),
+        bindings: {
+          message: '<'
+        }
+      });
+      
+      angular.module('oppia').component('loadingMessage', {
+        template: require('./loading-message.component.html'),
+        bindings: {
+          message: '<'
+        }
+      });`,
+      errors: [{
+        message: (
+          'Please ensure that there is exactly one component in the file.'), 
+        type: null,
+      }]
+    }
   ]
+
+
 });
