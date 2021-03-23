@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
 
 from constants import constants
@@ -43,10 +44,10 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
 (
-    subtopic_models, topic_models, user_models
+    subtopic_models, topic_models, user_models, exp_models, story_models
 ) = models.Registry.import_models([
-    models.NAMES.subtopic, models.NAMES.topic, models.NAMES.user
-])
+    models.NAMES.subtopic, models.NAMES.topic, models.NAMES.user,
+    models.NAMES.exp, models.NAMES.story])
 
 
 class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
