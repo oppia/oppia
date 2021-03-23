@@ -146,8 +146,8 @@ export class SearchService {
       searchQuery: string,
       selectedCategories: SelectionList,
       selectedLanguageCodes: SelectionList,
-      successCallback:() => void,
-      errorCallback?:(reason: string) => void): void {
+      successCallback: () => void,
+      errorCallback?: (reason: string) => void): void {
     const queryUrl = this.getQueryUrl(
       this.getSearchUrlQueryString(
         searchQuery, selectedCategories, selectedLanguageCodes));
@@ -228,8 +228,8 @@ export class SearchService {
   }
 
   loadMoreData(
-      successCallback:(SearchResponseData, boolean) => void,
-      failureCallback?:(any) => void): void {
+      successCallback: (SearchResponseData, boolean) => void,
+      failureCallback?: (any) => void): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
