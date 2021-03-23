@@ -160,7 +160,8 @@ var ensurePageHasNoTranslationIds = async function() {
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
-  var REGEX_NGB_TOOLTIP_ATTR = new RegExp('tooltip="I18N_|tooltip="\'I18N_', 'g');
+  var REGEX_NGB_TOOLTIP_ATTR = new RegExp(
+    'tooltip="I18N_|tooltip="\'I18N_', 'g');
   var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
   var REGEX_NG_TOP_NAV_VISIBILITY = (
     new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g'));

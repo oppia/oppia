@@ -33,7 +33,7 @@ export class LearnerPlaylistModalComponent implements OnInit {
   @Input() activityType: string;
 
   sectionNameI18nId: string;
-  removeFromLearnerPlaylistUrl:string;
+  removeFromLearnerPlaylistUrl: string;
 
   constructor(
     private activeModal: NgbActiveModal,

@@ -91,7 +91,7 @@ export class LearnerPlaylistBackendApiService {
   }
 
   removeFromLearnerPlaylist(
-      activityId:string, activityTitle:string, activityType:string,
+      activityId: string, activityTitle: string, activityType: string,
       learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
     const modelRef = this.ngbModal.open(
       LearnerPlaylistModalComponent, {backdrop: true});

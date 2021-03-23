@@ -24,7 +24,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
