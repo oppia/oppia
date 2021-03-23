@@ -30,10 +30,10 @@ def parse_json_from_js(js_file):
     """Extracts JSON object from JS file.
 
     Args:
-        js_file: file. JS file containing JSON that needs to be parsed.
+        js_file: file. The js file containing JSON that needs to be parsed.
 
     Returns:
-        dict. Parsed value of JSON in the JS file.
+        dict. The dict representation of JSON object in the js file.
     """
     text = js_file.read()
     text_without_comments = remove_comments(text)
@@ -47,7 +47,7 @@ def remove_comments(text):
     """Removes comments from given text.
 
     Args:
-        text: str. Text from which comments should be removed.
+        text: str. The text from which comments should be removed.
 
     Returns:
         str. Text with all its comments removed.

@@ -221,7 +221,7 @@ def _validate_validator(obj_type, validator):
     """Validates the value of a 'validator' field.
 
     Args:
-        obj_type: str. UI config spec type.
+        obj_type: str. The type of the object.
         validator: dict. The Specs that needs to be validated.
 
     Raises:
@@ -270,12 +270,13 @@ def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
     keys, are in the given dict.
 
     Args:
-        dict_to_check: dict. Dictionary for which keys are checked.
+        dict_to_check: dict. The dict which needs to be validated.
         required_keys: list. Keys which are required to be in the dictionary.
-        optional_keys: list. Keys which are optionals in the dictionary.
+        optional_keys: list. Keys which are optional in the dictionary.
 
     Raises:
-        AssertionError. The validation fails if there are extra keys.
+        AssertionError. The dict is missing required keys.
+        AssertionError. The dict contains extra keys.
     """
     assert set(required_keys) <= set(dict_to_check.keys()), (
         'Missing keys: %s' % dict_to_check)
@@ -301,7 +302,7 @@ def validate_schema(schema):
     of normalizers.
 
     Args:
-        schema: dict. Schema that needs to be validated.
+        schema: dict. The schema that needs to be validated.
 
     Raises:
         AssertionError. The schema is not valid.
