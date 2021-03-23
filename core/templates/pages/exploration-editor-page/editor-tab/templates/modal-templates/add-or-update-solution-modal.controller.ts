@@ -59,7 +59,8 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
         StateInteractionIdService.savedMemento,
         StateCustomizationArgsService.savedMemento,
         false,
-        $scope.SOLUTION_EDITOR_FOCUS_LABEL));
+        $scope.SOLUTION_EDITOR_FOCUS_LABEL,
+        StateSolutionService.savedMemento));
     $scope.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
