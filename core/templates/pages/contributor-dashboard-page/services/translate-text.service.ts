@@ -125,8 +125,8 @@ export class TranslateTextService {
     this.activeExpId = expId;
     this.translateTextBackedApiService.getTranslatableTextsAsync(
       expId, languageCode).then((translatableTexts: TranslatableTexts) => {
-      this.stateWiseContents = translatableTexts.stateNamesToContentIdMapping;
-      this.activeExpVersion = translatableTexts.version;
+      this.stateWiseContents = translatableTexts.stateWiseContents;
+      this.activeExpVersion = translatableTexts.explorationVersion;
       for (const stateName in this.stateWiseContents) {
         let stateHasText: boolean = false;
         const contentIds = [];

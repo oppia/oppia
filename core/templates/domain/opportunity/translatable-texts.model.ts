@@ -31,8 +31,9 @@ export interface TranslatableTextsBackendDict {
 
 export class TranslatableTexts {
   constructor(
-      readonly stateNamesToContentIdMapping: StateNamesToContentIdMapping,
-      readonly version: string) {}
+      private readonly stateNamesToContentIdMapping:
+      StateNamesToContentIdMapping,
+      private readonly version: string) {}
 
   static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
     TranslatableTexts {
