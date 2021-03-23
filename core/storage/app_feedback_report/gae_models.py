@@ -210,7 +210,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, platform, submitted_on_sec):
-    """Generates key for the instance of AppFeedbackReportModel class in the
+        """Generates key for the instance of AppFeedbackReportModel class in the
         required format with the arguments provided.
 
         Args:
