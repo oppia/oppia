@@ -218,7 +218,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             str. The generated ID for this entity using platform,
                 submitted_on_sec, and a random string, of the form
-                '[user_id].[submitted_on_sec].[random hash]'.
+                '[platform].[submitted_on_sec].[random hash]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
