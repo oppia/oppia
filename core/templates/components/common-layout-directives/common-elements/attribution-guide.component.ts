@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { AttributionService } from 'services/attribution.service';
+import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 
 @Component({
@@ -37,6 +38,7 @@ export class AttributionGuideComponent implements OnInit {
   constructor(
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
+    private contextService: ContextService,
     private urlService: UrlService
   ) {}
 
@@ -74,6 +76,10 @@ export class AttributionGuideComponent implements OnInit {
 
   getExplorationTitle(): string {
     return this.attributionService.getExplorationTitle();
+  }
+
+  getExplorationId(): string {
+    return this.contextService.getExplorationId();
   }
 
   copyAttribution(className: string): void {

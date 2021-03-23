@@ -37,7 +37,7 @@ export class TopicCreationBackendApiService {
 
   _createTopic(
       successCallback: (value: TopicCreationResponse) => void,
-      errorCallback:(reason: string) => void,
+      errorCallback: (reason: string) => void,
       topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): void {
     let postData = {
@@ -67,7 +67,7 @@ export class TopicCreationBackendApiService {
       });
   }
 
-  createTopic(
+  async createTopicAsync(
       topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): Promise<TopicCreationResponse> {
     return new Promise((resolve, reject) => {

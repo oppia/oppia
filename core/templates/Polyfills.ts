@@ -16,6 +16,8 @@
  * @fileoverview Polyfills for Oppia.
  */
 
+import 'globalthis/auto';
+
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
