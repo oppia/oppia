@@ -1039,7 +1039,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
         feedback_report_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            feedback_report_models: list(FeedbackReportModel). Models to redact
+            feedback_report_models: list(FeedbackReportModel). Models to scrub
                 user IDs from in the 'scrubbed_by' field.
         """
         for report_model in feedback_report_models:
