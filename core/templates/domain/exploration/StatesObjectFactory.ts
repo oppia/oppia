@@ -138,7 +138,7 @@ export class States {
     return finalStateNames;
   }
 
-  _getAllLanguageCodesFor(translationType: TranslationType) : string[] {
+  _getAllLanguageCodesFor(translationType: TranslationType): string[] {
     const allLanguageCodes = new Set<string>();
     Object.values(this._states).forEach(state => {
       state[translationType].getAllContentIds().forEach(contentId => {
