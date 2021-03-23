@@ -441,20 +441,20 @@ angular.module('oppia').component('settingsTab', {
         ctrl.rolesSaveButtonEnabled = true;
         ctrl.errorMessage = '';
 
-        if (ctrl.newMemberUsername.length <= 0) {
+        if (!ctrl.newMemberUsername) {
           ctrl.rolesSaveButtonEnabled = false;
           ctrl.errorMessage = '';
           return;
         }
 
-        if (ExplorationTitleService.savedMemento.length <= 0) {
+        if (!ExplorationTitleService.savedMemento) {
           ctrl.rolesSaveButtonEnabled = false;
           ctrl.errorMessage = (
             'Please provide a title before inviting.');
           return;
         }
 
-        if (ctrl.newMemberUsername === ctrl.loggedinUser) {
+        if (ctrl.newMemberUsername === ctrl.loggedInUser) {
           ctrl.rolesSaveButtonEnabled = false;
           ctrl.errorMessage = (
             'Users are not allowed to assign other roles to themselves.');
@@ -526,9 +526,9 @@ angular.module('oppia').component('settingsTab', {
         ctrl.canReleaseOwnership = false;
         ctrl.canUnpublish = false;
         ctrl.explorationId = ExplorationDataService.explorationId;
-        ctrl.loggedinUser = null;
+        ctrl.loggedInUser = null;
         UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.loggedinUser = userInfo.getUsername();
+          ctrl.loggedInUser = userInfo.getUsername();
         });
 
         UserExplorationPermissionsService.getPermissionsAsync()
