@@ -734,7 +734,9 @@ def _assign_role(
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
-        allow_assigning_any_role: bool. Flag to assign any role to exploration.
+        allow_assigning_any_role: bool. Whether to assign a role to the user
+            irrespective of whether they have any existing role in the activity.
+            The default value is false.
 
     Raises:
         Exception. The committer does not have rights to modify a role.
@@ -761,8 +763,16 @@ def _assign_role(
     assignee_username = user_services.get_username(assignee_id)
     old_role = rights_domain.ROLE_NONE
 
+    if new_role not in [
+            rights_domain.ROLE_OWNER,
+            rights_domain.ROLE_EDITOR,
+            rights_domain.ROLE_VOICE_ARTIST,
+            rights_domain.ROLE_VIEWER
+    ]:
+        raise Exception('Invalid role: %s' % new_role)
     if allow_assigning_any_role:
         old_role = activity_rights.assign_role(assignee_id, new_role)
+
     elif new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):
             raise Exception('This user already owns this %s.' % activity_type)
@@ -780,6 +790,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VOICE_ARTIST
 
     elif new_role == rights_domain.ROLE_EDITOR:
+
         if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
@@ -796,6 +807,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VOICE_ARTIST:
+
         if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_voice_artist(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
@@ -809,6 +821,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VIEWER:
+
         if (activity_rights.is_owner(assignee_id) or
                 activity_rights.is_editor(assignee_id) or
                 activity_rights.is_viewer(assignee_id)):
@@ -820,9 +833,6 @@ def _assign_role(
                 'Public %ss can be viewed by anyone.' % activity_type)
 
         activity_rights.viewer_ids.append(assignee_id)
-
-    else:
-        raise Exception('Invalid role: %s' % new_role)
 
     commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)

@@ -17,6 +17,7 @@
  * about the rights for this exploration.
  */
 
+import { AppConstants } from 'app.constants';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationDataService } from
@@ -151,8 +152,7 @@ export class ExplorationRightsService {
     });
   }
   removeRoleAsync(
-      memberUsername: string,
-      callback: () => void): Promise<void> {
+      memberUsername: string): Promise<void> {
     var requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
 
@@ -168,25 +168,21 @@ export class ExplorationRightsService {
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
         data.rights.community_owned, data.rights.viewable_if_private);
-      callback();
     });
   }
   checkUserAlreadyHasRoles(username: string): boolean {
-    var allUsernames = this.ownerNames;
-    allUsernames = allUsernames.concat(this.editorNames);
-    allUsernames = allUsernames.concat(this.voiceArtistNames);
-    allUsernames = allUsernames.concat(this.viewerNames);
-    return allUsernames.indexOf(username) > -1;
+    return [...this.ownerNames, ...this.editorNames, ...this.voiceArtistNames,
+      ...this.viewerNames].includes(username);
   }
   getOldRole(username: string): string {
-    if (this.ownerNames.indexOf(username) > -1) {
-      return 'owner';
-    } else if (this.editorNames.indexOf(username) > -1) {
-      return 'editor';
-    } else if (this.voiceArtistNames.indexOf(username) > -1) {
-      return 'voice artist';
+    if (this.ownerNames.includes(username)) {
+      return AppConstants.ROLE_OWNER;
+    } else if (this.editorNames.includes(username)) {
+      return AppConstants.ROLE_EDITOR;
+    } else if (this.voiceArtistNames.includes(username)) {
+      return AppConstants.ROLE_VOICE_ARTIST;
     } else {
-      return 'viewer';
+      return AppConstants.ROLE_VIEWER;
     }
   }
   publish(): Promise<void> {

@@ -159,8 +159,10 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.saveRoleChanges(
             username, newRole, $rootScope.$applyAsync);
-          ctrl.closeRolesForm();
+        }, function() {
+          AlertsService.clearWarnings();
         });
+        ctrl.closeRolesForm();
       };
 
       ctrl.refreshSettingsTab = function() {
@@ -309,6 +311,8 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.removeRoleAsync(
             memberUsername, $rootScope.$applyAsync);
+        }, function() {
+          AlertsService.clearWarnings();
         });
         ctrl.closeRolesForm();
       };

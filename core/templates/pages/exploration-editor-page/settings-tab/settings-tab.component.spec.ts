@@ -229,7 +229,7 @@ describe('Settings Tab Component', () => {
 
         expect(ctrl.stateNames).toEqual(['Introduction']);
         expect(ctrl.hasPageLoaded).toBe(true);
-        expect(ctrl.loggedinUser).toBe('username1');
+        expect(ctrl.loggedInUser).toBe('username1');
       });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
@@ -714,7 +714,7 @@ describe('Settings Tab Component', () => {
 
       it('should disable save button when adding another role to itself',
         () => {
-          ctrl.newMemberUsername = ctrl.loggedinUser;
+          ctrl.newMemberUsername = ctrl.loggedInUser;
           ctrl.rolesSaveButtonEnabled = true;
           explorationTitleService.init('Exploration title');
           ctrl.saveExplorationTitle();

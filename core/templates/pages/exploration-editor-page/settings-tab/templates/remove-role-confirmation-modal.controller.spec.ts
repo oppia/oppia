@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for RemoveRoleConfirmationModalController.
  */
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');

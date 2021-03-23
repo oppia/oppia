@@ -477,7 +477,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_domain.ROLE_VIEWER)
 
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-        self.assertTrue(exp_rights.is_viewer(self.user_id_a))
+        self.assertTrue(exp_rights.is_viewer(self.user_id_b))
 
     def test_check_exploration_rights(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
