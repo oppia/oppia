@@ -31,9 +31,6 @@ workflows:
       - e2e_library_and_collections:
           requires:
             - e2e_navigation_and_misc
-      - e2e_users:
-          requires:
-            - e2e_navigation_and_misc
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -189,7 +186,7 @@ jobs:
       - run:
           name: Run e2e publication test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --server_log_level="info" --prod_env
       - run:
           name: Run e2e library test
           command: |
@@ -202,44 +199,6 @@ jobs:
           name: Run e2e accessibility page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-      - upload_screenshots
-
-  e2e_users:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - check_release_changelog_update_branch
-      - merge_target_branch
-      - install_chrome
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Set up python by installing protobuf and enum
-          command: pip install enum34==1.1.10 protobuf==3.13.0
-      - run:
-          name: Run e2e users test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
-      - run:
-          name: Run e2e subscriptions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
-      - run:
-          name: Run e2e profileMenu test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
-      - run:
-          name: Run e2e preferences test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
-      - run:
-          name: Run e2e profileFeatures test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
-      - run:
-          name: Run e2e wipeout test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
       - upload_screenshots
 
   e2e_miscellaneous_tests:

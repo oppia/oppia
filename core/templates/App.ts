@@ -74,8 +74,6 @@ require('google-analytics.initializer.ts');
 // loaded *after* app.constants.ts.
 require('I18nFooter.ts');
 
-require('Polyfills.ts');
-
 // Default to passive event listeners.
 require('default-passive-events');
 
