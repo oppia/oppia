@@ -206,7 +206,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def _generate_id(cls, platform, submitted_on_sec):
+    def _generate_id(cls, platform, submitted_on_sec, scrubbed_by):
         """Generates key for the instance of AppFeedbackReportModel
         class in the required format with the arguments provided.
 
@@ -272,6 +272,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 'feedback_list': report_dict['feedback_list']
             }
             report_entity.web_report_info = new_report_dict
+        report_entity.scrubbed_by=scrubbed_by
         report_entity.update_timestamps()
         report_entity.put()
 
