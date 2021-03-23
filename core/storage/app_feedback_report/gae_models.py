@@ -373,6 +373,19 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """The lowest supported role for feedback reports will be moderator."""
         return feconf.ROLE_ID_MODERATOR
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether AppFeedbackReportModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether a model is associated with the user.
+        """
+        return cls.query(
+            cls.scrubbed_by == user_id).get(keys_only=True) is not None
+
 
 class AppFeedbackReportTicketModel(base_models.BaseModel):
     """Model for storing tickets created to triage feedback reports.
