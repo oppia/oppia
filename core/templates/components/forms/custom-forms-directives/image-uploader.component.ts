@@ -22,7 +22,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
 interface ImageTypeMapping {
-  [key : string] : {
+  [key: string]: {
     format: string,
     fileExtension: RegExp
   }
