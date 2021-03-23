@@ -234,7 +234,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
 
     @classmethod
-    def scrub_report(cls, report_id):
+    def scrub_report(cls, report_id, scrubbed_by):
         """Scrubs the instance of AppFeedbackReportModel with given ID, removing
         any user-entered input in the entity.
 

@@ -120,6 +120,37 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(report_model.android_report_info_schema_version, 1)
         self.assertEqual(report_model.web_report_info, None)
 
+    def test_scrub_report_model(self):
+        report_id = '%s.%s.%s' % (
+            self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+            'randomInteger123'),
+        report_model = app_feedback_report_models.AppFeedbackReportModel.get(
+            report_id)
+        report_dict = report_model.android_report_info
+        expected_report_dict = {
+            'feedback_list': report_dict['feedback_list'],
+            'package_version_code': report_dict['package_version_code'],
+            'device_language_locale_code': (
+                report_dict['device_language_locale_code']),
+            'build_fingerprint': report_dict['build_fingerprint'],
+            'network_type': report_dict['network_type'],
+            'text_size': report_dict['text_size'],
+            'download_and_update_only_on_wifi': (
+                report_dict['download_and_update_only_on_wifi']),
+            'automatically_update_topics': (
+                report_dict['automatically_update_topics']),
+            'account_is_profile_admin': (
+                report_dict['account_is_profile_admin'])
+        }
+
+        app_feedback_report_models.AppFeedbackReportModel.scrub_report(
+            report_id, 'scrubber_user')
+        scrubbed_report_model = app_feedback_report_models.AppFeedbackReportModel.get(
+            report_id)
+        self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
+        self.assertEqual(
+            scrubbed_report_model.android_report_info, expected_report_dict)
+
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(model.get_deletion_policy(),
