@@ -29,7 +29,7 @@ export class MockDateTimeFormatService {
 }
 
 describe('Thread table component', () => {
-  let component : ThreadTableComponent;
+  let component: ThreadTableComponent;
   let fixture: ComponentFixture<ThreadTableComponent>;
 
   beforeEach(waitForAsync(() => {

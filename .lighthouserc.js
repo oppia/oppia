@@ -29,6 +29,7 @@ module.exports = {
         'http://127.0.0.1:8181/contact',
         'http://127.0.0.1:8181/contributor-dashboard',
         'http://127.0.0.1:8181/creator-dashboard',
+        'http://127.0.0.1:8181/creator-guidelines',
         'http://127.0.0.1:8181/delete-account',
         'http://127.0.0.1:8181/donate',
         'http://127.0.0.1:8181/emaildashboard',
@@ -155,6 +156,16 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/creator-guidelines$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
             ],
             'uses-passive-event-listeners': ['error', {'minScore': 1}],
             'deprecations': ['error', {'minScore': 1}]
