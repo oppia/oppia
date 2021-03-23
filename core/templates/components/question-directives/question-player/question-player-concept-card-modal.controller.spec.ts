@@ -140,9 +140,6 @@ describe('Question Player Concept Card Modal Controller', function() {
       selected_subtopic_ids: 'selected_subtopic_ids'
     });
     $scope.retryTest();
-    $scope.selectedSubtopics();
-    expect(urlService.getUrlParams().hasOwnProperty(
-      'selected_subtopic_ids')).toBe(true);
     expect(mockWindow.location.replace).toHaveBeenCalledWith(
       'pathname?selected_subtopic_ids=selected_subtopic_ids');
   });
