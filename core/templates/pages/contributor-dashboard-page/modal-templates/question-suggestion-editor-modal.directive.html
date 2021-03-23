@@ -5,7 +5,13 @@
 
   <div class="modal-body">
     <div class="oppia-question-editor-section">
-      <h3>Selected Difficulty: <[skillDifficultyString]></h3>
+      <h3>Selected Difficulty: <[skillDifficultyString]>
+        <i role = "button"
+          class="material-icons oppia-editor-edit-icon select-difficulty-icon oppia-editable-section protractor-test-edit-content-pencil-button"
+          ng-click="onClickSuggestQuestionButton()"
+          title="Edit Skill Difficulty">&#xE254;
+        </i>
+      </h3>
       <div ng-if="skill.getRubricExplanations(skillDifficultyString).length > 0">
         <h3 title="Use these notes to make sure your question is at the right difficulty.">
           Notes from Skill Rubric
@@ -38,13 +44,6 @@
   </div>
 
   <div class="modal-footer">
-    <button ng-if="newQuestionIsBeingCreated"
-    title="To change already selected skill difficulty"
-    class="btn btn-success"
-    ng-click="onClickSuggestQuestionButton()"
-    >
-    Select Question Difficulty
-    </button>
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
     <button ng-if="newQuestionIsBeingCreated"
             title="To Save please add: interaction, hint, solution and address all misconceptions"
@@ -65,5 +64,11 @@
   }
   .oppia-question-suggestion-editor-modal>.modal-header {
     padding-bottom: 0;
+  }
+  .select-difficulty-icon.oppia-editor-edit-icon {
+    position: unset;
+  }
+  .select-difficulty-icon.oppia-editor-edit-icon:hover {
+    opacity: 0.8;
   }
 </style>
