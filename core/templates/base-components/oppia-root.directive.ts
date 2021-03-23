@@ -33,7 +33,6 @@ angular.module('oppia').directive('oppiaRoot', [
           $scope.initialized = false;
 
           $scope.onInit = function() {
-            console.log('init');
             const translateService = (
               OppiaAngularRootComponent.translateService);
             const i18nLanguageCodeService = (
