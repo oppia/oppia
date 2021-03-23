@@ -32,6 +32,9 @@ PLATFORM_CHOICE_ANDROID = 'android'
 PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 
+REPORT_INFO_TO_REDACT = [
+    'user_feedback_other_text_input', 'event_logs', 'logcat_logs']
+
 
 class AppFeedbackReportModel(base_models.BaseModel):
     """Model for storing feedback reports sent from learners.
@@ -206,7 +209,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def _generate_id(cls, platform, submitted_on_sec, scrubbed_by):
+    def _generate_id(cls, platform, submitted_on_sec):
         """Generates key for the instance of AppFeedbackReportModel
         class in the required format with the arguments provided.
 
@@ -247,34 +250,31 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 'The AppFeedbackReportModel trying to be scrubbed does not'
                 'exist.')
         if report_entity.platform == PLATFORM_CHOICE_ANDROID:
-            # Scrub the logs and the user's inputted text.
-            report_dict = report_entity.android_report_info
-            new_report_dict = {
-                'feedback_list': report_dict['feedback_list'],
-                'package_version_code': report_dict['package_version_code'],
-                'device_language_locale_code': (
-                    report_dict['device_language_locale_code']),
-                'build_fingerprint': report_dict['build_fingerprint'],
-                'network_type': report_dict['network_type'],
-                'text_size': report_dict['text_size'],
-                'download_and_update_only_on_wifi': (
-                    report_dict['download_and_update_only_on_wifi']),
-                'automatically_update_topics': (
-                    report_dict['automatically_update_topics']),
-                'account_is_profile_admin': (
-                    report_dict['account_is_profile_admin'])
-            }
-            report_entity.android_report_info = new_report_dict
+            scrubbed_report_info = cls._scrub_report_info(
+                report_entity.android_report_info)
+            report_entity.android_report_info = scrubbed_report_info
         else: 
-            # Scrub the user's inputted text.
-            report_dict = report_entity.web_report_info
-            new_report_dict = {
-                'feedback_list': report_dict['feedback_list']
-            }
-            report_entity.web_report_info = new_report_dict
+            scrubbed_report_info = cls._scrub_report_info(
+                report_entity.web_report_info)
+            report_entity.web_report_info = scrubbed_report_info
         report_entity.scrubbed_by=scrubbed_by
         report_entity.update_timestamps()
         report_entity.put()
+
+    @staticmethod
+    def _scrub_report_info(report_info_dict):
+        """Scrubs the dictionary of any fields that contains input directly from
+        the user.
+
+        Args: report_info_dict: dict. The info dict collected in a report.
+
+        Returns: dict. The scrubbed report.
+        """
+        new_report_info = dict()
+        for key in report_info_dict:
+            if not REPORT_INFO_TO_REDACT.__contains__(key):
+                new_report_info[key] = report_info_dict[key]
+        return new_report_info
 
 
     @staticmethod
