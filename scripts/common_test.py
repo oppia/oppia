@@ -377,7 +377,7 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertTrue(common.is_port_in_use(4444))
         httpd.server_close()
 
-    def test_wait_for_port_to_be_closed_port_never_closes(self):
+    def test_wait_for_port_to_not_be_in_use_port_never_closes(self):
         def mock_sleep(unused_seconds):
             return
         def mock_is_port_in_use(unused_port_number):
@@ -389,10 +389,10 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'is_port_in_use', mock_is_port_in_use)
 
         with sleep_swap, is_port_in_use_swap:
-            success = common.wait_for_port_to_be_closed(9999)
+            success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertFalse(success)
 
-    def test_wait_for_port_to_be_closed_port_closes(self):
+    def test_wait_for_port_to_not_be_in_use_port_closes(self):
         def mock_sleep(unused_seconds):
             raise AssertionError('mock_sleep should not be called.')
         def mock_is_port_in_use(unused_port_number):
@@ -404,7 +404,7 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'is_port_in_use', mock_is_port_in_use)
 
         with sleep_swap, is_port_in_use_swap:
-            success = common.wait_for_port_to_be_closed(9999)
+            success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertTrue(success)
 
     def test_permissions_of_file(self):

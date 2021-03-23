@@ -191,7 +191,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return True
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
@@ -215,15 +215,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         with swap_kill_process, subprocess_swap, swap_is_windows:
             with swap_set_constants_to_default:
-                with swap_wait_for_port_to_be_closed:
+                with swap_wait_for_port_to_not_be_in_use:
                     run_e2e_tests.cleanup()
 
     def test_cleanup_when_subprocesses_exist(self):
@@ -236,7 +236,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return True
 
         mock_processes = [
@@ -248,14 +248,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_kill_process_based_on_regex)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         with subprocess_swap, swap_kill_process, swap_set_constants_to_default:
-            with swap_wait_for_port_to_be_closed:
+            with swap_wait_for_port_to_not_be_in_use:
                 run_e2e_tests.cleanup()
         self.assertEqual(
             mock_kill_process_based_on_regex.called_times, len(mock_processes))
@@ -271,7 +271,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return False
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
@@ -295,9 +295,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,)])
         expected_error = (
@@ -306,7 +306,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
         with swap_kill_process, subprocess_swap, swap_is_windows:
             with swap_set_constants_to_default:
-                with swap_wait_for_port_to_be_closed:
+                with swap_wait_for_port_to_not_be_in_use:
                     with self.assertRaisesRegexp(
                         RuntimeError, expected_error
                     ):
@@ -320,7 +320,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return True
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
@@ -348,9 +348,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
@@ -362,7 +362,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with swap_kill_process, subprocess_swap, swap_is_windows, (
             windows_exception):
             with swap_set_constants_to_default:
-                with swap_wait_for_port_to_be_closed:
+                with swap_wait_for_port_to_not_be_in_use:
                     run_e2e_tests.cleanup()
 
     def test_is_oppia_server_already_running_when_ports_closed(self):

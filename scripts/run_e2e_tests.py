@@ -203,7 +203,7 @@ def cleanup():
     common.stop_redis_server()
 
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
-        if not common.wait_for_port_to_be_closed(port):
+        if not common.wait_for_port_to_not_be_in_use(port):
             raise RuntimeError(
                 'Port {} failed to close within {} seconds.'.format(
                     port, common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))

@@ -655,7 +655,7 @@ def wait_for_port_to_be_in_use(port_number):
         sys.exit(1)
 
 
-def wait_for_port_to_be_closed(port_number):
+def wait_for_port_to_not_be_in_use(port_number):
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
 
