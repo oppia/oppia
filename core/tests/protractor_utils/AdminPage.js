@@ -224,10 +224,7 @@ var AdminPage = function() {
     );
 
     await general.acceptAlert();
-    await waitFor.visibilityOf(
-      statusMessage, 'Confirmation message not visible');
-    await waitFor.textToBePresentInElement(
-      statusMessage, 'Saved successfully.', 'Failed to save feature');
+    await waitFor.visibilityOf(statusMessage);
   };
 
   this.enableFeatureForDev = async function(featureElement) {
