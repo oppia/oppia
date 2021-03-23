@@ -31,7 +31,7 @@ import { PageTitleService } from 'services/page-title.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
@@ -58,7 +58,7 @@ describe('Topic viewer page', () => {
       thumbnail_bg_color: '',
       description: 'Story Description',
       story_is_published: true,
-      pending_node_dicts: []
+      all_node_dicts: []
     }],
     additional_story_dicts: [],
     uncategorized_skill_ids: [],

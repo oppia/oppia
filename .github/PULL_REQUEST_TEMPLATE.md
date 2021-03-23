@@ -16,6 +16,12 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
   - This lets reviewers restart your CircleCI tests for you.
 - [ ] The PR is made from a branch that's **not** called "develop".
 
+## Proof that changes are correct
+
+<!--
+Add videos/screenshots of the user-facing interface to demonstrate that the changes made in this PR work correctly.
+-->
+
 ## PR Pointers
 
 - Make sure to follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change).
@@ -23,3 +29,5 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 - For what code owners will expect, see the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).
 - Make sure your PR follows conventions in the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays.
 - Never force push. If you do, your PR will be closed.
+- Oppiabot can assign anyone for review/help if you leave a comment like the following: "{{Question/comment}} @{{reviewer_username}} PTAL"
+- Some of the e2e tests are flaky, and can fail for reasons unrelated to your PR. We are working on fixing this, but in the meantime, if you need to restart the tests, please check the ["If your build fails" wiki page](https://github.com/oppia/oppia/wiki/If-your-build-fails).

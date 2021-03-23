@@ -119,8 +119,8 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     def test_delete_threads_for_multiple_entities(self):
         self.save_new_default_exploration(self.EXP_1_ID, self.EXP_1_ID)
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_1_ID,
             1,
             self.user_id,
@@ -176,8 +176,8 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
 
         self.save_new_default_exploration(self.EXP_1_ID, self.user_id)
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_1_ID,
             1,
             self.user_id,
@@ -780,8 +780,11 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             reference_dict['entity_type'], reference_dict['entity_id'],
             reference_dict['thread_id'], reference_dict['message_id'])
 
-        feedback_services.enqueue_feedback_message_instant_email_task(
-            user_id, reference)
+        (
+            feedback_services
+            .enqueue_feedback_message_instant_email_task_transactional(
+                user_id, reference)
+        )
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_EMAILS),
@@ -824,7 +827,8 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             messagelist = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messagelist), 1)
 
-            feedback_services.pop_feedback_message_references(self.editor_id, 0)
+            feedback_services.pop_feedback_message_references_transactional(
+                self.editor_id, 0)
             model = feedback_models.UnsentFeedbackEmailModel.get(
                 self.editor_id, strict=False)
             self.assertEqual(
@@ -832,7 +836,8 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 model.feedback_message_references[0]['thread_id'], thread_id)
 
-            feedback_services.pop_feedback_message_references(self.editor_id, 1)
+            feedback_services.pop_feedback_message_references_transactional(
+                self.editor_id, 1)
             model = feedback_models.UnsentFeedbackEmailModel.get(
                 self.editor_id, strict=False)
             self.assertIsNone(model)
@@ -841,8 +846,10 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # There are no feedback message references to remove.
             self.assertIsNone(
-                feedback_services.clear_feedback_message_references(
-                    self.editor_id, self.exploration.id, 'thread_id'))
+                feedback_services
+                .clear_feedback_message_references_transactional(
+                    self.editor_id, self.exploration.id, 'thread_id')
+            )
 
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
@@ -861,7 +868,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 model.feedback_message_references[0]['thread_id'], thread_id)
 
-            feedback_services.clear_feedback_message_references(
+            feedback_services.clear_feedback_message_references_transactional(
                 self.editor_id, self.exploration.id, 'new_thread_id')
             model = feedback_models.UnsentFeedbackEmailModel.get(
                 self.editor_id)
@@ -882,8 +889,10 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(model.retries, 0)
 
             with self.swap(
-                feconf, 'DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS', -1):
-                feedback_services.update_feedback_email_retries(self.editor_id)
+                feconf, 'DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS', -1
+            ):
+                feedback_services.update_feedback_email_retries_transactional(
+                    self.editor_id)
 
             model = feedback_models.UnsentFeedbackEmailModel.get(
                 self.editor_id)
@@ -1222,7 +1231,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Check that reply_to id is created for user A.
             queried_object = (
                 email_services
-                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                .get_feedback_thread_reply_info_by_user_and_thread(
                     self.user_id_a, thread_id))
             self.assertEqual(queried_object.user_id, self.user_id_a)
             self.assertEqual(queried_object.thread_id, thread_id)
@@ -1232,7 +1241,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Check that reply_to id is created for user B.
             queried_object = (
                 email_services
-                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                .get_feedback_thread_reply_info_by_user_and_thread(
                     self.user_id_b, thread_id))
             self.assertEqual(queried_object.user_id, self.user_id_b)
             self.assertEqual(queried_object.thread_id, thread_id)

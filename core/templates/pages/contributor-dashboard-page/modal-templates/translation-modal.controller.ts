@@ -56,13 +56,17 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        hide_complex_extensions: 'true'
+        hide_complex_extensions: 'true',
+        language: TranslationLanguageService.getActiveLanguageCode(),
+        languageDirection: (
+          TranslationLanguageService.getActiveLanguageDirection())
       }
     };
     $scope.subheading = opportunity.subheading;
     $scope.heading = opportunity.heading;
     $scope.loadingData = true;
     $scope.moreAvailable = false;
+    $scope.previousTranslationAvailable = false;
     $scope.textToTranslate = '';
     $scope.languageDescription = (
       TranslationLanguageService.getActiveLanguageDescription());
@@ -96,6 +100,13 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.activeWrittenTranslation.html = '';
     };
 
+    $scope.returnToPreviousTranslation = function() {
+      var textAndAvailability = (
+        TranslateTextService.getPreviousTextToTranslate());
+      $scope.textToTranslate = textAndAvailability.text;
+      $scope.previousTranslationAvailable = textAndAvailability.more;
+    };
+
     $scope.suggestTranslatedText = function() {
       if (!$scope.uploadingTranslation && !$scope.loadingData) {
         SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
@@ -116,8 +127,11 @@ angular.module('oppia').controller('TranslationModalController', [
               $scope.textToTranslate = textAndAvailability.text;
               $scope.moreAvailable = textAndAvailability.more;
             }
+            $scope.previousTranslationAvailable = true;
             $scope.activeWrittenTranslation.html = '';
             $scope.uploadingTranslation = false;
+          }, () => {
+            $uibModalInstance.close();
           });
       }
       if (!$scope.moreAvailable) {

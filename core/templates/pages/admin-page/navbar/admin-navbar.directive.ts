@@ -31,18 +31,12 @@ angular.module('oppia').directive('adminNavbar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        getUserEmail: '&userEmail'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', 'UserService',
         function($rootScope, UserService) {
           var ctrl = this;
-          ctrl.showTab = function() {
-            return AdminRouterService.showTab();
-          };
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
           };
@@ -61,25 +55,18 @@ angular.module('oppia').directive('adminNavbar', [
           ctrl.isMiscTabOpen = function() {
             return AdminRouterService.isMiscTabOpen();
           };
-          ctrl.onMouseoverProfilePictureOrDropdown = function(evt) {
-            angular.element(evt.currentTarget).parent().addClass('open');
-            ctrl.profileDropdownIsActive = true;
+          ctrl.activateProfileDropdown = function() {
+            return ctrl.profileDropdownIsActive = true;
           };
-
-          ctrl.onMouseoutProfilePictureOrDropdown = function(evt) {
-            angular.element(evt.currentTarget).parent().removeClass('open');
-            ctrl.profileDropdownIsActive = false;
+          ctrl.deactivateProfileDropdown = function() {
+            return ctrl.profileDropdownIsActive = false;
           };
-          ctrl.onMouseoverDropdownIconOrMenu = function(evt) {
-            angular.element(evt.currentTarget).parent().addClass('open');
-            ctrl.dropdownMenuisActive = true;
+          ctrl.activateDropdownMenu = function() {
+            return ctrl.dropdownMenuisActive = true;
           };
-
-          ctrl.onMouseoutDropdownIconOrMenu = function(evt) {
-            angular.element(evt.currentTarget).parent().removeClass('open');
-            ctrl.dropdownMenuisActive = false;
+          ctrl.deactivateDropdownMenu = function() {
+            return ctrl.dropdownMenuisActive = false;
           };
-
           ctrl.$onInit = function() {
             ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
             UserService.getProfileImageDataUrlAsync().then(

@@ -16,6 +16,8 @@
  * @fileoverview Directive for showing and reviewing contributions.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
+
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
@@ -71,7 +73,7 @@ angular.module('oppia').component('contributionsAndReview', {
           color: '#8ed274'
         },
         rejected: {
-          text: 'Rejected',
+          text: 'Revisions Requested',
           color: '#e76c8c'
         }
       };
@@ -175,15 +177,18 @@ angular.module('oppia').component('contributionsAndReview', {
         var questionHeader = contributionDetails.skill_description;
         var question = QuestionObjectFactory.createFromBackendDict(
           suggestion.change.question_dict);
-        var contentHtml = question.getStateData().content.getHtml();
+        var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
         var skillDifficulty = suggestion.change.skill_difficulty;
 
         $uibModal.open({
           templateUrl: _templateUrl,
-          backdrop: true,
+          backdrop: 'static',
           size: 'lg',
           resolve: {
+            suggestion: function() {
+              return cloneDeep(suggestion);
+            },
             authorName: function() {
               return authorName;
             },
@@ -207,13 +212,18 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             skillDifficulty: function() {
               return skillDifficulty;
+            },
+            suggestionId: function() {
+              return suggestionId;
             }
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
           ContributionAndReviewService.resolveSuggestiontoSkill(
             targetId, suggestionId, result.action, result.reviewMessage,
-            result.skillDifficulty, resolveSuggestionSuccess);
+            result.skillDifficulty, resolveSuggestionSuccess, () => {
+              AlertsService.addInfoMessage('Failed to submit suggestion.');
+            });
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -226,20 +236,26 @@ angular.module('oppia').component('contributionsAndReview', {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
-
+        var details = ctrl.contributions[initialSuggestionId].details;
+        var subheading = (
+          details.topic_name + ' / ' + details.story_title +
+          ' / ' + details.chapter_title);
         $uibModal.open({
           templateUrl: _templateUrl,
-          backdrop: true,
+          backdrop: 'static',
           size: 'lg',
           resolve: {
             suggestionIdToSuggestion: function() {
-              return angular.copy(suggestionIdToSuggestion);
+              return cloneDeep(suggestionIdToSuggestion);
             },
             initialSuggestionId: function() {
               return initialSuggestionId;
             },
             reviewable: function() {
               return reviewable;
+            },
+            subheading: function() {
+              return subheading;
             }
           },
           controller: 'TranslationSuggestionReviewModalController'
@@ -336,11 +352,13 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.contributionTabs = [
           {
             suggestionType: SUGGESTION_TYPE_QUESTION,
-            text: 'Questions'
+            text: 'Questions',
+            enabled: false
           },
           {
             suggestionType: SUGGESTION_TYPE_TRANSLATE,
-            text: 'Translations'
+            text: 'Translations',
+            enabled: true
           }
         ];
 
@@ -355,11 +373,22 @@ angular.module('oppia').component('contributionsAndReview', {
                     .can_review_translation_for_language_codes);
                 var userCanReviewQuestionSuggestions = (
                   userContributionRights.can_review_questions);
+                var userReviewableSuggestionTypes = [];
+                var userCanSuggestQuestions = (
+                  userContributionRights.can_suggest_questions);
+                for (var index in ctrl.contributionTabs) {
+                  if (ctrl.contributionTabs[index].suggestionType === (
+                    SUGGESTION_TYPE_QUESTION)) {
+                    ctrl.contributionTabs[index].enabled = (
+                      userCanSuggestQuestions);
+                  }
+                }
                 if (userCanReviewQuestionSuggestions) {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_QUESTION,
                     text: 'Review Questions'
                   });
+                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
                 }
                 if (
                   userCanReviewTranslationSuggestionsInLanguages
@@ -368,13 +397,17 @@ angular.module('oppia').component('contributionsAndReview', {
                     suggestionType: SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations'
                   });
+                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
                 }
-                if (ctrl.reviewTabs.length > 0) {
+                if (userReviewableSuggestionTypes.length > 0) {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_REVIEWS, ctrl.reviewTabs[0].suggestionType);
-                } else {
+                    ctrl.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
+                } else if (userCanSuggestQuestions) {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION);
+                } else {
+                  ctrl.switchToTab(
+                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE);
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.

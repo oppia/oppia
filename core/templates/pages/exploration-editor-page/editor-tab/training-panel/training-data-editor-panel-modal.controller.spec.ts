@@ -128,10 +128,12 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
           },
           rule_specs: [{
-            rule_type: '',
+            rule_type: 'Equals',
             inputs: {
-              x: ['c', 'd', 'e'],
-              y: ['a', 'b', 'c']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['c', 'd', 'e']
+              }
             }
           }],
           training_data: ['Answer1', 'Answer2']
@@ -178,8 +180,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         expect($scope.stateContent).toBe('This is Hola State');
         expect($scope.answerGroupHasNonEmptyRules).toBe(true);
         expect($scope.inputTemplate).toBe(
-          '<oppia-interactive-text-input last-answer="null"' +
-          ' label-for-focus-target="testInteractionInput">' +
+          '<oppia-interactive-text-input ' +
+          'label-for-focus-target="testInteractionInput" last-answer="null">' +
           '</oppia-interactive-text-input>');
       });
 

@@ -31,6 +31,9 @@ NAMES = utils.create_enum(
     'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
     'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
     'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
+    'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
+    'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
+    'opportunity', 'question', 'recommendations', 'skill', 'statistics',
     'story', 'subtopic', 'suggestion', 'topic', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
@@ -89,6 +92,9 @@ class _Gae(Platform):
             elif name == NAMES.audit:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
+            elif name == NAMES.auth:
+                from core.storage.auth import gae_models as auth_models
+                returned_models.append(auth_models)
             elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
@@ -190,6 +196,16 @@ class _Gae(Platform):
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
+    def import_auth_services(cls):
+        """Imports and returns gae_auth_services module.
+
+        Returns:
+            module. The gae_auth_services module.
+        """
+        from core.platform.auth import gae_auth_services
+        return gae_auth_services
+
+    @classmethod
     def import_transaction_services(cls):
         """Imports and returns gae_transaction_services module.
 
@@ -273,7 +289,7 @@ class _Gae(Platform):
         Returns:
             module. The core.platform.taskqueue services module.
         """
-        if (constants.DEV_MODE or utils.is_local_server_environment()):
+        if constants.EMULATOR_MODE:
             from core.platform.taskqueue import dev_mode_taskqueue_services
             return dev_mode_taskqueue_services
         else:
@@ -287,8 +303,8 @@ class _Gae(Platform):
         Returns:
             module. The gae_search_services module.
         """
-        from core.platform.search import gae_search_services
-        return gae_search_services
+        from core.platform.search import elastic_search_services
+        return elastic_search_services
 
     NAME = 'gae'
 
@@ -348,6 +364,15 @@ class Registry(python_utils.OBJECT):
             list(class). The corresponding storage-layer model classes.
         """
         return cls._get().get_all_storage_model_classes()
+
+    @classmethod
+    def import_auth_services(cls):
+        """Imports and returns auth_services module.
+
+        Returns:
+            module. The auth_services module.
+        """
+        return cls._get().import_auth_services()
 
     @classmethod
     def import_current_user_services(cls):

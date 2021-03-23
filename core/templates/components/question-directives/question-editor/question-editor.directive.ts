@@ -102,7 +102,7 @@ angular.module('oppia').directive('questionEditor', [
             if (stateData) {
               StateEditorService.onStateEditorInitialized.emit(stateData);
 
-              if (stateData.content.getHtml() || stateData.interaction.id) {
+              if (stateData.content.html || stateData.interaction.id) {
                 ctrl.interactionIsShown = true;
               }
 
@@ -200,7 +200,7 @@ angular.module('oppia').directive('questionEditor', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/components/forms/forms-templates/mark-all-audio-and-' +
                   'translations-as-needing-update-modal.directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 updateQuestion(function() {

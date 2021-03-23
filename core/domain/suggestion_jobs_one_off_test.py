@@ -102,8 +102,8 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
         }
 
         suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, self.skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.skill_id, 1,
             self.albert_id, suggestion_change, 'test description')
 
         self.assertEqual(
@@ -191,8 +191,8 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
         }
 
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             exp_id, 1, self.albert_id, add_translation_change_dict,
             'test description')
 
@@ -319,8 +319,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_exploration_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
@@ -423,8 +423,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         }
         suggestion_dict_with_math = {
             'suggestion_id': 'skill2.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill2',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -450,8 +450,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_with_math['change'],
                 'test description')
@@ -549,8 +549,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_exploration_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, change_dict, 'test description')
 
@@ -670,8 +670,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         }
         suggestion_dict_without_math = {
             'suggestion_id': 'skill2.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill2',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -697,8 +697,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_without_math['change'],
                 'test description')
@@ -810,14 +810,14 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
 
             suggestion1 = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change1, 'test description')
 
             suggestion2 = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change2, 'test description')
 
@@ -877,8 +877,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
 
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change1, 'test description')
 
@@ -926,8 +926,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
 
             suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change1, 'test description')
 
@@ -968,8 +968,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id_1, change1, 'test description')
 
@@ -988,8 +988,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
                     change2, 'test description')
 
@@ -1089,8 +1089,8 @@ class PopulateContributionStatsOneOffJobTests(
             self.mock_get_exploration_by_id):
             edit_state_content_suggestion = (
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, edit_state_content_change_dict,
                     'test description')
@@ -1117,8 +1117,8 @@ class PopulateContributionStatsOneOffJobTests(
                 self.MockExploration.get_content_html):
                 translation_suggestion = (
                     suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        feconf.ENTITY_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
                         self.author_id, add_translation_change_dict,
                         'test description')
@@ -1146,8 +1146,8 @@ class PopulateContributionStatsOneOffJobTests(
         }
 
         question_suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description')
@@ -1549,8 +1549,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -1577,8 +1577,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -1598,8 +1598,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -1627,8 +1627,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_REJECTED,
@@ -1656,8 +1656,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -1679,8 +1679,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -1712,3 +1712,251 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, None)
+
+
+class ContentSuggestionFormatUpdateOneOffJobTests(test_utils.GenericTestBase):
+
+    target_id = 'exp1'
+    target_version_at_submission = 1
+    exploration_category = 'Algebra'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+
+    def _create_suggestion_model(self, change_cmd):
+        """Creates a dummy suggestion model with the given change_cmd.
+
+        Args:
+            change_cmd: dict. The change_cmd used to populate the suggestion
+                model.
+        """
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=change_cmd,
+            score_category='score_category'
+        ).put()
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the ContentSuggestionFormatUpdateOneOffJob and
+        verifies that the output matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one-off
+                job.
+        """
+        job_id = (
+            suggestion_jobs_one_off
+            .ContentSuggestionFormatUpdateOneOffJob.create_new())
+        suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off
+            .ContentSuggestionFormatUpdateOneOffJob.get_output(job_id))
+
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    def setUp(self):
+        super(ContentSuggestionFormatUpdateOneOffJobTests, self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_no_action_is_performed_for_question_suggestions(self):
+        change_cmd = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': {},
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3,
+        }
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            target_id='skill_1',
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=change_cmd,
+            score_category='score_category'
+        ).put()
+
+        self._run_job_and_verify_output([])
+        retrieved_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                self.EXPLORATION_THREAD_ID))
+        self.assertEqual(change_cmd, retrieved_suggestion_model.change_cmd)
+
+    def test_no_action_is_performed_for_valid_content_suggestions(self):
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'html': 'new html content'
+            }
+        }
+        self._create_suggestion_model(change_cmd)
+
+        self._run_job_and_verify_output([])
+        retrieved_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                self.EXPLORATION_THREAD_ID))
+        self.assertEqual(change_cmd, retrieved_suggestion_model.change_cmd)
+
+    def test_suggestions_with_old_value_key_are_updated(self):
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'html': 'new html content'
+            },
+            'old_value': {
+                'html': 'old html content'
+            }
+        }
+        self._create_suggestion_model(change_cmd)
+        old_suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+
+        self._run_job_and_verify_output([
+            '[u\'CHANGED - Removed old_value\', [u\'%s\']]' %
+            self.EXPLORATION_THREAD_ID,
+            '[u\'SUCCESS - Updated suggestion\', [u\'%s\']]' %
+            self.EXPLORATION_THREAD_ID
+        ])
+        new_suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(
+            new_suggestion.last_updated, old_suggestion.last_updated)
+
+        retrieved_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                self.EXPLORATION_THREAD_ID))
+        self.assertEqual(retrieved_suggestion_model.change_cmd, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'html': 'new html content'
+            }
+        })
+
+    def test_suggestions_with_content_id_subkey_are_updated(self):
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            }
+        }
+        self._create_suggestion_model(change_cmd)
+        old_suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+
+        self._run_job_and_verify_output([
+            '[u\'CHANGED - Removed content_id\', [u\'%s\']]' %
+            self.EXPLORATION_THREAD_ID,
+            '[u\'SUCCESS - Updated suggestion\', [u\'%s\']]' %
+            self.EXPLORATION_THREAD_ID
+        ])
+        new_suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(
+            new_suggestion.last_updated, old_suggestion.last_updated)
+
+        retrieved_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                self.EXPLORATION_THREAD_ID))
+        self.assertEqual(retrieved_suggestion_model.change_cmd, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'html': 'new html content'
+            }
+        })
+
+    def test_suggestions_with_both_issues_are_updated(self):
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old html content'
+            }
+        }
+        self._create_suggestion_model(change_cmd)
+        old_suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+
+        self._run_job_and_verify_output([
+            '[u\'CHANGED - Removed old_value\', [u\'%s\']]' %
+            self.EXPLORATION_THREAD_ID,
+            '[u\'CHANGED - Removed content_id\', [u\'%s\']]' %
+            self.EXPLORATION_THREAD_ID,
+            '[u\'SUCCESS - Updated suggestion\', [u\'%s\']]' %
+            self.EXPLORATION_THREAD_ID
+        ])
+
+        new_suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(
+            new_suggestion.last_updated, old_suggestion.last_updated)
+
+        retrieved_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(
+                self.EXPLORATION_THREAD_ID))
+        self.assertEqual(retrieved_suggestion_model.change_cmd, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'html': 'new html content'
+            }
+        })
+
+    def test_suggestions_with_other_errors_are_detected(self):
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'html': 'new html content'
+            },
+            'invalid_key': 'haha'
+        }
+
+        self._create_suggestion_model(change_cmd)
+
+        self._run_job_and_verify_output([
+            '[u\'Failed assertion\', [u\'%s Bad change_cmd keys\']]' %
+            self.EXPLORATION_THREAD_ID
+        ])

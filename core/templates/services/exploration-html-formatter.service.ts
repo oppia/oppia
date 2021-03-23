@@ -27,6 +27,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 
 // A service that provides a number of utility functions useful to both the
@@ -35,6 +36,12 @@ import { InteractionCustomizationArgs } from
   providedIn: 'root'
 })
 export class ExplorationHtmlFormatterService {
+  private readonly migratedInteractions: string[] = [
+    'Continue',
+    'FractionInput',
+    'GraphInput'
+  ];
+
   constructor(
       private camelCaseToHyphens: CamelCaseToHyphensPipe,
       private extensionTagAssembler: ExtensionTagAssemblerService,
@@ -53,24 +60,45 @@ export class ExplorationHtmlFormatterService {
    *   Otherwise, parentHasLastAnswerProperty should be set to false.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
+   * @param {Solution} savedSolution - The saved solution that the interaction
+   * needs to be prefilled with.
    */
   getInteractionHtml(
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
-      labelForFocusTarget: string): string {
+      labelForFocusTarget: string,
+      savedSolution: Solution): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
-    element.attr(
-      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
+    if (savedSolution) {
+      // TODO(#12292): Refactor this once all interactions have been migrated to
+      // Angular 2+, such that we don't need to parse the string in the
+      // interaction directives/components.
+      element.attr(
+        'saved-solution', JSON.stringify(savedSolution.correctAnswer));
+    }
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }
-    return element.get(0).outerHTML;
+    element.attr(
+      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
+    let val = element.get(0).outerHTML;
+    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+      val = val.replace(
+        'last-answer="null"></oppia-interactive-' + htmlInteractionId + '>',
+        '[last-answer]="null"></oppia-interactive-' + htmlInteractionId + '>');
+      val = val.replace(
+        'last-answer="lastAnswer"></oppia-interactive-' +
+        htmlInteractionId + '>',
+        '[last-answer]="lastAnswer"></oppia-interactive-' +
+        htmlInteractionId + '>');
+    }
+    return val;
   }
 
   getAnswerHtml(
@@ -80,8 +108,7 @@ export class ExplorationHtmlFormatterService {
     var interactionChoices = null;
 
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value.map(
-        choice => choice.getHtml());
+      interactionChoices = interactionCustomizationArgs.choices.value;
     }
 
     var el = $(
@@ -97,13 +124,13 @@ export class ExplorationHtmlFormatterService {
 
   getShortAnswerHtml(
       answer: InteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;
 
     // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value.map(
-        choice => choice.getHtml());
+        choice => choice.html);
     }
 
     var el = $(

@@ -80,12 +80,12 @@ describe('InteractiveMapValidationService', () => {
         inputs: {
           d: 100
         }
-      }), rof.createFromBackendDict({
+      }, 'InteractiveMap'), rof.createFromBackendDict({
         rule_type: 'NotWithin',
         inputs: {
           d: 50
         }
-      })],
+      }, 'InteractiveMap')],
       goodDefaultOutcome,
       null,
       null

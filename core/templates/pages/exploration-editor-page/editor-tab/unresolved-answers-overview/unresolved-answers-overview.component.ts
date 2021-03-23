@@ -24,7 +24,9 @@ require(
   'teach-oppia-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-rights-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -101,7 +103,7 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/teach-oppia-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'TeachOppiaModalController'
         }).result.then(function() {}, function() {
           // Note to developers:

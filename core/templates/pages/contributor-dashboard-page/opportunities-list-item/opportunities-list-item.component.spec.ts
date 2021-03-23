@@ -80,7 +80,7 @@ describe('Opportunities List Item Component', function() {
         expect(ctrl.opportunityDataIsLoading).toBe(true);
         expect(ctrl.labelText).toBe(undefined);
         expect(ctrl.labelStyle).toBe(undefined);
-        expect(ctrl.opportunityHeadingTruncationLength).toBe(35);
+        expect(ctrl.opportunityHeadingTruncationLength).toBe(40);
       });
   });
 });

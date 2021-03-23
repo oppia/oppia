@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for user management.
  */
 
+var action = require('../protractor_utils/action.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
@@ -32,8 +33,10 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
-  await element(by.css('.protractor-test-i18n-language-selector'))
-    .element(by.cssContainingText('option', language)).click();
+  await action.select(
+    'Language Selector',
+    element(by.css('.protractor-test-i18n-language-selector')),
+    language);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();
 };
@@ -107,7 +110,9 @@ describe('Site language', function() {
     var EDITOR_USERNAME = 'langCollections';
 
     await users.createUser('lang@collections.com', EDITOR_USERNAME);
-    await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    await users.createAndLoginAdminUser(
+      'langCreator@explorations.com', CREATOR_USERNAME);
+    await users.logout();
     await users.createAndLoginAdminUser(
       'testlangadm@collections.com', 'testlangadm');
     await adminPage.get();
@@ -115,7 +120,7 @@ describe('Site language', function() {
     await users.logout();
 
     await users.login('langCreator@explorations.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Language Test'));
@@ -231,12 +236,11 @@ describe('Site language', function() {
   );
 
   it('should not change in an exploration', async function() {
-    await users.login('langCreator@explorations.com', true);
+    await users.login('langCreator@explorations.com');
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
-
-    await general.openEditor(firstExplorationId);
+    await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
     var placeholder = await element(by.css('.protractor-test-float-form-input'))

@@ -27,6 +27,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 import { fabric } from 'fabric';
 import Picker from 'vanilla-picker';
@@ -40,16 +41,18 @@ angular.module('oppia').component('svgFilenameEditor', {
     '$http', '$q', '$sce', '$scope', 'AlertsService',
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
-    'ImageUploadHelperService', 'UrlInterpolationService',
-    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'MAX_SVG_DIAGRAM_HEIGHT',
-    'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT', 'MIN_SVG_DIAGRAM_WIDTH',
+    'ImageUploadHelperService', 'SvgSanitizerService',
+    'UrlInterpolationService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    'MAX_SVG_DIAGRAM_HEIGHT', 'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT',
+    'MIN_SVG_DIAGRAM_WIDTH',
     function(
         $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
-        ImageUploadHelperService, UrlInterpolationService,
-        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, MAX_SVG_DIAGRAM_HEIGHT,
-        MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT, MIN_SVG_DIAGRAM_WIDTH) {
+        ImageUploadHelperService, SvgSanitizerService,
+        UrlInterpolationService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE,
+        MAX_SVG_DIAGRAM_HEIGHT, MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT,
+        MIN_SVG_DIAGRAM_WIDTH) {
       const ctrl = this;
       // These constants are used to identify the tool that is currently being
       // used so that other tools can be disabled accordingly.
@@ -332,7 +335,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           'data:image/svg+xml;base64,' +
           btoa(unescape(encodeURIComponent(svgString))));
         var invalidTagsAndAttr = (
-          ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+          SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
         if (invalidTagsAndAttr.tags.length !== 0) {
           var errorText = (
             'Invalid tags in svg:' + invalidTagsAndAttr.tags.join());
@@ -499,10 +502,9 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.continueDiagramEditing = function() {
         if (
           ctrl.data.savedSvgFileName &&
-          ctrl.imageSaveDestination ===
-          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-          ImageLocalStorageService.deleteImage(
-            ctrl.data.savedSvgFileName);
+          ctrl.imageSaveDestination === IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+        ) {
+          ImageLocalStorageService.deleteImage(ctrl.data.savedSvgFileName);
         }
         ctrl.diagramStatus = STATUS_EDITING;
         ctrl.data = {};
@@ -1311,27 +1313,16 @@ angular.module('oppia').component('svgFilenameEditor', {
           fill: ctrl.onFillChange,
           bg: ctrl.onBgChange
         };
-        var picker = new Picker(parent);
-        parent.style.background = ctrl.fabricjsOptions[value];
-        if (value === 'stroke') {
-          ctrl.strokePicker = picker;
-        }
-        if (value === 'fill') {
-          ctrl.fillPicker = picker;
-        }
-        if (value === 'bg') {
-          ctrl.bgPicker = picker;
-        }
-        picker.onOpen = function() {
+        let onOpen = function() {
           // This DOM manipulation is necessary because the color picker is not
           // configurable in the third-party module.
-          var alphaSliders = document.querySelectorAll(
+          let alphaSliders = document.querySelectorAll(
             '.picker_alpha .picker_selector');
           alphaSliders.forEach(function(element) {
             element.setAttribute('title', 'Transparency Slider');
           });
         };
-        picker.onChange = function(color) {
+        let onChange = function(color) {
           parent.style.background = color.rgbaString;
           var topAlphaSquare = document.getElementById(
             'top-' + value + '-alpha');
@@ -1343,10 +1334,22 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.fabricjsOptions[value] = color.rgbaString;
           onChangeFunc[value]();
         };
-        picker.onOpen();
-        picker.setOptions({
-          color: ctrl.fabricjsOptions[value]
+        var picker = new Picker({
+          parent: parent,
+          color: ctrl.fabricjsOptions[value],
+          onOpen: onOpen,
+          onChange: onChange
         });
+        parent.style.background = ctrl.fabricjsOptions[value];
+        if (value === 'stroke') {
+          ctrl.strokePicker = picker;
+        }
+        if (value === 'fill') {
+          ctrl.fillPicker = picker;
+        }
+        if (value === 'bg') {
+          ctrl.bgPicker = picker;
+        }
       };
 
       ctrl.initializeMouseEvents = function() {

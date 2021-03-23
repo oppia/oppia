@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import logging
 
 from constants import constants
@@ -173,7 +174,10 @@ def _get_augmented_skill_summaries_in_batches(
         _get_skill_summaries_in_batches(
             num_skills_to_fetch, urlsafe_start_cursor, sort_by))
 
-    assigned_skill_ids = {}
+    assigned_skill_ids = collections.defaultdict(lambda: {
+        'topic_names': [],
+        'classroom_names': []
+    })
 
     all_topic_models = topic_models.TopicModel.get_all()
     all_topics = [topic_fetchers.get_topic_from_model(topic_model)
@@ -189,19 +193,18 @@ def _get_augmented_skill_summaries_in_batches(
 
     for topic in all_topics:
         for skill_id in topic.get_all_skill_ids():
-            assigned_skill_ids[skill_id] = {
-                'topic_name': topic.name,
-                'classroom_name': topic_classroom_dict.get(topic.id, None)
-            }
+            assigned_skill_ids[skill_id]['topic_names'].append(topic.name)
+            assigned_skill_ids[skill_id]['classroom_names'].append(
+                topic_classroom_dict.get(topic.id, None))
 
     augmented_skill_summaries = []
     for skill_summary in skill_summaries:
-        topic_name = None
-        classroom_name = None
+        topic_names = []
+        classroom_names = []
         if skill_summary.id in assigned_skill_ids:
-            topic_name = assigned_skill_ids[skill_summary.id]['topic_name']
-            classroom_name = (
-                assigned_skill_ids[skill_summary.id]['classroom_name'])
+            topic_names = assigned_skill_ids[skill_summary.id]['topic_names']
+            classroom_names = (
+                assigned_skill_ids[skill_summary.id]['classroom_names'])
 
         augmented_skill_summary = skill_domain.AugmentedSkillSummary(
             skill_summary.id,
@@ -210,8 +213,8 @@ def _get_augmented_skill_summaries_in_batches(
             skill_summary.version,
             skill_summary.misconception_count,
             skill_summary.worked_examples_count,
-            topic_name,
-            classroom_name,
+            topic_names,
+            classroom_names,
             skill_summary.skill_model_created_on,
             skill_summary.skill_model_last_updated)
         augmented_skill_summaries.append(augmented_skill_summary)
@@ -238,7 +241,7 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
     elif status == constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
         unassigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
-            if augmented_skill_summary.topic_name is None:
+            if not augmented_skill_summary.topic_names:
                 unassigned_augmented_skill_summaries.append(
                     augmented_skill_summary)
 
@@ -247,7 +250,7 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
     elif status == constants.SKILL_STATUS_OPTIONS['ASSIGNED']:
         assigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
-            if augmented_skill_summary.topic_name is not None:
+            if augmented_skill_summary.topic_names:
                 assigned_augmented_skill_summaries.append(
                     augmented_skill_summary)
         return assigned_augmented_skill_summaries
@@ -272,7 +275,7 @@ def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
 
     augmented_skill_summaries_with_classroom_name = []
     for augmented_skill_summary in augmented_skill_summaries:
-        if augmented_skill_summary.classroom_name == classroom_name:
+        if classroom_name in augmented_skill_summary.classroom_names:
             augmented_skill_summaries_with_classroom_name.append(
                 augmented_skill_summary)
 
@@ -438,6 +441,56 @@ def get_all_topic_assignments_for_skill(skill_id):
     return topic_assignments
 
 
+def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
+    """Replaces the old skill id with the new one in all the associated topics.
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        old_skill_id: str. The old skill id.
+        new_skill_id: str. The new skill id.
+    """
+    all_topics = topic_fetchers.get_all_topics()
+    for topic in all_topics:
+        change_list = []
+        if old_skill_id in topic.get_all_skill_ids():
+            if new_skill_id in topic.get_all_skill_ids():
+                raise Exception(
+                    'Found topic \'%s\' contains the two skills to be merged. '
+                    'Please unassign one of these skills from topic '
+                    'and retry this operation.' % topic.name)
+            if old_skill_id in topic.uncategorized_skill_ids:
+                change_list.extend([topic_domain.TopicChange({
+                    'cmd': 'remove_uncategorized_skill_id',
+                    'uncategorized_skill_id': old_skill_id
+                }), topic_domain.TopicChange({
+                    'cmd': 'add_uncategorized_skill_id',
+                    'new_uncategorized_skill_id': new_skill_id
+                })])
+            for subtopic in topic.subtopics:
+                if old_skill_id in subtopic.skill_ids:
+                    change_list.extend([topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                        'subtopic_id': subtopic.id,
+                        'skill_id': old_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': 'remove_uncategorized_skill_id',
+                        'uncategorized_skill_id': old_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': 'add_uncategorized_skill_id',
+                        'new_uncategorized_skill_id': new_skill_id
+                    }), topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                        'old_subtopic_id': None,
+                        'new_subtopic_id': subtopic.id,
+                        'skill_id': new_skill_id
+                    })])
+                    break
+            topic_services.update_topic_and_subtopic_pages(
+                user_id, topic.id, change_list,
+                'Replace skill id %s with skill id %s in the topic' % (
+                    old_skill_id, new_skill_id))
+
+
 def remove_skill_from_all_topics(user_id, skill_id):
     """Deletes the skill with the given id from all the associated topics.
 
@@ -539,6 +592,20 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
     opportunity_services.create_skill_opportunity(
         skill.id,
         skill.description)
+
+
+def does_skill_with_description_exist(description):
+    """Checks if skill with provided description exists.
+
+    Args:
+        description: str. The description for the skill.
+
+    Returns:
+        bool. Whether the the description for the skill exists.
+    """
+    existing_skill = (
+        skill_fetchers.get_skill_by_description(description))
+    return existing_skill is not None
 
 
 def save_new_skill(committer_id, skill):
@@ -658,7 +725,7 @@ def apply_change_list(skill_id, change_list, committer_id):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, skill_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_skill(committer_id, skill, commit_message, change_list):

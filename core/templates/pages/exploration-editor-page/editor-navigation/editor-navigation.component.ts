@@ -23,7 +23,9 @@ require(
   'thread-data-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/modal-templates/help-modal.controller.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-rights-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
@@ -134,7 +136,9 @@ angular.module('oppia').component('editorNavigation', {
           .then(function() {
             $scope.publishIsInProcess = false;
             $scope.loadingDotsAreShown = false;
+            $scope.$applyAsync();
           });
+        $scope.$applyAsync();
       };
 
       $scope.saveChanges = function() {
@@ -146,7 +150,9 @@ angular.module('oppia').component('editorNavigation', {
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
+            $scope.$applyAsync();
           });
+        $scope.$applyAsync();
       };
 
       $scope.toggleMobileNavOptions = function() {
