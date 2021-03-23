@@ -22,15 +22,15 @@
 import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StorySummary, StorySummaryBackendDict } from 'domain/story/story-summary.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { SubtopicPageObjectFactory, SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/SubtopicPageObjectFactory.ts';
-import { TopicObjectFactory, Topic, TopicBackendDict } from 'domain/topic/TopicObjectFactory.ts';
-import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service.ts';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service.ts';
-import { RubricObjectFactory, RubricBackendDict, Rubric } from 'domain/skill/RubricObjectFactory.ts';
-import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service.ts';
+import { SubtopicPageObjectFactory, SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/SubtopicPageObjectFactory';
+import { TopicObjectFactory, Topic, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
+import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
+import { RubricObjectFactory, RubricBackendDict, Rubric } from 'domain/skill/RubricObjectFactory';
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
@@ -83,13 +83,13 @@ export class TopicEditorStateService {
   private _topicReinitializedEventEmitter: EventEmitter<void> =
    new EventEmitter();
 
-  private _getSubtopicPageId(topicId: string, subtopicId: number):string {
+  private _getSubtopicPageId(topicId: string, subtopicId: number): string {
     return topicId + '-' + subtopicId.toString();
   }
 
   private _updateGroupedSkillSummaries(
-      groupedSkillSummaries:{[topicName: string]: SkillSummaryBackendDict[]})
-    : void {
+      groupedSkillSummaries: {[topicName: string]: SkillSummaryBackendDict[]}):
+       void {
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
@@ -331,7 +331,7 @@ export class TopicEditorStateService {
   /**
    * Returns whether the user can create a skill via the topic editor.
    */
-  isSkillCreationAllowed() : boolean {
+  isSkillCreationAllowed(): boolean {
     return this._skillCreationIsAllowed;
   }
 
@@ -453,7 +453,7 @@ export class TopicEditorStateService {
    * shares behavior with setTopic(), when it succeeds.
    */
   saveTopic(
-      commitMessage: string) : Promise<void> {
+      commitMessage: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this._topicIsInitialized) {
         this.alertService.fatalWarning(
