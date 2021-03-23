@@ -38,6 +38,13 @@
   </div>
 
   <div class="modal-footer">
+    <button ng-if="newQuestionIsBeingCreated"
+    title="To change already selected skill difficulty"
+    class="btn btn-success"
+    ng-click="onClickSuggestQuestionButton()"
+    >
+    Select Question Difficulty
+    </button>
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
     <button ng-if="newQuestionIsBeingCreated"
             title="To Save please add: interaction, hint, solution and address all misconceptions"
