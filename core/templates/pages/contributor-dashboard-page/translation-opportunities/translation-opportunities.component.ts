@@ -131,7 +131,6 @@ angular.module('oppia').component('translationOpportunities', {
         document.body.style.cursor = '';
       };
 
-
       ctrl.loadOpportunities = function() {
         return ContributionOpportunitiesService
           .getTranslationOpportunitiesAsync(
