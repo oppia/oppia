@@ -144,13 +144,11 @@ describe('Preferences', function() {
       await users.createUser('lorem@preferences.com', 'loremPreferences');
       await users.login('lorem@preferences.com');
       await preferencesPage.get();
-      await waitFor.pageToFullyLoad();
       await preferencesPage.selectCreatorDashboard();
       await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/creator-dashboard');
       await preferencesPage.get();
-      await waitFor.pageToFullyLoad();
       await preferencesPage.selectLearnerDashboard();
       await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
@@ -162,7 +160,6 @@ describe('Preferences', function() {
       await users.createUser('delete@page.com', 'deletePage');
       await users.login('delete@page.com');
       await preferencesPage.get();
-      await waitFor.pageToFullyLoad();
       await preferencesPage.clickDeleteAccountButton();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/delete-account');
@@ -173,7 +170,6 @@ describe('Preferences', function() {
       await users.createUser('export@preferences.com', 'exportPreferences');
       await users.login('export@preferences.com');
       await preferencesPage.get();
-      await waitFor.pageToFullyLoad();
       await preferencesPage.clickExportAccountButton();
       await waitFor.fileToBeDownloaded('oppia_takeout_data.zip');
     }
