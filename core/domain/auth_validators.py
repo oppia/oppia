@@ -78,6 +78,16 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
+        """Returns a mapping of external id to model class.
+
+        Args:
+            item: auth_models.UserIdentifiersModel. Entity to validate.
+
+        Returns:
+            list(ExternalModelFetcherDetails). A list whose values are
+            ExternalModelFetcherDetails instances each representing
+            the class and ids for a single type of external model to fetch.
+        """
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_settings_ids', [item.user_id],
@@ -113,6 +123,16 @@ class UserIdByFirebaseAuthIdModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
+        """Returns a mapping of external id to model class.
+
+        Args:
+            item: auth_models.UserIdByFirebaseAuthIdModel. Entity to validate.
+
+        Returns:
+            list(ExternalModelFetcherDetails). A list whose values are
+            ExternalModelFetcherDetails instances each representing
+            the class and ids for a single type of external model to fetch.
+        """
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_settings_ids', [item.user_id],
@@ -123,3 +143,35 @@ class UserIdByFirebaseAuthIdModelValidator(
                 auth_models.UserAuthDetailsModel,
                 [item.user_id]),
         ]
+
+
+class FirebaseSeedModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating FirebaseSeedModel."""
+
+    @classmethod
+    def _validate_model_id(cls, item):
+        """Checks whether the id of model matches the regex specified for
+        the model.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+        """
+        if item.id != auth_models.ONLY_FIREBASE_SEED_MODEL_ID:
+            cls._add_error(
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
+                'Entity id %s: Entity id must be %s' % (
+                    item.id, auth_models.ONLY_FIREBASE_SEED_MODEL_ID))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        """Returns a mapping of external id to model class.
+
+        Args:
+            item: auth_models.FirebaseSeedModel. Entity to validate.
+
+        Returns:
+            list(ExternalModelFetcherDetails). A list whose values are
+            ExternalModelFetcherDetails instances each representing
+            the class and ids for a single type of external model to fetch.
+        """
+        return []

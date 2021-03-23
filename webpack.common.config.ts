@@ -101,6 +101,7 @@ module.exports = {
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
     library: commonPrefix + '/pages/library-page/library-page.import.ts',
+    login: commonPrefix + '/pages/login-page/login-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
@@ -111,6 +112,7 @@ module.exports = {
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
+    playbook: commonPrefix + '/pages/participation-playbook/playbook.import.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.import.ts',
@@ -429,6 +431,17 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['login'],
+      filename: 'login-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Login to Oppia'
+      },
+      template: commonPrefix + '/pages/login-page/login-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['maintenance'],
       filename: 'maintenance-page.mainpage.html',
       meta: defaultMeta,
@@ -469,6 +482,20 @@ module.exports = {
       template:
           commonPrefix + '/pages/pending-account-deletion-page/' +
           'pending-account-deletion-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['playbook'],
+      filename: 'playbook.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'The Oppia library is full of user-created lessons ' +
+        'called \'explorations\'. Read about how to participate in the ' +
+        'community and begin creating explorations.'
+      },
+      template:
+        commonPrefix + '/pages/participation-playbook/playbook.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -242,8 +242,8 @@
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.html @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component*.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @srijanreddy98
 /core/templates/components/profile-link-directives/ @srijanreddy98
@@ -464,6 +464,7 @@
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
+/core/templates/pages/login-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
 /core/templates/services/app.service*.ts @srijanreddy98
@@ -475,6 +476,7 @@
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
 /redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
+/.firebase.json @brianrodri
 
 
 # Miscellaneous.
@@ -563,7 +565,7 @@
 /core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
-
+/core/templates/pages/participation-playbook/ @jameesjohn @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
