@@ -145,6 +145,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
                 'property_name': 'objective',
                 'new_value': 'the objective'
             })], 'Test edit')
+        user_d_settings = user_services.get_user_settings(self.user_d_id)
+        user_d_settings.last_edited_an_exploration = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=2))
 
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.user_e_id, end_state_name='End')
@@ -218,14 +221,18 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.assertItemsEqual(query.user_ids, [self.user_a_id, self.user_e_id])
 
     def test_user_is_inactive_in_last_n_days(self):
+        number_of_days = 3
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'inactive_in_last_n_days': 3
+                'inactive_in_last_n_days': number_of_days
             })
         self._run_one_off_job(user_query_id)
 
         query = user_models.UserQueryModel.get(user_query_id)
 
+        # user_d has created an exploration 10 days ago but edited an
+        # exploration 2 days ago.
+        self.assertNotIn(self.user_d_id, query.user_ids)
         # List of users who were not active in last 3 days.
         self.assertItemsEqual(query.user_ids, [self.user_e_id])
 

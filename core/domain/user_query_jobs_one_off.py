@@ -44,7 +44,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _is_user_inactivity_query_satisfied(user_settings_model, query_model):
-        """Determines whether a user has been inactive for n days."""
+        """Determines whether a user has been inactive for n days by checking
+        whether the user has created or edited an exploration in the
+        last n days.
+        """
         last_active_date = datetime.datetime.min
         if user_settings_model.last_created_an_exploration:
             last_active_date = max(
