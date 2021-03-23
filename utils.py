@@ -82,7 +82,8 @@ def create_enum(*sequential, **names):
 
 
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
-    """Gets the contents of a file, given a relative filepath from oppia/.
+    """Gets the contents of a file, given a relative filepath
+    from oppia.
 
     Args:
         filepath: str. A full path to the file.
