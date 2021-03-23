@@ -34,7 +34,7 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
@@ -189,7 +189,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 

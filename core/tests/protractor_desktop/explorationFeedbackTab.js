@@ -82,7 +82,9 @@ describe('ExplorationFeedback', function() {
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -126,7 +128,9 @@ describe('ExplorationFeedback', function() {
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -179,7 +183,9 @@ describe('ExplorationFeedback', function() {
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
