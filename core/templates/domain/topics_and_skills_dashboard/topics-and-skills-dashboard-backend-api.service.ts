@@ -199,7 +199,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
     });
   }
 
-  async mergeSkillsAsync(oldSkillId:string, newSkillId:string): Promise<void> {
+  async mergeSkillsAsync(
+      oldSkillId: string, newSkillId: string): Promise<void> {
     let mergeSkillsData = {
       old_skill_id: oldSkillId,
       new_skill_id: newSkillId
