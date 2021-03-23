@@ -810,7 +810,8 @@ textarea {
   Styles for footer
 */
 
-.oppia-footer-container h4 {
+.oppia-footer-container h3 {
+  color: white;
   font-size: 1em;
   font-weight: bold;
   margin: 1.33em 0;
@@ -830,6 +831,7 @@ textarea {
   outline: 1px dotted #FFF;
   outline: auto 5px -webkit-focus-ring-color;
 }
+
 .oppia-footer-padding {
   height: 198px;
 }
