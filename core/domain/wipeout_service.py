@@ -1038,8 +1038,8 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
         feedback_report_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            feedback_report_models: list(FeedbackReportModel). Models to scrub
-                user IDs from in the 'scrubbed_by' field.
+            feedback_report_models: list(FeedbackReportModel). The models with a
+                user ID in the 'scrubbed_by' field that we want to pseudonymize.
         """
         for report_model in feedback_report_models:
             if report_model.scrubbed_by == user_id:
