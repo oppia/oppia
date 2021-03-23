@@ -386,7 +386,7 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
-def is_port_open(port):
+def is_port_in_use(port):
     """Checks if a process is listening to the port.
 
     Args:
@@ -643,12 +643,12 @@ def wait_for_port_to_be_open(port_number):
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (not is_port_open(port_number)
+    while (not is_port_in_use(port_number)
            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
-            and not is_port_open(port_number)):
+            and not is_port_in_use(port_number)):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' %
             port_number)
@@ -666,11 +666,11 @@ def wait_for_port_to_be_closed(port_number):
         bool. Whether the port closed in time.
     """
     waited_seconds = 0
-    while (is_port_open(port_number)
+    while (is_port_in_use(port_number)
            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
         time.sleep(1)
         waited_seconds += 1
-    return not is_port_open(port_number)
+    return not is_port_in_use(port_number)
 
 
 def start_redis_server():

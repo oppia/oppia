@@ -368,42 +368,42 @@ class CommonTests(test_utils.GenericTestBase):
             'ERROR: This script can only be run from the "test" branch.'):
             common.verify_current_branch_name('test')
 
-    def test_is_port_open(self):
-        self.assertFalse(common.is_port_open(4444))
+    def test_is_port_in_use(self):
+        self.assertFalse(common.is_port_in_use(4444))
 
         handler = http.server.SimpleHTTPRequestHandler
         httpd = socketserver.TCPServer(('', 4444), handler)
 
-        self.assertTrue(common.is_port_open(4444))
+        self.assertTrue(common.is_port_in_use(4444))
         httpd.server_close()
 
     def test_wait_for_port_to_be_closed_port_never_closes(self):
         def mock_sleep(unused_seconds):
             return
-        def mock_is_port_open(unused_port_number):
+        def mock_is_port_in_use(unused_port_number):
             return True
 
         sleep_swap = self.swap_with_checks(
             time, 'sleep', mock_sleep, expected_args=[(1,)] * 60)
-        is_port_open_swap = self.swap(
-            common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
 
-        with sleep_swap, is_port_open_swap:
+        with sleep_swap, is_port_in_use_swap:
             success = common.wait_for_port_to_be_closed(9999)
         self.assertFalse(success)
 
     def test_wait_for_port_to_be_closed_port_closes(self):
         def mock_sleep(unused_seconds):
             raise AssertionError('mock_sleep should not be called.')
-        def mock_is_port_open(unused_port_number):
+        def mock_is_port_in_use(unused_port_number):
             return False
 
         sleep_swap = self.swap(
             time, 'sleep', mock_sleep)
-        is_port_open_swap = self.swap(
-            common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
 
-        with sleep_swap, is_port_open_swap:
+        with sleep_swap, is_port_in_use_swap:
             success = common.wait_for_port_to_be_closed(9999)
         self.assertTrue(success)
 

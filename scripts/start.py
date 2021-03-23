@@ -98,7 +98,7 @@ def cleanup():
     common.print_each_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
-    while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
+    while common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
     build.set_constants_to_default()
     common.stop_redis_server()
@@ -112,7 +112,7 @@ def main(args=None):
     atexit.register(cleanup)
 
     # Check that there isn't a server already running.
-    if common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
+    if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
             'WARNING',
             'Could not start new server. There is already an existing server',

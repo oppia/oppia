@@ -366,53 +366,53 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.cleanup()
 
     def test_is_oppia_server_already_running_when_ports_closed(self):
-        def mock_is_port_open(unused_port):
+        def mock_is_port_in_use(unused_port):
             return False
 
-        is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open)
-        with is_port_open_swap:
+        is_port_in_use_swap = self.swap_with_checks(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        with is_port_in_use_swap:
             result = run_e2e_tests.is_oppia_server_already_running()
             self.assertFalse(result)
 
     def test_is_oppia_server_already_running_when_one_of_the_ports_is_open(
             self):
         running_port = run_e2e_tests.GOOGLE_APP_ENGINE_PORT
-        def mock_is_port_open(port):
+        def mock_is_port_in_use(port):
             if port == running_port:
                 return True
             return False
 
-        is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open)
-        with is_port_open_swap:
+        is_port_in_use_swap = self.swap_with_checks(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        with is_port_in_use_swap:
             result = run_e2e_tests.is_oppia_server_already_running()
             self.assertTrue(result)
 
     def test_wait_for_port_to_be_open_when_port_successfully_opened(self):
-        def mock_is_port_open(unused_port):
-            mock_is_port_open.wait_time += 1
-            if mock_is_port_open.wait_time > 10:
+        def mock_is_port_in_use(unused_port):
+            mock_is_port_in_use.wait_time += 1
+            if mock_is_port_in_use.wait_time > 10:
                 return True
             return False
-        mock_is_port_open.wait_time = 0
+        mock_is_port_in_use.wait_time = 0
 
         def mock_sleep(unused_time):
             mock_sleep.called_times += 1
             return
         mock_sleep.called_times = 0
 
-        is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap_with_checks(
+            common, 'is_port_in_use', mock_is_port_in_use)
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
 
-        with is_port_open_swap, sleep_swap:
+        with is_port_in_use_swap, sleep_swap:
             common.wait_for_port_to_be_open(1)
-        self.assertEqual(mock_is_port_open.wait_time, 11)
+        self.assertEqual(mock_is_port_in_use.wait_time, 11)
         self.assertEqual(mock_sleep.called_times, 10)
 
     def test_wait_for_port_to_be_open_when_port_failed_to_open(self):
-        def mock_is_port_open(unused_port):
+        def mock_is_port_in_use(unused_port):
             return False
 
         def mock_sleep(unused_time):
@@ -423,10 +423,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         mock_sleep.sleep_time = 0
 
-        is_port_open_swap = self.swap(common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
-        with is_port_open_swap, sleep_swap, exit_swap:
+        with is_port_in_use_swap, sleep_swap, exit_swap:
             common.wait_for_port_to_be_open(1)
         self.assertEqual(
             mock_sleep.sleep_time,
