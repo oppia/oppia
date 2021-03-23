@@ -596,7 +596,6 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
 
-
     PLATFORM_ANDROID = 'android'
     REPORT_ID_1 = '%s.%s.%s' % (
         PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_1.second,
@@ -699,6 +698,146 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         self.assertEqual(
             report_model.redacted_by, report_mappings[self.REPORT_ID_1]
         )
+
+
+class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
+    test_utils.GenericTestBase):
+    """Provides testing of the verification part of wipeout service."""
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
+    # The timestamp in sec since epoch for Mar 8 2021 10:7:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615199836)
+    # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+
+    PLATFORM_ANDROID = 'android'
+    REPORT_ID_1 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_1.second,
+        'randomInteger123')
+    REPORT_ID_2 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'randomInteger321')
+    TICKET_ID = '%s.%s.%s' % (
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 22
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_ENGLISH = 'english'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input':'add an admin',
+        'event_logs':['event1', 'event2'],
+        'logcat_logs':['logcat1', 'logcat2'],
+        'package_version_code':1,
+        'language_locale_code':'en',
+        'entry_point_info': {
+            'entry_point_name':'crash',
+        },
+        'text_size':'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi':True,
+        'automatically_update_topics':False,
+        'is_admin':False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
+
+    def setUp(self):
+        super(WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version= (
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_2,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version= (
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_verify_user_delete_when_user_is_deleted_returns_true(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+    def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version= (
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
 
 
 class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
