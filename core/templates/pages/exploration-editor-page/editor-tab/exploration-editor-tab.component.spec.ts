@@ -67,7 +67,7 @@ describe('Exploration editor tab component', function() {
   var $scope = null;
   var $rootScope = null;
   var $uibModal = null;
-  var $timeout = null; 
+  var $timeout = null;
   var answerGroupObjectFactory = null;
   var editabilityService = null;
   var explorationFeaturesService = null;
@@ -83,7 +83,7 @@ describe('Exploration editor tab component', function() {
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
   var userExplorationPermissionsService = null;
-  var focusManagerService = null
+  var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
 
   importAllAngularServices();
@@ -145,10 +145,10 @@ describe('Exploration editor tab component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    $timeout = $injector.get('$timeout')
+    $timeout = $injector.get('$timeout');
     stateEditorService = $injector.get('StateEditorService');
     editabilityService = $injector.get('EditabilityService');
-    focusManagerService =$injector.get('FocusManagerService');
+    focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
     explorationStatesService = $injector.get('ExplorationStatesService');
@@ -332,13 +332,13 @@ describe('Exploration editor tab component', function() {
 
   it('should call focus method when window loads', () => {
     stateEditorService.setActiveStateName('First State');
-    var ctrlSpy = spyOn(ctrl, 'windowOnLoad');
+    var ctrlSpy = spyOn(ctrl, 'windowOnload');
     ctrl.initStateEditor();
     $scope.$apply();
     $timeout.flush();
     expect(ctrlSpy).toHaveBeenCalled();
   });
-  
+
   it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.interactionIsShown).toBe(false);

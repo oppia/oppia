@@ -159,7 +159,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$timeout', '$uibModal',
+    '$q', '$rootScope', '$scope', '$uibModal',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -181,7 +181,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope,  $timeout, $uibModal,
+        $q, $rootScope, $scope, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -402,18 +402,18 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.setFocusOnActiveTab = function(activeTab) {
-            if (activeTab === 'history') {
-              FocusManagerService.setFocus('usernameInputField');
-            }
-            if (activeTab === 'feedback') {
-              if (!ctrl.activeThread) {
-                FocusManagerService.setFocus('newThreadButton');
-              }
-              if (ctrl.activeThread) {
-                FocusManagerService.setFocus('tmpMessageText');
-              }
-            }
-        };
+        if (activeTab === 'history') {
+          FocusManagerService.setFocus('usernameInputField');
+        }
+        if (activeTab === 'feedback') {
+          if (!ctrl.activeThread) {
+            FocusManagerService.setFocus('newThreadButton');
+          }
+          if (ctrl.activeThread) {
+            FocusManagerService.setFocus('tmpMessageText');
+          }
+        }
+      };
 
       ctrl.startEditorTutorial = function() {
         EditabilityService.onStartTutorial();

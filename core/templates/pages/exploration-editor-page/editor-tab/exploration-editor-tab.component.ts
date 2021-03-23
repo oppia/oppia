@@ -71,7 +71,8 @@ angular.module('oppia').component('explorationEditorTab', {
     '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
-    'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService', 'LoaderService',
+    'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
+    'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
     'StateEditorService', 'StateTutorialFirstTimeService',
     'UrlInterpolationService', 'UserExplorationPermissionsService',
@@ -79,7 +80,8 @@ angular.module('oppia').component('explorationEditorTab', {
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
-        ExplorationWarningsService, FocusManagerService, GraphDataService, LoaderService,
+        ExplorationWarningsService, FocusManagerService, GraphDataService,
+        LoaderService,
         RouterService, SiteAnalyticsService, StateEditorRefreshService,
         StateEditorService, StateTutorialFirstTimeService,
         UrlInterpolationService, UserExplorationPermissionsService) {
@@ -156,6 +158,8 @@ angular.module('oppia').component('explorationEditorTab', {
           }
 
           LoaderService.hideLoadingScreen();
+          // $timeout is used to ensure that focus acts only after
+          // element is visible in DOM.
           $timeout(() => ctrl.windowOnload(), 100);
         }
         if (EditabilityService.inTutorialMode()) {

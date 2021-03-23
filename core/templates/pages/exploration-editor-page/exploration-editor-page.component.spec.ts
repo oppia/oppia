@@ -402,7 +402,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should navigate between tabs', () => {
-      var focusSpy =  spyOn(ctrl, 'setFocusOnActiveTab');
+      var focusSpy = spyOn(ctrl, 'setFocusOnActiveTab');
       spyOn(rs, 'navigateToMainTab').and.stub();
       ctrl.selectMainTab();
       expect(rs.navigateToMainTab).toHaveBeenCalled();
@@ -439,7 +439,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should set focus on active tab', () => {
-      var focusSpy =  spyOn(focusManagerService, 'setFocus');
+      var focusSpy = spyOn(focusManagerService, 'setFocus');
       ctrl.setFocusOnActiveTab('history');
       expect(focusSpy).toHaveBeenCalledWith('usernameInputField');
       ctrl.activeThread = true;
