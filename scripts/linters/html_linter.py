@@ -111,36 +111,36 @@ class CustomHTMLParser(html.parser.HTMLParser):
         starttag_text = self.get_starttag_text()
 
         # Check whether there is space around attributes.
-        # An = is followed either by " or {.
+        # An = is followed by ".
         tag_substrings = starttag_text.split()
-        required_attribute_suffix = ['"', '{']
+        required_attribute_suffix = '"'
         conditional_statement_chars = ['=', '>', '<', '!']
-        for key, value in enumerate(tag_substrings):
+        for index, tag_substring in enumerate(tag_substrings):
             error_message = None
-            if key < len(tag_substrings) - 1:
-                next_value = tag_substrings[key + 1]
+            if index < len(tag_substrings) - 1:
+                next_value = tag_substrings[index + 1]
                 next_value_first_char = next_value[0] if next_value else None
             else:
                 next_value_first_char = None
-            if value == '=':
-                if next_value_first_char in required_attribute_suffix:
+            if tag_substring == '=':
+                if next_value_first_char == required_attribute_suffix:
                     error_message = (
                         '%s --> Attribute for tag %s on line '
                         '%s has unwanted white spaces around it' % (
                             self.filepath, tag, line_number))
-            elif value.startswith('='):
-                if value[1] in required_attribute_suffix:
+            elif tag_substring.startswith('='):
+                if tag_substring[1] == required_attribute_suffix:
                     error_message = (
                         '%s --> Attribute for tag %s on line '
                         '%s has unwanted white spaces before %s' % (
-                            self.filepath, tag, line_number, value))
-            elif value.endswith('='):
-                if (next_value_first_char in required_attribute_suffix and
-                        value[-2] not in conditional_statement_chars):
+                            self.filepath, tag, line_number, tag_substring))
+            elif tag_substring.endswith('='):
+                if (next_value_first_char == required_attribute_suffix and
+                        tag_substring[-2] not in conditional_statement_chars):
                     error_message = (
                         '%s --> Attribute for tag %s on line '
                         '%s has unwanted white spaces after %s' % (
-                            self.filepath, tag, line_number, value))
+                            self.filepath, tag, line_number, tag_substring))
             if error_message:
                 self.failed = True
                 self.error_messages.append(error_message)
