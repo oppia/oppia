@@ -729,8 +729,8 @@ def require_valid_meta_tag_content(meta_tag_content):
             meta_tag_content: str. The meta tag content to validate.
 
         Raises:
-            Exception. Meta tag content is not a string.
-            Exception. Meta tag content is longer than expected.
+            ValidationError. Meta tag content is not a string.
+            ValidationError. Meta tag content is longer than expected.
         """
     if not isinstance(meta_tag_content, python_utils.BASESTRING):
         raise ValidationError(
@@ -749,8 +749,8 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         page_title_fragment_for_web: str. The page title fragment to validate.
 
     Raises:
-        Exception. Page title fragment is not a string.
-        Exception. Page title fragment is too lengthy.
+        ValidationError. Page title fragment is not a string.
+        ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
