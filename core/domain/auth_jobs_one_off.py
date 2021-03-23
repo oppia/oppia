@@ -43,7 +43,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to sync Firebase accounts with Oppia's user accounts.
 
     This job does not print aggregated success output, because the reduce phase
-    is sharded by auth_id and could potentially generate 1000s of
+    is sharded by auth_id and could potentially generate tens of 1000s of
     privacy-sensitive outputs. Instead, success is interpreted as an output
     without any ERRORs.
 
