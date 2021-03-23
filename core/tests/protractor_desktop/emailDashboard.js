@@ -47,6 +47,7 @@ describe('Email Dashboard', function() {
     var inputElement = schemaEditorElement.element(by.tagName('input'));
     var submitButton = element(by.css('.protractor-test-submit-query-button'));
 
+    await waitFor.visibilityOf(inputElement, 'Input Element not displayed');
     await action.clear('Email dashboard input 3', inputElement);
     await action.sendKeys('Email dashboard input 3', inputElement, '1');
     await action.click('Submit Query button', submitButton);
