@@ -22,8 +22,8 @@ import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory.ts';
-import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service.ts';
+import { TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { Subscription } from 'rxjs';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
@@ -32,15 +32,15 @@ import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
 
 
 describe('Topic editor state service', () => {
-  let topicEditorStateService : TopicEditorStateService;
-  let topicObjectFactory : TopicObjectFactory;
-  let subtopicPageObjectFactory : SubtopicPageObjectFactory;
-  let topicUpdateService :TopicUpdateService;
+  let topicEditorStateService: TopicEditorStateService;
+  let topicObjectFactory: TopicObjectFactory;
+  let subtopicPageObjectFactory: SubtopicPageObjectFactory;
+  let topicUpdateService: TopicUpdateService;
   let secondBackendTopicObject = null;
   let secondTopicRightsObject = null;
   let mockEditableTopicBackendApiService = null;
   let mockTopicRightsBackendApiService = null;
-  let subtopicPageObject:SubtopicPageBackendDict = null;
+  let subtopicPageObject: SubtopicPageBackendDict = null;
   let secondSubtopicPageObject: SubtopicPageBackendDict = null;
   let testSubscriptions = null;
   let subtopicPageLoadedSpy = null;
@@ -54,7 +54,7 @@ describe('Topic editor state service', () => {
     backendStorySummariesObject: StorySummaryBackendDict | undefined[] = [];
     failure: null;
 
-    fetchTopic():Promise<Record<string, TopicBackendDict>> {
+    fetchTopic(): Promise<Record<string, TopicBackendDict>> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.newBackendTopicObject);
@@ -63,7 +63,7 @@ describe('Topic editor state service', () => {
         }
       });
     }
-    updateTopic():Promise<Record<string, TopicBackendDict>> {
+    updateTopic(): Promise<Record<string, TopicBackendDict>> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.newBackendTopicObject);
@@ -72,7 +72,7 @@ describe('Topic editor state service', () => {
         }
       });
     }
-    fetchStories():Promise<StorySummaryBackendDict | undefined[]> {
+    fetchStories(): Promise<StorySummaryBackendDict | undefined[]> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.backendStorySummariesObject);
@@ -82,7 +82,7 @@ describe('Topic editor state service', () => {
       });
     }
 
-    fetchSubtopicPage():Promise<Record<string, SubtopicPageBackendDict>> {
+    fetchSubtopicPage(): Promise<Record<string, SubtopicPageBackendDict>> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.newBackendSubtopicPageObject);
