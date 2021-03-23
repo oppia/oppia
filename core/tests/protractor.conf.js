@@ -1,3 +1,4 @@
+var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
@@ -342,6 +343,9 @@ exports.config = {
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
     browser.driver.manage().window().setSize(1285, 1000);
+
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+    FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   },
 
   // The params object will be passed directly to the protractor instance,

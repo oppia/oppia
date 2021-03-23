@@ -26,6 +26,8 @@ base_models, user_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
+ONLY_FIREBASE_SEED_MODEL_ID = '1'
+
 
 class UserAuthDetailsModel(base_models.BaseModel):
     """Stores the authentication details for a particular user.
@@ -292,3 +294,22 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
             to user_id argument.
         """
         return cls.query(cls.user_id == user_id).get()
+
+
+class FirebaseSeedModel(base_models.BaseModel):
+    """Dummy model used to kick-off the DestroyFirebaseAccountsOneOffJob."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model should never be erased."""
+        return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not correspond to any users."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Model does not correspond to any users."""
+        return False

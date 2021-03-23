@@ -40,6 +40,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import main
@@ -709,15 +710,60 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
 
 
 class SessionBeginHandlerTests(test_utils.GenericTestBase):
-    """Tests for session handler."""
+    """Tests for /session_begin handler."""
 
     def test_get(self):
-        call_counter = test_utils.CallCounter(lambda *_: None)
+        swap = self.swap_with_call_counter(
+            auth_services, 'establish_auth_session')
 
-        with self.swap(auth_services, 'establish_auth_session', call_counter):
+        with swap as call_counter:
             self.get_html_response('/session_begin', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
+
+
+class SessionEndHandlerTests(test_utils.GenericTestBase):
+    """Tests for /session_end handler."""
+
+    def test_get(self):
+        swap = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        with swap as call_counter:
+            self.get_html_response('/session_end', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+
+class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
+    """Tests for /seed_firebase handler."""
+
+    def test_get(self):
+        swap = self.swap_with_call_counter(
+            firebase_auth_services, 'seed_firebase')
+
+        with swap as call_counter:
+            response = self.get_html_response(
+                '/seed_firebase', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(response.location, 'http://localhost/')
+
+    def test_get_with_error(self):
+        swap = self.swap_with_call_counter(
+            firebase_auth_services, 'seed_firebase', raises=Exception())
+
+        captured_logging_context = self.capture_logging(min_level=logging.ERROR)
+
+        with swap as call_counter, captured_logging_context as logs:
+            response = self.get_html_response(
+                '/seed_firebase', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(response.location, 'http://localhost/')
+        self.assert_matches_regexps(logs, [
+            'Failed to prepare for SeedFirebaseOneOffJob'
+        ])
 
 
 class LogoutPageTests(test_utils.GenericTestBase):
@@ -727,9 +773,10 @@ class LogoutPageTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
         self.get_html_response('/explore/0')
 
-        call_counter = test_utils.CallCounter(lambda _: None)
+        swap = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
-        with self.swap(auth_services, 'destroy_auth_session', call_counter):
+        with swap as call_counter:
             # Logout with valid query arg. This test only validates that the
             # login cookies have expired after hitting the logout url.
             self.get_html_response('/logout', expected_status_int=302)
@@ -972,6 +1019,8 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         'Error404Handler',
         'LogoutPage',
         'SessionBeginHandler',
+        'SessionEndHandler',
+        'SeedFirebaseHandler',
     ])
 
     def test_every_method_has_decorator(self):
@@ -1201,6 +1250,13 @@ class SignUpTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response('/community-library')
+
+    def test_500_error_is_raised_when_enable_user_creation_is_false(self):
+        self.login('abc@example.com')
+
+        with self.swap(feconf, 'ENABLE_USER_CREATION', False):
+            response = self.get_response_without_checking_for_errors(
+                '%s?return_url=/' % feconf.SIGNUP_URL, [500])
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):

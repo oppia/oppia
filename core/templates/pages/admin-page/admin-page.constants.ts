@@ -35,6 +35,10 @@ export const AdminPageConstants = {
   ADMIN_VERIFY_USER_MODELS_DELETED_HANDLER_URL:
     '/verifyusermodelsdeletedhandler',
   ADMIN_DELETE_USER_HANDLER_URL: '/deleteuserhandler',
+  ADMIN_GRANT_SUPER_ADMIN_PRIVILEGES_HANDLER_URL:
+    '/admingrantsuperadminhandler',
+  ADMIN_REVOKE_SUPER_ADMIN_PRIVILEGES_HANDLER_URL:
+    '/adminrevokesuperadminhandler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#activities',

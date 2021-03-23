@@ -459,3 +459,26 @@ class UserIdByFirebaseAuthIdModelValidatorTests(AuthValidatorTestBase):
               'doesn\'t exist' % (self.auth_id, self.user_id, self.user_id)],
             ],
         ])
+
+
+class FirebaseSeedModelValidatorTests(AuthValidatorTestBase):
+
+    JOB_CLASS = prod_validation_jobs_one_off.FirebaseSeedModelAuditOneOffJob
+
+    def test_audit_with_valid_id_reports_success(self):
+        auth_models.FirebaseSeedModel(
+            id=auth_models.ONLY_FIREBASE_SEED_MODEL_ID).put()
+
+        self.assertItemsEqual(self.run_job_and_get_output(), [
+            ['fully-validated FirebaseSeedModel', 1],
+        ])
+
+    def test_audit_with_invalid_id_reports_an_error(self):
+        invalid_id = 'abc'
+        auth_models.FirebaseSeedModel(id=invalid_id).put()
+
+        self.assertItemsEqual(self.run_job_and_get_output(), [
+            ['failed validation check for model id check of FirebaseSeedModel',
+             ['Entity id %s: Entity id must be 1' % (invalid_id,)],
+            ],
+        ])
