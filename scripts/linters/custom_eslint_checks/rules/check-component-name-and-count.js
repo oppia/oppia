@@ -44,7 +44,7 @@ module.exports ={
     const fileName = context.getFilename();
     const componentsToCheck = ['controller', 'directive', 'factory', 'filter']
     let numComponents = 0;
-    console.info(fileName);
+    // console.info(fileName);
     return {
       CallExpression: function checkExpression(node) {
         if(!((fileName.endsWith('.js')) || (fileName.endsWith('.ts')))) {
