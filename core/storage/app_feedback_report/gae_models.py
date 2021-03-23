@@ -232,6 +232,50 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'The id generator for AppFeedbackReportModel is producing too'
             'many collisions.')
 
+
+    @classmethod
+    def scrub_report(cls, report_id):
+        """Scrubs the instance of AppFeedbackReportModel with given ID, removing
+        any user-entered input in the entity.
+
+        Args:
+            report_id: str. The id of the model entity to scrub.
+        """
+        report_entity = cls.get_by_id(report_id)
+        if not report_entity:
+            raise Exception(
+                'The AppFeedbackReportModel trying to be scrubbed does not'
+                'exist.')
+        if report_entity.platform == PLATFORM_CHOICE_ANDROID:
+            # Scrub the logs and the user's inputted text.
+            report_dict = report_entity.android_report_info
+            new_report_dict = {
+                'feedback_list': report_dict['feedback_list'],
+                'package_version_code': report_dict['package_version_code'],
+                'device_language_locale_code': (
+                    report_dict['device_language_locale_code']),
+                'build_fingerprint': report_dict['build_fingerprint'],
+                'network_type': report_dict['network_type'],
+                'text_size': report_dict['text_size'],
+                'download_and_update_only_on_wifi': (
+                    report_dict['download_and_update_only_on_wifi']),
+                'automatically_update_topics': (
+                    report_dict['automatically_update_topics']),
+                'account_is_profile_admin': (
+                    report_dict['account_is_profile_admin'])
+            }
+            report_entity.android_report_info = new_report_dict
+        else: 
+            # Scrub the user's inputted text.
+            report_dict = report_entity.web_report_info
+            new_report_dict = {
+                'feedback_list': report_dict['feedback_list']
+            }
+            report_entity.web_report_info = new_report_dict
+        report_entity.update_timestamps()
+        report_entity.put()
+
+
     @staticmethod
     def get_deletion_policy():
         """Model stores the user ID of who has scrubbed this report for auditing
