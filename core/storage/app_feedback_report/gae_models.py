@@ -297,7 +297,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'report_type': base_models.EXPORT_POLICY.EXPORTED,
             'category': base_models.EXPORT_POLICY.EXPORTED,
             'platform_version': base_models.EXPORT_POLICY.EXPORTED,
-            'country_locale_code': base_models.EXPORT_POLICY.EXPORTED,
+            'device_country_locale_code': base_models.EXPORT_POLICY.EXPORTED,
             'android_device_model': base_models.EXPORT_POLICY.EXPORTED,
             'android_sdk_version': base_models.EXPORT_POLICY.EXPORTED,
             'entry_point': base_models.EXPORT_POLICY.EXPORTED,
@@ -306,7 +306,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'entry_point_exploration_id': base_models.EXPORT_POLICY.EXPORTED,
             'entry_point_subtopic_id': base_models.EXPORT_POLICY.EXPORTED,
             'text_language_code': base_models.EXPORT_POLICY.EXPORTED,
-            'audio_language': base_models.EXPORT_POLICY.EXPORTED,
+            'audio_language_code': base_models.EXPORT_POLICY.EXPORTED,
             'android_report_info': base_models.EXPORT_POLICY.EXPORTED,
             'android_report_info_schema_version':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -604,7 +604,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             'stats_tracking_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'daily_ticket_stats_schema_version':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'daily_tickets_stats': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'daily_ticket_stats': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @staticmethod

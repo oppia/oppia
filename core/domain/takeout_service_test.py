@@ -743,6 +743,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.set_up_trivial()
         self.maxDiff = None
         # Generate expected output.
+        app_feedback_report = {}
         collection_progress_data = {}
         collection_rights_data = {
             'editable_collection_ids': [],
@@ -828,6 +829,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_user_email_preferences = {}
 
         expected_user_data = {
+            'app_feedback_report': app_feedback_report,
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
