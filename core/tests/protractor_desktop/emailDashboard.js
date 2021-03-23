@@ -53,6 +53,7 @@ describe('Email Dashboard', function() {
     var checkStatusButton = element(
       by.css('.protractor-test-check-status-button-0'));
     while (true) {
+      // eslint-disable-next-line oppia/protractor-practices
       await browser.sleep(1000);
       await action.click('Check Status Button', checkStatusButton);
       var statusElement = element(by.css('.protractor-test-status-0'));
