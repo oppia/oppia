@@ -33,7 +33,7 @@ describe('Pencil Code Editor Validation Service', () => {
   let oof: OutcomeObjectFactory = null;
   let rof: RuleObjectFactory = null;
   let inputBackend: RuleInputs = null;
-  let agof : AnswerGroupObjectFactory = null;
+  let agof: AnswerGroupObjectFactory = null;
 
   beforeEach(() => {
     oof = TestBed.get(OutcomeObjectFactory);

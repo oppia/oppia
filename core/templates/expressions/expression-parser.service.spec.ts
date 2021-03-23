@@ -19,7 +19,7 @@
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 
 describe('Expression parser service', () => {
-  let eps : ExpressionParserService;
+  let eps: ExpressionParserService;
   beforeEach(() => {
     eps = new ExpressionParserService();
   });
