@@ -7,9 +7,9 @@
     <div class="oppia-question-editor-section">
       <h3>Selected Difficulty: <[skillDifficultyString]>
         <i role = "button"
-          class="material-icons oppia-editor-edit-icon select-difficulty-icon oppia-editable-section protractor-test-edit-content-pencil-button"
-          ng-click="onClickSuggestQuestionButton()"
-          title="Edit Skill Difficulty">&#xE254;
+           class="material-icons oppia-editor-edit-icon select-difficulty-icon oppia-editable-section protractor-test-edit-content-pencil-button"
+           ng-click="onClickChangeDifficulty()"
+           title="Edit Skill Difficulty">&#xE254;
         </i>
       </h3>
       <div ng-if="skill.getRubricExplanations(skillDifficultyString).length > 0">

@@ -57,7 +57,6 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
-    console.log($scope.skill.getId());
     ContextService.setImageSaveDestinationToLocalStorage();
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
@@ -72,7 +71,6 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
         $scope.question, $scope.skill, $scope.skillDifficulty, imagesData,
         function() {
           AlertsService.addSuccessMessage('Submitted question for review.');
-          console.log( $scope.skill,$scope.skillDifficulty)
         });
       $uibModalInstance.close();
     };
@@ -83,11 +81,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
         $scope.question, $scope.misconceptionsBySkill);
     };
     $scope.skillId = $scope.skill.getId()
-    $scope.onClickSuggestQuestionButton = function() {
-
-      SiteAnalyticsService.registerContributorDashboardSuggestEvent(
-        'Question');
-
+    $scope.onClickChangeDifficulty = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topic-editor-page/modal-templates/' +
