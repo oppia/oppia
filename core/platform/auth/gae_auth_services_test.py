@@ -105,6 +105,7 @@ class GaeAuthServicesTests(test_utils.AppEngineTestBase):
 
         assoc_by_auth_id_model = auth_models.UserIdentifiersModel.get('aid')
         assoc_by_auth_id_model.deleted = True
+        assoc_by_auth_id_model.update_timestamps()
         assoc_by_auth_id_model.put()
 
         self.assertEqual(

@@ -856,6 +856,7 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
             stats_model.translation_reviewer_counts_by_lang_code[
                 language_code] += 1
 
+    stats_model.update_timestamps()
     stats_model.put()
 
 
@@ -967,10 +968,13 @@ def _save_user_settings(user_settings):
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
+        user_model.update_timestamps()
+        user_model.put()
     else:
         user_settings_dict['id'] = user_settings.user_id
-        user_model = user_models.UserSettingsModel(**user_settings_dict)
-    user_model.put()
+        model = user_models.UserSettingsModel(**user_settings_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def _get_user_settings_from_model(user_settings_model):
@@ -1242,6 +1246,7 @@ def _save_existing_users_settings(user_settings_list):
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
+    user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
 
 
@@ -1260,6 +1265,7 @@ def _save_existing_users_auth_details(user_auth_details_list):
             user_auth_models, user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_model.populate(**user_auth_details.to_dict())
+    auth_models.UserAuthDetailsModel.update_timestamps_multi(user_auth_models)
     auth_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
 
@@ -1279,10 +1285,12 @@ def _save_user_auth_details(user_auth_details):
     user_auth_details_dict = user_auth_details.to_dict()
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
+        user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
     else:
         user_auth_details_dict['id'] = user_auth_details.user_id
         model = auth_models.UserAuthDetailsModel(**user_auth_details_dict)
+        model.update_timestamps()
         model.put()
 
 
@@ -1632,6 +1640,7 @@ def save_deleted_username(normalized_username):
     )
     deleted_user_model = (
         user_models.DeletedUsernameModel(id=hashed_normalized_username))
+    deleted_user_model.update_timestamps()
     deleted_user_model.put()
 
 
@@ -1785,6 +1794,7 @@ def update_email_preferences(
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
+    email_preferences_model.update_timestamps()
     email_preferences_model.put()
 
 
@@ -1867,6 +1877,7 @@ def set_email_preferences_for_exploration(
     if mute_suggestion_notifications is not None:
         exploration_user_model.mute_suggestion_notifications = (
             mute_suggestion_notifications)
+    exploration_user_model.update_timestamps()
     exploration_user_model.put()
 
 
@@ -2280,6 +2291,7 @@ def update_dashboard_stats_log(user_id):
         }
     }
     model.weekly_creator_stats_list.append(weekly_dashboard_stats)
+    model.update_timestamps()
     model.put()
 
 

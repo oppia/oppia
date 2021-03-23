@@ -852,6 +852,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self._create_exploration(self.EXP_ID_3, self.user_a_id)
         model1 = exp_models.ExpSummaryModel.get(self.EXP_ID_3)
         model1.contributors_summary = {}
+        model1.update_timestamps()
         model1.put()
 
         self._run_computation()
@@ -1048,6 +1049,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self._create_exploration(self.EXP_ID_3, self.user_a_id)
         model1 = exp_models.ExpSummaryModel.get(self.EXP_ID_3)
         model1.deleted = True
+        model1.update_timestamps()
         model1.put()
 
         self._run_computation()

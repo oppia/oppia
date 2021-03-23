@@ -68,6 +68,9 @@ var ExplorationEditorHistoryTab = function() {
   this.expectCommitDatesToBeDisplayed = async function() {
     var numCommitDates = await datesCommitsWereSaved.count();
     for (var i = 0; i < numCommitDates; i++) {
+      await waitFor.visibilityOf(
+        datesCommitsWereSaved.get(
+          i), 'Dates Commits Were Saved taking too long to appear');
       var date = await datesCommitsWereSaved.get(i).getText();
       // The dates can be of varying format
       // (see getLocaleAbbreviatedDatetimeString). To play it
@@ -81,12 +84,15 @@ var ExplorationEditorHistoryTab = function() {
     return {
       openStateHistory: async function(stateName) {
         var listOfNames = await stateNodes.map(async function(stateElement) {
+          await waitFor.visibilityOf(stateNodeLabel(
+            stateElement), 'State Node Label taking too long to appear');
           return await stateNodeLabel(stateElement).getText();
         });
         var matched = false;
         for (var i = 0; i < listOfNames.length; i++) {
           if (listOfNames[i] === stateName) {
-            await stateNodes.get(i).click();
+            var stateNodeButton = stateNodes.get(i);
+            await action.click('State Node Button', stateNodeButton);
             matched = true;
           }
         }
@@ -100,7 +106,8 @@ var ExplorationEditorHistoryTab = function() {
           closeStateHistoryButton,
           'Close State History button is not clickable');
         expect(await closeStateHistoryButton.isDisplayed()).toBe(true);
-        await closeStateHistoryButton.click();
+        await action.click(
+          'Close State History Button', closeStateHistoryButton);
         await waitFor.invisibilityOf(
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
@@ -118,19 +125,15 @@ var ExplorationEditorHistoryTab = function() {
         // Array starts at 0.
         var firstVersionDropdown = element(
           by.css('.protractor-test-history-version-dropdown-first'));
-        await waitFor.visibilityOf(
-          firstVersionDropdown, 'First version dropdown');
-        await (
-          firstVersionDropdown.element(
-            by.cssContainingText('option', versionNumber1))).click();
+        var versionNumber1Button = firstVersionDropdown.element(
+          by.cssContainingText('option', versionNumber1));
+        await action.click('Version Number1 Button', versionNumber1Button);
 
         var secondVersionDropdown = element(
           by.css('.protractor-test-history-version-dropdown-second'));
-        await waitFor.visibilityOf(
-          secondVersionDropdown, 'Second version dropdown');
-        await (
-          secondVersionDropdown.element(
-            by.cssContainingText('option', versionNumber2))).click();
+        var versionNumber2Button = secondVersionDropdown.element(
+          by.cssContainingText('option', versionNumber2));
+        await action.click('Version Number2 Button', versionNumber2Button);
       },
       /*
        * This method compares the states in the history graph using each
@@ -148,6 +151,8 @@ var ExplorationEditorHistoryTab = function() {
         await waitFor.visibilityOf(
           historyGraph, 'History graph takes too long to be visible.');
         var states = await stateNodes.map(async function(stateElement) {
+          await waitFor.visibilityOf(stateNodeLabel(
+            stateElement), 'State Node Label taking too long to appear');
           var label = await stateNodeLabel(stateElement).getText();
           var color = await stateNodeBackground(stateElement).getCssValue(
             'fill');

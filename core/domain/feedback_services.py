@@ -109,7 +109,8 @@ def _create_models_for_thread_and_first_message(
     thread.subject = subject
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
-    thread.put_for_human()
+    thread.update_timestamps()
+    thread.put()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
         subject, text)
@@ -140,7 +141,7 @@ def create_thread(
 
 def create_message(
         thread_id, author_id, updated_status, updated_subject, text,
-        received_via_email=False):
+        received_via_email=False, should_send_email=True):
     """Creates a new message for the thread and subscribes the author to the
     thread.
 
@@ -156,6 +157,8 @@ def create_message(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether new message is received via email or
             web.
+        should_send_email: bool. Whether the new message(s) need to be added to
+            the email buffer.
 
     Returns:
         FeedbackMessage. The domain object representing the new message added
@@ -166,12 +169,13 @@ def create_message(
     """
     return create_messages(
         [thread_id], author_id, updated_status, updated_subject, text,
-        received_via_email=received_via_email)[0]
+        received_via_email=received_via_email,
+        should_send_email=should_send_email)[0]
 
 
 def create_messages(
         thread_ids, author_id, updated_status, updated_subject, text,
-        received_via_email=False):
+        received_via_email=False, should_send_email=True):
     """Creates a new message for each of the distinct threads in thread_ids and
     for each message, subscribes the author to the thread.
 
@@ -188,6 +192,8 @@ def create_messages(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether the new message(s) are received via
             email or web.
+        should_send_email: bool. Whether the new message(s) need to be added to
+            the email buffer.
 
     Returns:
         list(FeedbackMessage). The domain objects representing the new messages
@@ -273,8 +279,9 @@ def create_messages(
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
-    feedback_models.GeneralFeedbackMessageModel.put_multi_for_human(
+    feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
         message_models)
+    feedback_models.GeneralFeedbackMessageModel.put_multi(message_models)
 
     # Update the message data cache of the threads.
     for thread_model in thread_models:
@@ -299,8 +306,9 @@ def create_messages(
                         updated_subject != thread_model.subject):
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
-    feedback_models.GeneralFeedbackThreadModel.put_multi_for_human(
+    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
         thread_models)
+    feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
     # the thread, so that the last_updated time changes to show that there is
@@ -319,7 +327,9 @@ def create_messages(
         # we need not update the suggestion.
         if suggestion_model:
             suggestion_models_to_update.append(suggestion_model)
-    suggestion_models.GeneralSuggestionModel.put_multi_for_human(
+    suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
+        suggestion_models_to_update)
+    suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update)
 
     if (feconf.CAN_SEND_EMAILS and (
@@ -327,7 +337,8 @@ def create_messages(
             user_services.is_user_registered(author_id)) and
             # TODO(#12079): Figure out a better way to avoid sending feedback
             # thread emails for contributor dashboard suggestions.
-            (len(text) > 0 or old_statuses[index] != new_statuses[index])):
+            (len(text) > 0 or old_statuses[index] != new_statuses[index]) and
+            should_send_email):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
@@ -424,6 +435,7 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
         feedback_models.GeneralFeedbackThreadUserModel.create(
             user_id, thread_id))
     feedback_thread_user_model.message_ids_read_by_user = message_ids
+    feedback_thread_user_model.update_timestamps()
     feedback_thread_user_model.put()
 
 
@@ -497,6 +509,8 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     # Update both the new and previously existing models in the datastore.
     current_feedback_thread_user_models.extend(
         new_feedback_thread_user_models)
+    feedback_models.GeneralFeedbackThreadUserModel.update_timestamps_multi(
+        current_feedback_thread_user_models)
     feedback_models.GeneralFeedbackThreadUserModel.put_multi(
         current_feedback_thread_user_models)
 
@@ -907,10 +921,12 @@ def _add_feedback_message_reference_transactional(user_id, reference):
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     if model is not None:
         model.feedback_message_references.append(reference.to_dict())
+        model.update_timestamps()
         model.put()
     else:
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=[reference.to_dict()])
+        model.update_timestamps()
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
@@ -930,6 +946,7 @@ def update_feedback_email_retries_transactional(user_id):
     if (time_since_buffered >
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):
         model.retries += 1
+        model.update_timestamps()
         model.put()
 
 
@@ -955,6 +972,7 @@ def pop_feedback_message_references_transactional(
         # the retries count will be incorrect.
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=remaining_references)
+        model.update_timestamps()
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
@@ -999,6 +1017,7 @@ def clear_feedback_message_references_transactional(
         model.delete()
     else:
         model.feedback_message_references = updated_references
+        model.update_timestamps()
         model.put()
 
 
