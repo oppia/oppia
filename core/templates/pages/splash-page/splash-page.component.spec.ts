@@ -35,7 +35,7 @@ import { of } from 'rxjs';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
