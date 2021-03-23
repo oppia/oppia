@@ -85,8 +85,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
         """
         model = jobs_utils.clone_model(input_model)
         expected_post_commit_is_private = (
-            model.post_commit_status ==
-            feconf.POST_COMMIT_STATUS_PRIVATE)
+            model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
         if model.post_commit_is_private != expected_post_commit_is_private:
             yield errors.ModelInvalidCommitStatusError(model)
 
