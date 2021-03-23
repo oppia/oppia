@@ -56,7 +56,7 @@ export class ContentTranslationManagerService {
     private extensionTagAssemblerService: ExtensionTagAssemblerService
   ) {}
 
-  init(explorationLanguageCode: string) : void {
+  init(explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
     this.originalTranscript = cloneDeep(
       this.playerTranscriptService.transcript);
@@ -77,7 +77,7 @@ export class ContentTranslationManagerService {
    * the page and restart the exploration.
    * @param {string} languageCode The language code to display translations for.
    */
-  displayTranslations(languageCode: string) : void {
+  displayTranslations(languageCode: string): void {
     const cards = this.playerTranscriptService.transcript;
 
     if (languageCode === this.explorationLanguageCode) {
@@ -127,7 +127,7 @@ export class ContentTranslationManagerService {
     content[valueName] = writtenTranslation.translation;
   }
 
-  _displayTranslationsForCard(card: StateCard, languageCode: string) : void {
+  _displayTranslationsForCard(card: StateCard, languageCode: string): void {
     const writtenTranslations = card.writtenTranslations;
 
     const contentTranslation = writtenTranslations.translationsMapping[

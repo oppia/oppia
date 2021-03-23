@@ -1001,6 +1001,14 @@ class UserIdByFirebaseAuthIdModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [auth_models.UserIdByFirebaseAuthIdModel]
 
 
+class FirebaseSeedModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates FirebaseSeedModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [auth_models.FirebaseSeedModel]
+
+
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates PlatformParameterModel."""
 
