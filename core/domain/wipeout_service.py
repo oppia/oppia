@@ -1022,7 +1022,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     """
     user_id = pending_deletion_request.user_id
     app_feedback_report_model_class = (
-        app_feedback_report_models.FeedbackReportModel)
+        app_feedback_report_models.AppFeedbackReportModel)
 
     feedback_report_models = app_feedback_report_model_class.query(
         filter(app_feedback_report_model_class.scrubbed_by == user_id).fetch()
