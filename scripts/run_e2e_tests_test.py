@@ -389,7 +389,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result = run_e2e_tests.is_oppia_server_already_running()
             self.assertTrue(result)
 
-    def test_wait_for_port_to_be_open_when_port_successfully_opened(self):
+    def test_wait_for_port_to_be_in_use_when_port_successfully_opened(self):
         def mock_is_port_in_use(unused_port):
             mock_is_port_in_use.wait_time += 1
             if mock_is_port_in_use.wait_time > 10:
@@ -407,11 +407,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
 
         with is_port_in_use_swap, sleep_swap:
-            common.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_in_use(1)
         self.assertEqual(mock_is_port_in_use.wait_time, 11)
         self.assertEqual(mock_sleep.called_times, 10)
 
-    def test_wait_for_port_to_be_open_when_port_failed_to_open(self):
+    def test_wait_for_port_to_be_in_use_when_port_failed_to_open(self):
         def mock_is_port_in_use(unused_port):
             return False
 
@@ -428,7 +428,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_in_use_swap, sleep_swap, exit_swap:
-            common.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_in_use(1)
         self.assertEqual(
             mock_sleep.sleep_time,
             common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
@@ -876,7 +876,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -932,8 +932,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -999,7 +999,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1051,8 +1051,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -1345,7 +1345,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1399,8 +1399,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -1519,7 +1519,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1573,8 +1573,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -1644,7 +1644,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1698,8 +1698,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),

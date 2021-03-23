@@ -635,8 +635,8 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         raise
 
 
-def wait_for_port_to_be_open(port_number):
-    """Wait until the port is open and exit if port isn't open after
+def wait_for_port_to_be_in_use(port_number):
+    """Wait until the port is in use and exit if port isn't open after
     MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
     Args:
@@ -697,7 +697,7 @@ def start_redis_server():
         REDIS_SERVER_PATH, REDIS_CONF_PATH,
         '--daemonize', 'yes'
     ])
-    wait_for_port_to_be_open(feconf.REDISPORT)
+    wait_for_port_to_be_in_use(feconf.REDISPORT)
 
 
 def stop_redis_server():

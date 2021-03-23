@@ -814,14 +814,14 @@ class CommonTests(test_utils.GenericTestBase):
                     return '', ''
             return Ret()
 
-        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+        def mock_wait_for_port_to_be_in_use(port): # pylint: disable=unused-argument
             return
 
         swap_call = self.swap(subprocess, 'call', mock_call)
-        swap_wait_for_port_to_be_open = self.swap(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open)
-        with swap_call, swap_wait_for_port_to_be_open:
+        swap_wait_for_port_to_be_in_use = self.swap(
+            common, 'wait_for_port_to_be_in_use',
+            mock_wait_for_port_to_be_in_use)
+        with swap_call, swap_wait_for_port_to_be_in_use:
             common.start_redis_server()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -862,16 +862,16 @@ class CommonTests(test_utils.GenericTestBase):
                     return '', ''
             return Ret()
 
-        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+        def mock_wait_for_port_to_be_in_use(port): # pylint: disable=unused-argument
             return
 
         swap_call = self.swap(subprocess, 'call', mock_call)
-        swap_wait_for_port_to_be_open = self.swap(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open)
+        swap_wait_for_port_to_be_in_use = self.swap(
+            common, 'wait_for_port_to_be_in_use',
+            mock_wait_for_port_to_be_in_use)
         swap_os_remove = self.swap(os, 'remove', mock_os_remove_file)
         swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
-        with swap_call, swap_wait_for_port_to_be_open, swap_os_remove, (
+        with swap_call, swap_wait_for_port_to_be_in_use, swap_os_remove, (
             swap_os_path_exists):
             common.start_redis_server()
 
