@@ -11,12 +11,12 @@
 </schema-based-bool-editor>
 
 <schema-based-int-editor ng-if="$ctrl.schema().type === 'int' && !$ctrl.schema().choices"
-                         [local-value]="$scope.localValue" (local-value-change)="$ctrl.updateLocalValue($event)"
+                         [local-value]="$ctrl.localValue" (local-value-change)="$ctrl.updateLocalValue($event)"
                          [is-disabled]="$ctrl.isDisabled()"
-                         [validators]="$scope.schema().validators"
-                         [label-for-focus-target]="$scope.labelForFocusTarget()"
-                         (input-blur)="$scope.onInputBlur()"
-                         (input-focus)="$scope.onInputFocus()">
+                         [validators]="$ctrl.schema().validators"
+                         [label-for-focus-target]="$ctrl.labelForFocusTarget()"
+                         (input-blur)="$ctrl.onInputBlur()"
+                         (input-focus)="$ctrl.onInputFocus()">
 </schema-based-int-editor>
 
 <schema-based-float-editor ng-if="$ctrl.schema().type === 'float' && !$ctrl.schema().choices"
