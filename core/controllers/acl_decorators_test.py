@@ -978,6 +978,45 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class DeleteAnyUserTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_delete_any_user
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(DeleteAnyUserTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_delete_any_user(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/', expected_status_int=401)
+        self.logout()
+
+    def test_not_logged_user_cannot_delete_any_user(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/', expected_status_int=401)
+
+    def test_primary_admin_can_delete_any_user(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
 class VoiceoverExplorationTests(test_utils.GenericTestBase):
     """Tests for can_voiceover_exploration decorator."""
 

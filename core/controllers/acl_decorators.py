@@ -577,6 +577,46 @@ def can_access_admin_page(handler):
     return test_super_admin
 
 
+def can_delete_any_user(handler):
+    """Decorator that checks if the current user can delete any user.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can delete any user.
+    """
+
+    def test_primary_admin(self, **kwargs):
+        """Checks if the user is logged in and is a primary admin e.g. user with
+        email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user is not a primary admin of the
+                application.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        email = user_services.get_email_from_user_id(self.user_id)
+        if email != feconf.SYSTEM_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                '%s cannot delete any user.' % self.user_id)
+
+        return handler(self, **kwargs)
+    test_primary_admin.__wrapped__ = True
+
+    return test_primary_admin
+
+
 def can_upload_exploration(handler):
     """Decorator that checks if the current user can upload exploration.
 
