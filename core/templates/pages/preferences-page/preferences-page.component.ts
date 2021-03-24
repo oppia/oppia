@@ -36,7 +36,6 @@ require('services/alerts.service.ts');
 require('services/prevent-page-unload-event.service.ts');
 require('services/user.service.ts');
 require('services/utils.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').component('preferencesPage', {
   bindings: {
@@ -180,7 +179,6 @@ angular.module('oppia').component('preferencesPage', {
           // No further action is needed.
         });
       };
-
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = '';
         ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
