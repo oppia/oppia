@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the exploration rights service
  * of the exploration editor page.
  */
+
+import { AppConstants } from 'app.constants';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
@@ -248,7 +250,8 @@ describe('Exploration rights service', () => {
   it('should save a new member', fakeAsync(() => {
     let sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.viewer_names.push('newUser');
-    explorationRightsService.saveRoleChanges('newUser', 'viewer', mockFunction);
+    explorationRightsService.saveRoleChanges(
+      'newUser', AppConstants.ROLE_VIEWER, mockFunction);
 
     const req = httpTestingController.expectOne(
       '/createhandler/rights/12345');
@@ -261,9 +264,85 @@ describe('Exploration rights service', () => {
       sampleDataResultsCopy.rights.viewer_names);
   }));
 
+  it('should remove existing user', fakeAsync(() => {
+    let sampleDataResultsCopy = angular.copy(sampleDataResults);
+    sampleDataResultsCopy.rights.viewer_names.push('newUser');
+
+    explorationRightsService.removeRoleAsync(
+      'newUser').then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/createhandler/rights/12345?username=newUser');
+    expect(req.request.method).toEqual('DELETE');
+    req.flush(sampleDataResultsCopy, {status: 200, statusText: ''});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should check user already has roles', fakeAsync(() => {
+    var sampleDataResultsCopy = angular.copy(sampleDataResults);
+    sampleDataResultsCopy.rights.owner_names.push('newOwner');
+    sampleDataResultsCopy.rights.viewer_names.push('newViewer');
+    sampleDataResultsCopy.rights.editor_names.push('newEditor');
+    sampleDataResultsCopy.rights.voice_artist_names.push('newVoiceArtist');
+
+    explorationRightsService.init(
+      sampleDataResultsCopy.rights.owner_names,
+      sampleDataResultsCopy.rights.editor_names,
+      sampleDataResultsCopy.rights.voice_artist_names,
+      sampleDataResultsCopy.rights.viewer_names,
+      sampleDataResultsCopy.rights.status,
+      sampleDataResultsCopy.rights.cloned_from,
+      sampleDataResultsCopy.rights.community_owned,
+      sampleDataResultsCopy.rights.viewable_if_private
+    );
+
+    expect(explorationRightsService.checkUserAlreadyHasRoles(
+      'newOwner')).toBeTruthy();
+    expect(explorationRightsService.checkUserAlreadyHasRoles(
+      'newViewer')).toBeTruthy();
+    expect(explorationRightsService.checkUserAlreadyHasRoles(
+      'newEditor')).toBeTruthy();
+    expect(explorationRightsService.checkUserAlreadyHasRoles(
+      'newVoiceArtist')).toBeTruthy();
+    expect(explorationRightsService.checkUserAlreadyHasRoles(
+      'notInAllUsersList')).toBeFalsy();
+  }));
+
+  it('should check oldrole of user', fakeAsync(() => {
+    var sampleDataResultsCopy = angular.copy(sampleDataResults);
+    sampleDataResultsCopy.rights.owner_names.push('newOwner');
+    sampleDataResultsCopy.rights.viewer_names.push('newViewer');
+    sampleDataResultsCopy.rights.editor_names.push('newEditor');
+    sampleDataResultsCopy.rights.voice_artist_names.push('newVoiceArtist');
+
+    explorationRightsService.init(
+      sampleDataResultsCopy.rights.owner_names,
+      sampleDataResultsCopy.rights.editor_names,
+      sampleDataResultsCopy.rights.voice_artist_names,
+      sampleDataResultsCopy.rights.viewer_names,
+      sampleDataResultsCopy.rights.status,
+      sampleDataResultsCopy.rights.cloned_from,
+      sampleDataResultsCopy.rights.community_owned,
+      sampleDataResultsCopy.rights.viewable_if_private
+    );
+
+    expect(explorationRightsService.getOldRole('newOwner')).toEqual(
+      AppConstants.ROLE_OWNER);
+    expect(explorationRightsService.getOldRole('newViewer')).toEqual(
+      AppConstants.ROLE_VIEWER);
+    expect(explorationRightsService.getOldRole('newEditor')).toEqual(
+      AppConstants.ROLE_EDITOR);
+    expect(explorationRightsService.getOldRole('newVoiceArtist')).toEqual(
+      AppConstants.ROLE_VOICE_ARTIST);
+  }));
+
   it('should reject handler when saving a new member fails', fakeAsync(() => {
     explorationRightsService.saveRoleChanges(
-      'newUser', 'viewer', mockFunction).then(
+      'newUser', AppConstants.ROLE_VIEWER, mockFunction).then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne(

@@ -17,6 +17,7 @@
  * about the rights for this exploration.
  */
 
+import { AppConstants } from 'app.constants';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationDataService } from
@@ -149,6 +150,40 @@ export class ExplorationRightsService {
         data.rights.community_owned, data.rights.viewable_if_private);
       callback();
     });
+  }
+  removeRoleAsync(
+      memberUsername: string): Promise<void> {
+    var requestUrl = (
+      '/createhandler/rights/' + this.explorationDataService.explorationId);
+
+    return this.httpClient['delete'](requestUrl, {
+      params: {
+        username: memberUsername
+      }
+    }).toPromise().then((response: ExplorationRightsBackendResponse) => {
+      let data = response;
+      this.alertsService.clearWarnings();
+      this.init(
+        data.rights.owner_names, data.rights.editor_names,
+        data.rights.voice_artist_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from,
+        data.rights.community_owned, data.rights.viewable_if_private);
+    });
+  }
+  checkUserAlreadyHasRoles(username: string): boolean {
+    return [...this.ownerNames, ...this.editorNames, ...this.voiceArtistNames,
+      ...this.viewerNames].includes(username);
+  }
+  getOldRole(username: string): string {
+    if (this.ownerNames.includes(username)) {
+      return AppConstants.ROLE_OWNER;
+    } else if (this.editorNames.includes(username)) {
+      return AppConstants.ROLE_EDITOR;
+    } else if (this.voiceArtistNames.includes(username)) {
+      return AppConstants.ROLE_VOICE_ARTIST;
+    } else {
+      return AppConstants.ROLE_VIEWER;
+    }
   }
   publish(): Promise<void> {
     let requestUrl = (
