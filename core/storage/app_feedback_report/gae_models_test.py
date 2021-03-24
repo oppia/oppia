@@ -48,7 +48,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     ANDROID_SDK_VERSION = 22
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
-    AUDIO_LANGUAGE_ENGLISH = 'english'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
@@ -89,7 +89,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 android_sdk_version=self.ANDROID_SDK_VERSION,
                 entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
                 text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_ENGLISH,
+                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
                 android_report_info=self.ANDROID_REPORT_INFO,
                 android_report_info_schema_version=(
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
@@ -106,8 +106,9 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
                 self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
                 self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
-                self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_ENGLISH,
-                self.ANDROID_REPORT_INFO, None))
+                self.TEXT_LANGUAGE_CODE_ENGLISH,
+                self.AUDIO_LANGUAGE_CODE_ENGLISH, self.ANDROID_REPORT_INFO,
+                None))
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
@@ -175,7 +176,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 'entry_point_story_id': None,
                 'entry_point_subtopic_id': None,
                 'text_language_code': self.TEXT_LANGUAGE_CODE_ENGLISH,
-                'audio_language_code': self.AUDIO_LANGUAGE_ENGLISH,
+                'audio_language_code': self.AUDIO_LANGUAGE_CODE_ENGLISH,
                 'android_report_info': self.ANDROID_REPORT_INFO,
                 'android_report_info_schema_version': (
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION),
