@@ -163,8 +163,7 @@ describe('Context service', () => {
       expect(ecs.getEditorContext()).toBe('topic_editor');
     });
 
-    it('should correctly set and retrieve the topic id', () => 
-    {
+    it('should correctly set and retrieve the topic id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
       expect(ecs.getEntityId()).toBe('123');
@@ -198,7 +197,7 @@ describe('Context service', () => {
         expect(ecs.canEntityReferToSkills()).toBe(true);
       });
 
-    it('should not report exploration context when the context ' +
+    it('should not report exploration context when the context' +
       ' is not related to editor or player', ()=> {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
