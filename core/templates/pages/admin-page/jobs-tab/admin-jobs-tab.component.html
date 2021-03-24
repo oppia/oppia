@@ -1,0 +1,141 @@
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>Continuous computations</h3>
+  <table class="table">
+    <tr>
+      <th>Type</th>
+      <th>Status</th>
+      <th>Last started</th>
+      <th>Last stop signal sent</th>
+      <th>Last finished</th>
+      <th>Active realtime layer</th>
+      <th>Controls</th>
+    </tr>
+    <tr *ngFor="let computation of CONTINUOUS_COMPUTATIONS_DATA">
+      <td>{{computation.computationType}}</td>
+      <td>{{computation.statusCode}}</td>
+      <td>{{computation.humanReadableLastStarted}}</td>
+      <td>{{computation.humanReadableLastStopped}}</td>
+      <td>{{computation.humanReadableLastFinished}}</td>
+      <td>{{computation.activeRealtimeLayerIndex}}</td>
+      <td>
+        <button *ngIf="computation.isStartable"
+                (click)="startComputation(computation.computationType)">
+          Start
+        </button>
+        <button *ngIf="computation.isStoppable"
+                (click)="stopComputation(computation.computationType)">
+          Stop
+        </button>
+      </td>
+    </tr>
+  </table>
+</mat-card>
+
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>One-off jobs</h3>
+  <h4>Current time: {{ HUMAN_READABLE_CURRENT_TIME }}</h4>
+  <table class="table table-striped">
+    <tr *ngFor="let jobSpec of ONE_OFF_JOB_SPECS" class="protractor-test-one-off-jobs-rows">
+      <td class="protractor-test-one-off-jobs-name">{{jobSpec.jobType}}</td>
+      <td>
+        <button (click)="startNewJob(jobSpec.jobType)"
+                class="float-right protractor-test-one-off-jobs-start-btn">
+          Start new job
+        </button>
+        <span *ngIf="jobSpec.isQueuedOrRunning"
+              class="oppia-serious-warning-text">
+          <strong>
+            (warning: an instance of this job type is already running)
+          </strong>
+        </span>
+      </td>
+    </tr>
+  </table>
+</mat-card>
+
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>Audit jobs</h3>
+  <h4>Current time: {{HUMAN_READABLE_CURRENT_TIME}}</h4>
+  <table class="table table-striped">
+    <tr *ngFor="let jobSpec of AUDIT_JOB_SPECS">
+      <td>{{jobSpec.jobType}}</td>
+      <td>
+        <button (click)="startNewJob(jobSpec.jobType)"
+                class="float-right">
+          Start new job
+        </button>
+        <span *ngIf="jobSpec.isQueuedOrRunning"
+              class="oppia-serious-warning-text">
+          <strong>
+            (warning: an instance of this job type is already running)
+          </strong>
+        </span>
+      </td>
+    </tr>
+  </table>
+</mat-card>
+
+<mat-card *ngIf="UNFINISHED_JOB_DATA.length > 0"
+          class="oppia-page-card oppia-long-text protractor-test-unfinished-jobs-card oppia-long-text-card">
+  <h3>Unfinished jobs</h3>
+  <em>Note: This table may be stale; refresh to see the latest state.</em>
+  <table class="table">
+    <tr>
+      <th class="protractor-test-unfinished-one-off-jobs-id-header">Job ID</th>
+      <th>Status</th>
+      <th>Time started</th>
+      <th>Time finished</th>
+      <th></th>
+    </tr>
+    <tr *ngFor="let job of UNFINISHED_JOB_DATA" class="protractor-test-unfinished-one-off-jobs-rows">
+      <td class="protractor-test-unfinished-one-off-jobs-id">{{job.id}}</td>
+      <td>{{job.statusCode}}</td>
+      <td>{{job.humanReadableTimeStarted}}</td>
+      <td>{{job.humanReadableTimeFinished}}</td>
+      <td>
+        <button *ngIf="job.canBeCanceled"
+                (click)="cancelJob(job.id, job.jobType)"
+                class="protractor-test-one-off-jobs-stop-btn">
+          Cancel
+        </button>
+      </td>
+    </tr>
+  </table>
+</mat-card>
+<mat-card *ngIf="RECENT_JOB_DATA.length > 0"
+          class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>Recent jobs</h3>
+  <em>Note: This table may be stale; refresh to see the latest state.</em>
+  <table class="table">
+    <tr>
+      <th>Job ID</th>
+      <th>Status</th>
+      <th>Time started</th>
+      <th>Time finished</th>
+      <th></th>
+    </tr>
+    <tr *ngFor="let job of RECENT_JOB_DATA">
+      <td>{{job.id}}</td>
+      <td>{{job.statusCode}}</td>
+      <td>{{job.humanReadableTimeStarted}}</td>
+      <td>{{job.humanReadableTimeFinished}}</td>
+      <td>
+        <button (click)="showJobOutput(job.id)">
+          View Output
+        </button>
+      </td>
+    </tr>
+  </table>
+  <div [hidden]="!showingJobOutput" id="job-output">
+    <h4>Job Output</h4>
+    <ul *ngIf="jobOutput.length != 0">
+      <li *ngFor="let output of jobOutput">{{output}}</li>
+    </ul>
+    <em *ngIf="jobOutput.length == 0">None</em>
+  </div>
+</mat-card>
+<style>
+  .oppia-long-text-card {
+    max-width: 900px;
+  }
+</style>

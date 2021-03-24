@@ -24,7 +24,6 @@ require(
   'pages/admin-page/activities-tab/' +
   'admin-prod-mode-activities-tab.component.ts');
 require('pages/admin-page/config-tab/admin-config-tab.directive.ts');
-require('pages/admin-page/jobs-tab/admin-jobs-tab.directive.ts');
 require('pages/admin-page/misc-tab/admin-misc-tab.directive.ts');
 require('pages/admin-page/roles-tab/admin-roles-tab.directive.ts');
 require('pages/admin-page/features-tab/admin-features-tab.component');
