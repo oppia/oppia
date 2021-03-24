@@ -25,7 +25,6 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { Subscription } from 'rxjs';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -85,11 +84,11 @@ describe('Exploration Title Editor directive', function() {
 
   it('should set focus on settings tab when refreshSettingsTab flag is ' +
     'emitted', () => {
-      routerService.onRefreshSettingsTab.emit();
-      spyOn(focusManagerService, 'setFocus');
-      ctrl.focusLabel = 'xyzz';
-      $scope.$apply();
-      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-        'xyzz');
+    routerService.onRefreshSettingsTab.emit();
+    spyOn(focusManagerService, 'setFocus');
+    ctrl.focusLabel = 'xyzz';
+    $scope.$apply();
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'xyzz');
   });
 });
