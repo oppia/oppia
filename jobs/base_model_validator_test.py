@@ -73,43 +73,43 @@ class BaseModelValidatorTests(unittest.TestCase):
         self.year_ago = self.now - datetime.timedelta(weeks=52)
         self.year_later = self.now + datetime.timedelta(weeks=52)
 
-    def test_base_model_validator_ptransform(self):
-        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            invalid_id = MockModel(
-                id='123@?!*',
-                deleted=False,
-                created_on=self.year_ago,
-                last_updated=self.now)
-            invalid_timestamp = MockModel(
-                id='124',
-                deleted=False,
-                created_on=self.now,
-                last_updated=self.year_later)
-            expired_model = MockModel(
-                id='125',
-                deleted=True,
-                created_on=self.year_ago,
-                last_updated=self.year_ago)
-            valid_model = MockModel(
-                id='126',
-                deleted=False,
-                created_on=self.year_ago,
-                last_updated=self.now)
-            pcoll = (
-                p
-                | beam.Create([
-                    invalid_id, invalid_timestamp, expired_model, valid_model
-                ]))
+    # def test_base_model_validator_ptransform(self):
+    #     with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+    #         invalid_id = MockModel(
+    #             id='123@?!*',
+    #             deleted=False,
+    #             created_on=self.year_ago,
+    #             last_updated=self.now)
+    #         invalid_timestamp = MockModel(
+    #             id='124',
+    #             deleted=False,
+    #             created_on=self.now,
+    #             last_updated=self.year_later)
+    #         expired_model = MockModel(
+    #             id='125',
+    #             deleted=True,
+    #             created_on=self.year_ago,
+    #             last_updated=self.year_ago)
+    #         valid_model = MockModel(
+    #             id='126',
+    #             deleted=False,
+    #             created_on=self.year_ago,
+    #             last_updated=self.now)
+    #         pcoll = (
+    #             p
+    #             | beam.Create([
+    #                 invalid_id, invalid_timestamp, expired_model, valid_model
+    #             ]))
 
-            output = pcoll | base_model_validator.BaseModelValidator()
+    #         output = pcoll | base_model_validator.BaseModelValidator()
 
-            beam_testing_util.assert_that(
-                output,
-                beam_testing_util.equal_to([
-                    errors.ModelInvalidIdError(invalid_id),
-                    errors.ModelMutatedDuringJobError(invalid_timestamp),
-                    errors.ModelExpiredError(expired_model)
-                ]))
+    #         beam_testing_util.assert_that(
+    #             output,
+    #             beam_testing_util.equal_to([
+    #                 errors.ModelInvalidIdError(invalid_id),
+    #                 errors.ModelMutatedDuringJobError(invalid_timestamp),
+    #                 errors.ModelExpiredError(expired_model)
+    #             ]))
 
 
 class ValidateDeletedTests(BaseModelValidatorTests):
