@@ -215,6 +215,9 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
+# The earliest supported version of the exploration states blob schema.
+EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
@@ -1107,8 +1110,13 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+
+# TODO(#11462): Delete this after Firebase authentication has been deployed.
+ENABLE_USER_CREATION = True
+
 # The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live-on in the
+# arbitrary. If it is changed later on, then the cookie will live on in the
 # users' browsers as garbage (although it would expire eventually, see MAX_AGE).
 FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the
