@@ -50,8 +50,15 @@ export class UserExplorationPermissionsService {
   async fetchPermissionsAsync(): Promise<ExplorationPermissions> {
     UserExplorationPermissionsService.permissionsPromise = (
       this.explorationPermissionsBackendApiService.getPermissionsAsync());
-    this.userExplorationPermissionsFetched.emit();
-    return UserExplorationPermissionsService.permissionsPromise;
+    return new Promise((resolve, reject) => {
+      UserExplorationPermissionsService.permissionsPromise.then(
+        (response) => {
+          this.userExplorationPermissionsFetched.emit();
+          resolve(response);
+        },
+        reject,
+      );
+    });
   }
 
   get onUserExplorationPermissionsFetched(): EventEmitter<void> {
