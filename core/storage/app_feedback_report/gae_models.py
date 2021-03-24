@@ -394,7 +394,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     reports.
 
     The id of each model instance is created by combining the entity's
-    ticket_name hash, creation timestamp, and a random 16-character string
+    ticket_name hash, creation timestamp, and a random 16-character string.
     """
 
     # A name for the ticket given by the maintainer, limited to 100 characters.
@@ -425,7 +425,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             github_issue_number: int|None. The Github issue number associated
                 with the ticket, if it has one.
             newest_report_timestamp: datetime.datetime. The date and time of the
-                newest report that is a part of this ticket
+                newest report that is a part of this ticket.
             report_ids: list(str). The report_ids that are a part of this
                 ticket.
 
