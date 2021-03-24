@@ -620,7 +620,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     ANDROID_SDK_VERSION = 22
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
-    AUDIO_LANGUAGE_ENGLISH = 'english'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
@@ -659,7 +659,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            audio_languag_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)

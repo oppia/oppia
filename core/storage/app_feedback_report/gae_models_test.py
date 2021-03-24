@@ -190,6 +190,16 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             model.get_lowest_supported_role(), feconf.ROLE_ID_MODERATOR)
 
+    def test_has_reference_to_user_id(self):
+        model_class = app_feedback_report_models.AppFeedbackReportModel
+        # The only user references will be those who have scrubbed a report.
+        model_class.scrub_report(
+            report_id, 'scrubber_user')
+        self.assertTrue(model_class.has_reference_to_user_id('scrubber_user'))
+        self.assertFalse(
+            feedback_models.UnsentFeedbackEmailModel
+            .has_reference_to_user_id('id_x'))
+
 
 class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportTicketModel class."""
