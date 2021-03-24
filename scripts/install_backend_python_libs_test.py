@@ -82,11 +82,11 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     THIRD_PARTY_DATA_DIRECTORY_FILE_PATH = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'data', 'third_party')
 
-    TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
+    REQUIREMENTS_TEST_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'requirements_test.txt')
-    TEST_REQUIREMENTS_INVALID_GIT_TXT_FILE_PATH = os.path.join(
+    INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH,
-        'requirements_invalid_git_test.txt')
+        'invalid_git_requirements_test.txt')
 
     def setUp(self):
         super(InstallBackendPythonLibsTests, self).setUp()
@@ -173,7 +173,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_invalid_git_dependency_raises_an_exception(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
-            self.TEST_REQUIREMENTS_INVALID_GIT_TXT_FILE_PATH)
+            self.INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         with swap_requirements:
             self.assertRaisesRegexp(
@@ -183,7 +183,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_multiple_discrepancies_returns_correct_mismatches(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
-            self.TEST_REQUIREMENTS_TXT_FILE_PATH)
+            self.REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         def mock_find_distributions(paths): # pylint: disable=unused-argument
             return [
