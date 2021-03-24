@@ -194,12 +194,13 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # The only user references will be those who have scrubbed a report.
+        report_id = '%s.%s.%s' % (
+            self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+            'randomInteger123')
         model_class.scrub_report(
             report_id, 'scrubber_user')
         self.assertTrue(model_class.has_reference_to_user_id('scrubber_user'))
-        self.assertFalse(
-            feedback_models.UnsentFeedbackEmailModel
-            .has_reference_to_user_id('id_x'))
+        self.assertFalse(model_class.has_reference_to_user_id('id_x'))
 
 
 class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
