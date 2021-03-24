@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,243 +19,266 @@
  * undo/redo service.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
+import { CollectionDomainConstants } from
+  'domain/collection/collection-domain.constants';
+import { Collection } from 'domain/collection/collection.model';
 import { CollectionNode } from './collection-node.model';
+import { Change, CollectionChange } from 'domain/editor/undo_redo/change.model';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
-import { Change } from 'domain/editor/undo_redo/change.model';
+type CollectionUpdateApply = (
+  collectionChange: CollectionChange, collection: Collection) => void;
+type CollectionUpdateReverse = (
+  collectionChange: CollectionChange, collection: Collection) => void;
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/collection/collection-domain.constants.ajs.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class CollectionUpdateService {
+  constructor(private undoRedoService: UndoRedoService) {}
 
-angular.module('oppia').factory('CollectionUpdateService', [
-  'UndoRedoService', 'CMD_ADD_COLLECTION_NODE',
-  'CMD_DELETE_COLLECTION_NODE',
-  'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_SWAP_COLLECTION_NODES',
-  'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_LANGUAGE_CODE',
-  'COLLECTION_PROPERTY_OBJECTIVE',
-  'COLLECTION_PROPERTY_TAGS', 'COLLECTION_PROPERTY_TITLE', function(
-      UndoRedoService,
-      CMD_ADD_COLLECTION_NODE,
-      CMD_DELETE_COLLECTION_NODE,
-      CMD_EDIT_COLLECTION_PROPERTY, CMD_SWAP_COLLECTION_NODES,
-      COLLECTION_PROPERTY_CATEGORY, COLLECTION_PROPERTY_LANGUAGE_CODE,
-      COLLECTION_PROPERTY_OBJECTIVE,
-      COLLECTION_PROPERTY_TAGS, COLLECTION_PROPERTY_TITLE) {
-    // Creates a change using an apply function, reverse function, a change
-    // command and related parameters. The change is applied to a given
-    // collection.
-    var _applyChange = function(collection, command, params, apply, reverse) {
-      var changeDict = angular.copy(params);
-      changeDict.cmd = command;
-      var changeObj = new Change(changeDict, apply, reverse);
-      UndoRedoService.applyChange(changeObj, collection);
-    };
+  private _applyChange(
+      collection: Collection,
+      command: string, params,
+      apply: CollectionUpdateApply,
+      reverse: CollectionUpdateReverse): void {
+    let changeDict = cloneDeep(params);
+    changeDict.cmd = command;
+    let changeObj = new Change(changeDict, apply, reverse);
+    this.undoRedoService.applyChange(changeObj, collection);
+  }
 
-    var _getParameterFromChangeDict = function(changeDict, paramName) {
-      return changeDict[paramName];
-    };
+  private _getParameterFromChangeDict(changeDict, paramName) {
+    return changeDict[paramName];
+  }
 
-    // Applies a collection property change, specifically. See _applyChange()
-    // for details on the other behavior of this function.
-    var _applyPropertyChange = function(
-        collection, propertyName, newValue, oldValue, apply, reverse) {
-      _applyChange(collection, CMD_EDIT_COLLECTION_PROPERTY, {
+  // Applies a collection property change, specifically. See _applyChange()
+  // for details on the other behavior of this function.
+  private _applyPropertyChange(
+      collection: Collection,
+      propertyName: string,
+      newValue: string|string[],
+      oldValue: string|string[],
+      apply, reverse) {
+    this._applyChange(
+      collection,
+      CollectionDomainConstants.CMD_EDIT_COLLECTION_PROPERTY, {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue)
       }, apply, reverse);
-    };
+  }
 
-    var _getNewPropertyValueFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'new_value');
-    };
+  private _getNewPropertyValueFromChangeDict(changeDict) {
+    return this._getParameterFromChangeDict(changeDict, 'new_value');
+  }
 
-    var _getExplorationIdFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'exploration_id');
-    };
+  private _getExplorationIdFromChangeDict(changeDict): string {
+    return this._getParameterFromChangeDict(changeDict, 'exploration_id');
+  }
 
-    var _getFirstIndexFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'first_index');
-    };
+  private _getFirstIndexFromChangeDict(changeDict): number {
+    return this._getParameterFromChangeDict(changeDict, 'first_index');
+  }
 
-    var _getSecondIndexFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'second_index');
-    };
+  private _getSecondIndexFromChangeDict(changeDict): number {
+    return this._getParameterFromChangeDict(changeDict, 'second_index');
+  }
 
-    // These functions are associated with updates available in
-    // core.domain.collection_services.apply_change_list.
-    return {
-      /**
-       * Adds a new exploration to a collection and records the change in the
-       * undo/redo service.
-       */
-      addCollectionNode: function(
-          collection, explorationId, explorationSummaryBackendObject) {
-        var oldSummaryBackendObject = angular.copy(
-          explorationSummaryBackendObject);
-        _applyChange(collection, CMD_ADD_COLLECTION_NODE, {
-          exploration_id: explorationId
-        }, function(changeDict, collection) {
-          // Apply.
-          var explorationId = _getExplorationIdFromChangeDict(changeDict);
-          var collectionNode = (
-            CollectionNode.createFromExplorationId(
-              explorationId));
-          collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
-          collection.addCollectionNode(collectionNode);
-        }, function(changeDict, collection) {
-          // Undo.
-          var explorationId = _getExplorationIdFromChangeDict(changeDict);
-          collection.deleteCollectionNode(explorationId);
-        });
-      },
+  addCollectionNode(
+      collection: Collection,
+      explorationId: string,
+      explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict
+  ): void {
+    let oldSummaryBackendObject = cloneDeep(explorationSummaryBackendObject);
+    this._applyChange(
+      collection,
+      CollectionDomainConstants.CMD_ADD_COLLECTION_NODE, {
+        exploration_id: explorationId
+      }, (changeDict, collection) => {
+        // Apply.
+        let explorationId = this._getExplorationIdFromChangeDict(changeDict);
+        let collectionNode = (
+          CollectionNode.createFromExplorationId(
+            explorationId));
+        collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
+        collection.addCollectionNode(collectionNode);
+      }, (changeDict, collection) => {
+        // Undo.
+        let explorationId = this._getExplorationIdFromChangeDict(changeDict);
+        collection.deleteCollectionNode(explorationId);
+      });
+  }
 
-      swapNodes: function(collection, firstIndex, secondIndex) {
-        _applyChange(collection, CMD_SWAP_COLLECTION_NODES, {
-          first_index: firstIndex,
-          second_index: secondIndex
-        }, function(changeDict, collection) {
-          // Apply.
-          var firstIndex = _getFirstIndexFromChangeDict(changeDict);
-          var secondIndex = _getSecondIndexFromChangeDict(changeDict);
+  swapNodes(
+      collection: Collection,
+      firstIndex: number,
+      secondIndex: number): void {
+    this._applyChange(
+      collection,
+      CollectionDomainConstants.CMD_SWAP_COLLECTION_NODES, {
+        first_index: firstIndex,
+        second_index: secondIndex
+      }, (changeDict, collection) => {
+        // Apply.
+        let firstIndex = this._getFirstIndexFromChangeDict(changeDict);
+        let secondIndex = this._getSecondIndexFromChangeDict(changeDict);
 
-          collection.swapCollectionNodes(firstIndex, secondIndex);
-        }, function(changeDict, collection) {
-          // Undo.
-          var firstIndex = _getFirstIndexFromChangeDict(changeDict);
-          var secondIndex = _getSecondIndexFromChangeDict(changeDict);
+        collection.swapCollectionNodes(firstIndex, secondIndex);
+      }, (changeDict, collection) => {
+        // Undo.
+        let firstIndex = this._getFirstIndexFromChangeDict(changeDict);
+        let secondIndex = this._getSecondIndexFromChangeDict(changeDict);
 
-          collection.swapCollectionNodes(firstIndex, secondIndex);
-        });
-      },
+        collection.swapCollectionNodes(firstIndex, secondIndex);
+      });
+  }
 
-      /**
-       * Removes an exploration from a collection and records the change in
-       * the undo/redo service.
-       */
-      deleteCollectionNode: function(collection, explorationId) {
-        var oldCollectionNode = angular.copy(
-          collection.getCollectionNodeByExplorationId(explorationId));
-        _applyChange(collection, CMD_DELETE_COLLECTION_NODE, {
-          exploration_id: explorationId
-        }, function(changeDict, collection) {
-          // Apply.
-          var explorationId = _getExplorationIdFromChangeDict(changeDict);
-          collection.deleteCollectionNode(explorationId);
-        }, function(changeDict, collection) {
-          // Undo.
-          collection.addCollectionNode(oldCollectionNode);
-        });
-      },
+  /**
+   * Removes an exploration from a collection and records the change in
+   * the undo/redo service.
+   */
+  deleteCollectionNode(
+      collection: Collection,
+      explorationId: string): void {
+    let oldCollectionNode = collection.getCollectionNodeByExplorationId(
+      explorationId);
+    this._applyChange(
+      collection,
+      CollectionDomainConstants.CMD_DELETE_COLLECTION_NODE, {
+        exploration_id: explorationId
+      }, (changeDict, collection) => {
+        // Apply.
+        let explorationId = this._getExplorationIdFromChangeDict(changeDict);
+        collection.deleteCollectionNode(explorationId);
+      }, (changeDict, collection) => {
+        // Undo.
+        collection.addCollectionNode(oldCollectionNode);
+      });
+  }
 
-      /**
-       * Changes the title of a collection and records the change in the
-       * undo/redo service.
-       */
-      setCollectionTitle: function(collection, title) {
-        var oldTitle = angular.copy(collection.getTitle());
-        _applyPropertyChange(
-          collection, COLLECTION_PROPERTY_TITLE, title, oldTitle,
-          function(changeDict, collection) {
-            // ---- Apply ----
-            var title = _getNewPropertyValueFromChangeDict(changeDict);
-            collection.setTitle(title);
-          }, function(changeDict, collection) {
-            // ---- Undo ----
-            collection.setTitle(oldTitle);
-          });
-      },
+  /**
+   * Changes the title of a collection and records the change in the
+   * undo/redo service.
+   */
+  setCollectionTitle(
+      collection: Collection,
+      title: string): void {
+    const oldTitle = collection.getTitle();
+    this._applyPropertyChange(
+      collection,
+      CollectionDomainConstants.COLLECTION_PROPERTY_TITLE, title, oldTitle,
+      (changeDict, collection) => {
+        // ---- Apply ----
+        let title = this._getNewPropertyValueFromChangeDict(changeDict);
+        collection.setTitle(title);
+      }, (changeDict, collection) => {
+        // ---- Undo ----
+        collection.setTitle(oldTitle);
+      });
+  }
 
-      /**
-       * Changes the category of a collection and records the change in the
-       * undo/redo service.
-       */
-      setCollectionCategory: function(collection, category) {
-        var oldCategory = angular.copy(collection.getCategory());
-        _applyPropertyChange(
-          collection, COLLECTION_PROPERTY_CATEGORY, category, oldCategory,
-          function(changeDict, collection) {
-            // Apply.
-            var category = _getNewPropertyValueFromChangeDict(changeDict);
-            collection.setCategory(category);
-          }, function(changeDict, collection) {
-            // Undo.
-            collection.setCategory(oldCategory);
-          });
-      },
+  /**
+   * Changes the category of a collection and records the change in the
+   * undo/redo service.
+   */
+  setCollectionCategory(
+      collection: Collection,
+      category: string): void {
+    let oldCategory = collection.getCategory();
+    this._applyPropertyChange(
+      collection,
+      CollectionDomainConstants.COLLECTION_PROPERTY_CATEGORY, category,
+      oldCategory, (changeDict, collection) => {
+        // Apply.
+        const newCategory = this._getNewPropertyValueFromChangeDict(changeDict);
+        collection.setCategory(newCategory);
+      }, (changeDict, collection) => {
+        // Undo.
+        collection.setCategory(oldCategory);
+      });
+  }
 
-      /**
-       * Changes the objective of a collection and records the change in the
-       * undo/redo service.
-       */
-      setCollectionObjective: function(collection, objective) {
-        var oldObjective = angular.copy(collection.getObjective());
-        _applyPropertyChange(
-          collection, COLLECTION_PROPERTY_OBJECTIVE, objective, oldObjective,
-          function(changeDict, collection) {
-            // Apply.
-            var objective = _getNewPropertyValueFromChangeDict(changeDict);
-            collection.setObjective(objective);
-          }, function(changeDict, collection) {
-            // Undo.
-            collection.setObjective(oldObjective);
-          });
-      },
+  /**
+   * Changes the objective of a collection and records the change in the
+   * undo/redo service.
+   */
+  setCollectionObjective(collection: Collection, objective: string): void {
+    let oldObjective = collection.getObjective();
+    this._applyPropertyChange(
+      collection, CollectionDomainConstants.COLLECTION_PROPERTY_OBJECTIVE,
+      objective, oldObjective, (changeDict, collection) => {
+        // Apply.
+        let objective = this._getNewPropertyValueFromChangeDict(changeDict);
+        collection.setObjective(objective);
+      }, (changeDict, collection) => {
+        // Undo.
+        collection.setObjective(oldObjective);
+      });
+  }
 
-      /**
-       * Changes the language code of a collection and records the change in
-       * the undo/redo service.
-       */
-      setCollectionLanguageCode: function(collection, languageCode) {
-        var oldLanguageCode = angular.copy(collection.getLanguageCode());
-        _applyPropertyChange(
-          collection, COLLECTION_PROPERTY_LANGUAGE_CODE, languageCode,
-          oldLanguageCode,
-          function(changeDict, collection) {
-            // Apply.
-            var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
-            collection.setLanguageCode(languageCode);
-          }, function(changeDict, collection) {
-            // Undo.
-            collection.setLanguageCode(oldLanguageCode);
-          });
-      },
+  /**
+   * Changes the language code of a collection and records the change in
+   * the undo/redo service.
+   */
+  setCollectionLanguageCode(
+      collection: Collection,
+      languageCode: string): void {
+    let oldLanguageCode = collection.getLanguageCode();
+    this._applyPropertyChange(
+      collection, CollectionDomainConstants.COLLECTION_PROPERTY_LANGUAGE_CODE,
+      languageCode, oldLanguageCode, (changeDict, collection) => {
+        // Apply.
+        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
+        collection.setLanguageCode(languageCode);
+      }, (changeDict, collection) => {
+        // Undo.
+        collection.setLanguageCode(oldLanguageCode);
+      });
+  }
 
-      /**
-       * Changes the tags of a collection and records the change in
-       * the undo/redo service.
-       */
-      setCollectionTags: function(collection, tags) {
-        var oldTags = angular.copy(collection.getTags());
-        _applyPropertyChange(
-          collection, COLLECTION_PROPERTY_TAGS, tags, oldTags,
-          function(changeDict, collection) {
-            // Apply.
-            var tags = _getNewPropertyValueFromChangeDict(changeDict);
-            collection.setTags(tags);
-          }, function(changeDict, collection) {
-            // Undo.
-            collection.setTags(oldTags);
-          });
-      },
+  /**
+   * Changes the tags of a collection and records the change in
+   * the undo/redo service.
+   */
+  setCollectionTags(collection: Collection, tags: string[]): void {
+    const oldTags = collection.getTags();
+    this._applyPropertyChange(
+      collection, CollectionDomainConstants.COLLECTION_PROPERTY_TAGS,
+      tags, oldTags, (changeDict, collection) => {
+        // Apply.
+        let tags = this._getNewPropertyValueFromChangeDict(changeDict);
+        collection.setTags(tags);
+      }, (changeDict, collection) => {
+        // Undo.
+        collection.setTags(oldTags);
+      });
+  }
 
-      /**
-       * Returns whether the given change object constructed by this service
-       * is adding a new collection node to a collection.
-       */
-      isAddingCollectionNode: function(changeObject) {
-        var backendChangeObject = changeObject.getBackendChangeObject();
-        return backendChangeObject.cmd === CMD_ADD_COLLECTION_NODE;
-      },
+  /**
+   * Returns whether the given change object constructed by this service
+   * is adding a new collection node to a collection.
+   */
+  isAddingCollectionNode(changeObject: Change): boolean {
+    let backendChangeObject = changeObject.getBackendChangeObject();
+    return backendChangeObject.cmd === (
+      CollectionDomainConstants.CMD_ADD_COLLECTION_NODE);
+  }
 
-      /**
-       * Returns the exploration ID referenced by the specified change object,
-       * or undefined if the given changeObject does not reference an
-       * exploration ID. The change object is expected to be one constructed
-       * by this service.
-       */
-      getExplorationIdFromChangeObject: function(changeObject) {
-        return _getExplorationIdFromChangeDict(
-          changeObject.getBackendChangeObject());
-      }
-    };
-  }]);
+  /**
+   * Returns the exploration ID referenced by the specified change object,
+   * or undefined if the given changeObject does not reference an
+   * exploration ID. The change object is expected to be one constructed
+   * by this service.
+   */
+  getExplorationIdFromChangeObject(changeObject: Change): string {
+    return this._getExplorationIdFromChangeDict(
+      changeObject.getBackendChangeObject());
+  }
+}
+angular.module('oppia').factory('CollectionUpdateService',
+  downgradeInjectable(CollectionUpdateService));

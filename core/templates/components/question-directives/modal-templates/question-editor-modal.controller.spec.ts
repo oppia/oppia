@@ -16,12 +16,6 @@
  * @fileoverview Unit tests for QuestionEditorModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Editor Modal Controller', function() {
@@ -58,16 +52,9 @@ describe('Question Editor Modal Controller', function() {
   let question = null;
   let questionId = null;
   let questionStateData = null;
-  const rubrics = [];
-  const skillNames = [];
+  const rubric = [];
+  const skillName = [];
   let associatedSkillSummaries = null;
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   describe('when question is valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -171,8 +158,8 @@ describe('Question Editor Modal Controller', function() {
         questionId: questionId,
         untriagedSkillSummaries: untriagedSkillSummaries,
         questionStateData: questionStateData,
-        rubrics: rubrics,
-        skillNames: skillNames
+        rubric: rubric,
+        skillName: skillName
       });
     }));
 
@@ -187,8 +174,8 @@ describe('Question Editor Modal Controller', function() {
         expect($scope.canEditQuestion).toBe(canEditQuestion);
         expect($scope.newQuestionIsBeingCreated).toBe(
           newQuestionIsBeingCreated);
-        expect($scope.rubrics).toEqual(rubrics);
-        expect($scope.skillNames).toEqual(skillNames);
+        expect($scope.rubric).toEqual(rubric);
+        expect($scope.skillName).toEqual(skillName);
       });
 
     it('should get skill editor url based on the skill id', function() {
@@ -522,8 +509,8 @@ describe('Question Editor Modal Controller', function() {
         questionId: questionId,
         questionStateData: questionStateData,
         untriagedSkillSummaries: [],
-        rubrics: rubrics,
-        skillNames: skillNames
+        rubric: rubric,
+        skillName: skillName
       });
     }));
 

@@ -79,7 +79,7 @@ describe('MathEquationInputValidationService', () => {
       inputs: {
         x: 'y = c + m*x'
       }
-    });
+    }, 'MathEquationInput');
 
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
@@ -87,7 +87,7 @@ describe('MathEquationInputValidationService', () => {
         x: 'y = m*x + c',
         y: 'both'
       }
-    });
+    }, 'MathEquationInput');
 
     answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
@@ -116,13 +116,13 @@ describe('MathEquationInputValidationService', () => {
       inputs: {
         x: '(a+b)^2 = 0'
       }
-    });
+    }, 'MathEquationInput');
     let isEquivalentTo2 = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'a^2 + 2*a*b + b^2 = 0'
       }
-    });
+    }, 'MathEquationInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
@@ -142,14 +142,14 @@ describe('MathEquationInputValidationService', () => {
         x: 'x ^ 2 = 1',
         y: 'irrelevant'
       }
-    });
+    }, 'MathEquationInput');
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '-1 + x*x = 0',
         y: 'irrelevant'
       }
-    });
+    }, 'MathEquationInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
@@ -175,13 +175,13 @@ describe('MathEquationInputValidationService', () => {
         x: 'x * y = 0',
         y: 'both'
       }
-    });
+    }, 'MathEquationInput');
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'x + y = 0'
       }
-    });
+    }, 'MathEquationInput');
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
@@ -197,7 +197,7 @@ describe('MathEquationInputValidationService', () => {
         inputs: {
           x: 'x^2 = alpha - y/b'
         }
-      })
+      }, 'MathEquationInput')
     ];
     customizationArgs = {
       customOskLetters: {
@@ -222,7 +222,7 @@ describe('MathEquationInputValidationService', () => {
         inputs: {
           x: 'x=y'
         }
-      })
+      }, 'MathEquationInput')
     ];
     customizationArgs = {
       customOskLetters: {

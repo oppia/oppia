@@ -130,16 +130,17 @@ class Registry(python_utils.OBJECT):
         """
         if (state_schema_version not in
                 cls._state_schema_version_to_interaction_specs):
-            file_name = 'interaction_specs_stateV%i.json' % state_schema_version
+            file_name = (
+                'interaction_specs_state_v%i.json' % state_schema_version)
             spec_file = os.path.join(
                 feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
 
             try:
                 with python_utils.open_file(spec_file, 'r') as f:
                     specs_from_json = json.loads(f.read())
-            except:
-                raise Exception(
-                    'No specs json file found for state schema v%i' %
+            except IOError:
+                raise IOError(
+                    'No specs JSON file found for state schema v%i' %
                     state_schema_version)
 
             cls._state_schema_version_to_interaction_specs[

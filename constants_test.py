@@ -86,3 +86,39 @@ class ConstantsTests(test_utils.GenericTestBase):
 
             self.assertEqual(
                 actual_text_without_comments, expected_text_without_comments)
+
+    def test_language_constants_are_in_sync(self):
+        """Test if SUPPORTED_CONTENT_LANGUAGES and SUPPORTED_AUDIO_LANGUAGES
+        constants have any conflicting values.
+        """
+        # TODO(#11737): Remove this once language constants are consolidated.
+        rtl_content_languages = [
+            language[u'code']
+            for language
+            in constants.constants.SUPPORTED_CONTENT_LANGUAGES
+            if language[u'direction'] == 'rtl'
+        ]
+        ltr_content_languages = [
+            language[u'code']
+            for language
+            in constants.constants.SUPPORTED_CONTENT_LANGUAGES
+            if language[u'direction'] == 'ltr'
+        ]
+        rtl_audio_languages = [
+            language[u'id']
+            for language
+            in constants.constants.SUPPORTED_AUDIO_LANGUAGES
+            if language[u'direction'] == 'rtl'
+        ]
+        ltr_audio_languages = [
+            language[u'id']
+            for language
+            in constants.constants.SUPPORTED_AUDIO_LANGUAGES
+            if language[u'direction'] == 'ltr'
+        ]
+        conflicts = list(
+            set(rtl_content_languages) & set(ltr_audio_languages)
+        ) + list(
+            set(rtl_audio_languages) & set(ltr_content_languages)
+        )
+        self.assertFalse(conflicts)

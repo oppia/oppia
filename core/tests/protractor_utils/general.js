@@ -24,6 +24,12 @@ var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {
+  await waitFor.visibilityOf(
+    fromElement,
+    'fromElement taking too long to load');
+  await waitFor.visibilityOf(
+    toElement,
+    'toElement taking too long to load');
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
 };
 
@@ -101,12 +107,14 @@ var getExplorationIdFromPlayer = async function() {
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = async function(explorationId) {
+var openEditor = async function(explorationId, welcomeModalIsShown) {
   await browser.get(EDITOR_URL_SLICE + explorationId);
   await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  await explorationEditorMainTab.exitTutorial();
+  if (welcomeModalIsShown) {
+    await explorationEditorMainTab.exitTutorial();
+  }
 };
 
 var openPlayer = async function(explorationId) {
@@ -122,13 +130,18 @@ var moveToPlayer = async function() {
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = async function() {
+var moveToEditor = async function(welcomeModalIsShown) {
   var explorationId = await getExplorationIdFromPlayer();
-  await openEditor(explorationId);
+  await openEditor(explorationId, welcomeModalIsShown);
 };
 
 var expect404Error = async function() {
-  expect(await element(by.css('.protractor-test-error-container')).getText()).
+  var errorContainer = element(
+    by.css('.protractor-test-error-container'));
+  await waitFor.visibilityOf(
+    errorContainer,
+    'Protractor test error container taking too long to appear');
+  expect(await errorContainer.getText()).
     toMatch('Error 404');
 };
 
@@ -136,8 +149,12 @@ var expect404Error = async function() {
 var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  var promiseValue = await element(by.css(
-    '.oppia-base-container')).getAttribute('innerHTML');
+  var oppiaBaseContainer = element(by.css(
+    '.oppia-base-container'));
+  await waitFor.visibilityOf(
+    oppiaBaseContainer,
+    'Oppia base container taking too long to appear.');
+  var promiseValue = await oppiaBaseContainer.getAttribute('innerHTML');
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
@@ -193,7 +210,7 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
 
 var goToHomePage = async function() {
   var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
-  await oppiaMainLogo.click();
+  await action.click('Oppia Main Logo', oppiaMainLogo);
   return await waitFor.pageToFullyLoad();
 };
 

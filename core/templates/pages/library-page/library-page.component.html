@@ -47,7 +47,7 @@
           <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
         </div>
 
-        <div class="d-lg-none oppia-search-bar-container">
+        <div class="oppia-search-bar-container">
           <search-bar enable-dropup="false"></search-bar>
         </div>
 
@@ -58,7 +58,7 @@
             <p class="oppia-classroom-p" translate="I18N_CLASSROOM_CALLOUT_PARAGRAPH_1"></p>
             <a class="btn oppia-dashboard-intro-button oppia-transition-200" translate="I18N_CLASSROOM_CALLOUT_BUTTON" ng-href="/learn/math" href="/learn/math"></a>
           </div>
-          <picture class="d-flex">
+          <picture class="classroom-promo-image">
             <source type="image/webp"
                     ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')]>">
             <source type="image/png"
@@ -202,11 +202,10 @@
     background-color: whitesmoke;
     border: 4px solid #04857c;
     border-radius: 10px;
-    height: 300px;
-    margin: 0px 45px;
+    height: 340px;
+    margin: 0 45px;
     overflow: hidden;
     padding: 30px 45px 45px 45px;
-    position: relative;
   }
   library-page .oppia-classroom-text {
     float: left;
@@ -218,11 +217,13 @@
   }
   library-page .oppia-classroom-h2 {
     color: #033e39;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
+    font-weight: 700;
   }
   library-page .oppia-classroom-p {
     color: #383838;
     font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+    line-height: 1.5;
     margin-top: 25px;
   }
   library-page .oppia-classroom-div > img {
@@ -233,6 +234,10 @@
   }
   library-page .oppia-classroom-text > a {
     width: 180px;
+  }
+  library-page .classroom-promo-image {
+    display: flex;
+    padding-top: 40px;
   }
   library-page .oppia-group-page-header {
     color: #2c4841;
@@ -268,6 +273,9 @@
   @media(max-width: 720px) {
     library-page .oppia-library-group-header-container {
       width: 80%;
+    }
+    library-page .classroom-promo-image {
+      padding-top: 0;
     }
   }
   @media(max-width: 480px) {
@@ -393,7 +401,7 @@
       font-size: 1.05em;
     }
   }
-  @media (max-width: 992px) {
+  @media (max-width: 1126px) {
     library-page .oppia-classroom-div {
       margin-top: 100px;
     }
@@ -416,7 +424,7 @@
   }
   @media (max-width: 727px) {
     library-page .oppia-classroom-div {
-      height: 345px;
+      height: 400px;
       padding: 20px;
     }
     library-page .oppia-classroom-text {
@@ -432,6 +440,12 @@
       height: 60%;
       right: 10px;
       transform: translateY(45px);
+    }
+  }
+  @media (max-width: 767px) {
+    library-page .oppia-search-bar-container {
+      margin-bottom: 50px;
+      padding-bottom: 20px;
     }
   }
   @media (max-width: 450px) {
@@ -461,6 +475,11 @@
     }
     library-page .oppia-classroom-text > a {
       margin-top: 40px;
+    }
+  }
+  @media(min-width: 1126px) {
+    .oppia-search-bar-container {
+      display: none;
     }
   }
 </style>

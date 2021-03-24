@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,38 +15,46 @@
 /**
  * @fileoverview Unit tests for the subtopic viewer pre logo action
  */
-import { TestBed } from '@angular/core/testing';
+
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { SubtopicViewerNavbarPreLogoActionComponent } from './subtopic-viewer-navbar-pre-logo-action.component';
 import { UrlService } from 'services/contextual/url.service';
 
-require(
-  'pages/subtopic-viewer-page/navbar-pre-logo-action/' +
-  'subtopic-viewer-navbar-pre-logo-action.component.ts');
+describe('subtopic viewer pre logo action component', () => {
+  let component: SubtopicViewerNavbarPreLogoActionComponent;
+  let fixture: ComponentFixture<SubtopicViewerNavbarPreLogoActionComponent>;
+  let urlService: UrlService;
 
-describe('subtopic viewer pre logo action', function() {
-  let ctrl = null;
-  let urlService: UrlService = null;
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [SubtopicViewerNavbarPreLogoActionComponent],
+    }).compileComponents();
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(() => {
     urlService = TestBed.get(UrlService);
+
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
       .and.returnValue('url-fragment');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('math');
-  });
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController(
-      'subtopicViewerNavbarPreLogoAction',
-      { UrlService: urlService });
   }));
 
-  it('should set topic url fragment from the URL correctly', function() {
-    ctrl.$onInit();
-    expect(ctrl.topicUrlFragment).toEqual('url-fragment');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      SubtopicViewerNavbarPreLogoActionComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should set the topic url from the url fragment correctly', function() {
-    ctrl.$onInit();
-    expect(ctrl.topicUrl).toEqual('/learn/math/url-fragment/revision');
+  it('should set topic url fragment from the URL correctly', () => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicUrlFragment).toBe('url-fragment');
+    });
+  });
+
+  it('should set the topic url from the url fragment correctly', () => {
+    component.ngOnInit();
+    expect(component.topicUrl).toBe('/learn/math/url-fragment/revision');
   });
 });

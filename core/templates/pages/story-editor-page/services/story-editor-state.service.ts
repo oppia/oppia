@@ -194,8 +194,8 @@ export class StoryEditorStateService {
    */
   saveStory(
       commitMessage: string,
-      successCallback: (value?: Object) => void)
-  : boolean {
+      successCallback: (value?: Object) => void,
+      errorCallback: (value?: Object) => void): boolean {
     if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');
@@ -217,9 +217,12 @@ export class StoryEditorStateService {
           successCallback();
         }
       }, error => {
-        this.alertsService.addWarning(
-          error || 'There was an error when saving the story.');
+        let errorMessage = error || 'There was an error when saving the story.';
+        this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
+        if (errorCallback) {
+          errorCallback(errorMessage);
+        }
       });
     return true;
   }
@@ -234,8 +237,7 @@ export class StoryEditorStateService {
 
   changeStoryPublicationStatus(
       newStoryStatusIsPublic: boolean,
-      successCallback: (value?: Object) => void)
-  : boolean {
+      successCallback: (value?: Object) => void): boolean {
     if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot publish a story before one is loaded.');
@@ -296,8 +298,7 @@ export class StoryEditorStateService {
    */
   updateExistenceOfStoryUrlFragment(
       storyUrlFragment: string,
-      successCallback: (value?: Object) => void)
-  : void {
+      successCallback: (value?: Object) => void): void {
     this.editableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
       storyUrlFragment).then(
       (storyUrlFragmentExists) => {

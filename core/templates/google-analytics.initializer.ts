@@ -13,24 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Initialization of Google Analytics..
+ * @fileoverview Initialization of Google Analytics (gtag.js).
  */
 
-const constants = require('constants.ts');
-
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})
-(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+import constants from 'assets/constants';
 
 (function() {
   if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
-    ga('create', constants.ANALYTICS_ID, 'auto', {allowLinker: true});
-    ga('set', 'anonymizeIp', true);
-    ga('set', 'forceSSL', true);
-    ga('require', 'linker');
-    ga('linker:autoLink', [constants.SITE_NAME_FOR_ANALYTICS]);
-    ga('send', 'pageview');
+    // Reference doc:
+    // https://developers.google.com/analytics/devguides/collection/gtagjs
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(): void {
+      window.dataLayer.push(arguments);
+    }
+    gtag('set', 'linker', {
+      'domains': [constants.SITE_NAME_FOR_ANALYTICS]
+    });
+    gtag('js', new Date());
+    gtag('config', constants.ANALYTICS_ID, {
+      'anonymize_ip': true,
+      'forceSSL': true,
+    });
   }
 })()

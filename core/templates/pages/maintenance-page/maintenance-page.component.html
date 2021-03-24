@@ -7,9 +7,9 @@
             <div class="navbar-header protractor-test-navbar-header float-left">
               <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
                 <picture>
-                  <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_mint.webp')">
-                  <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_mint.png')">
-                  <img [src]="getStaticImageUrl('/logo/288x128_logo_mint.png')"
+                  <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
+                  <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+                  <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
                        class="oppia-logo oppia-logo-wide" alt="Oppia Home">
                 </picture>
               </a>
@@ -42,5 +42,9 @@
     display: flex;
     flex-direction: column;
     padding: 30px 55px 30px 45px;
+  }
+
+  .oppia-navbar {
+    background-color: #00645C;
   }
 </style>

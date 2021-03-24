@@ -21,9 +21,6 @@
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  /* eslint-disable-next-line max-len */
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -90,8 +87,6 @@ describe('TrainingDataService', function() {
     // descendant dependencies.
     angular.mock.module(function($provide) {
       $provide.value('AngularNameService', new AngularNameService());
-      $provide.value(
-        'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value(
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
@@ -169,7 +164,10 @@ describe('TrainingDataService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'Test'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['Test']
+              }}
             }],
             outcome: {
               dest: 'State',

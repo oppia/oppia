@@ -29,16 +29,6 @@ angular.module('oppia').factory('GraphDataService', [
       ComputeGraphService, ExplorationInitStateNameService,
       ExplorationStatesService) {
     var _graphData = null;
-
-    // Returns an object which can be treated as the input to a visualization
-    // for a directed graph. The returned object has the following keys:
-    //   - nodes: an object whose keys are node ids (equal to node names) and
-    //       whose values are node names
-    //   - links: a list of objects. Each object represents a directed link
-    //       between two nodes, and has keys 'source' and 'target', the values
-    //       of which are the names of the corresponding nodes.
-    //   - initStateName: the name of the initial state.
-    //   - finalStateName: the name of the final state.
     var _recomputeGraphData = function() {
       if (!ExplorationInitStateNameService.savedMemento) {
         return;
@@ -53,6 +43,16 @@ angular.module('oppia').factory('GraphDataService', [
       recompute: function() {
         _recomputeGraphData();
       },
+      /**
+       * @return graphData - Directed graph visualization input. This object
+       * includes the following keys:
+       * - nodes: Objects with keys of nodeids and values of node names.
+       * - links: list of objects. Each object represents a directed link
+       *    between two nodes, and has keys 'source' and 'target', the values
+       *    of which are the names of the corresponding nodes.
+       * - initStateName: the name of the initial state.
+       * - finalStateName: the name of the final state.
+       */
       getGraphData: function() {
         return angular.copy(_graphData);
       }

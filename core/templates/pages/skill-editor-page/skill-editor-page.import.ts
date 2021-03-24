@@ -32,6 +32,8 @@ angular.module('oppia', [
   uiValidate
 ]);
 
+require('Polyfills.ts');
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/skill-editor-page/skill-editor-page.module.ts');
@@ -39,6 +41,4 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
-require(
-  'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.component.ts');

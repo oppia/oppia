@@ -19,7 +19,7 @@
  */
 
 require('domain/classroom/classroom-backend-api.service');
-require('domain/sidebar/sidebar-status.service.ts');
+require('services/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
 require('services/navigation.service.ts');
@@ -71,7 +71,8 @@ angular.module('oppia').directive('topNavigationBar', [
           // which they will be hidden. Earlier elements will be hidden first.
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
-            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+            'I18N_TOPNAV_LIBRARY', 'I18N_TOPNAV_GET_INVOLVED',
+            'I18N_CREATE_EXPLORATION_CREATE'];
 
           ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
@@ -142,6 +143,13 @@ angular.module('oppia').directive('topNavigationBar', [
           };
           ctrl.toggleSidebar = function() {
             SidebarStatusService.toggleSidebar();
+          };
+
+          ctrl.navigateToClassroomPage = function(classroomUrl) {
+            SiteAnalyticsService.registerClassoomHeaderClickEvent();
+            $timeout(function() {
+              $window.location = classroomUrl;
+            }, 150);
           };
 
           /**

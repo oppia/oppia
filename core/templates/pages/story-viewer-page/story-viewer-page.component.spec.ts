@@ -22,8 +22,6 @@ import { OppiaAngularRootComponent } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ReadOnlyStoryNode } from
-  'domain/story_viewer/read-only-story-node.model';
 import { StoryNode } from 'domain/story/story-node.model';
 import { PageTitleService } from 'services/page-title.service';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
@@ -189,7 +187,7 @@ describe('Story Viewer Page component', function() {
   }));
 
   it('should get path icon parameters after story data is loaded', function() {
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       $q.resolve(storyPlaythrough));
     ctrl.$onInit();
     $rootScope.$apply();
@@ -214,7 +212,7 @@ describe('Story Viewer Page component', function() {
 
   it('should show warning when fetching story data fails', function() {
     spyOn(alertsService, 'addWarning');
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       $q.reject({
         status: 404
       }));
@@ -245,7 +243,8 @@ describe('Story Viewer Page component', function() {
 
   it('should change page title and meta tag when story data is fetched',
     function() {
-      spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         $q.resolve(storyPlaythrough));
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'updateMetaTag');
@@ -262,7 +261,7 @@ describe('Story Viewer Page component', function() {
     });
 
   it('should show story\'s chapters when story has chapters', function() {
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       $q.resolve(storyPlaythrough));
 
     ctrl.$onInit();
@@ -273,7 +272,8 @@ describe('Story Viewer Page component', function() {
 
   it('should not show story\'s chapters when story has no chapters',
     function() {
-      spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         $q.resolve(StoryPlaythrough.createFromBackendDict({
           story_nodes: [],
           story_title: 'Story Title 1',
@@ -293,149 +293,4 @@ describe('Story Viewer Page component', function() {
 
       expect(ctrl.showChapters()).toBe(false);
     });
-
-  it('should not hide chapter when it\'s part of story chapters', function() {
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
-      $q.resolve(storyPlaythrough));
-
-    ctrl.$onInit();
-    $rootScope.$apply();
-
-    var node = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_2',
-      title: 'Title 2',
-      description: 'Description 2',
-      destination_node_ids: [],
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_2'],
-      outline: 'Outline',
-      outline_is_finalized: false,
-      exploration_id: null,
-      exp_summary_dict: {
-        category: 'Welcome',
-        created_on_msec: 1564183471833.675,
-        community_owned: true,
-        thumbnail_bg_color: '#992a2b',
-        title: 'Welcome to Oppia! 2',
-        num_views: 14897,
-        tags: [],
-        last_updated_msec: 1571653541705.924,
-        human_readable_contributors_summary: {},
-        status: 'public',
-        language_code: 'en',
-        objective: "become familiar with Oppia's capabilities 2",
-        thumbnail_icon_url: '/subjects/Welcome.svg',
-        ratings: {
-          1: 1,
-          2: 1,
-          3: 3,
-          4: 24,
-          5: 46
-        },
-        id: '0',
-        activity_type: 'exploration'
-      },
-      completed: false,
-      thumbnail_bg_color: '#000',
-      thumbnail_filename: 'story.svg'
-    });
-    expect(ctrl.isChapterLocked(node)).toBe(false);
-  });
-
-  it('should not hide chapter when it\'s completed', function() {
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
-      $q.resolve(storyPlaythrough));
-
-    ctrl.$onInit();
-    $rootScope.$apply();
-
-    var node = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_3',
-      title: 'Title 2',
-      description: 'Description 2',
-      destination_node_ids: [],
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_2'],
-      outline: 'Outline',
-      outline_is_finalized: false,
-      exploration_id: null,
-      exp_summary_dict: {
-        category: 'Welcome',
-        created_on_msec: 1564183471833.675,
-        community_owned: true,
-        thumbnail_bg_color: '#992a2b',
-        title: 'Welcome to Oppia! 2',
-        num_views: 14897,
-        tags: [],
-        last_updated_msec: 1571653541705.924,
-        human_readable_contributors_summary: {},
-        status: 'public',
-        language_code: 'en',
-        objective: "become familiar with Oppia's capabilities 2",
-        thumbnail_icon_url: '/subjects/Welcome.svg',
-        ratings: {
-          1: 1,
-          2: 1,
-          3: 3,
-          4: 24,
-          5: 46
-        },
-        id: '0',
-        activity_type: 'exploration'
-      },
-      completed: true,
-      thumbnail_bg_color: '#000',
-      thumbnail_filename: 'story.svg'
-    });
-    expect(ctrl.isChapterLocked(node)).toBe(false);
-  });
-
-  it('should hide chapter when it\'s not part of story chapters and' +
-    ' it\'s not completed', function() {
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
-      $q.resolve(storyPlaythrough));
-
-    ctrl.$onInit();
-    $rootScope.$apply();
-
-    var node = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_3',
-      title: 'Title 2',
-      description: 'Description 2',
-      destination_node_ids: [],
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_2'],
-      outline: 'Outline',
-      outline_is_finalized: false,
-      exploration_id: null,
-      exp_summary_dict: {
-        category: 'Welcome',
-        created_on_msec: 1564183471833.675,
-        community_owned: true,
-        thumbnail_bg_color: '#992a2b',
-        title: 'Welcome to Oppia! 2',
-        num_views: 14897,
-        tags: [],
-        last_updated_msec: 1571653541705.924,
-        human_readable_contributors_summary: {},
-        status: 'public',
-        language_code: 'en',
-        objective: "become familiar with Oppia's capabilities 2",
-        thumbnail_icon_url: '/subjects/Welcome.svg',
-        ratings: {
-          1: 1,
-          2: 1,
-          3: 3,
-          4: 24,
-          5: 46
-        },
-        id: '0',
-        activity_type: 'exploration'
-      },
-      completed: false,
-      thumbnail_bg_color: '#000',
-      thumbnail_filename: 'story.svg'
-    });
-    expect(ctrl.isChapterLocked(node)).toBe(true);
-  });
 });

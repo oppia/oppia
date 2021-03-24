@@ -78,7 +78,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           return true;
         }
         return (
-          !ctrl.RatioExpressionInputForm.$invalid && ctrl.answer !== '');
+          !ctrl.RatioExpressionInputForm.answer.$invalid && ctrl.answer !== '');
       };
 
       var submitAnswerFn = function() {
@@ -91,7 +91,14 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           ctrl.RatioExpressionInputForm.answer.$setValidity(
             FORM_ERROR_TYPE, true);
         });
-        ctrl.answer = '';
+        if ($attrs.savedSolution !== undefined) {
+          let savedSolution = JSON.parse($attrs.savedSolution);
+          savedSolution = Ratio.fromList(
+            savedSolution).toAnswerString();
+          ctrl.answer = savedSolution;
+        } else {
+          ctrl.answer = '';
+        }
         ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
         var {
           placeholder,
@@ -100,7 +107,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           'RatioExpressionInput',
           $attrs
         );
-        ctrl.placeholder = placeholder.getUnicode();
+        ctrl.placeholder = placeholder.unicode;
         ctrl.expectedNumberOfTerms = numberOfTerms;
         ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA = {
           type: 'unicode',

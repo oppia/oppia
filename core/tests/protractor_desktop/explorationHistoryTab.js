@@ -54,7 +54,7 @@ describe('Exploration history', function() {
 
     // Creating an exploration creates the first commit. Therefore, there
     // should be a date associated with it.
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     // Switch to the history tab because that is where the commit history
     // is displayed.
@@ -67,7 +67,7 @@ describe('Exploration history', function() {
   it('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     // Check renaming state, editing text, editing interactions and adding
     // state.
@@ -91,6 +91,139 @@ describe('Exploration history', function() {
     await explorationEditorPage.saveChanges();
 
     var VERSION_1_STATE_1_CONTENTS = {
+      1: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
+      2: {
+        text: 'content:',
+        highlighted: false
+      },
+      3: {
+        text: '  content_id: content',
+        highlighted: false
+      },
+      4: {
+        text: '  html: \'\'',
+        highlighted: true
+      },
+      5: {
+        text: 'interaction:',
+        highlighted: false
+      },
+      6: {
+        text: '  answer_groups: []',
+        highlighted: true
+      },
+      7: {
+        text: '  confirmed_unclassified_answers: []',
+        highlighted: false
+      },
+      8: {
+        text: '  customization_args: {}',
+        highlighted: false
+      },
+      9: {
+        text: '  default_outcome:',
+        highlighted: false
+      },
+      // Note that highlighting *underneath* a line is still considered a
+      // highlight.
+      10: {
+        text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
+        highlighted: true
+      },
+      11: {
+        text: '    feedback:',
+        highlighted: false
+      },
+      12: {
+        text: '      content_id: default_outcome',
+        highlighted: false
+      },
+      13: {
+        text: '      html: \'\'',
+        highlighted: false
+      },
+      14: {
+        text: '    labelled_as_correct: false',
+        highlighted: false
+      },
+      15: {
+        text: '    missing_prerequisite_skill_id: null',
+        highlighted: false
+      },
+      16: {
+        text: '    param_changes: []',
+        highlighted: false
+      },
+      17: {
+        text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      18: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      19: {
+        text: '  id: null',
+        highlighted: true
+      },
+      20: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      21: {
+        text: 'next_content_id_index: 0',
+        highlighted: true
+      },
+      22: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      23: {
+        text: 'recorded_voiceovers:',
+        highlighted: false
+      },
+      24: {
+        text: '  voiceovers_mapping:',
+        highlighted: false
+      },
+      25: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      26: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      27: {
+        text: 'solicit_answer_details: false',
+        highlighted: false
+      },
+      28: {
+        text: 'written_translations:',
+        highlighted: false
+      },
+      29: {
+        text: '  translations_mapping:',
+        highlighted: false
+      },
+      30: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      31: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      32: {
+        text: '',
+        highlighted: false
+      }
+    };
+
+    var VERSION_2_STATE_1_CONTENTS = {
       1: {
         text: 'classifier_model_id: null',
         highlighted: false
@@ -289,139 +422,6 @@ describe('Exploration history', function() {
       }
     };
 
-    var VERSION_2_STATE_1_CONTENTS = {
-      1: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      2: {
-        text: 'content:',
-        highlighted: false
-      },
-      3: {
-        text: '  content_id: content',
-        highlighted: false
-      },
-      4: {
-        text: '  html: \'\'',
-        highlighted: true
-      },
-      5: {
-        text: 'interaction:',
-        highlighted: false
-      },
-      6: {
-        text: '  answer_groups: []',
-        highlighted: true
-      },
-      7: {
-        text: '  confirmed_unclassified_answers: []',
-        highlighted: false
-      },
-      8: {
-        text: '  customization_args: {}',
-        highlighted: false
-      },
-      9: {
-        text: '  default_outcome:',
-        highlighted: false
-      },
-      // Note that highlighting *underneath* a line is still considered a
-      // highlight.
-      10: {
-        text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
-        highlighted: true
-      },
-      11: {
-        text: '    feedback:',
-        highlighted: false
-      },
-      12: {
-        text: '      content_id: default_outcome',
-        highlighted: false
-      },
-      13: {
-        text: '      html: \'\'',
-        highlighted: false
-      },
-      14: {
-        text: '    labelled_as_correct: false',
-        highlighted: false
-      },
-      15: {
-        text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
-      },
-      16: {
-        text: '    param_changes: []',
-        highlighted: false
-      },
-      17: {
-        text: '    refresher_exploration_id: null',
-        highlighted: false
-      },
-      18: {
-        text: '  hints: []',
-        highlighted: false
-      },
-      19: {
-        text: '  id: null',
-        highlighted: true
-      },
-      20: {
-        text: '  solution: null',
-        highlighted: false
-      },
-      21: {
-        text: 'next_content_id_index: 0',
-        highlighted: true
-      },
-      22: {
-        text: 'param_changes: []',
-        highlighted: false
-      },
-      23: {
-        text: 'recorded_voiceovers:',
-        highlighted: false
-      },
-      24: {
-        text: '  voiceovers_mapping:',
-        highlighted: false
-      },
-      25: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      26: {
-        text: '    default_outcome: {}',
-        highlighted: true
-      },
-      27: {
-        text: 'solicit_answer_details: false',
-        highlighted: false
-      },
-      28: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      29: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      30: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      31: {
-        text: '    default_outcome: {}',
-        highlighted: true
-      },
-      32: {
-        text: '',
-        highlighted: false
-      }
-    };
-
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
@@ -483,7 +483,7 @@ describe('Exploration history', function() {
     await historyGraph.closeStateHistory();
 
     await historyGraph.openStateHistory('second');
-    await historyGraph.expectTextToMatch(STATE_2_STRING, '');
+    await historyGraph.expectTextToMatch('', STATE_2_STRING);
     await historyGraph.closeStateHistory();
 
     // Reset all checkboxes.
@@ -519,7 +519,7 @@ describe('Exploration history', function() {
     await historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
     await historyGraph.openStateHistory('second');
-    await historyGraph.expectTextToMatch('', STATE_2_STRING);
+    await historyGraph.expectTextToMatch(STATE_2_STRING, '');
     await historyGraph.closeStateHistory();
 
     // Check renaming a state.
@@ -578,7 +578,7 @@ describe('Exploration history', function() {
   it('should revert to old exploration commit', async function() {
     await users.createUser('user2@historyTab.com', 'user2HistoryTab');
     await users.login('user2@historyTab.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     // Make changes for second commit.
     // First card.
@@ -643,7 +643,7 @@ describe('Exploration history', function() {
     await explorationPlayerPage.expectExplorationToBeOver();
 
     // Verify history states between original and reversion.
-    await general.moveToEditor();
+    await general.moveToEditor(false);
     var expectedHistoryStates = [{
       label: 'first',
       color: COLOR_UNCHANGED

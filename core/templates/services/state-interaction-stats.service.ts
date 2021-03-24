@@ -87,7 +87,7 @@ export class StateInteractionStatsService {
         <MultipleChoiceInputCustomizationArgs>
         state.interaction.customizationArgs);
       return customizationArgs.choices.value[
-        <MultipleChoiceAnswer> answer].getHtml();
+        <MultipleChoiceAnswer> answer].html;
     }
     return answer;
   }
@@ -103,27 +103,28 @@ export class StateInteractionStatsService {
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
-
-    const statsPromise = this.stateInteractionStatsBackendApiService.getStats(
-      expId, state.name).then(vizInfo => <StateInteractionStats> {
-        explorationId: expId,
-        stateName: state.name,
-        visualizationsInfo: vizInfo.map(info => <VisualizationInfo> ({
-          addressedInfoIsSupported: info.addressedInfoIsSupported,
-          data: info.data.map(datum => <AnswerData>{
-            answer: this.getReadableAnswerString(state, datum.answer),
-            frequency: datum.frequency,
-            isAddressed: (
-              info.addressedInfoIsSupported ?
-              this.answerClassificationService
-                .isClassifiedExplicitlyOrGoesToNewState(
-                  state.name, state, datum.answer, interactionRulesService) :
-              undefined)
-          }),
-          id: info.id,
-          options: info.options
-        })),
-      });
+    const statsPromise = (
+      this.stateInteractionStatsBackendApiService.getStatsAsync(
+        expId,
+        state.name)).then(vizInfo => <StateInteractionStats> {
+          explorationId: expId,
+          stateName: state.name,
+          visualizationsInfo: vizInfo.map(info => <VisualizationInfo> ({
+            addressedInfoIsSupported: info.addressedInfoIsSupported,
+            data: info.data.map(datum => <AnswerData>{
+              answer: this.getReadableAnswerString(state, datum.answer),
+              frequency: datum.frequency,
+              isAddressed: (
+                info.addressedInfoIsSupported ?
+                this.answerClassificationService
+                  .isClassifiedExplicitlyOrGoesToNewState(
+                    state.name, state, datum.answer, interactionRulesService) :
+                undefined)
+            }),
+            id: info.id,
+            options: info.options
+          })),
+        });
     this.statsCache.set(state.name, statsPromise);
     return statsPromise;
   }

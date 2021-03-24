@@ -17,6 +17,7 @@
  * and check for any console errors
  */
 
+var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var users = require('../protractor_utils/users.js');
@@ -64,12 +65,13 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   beforeAll(async function() {
     // Should create a user and login.
-    await users.createUser('user11@accessibility.com', 'user11accessibility');
-    await users.login('user11@accessibility.com', true);
+    await users.createAndLoginAdminUser(
+      'user11@accessibility.com', 'user11accessibility');
+    libraryPage = new LibraryPage.LibraryPage();
   });
 
-  beforeAll(function() {
-    libraryPage = new LibraryPage.LibraryPage();
+  afterAll(async function() {
+    await users.logout();
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {
@@ -102,8 +104,7 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should skip to the main content element', async function() {
     await libraryPage.get();
     await browser.actions().sendKeys(protractor.Key.TAB).perform();
-    await waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
-    await skipLink.click();
+    await action.click('Skip link', skipLink);
     expect(await mainContent.getAttribute('class')).toEqual(
       await (await browser.driver.switchTo().activeElement())
         .getAttribute('class'));
@@ -546,7 +547,8 @@ describe('screenreader and keyboard user accessibility features', function() {
         EXPLORATION.title,
         EXPLORATION.category,
         EXPLORATION.objective,
-        EXPLORATION.language
+        EXPLORATION.language,
+        true
       );
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');
@@ -581,7 +583,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
 
       // Should safely exit out of the exploration.
-      await oppiaLogo.click();
+      await action.click('Oppia Logo', oppiaLogo);
     });
 
   afterEach(async function() {

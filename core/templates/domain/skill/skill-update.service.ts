@@ -223,40 +223,6 @@ export class SkillUpdateService {
     );
   }
 
-  updateWorkedExample(
-      skill: Skill,
-      workedExampleIndex: number,
-      newWorkedExampleQuestionHtml: string,
-      newWorkedExampleAnswerHtml: string
-  ): void {
-    const oldWorkedExamples = cloneDeep(
-      skill.getConceptCard().getWorkedExamples()
-    );
-    const newWorkedExamples = cloneDeep(oldWorkedExamples);
-    newWorkedExamples[workedExampleIndex]
-      .getQuestion()
-      .setHtml(newWorkedExampleQuestionHtml);
-    newWorkedExamples[workedExampleIndex]
-      .getExplanation()
-      .setHtml(newWorkedExampleAnswerHtml);
-    this._applySkillContentsPropertyChange(
-      skill,
-      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map((workedExample) => {
-        return workedExample.toBackendDict();
-      }),
-      oldWorkedExamples.map((workedExample) => {
-        return workedExample.toBackendDict();
-      }),
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-      },
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-      }
-    );
-  }
-
   updateWorkedExamples(skill: Skill, newWorkedExamples: WorkedExample[]): void {
     const oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
     this._applySkillContentsPropertyChange(
@@ -275,6 +241,24 @@ export class SkillUpdateService {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
+  }
+
+  updateWorkedExample(
+      skill: Skill,
+      workedExampleIndex: number,
+      newWorkedExampleQuestionHtml: string,
+      newWorkedExampleAnswerHtml: string
+  ): void {
+    const newWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    newWorkedExamples[workedExampleIndex]
+      .getQuestion()
+      .html = newWorkedExampleQuestionHtml;
+    newWorkedExamples[workedExampleIndex]
+      .getExplanation()
+      .html = newWorkedExampleAnswerHtml;
+    this.updateWorkedExamples(skill, newWorkedExamples);
   }
 
   addMisconception(skill: Skill, newMisconception: Misconception): void {

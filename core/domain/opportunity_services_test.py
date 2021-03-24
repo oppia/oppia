@@ -39,6 +39,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 import python_utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
@@ -139,8 +140,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_thread_id_for_suggestion):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.suggestion_target_id,
                 self.suggestion_target_version_at_submission, self.owner_id,
                 self.suggestion_change, 'test description')
@@ -323,7 +324,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -376,6 +380,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
                     'state_name': 'Introduction',
                     'new_value': [answer_group_dict]
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+                    'new_value': 4
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

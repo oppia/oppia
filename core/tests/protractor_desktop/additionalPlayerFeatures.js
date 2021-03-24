@@ -80,12 +80,15 @@ describe('Full exploration editor', function() {
       const EXPLORATION_CATEGORY = 'Mathematics';
       const EXPLORATION_LANGUAGE = 'Deutsch';
       const EXPLORATION_TAGS = ['maths', 'english', 'fractions', 'addition'];
+
       await workflow.createAddExpDetailsAndPublishExp(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
         EXPLORATION_LANGUAGE,
-        EXPLORATION_TAGS);
+        EXPLORATION_TAGS,
+        true
+      );
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorPage.verifyExplorationSettingFields(
         EXPLORATION_TITLE,
@@ -102,43 +105,28 @@ describe('Full exploration editor', function() {
     await users.createUser(
       'creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
     await users.login('creator@editorAndPlayer.com');
+
     await workflow.createAndPublishExploration(
       'Fractions',
       'Mathematics',
       EXPLORATION_OBJECTIVE,
-      'English');
+      'English',
+      true
+    );
     await users.logout();
     await users.createUser('learner@editorAndPlayer.com', 'learner');
     await users.login('learner@editorAndPlayer.com');
     await libraryPage.get();
     await libraryPage.clickExplorationObjective();
     await explorationPlayerPage.reportExploration();
-  });
-
-  it('should let learners suggest changes to an exploration', async function() {
-    await users.createUser(
-      'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
-    await users.login('creator2@editorAndPlayer.com');
-    await workflow.createAndPublishExploration(
-      'Adding Fractions', 'Mathematics', 'Let us learn how to add fractions',
-      'English');
-    await users.logout();
-
-    await users.createUser('learner2@editorAndPlayer.com', 'learner2');
-    await users.login('learner2@editorAndPlayer.com');
-    await libraryPage.get();
-    await libraryPage.findExploration('Adding Fractions');
-    await libraryPage.playExploration('Adding Fractions');
-    await explorationPlayerPage.clickSuggestChangesButton();
-    await explorationPlayerPage.fillAndSubmitSuggestion(
-      'Lets test the suggestion feature', 'Oh wow, It works!');
     await users.logout();
   });
 
   it('should prevent going back when help card is shown', async function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
-    await workflow.createExploration();
+
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 1'));
@@ -165,8 +153,11 @@ describe('Full exploration editor', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
     var backButton = element(by.css('.protractor-test-back-button'));
+    var nextCardButton = element(by.css('.protractor-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('LogicProof');
+    await waitFor.visibilityOf(
+      nextCardButton, 'Next Card button taking too long to show up.');
     await waitFor.invisibilityOf(
       backButton, 'Back button takes too long to disappear.');
 
@@ -183,20 +174,27 @@ describe('Full exploration editor', function() {
     await workflow.createAndPublishExploration(
       'Parent Exploration 1',
       'Algebra',
-      'This is the topmost parent exploration.');
+      'This is the topmost parent exploration.',
+      'English',
+      true
+    );
     var parentId1 = await general.getExplorationIdFromEditor();
-
     await workflow.createAndPublishExploration(
       'Parent Exploration 2',
       'Algebra',
       'This is the second parent exploration to which refresher ' +
-      'exploration redirects.');
+      'exploration redirects.',
+      'English',
+      false
+    );
     var parentId2 = await general.getExplorationIdFromEditor();
-
     await workflow.createAndPublishExploration(
       'Refresher Exploration',
       'Algebra',
-      'This is the most basic refresher exploration');
+      'This is the most basic refresher exploration',
+      'English',
+      false
+    );
 
     var refresherExplorationId = await general.getExplorationIdFromEditor();
 
@@ -219,7 +217,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should give option for redirection when author has specified ' +
-      'a refresher exploration Id', async function() {
+      'a refresher exploration ID', async function() {
     await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
 
     // Create Parent Exploration not added to collection.
@@ -229,7 +227,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(
-      'Parent Exploration not in collection');
+      'Parent Exp not in collection');
     await explorationEditorSettingsTab.setCategory('Algebra');
     await explorationEditorSettingsTab.setObjective(
       'This is a parent exploration');
@@ -254,7 +252,6 @@ describe('Full exploration editor', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(
       'Parent Exploration in collection');
@@ -282,7 +279,6 @@ describe('Full exploration editor', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateExplorationButton();
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Refresher Exploration');
     await explorationEditorSettingsTab.setCategory('Algebra');
@@ -306,7 +302,7 @@ describe('Full exploration editor', function() {
 
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(
-      'Parent Exploration not in collection');
+      'Parent Exp not in collection');
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination(null, false, refresherExplorationId);
@@ -328,8 +324,8 @@ describe('Full exploration editor', function() {
 
     // Play-test exploration and visit the refresher exploration.
     await libraryPage.get();
-    await libraryPage.findExploration('Parent Exploration not in collection');
-    await libraryPage.playExploration('Parent Exploration not in collection');
+    await libraryPage.findExploration('Parent Exp not in collection');
+    await libraryPage.playExploration('Parent Exp not in collection');
     await explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Incorrect');
     await explorationPlayerPage.clickConfirmRedirectionButton();
@@ -366,7 +362,7 @@ describe('Full exploration editor', function() {
         'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
       await users.login('user4@editorAndPlayer.com');
 
-      await workflow.createExploration();
+      await workflow.createExploration(true);
       await explorationEditorMainTab.setStateName('card 1');
       await explorationEditorMainTab.setContent(
         await forms.toRichText('this is card 1'));
@@ -426,8 +422,8 @@ describe('Full exploration editor', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user1@hintsAndSolutions.com');
-    await workflow.createExploration();
 
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Introduction');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('What language is Oppia?'));
@@ -467,8 +463,8 @@ describe('Full exploration editor', function() {
       'user10@editorAndPlayer.com', 'user10editorAndPlayer');
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
-    await workflow.createExploration();
 
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('You should recommend this exploration'));
     await explorationEditorMainTab.setInteraction('EndExploration');
@@ -489,7 +485,8 @@ describe('Full exploration editor', function() {
     // Using the Id from Player and create a new exploration
     // and add the Id as suggestion.
     var recommendedExplorationId = await general.getExplorationIdFromPlayer();
-    await workflow.createExploration();
+
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('I want to recommend an exploration at the end'));
     await explorationEditorMainTab.setInteraction(

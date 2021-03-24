@@ -95,7 +95,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         return (
-            subscriptions_model.activity_ids
+            subscriptions_model.exploration_ids
             if subscriptions_model else [])
 
     def _get_collection_ids_subscribed_to(self, user_id):
