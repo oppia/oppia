@@ -45,6 +45,7 @@ describe('Context service', () => {
 
     it('should correctly retrieve the exploration id cached before', () => {
       expect(ecs.getExplorationId()).toBe('123');
+      expect(ecs.getExplorationId()).toBe('123');
     });
 
     it('should correctly retrieve the page context', () => {
@@ -300,8 +301,6 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
     });
 
     it('should correctly set editor context to skill editor', () => {
