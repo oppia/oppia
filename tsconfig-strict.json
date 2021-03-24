@@ -141,7 +141,9 @@
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
-    "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts"
+    "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts",
+    "extensions/interactions/base-interaction-validation.service.ts",
+    "extensions/interactions/base-validator.spec.ts"
   ],
   "include": ["typings/*.ts"]
 }
