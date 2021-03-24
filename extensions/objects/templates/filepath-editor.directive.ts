@@ -17,7 +17,7 @@
  */
 
 // This directive can only be used in the context of an exploration.
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
@@ -35,8 +35,9 @@ var gifshot = require('gifshot');
 angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
   'CsrfTokenService', 'ImageLocalStorageService', 'ImagePreloaderService',
-  'ImageUploadHelperService', 'SvgSanitizerService', 'UrlInterpolationService',
-  'ALLOWED_IMAGE_FORMATS', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  'ImageUploadHelperService', 'SvgSanitizerService',
+  'UrlInterpolationService', 'ALLOWED_IMAGE_FORMATS',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $sce, AlertsService, AssetsBackendApiService, ContextService,
       CsrfTokenService, ImageLocalStorageService, ImagePreloaderService,

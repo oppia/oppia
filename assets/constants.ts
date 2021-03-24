@@ -5439,22 +5439,21 @@ export default {
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
-  "FIREBASE_AUTH_ENABLED": true,
-
-  // TODO(#11462): Delete this after Firebase authentication has been deployed.
-  "ENABLE_LOGIN_PAGE": true,
+  "FIREBASE_AUTH_ENABLED": false,
 
   // Data required for Firebase authentication.
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
   "FIREBASE_CONFIG_API_KEY": "fake-api-key",
+  "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
+  "FIREBASE_CONFIG_DATABASE_URL": "",
+  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
+  "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",
   "FIREBASE_CONFIG_STORAGE_BUCKET": "",
-  "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
-  "FIREBASE_CONFIG_APP_ID": "",
-  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
+  "FIREBASE_EMULATOR_ENABLED": true,
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
