@@ -118,7 +118,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             PageTitleService.setPageTitleForMobileView('Skill Editor');
             $timeout(function() {
               FocusManagerService.setFocus('newQuestionBtn');
-            }, 0);
+            }, 50);
           };
         }
       ]

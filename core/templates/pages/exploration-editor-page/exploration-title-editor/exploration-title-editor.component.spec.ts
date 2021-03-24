@@ -20,10 +20,22 @@ require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
 
-import { FocusManagerService } from 'services/stateful/focus-manager.service.ts';
+import { EventEmitter } from '@angular/core';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { Subscription } from 'rxjs';
+
+class MockRouterService {
+  private refreshSettingsTabEventEmitter: EventEmitter<void>;
+  get onRefreshSettingsTab() {
+    return this.refreshSettingsTabEventEmitter;
+  }
+  set refreshSettingsTabEmitter(val) {
+    this.refreshSettingsTabEventEmitter = val;
+  }
+}
 
 describe('Exploration Title Editor directive', function() {
   var $scope = null;
@@ -41,6 +53,7 @@ describe('Exploration Title Editor directive', function() {
       imports: [HttpClientTestingModule]
     });
     focusManagerService = TestBed.get(FocusManagerService);
+    routerService = new MockRouterService();
   });
 
 
@@ -56,7 +69,6 @@ describe('Exploration Title Editor directive', function() {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
     focusManagerService = $injector.get('FocusManagerService');
-    routerService = $injector.get('RouterService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationTitleEditor', {
@@ -71,15 +83,13 @@ describe('Exploration Title Editor directive', function() {
       expect($scope.explorationTitleService).toEqual(ExplorationTitleService);
     });
 
-  it('should apply autofocus to settings tab element when tab is switched',
-    function() {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValues('feedback', 'settings');
+  it('should set focus on settings tab when refreshSettingsTab flag is ' +
+    'emitted', () => {
+      routerService.onRefreshSettingsTab.emit();
       spyOn(focusManagerService, 'setFocus');
       ctrl.focusLabel = 'xyzz';
-      $rootScope.$apply(routerService.getActiveTabName());
-      $rootScope.$apply(routerService.getActiveTabName());
+      $scope.$apply();
       expect(focusManagerService.setFocus).toHaveBeenCalledWith(
         'xyzz');
-    });
+  });
 });

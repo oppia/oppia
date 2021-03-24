@@ -17,6 +17,9 @@
  */
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/focus-manager.service.ts');
+
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('explorationTitleEditor', {
   bindings: {
     // The text for the label of the field.
@@ -30,21 +33,22 @@ angular.module('oppia').component('explorationTitleEditor', {
   },
   template: require('./exploration-title-editor.component.html'),
   controller: [
-    '$rootScope', '$scope', 'ExplorationTitleService', 'FocusManagerService',
+    '$scope', 'ExplorationTitleService', 'FocusManagerService',
     'RouterService',
     function(
-        $rootScope, $scope, ExplorationTitleService, FocusManagerService,
+        $scope, ExplorationTitleService, FocusManagerService,
         RouterService) {
       $scope.explorationTitleService = ExplorationTitleService;
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.$onInit = function() {
-        $rootScope.$watch(
-          () => RouterService.getActiveTabName(),
-          (newValue) => {
-            if (newValue === 'settings') {
+        ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshSettingsTab.subscribe(
+            () => {
               FocusManagerService.setFocus(ctrl.focusLabel);
             }
-          });
+          )
+        );
       };
     }]
 });
