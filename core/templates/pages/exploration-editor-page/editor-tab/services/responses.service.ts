@@ -504,7 +504,7 @@ export class ResponsesService {
   save(
       newAnswerGroups: AnswerGroup[],
       defaultOutcome: Outcome,
-      callback:(value: AnswerGroup[], value2: Outcome) => void
+      callback: (value: AnswerGroup[], value2: Outcome) => void
   ): void {
     this._saveAnswerGroups(newAnswerGroups);
     this._saveDefaultOutcome(defaultOutcome);
