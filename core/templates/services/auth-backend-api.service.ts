@@ -31,10 +31,6 @@ export class AuthBackendApiService {
       headers: {Authorization: `Bearer ${idToken}`}
     }).toPromise();
   }
-
-  async endSessionAsync(): Promise<void> {
-    await this.httpClient.get('/session_end').toPromise();
-  }
 }
 
 angular.module('oppia').factory(
