@@ -35,7 +35,7 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-fdescribe('Exploration Title Editor directive', function() {
+describe('Exploration Title Editor directive', function() {
   var $scope = null;
   var $rootScope = null;
   var ExplorationTitleService = null;
