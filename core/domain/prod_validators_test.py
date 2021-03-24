@@ -29,14 +29,9 @@ from core.domain import prod_validation_jobs_one_off
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import subtopic_page_domain
 from core.domain import taskqueue_services
-from core.domain import topic_domain
-from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -49,13 +44,11 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
 (
-    collection_models, exp_models, feedback_models,
-    story_models, subtopic_models,
-    suggestion_models, topic_models, user_models
+    exp_models,story_models,
+    topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.NAMES.exploration,models.NAMES.story,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 
