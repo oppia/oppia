@@ -158,7 +158,8 @@ angular.module('oppia').controller('TranslationModalController', [
       return attributes.filter(attribute => attribute);
     };
 
-    $scope.notCopiedAllElements = function(originalElements, translatedElements) {
+    $scope.notCopiedAllElements = function(
+      originalElements, translatedElements) {
       const hasMatchingTranslatedElement = (element) => (
         translatedElements.includes(element));
       return !originalElements.every(hasMatchingTranslatedElement);
@@ -191,18 +192,24 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.isTranslationCompleted = function(
       originalElements: [HTMLElement], translatedElements: [HTMLElement]) {
 
-        const originalHtmlElements = Array.from(originalElements, element => element.nodeName);
-        const translatedHtmlElements = Array.from(translatedElements, element => element.nodeName);
-        
-        for (const originalElement of new Set(originalHtmlElements)) {
-          if (
-            !(translatedHtmlElements.some(element => element === originalElement)) ||
-            originalHtmlElements.filter(element => element === originalElement).length > translatedHtmlElements.filter(element => element === originalElement).length
-          )
-            return false;
-        }
-        return true;
-    }
+      const originalHtmlElements = Array.from(
+        originalElements, element => element.nodeName);
+      const translatedHtmlElements = Array.from(
+        translatedElements, element => element.nodeName);
+
+      for (const originalElement of new Set(originalHtmlElements)) {
+        if (
+          !(translatedHtmlElements.some(
+            element => element === originalElement)) ||
+          originalHtmlElements.filter(
+            element => element === originalElement).length > 
+            translatedHtmlElements.filter(
+              element => element === originalElement).length
+        )
+          return false;
+      }
+      return true;
+    };
 
     $scope.validateImages = function(
         textToTranslate, translatedText): TranslationError {
@@ -249,7 +256,8 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.hasImgCopyError = translationError.hasUncopiedImgs;
       $scope.hasImgTextError = translationError.hasDuplicateAltTexts ||
         translationError.hasDuplicateDescriptions;
-      $scope.incompleteTranslationError = translationError.hasUntranslatedElements;
+      $scope.incompleteTranslationError = translationError.
+        hasUntranslatedElements;
 
       if ($scope.hasImgCopyError) {
         return;
@@ -261,32 +269,32 @@ angular.module('oppia').controller('TranslationModalController', [
         return;
       }
       if ($scope.uploadingTranslation || $scope.loadingData) {
-        return; 
+        return;
       }
       SiteAnalyticsService.
-          registerContributorDashboardSubmitSuggestionEvent('Translation');
-        $scope.uploadingTranslation = true;
-        var imagesData = ImageLocalStorageService.getStoredImagesData();
-        ImageLocalStorageService.flushStoredImagesData();
-        ContextService.resetImageSaveDestination();
-        TranslateTextService.suggestTranslatedText(
-          $scope.activeWrittenTranslation.html,
-          TranslationLanguageService.getActiveLanguageCode(),
-          imagesData, function() {
-            AlertsService.addSuccessMessage(
-              'Submitted translation for review.');
-            if ($scope.moreAvailable) {
-              var textAndAvailability = (
-                TranslateTextService.getTextToTranslate());
-              $scope.textToTranslate = textAndAvailability.text;
-              $scope.moreAvailable = textAndAvailability.more;
-            }
-            $scope.previousTranslationAvailable = true;
-            $scope.activeWrittenTranslation.html = '';
-            $scope.uploadingTranslation = false;
-          }, () => {
-            $uibModalInstance.close();
-          });
+        registerContributorDashboardSubmitSuggestionEvent('Translation');
+      $scope.uploadingTranslation = true;
+      var imagesData = ImageLocalStorageService.getStoredImagesData();
+      ImageLocalStorageService.flushStoredImagesData();
+      ContextService.resetImageSaveDestination();
+      TranslateTextService.suggestTranslatedText(
+        $scope.activeWrittenTranslation.html,
+        TranslationLanguageService.getActiveLanguageCode(),
+        imagesData, function() {
+          AlertsService.addSuccessMessage(
+            'Submitted translation for review.');
+          if ($scope.moreAvailable) {
+            var textAndAvailability = (
+              TranslateTextService.getTextToTranslate());
+            $scope.textToTranslate = textAndAvailability.text;
+            $scope.moreAvailable = textAndAvailability.more;
+          }
+          $scope.previousTranslationAvailable = true;
+          $scope.activeWrittenTranslation.html = '';
+          $scope.uploadingTranslation = false;
+        }, () => {
+          $uibModalInstance.close();
+        });
       if (!$scope.moreAvailable) {
         $uibModalInstance.close();
       }
