@@ -1404,6 +1404,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_user_email_preferences = {}
         expected_user_auth_details = {}
+        expected_app_feedback_report = {}
 
         expected_user_data = {
             'user_stats': expected_stats_data,
@@ -1456,7 +1457,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
             'user_email_preferences': expected_user_email_preferences,
-            'user_auth_details': expected_user_auth_details
+            'user_auth_details': expected_user_auth_details,
+            'app_feedback_report': expected_app_feedback_report
         }
 
         user_takeout_object = takeout_service.export_data_for_user(
