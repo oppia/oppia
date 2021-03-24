@@ -1011,10 +1011,12 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             exp_and_state_key = '%s %s' % (
                 item.id, state_name)
             if interaction.id == 'RatioExpressionInput':
-                if interaction.customization_args['numberOfTerms'].value > 10:
-                    yield (python_utils.UNICODE(
-                        interaction.customization_args['numberOfTerms'].value),
-                           exp_and_state_key)
+                number_of_terms = (
+                    interaction.customization_args['numberOfTerms'].value)
+                if number_of_terms > 10:
+                    yield (
+                        python_utils.UNICODE(number_of_terms), exp_and_state_key
+                    )
 
         yield ('SUCCESS', 1)
 
