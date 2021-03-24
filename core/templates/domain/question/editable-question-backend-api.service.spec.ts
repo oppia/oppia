@@ -286,7 +286,6 @@ describe('Editable question backend API service', function() {
 
     let questionId = '0';
     let skillIdsTaskArray = ['1', '2', 1];
-    let difficulty = 1;
 
     editableQuestionBackendApiService.editQuestionSkillLinks(
       questionId, skillIdsTaskArray).then(
@@ -308,7 +307,6 @@ describe('Editable question backend API service', function() {
 
     let questionId = '0';
     let skillIdsTaskArray = ['1', '2', 1];
-    let difficulty = 1;
 
     editableQuestionBackendApiService.editQuestionSkillLinks(
       questionId, skillIdsTaskArray).then(

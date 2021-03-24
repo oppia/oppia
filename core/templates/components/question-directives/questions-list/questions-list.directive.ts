@@ -481,7 +481,7 @@ angular.module('oppia').directive('questionsList', [
           };
           ctrl.isQuestionValid = function() {
             let questionIdValid = QuestionValidationService.isQuestionValid(
-              ctrl.question, ctrl.misconceptionsBySkill)
+              ctrl.question, ctrl.misconceptionsBySkill);
             if (!ctrl.questionIsBeingUpdated) {
               return Boolean(
                 questionIdValid &&
