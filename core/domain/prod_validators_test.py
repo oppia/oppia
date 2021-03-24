@@ -44,10 +44,10 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
 (
-    exp_models,story_models,
+    exp_models, story_models,
     topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration,models.NAMES.story,
+    models.NAMES.exploration, models.NAMES.story,
     models.NAMES.topic, models.NAMES.user
 ])
 
