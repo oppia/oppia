@@ -18,9 +18,7 @@
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'learner-playlist-modal',

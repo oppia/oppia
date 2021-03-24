@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
 import { Pipe } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from
-  '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
