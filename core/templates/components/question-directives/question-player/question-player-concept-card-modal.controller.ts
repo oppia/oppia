@@ -48,7 +48,10 @@ angular.module('oppia').controller('QuestionPlayerConceptCardModalController', [
     };
 
     $scope.retryTest = function() {
-      $window.location.replace(UrlService.getPathname());
+      var selectedSubtopics = UrlService.getUrlParams().selected_subtopic_ids;
+      $window.location.replace(
+        UrlService.getPathname() + '?selected_subtopic_ids=' +
+        selectedSubtopics);
     };
   }
 ]);
