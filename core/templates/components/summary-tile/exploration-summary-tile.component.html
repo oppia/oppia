@@ -34,7 +34,7 @@
               <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate"></span>
             </span>
             <span *ngIf="getAverageRating()">
-              {{ getAverageRating() }}
+              {{ getAverageRating() | number:'1.1-1' }}
             </span>
             <span *ngIf="!getAverageRating()" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
             </span>
