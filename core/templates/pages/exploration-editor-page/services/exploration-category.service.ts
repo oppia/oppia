@@ -20,9 +20,7 @@
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-rights-backend-api.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('services/validators.service.ts');
 
 angular.module('oppia').factory('ExplorationCategoryService', [
