@@ -289,7 +289,7 @@ describe('Editable question backend API service', function() {
     let difficulty = 1;
 
     editableQuestionBackendApiService.editQuestionSkillLinks(
-      questionId, skillIdsTaskArray, difficulty).then(
+      questionId, skillIdsTaskArray).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/manage_question_skill_link/' + questionId);
@@ -311,7 +311,7 @@ describe('Editable question backend API service', function() {
     let difficulty = 1;
 
     editableQuestionBackendApiService.editQuestionSkillLinks(
-      questionId, skillIdsTaskArray, difficulty).then(
+      questionId, skillIdsTaskArray).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/manage_question_skill_link/' + questionId);

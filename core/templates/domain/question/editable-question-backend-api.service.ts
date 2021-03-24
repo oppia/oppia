@@ -159,7 +159,6 @@ export class EditableQuestionBackendApiService {
   private _editQuestionSkillLinks(
       questionId: string,
       skillIdsTaskArray: (string | number)[],
-      difficulty: number,
       successCallback: (value: void) => void,
       errorCallback: (reason?: string) => void): Promise<Question> {
     return new Promise((resolve, reject) => {
@@ -169,8 +168,6 @@ export class EditableQuestionBackendApiService {
             question_id: questionId
           });
       this.http.put(editQuestionSkillLinkUrl, {
-        action: 'edit_links',
-        difficulty: difficulty,
         skill_ids_task_list: skillIdsTaskArray
       }).toPromise()
         .then(
@@ -202,11 +199,10 @@ export class EditableQuestionBackendApiService {
 
   editQuestionSkillLinks(
       questionId: string,
-      skillIdsTaskArray: (string | number)[],
-      difficulty: number): Promise<void> {
+      skillIdsTaskArray: (string | number)[]): Promise<void> {
     return new Promise((resolve, reject) => {
       this._editQuestionSkillLinks(
-        questionId, skillIdsTaskArray, difficulty, resolve, reject);
+        questionId, skillIdsTaskArray, resolve, reject);
     });
   }
 

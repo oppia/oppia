@@ -93,7 +93,8 @@ angular.module('oppia').directive('questionsList', [
         'ShortSkillSummaryObjectFactory', 'SkillBackendApiService',
         'SkillEditorRoutingService',
         'UtilsService', 'WindowDimensionsService',
-        'INTERACTION_SPECS', 'NUM_QUESTIONS_PER_PAGE',
+        'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
+        'NUM_QUESTIONS_PER_PAGE',
         function(
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
@@ -103,7 +104,8 @@ angular.module('oppia').directive('questionsList', [
             ShortSkillSummaryObjectFactory, SkillBackendApiService,
             SkillEditorRoutingService,
             UtilsService, WindowDimensionsService,
-            INTERACTION_SPECS, NUM_QUESTIONS_PER_PAGE) {
+            DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
+            NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -307,6 +309,14 @@ angular.module('oppia').directive('questionsList', [
                   }
                 });
             }
+            ctrl.linkedSkillsWithDifficulty.forEach(
+              (linkedSkillWithDifficulty) => {
+                ctrl.skillLinkageModificationsArray.push({
+                  id: linkedSkillWithDifficulty.getId(),
+                  task: 'update_difficulty',
+                  difficulty: linkedSkillWithDifficulty.getDifficulty()
+                });
+              });
           };
 
           ctrl.initiateQuestionCreation = function() {
@@ -349,6 +359,7 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.editQuestion = function(
               questionSummaryForOneSkill, skillDescription, difficulty) {
+            ctrl.skillLinkageModificationsArray = [];
             if (ctrl.editorIsOpen) {
               return;
             }
@@ -469,10 +480,15 @@ angular.module('oppia').directive('questionsList', [
                 });
           };
           ctrl.isQuestionValid = function() {
-            return Boolean(QuestionValidationService.isQuestionValid(
-              ctrl.question, ctrl.misconceptionsBySkill) &&
+            let questionIdValid = QuestionValidationService.isQuestionValid(
+              ctrl.question, ctrl.misconceptionsBySkill)
+            if (!ctrl.questionIsBeingUpdated) {
+              return Boolean(
+                questionIdValid &&
                 ctrl.newQuestionSkillDifficulties &&
                 ctrl.newQuestionSkillDifficulties.length);
+            }
+            return questionIdValid;
           };
 
           ctrl.showSolutionCheckpoint = function() {
@@ -522,7 +538,8 @@ angular.module('oppia').directive('questionsList', [
               ctrl.skillLinkageModificationsArray = [];
               ctrl.skillLinkageModificationsArray.push({
                 id: summary.id,
-                task: 'add'
+                task: 'add',
+                difficulty: DEFAULT_SKILL_DIFFICULTY
               });
             }, function() {
               // Note to developers:
@@ -533,8 +550,8 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.updateSkillLinkage = function(commitMsg) {
             EditableQuestionBackendApiService.editQuestionSkillLinks(
-              ctrl.questionId, ctrl.skillLinkageModificationsArray,
-              ctrl.difficulty).then(
+              ctrl.questionId, ctrl.skillLinkageModificationsArray
+            ).then(
               data => {
                 $timeout(function() {
                   QuestionsListService.resetPageNumber();
