@@ -22,7 +22,7 @@ require(
 
 import { EventEmitter } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, flushMicrotasks } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
@@ -35,13 +35,13 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-
-describe('Exploration Title Editor directive', function() {
+fdescribe('Exploration Title Editor directive', function() {
   var $scope = null;
   var $rootScope = null;
   var ExplorationTitleService = null;
   var focusManagerService = null;
   var routerService = null;
+  var $flushPendingTasks = null;
   var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -68,13 +68,16 @@ describe('Exploration Title Editor directive', function() {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
     focusManagerService = $injector.get('FocusManagerService');
-
+    $flushPendingTasks = $injector.get('$flushPendingTasks');
+    routerService.refreshSettingsTabEmitter = new EventEmitter();
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationTitleEditor', {
       $scope: $scope,
-      ExplorationTitleService: ExplorationTitleService
+      ExplorationTitleService: ExplorationTitleService,
+      RouterService: routerService,
     });
     ctrl.$onInit();
+    $scope.$apply();
   }));
 
   it('should initialize controller properties after its initialization',
@@ -83,11 +86,12 @@ describe('Exploration Title Editor directive', function() {
     });
 
   it('should set focus on settings tab when refreshSettingsTab flag is ' +
-    'emitted', () => {
-    routerService.onRefreshSettingsTab.emit();
+    'emit', () => {
     spyOn(focusManagerService, 'setFocus');
     ctrl.focusLabel = 'xyzz';
+    routerService.onRefreshSettingsTab.emit();
     $scope.$apply();
+    $flushPendingTasks();
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'xyzz');
   });
