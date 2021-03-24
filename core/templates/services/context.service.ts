@@ -218,7 +218,9 @@ export class ContextService {
   // Returns a string representing the explorationId (obtained from the
   // URL).
   getExplorationId(): string {
-    if (!this.isInQuestionPlayerMode()) {
+    if (this.explorationId) {
+      return this.explorationId;
+    } else if (!this.isInQuestionPlayerMode()) {
       // The pathname should be one of /explore/{exploration_id} or
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.
       let pathnameArray = this.urlService.getPathname().split('/');
