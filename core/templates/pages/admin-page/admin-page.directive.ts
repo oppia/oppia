@@ -19,9 +19,7 @@
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/focus-on.directive.ts');
-require('pages/admin-page/navbar/admin-navbar.directive.ts');
-require(
-  'pages/admin-page/activities-tab/admin-dev-mode-activities-tab.directive.ts');
+require('pages/admin-page/navbar/admin-navbar.component.ts');
 require(
   'pages/admin-page/activities-tab/' +
   'admin-prod-mode-activities-tab.component.ts');

@@ -34,7 +34,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
-    'admin-dev-mode-activities-tab.directive.ts',
     'admin-jobs-tab.directive.ts',
     'admin-misc-tab.directive.ts',
     'admin-page.directive.ts',
