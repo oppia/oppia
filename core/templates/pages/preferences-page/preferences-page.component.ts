@@ -48,16 +48,14 @@ angular.module('oppia').component('preferencesPage', {
   template: require('./preferences-page.component.html'),
   controller: [
     '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
-    '$window', 'AlertsService', 'FocusManagerService',
-    'I18nLanguageCodeService',
+    '$window', 'AlertsService', 'I18nLanguageCodeService',
     'LanguageUtilService', 'LoaderService', 'PreventPageUnloadEventService',
     'UrlInterpolationService', 'UserService',
     'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
     'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
     'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES', function(
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
-        $window, AlertsService, FocusManagerService,
-        I18nLanguageCodeService,
+        $window, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, PreventPageUnloadEventService,
         UrlInterpolationService, UserService,
         DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
@@ -183,13 +181,6 @@ angular.module('oppia').component('preferencesPage', {
         });
       };
 
-      ctrl.addFocusWithoutScroll = function(label) {
-        FocusManagerService.setFocus(label);
-        $timeout(function() {
-          $window.scrollTo(0, 0);
-        }, 0);
-      };
-
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = '';
         ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
@@ -242,7 +233,6 @@ angular.module('oppia').component('preferencesPage', {
 
         $q.all([userInfoPromise, preferencesPromise]).then(function() {
           LoaderService.hideLoadingScreen();
-          ctrl.addFocusWithoutScroll('bioInputField');
         });
         ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
         ctrl.userCanExportAccount = ENABLE_ACCOUNT_EXPORT;
