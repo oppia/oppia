@@ -22,7 +22,7 @@ require(
 
 import { EventEmitter } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { TestBed, flushMicrotasks } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
