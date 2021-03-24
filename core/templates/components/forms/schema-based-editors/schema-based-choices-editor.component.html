@@ -1,0 +1,4 @@
+<select class="form-control" [(ngModel)]="localValue" (change)="updateLocalValue($event)"
+        [disabled]="isDisabled" required>
+  <option *ngFor="let choice of choices" [value]="choice">{{ choice }}</option>
+</select>

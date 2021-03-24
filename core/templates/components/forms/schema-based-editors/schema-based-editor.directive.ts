@@ -20,10 +20,10 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
+  'schema-based-bool-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-custom-editor.directive.ts');
@@ -37,7 +37,7 @@ require(
   'components/forms/schema-based-editors/' +
   'schema-based-html-editor.directive.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-int-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-list-editor.directive.ts');
@@ -52,7 +52,8 @@ require('components/forms/validators/is-nonempty.filter.ts');
 require('components/forms/validators/is-url-fragment.filter.ts');
 
 angular.module('oppia').directive('schemaBasedEditor', [
-  function() {
+  '$rootScope',
+  function($rootScope) {
     return {
       restrict: 'E',
       scope: {},
@@ -66,6 +67,12 @@ angular.module('oppia').directive('schemaBasedEditor', [
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [function() {
+        let ctrl = this;
+        ctrl.updateLocalValue = function($event) {
+          ctrl.localValue = $event;
+          $rootScope.$applyAsync();
+        };
+      }]
     };
   }]);

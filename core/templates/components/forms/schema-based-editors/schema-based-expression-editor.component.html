@@ -1,0 +1,3 @@
+<input type="text" [(ngModel)]="localValue" (change)="updateLocalValue()"
+       class="form-control" [disabled]="isDisabled"
+       required [attr.focus-on]="labelForFocusTarget">
