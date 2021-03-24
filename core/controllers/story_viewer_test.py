@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+
 from constants import constants
 from core.domain import question_services
 from core.domain import story_domain
@@ -44,7 +45,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.login(self.ADMIN_EMAIL)
         self.TOPIC_ID = 'topic_id'
         self.STORY_ID = 'story_id'

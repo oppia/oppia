@@ -64,7 +64,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.user_id = self.get_user_id_from_email(self.user_email)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id)
         rights_manager.publish_exploration(self.user, self.EXP_ID_1)
 

@@ -427,11 +427,11 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
@@ -539,7 +539,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -573,7 +573,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -623,7 +623,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -1356,7 +1356,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
             owner, self.VALID_EXP_ID, True)
@@ -1393,7 +1393,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
             owner, self.VALID_EXP_ID, True)
@@ -1421,7 +1421,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
             owner, self.VALID_EXP_ID, True)
@@ -2856,7 +2856,7 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
 
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
         self.set_admins(['user'])
 
         self.save_new_valid_exploration(

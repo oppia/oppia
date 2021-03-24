@@ -50,8 +50,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
 
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
 
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""

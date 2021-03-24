@@ -26,8 +26,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_services

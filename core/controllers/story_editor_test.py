@@ -38,7 +38,7 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.save_new_story(self.story_id, self.admin_id, self.topic_id)

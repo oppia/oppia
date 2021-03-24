@@ -241,7 +241,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -445,7 +445,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -652,7 +652,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -824,7 +824,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -1058,11 +1058,11 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.save_new_valid_exploration(
             'exp0', self.owner_id, end_state_name='End')
@@ -1265,7 +1265,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -1815,7 +1815,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.save_new_valid_exploration(
             'exp0', self.user_id, end_state_name='End')
@@ -2016,7 +2016,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -2206,7 +2206,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -2958,7 +2958,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
         user_services.update_user_role(
             self.user_id, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_actions = user_services.UserActionsInfo(self.user_id)
+        self.user_actions = user_services.get_user_actions_info(self.user_id)
 
         wipeout_service.pre_delete_user(self.user_id)
         self.process_and_flush_pending_mapreduce_tasks()

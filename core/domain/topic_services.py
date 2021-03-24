@@ -556,7 +556,7 @@ def publish_story(topic_id, story_id, committer_id):
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:
         raise Exception('A topic with the given ID doesn\'t exist')
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to publish the story.')
@@ -594,7 +594,7 @@ def unpublish_story(topic_id, story_id, committer_id):
         Exception. The story is already unpublished.
         Exception. The user does not have enough rights to unpublish the story.
     """
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the story.')
@@ -894,7 +894,7 @@ def publish_topic(topic_id, committer_id):
         raise Exception('The given topic does not exist')
     topic = topic_fetchers.get_topic_by_id(topic_id)
     topic.validate(strict=True)
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to publish the topic.')
@@ -925,7 +925,7 @@ def unpublish_topic(topic_id, committer_id):
     topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the topic.')

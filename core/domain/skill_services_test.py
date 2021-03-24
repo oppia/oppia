@@ -83,9 +83,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')
         self.set_admins([self.ADMIN_USERNAME, 'adm2'])
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
-        self.user_admin_2 = user_services.UserActionsInfo(self.user_id_admin_2)
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+        self.user_admin_2 = user_services.get_user_actions_info(
+            self.user_id_admin_2)
 
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='Description',

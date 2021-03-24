@@ -458,7 +458,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
 
-        self.user_a = user_services.UserActionsInfo(self.user_a_id)
+        self.user_a = user_services.get_user_actions_info(self.user_a_id)
 
         with self.swap(
             subscription_services, 'subscribe_to_thread', self._null_fn
@@ -1104,11 +1104,11 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1361,7 +1361,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         self.signup('user@email', 'user')
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email('user@email')
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -2194,7 +2194,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -2395,8 +2395,8 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email('user@email')
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.save_new_valid_exploration(
             'exp0', self.user_id, end_state_name='End')

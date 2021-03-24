@@ -74,7 +74,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                 }
             })
         )
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Description',

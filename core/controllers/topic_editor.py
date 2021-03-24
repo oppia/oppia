@@ -369,7 +369,7 @@ class TopicRightsHandler(base.BaseHandler):
         if topic_rights is None:
             raise self.InvalidInputException(
                 'Expected a valid topic id to be provided.')
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_topic = topic_services.check_can_edit_topic(
             user_actions_info, topic_rights)
 

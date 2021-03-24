@@ -635,7 +635,7 @@ def apply_change_list(skill_id, change_list, committer_id):
         Skill. The resulting skill domain object.
     """
     skill = skill_fetchers.get_skill_by_id(skill_id)
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:

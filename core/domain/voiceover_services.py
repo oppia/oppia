@@ -193,7 +193,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
+    reviewer = user_services.get_user_actions_info(reviewer_id)
 
     voiceover_application.accept(reviewer_id)
 
@@ -252,7 +252,7 @@ def reject_voiceover_application(
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
+    reviewer = user_services.get_user_actions_info(reviewer_id)
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
     _save_voiceover_applications([voiceover_application])

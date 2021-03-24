@@ -721,7 +721,7 @@ class AdminRoleHandler(base.BaseHandler):
             username=username)
 
         if topic_id:
-            user = user_services.UserActionsInfo(user_id)
+            user = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)

@@ -21,8 +21,8 @@ import copy
 import json
 import re
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service

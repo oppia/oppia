@@ -62,7 +62,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def _get_thread_ids_subscribed_to(self, user_id):
         """Returns the feedback thread ids to which the user corresponding to
