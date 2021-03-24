@@ -110,7 +110,7 @@ class ModelDomainObjectValidateError(ModelValidationError):
         super(ModelDomainObjectValidateError, self).__init__(model)
         self._message = (
             'Entity id %s: Entity fails domain validation with the '
-            'error %s' % (model.id, error_message))
+            'error: %s' % (model.id, error_message))
 
     @property
     def message(self):
@@ -124,7 +124,7 @@ class IdsInModelFieldValidationError(ModelValidationError):
         super(IdsInModelFieldValidationError, self).__init__(model)
         self._message = (
             'Entity id %s: Entity fails validation of ids in fields with the '
-            'error %s' % (model.id, error_message))
+            'error: %s' % (model.id, error_message))
 
     @property
     def message(self):

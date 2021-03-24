@@ -25,6 +25,7 @@ import unittest
 from core.platform import models
 from jobs import base_model_validator
 from jobs import base_model_validator_errors as errors
+import feconf
 
 import apache_beam as beam
 from apache_beam.runners.direct import direct_runner
@@ -39,6 +40,30 @@ datastore_services = models.Registry.import_datastore_services()
 
 class MockModel(base_models.BaseModel):
     pass
+
+
+class MockDomainObject():
+    pass
+
+
+class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    pass
+
+
+class MockModelValidatorWithInvalidValidationType(
+        base_model_validator.BaseModelValidator):
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, unused_item):
+        return MockModel()
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, unused_item):
+        return 'Invalid'
 
 
 class BaseModelValidatorTests(unittest.TestCase):
@@ -168,4 +193,117 @@ class ValidateModelIdTests(BaseModelValidatorTests):
                 output,
                 beam_testing_util.equal_to([
                     errors.ModelInvalidIdError(invalid_id_model)
+                ]))
+
+
+class ValidateModelDomainObjectInstancesTests(BaseModelValidatorTests):
+    def test_error_is_raised_with_invalid_validation_type_for_domain_objects(self):
+        def _get_model_domain_object(item):
+            return MockDomainObject()
+
+        def _get_domain_object_validation_type(item):
+            return 'Invalid'
+        
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:            
+            model = MockModel(
+                id='mock-123',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now)
+            pcoll = p | beam.Create([model])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateModelDomainObjectInstances(),
+                    _get_model_domain_object,
+                    _get_domain_object_validation_type))
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelDomainObjectValidateError(
+                        model,
+                        'Invalid validation type for domain object: Invalid')
+                ]))
+
+
+class ValidateIdsInModelFieldsTests(BaseModelValidatorTests):
+    def test_error_raised_when_fetching_external_model_with_system_ids(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            def _get_external_id_relationships(item):
+                return [
+                    base_model_validator.UserSettingsModelFetcherDetails(
+                        'user_id', [item.user_id],
+                        may_contain_system_ids=False,
+                        may_contain_pseudonymous_ids=False
+                    )]
+
+            model = MockCommitLogEntryModel(
+                id='mock-12345',
+                user_id=feconf.MIGRATION_BOT_USER_ID,
+                created_on=self.year_ago,
+                last_updated=self.now,
+                commit_cmds=[],
+                post_commit_status="public",
+                commit_type='create')
+            pcoll = p | beam.Create([model])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateIdsInModelFields(),
+                    _get_external_id_relationships)
+            )
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.IdsInModelFieldValidationError(
+                        model,
+                        'The field \'user_id\' should not contain system IDs')
+                ]))
+
+
+class ValidateExternalIdRelationshipsTests(BaseModelValidatorTests):
+
+    USER_ID = 'uid_%s' % ('a' * 32)
+
+    def test_error_raised_when_external_model_does_not_exists(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            def _get_external_id_relationships(item):
+                return [
+                    base_model_validator.UserSettingsModelFetcherDetails(
+                        'user_id', [item.user_id],
+                        may_contain_system_ids=False,
+                        may_contain_pseudonymous_ids=False
+                    )]
+
+            model = MockCommitLogEntryModel(
+                id='mock-12345',
+                user_id=self.USER_ID,
+                created_on=self.year_ago,
+                last_updated=self.now,
+                commit_cmds=[],
+                post_commit_status="public",
+                commit_type='create')
+            pcoll = p | beam.Create([model])
+
+            model_and_field_name_and_external_model_references = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.FetchFieldNameToExternalIdRelationships(),
+                    _get_external_id_relationships))
+
+            output = (
+                model_and_field_name_and_external_model_references
+                | beam.ParDo(
+                    base_model_validator.ValidateExternalIdRelationships()))
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelFieldCheckValidateError(
+                        model, 'user_id', self.USER_ID,
+                        user_models.UserSettingsModel)
                 ]))

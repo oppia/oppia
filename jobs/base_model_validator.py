@@ -36,7 +36,9 @@ from core.domain import cron_services
 from core.platform import models
 from jobs import base_model_validator_errors as errors
 from jobs import jobs_utils
+import feconf
 import python_utils
+import utils
 
 import apache_beam as beam
 
@@ -50,6 +52,106 @@ MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
 VALIDATION_MODE_NON_STRICT = 'non-strict'
+
+
+class ExternalModelFetcherDetails(python_utils.OBJECT):
+    """Value object providing the class and ids to fetch an external model.
+    NOTE TO DEVELOPERS: For UserSettingsModel, use the
+    UserSettingsModelFetcherDetails class instead of this one.
+    """
+
+    def __init__(self, field_name, model_class, model_ids):
+        """Initializes an ExternalModelFetcherDetails domain object.
+
+        Args:
+            field_name: str. A specific name used as an identifier by the
+                storage model which is used to identify the external model
+                reference. For example: 'exp_ids': ExplorationModel, exp_ids
+                is the field name to identify the external model
+                ExplorationModel.
+            model_class: ClassObject. The external model class.
+            model_ids: list(str). The list of external model ids to fetch the
+                external models.
+
+        Raises:
+            Exception. This class was used instead of
+                UserSettingsModelFetcherDetails for the UserSettingsModel.
+        """
+        if model_class == user_models.UserSettingsModel:
+            raise Exception(
+                'When fetching instances of UserSettingsModel, please use ' +
+                'UserSettingsModelFetcherDetails instead of ' +
+                'ExternalModelFetcherDetails')
+        validated_model_ids = []
+        model_id_errors = []
+        for model_id in model_ids:
+            if not model_id:
+                model_id_errors.append(
+                    'A model id in the field \'%s\' '
+                    'is empty' % field_name)
+            else:
+                validated_model_ids.append(model_id)
+        self.field_name = field_name
+        self.model_class = model_class
+        self.model_ids = validated_model_ids
+        self.model_id_errors = model_id_errors
+
+
+class UserSettingsModelFetcherDetails(python_utils.OBJECT):
+    """Value object providing ids to fetch the user settings model."""
+
+    def __init__(
+            self, field_name, model_ids,
+            may_contain_system_ids, may_contain_pseudonymous_ids):
+        """Initializes the UserSettingsModelFetcherDetails domain object.
+
+        Args:
+            field_name: str. A specific name used as an identifier by the
+                storage model which is used to identify the user settings model
+                reference. For example: `'committer_id': UserSettingsModel`
+                means that committer_id is a field which contains a user_id
+                used to identify the external model UserSettingsModel.
+            model_ids: list(str). The list of user settings model IDs for which
+                to fetch the UserSettingsModels.
+            may_contain_system_ids: bool. Whether the model IDs contain
+                system IDs which should be omitted before attempting to fetch
+                the corresponding models. Set may_contain_system_ids to True if
+                and only if this field can contain admin or bot IDs.
+            may_contain_pseudonymous_ids: bool. Whether the model ids contain
+                pseudonymous IDs which should be omitted before attempting to
+                fetch the corresponding models. Set may_contain_pseudonymous_ids
+                to True if and only if this field can contain user IDs that
+                are pseudonymized as part of Wipeout. In other words, these
+                fields can only be in models that have LOCALLY_PSEUDONYMIZE as
+                their DELETION_POLICY.
+        """
+        model_id_errors = []
+        validated_model_ids = []
+        for model_id in model_ids:
+            if model_id in feconf.SYSTEM_USERS.values():
+                if not may_contain_system_ids:
+                    model_id_errors.append(
+                        'The field \'%s\' should not contain '
+                        'system IDs' % field_name)
+            elif utils.is_pseudonymous_id(model_id):
+                if not may_contain_pseudonymous_ids:
+                    model_id_errors.append(
+                        'The field \'%s\' should not contain '
+                        'pseudonymous IDs' % field_name)
+            elif not utils.is_user_id_valid(
+                    model_id,
+                    allow_system_user_id=False,
+                    allow_pseudonymous_id=False
+            ):
+                model_id_errors.append(
+                    'The user id %s in the field \'%s\' is '
+                    'invalid' % (model_id, field_name))
+            else:
+                validated_model_ids.append(model_id)
+        self.field_name = field_name
+        self.model_class = user_models.UserSettingsModel
+        self.model_ids = validated_model_ids
+        self.model_id_errors = model_id_errors
 
 
 class ExternalModelReference(python_utils.OBJECT):
@@ -139,25 +241,30 @@ class ValidateModelTimeFields(beam.DoFn):
             yield errors.ModelMutatedDuringJobError(model)
 
 
-class ValidateModelDomainObjectInstances(beam.doFn):
+class ValidateModelDomainObjectInstances(beam.DoFn):
     """DoFn to check whether the model instance passes the validation of the
     domain object for model.
     """
 
-    def process(self, domain_object, validation_type):
+    def process(
+        self, item, get_model_domain_object, get_domain_object_validation_type):
         """Function that defines how to process each element in a pipeline of
         models.
 
         Args:
-            domain_object: datastore_services.Model. A domain object to
+            item: datastore_services.Model. A domain object to
             validate.
-            validation_type: str. The type of validation mode: neutral,
-            strict or non strict.
+            get_model_domain_object: function. A function to fetch
+            domain object.
+            get_domain_object_validation_type: function. A function to fetch
+            the validation type of the domain object.
 
         Yields:
             ModelDomainObjectValidateError. Error for domain object validation.
         """
         try:
+            domain_object = get_model_domain_object(item)
+            validation_type = get_domain_object_validation_type(item)
             if domain_object is None:
                 pass
             if validation_type == VALIDATION_MODE_NEUTRAL:
@@ -171,20 +278,20 @@ class ValidateModelDomainObjectInstances(beam.doFn):
                     'Invalid validation type for domain object: %s' % (
                         validation_type))
         except Exception as e:
-            yield errors.ModelDomainObjectValidateError(domain_object, e)
+            yield errors.ModelDomainObjectValidateError(item, e)
 
 
-class ValidateIdsInModelFields(beam.doFn):
+class ValidateIdsInModelFields(beam.DoFn):
     """DoFn to check whether the ids in the fields of the model are valid.
     """
 
-    def process(self, external_model_fetcher_details_and_model):
-        external_model_fetcher_details, model = external_model_fetcher_details_and_model
-        for error in external_model_fetcher_details.model_id_errors:
-            yield errors.IdsInModelFieldValidationError(model, error)
+    def process(self, item, get_external_id_relationships):
+        for external_model_fetcher_details in (get_external_id_relationships(item)):
+            for error in external_model_fetcher_details.model_id_errors:
+                yield errors.IdsInModelFieldValidationError(item, error)
 
 
-class FetchFieldNameToExternalIdRelationships(beam.doFn):
+class FetchFieldNameToExternalIdRelationships(beam.DoFn):
     """DoFn to fetch external models based on _get_external_id_relationships.
     """
 
@@ -224,11 +331,11 @@ class FetchFieldNameToExternalIdRelationships(beam.doFn):
             external_model_references = []
             for (model_id, model_instance) in python_utils.ZIP(
                     model_ids, fetched_model_instances):
-                external_model_references.append(ExternalModelReference(model_class, model_id, model_instance))    
+                external_model_references.append(ExternalModelReference(model_class, model_id, model_instance))
             yield (item, field_name, external_model_references)
 
 
-class ValidateExternalIdRelationships(beam.doFn):
+class ValidateExternalIdRelationships(beam.DoFn):
     """DoFn to check whether the external id properties on the model correspond
     to valid instances.
     """
@@ -298,31 +405,26 @@ class BaseModelValidator(beam.PTransform):
 
         ids_in_field_validation_error = (
             not_deleted
-            | beam.Map(
-                lambda x: (self._get_external_id_relationships(x), x))
-            | beam.ParDo(ValidateIdsInModelFields())
+            | beam.ParDo(
+                ValidateIdsInModelFields(),
+                self._get_external_id_relationships)
         )
 
         model_and_field_name_and_external_model_references = (
             not_deleted
-            | beam.ParDo(FetchFieldNameToExternalIdRelationships(), self._get_external_id_relationships))
+            | beam.ParDo(FetchFieldNameToExternalIdRelationships(),
+            self._get_external_id_relationships))
 
         external_id_relationships_validation_errors = (
             model_and_field_name_and_external_model_references
-            | beam.ParDo(ValidateExternalIdRelationships)
+            | beam.ParDo(ValidateExternalIdRelationships())
         )
-
-        external_id_relationships_validation_errors = (
-            model_and_field_name_and_external_model_references
-            | beam.ParDo(ValidateExternalIdRelationships)
-        )
-
 
         model_domain_object_validation_errors = (
             not_deleted
             | beam.ParDo(
                 ValidateModelDomainObjectInstances(),
-                self._get_model_domain_object_instance(),
+                self._get_model_domain_object_instance,
                 self._get_domain_object_validation_type)
         )
 
