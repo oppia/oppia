@@ -23,7 +23,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 
 export class Stopwatch {
   startTime;
-  constructor(private log:LoggerService) {
+  constructor(private log: LoggerService) {
     this.startTime = null;
   }
 
