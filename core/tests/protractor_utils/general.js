@@ -17,8 +17,6 @@
  * with protractor.
  */
 
-var _ = require('lodash');
-
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
@@ -39,35 +37,36 @@ var scrollToTop = async function() {
   await browser.executeScript('window.scrollTo(0,0);');
 };
 
-// The minimum log level we will report as an error.
+// We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
-var CONSOLE_ERRORS_TO_IGNORE = [
-  // These "localhost:9099" are errors related to communicating with the
-  // Firebase emulator, which would never occur in production, so we just ignore
-  // them.
-  _.escapeRegExp(
-    'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
-    'relyingparty/getAccountInfo?key=fake-api-key'),
-  _.escapeRegExp(
-    'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
-    'relyingparty/verifyPassword?key=fake-api-key'),
-];
+var CONSOLE_ERRORS_TO_IGNORE = [];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {
-  errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
+  var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
+  var browserLogs = await browser.manage().logs().get('browser');
+  var fatalErrors = [];
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
   if (browser.isMobile) {
-    errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
+    browserLogs = browserLogs.filter(function(browserLog) {
+      return !(browserLog.message.includes(' Slow network is detected.'));
+    });
   }
 
-  const browserLogs = await browser.manage().logs().get('browser');
-  const fatalErrors = browserLogs.filter(browserLog => {
-    return (
-      browserLog.level.value > CONSOLE_LOG_THRESHOLD &&
-      errorsToIgnore.every(e => browserLog.message.match(e) === null));
-  });
+  for (var i = 0; i < browserLogs.length; i++) {
+    if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
+      var errorFatal = true;
+      for (var j = 0; j < irrelevantErrors.length; j++) {
+        if (browserLogs[i].message.match(irrelevantErrors[j])) {
+          errorFatal = false;
+        }
+      }
+      if (errorFatal) {
+        fatalErrors.push(browserLogs[i]);
+      }
+    }
+  }
   expect(fatalErrors).toEqual([]);
 };
 
@@ -79,8 +78,7 @@ var SERVER_URL_PREFIX = 'http://localhost:9001';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var USER_PREFERENCES_URL = '/preferences';
-var LOGIN_URL_SUFFIX = '/login';
-var LOGOUT_URL_SUFFIX = '/logout';
+var LOGIN_URL_SUFFIX = '/_ah/login';
 var MODERATOR_URL_SUFFIX = '/moderator';
 // Note that this only works in dev, due to the use of cache slugs in prod.
 var SCRIPTS_URL_SLICE = '/assets/scripts/';
@@ -169,14 +167,6 @@ var ensurePageHasNoTranslationIds = async function() {
       .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
 };
 
-var acceptPrompt = async function(promptResponse) {
-  await waitFor.alertToBePresent();
-  const alert = await browser.switchTo().alert();
-  await alert.sendKeys(promptResponse);
-  await alert.accept();
-  await waitFor.pageToFullyLoad();
-};
-
 var acceptAlert = async function() {
   await waitFor.alertToBePresent();
   await (await browser.switchTo().alert()).accept();
@@ -243,7 +233,6 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
 };
 
 exports.acceptAlert = acceptAlert;
-exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 exports.isInDevMode = isInDevMode;
@@ -252,7 +241,6 @@ exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.USER_PREFERENCES_URL = USER_PREFERENCES_URL;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
-exports.LOGOUT_URL_SUFFIX = LOGOUT_URL_SUFFIX;
 exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;

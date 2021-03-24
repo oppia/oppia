@@ -86,9 +86,7 @@ describe('Feature Gating Flow', function() {
     await users.logout();
   });
 
-  // TODO(#12297): Re-enable once we've found an alternative session ID that can
-  // persist across disjoint user sessions.
-  xit('should show indicators after enabling dummy_feature', async() => {
+  it('should show indicators after enabling dummy_feature', async() => {
     await users.createAndLoginAdminUser(
       'admin4@featureGatingFlow.com', 'featuregating4');
     await adminPage.getFeaturesTab();

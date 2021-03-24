@@ -32,7 +32,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-import mock
 import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
@@ -452,51 +451,77 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.warn('3')
             logging.error('4')
             python_utils.PRINT('5')
-        logging.error('6')
+        logging.info('6')
 
         self.assertEqual(logs, ['3', '4'])
 
-    def test_swap_to_always_return_without_value_uses_none(self):
-        obj = mock.Mock()
-        obj.func = lambda: obj
+    def test_swap_to_always_return_uses_none_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
 
-        self.assertIs(obj.func(), obj)
+            def method(self):
+                """Returns self."""
+                return self
 
-        with self.swap_to_always_return(obj, 'func'):
-            self.assertIsNone(obj.func())
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_return(mock, 'method'):
+            self.assertIsNone(mock.method())
 
     def test_swap_to_always_return_with_value(self):
-        obj = mock.Mock()
-        obj.func = lambda: 0
+        right_obj = python_utils.OBJECT()
+        wrong_obj = python_utils.OBJECT()
+        self.assertIsNot(right_obj, wrong_obj)
 
-        self.assertEqual(obj.func(), 0)
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
 
-        with self.swap_to_always_return(obj, 'func', value=123):
-            self.assertEqual(obj.func(), 123)
+            def method(self):
+                """Returns self."""
+                return wrong_obj
 
-    def test_swap_to_always_raise_without_error_uses_empty_exception(self):
-        obj = mock.Mock()
-        obj.func = lambda: None
-        self.assertIsNone(obj.func())
+        mock = MockClass()
+        self.assertIs(mock.method(), wrong_obj)
 
-        with self.swap_to_always_raise(obj, 'func'):
+        with self.swap_to_always_return(mock, 'method', value=right_obj):
+            self.assertIs(mock.method(), right_obj)
+
+    def test_swap_to_always_raise_empty_exception_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return self
+
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_raise(mock, 'method'):
             try:
-                obj.func()
-            except Exception as e:
-                self.assertIs(type(e), Exception)
-                self.assertEqual(python_utils.UNICODE(e), '')
+                mock.method()
+            except Exception:
+                pass
             else:
-                self.fail(msg='obj.func() did not raise an Exception')
+                self.fail(msg='Exception was not raise as expected')
 
     def test_swap_to_always_raise_with_error(self):
-        obj = mock.Mock()
-        obj.func = lambda: python_utils.divide(1, 0)
+        right_error = Exception('right error')
+        wrong_error = Exception('wrong error')
 
-        self.assertRaisesRegexp(
-            ZeroDivisionError, 'integer division or modulo by zero', obj.func)
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
 
-        with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
-            self.assertRaisesRegexp(ValueError, 'abc', obj.func)
+            def method(self):
+                """Returns self."""
+                raise wrong_error
+
+        mock = MockClass()
+        self.assertRaisesRegexp(Exception, 'wrong error', mock.method)
+
+        with self.swap_to_always_raise(mock, 'method', error=right_error):
+            self.assertRaisesRegexp(Exception, 'right error', mock.method)
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
