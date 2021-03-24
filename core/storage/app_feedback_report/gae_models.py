@@ -27,6 +27,7 @@ import utils
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 
 PLATFORM_CHOICE_ANDROID = 'android'
 PLATFORM_CHOICE_WEB = 'web'
@@ -239,6 +240,19 @@ class AppFeedbackReportModel(base_models.BaseModel):
     def scrub_report(cls, report_id, scrubbed_by):
         """Scrubs the instance of AppFeedbackReportModel with given ID, removing
         any user-entered input in the entity.
+
+        Args:
+            report_id: str. The id of the model entity to scrub.
+            scrubbed_by: str. The id of the user or cron job that is intiating
+                scrubbing this report.
+        """
+        cls._scrub_report_in_transaction(report_id, scrubbed_by)
+
+    @classmethod
+    @transaction_services.run_in_transaction_wrapper
+    def _scrub_report_in_transaction(cls, report_id, scrubbed_by):
+        """See scrub_report for general documentaion of what this method does.
+        It's only safe to call this method from within a transaction.
 
         Args:
             report_id: str. The id of the model entity to scrub.

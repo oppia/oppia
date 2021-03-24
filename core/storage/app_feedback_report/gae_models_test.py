@@ -119,7 +119,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(report_model.android_report_info_schema_version, 1)
         self.assertEqual(report_model.web_report_info, None)
 
-    def test_scrub_report_model(self):
+    def test_scrub_report(self):
         report_id = '%s.%s.%s' % (
             self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
             'randomInteger123')
