@@ -35,7 +35,7 @@ class MockModel(base_models.BaseModel):
 
 
 class ValidatorErrorTestBase(unittest.TestCase):
-    """Base class for valiator error tests."""
+    """Base class for validator error tests."""
 
     def setUp(self):
         self.now = datetime.datetime.utcnow()
@@ -162,3 +162,35 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
             % (model.id, days))
 
         self.assertEqual(error.message, msg)
+
+
+class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
+    def test_model_invalid_commit_status(self):
+        model1 = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.year_ago,
+            last_updated=self.now,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='private',
+            post_commit_is_private=False,
+            commit_cmds=[])
+        error1 = errors.ModelInvalidCommitStatusError(model1)
+        model2 = base_models.BaseCommitLogEntryModel(
+            id=124,
+            created_on=self.year_ago,
+            last_updated=self.now,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='public',
+            post_commit_is_private=True,
+            commit_cmds=[])
+        error2 = errors.ModelInvalidCommitStatusError(model2)
+        msg1 = (
+            'Entity id %s: Post commit status is private but '
+            'post_commit_is_private is False' % model1.id)
+        msg2 = (
+            'Entity id %s: Post commit status is public but '
+            'post_commit_is_private is True' % model2.id)
+        self.assertEqual(error1.message, msg1)
+        self.assertEqual(error2.message, msg2)
