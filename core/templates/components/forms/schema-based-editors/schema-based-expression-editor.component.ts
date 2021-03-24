@@ -23,7 +23,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   selector: 'schema-based-expression-editor',
   templateUrl: './schema-based-expression-editor.component.html'
 })
-export class SchemaBasedExpressionEditor {
+export class SchemaBasedExpressionEditorComponent {
   @Input() localValue: string;
   @Output() localValueChange: EventEmitter<string> = (
     new EventEmitter());
@@ -37,4 +37,4 @@ export class SchemaBasedExpressionEditor {
 }
 
 angular.module('oppia').directive('schemaBasedExpressionEditor',
-  downgradeComponent({ component: SchemaBasedExpressionEditor }));
+  downgradeComponent({ component: SchemaBasedExpressionEditorComponent }));
