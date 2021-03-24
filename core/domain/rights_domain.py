@@ -246,6 +246,11 @@ class ActivityRights(python_utils.OBJECT):
             str. The previous role of the user.
         """
         old_role = ROLE_NONE
+        if new_role == ROLE_VIEWER:
+            if self.status != ACTIVITY_STATUS_PRIVATE:
+                raise Exception(
+                    'Public explorations can be viewed by anyone.')
+
         for role, user_ids in python_utils.ZIP(
                 [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
                 [self.owner_ids, self.editor_ids, self.viewer_ids,
