@@ -26,7 +26,7 @@ import { ExplorationFeatures } from
 export interface ExplorationDataDict {
   'param_changes': ParamChanges[] | [];
   states: {
-    [propsName : string]: {
+    [propsName: string]: {
       'param_changes': ParamChanges[] | []
     }
   };
