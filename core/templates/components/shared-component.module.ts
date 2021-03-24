@@ -58,6 +58,7 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
+import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 
 
 
@@ -99,6 +100,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FocusOnDirective,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -135,6 +137,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // These elements will remain here even after migration.
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -160,6 +163,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     FocusOnDirective,
+    ImageUploaderComponent,
     SharingLinksComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
