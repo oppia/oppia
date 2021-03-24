@@ -20,7 +20,8 @@ export class TranslationError {
   constructor(
     private _hasUncopiedImgs: boolean,
     private _hasDuplicateAltTexts: boolean,
-    private _hasDuplicateDescriptions: boolean) {}
+    private _hasDuplicateDescriptions: boolean,
+    private _hasUntranslatedElements: boolean) {}
 
   get hasDuplicateDescriptions(): boolean {
     return this._hasDuplicateDescriptions;
@@ -30,6 +31,9 @@ export class TranslationError {
   }
   get hasUncopiedImgs(): boolean {
     return this._hasUncopiedImgs;
+  }
+  get hasUntranslatedElements(): boolean {
+    return this._hasUntranslatedElements;
   }
 }
 
@@ -113,7 +117,7 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.validateParagraphCopy = function($event) {
       // Mathematical equations are also wrapped by <p> elements.
       // Hence, math elements should be allowed to be copied.
-      // It is related to issue 11683.
+      // See issue #11683.
       const paragraphChildrenElements: HTMLElement[] = (
         $event.target.localName === 'p') ? Array.from(
           $event.target.children) : [];
@@ -154,7 +158,7 @@ angular.module('oppia').controller('TranslationModalController', [
       return attributes.filter(attribute => attribute);
     };
 
-    $scope.copiedAllElements = function(originalElements, translatedElements) {
+    $scope.notCopiedAllElements = function(originalElements, translatedElements) {
       const hasMatchingTranslatedElement = (element) => (
         translatedElements.includes(element));
       return !originalElements.every(hasMatchingTranslatedElement);
@@ -166,7 +170,7 @@ angular.module('oppia').controller('TranslationModalController', [
       }
       const hasMatchingTranslatedElement = (element) => (
         translatedElements.includes(element) && originalElements.length > 0);
-      return originalElements.every(hasMatchingTranslatedElement);
+      return originalElements.some(hasMatchingTranslatedElement);
     };
 
     $scope.getTexts = function(rawText) {
@@ -184,12 +188,28 @@ angular.module('oppia').controller('TranslationModalController', [
       };
     };
 
+    $scope.isTranslationCompleted = function(
+      originalElements: [HTMLElement], translatedElements: [HTMLElement]) {
+
+        const originalHtmlElements = Array.from(originalElements, element => element.nodeName);
+        const translatedHtmlElements = Array.from(translatedElements, element => element.nodeName);
+        
+        for (const originalElement of new Set(originalHtmlElements)) {
+          if (
+            !(translatedHtmlElements.some(element => element === originalElement)) ||
+            originalHtmlElements.filter(element => element === originalElement).length > translatedHtmlElements.filter(element => element === originalElement).length
+          )
+            return false;
+        }
+        return true;
+    }
+
     $scope.validateImages = function(
         textToTranslate, translatedText): TranslationError {
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
 
-      const hasUncopiedImgs = $scope.copiedAllElements(
+      const hasUncopiedImgs = $scope.notCopiedAllElements(
         originalElements.foundImageFilePaths,
         translatedElements.foundImageFilePaths);
       const hasDuplicateAltTexts = $scope.changedImgDetails(
@@ -198,10 +218,12 @@ angular.module('oppia').controller('TranslationModalController', [
       const hasDuplicateDescriptions = $scope.changedImgDetails(
         originalElements.foundImageDescriptions,
         translatedElements.foundImageDescriptions);
+      const hasUntranslatedElements = !($scope.isTranslationCompleted(
+        textToTranslate, translatedText));
 
       return new TranslationError(
         hasUncopiedImgs, hasDuplicateAltTexts,
-        hasDuplicateDescriptions);
+        hasDuplicateDescriptions, hasUntranslatedElements);
     };
 
     $scope.returnToPreviousTranslation = function() {
@@ -214,49 +236,59 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.suggestTranslatedText = function() {
       $scope.hasImgCopyError = false;
       $scope.hasImgTextError = false;
+      $scope.incompleteTranslationError = false;
+
       const originalElements = angular.element(
         $scope.textToTranslate);
       const translatedElements = angular.element(
         $scope.activeWrittenTranslation.html);
 
-      let translationError = $scope.validateImages(
+      const translationError = $scope.validateImages(
         originalElements, translatedElements);
 
-      if (translationError.hasUncopiedImgs) {
-        $scope.hasImgCopyError = true;
-      } else if (translationError.hasDuplicateAltTexts ||
-        translationError.hasDuplicateDescriptions) {
-        $scope.hasImgTextError = true;
-      } else {
-        if (!$scope.uploadingTranslation && !$scope.loadingData) {
-          SiteAnalyticsService.
-            registerContributorDashboardSubmitSuggestionEvent('Translation');
-          $scope.uploadingTranslation = true;
-          var imagesData = ImageLocalStorageService.getStoredImagesData();
-          ImageLocalStorageService.flushStoredImagesData();
-          ContextService.resetImageSaveDestination();
-          TranslateTextService.suggestTranslatedText(
-            $scope.activeWrittenTranslation.html,
-            TranslationLanguageService.getActiveLanguageCode(),
-            imagesData, function() {
-              AlertsService.addSuccessMessage(
-                'Submitted translation for review.');
-              if ($scope.moreAvailable) {
-                var textAndAvailability = (
-                  TranslateTextService.getTextToTranslate());
-                $scope.textToTranslate = textAndAvailability.text;
-                $scope.moreAvailable = textAndAvailability.more;
-              }
-              $scope.previousTranslationAvailable = true;
-              $scope.activeWrittenTranslation.html = '';
-              $scope.uploadingTranslation = false;
-            }, () => {
-              $uibModalInstance.close();
-            });
-        }
-        if (!$scope.moreAvailable) {
-          $uibModalInstance.close();
-        }
+      $scope.hasImgCopyError = translationError.hasUncopiedImgs;
+      $scope.hasImgTextError = translationError.hasDuplicateAltTexts ||
+        translationError.hasDuplicateDescriptions;
+      $scope.incompleteTranslationError = translationError.hasUntranslatedElements;
+
+      if ($scope.hasImgCopyError) {
+        return;
+      }
+      if ($scope.hasImgTextError) {
+        return;
+      }
+      if ($scope.incompleteTranslationError) {
+        return;
+      }
+      if ($scope.uploadingTranslation || $scope.loadingData) {
+        return; 
+      }
+      SiteAnalyticsService.
+          registerContributorDashboardSubmitSuggestionEvent('Translation');
+        $scope.uploadingTranslation = true;
+        var imagesData = ImageLocalStorageService.getStoredImagesData();
+        ImageLocalStorageService.flushStoredImagesData();
+        ContextService.resetImageSaveDestination();
+        TranslateTextService.suggestTranslatedText(
+          $scope.activeWrittenTranslation.html,
+          TranslationLanguageService.getActiveLanguageCode(),
+          imagesData, function() {
+            AlertsService.addSuccessMessage(
+              'Submitted translation for review.');
+            if ($scope.moreAvailable) {
+              var textAndAvailability = (
+                TranslateTextService.getTextToTranslate());
+              $scope.textToTranslate = textAndAvailability.text;
+              $scope.moreAvailable = textAndAvailability.more;
+            }
+            $scope.previousTranslationAvailable = true;
+            $scope.activeWrittenTranslation.html = '';
+            $scope.uploadingTranslation = false;
+          }, () => {
+            $uibModalInstance.close();
+          });
+      if (!$scope.moreAvailable) {
+        $uibModalInstance.close();
       }
     };
   }
