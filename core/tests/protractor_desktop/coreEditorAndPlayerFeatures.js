@@ -82,17 +82,18 @@ describe('Enable correctness feedback and set correctness', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    await workflow.createExploration();
+  });
+
+  it('should allow selecting correct feedback from the response editor ' +
+     'after the interaction is created', async function() {
+    await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
     await explorationEditorSettingsTab.setCategory('Algorithm');
     await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.navigateToMainTab();
-  });
 
-  it('should allow selecting correct feedback from the response editor ' +
-     'after the interaction is created', async function() {
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Select the right option.'));
@@ -126,6 +127,14 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the response editor ' +
      'during set the interaction', async function() {
+    await workflow.createExploration(false);
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(explorationTitle);
+    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.navigateToMainTab();
+
     // Turn on correctness feedback first.
     await enableCorrectnessFeedbackSetting();
 
@@ -160,6 +169,13 @@ describe('Enable correctness feedback and set correctness', function() {
 
   it('should allow selecting correct feedback from the default response editor',
     async function() {
+      await workflow.createExploration(false);
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle(explorationTitle);
+      await explorationEditorSettingsTab.setCategory('Algorithm');
+      await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+      await explorationEditorSettingsTab.setLanguage('English');
+      await explorationEditorPage.navigateToMainTab();
       // Turn on correctness feedback first.
       await enableCorrectnessFeedbackSetting();
 
@@ -186,6 +202,14 @@ describe('Enable correctness feedback and set correctness', function() {
     });
 
   it('should show Learn Again button correctly', async function() {
+    await workflow.createExploration(false);
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(explorationTitle);
+    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.navigateToMainTab();
+
     // Turn on correctness feedback first.
     await enableCorrectnessFeedbackSetting();
 
@@ -283,7 +307,7 @@ describe('Core exploration functionality', function() {
     await users.createUser(
       `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
     await users.login(`user${userNumber}@stateEditor.com`);
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     userNumber++;
   });

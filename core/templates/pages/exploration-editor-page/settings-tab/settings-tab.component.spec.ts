@@ -424,10 +424,12 @@ describe('Settings Tab Component', () => {
         result: $q.resolve('Email body')
       });
       spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
-        .callFake((emailBody, callback) => {
-          callback();
+        .callFake((emailBody) => {
           return $q.resolve();
         });
+      ctrl.canUnpublish = false;
+      ctrl.canReleaseOwnership = false;
+
       $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
         draft_email_body: 'Draf message'
       });
@@ -436,7 +438,11 @@ describe('Settings Tab Component', () => {
       $scope.$apply();
 
       expect(explorationRightsService.saveModeratorChangeToBackendAsync)
-        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
+        .toHaveBeenCalledWith('Email body');
+      expect(userExplorationPermissionsService.fetchPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canUnpublish).toBe(true);
+      expect(ctrl.canReleaseOwnership).toBe(true);
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
@@ -495,7 +501,7 @@ describe('Settings Tab Component', () => {
       ctrl.editRole('Username1', 'editor');
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
-        'Username1', 'editor', jasmine.any(Function));
+        'Username1', 'editor');
       expect(ctrl.isRolesFormOpen).toBe(false);
     });
 
@@ -572,7 +578,7 @@ describe('Settings Tab Component', () => {
       ctrl.toggleViewabilityIfPrivate();
 
       expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
-        true, jasmine.any(Function));
+        true);
     });
 
     it('should refresh settings tab when refreshSettingsTab event occurs',
