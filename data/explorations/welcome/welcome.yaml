@@ -8,7 +8,7 @@ language_code: en
 objective: become familiar with Oppia's capabilities
 param_changes: []
 param_specs: {}
-schema_version: 43
+schema_version: 47
 states:
   END:
     classifier_model_id: null
@@ -175,8 +175,8 @@ states:
         \ &amp;quot;x=11&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_151542_toclmk6i95_height_2d021_width_6d795_vertical_0d241.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
         \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;,\
-        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_151657_43i02glydt_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"></oppia-noninteractive-math>?</p><p>\_\
-        </p>"
+        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_151657_43i02glydt_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>?</p><p>\_</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -457,7 +457,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: greek
+            x:
+              contentId: rule_input_17
+              normalizedStrSet:
+              - greek
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -477,7 +480,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: roman
+            x:
+              contentId: rule_input_18
+              normalizedStrSet:
+              - roman
           rule_type: Contains
         tagged_skill_misconception_id: null
         training_data: []
@@ -497,7 +503,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: latin
+            x:
+              contentId: rule_input_19
+              normalizedStrSet:
+              - latin
           rule_type: Contains
         tagged_skill_misconception_id: null
         training_data: []
@@ -513,7 +522,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: Swedish
+            x:
+              contentId: rule_input_20
+              normalizedStrSet:
+              - Swedish
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -529,7 +541,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: translate oppia
+            x:
+              contentId: rule_input_21
+              normalizedStrSet:
+              - translate oppia
           rule_type: Contains
         tagged_skill_misconception_id: null
         training_data: []
@@ -545,7 +560,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: finish
+            x:
+              contentId: rule_input_22
+              normalizedStrSet:
+              - finish
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -564,7 +582,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: finnish
+            x:
+              contentId: rule_input_23
+              normalizedStrSet:
+              - finnish
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -580,7 +601,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: finnish
+            x:
+              contentId: rule_input_24
+              normalizedStrSet:
+              - finnish
           rule_type: FuzzyEquals
         tagged_skill_misconception_id: null
         training_data: []
@@ -595,7 +619,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 'yes'
+            x:
+              contentId: rule_input_25
+              normalizedStrSet:
+              - 'yes'
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -611,7 +638,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: German
+            x:
+              contentId: rule_input_26
+              normalizedStrSet:
+              - German
           rule_type: Contains
         tagged_skill_misconception_id: null
         training_data: []
@@ -628,7 +658,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: French
+            x:
+              contentId: rule_input_27
+              normalizedStrSet:
+              - French
           rule_type: Contains
         tagged_skill_misconception_id: null
         training_data: []
@@ -647,7 +680,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: suomi
+            x:
+              contentId: rule_input_28
+              normalizedStrSet:
+              - suomi
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -662,7 +698,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: Finland
+            x:
+              contentId: rule_input_29
+              normalizedStrSet:
+              - Finland
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -677,7 +716,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: Norway
+            x:
+              contentId: rule_input_30
+              normalizedStrSet:
+              - Norway
           rule_type: Contains
         tagged_skill_misconception_id: null
         training_data: []
@@ -693,7 +735,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: Sweden
+            x:
+              contentId: rule_input_31
+              normalizedStrSet:
+              - Sweden
           rule_type: Contains
         tagged_skill_misconception_id: null
         training_data: []
@@ -719,7 +764,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 17
+    next_content_id_index: 32
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -741,6 +786,21 @@ states:
         feedback_7: {}
         feedback_8: {}
         feedback_9: {}
+        rule_input_17: {}
+        rule_input_18: {}
+        rule_input_19: {}
+        rule_input_20: {}
+        rule_input_21: {}
+        rule_input_22: {}
+        rule_input_23: {}
+        rule_input_24: {}
+        rule_input_25: {}
+        rule_input_26: {}
+        rule_input_27: {}
+        rule_input_28: {}
+        rule_input_29: {}
+        rule_input_30: {}
+        rule_input_31: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -762,6 +822,21 @@ states:
         feedback_7: {}
         feedback_8: {}
         feedback_9: {}
-states_schema_version: 38
+        rule_input_17: {}
+        rule_input_18: {}
+        rule_input_19: {}
+        rule_input_20: {}
+        rule_input_21: {}
+        rule_input_22: {}
+        rule_input_23: {}
+        rule_input_24: {}
+        rule_input_25: {}
+        rule_input_26: {}
+        rule_input_27: {}
+        rule_input_28: {}
+        rule_input_29: {}
+        rule_input_30: {}
+        rule_input_31: {}
+states_schema_version: 42
 tags: []
 title: Welcome to Oppia!

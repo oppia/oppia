@@ -144,14 +144,22 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_ignores_automated_exploration_commits(self):
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                EXP_ID, title=EXP_TITLE)
+            exp_services.save_new_exploration(USER_ID, exploration)
+
+        # Confirm that the exploration is at version 1.
+        exploration = exp_fetchers.get_exploration_by_id(EXP_ID)
+        self.assertEqual(exploration.version, 1)
+
         with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
-            self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
-
-            # Confirm that the exploration is at version 1.
-            exploration = exp_fetchers.get_exploration_by_id(EXP_ID)
-            self.assertEqual(exploration.version, 1)
 
             v1_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))

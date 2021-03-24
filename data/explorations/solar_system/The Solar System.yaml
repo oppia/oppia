@@ -8,15 +8,13 @@ language_code: en
 objective: Learn about the planets of the solar system
 param_changes: []
 param_specs: {}
-schema_version: 30
+schema_version: 47
 states:
   END:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -27,17 +25,20 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
   Exit:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Do you want to quit?</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
     interaction:
       answer_groups:
       - outcome:
@@ -53,7 +54,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -68,14 +69,18 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - <p>Yes</p>
-          - <p>No</p>
+          - content_id: ca_choices_3
+            html: <p>Yes</p>
+          - content_id: ca_choices_4
+            html: <p>No</p>
+        showChoicesInShuffledOrder:
+          value: false
       default_outcome:
         dest: Exit
         feedback:
@@ -88,27 +93,33 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 5
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
   First State:
     classifier_model_id: null
     content:
       content_id: content
       html: "<p>Our Solar System consists of nine planets orbiting around our sun:\
         \ Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto.\
-        \ They range from huge gas giants to small icy dwarf planets.</p><p>\_</p><p>Click\
-        \ on the planets below to find out more about each one!</p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      feedback_3: {}
-      feedback_4: {}
-      feedback_5: {}
-      feedback_6: {}
-      feedback_7: {}
-      feedback_8: {}
-      feedback_9: {}
+        \ They range from huge gas giants to small icy dwarf planets.</p><p>\xC2\_\
+        </p><p>Click on the planets below to find out more about each one!</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -126,7 +137,7 @@ states:
         - inputs:
             x: '1'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -145,7 +156,7 @@ states:
         - inputs:
             x: '2'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -163,7 +174,7 @@ states:
         - inputs:
             x: '3'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -182,7 +193,7 @@ states:
         - inputs:
             x: '4'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -202,7 +213,7 @@ states:
         - inputs:
             x: '5'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -211,7 +222,7 @@ states:
             html: "<p>Saturn, the sixth planet from the sun, is most well known for\
               \ its beautiful rings of ice and dust orbiting around it. Like Jupiter,\
               \ it is a gas giant, mostly made of layers of hydrogen which get progressively\
-              \ denser towards its solid core.\_</p>"
+              \ denser towards its solid core.\xC2\_</p>"
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -220,7 +231,7 @@ states:
         - inputs:
             x: '6'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -238,7 +249,7 @@ states:
         - inputs:
             x: '7'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -257,7 +268,7 @@ states:
         - inputs:
             x: '8'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: First State
@@ -275,7 +286,7 @@ states:
         - inputs:
             x: '9'
           rule_type: IsInRegion
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -369,7 +380,35 @@ states:
       hints: []
       id: ImageClickInput
       solution: null
+    next_content_id_index: 10
     param_changes: []
-states_schema_version: 25
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+states_schema_version: 42
 tags: []
 title: The Solar System
