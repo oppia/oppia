@@ -1729,7 +1729,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': '1.2 + 3'
+                    'x': '1,2 + 3'
                 },
                 'rule_type': 'IsMathematicallyEquivalentTo'
             }],
