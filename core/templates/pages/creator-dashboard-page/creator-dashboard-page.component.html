@@ -360,8 +360,7 @@
     <ul class="oppia-dashboard-tiles"
         ng-if="$ctrl.activeTab === 'myCollections' && $ctrl.collectionsList.length > 0">
       <span ng-repeat="collection in $ctrl.collectionsList">
-        <collection-summary-tile class="protractor-test-collection-card"
-                                 [get-collection-id]="collection.id"
+        <collection-summary-tile [get-collection-id]="collection.id"
                                  [get-collection-title]="collection.title"
                                  [get-last-updated-msec]="collection.lastUpdatedMsec"
                                  [get-node-count]="collection.nodeCount"

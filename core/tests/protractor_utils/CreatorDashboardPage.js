@@ -102,6 +102,8 @@ var CreatorDashboardPage = function() {
   };
 
   this.navigateToCollectionEditor = async function() {
+    await waitFor.visibilityOf(
+      collectionCard, 'Unable to find collection card');
     await action.click('Collection Card', collectionCard);
     await waitFor.pageToFullyLoad();
   };
