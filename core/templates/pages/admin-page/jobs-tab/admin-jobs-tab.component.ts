@@ -60,7 +60,7 @@ export class AdminJobsTabComponent {
   }
 
   startNewJob(
-      jobType: string) : void {
+      jobType: string): void {
     this.setStatusMessage.emit('Starting new job...');
     this.adminBackendApiService.startNewJobAsync(jobType).then(() => {
       this.setStatusMessage.emit('Job started successfully.');
