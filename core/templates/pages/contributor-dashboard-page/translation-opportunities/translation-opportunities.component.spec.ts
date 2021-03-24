@@ -53,7 +53,7 @@ describe('Translation opportunities component', () => {
     'en', null, null, false
   );
 
-  let opportunitiesArray : ExplorationOpportunitySummary[] = [];
+  let opportunitiesArray: ExplorationOpportunitySummary[] = [];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
