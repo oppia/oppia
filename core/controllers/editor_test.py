@@ -33,6 +33,7 @@ from core.domain import exp_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -1621,7 +1622,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             category='category',
             title='title',
             language_code='invalid_language_code',
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.State.create_default_state(
+                        'End', is_initial_state=True
+                    ).to_dict()),
+            },
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
         commit_cmd = exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_CREATE_NEW,
