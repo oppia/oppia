@@ -202,7 +202,7 @@ angular.module('oppia').controller('TranslationModalController', [
           !(translatedHtmlElements.some(
             element => element === originalElement)) ||
           originalHtmlElements.filter(
-            element => element === originalElement).length > 
+            element => element === originalElement).length >
             translatedHtmlElements.filter(
               element => element === originalElement).length
         )
