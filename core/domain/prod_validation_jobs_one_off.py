@@ -149,7 +149,7 @@ class ActivityReferencesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [activity_models.ActivityReferencesModel]
 
 
-class AppFeedbackReportModelAuditOneOfJob(ProdValidationAuditOneOffJob):
+class AppFeedbackReportModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates AppFeedbackReportModel."""
 
     @classmethod
@@ -157,7 +157,7 @@ class AppFeedbackReportModelAuditOneOfJob(ProdValidationAuditOneOffJob):
         return [app_feedback_report_models.AppFeedbackReportModel]
 
 
-class AppFeedbackReportTicketModelAuditOneOfJob(ProdValidationAuditOneOffJob):
+class AppFeedbackReportTicketModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates AppFeedbackReportTicketModel."""
 
     @classmethod
@@ -165,7 +165,7 @@ class AppFeedbackReportTicketModelAuditOneOfJob(ProdValidationAuditOneOffJob):
         return [app_feedback_report_models.AppFeedbackReportTicketModel]
 
 
-class AppFeedbackReportStatsModelAuditOneOfJob(ProdValidationAuditOneOffJob):
+class AppFeedbackReportStatsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates AppFeedbackReportStatsModel."""
 
     @classmethod

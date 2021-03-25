@@ -30,7 +30,7 @@ from core.platform import models
 
 
 class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validaton AppFeedbackReportModel."""
+    """Class for validating AppFeedbackReportModel."""
 
     # Timestamp in sec since epoch for Apr 1 2021 12:00:00 UTC.
     EARLIEST_DATETIME = datetime.datetime.fromtimestamp(1617235200)
@@ -60,7 +60,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
 class AppFeedbackReportTicketModelValidator(
     base_model_validators.BaseModelValidator):
-"""Class for validaton AppFeedbackReportTicketModel."""
+    """Class for validating AppFeedbackReportTicketModel."""
 
     # The length of a AppFeedbackReportTicketModel id is 
     REPORT_ID_LENGTH = 12+12+2+
@@ -99,7 +99,7 @@ class AppFeedbackReportTicketModelValidator(
 
 class AppFeedbackReportStatsModelValidator(
     base_model_validators.BaseModelValidator):
-"""Class for validaton AppFeedbackReportStatsModel."""
+"""Class for validating AppFeedbackReportStatsModel."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
