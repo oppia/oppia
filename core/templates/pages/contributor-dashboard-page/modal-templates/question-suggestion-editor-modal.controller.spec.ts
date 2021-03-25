@@ -241,9 +241,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
 
     it('should open skill difficulty selection modal on clicking' +
         ' change difficulty icon', function() {
-      var uibSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      var uibSpy = spyOn($uibModal, 'open').and.callThrough();
       $scope.onClickChangeDifficulty();
       $scope.$apply();
       $flushPendingTasks();
@@ -262,6 +260,16 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $flushPendingTasks();
       expect($scope.skillDifficulty).toBe(0.6);
       expect($scope.skillDifficultyString).toBe('Medium');
+    });
+
+    it('should dismiss modal if cancel button is clicked', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      $scope.onClickChangeDifficulty();
+      $scope.cancel();
+      $scope.$apply();
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
   });
   describe('when question is not valid', function() {
