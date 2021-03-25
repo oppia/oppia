@@ -955,7 +955,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._match_line_breaks_in_controller_dependencies())
         linter_stdout.append(self._check_constants_declaration())
         linter_stdout.append(self._check_comments())
-        linter_stdout.append(self._check_ts_ignore())
         linter_stdout.append(self._check_ts_expect_error())
         linter_stdout.append(self._check_angular_services_index())
 
