@@ -110,40 +110,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
 
-        # Check whether there is space around attributes.
-        # An = is followed by ".
-        tag_substrings = starttag_text.split()
-        required_attribute_suffix = '"'
-        conditional_statement_chars = ['=', '>', '<', '!']
-        for index, tag_substring in enumerate(tag_substrings):
-            error_message = None
-            if index < len(tag_substrings) - 1:
-                next_value = tag_substrings[index + 1]
-                next_value_first_char = next_value[0] if next_value else None
-            else:
-                next_value_first_char = None
-            if tag_substring == '=':
-                if next_value_first_char == required_attribute_suffix:
-                    error_message = (
-                        '%s --> Attribute for tag %s on line '
-                        '%s has unwanted white spaces around it' % (
-                            self.filepath, tag, line_number))
-            elif tag_substring.startswith('='):
-                if tag_substring[1] == required_attribute_suffix:
-                    error_message = (
-                        '%s --> Attribute for tag %s on line '
-                        '%s has unwanted white spaces before %s' % (
-                            self.filepath, tag, line_number, tag_substring))
-            elif tag_substring.endswith('='):
-                if (next_value_first_char == required_attribute_suffix and
-                        tag_substring[-2] not in conditional_statement_chars):
-                    error_message = (
-                        '%s --> Attribute for tag %s on line '
-                        '%s has unwanted white spaces after %s' % (
-                            self.filepath, tag, line_number, tag_substring))
-            if error_message:
-                self.failed = True
-                self.error_messages.append(error_message)
 
         # Check whether the values of all attributes are placed
         # in double quotes.
@@ -168,6 +134,27 @@ class CustomHTMLParser(html.parser.HTMLParser):
                         'be enclosed within double quotes.' % (
                             self.filepath, value, attr,
                             tag, line_number))
+                    self.error_messages.append(error_message)
+
+                # Check if there are any white spaces around
+                # attribute assignment
+
+                if starttag_text.find(attr) < 0:
+                    # Attribute names are case insensitive,
+                    # So attr name might not match the
+                    # actual attr name in tag.
+                    attr_pos = starttag_text.lower().find(attr)
+                    attr_name = starttag_text[attr_pos:attr_pos+len(attr)]
+                    expected_attr_assignment = '{}="{}"'.format(attr_name, value)
+                else:
+                    expected_attr_assignment = '{}="{}"'.format(attr, value)
+
+                if starttag_text.find(expected_attr_assignment) < 0:
+                    self.failed = True
+                    error_message = (
+                        '%s --> Attribute %s for tag %s on line '
+                        '%s has unwanted white spaces around it' % (
+                            self.filepath, attr, tag, line_number))
                     self.error_messages.append(error_message)
 
         for line_num, line in enumerate(starttag_text.splitlines()):

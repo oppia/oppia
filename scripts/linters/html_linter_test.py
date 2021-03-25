@@ -52,10 +52,8 @@ INVALID_MISMATCHED_TAGS_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_mismatched_tags.html')
 INVALID_SPACE_AROUND_ATTRIBUTE_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_space_around_attribute.html')
-INVALID_SPACE_BEFORE_ATTRIBUTE_VALUE_HTML_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_space_before_attribute_value.html')
-INVALID_SPACE_AFTER_ATTRIBUTE_KEY_HTML_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_space_after_attribute_key.html')
+INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_space_around_innerhtml_attribute.html')
 
 
 class CustomHTMLParserTests(test_utils.LinterTestBase):
@@ -140,28 +138,18 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [INVALID_SPACE_AROUND_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
-            'Attribute for tag div on line 4 ',
+            'Attribute class for tag div on line 4 ',
             'has unwanted white spaces around it'
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)
 
-    def test_custom_space_before_html_attribute_value(self):
+    def test_custom_space_innerhtml_attribute(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [INVALID_SPACE_BEFORE_ATTRIBUTE_VALUE_HTML_FILEPATH], FILE_CACHE
+            [INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
-            'Attribute for tag div on line 4 ',
-            'has unwanted white spaces before ="dummy"'
-        ], lint_task_report.trimmed_messages)
-        self.assertTrue(lint_task_report)
-
-    def test_custom_space_after_html_attribute_key(self):
-        lint_task_report = html_linter.HTMLLintChecksManager(
-            [INVALID_SPACE_AFTER_ATTRIBUTE_KEY_HTML_FILEPATH], FILE_CACHE
-        ).check_html_tags_and_attributes()
-        self.assert_same_list_elements([
-            'Attribute for tag div on line 4 ',
-            'has unwanted white spaces after class'
+            'Attribute [innerhtml] for tag h1 on line 5 ',
+            'has unwanted white spaces around it'
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)
 
