@@ -141,7 +141,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         super(FeedbackThreadIntegrationTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
@@ -387,7 +387,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.owner_2 = user_services.UserActionsInfo(self.owner_id_2)
+        self.owner_2 = user_services.get_user_actions_info(self.owner_id_2)
 
         # Create an exploration.
         self.save_new_valid_exploration(
