@@ -21,10 +21,12 @@
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { UrlService } from 'services/contextual/url.service';
 
 describe('Question Player Concept Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
+  var urlService: UrlService = null;
   var SkillObjectFactory = null;
 
   var skillIds = ['skill1', 'skill2'];
@@ -45,7 +47,8 @@ describe('Question Player Concept Card Modal Controller', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
     $provide.value('UrlService', {
-      getPathname: () => 'pathname'
+      getPathname: () => 'pathname',
+      getUrlParams: () => 'getUrlParams'
     });
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -53,6 +56,7 @@ describe('Question Player Concept Card Modal Controller', function() {
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
+    urlService = $injector.get('UrlService');
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
@@ -132,7 +136,11 @@ describe('Question Player Concept Card Modal Controller', function() {
   });
 
   it('should refresh page when retrying a practice test', function() {
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      selected_subtopic_ids: 'selected_subtopic_ids'
+    });
     $scope.retryTest();
-    expect(mockWindow.location.replace).toHaveBeenCalledWith('pathname');
+    expect(mockWindow.location.replace).toHaveBeenCalledWith(
+      'pathname?selected_subtopic_ids=selected_subtopic_ids');
   });
 });

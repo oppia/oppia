@@ -60,7 +60,6 @@ import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/crea
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
@@ -338,6 +337,7 @@ import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { QuestionValidationService } from './question-validation.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
@@ -353,7 +353,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['AngularNameService', AngularNameService],
   ['AnswerClassificationService', AnswerClassificationService],
   ['AnswerGroupObjectFactory', AnswerGroupObjectFactory],
-  ['AnswerStatsObjectFactory', AnswerStatsObjectFactory],
   ['AppService', AppService],
   ['AssetsBackendApiService', AssetsBackendApiService],
   ['AttributionService', AttributionService],
@@ -692,5 +691,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['baseInteractionValidationService', baseInteractionValidationService],
-  ['CollectionEditorStateService', CollectionEditorStateService]
+  ['UndoRedoService', UndoRedoService],
+  ['QuestionValidationService', QuestionValidationService],
+  ['CollectionEditorStateService', CollectionEditorStateService],
 ];

@@ -25,8 +25,8 @@ import itertools
 import logging
 import re
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
@@ -595,12 +595,10 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             bool. Whether the interaction is supported by the Android app.
         """
-        if self.id:
-            return (
-                self.id in
-                android_validation_constants.VALID_INTERACTION_IDS)
-
-        return True
+        return (
+            self.id is None or
+            self.id in android_validation_constants.VALID_INTERACTION_IDS
+        )
 
     def is_rte_content_supported_on_android(
             self, require_valid_component_names):
@@ -2887,7 +2885,6 @@ class State(python_utils.OBJECT):
 
         new_content_id_list = [
             hint.hint_content.content_id for hint in self.interaction.hints]
-
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 

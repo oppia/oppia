@@ -59,7 +59,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
@@ -1030,7 +1030,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration.
         self.login(self.EDITOR_EMAIL)
@@ -1141,7 +1141,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         # Save and publish explorations.
         self.save_new_valid_exploration(
@@ -1564,6 +1564,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1632,6 +1633,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1674,6 +1676,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5'
         ]
+        model.update_timestamps()
         model.put()
 
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {

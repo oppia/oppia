@@ -153,6 +153,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         deleted_user_model = (
             user_models.UserSettingsModel.get_by_id(deleted_user_id))
         deleted_user_model.deleted = True
+        deleted_user_model.update_timestamps()
         deleted_user_model.put()
 
     def test_that_no_get_results_in_500_error(self):
@@ -314,7 +315,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator = user_services.UserActionsInfo(creator_user_id)
+        creator = user_services.get_user_actions_info(creator_user_id)
         editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
         exploration_id = '1_en_test_exploration'
         self.save_new_valid_exploration(
