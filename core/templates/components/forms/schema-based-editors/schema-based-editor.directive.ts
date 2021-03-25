@@ -60,6 +60,7 @@ angular.module('oppia').directive('schemaBasedEditor', [
       bindToController: {
         schema: '&',
         isDisabled: '&',
+        notRequired: '&',
         localValue: '=',
         labelForFocusTarget: '&',
         onInputBlur: '=',

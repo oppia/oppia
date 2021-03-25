@@ -3,7 +3,7 @@
     <mat-form-field class="long oppia-blue-on-focus md-default-theme m-0">
       <input type="number" matInput [(ngModel)]="localValue" (change)="updateLocalValue()"
              [disabled]="isDisabled" required [attr.focus-on]="labelForFocusTarget"
-             (blur)="inputBlur.emit()" (focus)="inputFocus.emit()">
+             (blur)="inputBlur.emit()" (focus)="inputFocus.emit()" [required]="!notRequired" >
     </mat-form-field>
   </span>
 </div>

@@ -29,6 +29,7 @@ export class SchemaBasedIntEditorComponent {
     new EventEmitter());
   @Input() isDisabled: boolean;
   @Input() validators;
+  @Input() notRequired: boolean;
   @Input() labelForFocusTarget;
   @Output() inputBlur: EventEmitter<void> = new EventEmitter();
   @Output() inputFocus: EventEmitter<void> = new EventEmitter();
