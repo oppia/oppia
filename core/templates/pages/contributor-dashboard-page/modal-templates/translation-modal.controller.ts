@@ -190,7 +190,7 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.isTranslationCompleted = function(
-      originalElements: [HTMLElement], translatedElements: [HTMLElement]) {
+        originalElements: [HTMLElement], translatedElements: [HTMLElement]) {
       const originalHtmlElements = Array.from(
         originalElements, element => element.nodeName);
       const translatedHtmlElements = Array.from(
@@ -201,8 +201,8 @@ angular.module('oppia').controller('TranslationModalController', [
           !(translatedHtmlElements.some(
             element => element === originalElement)) ||
           originalHtmlElements.filter(
-            element => element === originalElement).length
-            > translatedHtmlElements.filter(
+            element => element === originalElement).length >
+            translatedHtmlElements.filter(
               element => element === originalElement).length
         ) {
           return false;
