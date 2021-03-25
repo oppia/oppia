@@ -77,7 +77,6 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       }
     };
 
-
     // Setup microphone inputs for mp3 audio processing.
     var _processMicAudio = function(stream) {
       definedAudioContext = new audioContextAvailable();
