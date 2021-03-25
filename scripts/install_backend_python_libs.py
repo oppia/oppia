@@ -210,6 +210,11 @@ def _remove_metadata(library_name, version_string):
         version_string: str. Stringified version of the library to remove the
             metadata for.
     """
+    if version_string.startswith('git'):
+        # Repositories installed directly from GitHub are guaranteed to have a
+        # valid metadata directory, because that's how we resolve the version
+        # string to begin with.
+        return
     possible_normalized_directory_names = (
         _get_possible_normalized_metadata_directory_names(
             library_name, version_string))
