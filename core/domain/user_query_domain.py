@@ -21,22 +21,22 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 
+from constants import constants
 import feconf
 import python_utils
 import utils
 
+attribute_names = [ # pylint: disable=invalid-name
+    predicate['backend_attr'] for predicate in (
+        constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
-UserQueryParams = collections.namedtuple(
-    'UserQueryParams',
-    [
-        'inactive_in_last_n_days',
-        'has_not_logged_in_for_n_days',
-        'created_at_least_n_exps',
-        'created_fewer_than_n_exps',
-        'edited_at_least_n_exps',
-        'edited_fewer_than_n_exps'
-    ]
-)
+UserQueryParams = collections.namedtuple( # pylint: disable=invalid-name
+    'UserQueryParams', attribute_names)
+
+# TODO(#12275): In python 2, the default values in collection has to be assigned
+# to None. Once migrated to python 3, this has to be removed.
+UserQueryParams.__new__.__defaults__ = (None,) * len(
+    UserQueryParams._fields)
 
 
 class UserQuery(python_utils.OBJECT):

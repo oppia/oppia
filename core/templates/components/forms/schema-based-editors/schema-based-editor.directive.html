@@ -10,7 +10,7 @@
 
 <schema-based-int-editor ng-if="$ctrl.schema().type === 'int' && !$ctrl.schema().choices"
                          local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
-                         validators="$ctrl.schema().validators"
+                         not-required="$ctrl.notRequired()" validators="$ctrl.schema().validators"
                          label-for-focus-target="$ctrl.labelForFocusTarget()"
                          on-input-blur="$ctrl.onInputBlur"
                          on-input-focus="$ctrl.onInputFocus">

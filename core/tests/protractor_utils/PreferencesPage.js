@@ -23,6 +23,8 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
+  var emailUpdatesCheckbox = element(
+    by.css('.protractor-test-email-updates-checkbox'));
   var editorRoleEmailsCheckbox = element(
     by.css('.protractor-test-editor-role-email-checkbox'));
   var feedbackMessageEmailsCheckbox = element(
@@ -92,6 +94,11 @@ var PreferencesPage = function() {
   this.editUserBio = async function(bio) {
     await action.sendKeys('User bio field', userBioElement, bio);
     await saveNewChanges('User Bio');
+  };
+
+  this.toggleEmailUpdatesCheckbox = async function() {
+    await action.click('Email Updates checkbox', emailUpdatesCheckbox);
+    await saveNewChanges('Email Updates');
   };
 
   this.toggleEditorRoleEmailsCheckbox = async function() {

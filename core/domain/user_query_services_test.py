@@ -110,24 +110,26 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             self.user_query_model_2.query_status, user_queries[0].status)
 
     def test_save_new_query_model(self):
-        inactive_in_last_n_days = 10
-        created_at_least_n_exps = 5
-        has_not_logged_in_for_n_days = 30
+        query_param = {
+            'inactive_in_last_n_days': 10,
+            'created_at_least_n_exps': 5,
+            'has_not_logged_in_for_n_days': 30
+        }
         user_query_id = user_query_services.save_new_user_query(
-            self.admin_user_id, inactive_in_last_n_days=inactive_in_last_n_days,
-            created_at_least_n_exps=created_at_least_n_exps,
-            has_not_logged_in_for_n_days=has_not_logged_in_for_n_days)
+            self.admin_user_id, query_param)
 
         query_model = user_models.UserQueryModel.get(user_query_id)
 
         self.assertEqual(query_model.submitter_id, self.admin_user_id)
         self.assertEqual(
-            query_model.inactive_in_last_n_days, inactive_in_last_n_days)
+            query_model.inactive_in_last_n_days,
+            query_param['inactive_in_last_n_days'])
         self.assertEqual(
-            query_model.created_at_least_n_exps, created_at_least_n_exps)
+            query_model.created_at_least_n_exps,
+            query_param['created_at_least_n_exps'])
         self.assertEqual(
             query_model.has_not_logged_in_for_n_days,
-            has_not_logged_in_for_n_days)
+            query_param['has_not_logged_in_for_n_days'])
         self.assertIsNone(query_model.created_fewer_than_n_exps)
         self.assertIsNone(query_model.edited_at_least_n_exps)
         self.assertIsNone(query_model.edited_fewer_than_n_exps)

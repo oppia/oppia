@@ -1878,8 +1878,13 @@ class UserQueryModel(base_models.BaseModel):
 
     The id of each instance of this model is alphanumeric id of length 12
     unique to each model instance.
+
+    This model turns off caching, because this results in stale data being
+    shown after each UserQueryOneOffJob.
     """
 
+    _use_cache = False
+    _use_memcache = False
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever

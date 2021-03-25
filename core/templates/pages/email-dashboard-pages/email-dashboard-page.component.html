@@ -1,26 +1,34 @@
-<div class="oppia-query-form">
-  <form class="form" ng-submit="$ctrl.submitQueryAsync()">
-    <label for="label-target-not-logged-n-days">Has not logged in for n days: </label>
-    <input id="label-target-not-logged-n-days" type="number" min="0" ng-model="$ctrl.hasNotLoggedInForNDays">
-    <br>
-    <label for="label-target-inactive-for-ndays">Inactive in last n days:</label>
-    <input id="label-target-inactive-for-ndays" type="number" min="0" ng-model="$ctrl.inactiveInLastNDays">
-    <br>
-    <label for="label-target-created-more-n-exps">Has created at least n explorations:</label>
-    <input id="label-target-created-more-n-exps" type="number" min="0" ng-model="$ctrl.createdAtLeastNExps">
-    <br>
-    <label for="label-target-created-fewer-n-exps">Has created fewer than n explorations:</label>
-    <input id="label-target-created-fewer-n-exps" type="number" min="0" ng-model="$ctrl.createdFewerThanNExps">
-    <br>
-    <label for="label-target-edited-more-n-exps">Has edited at least n explorations:</label>
-    <input id="label-target-edited-more-n-exps" type="number" min="0" ng-model="$ctrl.editedAtLeastNExps">
-    <br>
-    <label for="label-target-edited-fewer-n-exps">Has edited fewer than n explorations: </label>
-    <input id="label-target-edited-fewer-n-exps" type="number" min="0" ng-model="$ctrl.editedFewerThanNExps">
-    <br>
-    <input type="submit" value="submit query">
-    <input type="reset" value="reset" ng-click="$ctrl.resetForm()">
-  </form>
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-10">
+        <md-card class="oppia-page-card oppia-long-text">
+          <form class="form-horizontal" ng-submit="$ctrl.submitQueryAsync()" name="form.schemaForm">
+            <legend>Email Dashboard</legend>
+            <div ng-repeat="customizationArgSpec in $ctrl.customizationArgSpecs track by $index">
+              <div class="d-xl-inline-flex form-group">
+                <label class="col-3 col-form-label" for="label-target-role-method">
+                  <[customizationArgSpec.description]>:
+                </label>
+                <div class="col-7">
+                  <schema-based-editor local-value="$ctrl.data[customizationArgSpec.backend_attr]"
+                                       schema="customizationArgSpec.schema"
+                                       not-required="true"
+                                       class="protractor-test-email-dashboard-input-{{ $index }}">
+                  </schema-based-editor>
+                </div>
+              </div>
+            </div>
+            <input type="submit"
+                   value="submit query"
+                   ng-disabled="form.schemaForm.$invalid || $ctrl.areAllInputsEmpty()"
+                   class="protractor-test-submit-query-button">
+            <input type="reset" value="reset" ng-click="$ctrl.resetForm()">
+          </form>
+        </md-card>
+      </div>
+    </div>
+  </div>
   <p class="success" ng-if="$ctrl.showSuccessMessage">Query has been submitted successfully. Check recent queries below.</p>
   <div class="oppia-recent-queries">
     <p>Recent queries:</p>
@@ -39,9 +47,9 @@
           <td><[q.id]></td>
           <td><[q.createdOn]></td>
           <td><[q.submitterUsername]></td>
-          <td><[q.status]></td>
-          <td><[q.numQualifiedUsers]></td>
-          <td><button ng-click="$ctrl.recheckStatus($index)">Re-check status</button></td>
+          <td class="protractor-test-status-{{ $index }}"><[q.status]></td>
+          <td class="protractor-test-number-of-users-{{ $index }}"><[q.numQualifiedUsers]></td>
+          <td><button ng-click="$ctrl.recheckStatus($index)" class="protractor-test-check-status-button-{{ $index }}">Re-check status</button></td>
           <td ng-if="$ctrl.showLinkToResultPage(q.submitterUsername, q.status)">
             <a ng-href="/emaildashboardresult/<[q.id]>">
               <button class="btn btn-link">Result</button>

@@ -28,6 +28,7 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
       bindToController: {
         localValue: '=',
         isDisabled: '&',
+        notRequired: '&',
         validators: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',

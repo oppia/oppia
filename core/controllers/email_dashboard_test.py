@@ -35,6 +35,11 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     SUBMITTER_USERNAME = 'submit'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
+    SAMPLE_QUERY_PARAM = {
+        'inactive_in_last_n_days': 10,
+        'created_at_least_n_exps': 5,
+        'has_not_logged_in_for_n_days': 30
+    }
 
     def setUp(self):
         super(EmailDashboardDataHandlerTests, self).setUp()
@@ -103,9 +108,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         query_data = self.get_json(
             '/querystatuscheck', params={'query_id': user_query_id})['query']
@@ -175,6 +178,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     NEW_SUBMITTER_USERNAME = 'submit2'
     EXP_ID_1 = 'exp_1'
     EXP_ID_2 = 'exp_2'
+    SAMPLE_QUERY_PARAM = {
+        'inactive_in_last_n_days': 10,
+        'created_at_least_n_exps': 5,
+        'has_not_logged_in_for_n_days': 30
+    }
 
     def setUp(self):
         super(EmailDashboardResultTests, self).setUp()
@@ -254,9 +262,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.assertEqual(response['recent_queries'], [])
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         response = self.get_json(
             '/emaildashboarddatahandler',
@@ -277,9 +283,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -311,14 +315,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_1_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         user_query_2_id = user_query_services.save_new_user_query(
-            self.new_submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.new_submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -358,9 +358,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -391,14 +389,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_1_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         user_query_2_id = user_query_services.save_new_user_query(
-            self.new_submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.new_submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -437,9 +431,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -470,14 +462,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_1_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         user_query_2_id = user_query_services.save_new_user_query(
-            self.new_submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.new_submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
