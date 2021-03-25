@@ -117,7 +117,7 @@ class ModelExplorationIsPrivateError(ModelValidationError):
     """Error class for private exploration models."""
 
     def __init__(self, private_exp_id):
-        super(ModelExplorationNotExistError, self).__init__(private_exp_id)
+        super(ModelExplorationIsPrivateError, self).__init__(private_exp_id)
         self._message = (
             '%s Explorations with ids %s are private' % (
                 self.base_message, private_exp_id))
