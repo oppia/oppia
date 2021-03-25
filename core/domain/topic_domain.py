@@ -23,8 +23,8 @@ import copy
 import json
 import re
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 from core.domain import user_services
@@ -1671,8 +1671,9 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
-            thumbnail_filename, thumbnail_bg_color, url_fragment,
-            topic_model_created_on, topic_model_last_updated):
+            total_published_node_count, thumbnail_filename,
+            thumbnail_bg_color, url_fragment, topic_model_created_on,
+            topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -1691,6 +1692,8 @@ class TopicSummary(python_utils.OBJECT):
             subtopic_count: int. The number of subtopics in the topic.
             total_skill_count: int. The total number of skills in the topic
                 (including those that are uncategorized).
+            total_published_node_count: int. The total number of chapters
+                that are published and associated with the stories of the topic.
             thumbnail_filename: str. The filename for the topic thumbnail.
             thumbnail_bg_color: str. The background color for the thumbnail.
             url_fragment: str. The url fragment of the topic.
@@ -1710,6 +1713,7 @@ class TopicSummary(python_utils.OBJECT):
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
         self.total_skill_count = total_skill_count
+        self.total_published_node_count = total_published_node_count
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.topic_model_created_on = topic_model_created_on
@@ -1820,6 +1824,16 @@ class TopicSummary(python_utils.OBJECT):
                 'uncategorized_skill_count %s, received \'%s\'' % (
                     self.uncategorized_skill_count, self.total_skill_count))
 
+        if not isinstance(self.total_published_node_count, int):
+            raise utils.ValidationError(
+                'Expected total published node count to be an integer, '
+                'received \'%s\'' % self.total_published_node_count)
+
+        if self.total_published_node_count < 0:
+            raise utils.ValidationError(
+                'Expected total_published_node_count to be non-negative, '
+                'received \'%s\'' % self.total_published_node_count)
+
         if not isinstance(self.subtopic_count, int):
             raise utils.ValidationError(
                 'Expected subtopic count to be an integer, received \'%s\''
@@ -1848,6 +1862,7 @@ class TopicSummary(python_utils.OBJECT):
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
             'total_skill_count': self.total_skill_count,
+            'total_published_node_count': self.total_published_node_count,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'topic_model_created_on': utils.get_time_in_millisecs(
