@@ -2403,9 +2403,11 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.user_query_id = user_query_services.save_new_user_query(
-            self.admin_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.admin_id, {
+                'inactive_in_last_n_days': 10,
+                'created_at_least_n_exps': 5,
+                'has_not_logged_in_for_n_days': 30
+            })
 
         self.model_instance = user_models.UserQueryModel.get_by_id(
             self.user_query_id)
@@ -2417,6 +2419,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             user_query_services.send_email_to_qualified_users(
                 self.user_query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
+        self.model_instance = user_models.UserQueryModel.get_by_id(
+            self.user_query_id)
         self.sent_mail_id = self.model_instance.sent_email_model_id
 
         self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
@@ -2580,9 +2584,11 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.user_query_id = user_query_services.save_new_user_query(
-            self.admin_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.admin_id, {
+                'inactive_in_last_n_days': 10,
+                'created_at_least_n_exps': 5,
+                'has_not_logged_in_for_n_days': 30
+            })
 
         query_model = user_models.UserQueryModel.get_by_id(
             self.user_query_id)
@@ -2596,6 +2602,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.model_instance = user_models.UserBulkEmailsModel.get_by_id(
             self.user_id)
+        query_model = user_models.UserQueryModel.get_by_id(
+            self.user_query_id)
         self.sent_mail_id = query_model.sent_email_model_id
         self.job_class = (
             prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob)
