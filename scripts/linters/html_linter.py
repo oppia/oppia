@@ -117,6 +117,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
             # Therefore the check should run only for those
             # attributes which have a value.
             if value:
+                value_in_quotes = True
                 # &quot; is rendered as a double quote by the parser.
                 if '&quot;' in starttag_text:
                     expected_value = value
@@ -126,6 +127,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     rendered_text = starttag_text
 
                 if not expected_value in rendered_text:
+                    value_in_quotes = False
                     self.failed = True
                     error_message = (
                         '%s --> The value %s of attribute '
@@ -137,19 +139,20 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
                 # Check if there are any white spaces around
                 # attribute assignment.
-
-                if starttag_text.find(attr) < 0:
+                attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
+                if rendered_text.find(attr) < 0:
                     # Attribute names are case insensitive,
                     # So attr name might not match the
                     # actual attr name in tag.
-                    attr_pos = starttag_text.lower().find(attr)
-                    attr_name = starttag_text[attr_pos:attr_pos + len(attr)]
-                    expected_attr_assignment = '{}="{}"'.format(
+
+                    attr_pos = rendered_text.lower().find(attr)
+                    attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
+                    expected_attr_assignment = attr_val_structure.format(
                         attr_name, value)
                 else:
-                    expected_attr_assignment = '{}="{}"'.format(attr, value)
-
-                if starttag_text.find(expected_attr_assignment) < 0:
+                    expected_attr_assignment = attr_val_structure.format(
+                        attr, value)
+                if rendered_text.find(expected_attr_assignment) < 0:
                     self.failed = True
                     error_message = (
                         '%s --> Attribute %s for tag %s on line '
