@@ -80,7 +80,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);
     };
-    $scope.skillId = $scope.skill.getId()
+    $scope.skillId = $scope.skill.getId();
     $scope.onClickChangeDifficulty = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

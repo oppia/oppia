@@ -239,30 +239,30 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
     });
 
-   it('should open skill difficulty selection modal on clicking' +
-    ' change difficulty icon', function() {
-    var uibSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+    it('should open skill difficulty selection modal on clicking' +
+        ' change difficulty icon', function() {
+      var uibSpy = spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      $scope.onClickChangeDifficulty();
+      $scope.$apply();
+      $flushPendingTasks();
+      expect(uibSpy).toHaveBeenCalled();
     });
-    $scope.onClickChangeDifficulty();
-    $scope.$apply();
-    $flushPendingTasks();
-    expect(uibSpy).toHaveBeenCalled();
-   });
 
-   it('should change skill difficulty when skill difficulty' +
-    ' is edited via skill difficulty modal', function(){
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        skillDifficulty: 0.6
-      })
+    it('should change skill difficulty when skill difficulty' +
+      ' is edited via skill difficulty modal', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
+          skillDifficulty: 0.6
+        })
+      });
+      $scope.onClickChangeDifficulty();
+      $scope.$apply();
+      $flushPendingTasks();
+      expect($scope.skillDifficulty).toBe(0.6);
+      expect($scope.skillDifficultyString).toBe('Medium');
     });
-    $scope.onClickChangeDifficulty();
-    $scope.$apply();
-    $flushPendingTasks();
-    expect($scope.skillDifficulty).toBe(0.6);
-    expect($scope.skillDifficultyString).toBe('Medium');
-   });
   });
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
