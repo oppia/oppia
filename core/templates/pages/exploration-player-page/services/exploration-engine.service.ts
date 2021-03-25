@@ -152,7 +152,7 @@ export class ExplorationEngineService {
   private makeParams(
       oldParams: ExplorationParams,
       paramChanges: ParamChange[],
-      envs: ExplorationParams[]) : ExplorationParams {
+      envs: ExplorationParams[]): ExplorationParams {
     let newParams: ExplorationParams = cloneDeep(oldParams);
     if (paramChanges.every(pc => {
       if (pc.generatorId === 'Copier') {
@@ -223,7 +223,7 @@ export class ExplorationEngineService {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
         interactionId,
         this.exploration.getInteractionCustomizationArgs(this.nextStateName),
-        true, nextFocusLabel);
+        true, nextFocusLabel, null);
     }
 
     let questionHtml = this.makeQuestion(initialState, [newParams]);
@@ -249,7 +249,7 @@ export class ExplorationEngineService {
   // Initialize the parameters in the exploration as specified in the
   // exploration-level initial parameter changes list, followed by any
   // manual parameter changes (in editor preview mode).
-  private initParams(manualParamChanges: ParamChange[]) :void {
+  private initParams(manualParamChanges: ParamChange[]): void {
     let baseParams = {};
     this.exploration.paramSpecs.forEach(function(paramName, paramSpec) {
       baseParams[paramName] = paramSpec.getType().createDefaultValue();
@@ -270,7 +270,7 @@ export class ExplorationEngineService {
       interactionId,
       this.exploration.getInteractionCustomizationArgs(this.nextStateName),
       true,
-      labelForFocusTarget);
+      labelForFocusTarget, null);
   }
 
   private checkAlwaysAskLearnersForAnswerDetails(): void {
