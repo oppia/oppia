@@ -452,7 +452,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             ), {
                 'skill_ids_task_list': [{
                     'id': 'skill_2',
-                    'task': 'remove',
+                    'task': 'remove'
                 }]
             }, csrf_token=csrf_token)
         question_summaries, _, _ = (
