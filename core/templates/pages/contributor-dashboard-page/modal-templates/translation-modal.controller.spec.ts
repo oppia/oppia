@@ -180,6 +180,52 @@ describe('Translation Modal Controller', function() {
       .toHaveBeenCalledWith('Translation');
   });
 
+  it('should not register Contributor Dashboard submit suggestion event when' +
+    ' the data is being loaded',
+  function() {
+    $httpBackend.flush();
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardSubmitSuggestionEvent');
+    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
+      '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
+      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
+      '</oppia-noninteractive-image>';
+    $scope.activeWrittenTranslation.html =
+      '<oppia-noninteractive-image alt-with-value=' +
+      '"&quot;alt-text&quot;" caption-with-value=' +
+      '"&quot;caption&quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
+      '</oppia-noninteractive-image>';
+    $scope.loadingData = true;
+
+    $scope.suggestTranslatedText();
+
+    expect(
+      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+      .not.toHaveBeenCalledWith('Translation');
+  });
+
+  it('should not register Contributor Dashboard submit suggestion event when' +
+    ' the translation is being uploaded',
+  function() {
+    $httpBackend.flush();
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardSubmitSuggestionEvent');
+    $scope.textToTranslate = '<p>First</p><p>Second</p>';
+    $scope.activeWrittenTranslation.html =
+      '<p>ABC</p>';
+
+    $scope.suggestTranslatedText();
+    
+    expect($scope.incompleteTranslationError).toBe(false);
+    expect(
+      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+      .not.toHaveBeenCalledWith('Translation');
+  });
+
   it('should suggest more text to be translated when contributor finish' +
     ' translating text and they would like to continue translating',
   function() {
