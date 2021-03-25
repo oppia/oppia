@@ -705,7 +705,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 self.REPORT_ID_1)
         )
         self.assertEqual(
-            report_model.redacted_by, report_mappings[self.REPORT_ID_1]
+            report_model.scrubbed_by, report_mappings[self.REPORT_ID_1]
         )
 
 
