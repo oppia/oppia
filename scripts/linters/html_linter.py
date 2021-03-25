@@ -110,7 +110,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
 
-
         # Check whether the values of all attributes are placed
         # in double quotes.
         for attr, value in attrs:
@@ -137,15 +136,16 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     self.error_messages.append(error_message)
 
                 # Check if there are any white spaces around
-                # attribute assignment
+                # attribute assignment.
 
                 if starttag_text.find(attr) < 0:
                     # Attribute names are case insensitive,
                     # So attr name might not match the
                     # actual attr name in tag.
                     attr_pos = starttag_text.lower().find(attr)
-                    attr_name = starttag_text[attr_pos:attr_pos+len(attr)]
-                    expected_attr_assignment = '{}="{}"'.format(attr_name, value)
+                    attr_name = starttag_text[attr_pos:attr_pos + len(attr)]
+                    expected_attr_assignment = '{}="{}"'.format(
+                        attr_name, value)
                 else:
                     expected_attr_assignment = '{}="{}"'.format(attr, value)
 
