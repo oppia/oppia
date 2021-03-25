@@ -301,8 +301,8 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         stats_models = (
             stats_model_class.get_stats_for_ticket(self.TICKET_ID))
         self.assertEqual(len(stats_models), 1)
-        self.assertEqual(stats_models.first.id, entity_id)
-        self.assertEqual(stats_models.first, expected_stats_model)
+        self.assertEqual(stats_models[0].id, entity_id)
+        self.assertEqual(stats_models[0], expected_stats_model)
 
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportStatsModel()
