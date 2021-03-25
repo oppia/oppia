@@ -140,7 +140,10 @@ describe('History tab component', function() {
       })
     });
     $provide.value('RouterService', {
-      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter
+      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter,
+      getActiveTabName() {
+        return ('main');
+      },
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',

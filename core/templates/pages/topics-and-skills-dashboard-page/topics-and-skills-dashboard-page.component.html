@@ -142,11 +142,13 @@
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS && $ctrl.userCanCreateTopic"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button create-topic-button">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS && $ctrl.userCanCreateTopic"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button create-topic-button
+            oppia-autofocus" focus-on="createTopicBtn">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Topic</span>
             </div>
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.userCanCreateSkill"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle create-skill-button">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.userCanCreateSkill"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle create-skill-button
+            oppia-autofocus" focus-on="createSkillBtn">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Skill</span>
             </div>

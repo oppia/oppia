@@ -3,7 +3,8 @@
           ng-model="selectedSkillId"
           ng-if="allSkillSummaries.length > 0"
           ng-change="reinitializeQuestionsList(selectedSkillId)"
-          ng-options="summary.getId() as summary.getDescription() for summary in allSkillSummaries">
+          ng-options="summary.getId() as summary.getDescription() for summary in allSkillSummaries"
+          focus-on="selectSkillField">
     <option value="" hidden selected> Select a skill to view question list or create a new question </option>
   </select>
 </div>

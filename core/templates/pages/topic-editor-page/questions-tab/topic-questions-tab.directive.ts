@@ -26,7 +26,7 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/questions-list.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsTab', [
@@ -38,10 +38,12 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/topic-editor-page/questions-tab/' +
         'topic-questions-tab.directive.html'),
       controller: [
-        '$scope', 'QuestionsListService', 'TopicEditorStateService',
+        '$scope', '$window', 'FocusManagerService', 'QuestionsListService',
+        'TopicEditorStateService',
         'TopicsAndSkillsDashboardBackendApiService',
         function(
-            $scope, QuestionsListService, TopicEditorStateService,
+            $scope, $window, FocusManagerService, QuestionsListService,
+            TopicEditorStateService,
             TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -85,6 +87,13 @@ angular.module('oppia').directive('questionsTab', [
             );
           };
           ctrl.$onInit = function() {
+            // To set autofocus when screen loads.
+            $window.onload = function() {
+              FocusManagerService.setFocus('selectSkillField');
+            };
+            // To-set autofocus when user navigates to editor using
+            // question-editor-tab.
+            FocusManagerService.setFocus('selectSkillField');
             $scope.selectedSkillId = null;
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(

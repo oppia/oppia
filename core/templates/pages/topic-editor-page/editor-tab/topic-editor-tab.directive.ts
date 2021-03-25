@@ -45,6 +45,7 @@ require('services/context.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');
+require('services/stateful/focus-manager.service.ts');
 require('domain/question/question-backend-api.service.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -66,7 +67,8 @@ angular.module('oppia').directive('topicEditorTab', [
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
-        'EntityCreationService', 'ImageUploadHelperService',
+        'EntityCreationService', 'FocusManagerService',
+        'ImageUploadHelperService',
         'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
@@ -77,7 +79,8 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         function(
             $rootScope, $scope, $uibModal, ContextService,
-            EntityCreationService, ImageUploadHelperService,
+            EntityCreationService, FocusManagerService,
+            ImageUploadHelperService,
             PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
@@ -107,6 +110,7 @@ angular.module('oppia').directive('topicEditorTab', [
             if (TopicEditorStateService.hasLoadedTopic()) {
               $scope.topicDataHasLoaded = true;
               $scope.$applyAsync();
+              FocusManagerService.setFocus('addStoryBtn');
             }
             $scope.editableName = $scope.topic.getName();
             $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
@@ -462,6 +466,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           ctrl.$onInit = function() {
+            FocusManagerService.setFocus('addStoryBtn');
             $scope.topicPreviewCardIsShown = false;
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';
