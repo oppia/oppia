@@ -287,8 +287,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    states_schema_version,
-                    item.id)
+                    states_schema_version)
                 states_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -344,8 +343,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
-        if (item.states_schema_version !=
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
+        if item.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
@@ -856,14 +854,6 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 'INFO - Exploration %s failed non-strict validation' % item.id,
                 e)
 
-        # Some (very) old explorations do not have a states schema version.
-        # These explorations have snapshots that were created before the
-        # states_schema_version system was introduced. We therefore set their
-        # states schema version to 0, since we now expect all snapshots to
-        # explicitly include this field.
-        if 'states_schema_version' not in item.content:
-            item.content['states_schema_version'] = 0
-
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_state_schema_version = item.content['states_schema_version']
         if current_state_schema_version == target_state_schema_version:
@@ -880,8 +870,7 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    current_state_schema_version,
-                    exp_id)
+                    current_state_schema_version)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -948,10 +937,6 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'INFO - Exploration %s failed non-strict validation' % item.id,
                 e)
 
-        # Some old explorations do not have a states schema version.
-        if 'states_schema_version' not in item.content:
-            item.content['states_schema_version'] = 0
-
         # If the snapshot being stored in the datastore does not have the most
         # up-to-date states schema version, then update it.
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
@@ -969,8 +954,7 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         while current_state_schema_version < target_state_schema_version:
             exp_domain.Exploration.update_states_from_model(
                 versioned_exploration_states,
-                current_state_schema_version,
-                exp_id)
+                current_state_schema_version)
             current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:

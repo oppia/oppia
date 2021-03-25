@@ -24,7 +24,7 @@ import { ThumbnailDisplayComponent } from './thumbnail-display.component';
 describe('Thumbnail Component', () => {
   let component: ThumbnailDisplayComponent;
   let fixture: ComponentFixture<ThumbnailDisplayComponent>;
-  let svgSantitizerService: SvgSanitizerService;
+  let svgSanitizerService: SvgSanitizerService;
   class MockSvgSanitizerService {
     getTrustedSvgResourceUrl(str: string): string {
       return str;
@@ -82,12 +82,12 @@ describe('Thumbnail Component', () => {
 
     fixture = TestBed.createComponent(ThumbnailDisplayComponent);
     component = fixture.componentInstance;
-    svgSantitizerService = TestBed.get(SvgSanitizerService);
+    svgSanitizerService = TestBed.get(SvgSanitizerService);
   }));
 
   it('should not render malicious SVG\'s on Init', fakeAsync(() => {
     const sanitizerSpy = spyOn(
-      svgSantitizerService, 'getTrustedSvgResourceUrl');
+      svgSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = maliciousSvg;
     component.ngOnInit();
@@ -100,7 +100,7 @@ describe('Thumbnail Component', () => {
 
   it('should not render malicious SVG\'s on value change', fakeAsync(() => {
     const sanitizerSpy = spyOn(
-      svgSantitizerService, 'getTrustedSvgResourceUrl');
+      svgSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = maliciousSvg;
     component.ngOnChanges();
@@ -113,7 +113,7 @@ describe('Thumbnail Component', () => {
 
   it('should not try to render invalid base64 images', fakeAsync(() => {
     const sanitizerSpy = spyOn(
-      svgSantitizerService, 'getTrustedSvgResourceUrl');
+      svgSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = invalidBase64data;
     component.ngOnChanges();
