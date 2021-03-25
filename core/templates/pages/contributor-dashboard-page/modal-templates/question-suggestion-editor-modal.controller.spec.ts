@@ -25,6 +25,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let $uibModalInstance = null;
   let $q = null;
   let $scope = null;
+  let $flushPendingTasks = null;
   let CsrfTokenService = null;
   let QuestionObjectFactory = null;
   let QuestionSuggestionService = null;
@@ -37,7 +38,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let questionId = null;
   let questionStateData = null;
   let skill = null;
-  const skillDifficulty = 0.3;
+  let skillDifficulty = 0.3;
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
@@ -48,6 +49,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
       CsrfTokenService = $injector.get('CsrfTokenService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
@@ -236,8 +238,32 @@ describe('Question Suggestion Editor Modal Controller', function() {
 
       expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
     });
-  });
 
+   fit('should open skill difficulty selection modal on clicking' +
+   ' change difficulty icon', function() {
+    var uibSpy = spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
+    $scope.onClickChangeDifficulty();
+    $scope.$apply();
+    $flushPendingTasks();
+    expect(uibSpy).toHaveBeenCalled();
+   });
+
+   fit('should change skill difficulty when skill difficulty' +
+   ' is edited via skill difficulty modal', function(){
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve({
+        skillDifficulty: 0.6
+      })
+    });
+    $scope.onClickChangeDifficulty();
+    $scope.$apply();
+    $flushPendingTasks();
+    expect($scope.skillDifficulty).toBe(0.6);
+    expect($scope.skillDifficultyString).toBe('Medium');
+   });
+  });
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
