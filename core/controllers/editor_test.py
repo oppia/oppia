@@ -33,6 +33,7 @@ from core.domain import exp_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -68,9 +69,9 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
         self.system_user = user_services.get_system_user()
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
     def assert_can_edit(self, exp_id):
         """Returns True if the current user can edit the exploration
@@ -1621,7 +1622,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             category='category',
             title='title',
             language_code='invalid_language_code',
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.State.create_default_state(
+                        'End', is_initial_state=True
+                    ).to_dict()),
+            },
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
         commit_cmd = exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_CREATE_NEW,
@@ -1848,7 +1856,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         super(ModeratorEmailsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -2016,7 +2024,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         super(FetchIssuesPlaythroughHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -2174,7 +2182,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
         super(ResolveIssueHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
