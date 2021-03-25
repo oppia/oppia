@@ -563,6 +563,9 @@ def update_story(
         committer_id, story_id, change_list, commit_message):
     """Updates a story. Commits changes.
 
+    # NOTE: This function should not be called on its own. Access it
+    # through `topic_services.update_story_and_topic_summary`.
+
     Args:
         committer_id: str. The id of the user who is performing the update
             action.

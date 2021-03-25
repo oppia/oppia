@@ -136,7 +136,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             thumbnail_filename, feconf.ENTITY_TYPE_STORY, entity_id, raw_image,
             filename_prefix, image_is_compressible)
 
-        story_services.update_story(
+        topic_services.update_story_and_topic_summary(
             self.user_id, new_story_id, [story_domain.StoryChange({
                 'cmd': 'update_story_property',
                 'property_name': 'thumbnail_filename',
@@ -147,7 +147,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
                 'property_name': 'thumbnail_bg_color',
                 'old_value': None,
                 'new_value': thumbnail_bg_color
-            }), ], 'Added story thumbnail.')
+            }), ], 'Added story thumbnail.', topic_id)
 
         self.render_json({
             'storyId': new_story_id
