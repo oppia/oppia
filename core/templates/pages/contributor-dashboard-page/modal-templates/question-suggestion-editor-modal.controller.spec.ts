@@ -239,8 +239,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
     });
 
-   fit('should open skill difficulty selection modal on clicking' +
-   ' change difficulty icon', function() {
+   it('should open skill difficulty selection modal on clicking' +
+    ' change difficulty icon', function() {
     var uibSpy = spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
@@ -250,8 +250,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
     expect(uibSpy).toHaveBeenCalled();
    });
 
-   fit('should change skill difficulty when skill difficulty' +
-   ' is edited via skill difficulty modal', function(){
+   it('should change skill difficulty when skill difficulty' +
+    ' is edited via skill difficulty modal', function(){
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         skillDifficulty: 0.6
