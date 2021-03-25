@@ -3730,7 +3730,6 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
             '[u\'%s\']]' % self.VALID_EXP_ID,
         ]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
-<<<<<<< HEAD
 
     def test_migration_job_handles_missing_states_schema_version(self):
         swap_exp_schema_5 = self.swap(
