@@ -177,7 +177,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
         Returns:
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
-            instance.
+                instance.
         """
         entity_id = cls._generate_id(platform, submitted_on.second)
         android_schema_version = None
@@ -445,7 +445,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
         Returns:
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
-            instance.
+                instance.
         """
         ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
