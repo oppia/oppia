@@ -270,7 +270,7 @@
           </i>
         </div>
         <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
-          <div ng-hide="$ctrl.isRolesFormOpen" class="oppia-edit-roles-btn-container">
+          <div ng-if="$ctrl.canModifyRoles" ng-hide="$ctrl.isRolesFormOpen" class="oppia-edit-roles-btn-container">
             <span ng-click="$ctrl.openEditRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-roles">
               EDIT
             </span>
