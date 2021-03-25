@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core.domain import base_model_validators
 from core.platform import models
 
@@ -43,8 +45,8 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(jcqli): Create domain object when implementing domain layer
+    def _get_model_domain_object_instance(cls):
+        # TODO(jcqli): Create domain object when implementing domain layer.
         return None
 
     @classmethod
@@ -59,20 +61,20 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
 
 class AppFeedbackReportTicketModelValidator(
-    base_model_validators.BaseModelValidator):
+        base_model_validators.BaseModelValidator):
     """Class for validating AppFeedbackReportTicketModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
+    def _get_model_id_regex(cls):
         # Valid id: [creation_datetime]:[hash(ticket_name)]:[random hash]
         regex_string = (
             '\\d+\\:[A-Za-z0-9]{1,%s}$\\:[A-Za-z0-9]{1,%s}$' % (
-            base_models.ID_LENGTH, base_models.ID_LENGTH))
+                base_models.ID_LENGTH, base_models.ID_LENGTH))
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(jcqli): Create domain object when implementing domain layer
+    def _get_model_domain_object_instance(cls):
+        # TODO(jcqli): Create domain object when implementing domain layer.
         return None
 
     @classmethod
@@ -95,20 +97,20 @@ class AppFeedbackReportTicketModelValidator(
 
 
 class AppFeedbackReportStatsModelValidator(
-    base_model_validators.BaseModelValidator):
-"""Class for validating AppFeedbackReportStatsModel."""
+        base_model_validators.BaseModelValidator):
+    """Class for validating AppFeedbackReportStatsModel."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [platform]:[ticket_id]:[date.seconds]
         regex_string = '^%s\\:[A-Za-z0-9]{1,%s}$\\:%s\\.\\d+' % (
-            item.platform, base_models.ID_LENGTH, 
+            item.platform, base_models.ID_LENGTH,
             item.stats_tracking_date.second)
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(jcqli): Create domain object when implementing domain layer
+    def _get_model_domain_object_instance(cls):
+        # TODO(jcqli): Create domain object when implementing domain layer.
         return None
 
     @classmethod

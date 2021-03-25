@@ -296,7 +296,8 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get(
                 entity_id))
 
-        stats_model_class = app_feedback_report_models.AppFeedbackReportStatsModel
+        stats_model_class = (
+            app_feedback_report_models.AppFeedbackReportStatsModel)
         stats_models = (
             stats_model_class.get_stats_for_ticket(self.TICKET_ID))
         self.assertEqual(len(stats_models), 1)

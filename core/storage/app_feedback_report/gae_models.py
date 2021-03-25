@@ -177,7 +177,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
         Returns:
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
-                instance.
+            instance.
         """
         entity_id = cls._generate_id(platform, submitted_on.second)
         android_schema_version = None
@@ -221,8 +221,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity using platform,
-                submitted_on_sec, and a random string, of the form
-                '[platform].[submitted_on_sec].[random hash]'.
+            submitted_on_sec, and a random string, of the form
+            '[platform].[submitted_on_sec].[random hash]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
@@ -445,7 +445,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
         Returns:
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
-                instance.
+            instance.
         """
         ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
@@ -467,9 +467,9 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity using the current datetime in
-                seconds (as the entity's creation timestamp), a SHA1 hash of the
-                ticket_name, and a random string, of the form
-                '[creation_datetime]:[hash(ticket_name)]:[random hash]'.
+            seconds (as the entity's creation timestamp), a SHA1 hash of the
+            ticket_name, and a random string, of the form
+            '[creation_datetime]:[hash(ticket_name)]:[random hash]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
@@ -578,7 +578,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
         Returns:
             AppFeedbackReportStatsModel. The newly created
-                AppFeedbackReportStatsModel instance.
+            AppFeedbackReportStatsModel instance.
         """
         entity_id = cls._generate_id(platform, ticket_id, stats_tracking_date)
         stats_entity = cls(
@@ -603,7 +603,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity of the form
-                '[platform]:[ticket_id]:[date.seconds]'.
+            '[platform]:[ticket_id]:[date.seconds]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (
@@ -614,7 +614,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             'The id generator for AppFeedbackReportStatsModel is producing too'
             'many collisions.')
 
-    @staticmethod
+    @classmethod
     def get_stats_for_ticket(cls, ticket_id):
         """Fetches the stats for a single ticket.
 
@@ -623,7 +623,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
         Returns:
             list(AppFeedbackReportStatsModel). A list of IDs for the stats of
-                the specified ticket..
+            the specified ticket.
         """
         return cls.query(cls.ticket_id == ticket_id).fetch()
 
