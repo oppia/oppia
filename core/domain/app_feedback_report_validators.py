@@ -62,9 +62,6 @@ class AppFeedbackReportTicketModelValidator(
     base_model_validators.BaseModelValidator):
     """Class for validating AppFeedbackReportTicketModel."""
 
-    # The length of a AppFeedbackReportTicketModel id is 
-    REPORT_ID_LENGTH = 12+12+2+
-
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [creation_datetime]:[hash(ticket_name)]:[random hash]

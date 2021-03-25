@@ -1031,7 +1031,8 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     _save_pseudonymizable_entity_mappings(
         pending_deletion_request, models.NAMES.app_feedback_report, report_ids)
 
-    def _pseudonymize_models(feedback_report_models):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(feedback_report_models):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1057,8 +1058,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
             0,
             len(feedback_report_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        transaction_services.run_in_transaction(
-            _pseudonymize_models,
+        _pseudonymize_models_transactional(
             feedback_report_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
