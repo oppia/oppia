@@ -194,7 +194,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.viewer_ids = []
         self.activity_rights.voice_artist_ids = []
 
-        self.activity_rights.assign_role(
+        self.activity_rights.assign_new_role(
             '123456', rights_domain.ROLE_VOICE_ARTIST)
         self.assertTrue('123456' not in self.activity_rights.owner_ids)
         self.assertTrue('123456' in self.activity_rights.voice_artist_ids)
@@ -204,7 +204,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.editor_ids = []
         self.activity_rights.viewer_ids = []
 
-        self.activity_rights.assign_role('123456', rights_domain.ROLE_OWNER)
+        self.activity_rights.assign_new_role('123456', rights_domain.ROLE_OWNER)
         self.assertTrue('123456' in self.activity_rights.owner_ids)
 
     def test_cannot_assign_same_role(self):
@@ -214,7 +214,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'This user already owns this exploration.'):
-            self.activity_rights.assign_role(
+            self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_OWNER)
 
     def test_cannot_assign_viewer_to_public_exp(self):
@@ -225,7 +225,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Public explorations can be viewed by anyone.'):
-            self.activity_rights.assign_role(
+            self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VIEWER)
 
 

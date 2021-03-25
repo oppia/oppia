@@ -771,7 +771,7 @@ def _assign_role(
     ]:
         raise Exception('Invalid role: %s' % new_role)
     if allow_assigning_any_role:
-        old_role = activity_rights.assign_role(assignee_id, new_role)
+        old_role = activity_rights.assign_new_role(assignee_id, new_role)
 
     elif new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):

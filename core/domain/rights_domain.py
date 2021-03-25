@@ -235,7 +235,7 @@ class ActivityRights(python_utils.OBJECT):
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
-    def assign_role(self, user_id, new_role):
+    def assign_new_role(self, user_id, new_role):
         """Assigns new role to user and removes previous role if present.
 
         Args:
