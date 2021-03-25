@@ -51,10 +51,10 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
 
-        self.topic_manager = user_services.UserActionsInfo(
+        self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.new_user = user_services.UserActionsInfo(self.new_user_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.new_user = user_services.get_user_actions_info(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Skill Description')

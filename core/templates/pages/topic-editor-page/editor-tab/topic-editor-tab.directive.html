@@ -279,8 +279,8 @@
         </i>
       </div>
       <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
-        <button class="btn add-story-btn protractor-test-create-story-button"
-                ng-click="createCanonicalStory()">
+        <button class="btn add-story-btn protractor-test-create-story-button oppia-autofocus"
+                ng-click="createCanonicalStory()" focus-on="addStoryBtn">
           + ADD STORY
         </button>
         <div class="canonical-stories">

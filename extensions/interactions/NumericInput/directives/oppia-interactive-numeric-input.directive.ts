@@ -64,7 +64,10 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
-            ctrl.answer = '';
+            ctrl.answer = (
+              $attrs.savedSolution !== undefined ?
+              JSON.parse($attrs.savedSolution) : ''
+            );
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
             ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
