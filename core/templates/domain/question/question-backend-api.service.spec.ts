@@ -153,7 +153,7 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/question_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
@@ -176,7 +176,7 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/question_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
@@ -318,7 +318,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      questionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?cursor=');
@@ -340,7 +340,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      questionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?cursor=');
@@ -363,7 +363,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      questionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummariesAsync(
         '1', '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?cursor=1');
