@@ -17,7 +17,7 @@
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Translation Modal Controller', function() {
+fdescribe('Translation Modal Controller', function() {
   let $httpBackend = null;
   let $q = null;
   let $scope = null;
@@ -208,7 +208,34 @@ describe('Translation Modal Controller', function() {
   });
 
   it('should not register Contributor Dashboard submit suggestion event when' +
-    ' the translation is being uploaded',
+    ' the data is being uploaded',
+  function() {
+    $httpBackend.flush();
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardSubmitSuggestionEvent');
+    $scope.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
+      '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
+      '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
+      '</oppia-noninteractive-image>';
+    $scope.activeWrittenTranslation.html =
+      '<oppia-noninteractive-image alt-with-value=' +
+      '"&quot;alt-text&quot;" caption-with-value=' +
+      '"&quot;caption&quot;" filepath-with-value="&amp;quot;' +
+      'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
+      '</oppia-noninteractive-image>';
+    $scope.uploadingTranslation = true;
+
+    $scope.suggestTranslatedText();
+
+    expect(
+      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+      .not.toHaveBeenCalledWith('Translation');
+  });
+
+  it('should not register Contributor Dashboard submit suggestion event when' +
+    ' the translation is not completed',
   function() {
     $httpBackend.flush();
     spyOn(
@@ -220,7 +247,7 @@ describe('Translation Modal Controller', function() {
 
     $scope.suggestTranslatedText();
     
-    expect($scope.incompleteTranslationError).toBe(false);
+    expect($scope.incompleteTranslationError).toBe(true);
     expect(
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
       .not.toHaveBeenCalledWith('Translation');
