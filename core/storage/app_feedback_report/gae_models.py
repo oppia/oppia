@@ -469,7 +469,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             str. The generated ID for this entity using the current datetime in
                 seconds (as the entity's creation timestamp), a SHA1 hash of the
                 ticket_name, and a random string, of the form
-                '[creation_datetime]:hash([ticket_name]):[random hash]'.
+                '[creation_datetime]:[hash(ticket_name)]:[random hash]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
@@ -613,6 +613,19 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         raise Exception(
             'The id generator for AppFeedbackReportStatsModel is producing too'
             'many collisions.')
+
+    @staticmethod
+    def get_stats_for_ticket(cls, ticket_id):
+        """Fetches the stats for a single ticket.
+
+        Args:
+            ticket_id: str. The id of the ticket to get stats for.
+
+        Returns:
+            list(AppFeedbackReportStatsModel). A list of IDs for the stats of
+                the specified ticket..
+        """
+        return cls.query(cls.ticket_id == ticket_id).fetch()
 
     @staticmethod
     def get_deletion_policy():

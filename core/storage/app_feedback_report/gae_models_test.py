@@ -285,6 +285,24 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             stats_model.stats_tracking_date, self.STATS_DATE_TIMESTAMP)
         self.assertEqual(stats_model.daily_ticket_stats, self.DAILY_STATS)
 
+    def test_get_stats_for_ticket(self):
+        entity_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.create(
+                platform='android',
+                ticket_id=self.TICKET_ID,
+                stats_tracking_date=self.STATS_DATE_TIMESTAMP,
+                daily_ticket_stats=self.DAILY_STATS))
+        expected_stats_model = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get(
+                entity_id))
+
+        stats_model_class = app_feedback_report_models.AppFeedbackReportStatsModel
+        stats_models = (
+            stats_model_class.get_stats_for_ticket(self.TICKET_ID))
+        self.assertEqual(len(stats_models), 1)
+        self.assertEqual(stats_models.first.id, entity_id)
+        self.assertEqual(stats_models.first, expected_stats_model)
+
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportStatsModel()
         self.assertEqual(
