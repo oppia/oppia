@@ -166,14 +166,14 @@ angular.module('oppia').directive('adminRolesTab', [
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then((usersObject) => {
-              ctrl.contributionReviewersResult.usernames =
-                usersObject.usernames;
+              ctrl.contributionReviewersResult.usernames = (
+                usersObject.usernames);
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
+              refreshFormData();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
-              refreshFormData();
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
@@ -383,7 +383,7 @@ angular.module('oppia').directive('adminRolesTab', [
           });
         };
 
-        ctrl.clearReviewersData = function() {
+        ctrl.clearViewData = function() {
           ctrl.contributionReviewersDataFetched = false;
           ctrl.resultRolesVisible = false;
           ctrl.userRolesResult = {};
