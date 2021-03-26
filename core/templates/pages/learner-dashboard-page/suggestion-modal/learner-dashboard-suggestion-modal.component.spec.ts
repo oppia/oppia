@@ -18,9 +18,8 @@
  */
 
 import { Component, Directive, Pipe } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
 
@@ -31,14 +30,15 @@ class MockTranslatePipe {
   }
 }
 
-export function MockAngularHtmlBindWrapperDirective(
-    options: Component): Directive {
+// eslint-disable-next-line func-style
+function MockAngularHtmlBindWrapperDirective(
+  options: Component): Directive {
   const metadata: Directive = {
-      selector: options.selector,
-      inputs: options.inputs,
-      outputs: options.outputs
+    selector: options.selector,
+    inputs: options.inputs,
+    outputs: options.outputs
   };
-  return <any>Directive(metadata)(class _ { });
+  return <undefined>Directive(metadata)(class _ { });
 }
 
 class MockActiveModal {
@@ -66,8 +66,8 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
       declarations: [
         LearnerDashboardSuggestionModalComponent,
         MockTranslatePipe,
-        MockAngularHtmlBindWrapperDirective({ 
-          selector: 'angular-html-bind-wrapper', 
+        MockAngularHtmlBindWrapperDirective({
+          selector: 'angular-html-bind-wrapper',
           inputs: ['htmlData'] })
       ],
       providers: [
@@ -89,10 +89,10 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
   });
 
   it('should initialize componentInstance properties', () => {
-      expect(component.newContent).toBe(newContent);
-      expect(component.oldContent).toBe(oldContent);
-      expect(component.description).toBe(description);
-    });
+    expect(component.newContent).toBe(newContent);
+    expect(component.oldContent).toBe(oldContent);
+    expect(component.description).toBe(description);
+  });
 
   it('should dismiss the modal on clicking cancel button', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
