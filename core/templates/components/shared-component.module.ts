@@ -42,7 +42,6 @@ import { ProfileLinkImageComponent } from 'components/profile-link-directives/pr
 import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
-import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
@@ -106,7 +105,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FocusOnDirective,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -143,7 +141,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // These elements will remain here even after migration.
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -169,7 +166,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     FocusOnDirective,
-    ImageUploaderComponent,
     SharingLinksComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
