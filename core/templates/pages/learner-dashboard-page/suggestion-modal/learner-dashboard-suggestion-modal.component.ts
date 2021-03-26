@@ -19,7 +19,6 @@
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'learner-dashboard-suggestion-modal',
@@ -33,7 +32,6 @@ export class LearnerDashboardSuggestionModalComponent {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   cancel(): void {

@@ -639,7 +639,7 @@ describe('Learner dashboard page', function() {
     it('should show new and old content when opening suggestion modal',
       function() {
         spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
-          .and.callThrough();
+          .and.returnValue(null);
         var newContent = 'New content';
         var oldContent = 'Old content';
         var description = 'Description';

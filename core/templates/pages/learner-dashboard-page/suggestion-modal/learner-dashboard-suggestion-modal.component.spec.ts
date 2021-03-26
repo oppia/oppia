@@ -14,49 +14,89 @@
 
 
 /**
- * @fileoverview Unit tests for LearnerDashboardSuggestionModalController.
+ * @fileoverview Unit tests for LearnerDashboardSuggestionModalComponent.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { Component, Directive, Pipe } from '@angular/core';
+import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 
-describe('Learner Dashboard Suggestion Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var description = 'This is a description string';
-  var newContent = 'new content';
-  var oldContent = 'old content';
+import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+
+export function MockAngularHtmlBindWrapperDirective(
+    options: Component): Directive {
+  const metadata: Directive = {
+      selector: options.selector,
+      inputs: options.inputs,
+      outputs: options.outputs
+  };
+  return <any>Directive(metadata)(class _ { });
+}
+
+class MockActiveModal {
+  close(): void {
+    return;
+  }
+
+  dismiss(): void {
+    return;
+  }
+}
+
+
+describe('Learner Dashboard Suggestion Modal Component', () => {
+  let description = 'This is a description string';
+  let newContent = 'new content';
+  let oldContent = 'old content';
+
+  let component: LearnerDashboardSuggestionModalComponent;
+  let fixture: ComponentFixture<LearnerDashboardSuggestionModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        LearnerDashboardSuggestionModalComponent,
+        MockTranslatePipe,
+        MockAngularHtmlBindWrapperDirective({ 
+          selector: 'angular-html-bind-wrapper', 
+          inputs: ['htmlData'] })
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal, useClass: MockActiveModal
+        },
+      ]
+    }).compileComponents();
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LearnerDashboardSuggestionModalComponent);
+    component = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    component.newContent = newContent;
+    component.oldContent = oldContent;
+    component.description = description;
+    fixture.detectChanges();
+  });
 
-    $scope = $rootScope.$new();
-    $controller('LearnerDashboardSuggestionModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      description: description,
-      newContent: newContent,
-      oldContent: oldContent
-    });
-  }));
-
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.newContent).toBe(newContent);
-      expect($scope.oldContent).toBe(oldContent);
-      expect($scope.description).toBe(description);
+  it('should initialize componentInstance properties', () => {
+      expect(component.newContent).toBe(newContent);
+      expect(component.oldContent).toBe(oldContent);
+      expect(component.description).toBe(description);
     });
 
-  it('should dismiss the modal on clicking cancel button', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+  it('should dismiss the modal on clicking cancel button', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    component.cancel();
+    expect(dismissSpy).toHaveBeenCalled();
   });
 });
