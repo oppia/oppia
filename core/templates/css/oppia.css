@@ -376,7 +376,7 @@ legend {
 }
 
 .oppia-dashboard-container .exp-private-text {
-  color: #aaa;
+  color: #757575;
   font-style: italic;
 }
 
@@ -810,7 +810,8 @@ textarea {
   Styles for footer
 */
 
-.oppia-footer-container h4 {
+.oppia-footer-container h3 {
+  color: white;
   font-size: 1em;
   font-weight: bold;
   margin: 1.33em 0;
@@ -3412,7 +3413,7 @@ oppia-noninteractive-link {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1em;
+  font-size: 1.2em;
   font-weight: normal;
   -ms-hyphens: auto;
   -moz-hyphens: auto;
