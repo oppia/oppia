@@ -44,7 +44,7 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
