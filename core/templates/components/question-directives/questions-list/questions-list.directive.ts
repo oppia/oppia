@@ -199,7 +199,13 @@ angular.module('oppia').directive('questionsList', [
               EditableQuestionBackendApiService.createQuestion(
                 ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
                 ctrl.question.toBackendDict(true), imagesData
-              ).then(function() {
+              ).then(function(response) {
+                if (ctrl.skillLinkageModificationsArray &&
+                    ctrl.skillLinkageModificationsArray.length > 0) {
+                  EditableQuestionBackendApiService.editQuestionSkillLinks(
+                    response.questionId, ctrl.skillLinkageModificationsArray
+                  );
+                }
                 QuestionsListService.resetPageNumber();
                 QuestionsListService.getQuestionSummariesAsync(
                   ctrl.selectedSkillId, true, true
@@ -595,14 +601,9 @@ angular.module('oppia').directive('questionsList', [
                 // clicked. No further action is needed.
               });
             } else {
-              if (ctrl.skillLinkageModificationsArray.length > 0) {
-                ctrl.updateSkillLinkage(null);
-                SkillEditorRoutingService.creatingNewQuestion(false);
-              } else {
-                ContextService.resetImageSaveDestination();
-                ctrl.saveAndPublishQuestion(null);
-                SkillEditorRoutingService.creatingNewQuestion(false);
-              }
+              ContextService.resetImageSaveDestination();
+              ctrl.saveAndPublishQuestion(null);
+              SkillEditorRoutingService.creatingNewQuestion(false);
             }
           };
 

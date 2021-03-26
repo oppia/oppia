@@ -87,7 +87,7 @@ export class EditableQuestionBackendApiService {
         .then(response => {
           successCallback(
             {
-              questionId: response.questionId
+              questionId: response['question_id']
             });
         },
         errorResponse => {
