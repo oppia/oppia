@@ -361,7 +361,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'voiceover-recording.service.ts',
     'warnings-and-alerts.directive.ts',
     'worked-example-editor.directive.ts',
-    'suggestion-modal-for-learner-dashboard.service'
+    'suggestion-modal-for-learner-dashboard.service.ts'
 ]
 
 
