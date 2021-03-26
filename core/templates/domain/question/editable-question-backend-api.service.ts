@@ -26,8 +26,12 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
 import { SkillBackendDict } from 'domain/skill/SkillObjectFactory';
 
-export interface EditableQuestionBackendResponse {
+export interface CreateQuestionResponse {
   questionId: string;
+}
+
+export interface CreateQuestionResponseBackendDict {
+  'question_id': string;
 }
 
 export interface FetchQuestionBackendResponse {
@@ -65,9 +69,9 @@ export class EditableQuestionBackendApiService {
       skillDifficulties: number[],
       questionObject: Question,
       imagesData: ImageData[],
-      successCallback: (value: EditableQuestionBackendResponse) => void,
+      successCallback: (value: CreateQuestionResponse) => void,
       errorCallback: (reason?: string) => void
-  ): Promise<EditableQuestionBackendResponse> {
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       let postData = {
         question_dict: questionObject,
@@ -82,12 +86,12 @@ export class EditableQuestionBackendApiService {
       for (let idx in imageBlobs) {
         body.append(filenames[idx], imageBlobs[idx]);
       }
-      this.http.post<EditableQuestionBackendResponse>(
+      this.http.post<CreateQuestionResponseBackendDict>(
         QuestionDomainConstants.QUESTION_CREATION_URL, body).toPromise()
         .then(response => {
           successCallback(
             {
-              questionId: response['question_id']
+              questionId: response.question_id
             });
         },
         errorResponse => {
@@ -184,7 +188,7 @@ export class EditableQuestionBackendApiService {
       skillIds: string[],
       skillDifficulties: number[],
       questionDict: Question,
-      imagesData: ImageData[]): Promise<EditableQuestionBackendResponse> {
+      imagesData: ImageData[]): Promise<CreateQuestionResponse> {
     return new Promise((resolve, reject) => {
       this._createQuestion(
         skillIds, skillDifficulties, questionDict, imagesData, resolve, reject);
