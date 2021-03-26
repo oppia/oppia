@@ -25,6 +25,9 @@ require(
   'components/state-editor/state-interaction-editor/' +
   'state-interaction-editor.directive.ts');
 require(
+  'components/state-editor/state-skill-editor/' +
+  'state-skill-editor.directive.ts');
+require(
   'components/state-editor/state-responses-editor/' +
   'state-responses.directive.ts');
 require(
