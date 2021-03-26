@@ -76,7 +76,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.skillIds = ctrl.subtopic.getSkillIds();
           ctrl.questionCount = 0;
           if (ctrl.skillIds.length) {
-            QuestionBackendApiService.fetchTotalQuestionCountForSkillIds(
+            QuestionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
               ctrl.skillIds).then((questionCount) => {
               ctrl.questionCount = questionCount;
               $scope.$applyAsync();
