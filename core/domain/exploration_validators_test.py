@@ -149,7 +149,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_public_exploration_with_missing_interaction_in_state(self):
-        owner = user_services.UserActionsInfo(self.owner_id)
+        owner = user_services.get_user_actions_info(self.owner_id)
         rights_manager.publish_exploration(owner, '0')
         expected_output = [
             (
@@ -620,7 +620,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         editor_email = 'user@editor.com'
         viewer_email = 'user@viewer.com'
@@ -1441,7 +1441,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         editor_email = 'user@editor.com'
         viewer_email = 'user@viewer.com'

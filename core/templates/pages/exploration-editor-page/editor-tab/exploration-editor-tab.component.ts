@@ -68,18 +68,20 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorTab', {
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$scope', '$templateCache', '$uibModal', 'EditabilityService',
+    '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
-    'ExplorationWarningsService', 'GraphDataService', 'LoaderService',
+    'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
+    'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
     'StateEditorService', 'StateTutorialFirstTimeService',
     'UrlInterpolationService', 'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $uibModal, EditabilityService,
+        $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
-        ExplorationWarningsService, GraphDataService, LoaderService,
+        ExplorationWarningsService, FocusManagerService, GraphDataService,
+        LoaderService,
         RouterService, SiteAnalyticsService, StateEditorRefreshService,
         StateEditorService, StateTutorialFirstTimeService,
         UrlInterpolationService, UserExplorationPermissionsService) {
@@ -156,9 +158,25 @@ angular.module('oppia').component('explorationEditorTab', {
           }
 
           LoaderService.hideLoadingScreen();
+          // $timeout is used to ensure that focus acts only after
+          // element is visible in DOM.
+          $timeout(() => ctrl.windowOnload(), 100);
         }
         if (EditabilityService.inTutorialMode()) {
           ctrl.startTutorial();
+        }
+      };
+
+      ctrl.windowOnload = function() {
+        ctrl.TabName = RouterService.getActiveTabName();
+        if (ctrl.TabName === 'main') {
+          FocusManagerService.setFocus('oppiaEditableSection');
+        }
+        if (ctrl.TabName === 'feedback') {
+          FocusManagerService.setFocus('newThreadButton');
+        }
+        if (ctrl.TabName === 'history') {
+          FocusManagerService.setFocus('usernameInputField');
         }
       };
 
