@@ -155,14 +155,10 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel.export_data(
                 self.USER_ID))
 
-        report_id = '%s.%s.%s' % (
-            self.PLATFORM, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
-            'randomInteger123')
         expected_data = {
-            report_id: {
+            self.REPORT_SUBMITTED_TIMESTAMP_1: {
                 'platform': self.PLATFORM,
                 'ticket_id': self.TICKET_ID,
-                'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP_1,
                 'report_type': self.REPORT_TYPE_SUGGESTION,
                 'category': self.CATEGORY_OTHER,
                 'platform_version': self.PLATFORM_VERSION,

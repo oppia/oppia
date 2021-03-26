@@ -303,11 +303,11 @@ class AppFeedbackReportModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains data referencing user and will be exported."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'platform': base_models.EXPORT_POLICY.EXPORTED,
             'scrubbed_by': base_models.EXPORT_POLICY.EXPORTED,
             'ticket_id': base_models.EXPORT_POLICY.EXPORTED,
-            'submitted_on': base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_on': (
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT),
             'report_type': base_models.EXPORT_POLICY.EXPORTED,
             'category': base_models.EXPORT_POLICY.EXPORTED,
             'platform_version': base_models.EXPORT_POLICY.EXPORTED,
@@ -347,10 +347,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
             cls.scrubbed_by == user_id).fetch()
 
         for report_model in report_models:
-            user_data[report_model.id] = {
+            user_data[report_model.submitted_on] = {
                 'platform': report_model.platform,
                 'ticket_id': report_model.ticket_id,
-                'submitted_on': report_model.submitted_on,
                 'report_type': report_model.report_type,
                 'category': report_model.category,
                 'platform_version': report_model.platform_version,
