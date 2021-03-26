@@ -105,6 +105,7 @@ angular.module('oppia').component('questionOpportunities', {
         const questionId = question.getId();
         const questionStateData = question.getStateData();
         QuestionUndoRedoService.clearChanges();
+        ContextService.setCommunityDashboardQuestionEditorIsOpen();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/contributor-dashboard-page/modal-templates/' +
@@ -120,8 +121,11 @@ angular.module('oppia').component('questionOpportunities', {
             skillDifficulty: () => skillDifficulty
           },
           controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function() {
+          ContextService.clearCommunityDashboardQuestionEditorIsOpen();
+        }, function() {
           ContextService.resetImageSaveDestination();
+          ContextService.clearCommunityDashboardQuestionEditorIsOpen();
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

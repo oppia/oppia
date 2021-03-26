@@ -36,6 +36,7 @@ export class ContextService {
   explorationIsLinkedToStory = false;
   explorationId = null;
   questionPlayerIsManuallySet = false;
+  communityDashboardQuestionEditorIsOpen = false;
   questionId = null;
   editorContext = null;
   customEntityContext = null;
@@ -131,10 +132,27 @@ export class ContextService {
     return this.questionPlayerIsManuallySet;
   }
 
+  setCommunityDashboardQuestionEditorIsOpen(): void {
+    this.communityDashboardQuestionEditorIsOpen = true;
+  }
+
+  clearCommunityDashboardQuestionEditorIsOpen(): void {
+    this.communityDashboardQuestionEditorIsOpen = false;
+  }
+
+  getCommunityDashboardQuestionEditorIsOpen(): boolean {
+    return this.communityDashboardQuestionEditorIsOpen;
+  }
+
   canEntityReferToSkills(): boolean {
     return (
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
+      (
+        this.getPageContext() === (
+          ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD) &&
+          this.getCommunityDashboardQuestionEditorIsOpen()
+      ) ||
       (
         this.getPageContext() === (
           ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
