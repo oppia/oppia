@@ -326,6 +326,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
+    'suggestion-modal-for-learner-dashboard.service.ts'
     'summary-list-header.component.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
@@ -361,7 +362,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'voiceover-recording.service.ts',
     'warnings-and-alerts.directive.ts',
     'worked-example-editor.directive.ts',
-    'suggestion-modal-for-learner-dashboard.service.ts'
 ]
 
 
