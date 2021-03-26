@@ -32,9 +32,9 @@
   <div class="filepath-editor-image-container"
        ng-attr-style="<[$ctrl.getImageContainerDynamicStyles()]>">
     <div ng-if="$ctrl.isNoImageUploaded()">
-      <oppia-image-uploader (file-changed)="onFileChanged($event)"
-                            [allowed-image-formats]="allowedImageFormats">
-      </oppia-image-uploader>
+      <image-uploader on-file-changed="$ctrl.onFileChanged"
+                      allowed-image-formats="$ctrl.allowedImageFormats">
+      </image-uploader>
     </div>
     <div ng-if="$ctrl.isImageUploaded()"
          class="filepath-editor-image-crop-container"
