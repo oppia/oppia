@@ -3731,58 +3731,6 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
         ]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
 
-    def test_migration_job_handles_missing_states_schema_version(self):
-        swap_exp_schema_5 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 5)
-        with swap_exp_schema_5:
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 0):
-                exploration = exp_domain.Exploration.create_default_exploration(
-                    self.VALID_EXP_ID, title='title', category='category')
-                exp_services.save_new_exploration(self.albert_id, exploration)
-
-            # Bring the main exploration to the latest schema.
-            caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION, None,
-                [self.VALID_EXP_ID])
-            migration_change_list = [
-                exp_domain.ExplorationChange({
-                    'cmd': (
-                        exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
-                    'from_version': '0',
-                    'to_version': '1'
-                })
-            ]
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
-                exp_services.update_exploration(
-                    self.albert_id, self.VALID_EXP_ID, migration_change_list,
-                    'Ran Exploration Migration job.')
-            exploration_model = exp_models.ExplorationModel.get(
-                self.VALID_EXP_ID)
-            self.assertEqual(exploration_model.states_schema_version, 1)
-
-            # Modify the snapshot to have no states schema version. (This
-            # implies a schema version of 0.)
-            snapshot_content_model = (
-                exp_models.ExplorationSnapshotContentModel.get(
-                    '%s-1' % self.VALID_EXP_ID))
-            del snapshot_content_model.content['states_schema_version']
-            snapshot_content_model.update_timestamps(
-                update_last_updated_time=False)
-            snapshot_content_model.put()
-
-            # There is no failure due to a missing states schema version.
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 1):
-                job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
-                exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
-                self.process_and_flush_pending_mapreduce_tasks()
-
-        # The updated snapshot content model should have a populated states
-        # schema version.
-        snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get(
-            '%s-1' % self.VALID_EXP_ID)
-        self.assertEqual(
-            snapshot_content_model.content['states_schema_version'], 1)
-
 
 class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
 
