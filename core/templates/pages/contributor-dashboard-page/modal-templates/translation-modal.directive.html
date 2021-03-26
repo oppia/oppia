@@ -33,6 +33,13 @@
                          class="oppia-rte-editor">
       </angular-html-bind>
     </div>
+    <div>
+      <ul>
+        <li ng-if="TRANSLATION_TIPS[activeLanguageCode]"
+            ng-repeat="tip in TRANSLATION_TIPS[activeLanguageCode]"><[tip]>
+        </li>
+      </ul>
+    </div>
     <div class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
         <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
