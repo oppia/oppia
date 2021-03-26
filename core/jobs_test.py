@@ -63,7 +63,7 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            int. It will yield a integer value.
+            tuple(str,int). It will yield a integer value.
         """
         current_class = MockJobManagerOne
         if current_class.entity_created_before_job_queued(item):
@@ -99,7 +99,7 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            int. It will yield a integer value.
+            tuple(str,int). It will yield a integer value.
         """
         current_class = MockJobManagerTwo
         if current_class.entity_created_before_job_queued(item):
@@ -135,7 +135,7 @@ class MockFailingJobManager(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            int. One might yield (exploration.id, 1).
+            tuple(str,int). One might yield (exploration.id, 1).
         """
         current_class = MockFailingJobManager
         if current_class.entity_created_before_job_queued(item):
@@ -339,7 +339,7 @@ class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
         """Post failure Hook.
 
         Args:
-            job_id: str. The ID of the Job to enqueue.
+            job_id: str. The ID of the job that just failed.
         """
         model = MockSumModel.get_by_id(SUM_MODEL_ID)
         model.failed = True
@@ -385,7 +385,7 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            str. One might yield (exploration.id, 1).
+            tuple(str,int). One might yield (exploration.id, 1).
         """
         current_class = SampleMapReduceJobManager
         if current_class.entity_created_before_job_queued(item):
@@ -685,7 +685,7 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
             item: *. A single element of type given by entity_class().
 
         Yields:
-            str. One might yield (exploration.id, 1).
+            tuple(str,int). One might yield (exploration.id, 1).
         """
         yield ('sum', 1)
 
@@ -761,7 +761,7 @@ class MockStartExplorationMRJobManager(
             item: *. A single element of type given by entity_class().
 
         Yields:
-            str. One might yield (exploration.id, 1).
+            tuple(str,int). One might yield (exploration.id, 1).
         """
         current_class = MockStartExplorationMRJobManager
         if current_class.entity_created_before_job_queued(item):
@@ -822,13 +822,13 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
         Args:
             active_realtime_layer: int. The currently active realtime datastore
                 layer.
-            event_type: str. The event triggered by a student.
+            event_type: str. The type of event triggered by a learner.
             exp_id: int. The experiment id.
             unused_exp_version: int. The unused experiment version.
             unused_state_name: str. The unused state name.
             unused_session_id: int. The unused session id.
             unused_params: list(*). Unused parameters.
-            unused_play_type: *. Unsed play type.
+            unused_play_type: *. Unused play type.
         """
 
         @transaction_services.run_in_transaction_wrapper
