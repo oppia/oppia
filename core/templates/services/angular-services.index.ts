@@ -88,6 +88,7 @@ import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThre
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -494,6 +495,7 @@ export const angularServices: [string, Type<{}>][] = [
     LearnerDashboardIdsBackendApiService],
   ['LearnerParamsService', LearnerParamsService],
   ['LearnerPlaylistBackendApiService', LearnerPlaylistBackendApiService],
+  ['SuggestionModalForLearnerDashboardService', SuggestionModalForLearnerDashboardService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],

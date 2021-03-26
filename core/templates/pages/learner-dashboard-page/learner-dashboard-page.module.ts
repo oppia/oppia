@@ -23,10 +23,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+
+import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -36,9 +36,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ],
   declarations: [
     OppiaAngularRootComponent,
+    LearnerDashboardSuggestionModalComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
+    LearnerDashboardSuggestionModalComponent,
   ],
   providers: [
     {

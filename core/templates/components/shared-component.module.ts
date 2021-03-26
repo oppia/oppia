@@ -128,7 +128,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TruncatePipe,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
-    PromoBarComponent
+    PromoBarComponent,
   ],
 
   entryComponents: [
@@ -184,7 +184,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SummarizeNonnegativeNumberPipe,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
-    PromoBarComponent
+    PromoBarComponent,
   ],
 })
 

@@ -13,53 +13,35 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for learnerPlaylistModal.
+ * @fileoverview Component for learner dashboard suggestion modal.
  */
 
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Component({
-  selector: 'learner-playlist-modal',
-  templateUrl: './learner-playlist-modal.component.html',
+  selector: 'learner-dashboard-suggestion-modal',
+  templateUrl: './learner-dashboard-suggestion-modal.component.html',
   styleUrls: []
 })
-export class LearnerPlaylistModalComponent implements OnInit {
-  @Input() activityId: string;
-  @Input() activityTitle: string;
-  @Input() activityType: string;
-
-  sectionNameI18nId: string;
-  removeFromLearnerPlaylistUrl: string;
+export class LearnerDashboardSuggestionModalComponent {
+  @Input() newContent: string;
+  @Input() oldContent: string;
+  @Input() description: string;
 
   constructor(
     private activeModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  ngOnInit(): void {
-    this.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-    this.removeFromLearnerPlaylistUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        '/learnerplaylistactivityhandler/' +
-        '<activityType>/<activityId>', {
-          activityType: this.activityType,
-          activityId: this.activityId
-        }));
-  }
-
-  remove(): void {
-    this.activeModal.close(this.removeFromLearnerPlaylistUrl);
-  }
-
   cancel(): void {
-    this.activeModal.dismiss();
+    this.activeModal.dismiss('cancel');
   }
 }
 
 angular.module('oppia').directive(
   'learnerPlaylistModalComponent',
   downgradeComponent(
-    {component: LearnerPlaylistModalComponent}));
+    {component: LearnerDashboardSuggestionModalComponent}));
