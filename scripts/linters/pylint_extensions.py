@@ -2126,18 +2126,18 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
     }
 
     def visit_functiondef(self, node):
-        """Visits every function definition and ensures there are no blank lines below
-        function definition.
+        """Visits every function definition and ensures there are no blank lines 
+        below function definition.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or method
                 definition in the AST.
         """
         c = 0
-        for i in range(len(node.root().file)):
+        for i in python_utils.RANGE(len(node.root().file)):
             c += 1
         line_number = node.fromlineno
-        for i in range(c):
+        for i in python_utils.RANGE(c):
             line = linecache.getline(node.root().file, line_number + i).strip()
             if re.search(r':', line):
                 line_number += i
