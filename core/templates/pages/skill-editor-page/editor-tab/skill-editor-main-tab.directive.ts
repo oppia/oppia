@@ -15,7 +15,7 @@
 /**
  * @fileoverview Controller for the main tab of the skill editor.
  */
-
+require('services/stateful/focus-manager.service.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-description-editor/' +
   'skill-description-editor.directive.ts');
@@ -45,11 +45,13 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'PageTitleService',
+        '$scope', '$timeout', '$uibModal', 'FocusManagerService',
+        'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $uibModal, PageTitleService,
+            $scope, $timeout, $uibModal, FocusManagerService,
+            PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
@@ -114,6 +116,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
             $scope.topicName = null;
             $scope.subtopicName = null;
             PageTitleService.setPageTitleForMobileView('Skill Editor');
+            // To ensure that the focus event function executes only after
+            // all the functions in the main thread have executed,
+            // $timeout is required.
+            $timeout(function() {
+              FocusManagerService.setFocus('newQuestionBtn');
+            }, 0);
           };
         }
       ]
