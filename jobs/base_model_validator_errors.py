@@ -19,44 +19,60 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import cron_services
+import feconf
 import python_utils
 
 
 class ModelValidationError(python_utils.OBJECT):
-    """Base error class for model validations."""
+    """Base class for model validation errors.
+
+    Attributes:
+        message: str. A summary of the issue which includes the erroneous
+            model's id.
+    """
 
     def __init__(self, model):
-        self._base_message = 'Entity id %s:' % (model.id)
-
-    @property
-    def key(self):
-        """Property that returns the error class name."""
-        return self.__class__.__name__
-
-    @property
-    def base_message(self):
-        """Message property to override in subclasses."""
-        return self._base_message
+        self._message = None
+        self._prefix = '%s(id="%s")' % (model.__class__.__name__, model.id)
 
     @property
     def message(self):
         """Message property to override in subclasses."""
-        raise NotImplementedError
+        if self._message is None:
+            raise NotImplementedError(
+                'Subclasses must assign to self.message in __init__')
+        return self._message
+
+    @message.setter
+    def message(self, value):
+        """Message property setter for assigning values.
+
+        Args:
+            value: str. The message for the error.
+
+        Returns:
+            str. The complete newly assigned message.
+        """
+        if not value:
+            raise ValueError('self.message must have a non-empty value')
+        self._message = '%s: %s' % (self._prefix, value)
+        return self._message
 
     def __repr__(self):
-        return '%s: %s' % (self.key, self.message) if self.message else self.key
+        return '%s in %s' % (self.__class__.__name__, self.message)
 
     def __eq__(self, other):
-        if self.__class__ is other.__class__:
-            return (self.key, self.message) == (other.key, other.message)
-        return NotImplemented
+        return (
+            self.message == other.message
+            if self.__class__ is other.__class__ else NotImplemented)
 
     def __ne__(self, other):
-        return not self.__eq__(other)
+        return (
+            not (self == other)
+            if self.__class__ is other.__class__ else NotImplemented)
 
     def __hash__(self):
-        return hash((self.__class__, self.key, self.message))
+        return hash((self.__class__, self.message))
 
 
 class ModelTimestampRelationshipError(ModelValidationError):
@@ -64,14 +80,9 @@ class ModelTimestampRelationshipError(ModelValidationError):
 
     def __init__(self, model):
         super(ModelTimestampRelationshipError, self).__init__(model)
-        self._message = (
-            '%s The created_on field has a value %s which '
-            'is greater than the value %s of last_updated field'
-            % (self.base_message, model.created_on, model.last_updated))
-
-    @property
-    def message(self):
-        return self._message
+        self.message = (
+            'created_on=%r is later than last_updated=%r'
+            % (model.created_on, model.last_updated))
 
 
 class ModelInvalidCommitStatusError(ModelValidationError):
@@ -79,18 +90,10 @@ class ModelInvalidCommitStatusError(ModelValidationError):
 
     def __init__(self, model):
         super(ModelInvalidCommitStatusError, self).__init__(model)
-        if model.post_commit_is_private:
-            self._message = (
-                '%s Post commit status is public but '
-                'post_commit_is_private is True' % self.base_message)
-        else:
-            self._message = (
-                '%s Post commit status is private but '
-                'post_commit_is_private is False' % self.base_message)
-
-    @property
-    def message(self):
-        return self._message
+        self.message = (
+            'post_commit_status="public" but post_commit_is_private=True'
+            if model.post_commit_is_private else
+            'post_commit_status="private" but post_commit_is_private=False')
 
 
 class ModelMutatedDuringJobError(ModelValidationError):
@@ -98,28 +101,16 @@ class ModelMutatedDuringJobError(ModelValidationError):
 
     def __init__(self, model):
         super(ModelMutatedDuringJobError, self).__init__(model)
-        self._message = (
-            '%s The last_updated field has a value %s which '
-            'is greater than the time when the job was run'
-            % (self.base_message, model.last_updated))
-
-    @property
-    def message(self):
-        return self._message
+        self.message = 'last_updated=%r is later than the job\'s start time' % (
+            model.last_updated)
 
 
 class ModelInvalidIdError(ModelValidationError):
     """Error class for id model validation errors."""
 
-    def __init__(self, model):
+    def __init__(self, model, pattern):
         super(ModelInvalidIdError, self).__init__(model)
-        self._message = (
-            '%s Entity id does not match regex pattern'
-            % (self.base_message))
-
-    @property
-    def message(self):
-        return self._message
+        self.message = 'id does not match the expected regex=%r' % pattern
 
 
 class ModelExpiredError(ModelValidationError):
@@ -127,11 +118,5 @@ class ModelExpiredError(ModelValidationError):
 
     def __init__(self, model):
         super(ModelExpiredError, self).__init__(model)
-        days = cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days
-        self._message = (
-            '%s Model marked as deleted is older than %s days'
-            % (self.base_message, days))
-
-    @property
-    def message(self):
-        return self._message
+        self.message = 'deleted=True and model is older than %s days' % (
+            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)

@@ -31,7 +31,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import re
 
-from core.domain import cron_services
 from core.platform import models
 import feconf
 from jobs import base_model_validator_errors as errors
@@ -39,10 +38,11 @@ from jobs import jobs_utils
 
 import apache_beam as beam
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+base_models, user_models = (
+    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
 
 
+DEFAULT_ID_REGEX_STRING = '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
@@ -60,11 +60,10 @@ class ValidateModelIdWithRegex(beam.DoFn):
         Yields:
             ModelInvalidIdError. An error class for models with invalid IDs.
         """
-        regex = re.compile(regex_string)
         model = jobs_utils.clone_model(input_model)
 
-        if not regex.match(model.id):
-            yield errors.ModelInvalidIdError(model)
+        if not re.match(regex_string, model.id):
+            yield errors.ModelInvalidIdError(model, regex_string)
 
 
 class ValidatePostCommitIsPrivate(beam.DoFn):
@@ -84,6 +83,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
             ModelInvalidCommitStatus. Error for commit_type validation.
         """
         model = jobs_utils.clone_model(input_model)
+
         expected_post_commit_is_private = (
             model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
         if model.post_commit_is_private != expected_post_commit_is_private:
@@ -104,11 +104,10 @@ class ValidateDeleted(beam.DoFn):
             ModelExpiredError. An error class for expired models.
         """
         model = jobs_utils.clone_model(input_model)
-        date_now = datetime.datetime.utcnow()
 
         expiration_date = (
-            date_now -
-            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+            datetime.datetime.utcnow() -
+            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
         if model.last_updated < expiration_date:
             yield errors.ModelExpiredError(model)
@@ -140,9 +139,7 @@ class ValidateModelTimeFields(beam.DoFn):
 
 
 class BaseModelValidator(beam.PTransform):
-    """Composite beam Transform which returns a pipeline of validation
-    errors.
-    """
+    """Composite PTransform which returns a pipeline of validation errors."""
 
     def expand(self, model_pipe):
         """Function that takes in a beam.PCollection of datastore models and
@@ -159,16 +156,18 @@ class BaseModelValidator(beam.PTransform):
             model_pipe
             | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
         )
-
-        deletion_errors = deleted | beam.ParDo(ValidateDeleted())
-
+        deletion_errors = (
+            deleted
+            | 'Validate deleted property' >> beam.ParDo(ValidateDeleted())
+        )
         time_field_validation_errors = (
-            not_deleted | beam.ParDo(ValidateModelTimeFields()))
-
+            not_deleted
+            | 'Validate timestamps' >> beam.ParDo(ValidateModelTimeFields())
+        )
         model_id_validation_errors = (
             not_deleted
-            | beam.ParDo(
-                ValidateModelIdWithRegex(), self._get_model_id_regex())
+            | 'Validate id' >> beam.ParDo(
+                ValidateModelIdWithRegex(), self.get_model_id_regex())
         )
 
         return (
@@ -178,10 +177,11 @@ class BaseModelValidator(beam.PTransform):
                 model_id_validation_errors)
             | beam.Flatten())
 
-    def _get_model_id_regex(self):
+    @classmethod
+    def get_model_id_regex(cls):
         """Returns a regex for model id.
 
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
+        return DEFAULT_ID_REGEX_STRING
