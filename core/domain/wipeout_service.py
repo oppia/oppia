@@ -1025,22 +1025,22 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
         app_feedback_report_models.AppFeedbackReportModel)
 
     feedback_report_models = app_feedback_report_model_class.query(
-        filter(app_feedback_report_model_class.scrubbed_by == user_id).fetch()
-    )
+        app_feedback_report_model_class.scrubbed_by == user_id).fetch()
     report_ids = set([model.id for model in feedback_report_models])
 
     _save_pseudonymizable_entity_mappings(
         pending_deletion_request, models.NAMES.app_feedback_report, report_ids)
 
-    def _pseudonymize_models(feedback_report_models):
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(feedback_report_models):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
         feedback_report_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            feedback_report_models: list(FeedbackReportModel). Models to scrub
-                user IDs from in the 'scrubbed_by' field.
+            feedback_report_models: list(FeedbackReportModel). The models with a
+                user ID in the 'scrubbed_by' field that we want to pseudonymize.
         """
         for report_model in feedback_report_models:
             if report_model.scrubbed_by == user_id:
@@ -1058,8 +1058,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
             0,
             len(feedback_report_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        transaction_services.run_in_transaction(
-            _pseudonymize_models,
+        _pseudonymize_models_transactional(
             feedback_report_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )

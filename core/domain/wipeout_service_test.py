@@ -188,7 +188,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
-        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
+        self.user_1_actions = user_services.get_user_actions_info(
+            self.user_1_id)
 
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
@@ -504,7 +505,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
+        self.user_1_actions = user_services.get_user_actions_info(
+            self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
         self.pending_deletion_request = (
@@ -589,7 +591,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
 
 class WipeoutServiceDeleteAppFeedbackReportModelsTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
     USER_1_EMAIL = 'some@email.com'
@@ -620,7 +622,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     ANDROID_SDK_VERSION = 22
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
-    AUDIO_LANGUAGE_ENGLISH = 'english'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
@@ -654,12 +656,12 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
@@ -675,12 +677,12 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
@@ -703,12 +705,12 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 self.REPORT_ID_1)
         )
         self.assertEqual(
-            report_model.redacted_by, report_mappings[self.REPORT_ID_1]
+            report_model.scrubbed_by, report_mappings[self.REPORT_ID_1]
         )
 
 
 class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
     USER_1_EMAIL = 'some@email.com'
@@ -739,7 +741,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
     ANDROID_SDK_VERSION = 22
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
-    AUDIO_LANGUAGE_ENGLISH = 'english'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
@@ -757,7 +759,9 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests, self).setUp()
+        super(
+            WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests,
+            self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -773,12 +777,12 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
@@ -794,12 +798,12 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
@@ -828,12 +832,12 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-            audio_language=self.AUDIO_LANGUAGE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
@@ -1095,7 +1099,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
         self.publish_collection(self.user_1_id, self.COL_1_ID)
         rights_manager.assign_role_for_collection(
-            user_services.UserActionsInfo(self.user_1_id),
+            user_services.get_user_actions_info(self.user_1_id),
             self.COL_1_ID,
             self.user_2_id,
             feconf.ROLE_OWNER)
@@ -1494,7 +1498,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
         self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         rights_manager.assign_role_for_exploration(
-            user_services.UserActionsInfo(self.user_1_id),
+            user_services.get_user_actions_info(self.user_1_id),
             self.EXP_1_ID,
             self.user_2_id,
             feconf.ROLE_OWNER)
@@ -3922,8 +3926,10 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             self.user_1_id, feconf.ROLE_ID_ADMIN)
         user_services.update_user_role(
             self.user_2_id, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
-        self.user_2_actions = user_services.UserActionsInfo(self.user_2_id)
+        self.user_1_actions = user_services.get_user_actions_info(
+            self.user_1_id)
+        self.user_2_actions = user_services.get_user_actions_info(
+            self.user_2_id)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
         topic_services.assign_role(
             self.user_1_actions,

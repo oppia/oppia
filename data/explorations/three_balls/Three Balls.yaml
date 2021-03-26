@@ -15,20 +15,15 @@ param_changes:
 param_specs:
   guess:
     obj_type: UnicodeString
-schema_version: 30
+schema_version: 47
 states:
   Continue Option:
     classifier_model_id: null
     content:
       content_id: content
-      html: "<p>Wow, you got through that really fast!</p><p>\_</p><p>Would you like\
-        \ to play around with the problem a bit more, and see how this exploration\
+      html: "<p>Wow, you got through that really fast!</p><p>\xC2\_</p><p>Would you\
+        \ like to play around with the problem a bit more, and see how this exploration\
         \ would have presented the material if you didn't figure it out yourself?</p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
     interaction:
       answer_groups:
       - outcome:
@@ -44,7 +39,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -59,16 +54,20 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - <p>Yes, take me to another stage in the exploration that would have taught
-            me about permutations</p>
-          - <p>No thanks, I'm done for now. I can always restart it if I want to experiment
-            more.</p>
+          - content_id: ca_choices_3
+            html: <p>Yes, take me to another stage in the exploration that would have
+              taught me about permutations</p>
+          - content_id: ca_choices_4
+            html: <p>No thanks, I'm done for now. I can always restart it if I want
+              to experiment more.</p>
+        showChoicesInShuffledOrder:
+          value: false
       default_outcome:
         dest: Continue Option
         feedback:
@@ -81,14 +80,30 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 5
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
   END:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -99,7 +114,15 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
   Final challenge:
     classifier_model_id: null
     content:
@@ -108,16 +131,6 @@ states:
         figure out how many ways there are to arrange four balls in a row? Listing
         all the possibilities by hand is going to be tedious, but, by now, you''ve
         learned at least one way to calculate this number quickly and accurately.</p>'
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      feedback_3: {}
-      feedback_4: {}
-      feedback_5: {}
-      feedback_6: {}
-      feedback_7: {}
     interaction:
       answer_groups:
       - outcome:
@@ -135,7 +148,7 @@ states:
         - inputs:
             x: 24.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -151,7 +164,7 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -177,7 +190,7 @@ states:
             a: 18.0
             b: 23.0
           rule_type: IsInclusivelyBetween
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -200,7 +213,7 @@ states:
         - inputs:
             x: 24.0
           rule_type: IsGreaterThan
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -216,7 +229,7 @@ states:
         - inputs:
             x: 6.0
           rule_type: IsLessThan
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -232,7 +245,7 @@ states:
         - inputs:
             x: 6.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -252,7 +265,7 @@ states:
         - inputs:
             x: 12.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -269,18 +282,37 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    next_content_id_index: 8
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
   Found all the ways:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>So, you've found that there are six ways to arrange these three balls.<br><br>Is
         that the same as your first guess?</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
     interaction:
       answer_groups:
       - outcome:
@@ -297,7 +329,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Introspection
@@ -313,14 +345,18 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - <p>Yes</p>
-          - <p>No</p>
+          - content_id: ca_choices_3
+            html: <p>Yes</p>
+          - content_id: ca_choices_4
+            html: <p>No</p>
+        showChoicesInShuffledOrder:
+          value: false
       default_outcome:
         dest: Introspection
         feedback:
@@ -333,7 +369,25 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 5
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
   General Theory:
     classifier_model_id: null
     content:
@@ -342,35 +396,27 @@ states:
         \ to arrange 2 balls.<br>There are\_6 ways to arrange 3 balls.<br><br>Let's\
         \ give these names. We will say F1 = 1, F2 = 2, F3 = 6. So, if you have n\
         \ balls (where n is 1, 2, 3, ...), then Fn is the number of ways to arrange\
-        \ them.<br></p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
-        \ filepath-with-value=\"&amp;quot;patterns_height_643_width_670.png&amp;quot;\"\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br>Can you see a pattern here, or a\
+        \ them.<br></p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;patterns_height_643_width_670.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p><br><br>Can you see a pattern here, or a\
         \ systematic way to count them? Let's have a look at the 3-ball case.<br><br>--------------------------------------------------------------------------------------------<br><br>First\
         \ you pick the ball on the left. This could be red, blue or yellow. There\
         \ are three cases to consider:<br><br>If the first ball is red, then there\
         \ are two balls left to arrange in the other two slots. And there are F2 ways\
-        \ to do this.</p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
-        \ filepath-with-value=\"&amp;quot;startRed_height_214_width_643.png&amp;quot;\"\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br></p><p>If the first ball is blue,\
+        \ to do this.</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;startRed_height_214_width_643.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p><br><br></p><p>If the first ball is blue,\
         \ then there are two balls left to ... hey, this is the same thing, it's just\
-        \ F2.</p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
-        \ filepath-with-value=\"&amp;quot;startBlue_height_219_width_633.png&amp;quot;\"\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p><br>And, if the first ball is yellow,\
-        \ then ... yada, yada, F2.<br></p><oppia-noninteractive-image caption-with-value=\"\
-        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;startYellow_height_200_width_635.png&amp;quot;\"\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br>So the total number of ways to arrange\
-        \ 3 balls, F3, is equal to 3 * F2. And all this works out correctly, because\
-        \ F2 = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,\
+        \ F2.</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;startBlue_height_219_width_633.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\_</p><p><br>And, if the first ball is yellow,\
+        \ then ... yada, yada, F2.<br></p><oppia-noninteractive-image alt-with-value=\"\
+        &amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+        &amp;quot;startYellow_height_200_width_635.png&amp;quot;\"></oppia-noninteractive-image><p><br><br>So\
+        \ the total number of ways to arrange 3 balls, F3, is equal to 3 * F2. And\
+        \ all this works out correctly, because F2 = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,\
         \ can you write out a similar expression for F2, in terms of F1? Then we'll\
         \ move on to figuring out F4, which starts to become hard to compute manually.</p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      feedback_3: {}
-      feedback_4: {}
-      feedback_5: {}
     interaction:
       answer_groups:
       - outcome:
@@ -386,9 +432,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 2F1
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - 2F1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -403,9 +452,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 2*F1
+            x:
+              contentId: rule_input_8
+              normalizedStrSet:
+              - 2*F1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -420,9 +472,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: F1*2
+            x:
+              contentId: rule_input_9
+              normalizedStrSet:
+              - F1*2
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -437,9 +492,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 2 * F1
+            x:
+              contentId: rule_input_10
+              normalizedStrSet:
+              - 2 * F1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -454,14 +512,19 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: F1 * 2
+            x:
+              contentId: rule_input_11
+              normalizedStrSet:
+              - F1 * 2
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value:
+            content_id: ca_placeholder_6
+            unicode_str: Type your answer here.
         rows:
           value: 1
       default_outcome:
@@ -479,7 +542,39 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 12
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
   Guess a generalization:
     classifier_model_id: null
     content:
@@ -492,10 +587,6 @@ states:
         works for 3 balls; we can figure out exactly why later.<br><br>Do you believe
         this reasoning? Do you agree that there are exactly 8 ways to arrange four
         balls of different colours in a line?</p>'
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -513,14 +604,18 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - <p>Yes! It's clearly 8.</p>
-          - <p>No, I don't think it's 8.</p>
+          - content_id: ca_choices_2
+            html: <p>Yes! It's clearly 8.</p>
+          - content_id: ca_choices_3
+            html: <p>No, I don't think it's 8.</p>
+        showChoicesInShuffledOrder:
+          value: false
       default_outcome:
         dest: Two balls
         feedback:
@@ -533,25 +628,36 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 4
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Intro:
     classifier_model_id: null
     content:
       content_id: content
-      html: "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
-        \ filepath-with-value=\"&amp;quot;3balls_height_312_width_328.png&amp;quot;\"\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>Suppose you were given three balls:\
-        \ one red, one blue, and one yellow -- and one day, you are idly playing around\
-        \ with them. Soon, you discover that you can make patterns by arranging the\
-        \ balls in a straight line; let's pretend you're doing this with the line\
+      html: "<oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"\
+        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3balls_height_312_width_328.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\xC2\_</p><p>Suppose you were given three\
+        \ balls: one red, one blue, and one yellow -- and one day, you are idly playing\
+        \ around with them. Soon, you discover that you can make patterns by arranging\
+        \ the balls in a straight line; let's pretend you're doing this with the line\
         \ stretching from left to right in front of you.<br><br>How many different\
         \ ways can you find to arrange the three balls in a straight line? Try to\
         \ determine all of them.<br></p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
     interaction:
       answer_groups:
       - outcome:
@@ -567,7 +673,7 @@ states:
         - inputs:
             x: 6.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Intro
@@ -585,7 +691,7 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -601,7 +707,21 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
   Introspection:
     classifier_model_id: null
     content:
@@ -616,10 +736,6 @@ states:
         things, or a systematic way that you could have used to count the balls. Write
         these down here -- you will probably want to refer to them in a future exercise,
         and we'll show your jottings to you again at that point.</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -633,14 +749,19 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: ''
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - ''
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: Type your answer here.
         rows:
           value: 1
       default_outcome:
@@ -655,7 +776,23 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 4
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
   Not 6:
     classifier_model_id: null
     content:
@@ -664,19 +801,10 @@ states:
         \ what you came up with; could you list the different ways?\_Write them as\
         \ three-character words, for example:<br><br>\_ \_ \_RBY<br><br>Means put\
         \ the red ball on the left, the blue ball in the middle, and the yellow ball\
-        \ on the right, like this:</p><oppia-noninteractive-image caption-with-value=\"\
-        &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;RBY_height_196_width_551.png&amp;quot;\"\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>Can you list all the ways you found?<br><br>\_\
-        \ \_\_</p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      feedback_3: {}
-      feedback_4: {}
-      feedback_5: {}
-      feedback_6: {}
+        \ on the right, like this:</p><oppia-noninteractive-image alt-with-value=\"\
+        &amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+        &amp;quot;RBY_height_196_width_551.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
+        </p><p>Can you list all the ways you found?<br><br>\_ \_\_</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -693,14 +821,16 @@ states:
         rule_specs:
         - inputs:
             x:
-            - bry
-            - byr
-            - rby
-            - ryb
-            - ybr
-            - yrb
+              contentId: rule_input_8
+              unicodeStrSet:
+              - bry
+              - byr
+              - rby
+              - ryb
+              - ybr
+              - yrb
           rule_type: HasElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -716,14 +846,16 @@ states:
         rule_specs:
         - inputs:
             x:
-            - BRY
-            - BYR
-            - RBY
-            - RYB
-            - YBR
-            - YRB
+              contentId: rule_input_9
+              unicodeStrSet:
+              - BRY
+              - BYR
+              - RBY
+              - RYB
+              - YBR
+              - YRB
           rule_type: HasElementsNotIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -738,10 +870,12 @@ states:
         rule_specs:
         - inputs:
             x:
-            - RBY
-            - RYB
+              contentId: rule_input_10
+              unicodeStrSet:
+              - RBY
+              - RYB
           rule_type: OmitsElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -756,10 +890,12 @@ states:
         rule_specs:
         - inputs:
             x:
-            - YBR
-            - YRB
+              contentId: rule_input_11
+              unicodeStrSet:
+              - YBR
+              - YRB
           rule_type: OmitsElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -773,10 +909,12 @@ states:
         rule_specs:
         - inputs:
             x:
-            - BRY
-            - BYR
+              contentId: rule_input_12
+              unicodeStrSet:
+              - BRY
+              - BYR
           rule_type: OmitsElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Found all the ways
@@ -790,17 +928,23 @@ states:
         rule_specs:
         - inputs:
             x:
-            - BRY
-            - BYR
-            - RBY
-            - RYB
-            - YBR
-            - YRB
+              contentId: rule_input_13
+              unicodeStrSet:
+              - BRY
+              - BYR
+              - RBY
+              - RYB
+              - YBR
+              - YRB
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_7
+            unicode_str: Add item
       default_outcome:
         dest: Not 6
         feedback:
@@ -814,12 +958,48 @@ states:
       hints: []
       id: SetInput
       solution: null
+    next_content_id_index: 14
     param_changes:
     - customization_args:
         parse_with_jinja: true
         value: '{{if guess != -1 then guess else answer}}'
       generator_id: Copier
       name: guess
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_13: {}
+        rule_input_8: {}
+        rule_input_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_13: {}
+        rule_input_8: {}
+        rule_input_9: {}
   Two balls:
     classifier_model_id: null
     content:
@@ -830,15 +1010,9 @@ states:
         \ more general pattern.<br><br>The most obvious small case is 1 ball! There's\
         \ one way to arrange one ball in a line.<br><br>How about 2 balls? How many\
         \ ways are there to arrange two balls, with different colours, in a line?</p><oppia-noninteractive-image\
-        \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;2balls_height_248_width_265.png&amp;quot;\"\
-        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      feedback_3: {}
-      feedback_4: {}
+        \ alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\"\
+        \ filepath-with-value=\"&amp;quot;2balls_height_248_width_265.png&amp;quot;\"\
+        ></oppia-noninteractive-image><p>\xC2\_</p>"
     interaction:
       answer_groups:
       - outcome:
@@ -856,7 +1030,7 @@ states:
         - inputs:
             x: 2.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Two balls
@@ -883,7 +1057,7 @@ states:
         - inputs:
             x: 4.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Two balls
@@ -899,7 +1073,7 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Two balls
@@ -914,7 +1088,7 @@ states:
         - inputs:
             x: 1.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -931,20 +1105,30 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    next_content_id_index: 5
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
   correct but why:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Right! Why do you think it is 6?</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      feedback_3: {}
-      feedback_4: {}
-      feedback_5: {}
     interaction:
       answer_groups:
       - outcome:
@@ -962,9 +1146,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: permutation
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - permutation
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -981,9 +1168,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: factorial
+            x:
+              contentId: rule_input_8
+              normalizedStrSet:
+              - factorial
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -1000,9 +1190,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 3!
+            x:
+              contentId: rule_input_9
+              normalizedStrSet:
+              - 3!
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -1020,9 +1213,12 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 3*2*1
+            x:
+              contentId: rule_input_10
+              normalizedStrSet:
+              - 3*2*1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -1040,14 +1236,19 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: 3x2x1
+            x:
+              contentId: rule_input_11
+              normalizedStrSet:
+              - 3x2x1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value:
+            content_id: ca_placeholder_6
+            unicode_str: Type your answer here.
         rows:
           value: 5
       default_outcome:
@@ -1070,7 +1271,39 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 12
     param_changes: []
-states_schema_version: 25
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_7: {}
+        rule_input_8: {}
+        rule_input_9: {}
+states_schema_version: 42
 tags: []
 title: Three Balls

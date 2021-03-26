@@ -44,7 +44,7 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -78,6 +78,10 @@
 /extensions/classifiers/ @oppia/ml
 /buf.yaml @oppia/ml
 /buf.gen.yaml @oppia/ml
+
+
+# App Feedback Reporting project
+/core/domain/app_feedback_report_*.py @BenHenning
 
 
 # Audio and Translation team.
@@ -464,7 +468,6 @@
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
-/core/templates/pages/login-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
 /core/templates/services/app.service*.ts @srijanreddy98
@@ -476,7 +479,6 @@
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
 /redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
-/.firebase.json @brianrodri
 
 
 # Miscellaneous.

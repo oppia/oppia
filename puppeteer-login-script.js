@@ -50,16 +50,13 @@ module.exports = async(browser, context) => {
 
 // Needed to relogin after lighthouse_setup.js.
 const login = async function(context, page) {
-  page.on('dialog', async dialog => {
-    if (dialog.message() === 'Please enter the email address to sign-in with') {
-      await dialog.accept('testadmin@example.com');
-    } else {
-      await dialog.dismiss();
-    }
-  });
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(ADMIN_URL, { waitUntil: networkIdle});
+    await page.goto(
+      ADMIN_URL, { waitUntil: networkIdle});
+    await page.waitForSelector('#admin', {visible: true});
+    await page.click('#admin');
+    await page.click('#submit-login');
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, {visible: true});
