@@ -233,7 +233,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
-            'The id generator for AppFeedbackReportModel is producing too'
+            'The id generator for AppFeedbackReportModel is producing too '
             'many collisions.')
 
     @classmethod
@@ -262,7 +262,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         report_entity = cls.get_by_id(report_id)
         if not report_entity:
             raise Exception(
-                'The AppFeedbackReportModel trying to be scrubbed does not'
+                'The AppFeedbackReportModel trying to be scrubbed does not '
                 'exist.')
         if report_entity.platform == PLATFORM_CHOICE_ANDROID:
             scrubbed_report_info = cls._scrub_report_info(
@@ -347,9 +347,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
             cls.scrubbed_by == user_id).fetch()
 
         for report_model in report_models:
-            user_data[report_model.submitted_on] = {
+            user_data[report_model.id] = {
                 'platform': report_model.platform,
                 'ticket_id': report_model.ticket_id,
+                'submitted_on': report_model.submitted_on,
                 'report_type': report_model.report_type,
                 'category': report_model.category,
                 'platform_version': report_model.platform_version,
@@ -610,7 +611,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
-            'The id generator for AppFeedbackReportStatsModel is producing too'
+            'The id generator for AppFeedbackReportStatsModel is producing too '
             'many collisions.')
 
     @classmethod
