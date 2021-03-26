@@ -34,7 +34,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
-    'admin-jobs-tab.directive.ts',
     'admin-misc-tab.directive.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
@@ -127,7 +126,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'html-escaper.service.ts',
     'html-select.directive.ts',
     'I18nFooter.ts',
-    'image-uploader.directive.ts',
+    'image-uploader.component.ts',
     'image-with-regions-editor.directive.ts',
     'input-response-pair.directive.ts',
     'int-editor.directive.ts',

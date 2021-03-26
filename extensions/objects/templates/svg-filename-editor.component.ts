@@ -16,7 +16,7 @@
  * @fileoverview Component for svg filename editor.
  */
 
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('objects/templates/svg-filename-editor.constants.ajs.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
