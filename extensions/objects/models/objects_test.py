@@ -953,22 +953,22 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
             })
 
 
-class TranslatableUnicodeTests(test_utils.GenericTestBase):
+class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
         with self.assertRaisesRegexp(TypeError, 'Invalid unicode string'):
-            objects.TranslatableUnicode.normalize({
+            objects.TranslatableUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStr': 5
             })
 
         with self.assertRaisesRegexp(TypeError, 'Invalid unicode string'):
-            objects.TranslatableUnicode.normalize({
+            objects.TranslatableUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStr': ['abc']
             })
 
-        objects.TranslatableUnicode.normalize({
+        objects.TranslatableUnicodeString.normalize({
             'contentId': 'rule_input',
             'unicodeStr': 'abc'
         })

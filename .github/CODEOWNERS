@@ -291,6 +291,7 @@
 /core/domain/interaction_registry*.py @iamprayush
 /core/domain/object_registry*.py @iamprayush
 /core/domain/rules_registry*.py @aks681
+/core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri

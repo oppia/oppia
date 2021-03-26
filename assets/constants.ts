@@ -4848,6 +4848,10 @@ export default {
     "description": "lietuvių (Lithuanian)",
     "direction": "ltr"
   }, {
+    "code": "ms",
+    "description": "Bahasa Melayu (Malay)",
+    "direction": "ltr"
+  }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
     "direction": "ltr"
