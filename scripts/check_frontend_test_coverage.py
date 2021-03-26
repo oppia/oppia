@@ -53,7 +53,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'base-content.directive.ts',
     'base-interaction-validation.service.ts',
     'Base.ts',
-    'boolean-editor.directive.ts',
+    'boolean-editor.component.ts',
     'change-list.service.ts',
     'ck-editor-4-rte.directive.ts',
     'ck-editor-4-widgets.initializer.ts',

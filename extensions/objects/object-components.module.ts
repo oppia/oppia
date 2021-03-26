@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AlgebraicExpressionEditor } from './templates/algebraic-expression-editor.component';
+import { BooleanEditorComponent } from './templates/boolean-editor.component';
 
 
 @NgModule({
@@ -30,13 +31,16 @@ import { AlgebraicExpressionEditor } from './templates/algebraic-expression-edit
     BrowserModule
   ],
   declarations: [
-    AlgebraicExpressionEditor
+    AlgebraicExpressionEditor,
+    BooleanEditorComponent
   ],
   entryComponents: [
-    AlgebraicExpressionEditor
+    AlgebraicExpressionEditor,
+    BooleanEditorComponent
   ],
   exports: [
-    AlgebraicExpressionEditor
+    AlgebraicExpressionEditor,
+    BooleanEditorComponent
   ],
 })
 

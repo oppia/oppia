@@ -17,7 +17,7 @@
  */
 
 require('objects/templates/algebraic-expression-editor.component.ts');
-require('objects/templates/boolean-editor.directive.ts');
+require('objects/templates/boolean-editor.component.ts');
 require('objects/templates/code-string-editor.directive.ts');
 require('objects/templates/coord-two-dim-editor.directive.ts');
 require('objects/templates/custom-osk-letters-editor.component.ts');

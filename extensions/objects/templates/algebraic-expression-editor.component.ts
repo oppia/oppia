@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -41,7 +41,6 @@ export class AlgebraicExpressionEditor implements OnInit {
   currentValue: string = '';
 
   constructor(
-    private cdRef: ChangeDetectorRef,
     private deviceInfoService: DeviceInfoService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
@@ -79,7 +78,6 @@ export class AlgebraicExpressionEditor implements OnInit {
           // 'watchers' aware of changes in answer.
           this.currentValue = activeGuppyObject.guppyInstance.asciimath();
           this.isCurrentAnswerValid();
-          this.cdRef.markForCheck();
         }
       }
     });

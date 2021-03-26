@@ -35,7 +35,7 @@ interface ObjectEditorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('objectEditor', [
-  '$compile', '$log', function($compile, $log) {
+  '$compile', '$log', '$rootScope', function($compile, $log, $rootScope) {
     return {
       scope: {
         alwaysEditable: '@',
@@ -46,6 +46,10 @@ angular.module('oppia').directive('objectEditor', [
         value: '='
       },
       link: function(scope: ObjectEditorCustomScope, element) {
+        const MIGRATED_EDITORS: string[] = [
+          'algebraic-expression',
+          'boolean-editor'
+        ];
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
         var directiveName = scope.objType.replace(
@@ -61,15 +65,16 @@ angular.module('oppia').directive('objectEditor', [
         };
         scope.updateValue = function(e) {
           scope.value = e;
+          $rootScope.$applyAsync();
         };
         if (directiveName) {
-          if (directiveName === 'algebraic-expression') {
+          if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
             element.html(
               '<' + directiveName +
               '-editor get-always-editable="getAlwaysEditable()"' +
               ' get-init-args="getInitArgs()" get-is-editable="' +
-              // eslint-disable-next-line max-len
-              'getIsEditable()" get-schema="getSchema()" (value-changed)="updateValue($event)" [value]="value"></' +
+              'getIsEditable()" get-schema="getSchema()"' +
+              '(value-changed)="updateValue($event)" [value]="value"></' +
               directiveName + '-editor>');
             $compile(element.contents())(scope);
           } else {
