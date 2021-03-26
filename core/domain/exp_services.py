@@ -1255,11 +1255,8 @@ def get_demo_exploration_components(demo_path):
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, exploration_id, assets_list,
         strip_voiceovers=False):
-    """Note that the default title and category will be used if the YAML
-    schema version is less than
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    since in that case the YAML schema will not have a title and category
-    present.
+    """Saves a new exploration given its representation in YAML form and the
+    list of assets associated with it.
 
     Args:
         committer_id: str. The id of the user who made the commit.
@@ -1279,7 +1276,6 @@ def save_new_exploration_from_yaml_and_assets(
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')
-    exp_schema_version = yaml_dict['schema_version']
 
     # The assets are committed before the exploration is created because the
     # migrating to state schema version 25 involves adding dimensions to
@@ -1291,16 +1287,7 @@ def save_new_exploration_from_yaml_and_assets(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(asset_filename, asset_content)
 
-    if (exp_schema_version <=
-            exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
-        # The schema of the YAML file for older explorations did not include
-        # a title and a category; these need to be manually specified.
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
-            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
-    else:
-        exploration = exp_domain.Exploration.from_yaml(
-            exploration_id, yaml_content)
+    exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
     if strip_voiceovers:
@@ -1798,14 +1785,17 @@ def regenerate_missing_stats_for_exploration(exp_id):
     exp_stats_list = stats_services.get_multiple_exploration_stats_by_version(
         exp_id, exp_versions)
 
-    exp_list = exp_fetchers.get_multiple_explorations_by_version(
-        exp_id, exp_versions, run_conversion=False)
+    exp_list = (
+        exp_fetchers
+        .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+            exp_id, exp_versions))
 
     if all(exp_stats is None for exp_stats in exp_stats_list):
         for index, version in enumerate(exp_versions):
             exp_stats_for_version = (
                 stats_services.get_stats_for_new_exploration(
-                    exp_id, version, exp_list[index].states.keys()))
+                    exp_id, version,
+                    exp_list[index].state_interaction_ids_dict.keys()))
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
@@ -1865,7 +1855,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
         elif exp.version == 1:
             new_exploration_stats = (
                 stats_services.get_stats_for_new_exploration(
-                    exp_id, exp.version, exp.states))
+                    exp_id, exp.version, exp.state_interaction_ids_dict.keys()))
             stats_services.create_stats_model(new_exploration_stats)
             missing_exp_stats_indices.append(i)
             missing_exp_stats.append(
@@ -1880,7 +1870,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
             if exp_stats is None:
                 new_exploration_stats = (
                     stats_services.get_stats_for_new_exploration(
-                        exp_id, exp.version, exp.states))
+                        exp_id, exp.version,
+                        exp.state_interaction_ids_dict.keys()))
                 stats_services.create_stats_model(new_exploration_stats)
                 missing_exp_stats_indices.append(i)
                 missing_exp_stats.append(
@@ -1904,7 +1895,7 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
         # Fill missing State-level stats.
         state_stats_mapping = exp_stats.state_stats_mapping
-        for state_name, _ in exp.states.items():
+        for state_name in exp.state_interaction_ids_dict.keys():
             if state_name in state_stats_mapping:
                 num_valid_state_stats += 1
                 continue
@@ -1918,9 +1909,9 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
             try:
                 prev_interaction_id = (
-                    prev_exp.states[prev_state_name].interaction.id)
+                    prev_exp.state_interaction_ids_dict[state_name])
                 current_interaction_id = (
-                    exp.states[state_name].interaction.id)
+                    exp.state_interaction_ids_dict[state_name])
                 exp_stats_list[i].state_stats_mapping[state_name] = (
                     prev_exp_stats.state_stats_mapping[
                         prev_state_name].clone()
@@ -1942,7 +1933,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
                                 exp_versions_diff.new_to_old_state_names),
                             'old_to_new_state_names': (
                                 exp_versions_diff.old_to_new_state_names),
-                            'prev_exp.states': prev_exp.states.keys(),
+                            'prev_exp.states': (
+                                prev_exp.state_interaction_ids_dict.keys()),
                             'prev_exp_stats': prev_exp_stats
                         }))
 
