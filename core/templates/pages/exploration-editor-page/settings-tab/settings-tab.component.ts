@@ -439,7 +439,7 @@ angular.module('oppia').component('settingsTab', {
 
       ctrl.isTitlePresent = function() {
         return ExplorationTitleService.savedMemento.length > 0;
-      }
+      };
 
       ctrl.onRolesFormUsernameBlur = function() {
         ctrl.rolesSaveButtonEnabled = true;
