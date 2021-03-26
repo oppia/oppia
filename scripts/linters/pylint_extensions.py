@@ -2126,7 +2126,7 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
     }
 
     def visit_functiondef(self, node):
-        """Visits every function definition and ensures there are no blank lines 
+        """Visits every function definition and ensures there are no blank lines
         below function definition.
 
         Args:
