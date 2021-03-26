@@ -157,8 +157,10 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.saveRoleChanges(
             username, newRole);
-        }, function() {
-          AlertsService.clearWarnings();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
         ctrl.closeRolesForm();
       };
@@ -309,8 +311,10 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.removeRoleAsync(
             memberUsername);
-        }, function() {
-          AlertsService.clearWarnings();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
         ctrl.closeRolesForm();
       };
@@ -433,6 +437,10 @@ angular.module('oppia').component('settingsTab', {
         ctrl.isRolesFormOpen = false;
       };
 
+      ctrl.isTitlePresent = function() {
+        return ExplorationTitleService.savedMemento.length > 0;
+      }
+
       ctrl.onRolesFormUsernameBlur = function() {
         ctrl.rolesSaveButtonEnabled = true;
         ctrl.errorMessage = '';
@@ -443,7 +451,7 @@ angular.module('oppia').component('settingsTab', {
           return;
         }
 
-        if (!ExplorationTitleService.savedMemento) {
+        if (!ctrl.isTitlePresent()) {
           ctrl.rolesSaveButtonEnabled = false;
           ctrl.errorMessage = (
             'Please provide a title before inviting.');

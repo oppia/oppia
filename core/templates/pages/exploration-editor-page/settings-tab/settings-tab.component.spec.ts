@@ -258,6 +258,7 @@ describe('Settings Tab Component', () => {
       ctrl.saveExplorationTitle();
 
       expect(explorationTitleService.saveDisplayedValue).toHaveBeenCalled();
+      expect(ctrl.isTitlePresent()).toBe(true);
     });
 
     it('should save exploration category', () => {
