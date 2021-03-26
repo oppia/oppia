@@ -43,7 +43,6 @@ import { KeyboardShortcutHelpModalComponent } from
   'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
-import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 import { StorySummaryTileDirective } from
   './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from
@@ -107,7 +106,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -140,7 +138,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // These elements will remain here even after migration.
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
     SkillMasteryViewerComponent,
@@ -166,7 +163,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SchemaBasedEditorDirective,
     FocusOnDirective,
     PromoBarComponent,
-    ImageUploaderComponent,
     SharingLinksComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
