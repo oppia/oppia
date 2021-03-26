@@ -240,6 +240,7 @@ import { LearnerDashboardBackendApiService } from
 import { LearnerPlaylistBackendApiService } from
   'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from
+  // eslint-disable-next-line max-len
   'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
@@ -613,7 +614,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     LearnerAnswerDetailsBackendApiService;
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   static learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService;
-  static suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService;
+  static suggestionModalForLearnerDashboardService:
+    SuggestionModalForLearnerDashboardService;
   static learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService;
   static learnerParamsService: LearnerParamsService;
@@ -903,7 +905,8 @@ private learnerAnswerDetailsBackendApiService:
   LearnerAnswerDetailsBackendApiService,
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
 private learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService,
-private suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService,
+private suggestionModalForLearnerDashboardService:
+  SuggestionModalForLearnerDashboardService,
 private learnerDashboardIdsBackendApiService:
   LearnerDashboardIdsBackendApiService,
 private learnerParamsService: LearnerParamsService,

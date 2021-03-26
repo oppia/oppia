@@ -21,6 +21,11 @@ import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
+interface ExtraParams {
+  'newContent': string,
+  'oldContent': string,
+  'description': string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +39,7 @@ export class SuggestionModalForLearnerDashboardService {
   ) {}
 
   private _showEditStateContentSuggestionModal(
-      newContent, oldContent, description) {
+      newContent: string, oldContent: string, description: string): void {
     const modelRef = this.ngbModal.open(
       LearnerDashboardSuggestionModalComponent, {backdrop: true});
     modelRef.componentInstance.newContent = newContent;
@@ -47,7 +52,7 @@ export class SuggestionModalForLearnerDashboardService {
     });
   }
 
-  showSuggestionModal (suggestionType, extraParams) {
+  showSuggestionModal(suggestionType: string, extraParams: ExtraParams): void {
     if (suggestionType === 'edit_exploration_state_content') {
       this._showEditStateContentSuggestionModal(
         extraParams.newContent,

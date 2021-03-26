@@ -26,7 +26,8 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
       bindToController: {
         htmlData: '<'
       },
-      template: '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
+      template:
+        '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
       controllerAs: '$ctrl',
       controller: [
         '$rootScope',
@@ -47,11 +48,11 @@ import { UpgradeComponent } from '@angular/upgrade/static';
 export const ScopeProvider = {
   deps: ['$injector'],
   provide: '$scope',
-  useFactory: (injector: Injector) => injector.get('$rootScope').$new(),
+  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
 };
 @Directive({
   selector: 'angular-html-bind-wrapper',
-  providers: [ ScopeProvider ],
+  providers: [ScopeProvider],
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;

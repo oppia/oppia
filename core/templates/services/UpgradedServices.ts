@@ -225,6 +225,7 @@ import { LearnerDashboardBackendApiService } from
 import { LearnerPlaylistBackendApiService } from
   'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from
+  // eslint-disable-next-line max-len
   'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
