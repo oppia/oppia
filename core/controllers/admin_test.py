@@ -75,7 +75,7 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         """Maps The Item.
-        
+
         Args:
             item: item to be Mapped.
         """
@@ -245,7 +245,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         def _mock_logging_function(msg, *args):
             """Mocks logging.info().
-            
+
             Args:
                 args: str. Takes Arguments for the mock logging function.
             """
@@ -822,7 +822,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_post_flag_changes_correctly_updates_flags_returned_by_getter(self):
-        """Handles POST requests. 
+        """Handles POST requests.
         Test that handle all flag changes and updates flages we get by getter."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()

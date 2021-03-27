@@ -172,7 +172,7 @@ class TopicAssignmentsHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id):
         """Handles GET requests.
-        
+
         Args:
             skill_id: str. Takes Skill ID from Dashboard
         """
