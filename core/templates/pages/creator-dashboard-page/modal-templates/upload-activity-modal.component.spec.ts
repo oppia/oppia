@@ -66,7 +66,7 @@ describe('Upload Activity Modal Component', () => {
   it('should close modal when saving activity', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
-    const file = {
+    let file = {
       size: 100,
       name: 'file.mp3'
     };
@@ -84,7 +84,7 @@ describe('Upload Activity Modal Component', () => {
       };
     });
     component.save();
-    expect(dismissSpy).not.toHaveBeenCalled();
+    expect(dismissSpy).toHaveBeenCalledWith();
   }));
 
   it('should not save activity when file is empty', fakeAsync(() => {
