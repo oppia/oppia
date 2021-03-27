@@ -40,6 +40,27 @@
         </schema-based-editor>
       </div>
     </div>
+    <div class="oppia-view-completed-translations-section">
+      <div className="oppia-view-completed-translations-button-row">  
+        <button class="btn btn-primary oppia-view-completed-translations-button"
+                ng-click="toggleViewCompletedTranslationsModal()"> 
+            <span ng-if="!viewCompletedTranslationsModalOpen">
+              View Completed Translations
+            </span>
+            <span ng-if="viewCompletedTranslationsModalOpen">
+              Hide Completed Translations
+            </span>
+        </button>
+      </div> 
+      <div class="oppia-completed-translations-row"
+           ng-if="viewCompletedTranslationsModalOpen">
+        <div ng-repeat = "content in contentList track by $index" ng-ig="!loadingTranslatedText">
+          <angular-html-bind html-data="content"></angular-html-bind>
+          <angular-html-bind html-data="translationsList[$index]"></angular-html-bind>
+        </div>
+        The content and corresponding translations will be displayed here.
+      </div>
+    </div>
   </div>
 </div>
 <div class="modal-footer">
@@ -144,5 +165,20 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  .oppia-view-completed-translations-button{
+    float:right;
+    display: block;
+  }
+  .oppia-view-completed-translations-button-row{
+    background-color: #009688;
+    width: 100%;
+  }
+  .oppia-completed-translations-row{
+    margin-top: 10px;
+  }
+  .oppia-view-completed-translations-section{
+    display: flex;
+    flex-direction: column;
   }
 </style>

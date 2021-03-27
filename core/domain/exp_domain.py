@@ -1396,6 +1396,33 @@ class Exploration(python_utils.OBJECT):
 
         return state_names_to_content_id_mapping
 
+    def get_translated_text(self, language_code):
+        """To be written
+
+        Args:
+            language_code: str. The language code in which translation is
+                required.
+
+        Returns:
+            dict(str, dict(str, str)). A dict where state_name is the key and a
+            dict with content_id as the key and html content as value.
+        """
+        print("correct function called in the exp_domain file")
+        completed_translations = []
+        completed_translations_content = []
+        dummy_completed_translations = ['<p>Translation 1</p>', '<p>Translation 2</p>']
+        for state_name, state in self.states.items():
+            abc = state.get_translated_html_for_given_language(language_code)
+            print(abc[0])
+            if(abc[0]=="true"):
+                completed_translations_content.append(abc[1])
+                completed_translations.append(abc[2])
+            # state.just_a_random_function()
+            # print("nothing")
+        print("printing completed tranlations")
+        print(completed_translations)
+        return [completed_translations_content, completed_translations]
+
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.

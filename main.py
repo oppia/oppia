@@ -283,6 +283,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
+        r'/gettranslatedtexthandler',
+        contributor_dashboard.TranslatedTextHandler),
+    get_redirect_route(
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(

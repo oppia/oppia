@@ -21,6 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
+require('pages/contributor-dashboard-page/services/translated-text.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
@@ -34,12 +35,12 @@ angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'ENTITY_TYPE',
+  'opportunity', 'ENTITY_TYPE', 'TranslatedTextService',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
-      opportunity, ENTITY_TYPE) {
+      opportunity, ENTITY_TYPE, TranslatedTextService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -68,6 +69,10 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.moreAvailable = false;
     $scope.previousTranslationAvailable = false;
     $scope.textToTranslate = '';
+    $scope.viewCompletedTranslationsModalOpen = false;
+    $scope.translationsList=[];
+    $scope.contentList=[];
+    $scope.loadingTranslatedText = false;
     $scope.languageDescription = (
       TranslationLanguageService.getActiveLanguageDescription());
     TranslateTextService.init(
@@ -80,7 +85,18 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.moreAvailable = textAndAvailability.more;
         $scope.loadingData = false;
       });
-
+    TranslatedTextService.init(
+      opportunity.id,
+      TranslationLanguageService.getActiveLanguageCode(),
+      function(){
+        var TranslatedTextAndContent = (
+          TranslatedTextService.getTranslatedText());
+        $scope.translationsList = TranslatedTextAndContent.translationsList;
+        $scope.contentList = TranslatedTextAndContent.contentList;
+        $scope.loadingTranslatedText = false;  
+      }
+    )
+    
     $scope.onContentClick = function($event) {
       if ($scope.isCopyModeActive()) {
         $event.stopPropagation();
@@ -138,5 +154,10 @@ angular.module('oppia').controller('TranslationModalController', [
         $uibModalInstance.close();
       }
     };
+
+    $scope.toggleViewCompletedTranslationsModal= function(){
+      $scope.viewCompletedTranslationsModalOpen =
+        !$scope.viewCompletedTranslationsModalOpen;
+    }
   }
 ]);

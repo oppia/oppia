@@ -3015,6 +3015,36 @@ class State(python_utils.OBJECT):
 
         return content_id_to_html
 
+    def get_translated_html_for_given_language(self, language_code):
+        """to be written properly
+
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Returns:
+            dict(str, str). A dict with key as content id and value as the
+            content html.
+        """
+        print("printing from state_domain.py")
+        return self._get_html_from_state(language_code)
+
+    def _get_html_from_state(self, language_code):
+        print("from _get_html_from_state function")
+        # for thing in self.written_translations.translations_mapping:
+        #     print("printing thing")
+        #     print(thing)
+        # s = "u'"+language_code+"'"
+        # print("printing s " + s)
+        translation_found = "false"
+        translation = ""
+        for key in self.written_translations.translations_mapping[u'content']:
+            print("printing keys")
+            if(key==language_code):
+                print("found translation")
+                translation_found = "true"
+                translation = self.written_translations.translations_mapping[u'content'][key].translation
+        return [translation_found, self.content.html, translation]
+
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
