@@ -49,7 +49,7 @@
 
 # Angular Migration team
 # TODO(#12350): For the following 17 files,
-replace @arpit1912 with @darksun27 after 2021-04-10.
+# replace @arpit1912 with @darksun27 after 2021-04-10.
 /core/templates/components/shared-component.module.ts @srijanreddy98 @arpit1912
 /core/templates/services/loader.service*.ts @srijanreddy98 @arpit1912
 /core/templates/components/material.module.ts @srijanreddy98 @arpit1912
