@@ -1010,3 +1010,37 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class ExpSnapshotsContentDeletionJob(jobs.BaseMapReduceOneOffJobManager):
+    """"""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationSnapshotContentModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotContentModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+        ]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsContentDeletionJob, cls).enqueue(
+            job_id, shard_count=16)
+
+    @staticmethod
+    def map(item):
+        exp_id = item.get_unversioned_instance_id()
+        exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, strict=False)
+        if exploration is None:
+            exp_services.delete_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id, force_deletion=True)
+            yield ('SUCCESS_DELETED_EXP', 1)
+        else:
+            yield ('SUCCESS NO ACTION', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

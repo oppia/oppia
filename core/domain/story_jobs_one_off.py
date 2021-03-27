@@ -150,3 +150,24 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class DeleteStoryCommitLogEntriesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to delete unneeded story commit logs."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryCommitLogEntryModel]
+
+    @staticmethod
+    def map(model):
+        if story_fetchers.get_story_by_id(model.story_id, strict=False) is None:
+            story_services.delete_story(
+                feconf.SYSTEM_COMMITTER_ID, model.story_id)
+            yield ('SUCCESS DELETED STORY', model.story_id)
+        else:
+            yield ('SUCCESS NO ACTION', model.story_id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

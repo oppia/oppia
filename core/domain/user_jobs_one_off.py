@@ -22,13 +22,16 @@ import copy
 import datetime
 import imghdr
 
+from constants import constants
 from core import jobs
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import image_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -1122,3 +1125,97 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class DeleteNonExistentExpsFromActivitiesOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that removes explorations that do not exist or that are private from
+    completed and incomplete activities models.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            DeleteNonExistentExpsFromActivitiesOneOffJob, cls
+        ).enqueue(job_id, shard_count=16)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            user_models.CompletedActivitiesModel,
+            user_models.IncompleteActivitiesModel
+        ]
+
+    @staticmethod
+    def map(activities_model):
+        class_name = activities_model.__class__.__name__
+        exploration_ids = activities_model.exploration_ids
+        exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
+            activities_model.exploration_ids)
+        exist_exploration_ids = [
+            exp_id for exp_id, exp_rights_model
+            in python_utils.ZIP(exploration_ids, exp_rights_models)
+            if exp_rights_model is not None
+        ]
+
+        changed = False
+        if len(exist_exploration_ids) < len(exploration_ids):
+            changed = True
+            yield ('REMOVED_DELETED_EXPS - %s' % class_name, 1)
+
+        public_exploration_ids = [
+            exp_id for exp_id, exp_rights_model
+            in python_utils.ZIP(exploration_ids, exp_rights_models)
+            if exp_rights_model.status == constants.ACTIVITY_STATUS_PUBLIC
+        ]
+
+        if len(public_exploration_ids) < len(exist_exploration_ids):
+            changed = True
+            yield ('REMOVED_PRIVATE_EXPS - %s' % class_name, 1)
+
+        if changed:
+            activities_model.exploration_ids = public_exploration_ids
+            activities_model.update_timestamps(update_last_updated_time=False)
+            activities_model.put()
+
+        yield ('SUCCESS' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class DeleteNonExistentExpUserDataOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes exploration user data models that do not have
+    existing exploration.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            DeleteNonExistentExpUserDataOneOffJob, cls
+        ).enqueue(job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationUserDataModel]
+
+    @staticmethod
+    def map(model):
+        exp_model = exp_models.ExplorationModel.get(
+            model.exploration_id, strict=False)
+        if exp_model is None:
+            exp_services.delete_exploration(
+                feconf.SYSTEM_COMMITTER_ID,
+                model.exploration_id,
+                force_deletion=True
+            )
+            yield ('SUCCESS_DELETED_EXPLORATION', 1)
+        else:
+            yield ('SUCCESS_KEPT', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
