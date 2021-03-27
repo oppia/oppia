@@ -31,7 +31,7 @@ require('domain/skill/RubricObjectFactory.ts');
 require('components/rubrics-editor/rubrics-editor.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'create-new-skill-modal.controller.ts');
+  'create-new-skill-modal.component.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require(

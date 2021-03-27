@@ -34,7 +34,7 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-    'create-new-skill-modal.controller.ts');
+    'create-new-skill-modal.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
     'skills-list.directive.ts');
