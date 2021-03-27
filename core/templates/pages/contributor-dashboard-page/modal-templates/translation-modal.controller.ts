@@ -158,14 +158,14 @@ angular.module('oppia').controller('TranslationModalController', [
       return attributes.filter(attribute => attribute);
     };
 
-    $scope.notCopiedAllElements = function(
+    $scope.copiedAllElements = function(
         originalElements, translatedElements) {
       const hasMatchingTranslatedElement = (element) => (
         translatedElements.includes(element));
-      return !originalElements.every(hasMatchingTranslatedElement);
+      return originalElements.every(hasMatchingTranslatedElement);
     };
 
-    $scope.changedImgDetails = function(originalElements, translatedElements) {
+    $scope.hasSomeDuplicateElements = function(originalElements, translatedElements) {
       if (originalElements.length === 0) {
         return false;
       }
@@ -196,7 +196,7 @@ angular.module('oppia').controller('TranslationModalController', [
       const translatedHtmlElements = Array.from(
         translatedElements, element => element.nodeName);
 
-      for (const originalElement of new Set(originalHtmlElements)) {
+      for (const originalElement of originalHtmlElements) {
         if (
           !(translatedHtmlElements.some(
             element => element === originalElement)) ||
@@ -211,18 +211,18 @@ angular.module('oppia').controller('TranslationModalController', [
       return true;
     };
 
-    $scope.validateImages = function(
+    $scope.validateTranslation = function(
         textToTranslate, translatedText): TranslationError {
       const translatedElements = $scope.getTexts(translatedText);
       const originalElements = $scope.getTexts(textToTranslate);
 
-      const hasUncopiedImgs = $scope.notCopiedAllElements(
+      const hasUncopiedImgs = !$scope.copiedAllElements(
         originalElements.foundImageFilePaths,
         translatedElements.foundImageFilePaths);
-      const hasDuplicateAltTexts = $scope.changedImgDetails(
+      const hasDuplicateAltTexts = $scope.hasSomeDuplicateElements(
         originalElements.foundImageAlts,
         translatedElements.foundImageAlts);
-      const hasDuplicateDescriptions = $scope.changedImgDetails(
+      const hasDuplicateDescriptions = $scope.hasSomeDuplicateElements(
         originalElements.foundImageDescriptions,
         translatedElements.foundImageDescriptions);
       const hasUntranslatedElements = !($scope.isTranslationCompleted(
@@ -250,7 +250,7 @@ angular.module('oppia').controller('TranslationModalController', [
       const translatedElements = angular.element(
         $scope.activeWrittenTranslation.html);
 
-      const translationError = $scope.validateImages(
+      const translationError = $scope.validateTranslation(
         originalElements, translatedElements);
 
       $scope.hasImgCopyError = translationError.hasUncopiedImgs;
@@ -259,16 +259,8 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.incompleteTranslationError = translationError.
         hasUntranslatedElements;
 
-      if ($scope.hasImgCopyError) {
-        return;
-      }
-      if ($scope.hasImgTextError) {
-        return;
-      }
-      if ($scope.incompleteTranslationError) {
-        return;
-      }
-      if ($scope.uploadingTranslation || $scope.loadingData) {
+      if ($scope.hasImgCopyError || $scope.hasImgTextError || $scope.incompleteTranslationError
+        || $scope.uploadingTranslation || $scope.loadingData) {
         return;
       }
       SiteAnalyticsService.
