@@ -68,6 +68,7 @@ class ExplorationPage(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
         """Handles GET requests.
+
         Args:
             unused_exploration_id: Gets the data for the exploration overview page. (Unused).
         """
@@ -83,6 +84,7 @@ class ExplorationHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests.
+
         Args:
             exploration_id: Runs the data for the exploration overview page."""
         # 'apply_draft' and 'v'(version) are optional parameters because the
@@ -119,7 +121,9 @@ class ExplorationHandler(EditorHandler):
     @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Handles PUT requests.
-        exploration_id: Updates properties of the given exploration."""
+
+        Args:
+            exploration_id: Updates properties of the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
@@ -169,6 +173,7 @@ class ExplorationHandler(EditorHandler):
     @acl_decorators.can_delete_exploration
     def delete(self, exploration_id):
         """Deletes the given exploration.
+        
         Args:
             exploration_id: Deletes the data for the exploration overview page.
         """
@@ -196,6 +201,7 @@ class UserExplorationPermissionsHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET Requests.
+       
         Args:
             exploration_id: Gets the user permissions for an exploration."""
         exploration_rights = rights_manager.get_exploration_rights(
@@ -228,6 +234,7 @@ class ExplorationRightsHandler(EditorHandler):
     @acl_decorators.can_modify_exploration_roles
     def put(self, exploration_id):
         """Handles PUT Requests.
+        
         Args:
             exploration_id: Updates the editing rights for the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -301,6 +308,7 @@ class ExplorationStatusHandler(EditorHandler):
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id):
         """Handles PUT Requests.
+       
         Args:
             exploration_id: Publish Exploration
         """
@@ -407,7 +415,8 @@ class ExplorationFileDownloader(EditorHandler):
     @acl_decorators.can_download_exploration
     def get(self, exploration_id):
         """Handles GET requests.
-         Args:
+        
+        Args:
             exploration_id: str. The exploration id.
         """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -451,7 +460,8 @@ class StateYamlHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handles POST requests.
-         Args:
+        
+        Args:
             exploration_id: str. The exploration id.(Unused)
         """
         state_dict = self.payload.get('state_dict')
@@ -474,7 +484,8 @@ class ExplorationSnapshotsHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests.
-         Args:
+        
+        Args:
             exploration_id: str. The exploration id.
         """
 
@@ -500,7 +511,8 @@ class ExplorationRevertHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Handles POST requests.
-         Args:
+        
+        Args:
             exploration_id: str. The exploration id.
         """
         current_version = self.payload.get('current_version')
@@ -536,7 +548,8 @@ class ExplorationStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests.
-         Args:
+        
+        Args:
             exploration_id: str. The exploration id."""
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -553,7 +566,8 @@ class StateInteractionStatsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests.
-         Args:
+       
+        Args:
             exploration_id: str. The exploration id.
             escaped_state_name: str State Name ( Escaped ).       
         """
@@ -585,6 +599,7 @@ class FetchIssuesHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exp_id):
         """Handles GET requests.
+        
         Args:
             exp_id: str. The exploration id.
         """
@@ -611,6 +626,7 @@ class FetchPlaythroughHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, unused_exploration_id, playthrough_id):
         """Handles GET requests.
+        
         Args:
             unused_exploration_id: str. The exploration id (Unused).
             playtrhough_id: str. The PlayThrough id.
@@ -632,6 +648,7 @@ class ResolveIssueHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests.
+        
         Args:
             exp_id: str. The exploration id .
         """
@@ -727,6 +744,7 @@ class StartedTutorialEventHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handles POST requests.
+        
         Args:
             unused_exploration_id: The Exploration id (Unused).
         """
@@ -740,6 +758,7 @@ class EditorAutosaveHandler(ExplorationHandler):
     @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Handles PUT requests for draft updation.
+        
         Args:
             exploration_id: The Exploration id (Unused).
         """
@@ -787,7 +806,11 @@ class EditorAutosaveHandler(ExplorationHandler):
 
     @acl_decorators.can_save_exploration
     def post(self, exploration_id):
-        """Handles POST request for discarding draft changes."""
+        """Handles POST request for discarding draft changes.
+        
+        Args:
+            exploration_id: str. The exploration id
+        """
         exp_services.discard_draft(exploration_id, self.user_id)
         self.render_json({})
 
@@ -800,8 +823,9 @@ class StateAnswerStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests.
+        
         Args:
-            exploration_id: The Exploration id.
+            exploration_id: str. The Exploration id.
         """
         current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
@@ -825,6 +849,7 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Handles GET requests for unresolved answers.
+        
         Args:
             exploration_id: The Exploration id.
         """
@@ -850,6 +875,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
     def get(self, entity_type, entity_id):
         """Handles the GET requests for learner answer info for an
         exploration state.
+        
         Args:
             entity_type: str. Type of entity.
             entity_id: str. the entity id.
@@ -902,7 +928,12 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
     @acl_decorators.can_edit_entity
     def delete(self, entity_type, entity_id):
-        """Deletes the learner answer info by the given id."""
+        """Deletes the learner answer info by the given id.
+        
+        Args:
+            entity_type: type of the entity.
+            entity_id: id of entity.
+        """
 
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException

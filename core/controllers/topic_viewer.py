@@ -49,6 +49,7 @@ class TopicPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
         """Handles GET requests.
+
         Args:
             topic_name: str. Name of Topic of page to be fetched.
         """

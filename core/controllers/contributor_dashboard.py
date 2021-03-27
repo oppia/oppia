@@ -50,6 +50,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, opportunity_type):
         """Handles GET requests.
+        
         Args:
             opportunity_type: str. Type of Opportunity.
         """

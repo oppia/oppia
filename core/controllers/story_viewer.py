@@ -49,6 +49,7 @@ class StoryPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
         """Handles GET requests.
+
         Args:
             story_id: str. The Story id
         """
@@ -98,6 +99,7 @@ class StoryProgressHandler(base.BaseHandler):
     def _record_node_completion(
             self, story_id, node_id, completed_node_ids, ordered_nodes):
         """Records node completion.
+        
         Args:
             story_id: str. The Story id.
             node_id: str. The Node id.
@@ -134,6 +136,7 @@ class StoryProgressHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id, node_id):
         """Handles GET requests.
+        
         Args:
             story_id: str. The Story id.
             node_id: str. The Node id.
@@ -183,6 +186,7 @@ class StoryProgressHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def post(self, story_id, node_id):
         """Handles POST Requests.
+        
         Args:
             story_id: str. The Story id.
             node_id: str. The Node id.

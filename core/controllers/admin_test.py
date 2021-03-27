@@ -69,12 +69,13 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """ Entity Classes to Map Over """
+        """Entity Classes to Map Over."""
         return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(item):
-        """
+        """Maps The Item.
+        
         Args:
             item: item to be Mapped.
         """
@@ -83,6 +84,7 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         """ Reduce Method
+
         Args:
             key: index of value.
             values: values that to be reduced.
@@ -193,7 +195,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_generate_dummy_skill_data_in_production_mode(self):
-        """ Test that Generate Dummy Skill Data in Production Mode. """
+        """Test that Generate Dummy Skill Data in Production Mode."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -208,7 +210,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_admins_cannot_generate_dummy_skill_data(self):
-        """ Non Admins Test that Generate Dummy Skill Data in Production Mode. """
+        """Non Admins Test that Generate Dummy Skill Data in Production Mode."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         assert_raises_regexp = self.assertRaisesRegexp(
@@ -221,7 +223,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_reload_collection_in_production_mode(self):
-        """ Test that Reload Collection in Production Mode. """
+        """Test that Reload Collection in Production Mode."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -242,7 +244,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.info()."""
+            """Mocks logging.info().
+            
+            Args:
+                args: str. Takes Arguments for the mock logging function.
+            """
             observed_log_messages.append(msg % args)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -750,8 +756,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_handler_includes_all_feature_flags(self):
-        """ Handles GET requests. 
-        Test that handle all include feature flags. """
+        """Handles GET requests.
+        Test that handle all include feature flags."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
             'test_feature_1', 'feature for test.', 'dev')
@@ -771,8 +777,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_post_with_flag_changes_updates_feature_flags(self):
-        """ Handles POST requests. 
-        Test that handle all flag changes updates. """
+        """Handles POST requests.
+        Test that handle all flag changes updates."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -816,8 +822,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_post_flag_changes_correctly_updates_flags_returned_by_getter(self):
-        """ Handles POST requests. 
-        Test that handle all flag changes and updates flages we get by getter. """
+        """Handles POST requests. 
+        Test that handle all flag changes and updates flages we get by getter."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -862,7 +868,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_invalid_rules_returns_400(self):
-        """ Test that update flag rules with Invalid Rules, Return 400. """
+        """ Test that update flag rules with Invalid Rules, Returns 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -906,7 +912,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_unknown_feature_name_returns_400(self):
-        """ Test that update flag rules with Unknown Feature Name, Return 400. """
+        """ Test that update flag rules with Unknown Feature Name, Returns 400. """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -1209,6 +1215,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_view_and_update_role(self):
+        """View tests and Update roles of the User."""
         user_email = 'user1@example.com'
         username = 'user1'
 
@@ -1242,6 +1249,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_invalid_username_in_filter_criterion_and_update_role(self):
+        """Test Invalid Username in filter criterion and update role of the user."""
         username = 'myinvaliduser'
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1518,10 +1526,12 @@ class SendDummyMailTest(test_utils.GenericTestBase):
     """"Tests for sending test mails to admin."""
 
     def setUp(self):
+        """Setup the the Sender for Dummy Mail Tests."""
         super(SendDummyMailTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
     def test_send_dummy_mail(self):
+        """Test & Send Dummy Mail."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -1546,11 +1556,13 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     NEW_USERNAME = 'newUsername'
 
     def setUp(self):
+        """Setup the utility for updating Username Handle Test."""
         super(UpdateUsernameHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.OLD_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
     def test_update_username_with_none_new_username(self):
+        """Test the update of username with new username."""
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
@@ -1565,6 +1577,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             'specified.')
 
     def test_update_username_with_none_old_username(self):
+        """Test the update of username with old username."""
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
@@ -1579,6 +1592,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             'specified.')
 
     def test_update_username_with_non_string_new_username(self):
+        """Test the update of username with non-string new username."""
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
@@ -1593,6 +1607,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             'string, received 123')
 
     def test_update_username_with_non_string_old_username(self):
+        """Test the update of username with non-string old username."""
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
@@ -1607,6 +1622,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             'string, received 123')
 
     def test_update_username_with_long_new_username(self):
+        """Test the update of username with long new username."""
         long_username = 'a' * (constants.MAX_USERNAME_LENGTH + 1)
         csrf_token = self.get_new_csrf_token()
 
@@ -1624,6 +1640,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 long_username))
 
     def test_update_username_with_nonexistent_old_username(self):
+        """Test the update of username with Non-Existant old username."""
         non_existent_username = 'invalid'
         csrf_token = self.get_new_csrf_token()
 
@@ -1637,6 +1654,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Invalid username: invalid')
 
     def test_update_username_with_new_username_already_taken(self):
+        """Test the update of username with new username, that is already taken."""
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
@@ -1649,6 +1667,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Username already taken.')
 
     def test_update_username(self):
+        """Test Updation of Username."""
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1661,6 +1680,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(user_services.get_username(user_id), self.NEW_USERNAME)
 
     def test_update_username_creates_audit_model(self):
+        """Test Update Username Creates Audit Model."""
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1708,6 +1728,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
+        """Setup of Adding Contribution Rights Handlers."""
         super(AddContributionRightsHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
@@ -1737,6 +1758,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid username: invalid')
 
     def test_add_translation_reviewer(self):
+        """Test Add Translation Reviewer."""
         self.assertFalse(
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
@@ -1769,6 +1791,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid language_code: invalid')
 
     def test_assigning_same_language_for_translation_review_raise_error(self):
+        """Test Assigning Same Language for Translation review raise error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertFalse(
             user_services.can_review_translation_suggestions(
@@ -1796,6 +1819,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             'language code hi')
 
     def test_add_voiceover_reviewer(self):
+        """Test Add Voiceover Reviewer."""
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
@@ -1814,6 +1838,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.voiceover_reviewer_id, language_code='hi'))
 
     def test_add_voiceover_reviewer_in_invalid_language(self):
+        """Test Add VoiceOver Reviewer in Inavlid Language."""
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
@@ -1834,6 +1859,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.voiceover_reviewer_id, language_code='hi'))
 
     def test_assigning_same_language_for_voiceover_review_raise_error(self):
+        """Test Assigning Same Language for voiceover review, raises error."""
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
@@ -1863,6 +1889,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             'language code hi')
 
     def test_add_question_reviewer(self):
+        """Test Add Question Reviewer."""
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
@@ -1879,6 +1906,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
     def test_assigning_same_user_as_question_reviewer_raise_error(self):
+        """Test Assigning Same user as question reviewer, raises error."""
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
@@ -1903,6 +1931,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             'User question already has rights to review question.')
 
     def test_add_question_submitter(self):
+        """Test add Question Submitter."""
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
@@ -1919,6 +1948,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
     def test_assigning_same_user_as_question_submitter_raise_error(self):
+        """Test Assigning Same User as Question Submitter, raises error."""
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
@@ -1943,6 +1973,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             'User question already has rights to submit question.')
 
     def test_add_reviewer_for_invalid_category_raise_error(self):
+        """Test Add Reviewer for Invalid Category, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
@@ -1964,6 +1995,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
+        """Test Setup Remove Contribution Rights Handler."""
         super(RemoveContributionRightsHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
@@ -1978,6 +2010,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.QUESTION_REVIEWER_EMAIL)
 
     def test_add_reviewer_without_username_raise_error(self):
+        """Test Add Reviewer without username, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
@@ -1989,6 +2022,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Missing username param')
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
+        """Test add reviewer with invalid username, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
@@ -2002,6 +2036,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid username: invalid')
 
     def test_remove_translation_reviewer(self):
+        """Test Remove translation reviewer."""
         self.assertFalse(
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
@@ -2026,6 +2061,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.translation_reviewer_id, language_code='hi'))
 
     def test_remove_translation_reviewer_in_invalid_language_raise_error(self):
+        """Test Remove translation reviewer in invalid langauge, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
@@ -2041,6 +2077,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid language_code: invalid')
 
     def test_remove_unassigned_translation_reviewer_raise_error(self):
+        """Test Remove unassigned translation reviewer, raises error."""
         self.assertFalse(
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
@@ -2060,6 +2097,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             'hi.')
 
     def test_remove_voiceover_reviewer(self):
+        """Test Remove voiceover reviewer."""
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
@@ -2084,6 +2122,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.translation_reviewer_id, language_code='hi'))
 
     def test_remove_voiceover_reviewer_in_invalid_language_raise_error(self):
+        """Test Remove voiceover reviewer in invalid language, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
@@ -2099,6 +2138,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid language_code: invalid')
 
     def test_remove_unassigned_voiceover_reviewer_raise_error(self):
+        """Test Remove unassigned voiceover reviewer, raises error."""
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.translation_reviewer_id, language_code='hi'))
@@ -2118,6 +2158,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             'hi.')
 
     def test_remove_question_reviewer(self):
+        """Test remove question reviewer."""
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         self.assertTrue(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
@@ -2135,6 +2176,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
     def test_removing_unassigned_question_reviewer_raise_error(self):
+        """Test removing unassigned question reviewer, raises error."""
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
@@ -2152,6 +2194,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             'question does not have rights to review question.')
 
     def test_remove_question_submitter(self):
+        """Test Remove question submitter."""
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         self.assertTrue(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
@@ -2169,6 +2212,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
     def test_removing_unassigned_question_submitter_raise_error(self):
+        """Test Removing unassigned question submitter raise error."""
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
@@ -2186,6 +2230,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             'question does not have rights to submit question.')
 
     def test_remove_reviewer_for_invalid_category_raise_error(self):
+        """Test to Remove reviewer for invalid category, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
@@ -2199,6 +2244,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid category: invalid')
 
     def test_remove_reviewer_for_invalid_removal_type_raise_error(self):
+        """Test Remove reviewer for invalid removal type, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
@@ -2211,6 +2257,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid removal_type: invalid')
 
     def test_remove_reviewer_from_all_reviewable_items(self):
+        """Test Remove Reviewer from all reviewable items."""
         user_services.allow_user_to_review_question(
             self.translation_reviewer_id)
         self.assertTrue(user_services.can_review_question_suggestions(
@@ -2254,6 +2301,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
+        """Setting Up for Contributor users list handler test."""
         super(ContributorUsersListHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
@@ -2268,6 +2316,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self.QUESTION_REVIEWER_EMAIL)
 
     def test_check_contribution_reviewer_by_translation_reviewer_role(self):
+        """Test Check contribution reviewer by translation reviewer role."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_translation_in_language(
             self.translation_reviewer_id, 'hi')
@@ -2284,6 +2333,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('voiceartist' in response['usernames'])
 
     def test_check_contribution_reviewer_by_voiceover_reviewer_role(self):
+        """Test Check contribution reviewer by voiceover reviewer role."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_voiceover_in_language(
             self.translation_reviewer_id, 'hi')
@@ -2300,6 +2350,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('voiceartist' in response['usernames'])
 
     def test_check_contribution_reviewer_by_question_reviewer_role(self):
+        """Test Check contribution reviewer by question reviewer role."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
@@ -2313,6 +2364,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('voiceartist' in response['usernames'])
 
     def test_check_contributor_user_by_question_submitter_role(self):
+        """Test Check contributor user by question submitter role."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         user_services.allow_user_to_submit_question(self.voiceover_reviewer_id)
@@ -2327,6 +2379,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def test_check_contribution_reviewer_with_invalid_language_code_raise_error(
             self):
+        """Test check contribution reviewer with invalid language code, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/getcontributorusershandler', params={
@@ -2339,6 +2392,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def test_check_contribution_reviewer_with_invalid_category_raise_error(
             self):
+        """Test Check contribution reviewer with invalid category, raises error."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/getcontributorusershandler', params={
@@ -2356,6 +2410,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
+        """Test Setup for contribution rights data handler test."""
         super(ContributionRightsDataHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
@@ -2363,6 +2418,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
     def test_check_contribution_reviewer_rights(self):
+        """Test Check contribution reviewer rights."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/contributionrightsdatahandler', params={
@@ -2394,6 +2450,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['can_submit_questions'], True)
 
     def test_check_contribution_reviewer_rights_invalid_username(self):
+        """Test Check contribution reviewer rights invalid username."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/contributionrightsdatahandler', params={
@@ -2404,6 +2461,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_check_contribution_reviewer_rights_without_username(self):
+        """Test check contribution reviewer rights without username."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/contributionrightsdatahandler', params={},
@@ -2417,10 +2475,12 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
     """Tests MemoryCacheAdminHandler."""
 
     def setUp(self):
+        """Test Setup Memory Cache Admin Handler."""
         super(MemoryCacheAdminHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
     def test_get_memory_cache_data(self):
+        """Test get memory cache data."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/memorycacheadminhandler')
@@ -2431,6 +2491,7 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['total_keys_stored'], 1)
 
     def test_flush_memory_cache(self):
+        """Test Flush Memory Cache."""
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
@@ -2450,15 +2511,18 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
     """Tests NumberOfDeletionRequestsHandler."""
 
     def setUp(self):
+        """Test Setup Number of Deletion Requests Handler Test."""
         super(NumberOfDeletionRequestsHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
     def test_get_with_no_deletion_request_returns_zero(self):
+        """Test get with no deletion request, returns zero."""
         response = self.get_json('/numberofdeletionrequestshandler')
         self.assertEqual(response['number_of_pending_deletion_models'], 0)
 
     def test_get_with_two_deletion_request_returns_two(self):
+        """Test get with two deletion request, return two."""
         user_models.PendingDeletionRequestModel(
             id='id1', email='id1@email.com', role='role'
         ).put()
@@ -2474,21 +2538,25 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
     """Tests VerifyUserModelsDeletedHandler."""
 
     def setUp(self):
+        """test setup for verify user models deleted handler."""
         super(VerifyUserModelsDeletedHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
     def test_get_without_user_id_raises_error(self):
+        """test get witrhout user id, raises error."""
         self.get_json(
             '/verifyusermodelsdeletedhandler', expected_status_int=400)
 
     def test_get_with_nonexistent_user_id_returns_true(self):
+        """test get with nonexistent user id, returns true."""
         response = self.get_json(
             '/verifyusermodelsdeletedhandler', params={'user_id': 'aaa'})
         self.assertFalse(response['related_models_exist'])
 
     def test_get_with_existing_user_id_returns_true(self):
+        """test get with existing user id, returns true."""
         response = self.get_json(
             '/verifyusermodelsdeletedhandler',
             params={'user_id': self.admin_user_id}
@@ -2500,6 +2568,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
     """Tests DeleteUserHandler."""
 
     def setUp(self):
+        """test setup for delete user handler test."""
         super(DeleteUserHandlerTest, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -2508,18 +2577,21 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
     def test_delete_without_user_id_raises_error(self):
+        """test delete without user id, raises error."""
         self.delete_json(
             '/deleteuserhandler',
             params={'username': 'someusername'},
             expected_status_int=400)
 
     def test_delete_without_username_raises_error(self):
+        """test delete without username, raises error."""
         self.delete_json(
             '/deleteuserhandler',
             params={'user_id': 'aa'},
             expected_status_int=400)
 
     def test_delete_with_wrong_username_raises_error(self):
+        """test delete with wrong username, raises error."""
         self.delete_json(
             '/deleteuserhandler',
             params={
@@ -2529,6 +2601,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
 
     def test_delete_with_differing_user_id_and_username_raises_error(self):
+        """test delete with differing user id and username, raises error."""
         self.delete_json(
             '/deleteuserhandler',
             params={
@@ -2538,6 +2611,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
 
     def test_delete_with_correct_user_id_andusername_returns_true(self):
+        """test delete with correct user id and username, returns true."""
         response = self.delete_json(
             '/deleteuserhandler',
             params={
