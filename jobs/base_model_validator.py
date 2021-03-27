@@ -58,12 +58,12 @@ class ValidateModelIdWithRegex(beam.DoFn):
             regex_string: str. Regex pattern for valid ids to match.
 
         Yields:
-            ModelInvalidIdError. An error class for models with invalid IDs.
+            InvalidIdError. An error class for models with invalid IDs.
         """
         model = jobs_utils.clone_model(input_model)
 
         if not re.match(regex_string, model.id):
-            yield errors.ModelInvalidIdError(model, regex_string)
+            yield errors.InvalidIdError(model, regex_string)
 
 
 class ValidatePostCommitIsPrivate(beam.DoFn):
@@ -87,7 +87,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
         expected_post_commit_is_private = (
             model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
         if model.post_commit_is_private != expected_post_commit_is_private:
-            yield errors.ModelInvalidCommitStatusError(model)
+            yield errors.InvalidCommitStatusError(model)
 
 
 class ValidateDeleted(beam.DoFn):
@@ -126,12 +126,13 @@ class ValidateModelTimeFields(beam.DoFn):
             input_model: datastore_services.Model. Entity to validate.
 
         Yields:
-            ModelMutatedDuringJobError. Error for timestamp validation.
-            ModelTimestampRelationshipError. Error for timestamp validation.
+            ModelMutatedDuringJobError. Error for models mutated during the job.
+            InconsistentTimestampsError. Error for models with inconsistent
+            timestamps.
         """
         model = jobs_utils.clone_model(input_model)
         if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
-            yield errors.ModelTimestampRelationshipError(model)
+            yield errors.InconsistentTimestampsError(model)
 
         current_datetime = datetime.datetime.utcnow()
         if (model.last_updated - MAX_CLOCK_SKEW_SECS) > current_datetime:

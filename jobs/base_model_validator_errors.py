@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import feconf
 import python_utils
 
@@ -26,37 +27,64 @@ import python_utils
 class ModelValidationError(python_utils.OBJECT):
     """Base class for model validation errors.
 
-    Attributes:
-        message: str. A summary of the issue which includes the erroneous
-            model's id.
+    NOTE: Apache Beam will use pickle to serialize/deserialize error instances.
     """
 
+    # ModelValidationError and its subclasses will hold exactly one attribute to
+    # minimize their memory footprint.
+    __slots__ = '_message',
+
     def __init__(self, model):
-        self._message = None
-        self._prefix = '%s(id="%s")' % (model.__class__.__name__, model.id)
+        # At first, self._message is a tuple of model identifiers that will be
+        # used to annotate the actual message provided by subclasses.
+        model_name = model.__class__.__name__
+        # We use json.dumps to get a quote-escaped string.
+        model_id = json.dumps(model.id)
+        self._message = (model_name, model_id)
+
+    def __getstate__(self):
+        """Called by pickle to get the value that uniquely defines self."""
+        return self.message
+
+    def __setstate__(self, message):
+        """Called by pickle to build an instance from the __getstate__ value."""
+        self._message = message
 
     @property
     def message(self):
-        """Message property to override in subclasses."""
-        if self._message is None:
+        """Returns the error's message, which includes the erroneous model's id.
+
+        Returns:
+            str. The message.
+
+        Raises:
+            NotImplementedError. If message was never assigned a value.
+        """
+        if not python_utils.is_string(self._message):
             raise NotImplementedError(
-                'Subclasses must assign to self.message in __init__')
+                'self.message must be assigned a value in __init__')
         return self._message
 
     @message.setter
     def message(self, value):
-        """Message property setter for assigning values.
+        """Assigns a value to self.message.
 
         Args:
-            value: str. The message for the error.
+            value: str. The message.
 
-        Returns:
-            str. The complete newly assigned message.
+        Raises:
+            TypeError. When the message has already been assigned a value.
+            TypeError. When the value is not a string.
+            ValueError. When the value is empty.
         """
+        if python_utils.is_string(self._message):
+            raise TypeError('self.message must be assigned to exactly once')
+        if not python_utils.is_string(value):
+            raise TypeError('self.message must be a string')
         if not value:
-            raise ValueError('self.message must have a non-empty value')
-        self._message = '%s: %s' % (self._prefix, value)
-        return self._message
+            raise ValueError('self.message must be a non-empty string')
+        model_name, model_id = self._message
+        self._message = '%s(id=%s): %s' % (model_name, model_id, value)
 
     def __repr__(self):
         return '%s in %s' % (self.__class__.__name__, self.message)
@@ -75,21 +103,21 @@ class ModelValidationError(python_utils.OBJECT):
         return hash((self.__class__, self.message))
 
 
-class ModelTimestampRelationshipError(ModelValidationError):
-    """Error class for time field model validation errors."""
+class InconsistentTimestampsError(ModelValidationError):
+    """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model):
-        super(ModelTimestampRelationshipError, self).__init__(model)
+        super(InconsistentTimestampsError, self).__init__(model)
         self.message = (
             'created_on=%r is later than last_updated=%r'
             % (model.created_on, model.last_updated))
 
 
-class ModelInvalidCommitStatusError(ModelValidationError):
-    """Error class for commit_status validation errors."""
+class InvalidCommitStatusError(ModelValidationError):
+    """Error class for commit models with inconsistent status values."""
 
     def __init__(self, model):
-        super(ModelInvalidCommitStatusError, self).__init__(model)
+        super(InvalidCommitStatusError, self).__init__(model)
         self.message = (
             'post_commit_status="public" but post_commit_is_private=True'
             if model.post_commit_is_private else
@@ -97,7 +125,7 @@ class ModelInvalidCommitStatusError(ModelValidationError):
 
 
 class ModelMutatedDuringJobError(ModelValidationError):
-    """Error class for current time model validation errors."""
+    """Error class for models mutated during a job."""
 
     def __init__(self, model):
         super(ModelMutatedDuringJobError, self).__init__(model)
@@ -105,18 +133,18 @@ class ModelMutatedDuringJobError(ModelValidationError):
             model.last_updated)
 
 
-class ModelInvalidIdError(ModelValidationError):
-    """Error class for id model validation errors."""
+class InvalidIdError(ModelValidationError):
+    """Error class for models with invalid ids."""
 
     def __init__(self, model, pattern):
-        super(ModelInvalidIdError, self).__init__(model)
+        super(InvalidIdError, self).__init__(model)
         self.message = 'id does not match the expected regex=%r' % pattern
 
 
 class ModelExpiredError(ModelValidationError):
-    """Error class for stale deletion validation errors."""
+    """Error class for stale models."""
 
     def __init__(self, model):
         super(ModelExpiredError, self).__init__(model)
-        self.message = 'deleted=True and model is older than %s days' % (
+        self.message = 'deleted=True when older than %s days' % (
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)

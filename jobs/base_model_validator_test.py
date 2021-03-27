@@ -45,12 +45,12 @@ class BaseModelValidatorTestBase(jobs_test_utils.BeamTestBase):
 class BaseModelValidatorTests(BaseModelValidatorTestBase):
 
     def test_base_model_validator_ptransform(self):
-        invalid_id = base_models.BaseModel(
+        model_with_invalid_id = base_models.BaseModel(
             id='123@?!*',
             deleted=False,
             created_on=self.YEAR_AGO,
             last_updated=self.NOW)
-        invalid_timestamp = base_models.BaseModel(
+        model_with_invalid_timestamp = base_models.BaseModel(
             id='124',
             deleted=False,
             created_on=self.NOW,
@@ -68,15 +68,20 @@ class BaseModelValidatorTests(BaseModelValidatorTestBase):
 
         output = (
             self.pipeline
-            | beam.Create(
-                [invalid_id, invalid_timestamp, expired_model, valid_model])
+            | beam.Create([
+                model_with_invalid_id,
+                model_with_invalid_timestamp,
+                expired_model,
+                valid_model,
+            ])
             | base_model_validator.BaseModelValidator()
         )
 
         self.assert_pcoll_equal(output, [
-            errors.ModelInvalidIdError(
-                invalid_id, base_model_validator.DEFAULT_ID_REGEX_STRING),
-            errors.ModelMutatedDuringJobError(invalid_timestamp),
+            errors.InvalidIdError(
+                model_with_invalid_id,
+                base_model_validator.DEFAULT_ID_REGEX_STRING),
+            errors.ModelMutatedDuringJobError(model_with_invalid_timestamp),
             errors.ModelExpiredError(expired_model),
         ])
 
@@ -116,7 +121,7 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            errors.ModelTimestampRelationshipError(invalid_timestamp),
+            errors.InconsistentTimestampsError(invalid_timestamp),
         ])
 
     def test_process_reports_model_mutated_during_job_error(self):
@@ -153,7 +158,7 @@ class ValidateModelIdTests(BaseModelValidatorTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            errors.ModelInvalidIdError(
+            errors.InvalidIdError(
                 invalid_id_model, base_model_validator.DEFAULT_ID_REGEX_STRING),
         ])
 
@@ -178,7 +183,7 @@ class ValidatePostCommitIsPrivateTests(BaseModelValidatorTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            errors.ModelInvalidCommitStatusError(invalid_commit_status),
+            errors.InvalidCommitStatusError(invalid_commit_status),
         ])
 
     def test_validate_post_commit_is_private_when_status_is_private(self):
@@ -199,5 +204,5 @@ class ValidatePostCommitIsPrivateTests(BaseModelValidatorTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            errors.ModelInvalidCommitStatusError(invalid_commit_status),
+            errors.InvalidCommitStatusError(invalid_commit_status),
         ])

@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import pickle
 
 from core.platform import models
 from core.tests import test_utils
@@ -32,7 +33,7 @@ base_models, user_models = (
 
 
 class FooError(errors.ModelValidationError):
-    """A simple error subclass with a distinct type."""
+    """A simple test-only error."""
 
     def __init__(self, model):
         super(FooError, self).__init__(model)
@@ -40,7 +41,7 @@ class FooError(errors.ModelValidationError):
 
 
 class BarError(errors.ModelValidationError):
-    """A simple error subclass with a distinct type."""
+    """A simple test-only error."""
 
     def __init__(self, model):
         super(BarError, self).__init__(model)
@@ -58,7 +59,13 @@ class ValidatorErrorTestBase(test_utils.TestBase):
 class ModelValidationErrorTests(ValidatorErrorTestBase):
 
     def setUp(self):
+        super(ModelValidationErrorTests, self).setUp()
         self.model = base_models.BaseModel(id='123')
+
+    def test_message(self):
+        error = FooError(self.model)
+
+        self.assertEqual(error.message, 'BaseModel(id="123"): foo')
 
     def test_message_raises_not_implemented_error_if_not_assigned_a_value(self):
         class ErrorWithoutMessage(errors.ModelValidationError):
@@ -66,36 +73,69 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
 
             pass
 
+        error = ErrorWithoutMessage(self.model)
+
         self.assertRaisesRegexp(
             NotImplementedError,
-            'Subclasses must assign to self.message in __init__',
-            lambda: ErrorWithoutMessage(self.model).message)
+            'self.message must be assigned a value in __init__',
+            lambda: error.message)
+
+    def test_message_raises_type_error_if_reassigned_a_value(self):
+        class ErrorWithUpdateMessageMethod(errors.ModelValidationError):
+            """Subclass that tries to reassign to self.message in a method."""
+
+            def __init__(self, model):
+                super(ErrorWithUpdateMessageMethod, self).__init__(model)
+                self.message = 'initial message'
+
+            def update_message(self):
+                """Tries to reassign self.message."""
+                self.message = 'updated message'
+
+        error = ErrorWithUpdateMessageMethod(self.model)
+
+        self.assertEqual(error.message, 'BaseModel(id="123"): initial message')
+        self.assertRaisesRegexp(
+            TypeError, 'self.message must be assigned to exactly once',
+            error.update_message)
+
+    def test_message_raises_type_error_if_assigned_a_non_string_value(self):
+        class ErrorWithIntMessage(errors.ModelValidationError):
+            """Subclass that tries to assign an int value to self.message."""
+
+            def __init__(self, model):
+                super(ErrorWithIntMessage, self).__init__(model)
+                self.message = 123
+
+        self.assertRaisesRegexp(
+            TypeError, 'self.message must be a string',
+            lambda: ErrorWithIntMessage(self.model))
 
     def test_message_raises_value_error_if_assigned_an_empty_value(self):
         class ErrorWithEmptyMessage(errors.ModelValidationError):
-            """Subclass that assigns an empty value to self.message."""
+            """Subclass that tries to assign an empty value to self.message."""
 
             def __init__(self, model):
                 super(ErrorWithEmptyMessage, self).__init__(model)
                 self.message = ''
 
         self.assertRaisesRegexp(
-            ValueError, 'self.message must have a non-empty value',
+            ValueError, 'self.message must be a non-empty string',
             lambda: ErrorWithEmptyMessage(self.model))
 
     def test_repr(self):
         self.assertEqual(
             repr(FooError(self.model)), 'FooError in BaseModel(id="123"): foo')
 
-    def test_equality_with_different_type(self):
+    def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))
 
-    def test_equality_with_same_type_and_same_value(self):
+    def test_equality_between_same_types_and_same_values(self):
         self.assertEqual(
             FooError(self.model),
             FooError(jobs_utils.clone_model(self.model)))
 
-    def test_equality_with_same_type_and_different_value(self):
+    def test_equality_between_same_types_and_different_values(self):
         self.assertNotEqual(
             FooError(self.model),
             FooError(jobs_utils.clone_model(self.model, id='987')))
@@ -107,15 +147,33 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
         }
         self.assertEqual(len(set_of_errors), 1)
 
+    def test_pickling_base_class_raises_not_implemented_error(self):
+        self.assertRaisesRegexp(
+            NotImplementedError,
+            'self.message must be assigned a value in __init__',
+            lambda: pickle.dumps(errors.ModelValidationError(self.model)))
 
-class ModelTimestampRelationshipErrorTests(ValidatorErrorTestBase):
+    def test_pickling_sub_classes(self):
+        foo_error, bar_error = FooError(self.model), BarError(self.model)
 
-    def test_model_timestamp_relationship_error(self):
+        pickled_foo_error, pickled_bar_error = (
+            pickle.dumps(foo_error), pickle.dumps(bar_error))
+        unpickled_foo_error, unpickled_bar_error = (
+            pickle.loads(pickled_foo_error), pickle.loads(pickled_bar_error))
+
+        self.assertEqual(foo_error, unpickled_foo_error)
+        self.assertEqual(bar_error, unpickled_bar_error)
+        self.assertNotEqual(unpickled_foo_error, unpickled_bar_error)
+
+
+class InconsistentTimestampsErrorTests(ValidatorErrorTestBase):
+
+    def test_message(self):
         model = base_models.BaseModel(
             id='123',
             created_on=self.NOW,
             last_updated=self.YEAR_AGO)
-        error = errors.ModelTimestampRelationshipError(model)
+        error = errors.InconsistentTimestampsError(model)
 
         self.assertEqual(
             error.message,
@@ -125,7 +183,7 @@ class ModelTimestampRelationshipErrorTests(ValidatorErrorTestBase):
 
 class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
 
-    def test_model_with_invalid_post_commit_status_when_private(self):
+    def test_message_for_private_post_commit_status(self):
         model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -135,16 +193,16 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
             post_commit_status='private',
             post_commit_is_private=False,
             commit_cmds=[])
-        error = errors.ModelInvalidCommitStatusError(model)
+        error = errors.InvalidCommitStatusError(model)
 
         self.assertEqual(
             error.message,
-            'BaseCommitLogEntryModel(id="%s"): post_commit_status="private" '
-            'but post_commit_is_private=False' % model.id)
+            'BaseCommitLogEntryModel(id="123"): post_commit_status="private" '
+            'but post_commit_is_private=False')
 
-    def test_model_with_invalid_post_commit_status_when_public(self):
+    def test_message_for_public_post_commit_status(self):
         model = base_models.BaseCommitLogEntryModel(
-            id=124,
+            id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             commit_type='invalid-type',
@@ -152,48 +210,48 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
             post_commit_status='public',
             post_commit_is_private=True,
             commit_cmds=[])
-        error = errors.ModelInvalidCommitStatusError(model)
+        error = errors.InvalidCommitStatusError(model)
 
         self.assertEqual(
             error.message,
-            'BaseCommitLogEntryModel(id="%s"): post_commit_status="public" '
-            'but post_commit_is_private=True' % model.id)
+            'BaseCommitLogEntryModel(id="123"): post_commit_status="public" '
+            'but post_commit_is_private=True')
 
 
 class ModelMutatedDuringJobErrorTests(ValidatorErrorTestBase):
 
-    def test_model_mutated_during_job_error(self):
+    def test_message(self):
         model = base_models.BaseModel(
-            id='124',
+            id='123',
             created_on=self.NOW,
             last_updated=self.YEAR_LATER)
         error = errors.ModelMutatedDuringJobError(model)
 
         self.assertEqual(
             error.message,
-            'BaseModel(id="%s"): last_updated=%r is later than the job\'s '
-            'start time' % (
-                model.id, model.last_updated))
+            'BaseModel(id="123"): last_updated=%r is later than the job\'s '
+            'start time' % model.last_updated)
 
 
 class ModelInvalidIdErrorTests(ValidatorErrorTestBase):
 
-    def test_model_invalid_id_error(self):
+    def test_message(self):
+        regex = '[a-z0-9]+'
         model = base_models.BaseModel(
-            id='123@?!*',
+            id='?!"',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW)
-        error = errors.ModelInvalidIdError(model, 'abc')
+        error = errors.InvalidIdError(model, regex)
 
         self.assertEqual(
             error.message,
-            'BaseModel(id="%s"): id does not match the expected regex=%r' % (
-                model.id, 'abc'))
+            r'BaseModel(id="?!\""): id does not match the expected regex=%r' % (
+                regex))
 
 
 class ModelExpiredErrorTests(ValidatorErrorTestBase):
 
-    def test_model_expired_error(self):
+    def test_message(self):
         model = base_models.BaseModel(
             id='123',
             deleted=True,
@@ -203,7 +261,5 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
 
         self.assertEqual(
             error.message,
-            'BaseModel(id="%s"): deleted=True and model is older than %s '
-            'days' % (
-                model.id,
+            'BaseModel(id="123"): deleted=True when older than %d days' % (
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
