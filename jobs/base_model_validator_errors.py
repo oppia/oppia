@@ -24,41 +24,40 @@ import feconf
 import python_utils
 
 
-class ModelValidationError(python_utils.OBJECT):
+class ModelValidationErrorBase(python_utils.OBJECT):
     """Base class for model validation errors.
 
-    NOTE: Apache Beam will use pickle to serialize/deserialize error instances.
+    NOTE: Apache Beam will use pickle to serialize/deserialize class instances.
     """
 
-    # ModelValidationError and its subclasses will hold exactly one attribute to
-    # minimize their memory footprint.
+    # ModelValidationErrorBase and its subclasses will hold exactly one
+    # attribute to minimize their memory footprint.
     __slots__ = '_message',
 
     def __init__(self, model):
-        # At first, self._message is a tuple of model identifiers that will be
-        # used to annotate the actual message provided by subclasses.
         model_name = model.__class__.__name__
-        # We use json.dumps to get a quote-escaped string.
-        model_id = json.dumps(model.id)
-        self._message = (model_name, model_id)
+        quoted_model_id = json.dumps(model.id)
+        # At first, self._message is a tuple of model identifiers that will be
+        # used to annotate the _actual_ message provided by subclasses.
+        self._message = (model_name, quoted_model_id)
 
     def __getstate__(self):
         """Called by pickle to get the value that uniquely defines self."""
         return self.message
 
     def __setstate__(self, message):
-        """Called by pickle to build an instance from the __getstate__ value."""
+        """Called by pickle to build an instance from __getstate__'s value."""
         self._message = message
 
     @property
     def message(self):
-        """Returns the error's message, which includes the erroneous model's id.
+        """Returns the error message, which includes the erroneous model's id.
 
         Returns:
-            str. The message.
+            str. The error message.
 
         Raises:
-            NotImplementedError. If message was never assigned a value.
+            NotImplementedError. When self.message was never assigned a value.
         """
         if not python_utils.is_string(self._message):
             raise NotImplementedError(
@@ -66,28 +65,29 @@ class ModelValidationError(python_utils.OBJECT):
         return self._message
 
     @message.setter
-    def message(self, value):
-        """Assigns a value to self.message.
+    def message(self, message):
+        """Sets the error message.
 
         Args:
-            value: str. The message.
+            message: str. The error message.
 
         Raises:
-            TypeError. When the message has already been assigned a value.
-            TypeError. When the value is not a string.
-            ValueError. When the value is empty.
+            TypeError. When self.message has already been assigned a value.
+            TypeError. When the input message is not a string.
+            ValueError. When the input message is empty.
         """
         if python_utils.is_string(self._message):
             raise TypeError('self.message must be assigned to exactly once')
-        if not python_utils.is_string(value):
+        if not python_utils.is_string(message):
             raise TypeError('self.message must be a string')
-        if not value:
+        if not message:
             raise ValueError('self.message must be a non-empty string')
-        model_name, model_id = self._message
-        self._message = '%s(id=%s): %s' % (model_name, model_id, value)
+        model_name, quoted_model_id = self._message
+        self._message = '%s in %s(id=%s): %s' % (
+            self.__class__.__name__, model_name, quoted_model_id, message)
 
     def __repr__(self):
-        return '%s in %s' % (self.__class__.__name__, self.message)
+        return self.message
 
     def __eq__(self, other):
         return (
@@ -103,7 +103,7 @@ class ModelValidationError(python_utils.OBJECT):
         return hash((self.__class__, self.message))
 
 
-class InconsistentTimestampsError(ModelValidationError):
+class InconsistentTimestampsError(ModelValidationErrorBase):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model):
@@ -113,36 +113,38 @@ class InconsistentTimestampsError(ModelValidationError):
             % (model.created_on, model.last_updated))
 
 
-class InvalidCommitStatusError(ModelValidationError):
+class InvalidCommitStatusError(ModelValidationErrorBase):
     """Error class for commit models with inconsistent status values."""
 
     def __init__(self, model):
         super(InvalidCommitStatusError, self).__init__(model)
         self.message = (
-            'post_commit_status="public" but post_commit_is_private=True'
-            if model.post_commit_is_private else
-            'post_commit_status="private" but post_commit_is_private=False')
+            'post_commit_status="%s" but post_commit_is_private=%r' % (
+                model.post_commit_status, model.post_commit_is_private))
 
 
-class ModelMutatedDuringJobError(ModelValidationError):
+class ModelMutatedDuringJobError(ModelValidationErrorBase):
     """Error class for models mutated during a job."""
 
     def __init__(self, model):
         super(ModelMutatedDuringJobError, self).__init__(model)
-        self.message = 'last_updated=%r is later than the job\'s start time' % (
-            model.last_updated)
+        self.message = (
+            'last_updated=%r is later than the validation job\'s start time' % (
+                model.last_updated))
 
 
-class InvalidIdError(ModelValidationError):
+class InvalidIdError(ModelValidationErrorBase):
     """Error class for models with invalid ids."""
 
-    def __init__(self, model, pattern):
+    def __init__(self, model, regex):
         super(InvalidIdError, self).__init__(model)
-        self.message = 'id does not match the expected regex=%r' % pattern
+        quote_escaped_regex = json.dumps(regex)
+        self.message = (
+            'id does not match the expected regex=%s' % quote_escaped_regex)
 
 
-class ModelExpiredError(ModelValidationError):
-    """Error class for stale models."""
+class ModelExpiredError(ModelValidationErrorBase):
+    """Error class for expired models."""
 
     def __init__(self, model):
         super(ModelExpiredError, self).__init__(model)

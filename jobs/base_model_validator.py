@@ -90,7 +90,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
             yield errors.InvalidCommitStatusError(model)
 
 
-class ValidateDeleted(beam.DoFn):
+class ValidateDeletedModel(beam.DoFn):
     """DoFn to check whether models marked for deletion are stale."""
 
     def process(self, input_model):
@@ -113,7 +113,7 @@ class ValidateDeleted(beam.DoFn):
             yield errors.ModelExpiredError(model)
 
 
-class ValidateModelTimeFields(beam.DoFn):
+class ValidateModelTimestamps(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are
     valid.
     """
@@ -142,42 +142,6 @@ class ValidateModelTimeFields(beam.DoFn):
 class BaseModelValidator(beam.PTransform):
     """Composite PTransform which returns a pipeline of validation errors."""
 
-    def expand(self, model_pipe):
-        """Function that takes in a beam.PCollection of datastore models and
-        returns a beam.PCollection of validation errors.
-
-        Args:
-            model_pipe: beam.PCollection. A collection of models.
-
-        Returns:
-            beam.PCollection. A collection of errors represented as
-            key-value pairs.
-        """
-        not_deleted, deleted = (
-            model_pipe
-            | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
-        )
-        deletion_errors = (
-            deleted
-            | 'Validate deleted property' >> beam.ParDo(ValidateDeleted())
-        )
-        time_field_validation_errors = (
-            not_deleted
-            | 'Validate timestamps' >> beam.ParDo(ValidateModelTimeFields())
-        )
-        model_id_validation_errors = (
-            not_deleted
-            | 'Validate id' >> beam.ParDo(
-                ValidateModelIdWithRegex(), self.get_model_id_regex())
-        )
-
-        return (
-            (
-                deletion_errors,
-                time_field_validation_errors,
-                model_id_validation_errors)
-            | beam.Flatten())
-
     @classmethod
     def get_model_id_regex(cls):
         """Returns a regex for model id.
@@ -186,3 +150,35 @@ class BaseModelValidator(beam.PTransform):
             str. A regex pattern to be followed by the model id.
         """
         return DEFAULT_ID_REGEX_STRING
+
+    def expand(self, input_models):
+        """Transforms a PCollection of models into validation errors.
+
+        Args:
+            input_models: beam.PCollection. A collection of models.
+
+        Returns:
+            beam.PCollection. A collection of errors represented as
+            key-value pairs.
+        """
+        existing_models, deleted_models = (
+            input_models
+            | 'Split by deleted' >> beam.Partition(
+                lambda model, unused_num_partitions: int(model.deleted), 2)
+        )
+        deletion_errors = (
+            deleted_models
+            | 'Validate deleted models' >> beam.ParDo(ValidateDeletedModel())
+        )
+        timestamp_errors = (
+            existing_models
+            | 'Validate timestamps' >> beam.ParDo(ValidateModelTimestamps())
+        )
+        id_errors = (
+            existing_models
+            | 'Validate id' >> beam.ParDo(
+                ValidateModelIdWithRegex(), self.get_model_id_regex())
+        )
+
+        error_pcolls = (deletion_errors, timestamp_errors, id_errors)
+        return error_pcolls | beam.Flatten()

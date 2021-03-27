@@ -27,12 +27,13 @@ from core.tests import test_utils
 import feconf
 from jobs import base_model_validator_errors as errors
 from jobs import jobs_utils
+import python_utils
 
 base_models, user_models = (
     models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
 
 
-class FooError(errors.ModelValidationError):
+class FooError(errors.ModelValidationErrorBase):
     """A simple test-only error."""
 
     def __init__(self, model):
@@ -40,7 +41,7 @@ class FooError(errors.ModelValidationError):
         self.message = 'foo'
 
 
-class BarError(errors.ModelValidationError):
+class BarError(errors.ModelValidationErrorBase):
     """A simple test-only error."""
 
     def __init__(self, model):
@@ -48,7 +49,7 @@ class BarError(errors.ModelValidationError):
         self.message = 'bar'
 
 
-class ValidatorErrorTestBase(test_utils.TestBase):
+class ModelValidatorErrorTestBase(test_utils.TestBase):
     """Base class for validator error tests."""
 
     NOW = datetime.datetime.utcnow()
@@ -56,19 +57,19 @@ class ValidatorErrorTestBase(test_utils.TestBase):
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
 
-class ModelValidationErrorTests(ValidatorErrorTestBase):
+class ModelValidationErrorBaseTests(ModelValidatorErrorTestBase):
 
     def setUp(self):
-        super(ModelValidationErrorTests, self).setUp()
+        super(ModelValidationErrorBaseTests, self).setUp()
         self.model = base_models.BaseModel(id='123')
 
     def test_message(self):
         error = FooError(self.model)
 
-        self.assertEqual(error.message, 'BaseModel(id="123"): foo')
+        self.assertEqual(error.message, 'FooError in BaseModel(id="123"): foo')
 
     def test_message_raises_not_implemented_error_if_not_assigned_a_value(self):
-        class ErrorWithoutMessage(errors.ModelValidationError):
+        class ErrorWithoutMessage(errors.ModelValidationErrorBase):
             """Subclass that does not assign a value to self.message."""
 
             pass
@@ -81,7 +82,7 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
             lambda: error.message)
 
     def test_message_raises_type_error_if_reassigned_a_value(self):
-        class ErrorWithUpdateMessageMethod(errors.ModelValidationError):
+        class ErrorWithUpdateMessageMethod(errors.ModelValidationErrorBase):
             """Subclass that tries to reassign to self.message in a method."""
 
             def __init__(self, model):
@@ -94,13 +95,20 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
 
         error = ErrorWithUpdateMessageMethod(self.model)
 
-        self.assertEqual(error.message, 'BaseModel(id="123"): initial message')
+        self.assertEqual(
+            error.message,
+            'ErrorWithUpdateMessageMethod in BaseModel(id="123"): initial '
+            'message')
         self.assertRaisesRegexp(
             TypeError, 'self.message must be assigned to exactly once',
             error.update_message)
+        self.assertEqual(
+            error.message,
+            'ErrorWithUpdateMessageMethod in BaseModel(id="123"): initial '
+            'message')
 
     def test_message_raises_type_error_if_assigned_a_non_string_value(self):
-        class ErrorWithIntMessage(errors.ModelValidationError):
+        class ErrorWithIntMessage(errors.ModelValidationErrorBase):
             """Subclass that tries to assign an int value to self.message."""
 
             def __init__(self, model):
@@ -112,7 +120,7 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
             lambda: ErrorWithIntMessage(self.model))
 
     def test_message_raises_value_error_if_assigned_an_empty_value(self):
-        class ErrorWithEmptyMessage(errors.ModelValidationError):
+        class ErrorWithEmptyMessage(errors.ModelValidationErrorBase):
             """Subclass that tries to assign an empty value to self.message."""
 
             def __init__(self, model):
@@ -123,9 +131,12 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
             ValueError, 'self.message must be a non-empty string',
             lambda: ErrorWithEmptyMessage(self.model))
 
-    def test_repr(self):
+    def test_str(self):
         self.assertEqual(
             repr(FooError(self.model)), 'FooError in BaseModel(id="123"): foo')
+        self.assertEqual(
+            python_utils.UNICODE(FooError(self.model)),
+            'FooError in BaseModel(id="123"): foo')
 
     def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))
@@ -151,7 +162,7 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
         self.assertRaisesRegexp(
             NotImplementedError,
             'self.message must be assigned a value in __init__',
-            lambda: pickle.dumps(errors.ModelValidationError(self.model)))
+            lambda: pickle.dumps(errors.ModelValidationErrorBase(self.model)))
 
     def test_pickling_sub_classes(self):
         foo_error, bar_error = FooError(self.model), BarError(self.model)
@@ -166,7 +177,7 @@ class ModelValidationErrorTests(ValidatorErrorTestBase):
         self.assertNotEqual(unpickled_foo_error, unpickled_bar_error)
 
 
-class InconsistentTimestampsErrorTests(ValidatorErrorTestBase):
+class InconsistentTimestampsErrorTests(ModelValidatorErrorTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
@@ -177,11 +188,11 @@ class InconsistentTimestampsErrorTests(ValidatorErrorTestBase):
 
         self.assertEqual(
             error.message,
-            'BaseModel(id="123"): created_on=%r is later than '
-            'last_updated=%r' % (self.NOW, self.YEAR_AGO))
+            'InconsistentTimestampsError in BaseModel(id="123"): created_on=%r '
+            'is later than last_updated=%r' % (self.NOW, self.YEAR_AGO))
 
 
-class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
+class InvalidCommitStatusErrorTests(ModelValidatorErrorTestBase):
 
     def test_message_for_private_post_commit_status(self):
         model = base_models.BaseCommitLogEntryModel(
@@ -197,8 +208,8 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
 
         self.assertEqual(
             error.message,
-            'BaseCommitLogEntryModel(id="123"): post_commit_status="private" '
-            'but post_commit_is_private=False')
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
+            'post_commit_status="private" but post_commit_is_private=False')
 
     def test_message_for_public_post_commit_status(self):
         model = base_models.BaseCommitLogEntryModel(
@@ -214,11 +225,11 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
 
         self.assertEqual(
             error.message,
-            'BaseCommitLogEntryModel(id="123"): post_commit_status="public" '
-            'but post_commit_is_private=True')
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
+            'post_commit_status="public" but post_commit_is_private=True')
 
 
-class ModelMutatedDuringJobErrorTests(ValidatorErrorTestBase):
+class ModelMutatedDuringJobErrorTests(ModelValidatorErrorTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
@@ -229,11 +240,12 @@ class ModelMutatedDuringJobErrorTests(ValidatorErrorTestBase):
 
         self.assertEqual(
             error.message,
-            'BaseModel(id="123"): last_updated=%r is later than the job\'s '
-            'start time' % model.last_updated)
+            'ModelMutatedDuringJobError in BaseModel(id="123"): '
+            'last_updated=%r is later than the validation job\'s start time' % (
+                model.last_updated))
 
 
-class ModelInvalidIdErrorTests(ValidatorErrorTestBase):
+class InvalidIdErrorTests(ModelValidatorErrorTestBase):
 
     def test_message(self):
         regex = '[a-z0-9]+'
@@ -245,11 +257,11 @@ class ModelInvalidIdErrorTests(ValidatorErrorTestBase):
 
         self.assertEqual(
             error.message,
-            r'BaseModel(id="?!\""): id does not match the expected regex=%r' % (
-                regex))
+            r'InvalidIdError in BaseModel(id="?!\""): id does not match the '
+            r'expected regex="[a-z0-9]+"')
 
 
-class ModelExpiredErrorTests(ValidatorErrorTestBase):
+class ModelExpiredErrorTests(ModelValidatorErrorTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
@@ -261,5 +273,6 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
 
         self.assertEqual(
             error.message,
-            'BaseModel(id="123"): deleted=True when older than %d days' % (
+            'ModelExpiredError in BaseModel(id="123"): deleted=True when older '
+            'than %d days' % (
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
