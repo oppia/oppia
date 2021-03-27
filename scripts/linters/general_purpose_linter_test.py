@@ -54,7 +54,6 @@ FILE_IN_EXCLUDED_PATH = os.path.join(
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_EXPLORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_explore.js')
 INVALID_PAUSE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_pause.js')
-INVALID_SLEEP_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_sleep.js')
 INVALID_WAIT_FOR_ANGULAR_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_wait_for_angular.js')
 INVALID_FDESCRIBE_DDESCRIBE_FILEPATH = os.path.join(
@@ -183,16 +182,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             ['Line 30: In tests, please do not use browser.pause().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_browser_sleep(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_SLEEP_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 30: In tests, please do not use browser.sleep().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
