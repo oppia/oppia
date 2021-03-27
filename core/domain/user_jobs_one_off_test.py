@@ -2869,3 +2869,43 @@ class DiscardOldDraftsOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(new_model.draft_change_list)
         self.assertIsNone(new_model.draft_change_list_last_updated)
         self.assertIsNone(new_model.draft_change_list_exp_version)
+
+
+class UserRolesPopulationOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the UserRolesPopulationOneOffJob."""
+
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UserRolesPopulationOneOffJob.create_new())
+        user_jobs_one_off.UserRolesPopulationOneOffJob.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        self.process_and_flush_pending_mapreduce_tasks()
+        return user_jobs_one_off.UserRolesPopulationOneOffJob.get_output(job_id)
+
+    def test_job_updates_roles_field_with_role(self):
+        user_models.UserSettingsModel(
+            id='user-id',
+            email='email@email.com',
+            normalized_username='username',
+            role='admin').update_timestamps().put()
+
+        old_user_model = user_models.UserSettingsModel.get('user-id')
+        self.assertEqual(old_user_model.roles, [])
+
+        actual_output = self._run_one_off_job()
+
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+        new_user_model = user_models.UserSettingsModel.get('user-id')
+
+        self.assertEqual(new_user_model.roles, ['admin'])
+        self.assertEqual(
+            new_user_model.last_updated, old_user_model.last_updated)

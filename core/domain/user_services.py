@@ -577,6 +577,10 @@ def _save_user_settings(user_settings):
 
     user_settings_dict = user_settings.to_dict()
 
+    # The "roles" field is keep in sync with the "role", this code will be
+    # removed once the "role" field gets depricated.
+    user_settings_dict['roles'] = [user_settings_dict['role']]
+
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
@@ -859,7 +863,13 @@ def _save_existing_users_settings(user_settings_list):
     for user_model, user_settings in python_utils.ZIP(
             user_settings_models, user_settings_list):
         user_settings.validate()
-        user_model.populate(**user_settings.to_dict())
+        user_settings_dict = user_settings.to_dict()
+
+        # The "roles" field is keep in sync with the "role", this code will be
+        # removed once the "role" field gets depricated.
+        user_settings_dict['roles'] = [user_settings_dict['role']]
+
+        user_model.populate(**user_settings_dict)
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
 

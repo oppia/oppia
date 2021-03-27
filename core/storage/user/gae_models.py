@@ -120,6 +120,10 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
+    # Currently, "roles" field is not in use.
+    # A list of roles assigned to the user.
+    roles = datastore_services.StringProperty(repeated=True, indexed=True)
+
     @staticmethod
     def get_lowest_supported_role():
         """The lowest supported role here should be Learner."""
