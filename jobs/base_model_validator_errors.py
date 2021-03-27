@@ -74,6 +74,25 @@ class ModelTimestampRelationshipError(ModelValidationError):
         return self._message
 
 
+class ModelInvalidCommitStatusError(ModelValidationError):
+    """Error class for commit_status validation errors."""
+
+    def __init__(self, model):
+        super(ModelInvalidCommitStatusError, self).__init__(model)
+        if model.post_commit_is_private:
+            self._message = (
+                '%s Post commit status is public but '
+                'post_commit_is_private is True' % self.base_message)
+        else:
+            self._message = (
+                '%s Post commit status is private but '
+                'post_commit_is_private is False' % self.base_message)
+
+    @property
+    def message(self):
+        return self._message
+
+
 class ModelMutatedDuringJobError(ModelValidationError):
     """Error class for current time model validation errors."""
 
