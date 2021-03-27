@@ -213,4 +213,3 @@ class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
             'post_commit_is_private is True' % model2.id)
         self.assertEqual(error1.message, msg1)
         self.assertEqual(error2.message, msg2)
-

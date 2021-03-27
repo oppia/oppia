@@ -230,7 +230,7 @@ class BaseSnapshotMetadataModelValidator(beam.PTransform):
             beam.PCollection. A collection of errors represented as
             key-value pairs.
         """
-        not_deleted, deleted = (
+        not_deleted, _ = (
             model_pipe
             | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
         )
@@ -248,4 +248,3 @@ class BaseSnapshotMetadataModelValidator(beam.PTransform):
                 commit_type_validation_errors,
                 post_commit_is_private_errors)
             | beam.Flatten())
-
