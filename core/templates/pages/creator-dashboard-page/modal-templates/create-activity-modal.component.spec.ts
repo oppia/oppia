@@ -29,7 +29,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string): string {
     return value;
   }
 }
@@ -111,10 +111,6 @@ describe('Create Activity Modal Component', () =>{
     () => {
       component.canCreateCollections = true;
       expect(component.canCreateCollections).toBeTrue();
-      expect(component.explorationImgUrl).toEqual(
-        '/assets/images/activity/exploration.svg');
-      expect(component.collectionImgUrl).toEqual(
-        '/assets/images/activity/collection.svg');
     });
 
   it('should create new exploration when choosing exploration as the new' +

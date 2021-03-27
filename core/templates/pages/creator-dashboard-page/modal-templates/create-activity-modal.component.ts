@@ -37,15 +37,12 @@ export class CreateActivityModalComponent implements OnInit {
     private userService: UserService,
     private explorationCreationService: ExplorationCreationService,
     private collectionCreationService: CollectionCreationService,
-    private ngbActiveModal: NgbActiveModal
+    private activeModal: NgbActiveModal
   ) {}
 
-  explorationImgUrl =
-    this.urlInterpolationService.getStaticImageUrl('/activity/exploration.svg');
-
-  collectionImgUrl =
-    this.urlInterpolationService.getStaticImageUrl('/activity/collection.svg');
-
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.canCreateCollections = (
@@ -55,12 +52,12 @@ export class CreateActivityModalComponent implements OnInit {
 
   chooseExploration(): void {
     this.explorationCreationService.createNewExploration();
-    this.ngbActiveModal.dismiss();
+    this.activeModal.dismiss();
   }
 
   chooseCollection(): void {
     this.collectionCreationService.createNewCollection();
-    this.ngbActiveModal.dismiss();
+    this.activeModal.dismiss();
   }
 }
 angular.module('oppia').directive(

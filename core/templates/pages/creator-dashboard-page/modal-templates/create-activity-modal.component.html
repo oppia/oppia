@@ -7,7 +7,7 @@
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-        <img [src]="explorationImageUrl" (click)="chooseExploration()">
+        <img [src]="getStaticImageUrl('/activity/exploration.svg')" (click)="chooseExploration()">
         <button type="button" (click)="chooseExploration()"
                 class="btn oppia-transition-200 protractor-test-create-exploration">
           <span [innerHTML]="'I18N_CREATE_EXPLORATION' | translate"></span>
@@ -15,7 +15,7 @@
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center" ng-if="canCreateCollections">
-        <img [src]="collectionImageUrl" (click)="chooseCollection()">
+        <img [src]="getStaticImageUrl('/activity/collection.svg')" (click)="chooseCollection()">
         <button type="button" (click)="chooseCollection()"
                 class="btn oppia-transition-200 protractor-test-create-collection">
           <span [innerHTML]="'I18N_CREATE_COLLECTION' | translate"></span>

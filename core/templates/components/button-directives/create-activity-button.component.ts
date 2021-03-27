@@ -72,7 +72,7 @@ export class CreateActivityButtonComponent implements OnInit {
        this.ngbModal.open(
          CreateActivityModalComponent,
          {backdrop: true}
-       ).result.then(function() {}, function() {
+       ).result.then(() => {}, () => {
          this.creationInProgress = false;
        });
      }

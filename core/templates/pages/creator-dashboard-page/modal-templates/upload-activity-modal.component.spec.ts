@@ -17,7 +17,7 @@
  */
 
 import { AlertsService } from 'services/alerts.service';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UploadActivityModalComponent } from './upload-activity-modal.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -34,22 +34,24 @@ class MockAlertsService {
   }
 }
 
-fdescribe('Upload Activity Modal Component', () => {
+describe('Upload Activity Modal Component', () => {
   let component: UploadActivityModalComponent;
   let fixture: ComponentFixture<UploadActivityModalComponent>;
   let alertsService: AlertsService;
   let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [UploadActivityModalComponent],
       providers: [
         {
-          provide: NgbActiveModal, useClass: MockActiveModal
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
         },
         {
-          provide: AlertsService, useClass: MockAlertsService
+          provide: AlertsService,
+          useClass: MockAlertsService
         }
       ]
     }).compileComponents().then(() => {
@@ -59,12 +61,12 @@ fdescribe('Upload Activity Modal Component', () => {
     });
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     alertsService = TestBed.get(AlertsService);
-  });
+  }));
 
-  it('should close modal when saving activity', () => {
+  it('should close modal when saving activity', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
-    var file = {
+    const file = {
       size: 100,
       name: 'file.mp3'
     };
@@ -82,13 +84,10 @@ fdescribe('Upload Activity Modal Component', () => {
       };
     });
     component.save();
+    expect(dismissSpy).toHaveBeenCalled();
+  }));
 
-    expect(dismissSpy).toHaveBeenCalledWith({
-      yamlFile: file
-    });
-  });
-
-  it('should not save activity when file is empty', () => {
+  it('should not save activity when file is empty', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     spyOn(alertsService, 'addWarning').and.callThrough();
     // TODO(#10113): Refactor the code to not use the DOM methods.
@@ -105,9 +104,9 @@ fdescribe('Upload Activity Modal Component', () => {
       };
     });
     component.save();
-
+    flushMicrotasks();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Empty file detected.');
     expect(dismissSpy).not.toHaveBeenCalled();
-  });
+  }));
 });
