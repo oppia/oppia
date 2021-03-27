@@ -108,9 +108,8 @@ class InconsistentTimestampsError(ModelValidationErrorBase):
 
     def __init__(self, model):
         super(InconsistentTimestampsError, self).__init__(model)
-        self.message = (
-            'created_on=%r is later than last_updated=%r'
-            % (model.created_on, model.last_updated))
+        self.message = 'created_on=%r is later than last_updated=%r' % (
+            model.created_on, model.last_updated)
 
 
 class InvalidCommitStatusError(ModelValidationErrorBase):
@@ -139,8 +138,8 @@ class InvalidIdError(ModelValidationErrorBase):
     def __init__(self, model, regex):
         super(InvalidIdError, self).__init__(model)
         quote_escaped_regex = json.dumps(regex)
-        self.message = (
-            'id does not match the expected regex=%s' % quote_escaped_regex)
+        self.message = 'id does not match the expected regex=%s' % (
+            quote_escaped_regex)
 
 
 class ModelExpiredError(ModelValidationErrorBase):
