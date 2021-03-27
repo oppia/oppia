@@ -25,24 +25,25 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 
 @Component({
-  selector: 'on-screen-keyboard',
+  selector: 'oppia-on-screen-keyboard',
   templateUrl: './on-screen-keyboard.component.html'
 })
 export class OnScreenKeyboardComponent {
   engine;
   guppyInstance;
-  functionsTab = constants.OSK_FUNCTIONS_TAB;
-  lettersTab = constants.OSK_LETTERS_TAB;
-  mainTab = constants.OSK_MAIN_TAB;
-  greekSymbols = Object.values(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
-  greekLetters = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
-  currentTab = this.mainTab;
-  lettersInKeyboardLayout = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
-  functions = [
+  functionsTab : string = constants.OSK_FUNCTIONS_TAB;
+  lettersTab: string = constants.OSK_LETTERS_TAB;
+  mainTab: string = constants.OSK_MAIN_TAB;
+  greekSymbols: string[] =
+  Object.values(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+  greekLetters: string[] = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+  currentTab: string = this.mainTab;
+  lettersInKeyboardLayout: string[] = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  functions: string[] = [
     'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
     'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
-  interactionType;
-  customLetters;
+  interactionType: string;
+  customLetters: string[];
 
   constructor(
     private deviceInfoService: DeviceInfoService,
@@ -50,21 +51,20 @@ export class OnScreenKeyboardComponent {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-
   activateGuppy(): void {
     this.guppyInstance.activate();
   }
 
-  changeTab(newTab): void {
+  changeTab(newTab: string): void {
     this.currentTab = newTab;
     this.guppyInstance.activate();
   }
 
-  getStaticImageUrl(imagePath): string {
+  getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  insertString(str): void {
+  insertString(str: string): void {
     let index = this.greekSymbols.indexOf(str);
     if (index !== -1) {
       str = this.greekLetters[index];
@@ -73,7 +73,7 @@ export class OnScreenKeyboardComponent {
     this.guppyInstance.activate();
   }
 
-  insertSymbol(symbol): void {
+  insertSymbol(symbol: string): void {
     this.engine.insert_symbol(symbol);
     this.guppyInstance.activate();
   }
@@ -93,7 +93,7 @@ export class OnScreenKeyboardComponent {
     this.guppyInstance.activate();
   }
 
-  exponent(value): void {
+  exponent(value: string): void {
     this.engine.insert_string('exp');
     this.engine.insert_string(value);
     this.engine.right();
@@ -101,11 +101,10 @@ export class OnScreenKeyboardComponent {
   }
 
   hideOSK(): void {
-    this.guppyInstance.setShowOSK(false);
+    this.guppyInitializationService.setShowOSK(false);
   }
 
   showOSK(): boolean {
-    console.log('ShowOSK');
     if (
       !this.deviceInfoService.isMobileUserAgent() ||
           !this.deviceInfoService.hasTouchEvents()) {
@@ -120,118 +119,11 @@ export class OnScreenKeyboardComponent {
       this.interactionType = GuppyInitializationService.interactionType;
       this.customLetters =
         this.guppyInitializationService.getCustomOskLetters();
-      console.log(true);
       return true;
     }
-    console.log(false);
     return false;
   }
 }
 
-angular.module('oppia').component('onScreenKeyboard',
+angular.module('oppia').directive('oppiaOnScreenKeyboard',
   downgradeComponent({ component: OnScreenKeyboardComponent }));
-
-// Require('domain/utilities/url-interpolation.service.ts');
-// require('services/contextual/device-info.service.ts');
-// require('services/guppy-initialization.service.ts');
-
-// angular.module('oppia').component('onScreenKeyboard', {
-//   template: require('./on-screen-keyboard.component.html'),
-//   controller: [
-//     'DeviceInfoService', 'GuppyInitializationService',
-//     'UrlInterpolationService', 'GREEK_LETTER_NAMES_TO_SYMBOLS',
-//     'OSK_FUNCTIONS_TAB', 'OSK_LETTERS_TAB', 'OSK_MAIN_TAB',
-//     function(
-//         DeviceInfoService, GuppyInitializationService,
-//         UrlInterpolationService, GREEK_LETTER_NAMES_TO_SYMBOLS,
-//         OSK_FUNCTIONS_TAB, OSK_LETTERS_TAB, OSK_MAIN_TAB) {
-//       const ctrl = this;
-//       let engine, guppyInstance;
-
-//       ctrl.functionsTab = OSK_FUNCTIONS_TAB;
-//       ctrl.lettersTab = OSK_LETTERS_TAB;
-//       ctrl.mainTab = OSK_MAIN_TAB;
-
-//       let greekSymbols = Object.values(GREEK_LETTER_NAMES_TO_SYMBOLS);
-//       let greekLetters = Object.keys(GREEK_LETTER_NAMES_TO_SYMBOLS);
-
-//       ctrl.currentTab = ctrl.mainTab;
-//       ctrl.lettersInKeyboardLayout = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
-//       ctrl.functions = [
-//         'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
-//         'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
-
-//       ctrl.activateGuppy = function() {
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.changeTab = function(newTab) {
-//         ctrl.currentTab = newTab;
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.getStaticImageUrl = function(imagePath) {
-//         return UrlInterpolationService.getStaticImageUrl(imagePath);
-//       };
-
-//       ctrl.insertString = function(string) {
-//         let index = greekSymbols.indexOf(string);
-//         if (index !== -1) {
-//           string = greekLetters[index];
-//         }
-//         engine.insert_string(string);
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.insertSymbol = function(symbol) {
-//         engine.insert_symbol(symbol);
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.backspace = function() {
-//         engine.backspace();
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.left = function() {
-//         engine.left();
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.right = function() {
-//         engine.right();
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.exponent = function(value) {
-//         engine.insert_string('exp');
-//         engine.insert_string(value);
-//         engine.right();
-//         guppyInstance.activate();
-//       };
-
-//       ctrl.hideOSK = function() {
-//         GuppyInitializationService.setShowOSK(false);
-//       };
-
-//       ctrl.showOSK = function() {
-//         if (
-//           !DeviceInfoService.isMobileUserAgent() ||
-//           !DeviceInfoService.hasTouchEvents()) {
-//           return false;
-//         }
-//         let showOSK = GuppyInitializationService.getShowOSK();
-//         let activeGuppyObject = (
-//           GuppyInitializationService.findActiveGuppyObject());
-//         if (showOSK && activeGuppyObject !== undefined) {
-//           guppyInstance = activeGuppyObject.guppyInstance;
-//           engine = guppyInstance.engine;
-//           ctrl.interactionType = GuppyInitializationService.interactionType;
-//           ctrl.customLetters = GuppyInitializationService.getCustomOskLetters();
-//           return true;
-//         }
-//         return false;
-//       };
-//     }
-//   ]
-// });
