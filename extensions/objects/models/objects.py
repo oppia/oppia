@@ -1621,22 +1621,9 @@ class BaseTranslatableObject(BaseObject):
     # The schema of the translatable value. This field must be populated by
     # subclasses.
     _value_schema = None
-    # The default translatable value. This field must be populated by
+    # The default value of the object. This field must be populated by
     # subclasses.
-    _default_translatable_value = None
-
-    @property
-    def default_value(self):
-        """Returns the default TranslatableObject value (including content ID).
-
-        Returns:
-            dict. The default value for the type of object described by this
-            class.
-        """
-        return {
-            'contentId': None,
-            self._value_key_name: self._default_translatable_value
-        }
+    default_value = None
 
     @staticmethod
     def normalize_value(value):
@@ -1710,7 +1697,10 @@ class TranslatableUnicodeString(BaseTranslatableObject):
 
     _value_key_name = 'unicodeStr'
     _value_schema = UnicodeString.get_schema()
-    _default_translatable_value = ''
+    default_value = {
+        'contentId': None,
+        'unicodeStr': '',
+    }
 
     @staticmethod
     def normalize_value(value):
@@ -1734,7 +1724,10 @@ class TranslatableHtml(BaseTranslatableObject):
 
     _value_key_name = 'html'
     _value_schema = Html.get_schema()
-    _default_translatable_value = ''
+    default_value = {
+        'contentId': None,
+        'html': '',
+    }
 
     @staticmethod
     def normalize_value(value):
@@ -1758,7 +1751,10 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
 
     _value_key_name = 'normalizedStrSet'
     _value_schema = SetOfNormalizedString.get_schema()
-    _default_translatable_value = []
+    default_value = {
+        'contentId': None,
+        'normalizedStrSet': [],
+    }
 
     @staticmethod
     def normalize_value(value):
@@ -1790,7 +1786,10 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 
     _value_key_name = 'unicodeStrSet'
     _value_schema = SetOfUnicodeString.get_schema()
-    _default_translatable_value = []
+    default_value = {
+        'contentId': None,
+        'unicodeStrSet': [],
+    }
 
     @staticmethod
     def normalize_value(value):

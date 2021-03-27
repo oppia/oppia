@@ -865,22 +865,32 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                     continue
 
                 if isinstance(member(), objects.BaseTranslatableObject):
+                    self.assertIsInstance(member.default_value, dict)
+                    self.assertEqual(len(member.default_value.keys()), 2)
+                    # We need to check the protected property in order to avoid
+                    # skew between it and the key that is used in the default
+                    # value.
+                    self.assertEqual(
+                        sorted(['contentId', member._value_key_name]),  # pylint: disable=protected-access
+                        sorted(member.default_value.keys()))
+                    self.assertIsNone(member.default_value['contentId'])
+
                     # If the object is a subclass of BaseTranslatableObject,
                     # the default content_id would be None but the
                     # normalization will enforce a non-None string. This is
                     # because the content id is populated before being saved.
                     # So we do the same here.
-                    actual_default_value = member().default_value
+                    actual_default_value = member.default_value
                     actual_default_value['contentId'] = 'content_id'
-                    normalized_default_value = member().normalize(
+                    normalized_default_value = member.normalize(
                         actual_default_value)
                     self.assertIsInstance(normalized_default_value, dict)
                     self.assertEqual(
                         normalized_default_value, actual_default_value)
                 else:
                     self.assertEqual(
-                        member().normalize(member().default_value),
-                        member().default_value)
+                        member.normalize(member.default_value),
+                        member.default_value)
 
                     type_error_message = (
                         'Mismatched default value types for object class %s' %
@@ -890,14 +900,14 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                     # Python. We handle the string case separately since Python
                     # treats str and unicode as different types.
                     if isinstance(
-                            member().default_value, python_utils.BASESTRING):
+                            member.default_value, python_utils.BASESTRING):
                         self.assertIsInstance(
-                            member().normalize(member().default_value),
+                            member.normalize(member.default_value),
                             python_utils.BASESTRING, msg=type_error_message)
                     else:
                         self.assertIsInstance(
-                            member.normalize(member().default_value),
-                            type(member().default_value),
+                            member.normalize(member.default_value),
+                            type(member.default_value),
                             msg=type_error_message)
 
 
