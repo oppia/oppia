@@ -124,7 +124,7 @@ export class ExplorationHtmlFormatterService {
 
   getShortAnswerHtml(
       answer: InteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;
 
     // TODO(sll): Get rid of this special case for multiple choice.
