@@ -61,3 +61,11 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
             TypeError, 'not a valid translatable object class'):
             translatable_object_registry.Registry.get_object_class(
                 'BaseTranslatableObject')
+
+    def test_get_translatable_object_classes(self):
+        """Tests the normal behavior of get_translatable_object_classes()."""
+        class_names_to_classes = (
+            translatable_object_registry.Registry.get_all_class_names())
+        self.assertEqual(class_names_to_classes, [
+            'TranslatableHtml', 'TranslatableSetOfNormalizedString',
+            'TranslatableSetOfUnicodeString', 'TranslatableUnicodeString'])

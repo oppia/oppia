@@ -53,6 +53,16 @@ class Registry(python_utils.OBJECT):
             cls.translatable_objects_dict[clazz.__name__] = clazz
 
     @classmethod
+    def get_all_class_names(cls):
+        """Gets a list of all translatable object class names.
+
+        Returns:
+            list(str). The full sorted list of translatable object class names.
+        """
+        cls._refresh_registry()
+        return sorted(cls.translatable_objects_dict.keys())
+
+    @classmethod
     def get_object_class(cls, obj_type):
         """Gets a translatable object class by its type.
 

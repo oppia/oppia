@@ -861,34 +861,44 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
     def test_default_values_for_objects_are_valid(self):
         for _, member in inspect.getmembers(objects):
             if inspect.isclass(member) and member.default_value is not None:
+                if member.__name__ == 'BaseTranslatableObject':
+                    continue
+
                 if isinstance(member(), objects.BaseTranslatableObject):
-                    # If object is a BaseTranslatableObject, the default
-                    # content_id could be None but the normalization will
-                    # enforce a non-None string. This is because the content id
-                    # is populated before being saved. To get around this, we
-                    # populate the content id.
-                    member.default_value['contentId'] = 'rule_input'
-
-                self.assertEqual(
-                    member.normalize(member.default_value),
-                    member.default_value)
-
-                # Comparing types here is necessary because 0 == False in
-                # Python. We handle the string case separately since Python
-                # treats str and unicode as different types.
-                type_error_message = (
-                    'Mismatched default value types for object class %s' %
-                    member.__name__)
-                if isinstance(member.default_value, python_utils.BASESTRING):
-                    self.assertIsInstance(
-                        member.normalize(member.default_value),
-                        python_utils.BASESTRING,
-                        msg=type_error_message)
+                    # If the object is a subclass of BaseTranslatableObject,
+                    # the default content_id would be None but the
+                    # normalization will enforce a non-None string. This is
+                    # because the content id is populated before being saved.
+                    # So we do the same here.
+                    actual_default_value = member().default_value
+                    actual_default_value['contentId'] = 'content_id'
+                    normalized_default_value = member().normalize(
+                        actual_default_value)
+                    self.assertIsInstance(normalized_default_value, dict)
+                    self.assertEqual(
+                        normalized_default_value, actual_default_value)
                 else:
-                    self.assertIsInstance(
-                        member.normalize(member.default_value),
-                        type(member.default_value),
-                        msg=type_error_message)
+                    self.assertEqual(
+                        member().normalize(member().default_value),
+                        member().default_value)
+
+                    type_error_message = (
+                        'Mismatched default value types for object class %s' %
+                        member.__name__)
+
+                    # Comparing types here is necessary because 0 == False in
+                    # Python. We handle the string case separately since Python
+                    # treats str and unicode as different types.
+                    if isinstance(
+                            member().default_value, python_utils.BASESTRING):
+                        self.assertIsInstance(
+                            member().normalize(member().default_value),
+                            python_utils.BASESTRING, msg=type_error_message)
+                    else:
+                        self.assertIsInstance(
+                            member.normalize(member().default_value),
+                            type(member().default_value),
+                            msg=type_error_message)
 
 
 class NormalizedRectangleTests(test_utils.GenericTestBase):
@@ -939,11 +949,14 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
             'be set'):
             objects.BaseTranslatableObject.get_schema()
 
-        with self.assertRaisesRegexp(
-            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
-            objects.BaseTranslatableObject.normalize({
-                'contentId': 'rule_input'
-            })
+        with self.swap(objects.BaseTranslatableObject, '_value_key_name', 'a'):
+            with self.assertRaisesRegexp(
+                NotImplementedError,
+                'Subclasses of BaseTranslatableObject should'):
+                objects.BaseTranslatableObject.normalize({
+                    'contentId': 'rule_input',
+                    'a': 'thing to translate'
+                })
 
     def test_base_translatable_object_normalization(self):
         with self.assertRaisesRegexp(

@@ -1651,7 +1651,7 @@ class BaseTranslatableObject(BaseObject):
         """
         raise NotImplementedError(
             'Subclasses of BaseTranslatableObject should implement '
-            '_normalize_value().')
+            'normalize_value().')
 
     @classmethod
     def get_schema(cls):
