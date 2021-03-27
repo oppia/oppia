@@ -44,7 +44,7 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -242,8 +242,8 @@
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/loading-dots.component.html @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component*.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @srijanreddy98
 /core/templates/components/profile-link-directives/ @srijanreddy98
@@ -563,7 +563,7 @@
 /core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
-
+/core/templates/pages/participation-playbook/ @jameesjohn @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
