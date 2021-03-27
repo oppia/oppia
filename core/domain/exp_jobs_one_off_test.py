@@ -3730,3 +3730,194 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
             '[u\'%s\']]' % self.VALID_EXP_ID,
         ]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(RatioTermsAuditOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_number_of_ratio_terms_tabulated_are_correct_in_single_exp(self):
+        """Checks that correct number of ratio terms are shown when
+        there is single exploration.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        id1 = 'RatioExpressionInput'
+        id2 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 5
+            }
+        }
+        carg2 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 12
+            }
+        }
+        state1.update_interaction_id(id1)
+        state2.update_interaction_id(id2)
+        state1.update_interaction_customization_args(carg1)
+        state2.update_interaction_customization_args(carg2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start RatioTermsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.RatioTermsAuditOneOffJob.create_new()
+        exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(
+            job_id)
+        expected_output = [
+            '[u\'SUCCESS\', 1]',
+            '[u\'12\', [u\'exp_id0 State2\']]'
+        ]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_number_of_ratio_terms_tabulated_are_correct_in_multiple_exps(self):
+        """Checks that correct number of ratio terms are shown when
+        there are multiple explorations.
+        """
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration1.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration1.states['State1']
+        state2 = exploration1.states['State2']
+        id1 = 'RatioExpressionInput'
+        id2 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 5
+            }
+        }
+        carg2 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 12
+            }
+        }
+        state1.update_interaction_id(id1)
+        state2.update_interaction_id(id2)
+        state1.update_interaction_customization_args(carg1)
+        state2.update_interaction_customization_args(carg2)
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title='title', category='category')
+
+        exploration2.add_states(['State1', 'State2'])
+
+        state1 = exploration2.states['State1']
+        id1 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 11
+            }
+        }
+        state1.update_interaction_id(id1)
+        state1.update_interaction_customization_args(carg1)
+
+        exp_services.save_new_exploration(self.albert_id, exploration2)
+
+        # Start RatioTermsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.RatioTermsAuditOneOffJob.create_new()
+        exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(
+            job_id)
+
+        actual_output_dict = {}
+
+        for item in [ast.literal_eval(value) for value in actual_output]:
+            if item[0] != 'SUCCESS':
+                actual_output_dict[item[0]] = set(item[1])
+            else:
+                actual_output_dict['SUCCESS'] = item[1]
+
+        expected_output_dict = {
+            '12': set(['exp_id0 State2']),
+            '11': set(['exp_id1 State1']),
+            'SUCCESS': 2
+        }
+
+        self.assertEqual(actual_output_dict, expected_output_dict)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        id1 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 11
+            }
+        }
+        state1.update_interaction_id(id1)
+        state1.update_interaction_customization_args(carg1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(self, exp_jobs_one_off.RatioTermsAuditOneOffJob)
