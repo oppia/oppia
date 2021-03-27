@@ -67,8 +67,29 @@ class ValidateModelIdWithRegex(beam.DoFn):
             yield errors.ModelInvalidIdError(model)
 
 
+class ValidatePostCommitStatus(beam.DoFn):
+    """DoFn to validate post_commit_status."""
+
+    def process(self, input_model):
+        """Function validates that post_commit_status is either public or
+        private
+
+        Args:
+            input_model: base_models.BaseCommitLogEntryModel.
+                Entity to validate.
+
+        Yields:
+            ModelInvalidCommitStatus. Error for commit_type validation.
+        """
+        model = jobs_utils.clone_model(input_model)
+        if model.post_commit_status not in [
+                feconf.POST_COMMIT_STATUS_PUBLIC,
+                feconf.POST_COMMIT_STATUS_PRIVATE]:
+            yield errors.ModelInvalidCommitStatusError(model)
+
+
 class ValidatePostCommitIsPrivate(beam.DoFn):
-    """DoFn to check if post_commmit_status is private when
+    """DoFn to check if post_commit_status is private when
     post_commit_is_private is true and vice-versa.
     """
 
@@ -81,13 +102,14 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
                 Entity to validate.
 
         Yields:
-            ModelInvalidCommitStatus. Error for commit_type validation.
+            ModelInvalidPrivateCommitStatusError. Error for private
+            commit_type validation.
         """
         model = jobs_utils.clone_model(input_model)
         expected_post_commit_is_private = (
             model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
         if model.post_commit_is_private != expected_post_commit_is_private:
-            yield errors.ModelInvalidCommitStatusError(model)
+            yield errors.ModelInvalidPrivateCommitStatusError(model)
 
 
 class ValidateDeleted(beam.DoFn):
