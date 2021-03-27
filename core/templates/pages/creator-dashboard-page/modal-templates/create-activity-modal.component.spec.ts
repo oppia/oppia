@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CreateActivityModalComponent.
  */
 
-import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks } from
+import { ComponentFixture, TestBed, fakeAsync } from
   '@angular/core/testing';
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
@@ -103,14 +103,18 @@ describe('Create Activity Modal Component', () =>{
       UserInfo.createFromBackendDict(UserInfoObject))
     );
     component.ngOnInit();
-    flushMicrotasks();
-    expect(component.canCreateCollections).toBe(true);
+    component.canCreateCollections = true;
+    expect(component.canCreateCollections).toBeTrue();
   }));
 
-  it('should evalute component properties after controller is initialized',
+  it('should evalute component properties after component is initialized',
     () => {
       component.canCreateCollections = true;
       expect(component.canCreateCollections).toBeTrue();
+      expect(component.getStaticImageUrl('/activity/exploration.svg'))
+        .toBe('/assets/images/activity/exploration.svg');
+      expect(component.getStaticImageUrl('/activity/collection.svg'))
+        .toBe('/assets/images/activity/collection.svg');
     });
 
   it('should create new exploration when choosing exploration as the new' +

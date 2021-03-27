@@ -31,7 +31,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 export class CreateActivityModalComponent implements OnInit {
   explorationImageUrl: string;
   collectionImageUrl: string;
-  canCreateCollections: boolean;
+  canCreateCollections: boolean = false;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
@@ -40,14 +40,15 @@ export class CreateActivityModalComponent implements OnInit {
     private activeModal: NgbActiveModal
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.canCreateCollections = (
         userInfo.canCreateCollections());
     });
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   chooseExploration(): void {
