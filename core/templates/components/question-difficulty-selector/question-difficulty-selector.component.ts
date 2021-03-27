@@ -28,7 +28,7 @@ angular.module('oppia').directive('questionDifficultySelector', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-difficulty-selector/' +
-        'question-difficulty-selector.directive.html'),
+        'question-difficulty-selector.component.html'),
       controller: [
         '$scope', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
         function(
