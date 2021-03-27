@@ -171,7 +171,54 @@ class ValidateModelIdTests(BaseModelValidatorTests):
                 ]))
 
 
-class ValidateCommitTypeTests(BaseModelValidatorTests):
+class BaseSnapshotMetadataModelValidatorTests(unittest.TestCase):
+
+    def setUp(self):
+        self.now = datetime.datetime.utcnow()
+        self.year_ago = self.now - datetime.timedelta(weeks=52)
+        self.year_later = self.now + datetime.timedelta(weeks=52)
+
+    def test_base_snapshot_metadata_model_validator_ptransform(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
+                id='1',
+                created_on=self.year_ago,
+                last_updated=self.now,
+                commit_type='invalid-type',
+                user_id='',
+                post_commit_status='public',
+                post_commit_is_private=False,
+                commit_cmds=[])
+            invalid_commit_status = base_models.BaseCommitLogEntryModel(
+                id='2',
+                created_on=self.year_ago,
+                last_updated=self.now,
+                commit_type='edit',
+                user_id='',
+                post_commit_status='public',
+                post_commit_is_private=True,
+                commit_cmds=[])
+            pcoll = (
+                p
+                | beam.Create([
+                    invalid_commit_type_model, invalid_commit_status
+                ]))
+
+            output = (
+                pcoll
+                | base_model_validator.BaseSnapshotMetadataModelValidator())
+
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelInvalidCommitTypeError(
+                        invalid_commit_type_model),
+                    errors.ModelInvalidCommitStatusError(
+                        invalid_commit_status)
+                ]))
+
+
+class ValidateCommitTypeTests(BaseSnapshotMetadataModelValidatorTests):
     def test_validate_commit_type(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
@@ -195,7 +242,7 @@ class ValidateCommitTypeTests(BaseModelValidatorTests):
                 ]))
 
 
-class ValidatePostCommitIsPrivateTests(BaseModelValidatorTests):
+class ValidatePostCommitIsPrivateTests(BaseSnapshotMetadataModelValidatorTests):
     def test_validate_post_commit_is_private_when_status_is_public(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             invalid_commit_status = base_models.BaseCommitLogEntryModel(

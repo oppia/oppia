@@ -212,3 +212,40 @@ class BaseModelValidator(beam.PTransform):
             str. A regex pattern to be followed by the model id.
         """
         return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
+
+
+class BaseSnapshotMetadataModelValidator(beam.PTransform):
+    """Composite beam Transform which returns a pipeline of validation
+    errors.
+    """
+
+    def expand(self, model_pipe):
+        """Function that takes in a beam.PCollection of datastore models and
+        returns a beam.PCollection of validation errors.
+
+        Args:
+            model_pipe: beam.PCollection. A collection of models.
+
+        Returns:
+            beam.PCollection. A collection of errors represented as
+            key-value pairs.
+        """
+        not_deleted, deleted = (
+            model_pipe
+            | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
+        )
+
+        commit_type_validation_errors = (
+            not_deleted | beam.ParDo(ValidateCommitType())
+        )
+
+        post_commit_is_private_errors = (
+            not_deleted | beam.ParDo(ValidatePostCommitIsPrivate())
+        )
+
+        return (
+            (
+                commit_type_validation_errors,
+                post_commit_is_private_errors)
+            | beam.Flatten())
+
