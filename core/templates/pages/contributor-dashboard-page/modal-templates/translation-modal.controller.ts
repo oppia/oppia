@@ -165,7 +165,8 @@ angular.module('oppia').controller('TranslationModalController', [
       return originalElements.every(hasMatchingTranslatedElement);
     };
 
-    $scope.hasSomeDuplicateElements = function(originalElements, translatedElements) {
+    $scope.hasSomeDuplicateElements = function(originalElements,
+      translatedElements) {
       if (originalElements.length === 0) {
         return false;
       }
@@ -259,8 +260,9 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.incompleteTranslationError = translationError.
         hasUntranslatedElements;
 
-      if ($scope.hasImgCopyError || $scope.hasImgTextError || $scope.incompleteTranslationError
-        || $scope.uploadingTranslation || $scope.loadingData) {
+      if ($scope.hasImgCopyError || $scope.hasImgTextError ||
+        $scope.incompleteTranslationError || $scope.uploadingTranslation ||
+        $scope.loadingData) {
         return;
       }
       SiteAnalyticsService.
