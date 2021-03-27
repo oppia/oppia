@@ -290,6 +290,7 @@ describe('Context service', () => {
     it('should correctly affirm that story editor cannot refer to skills',
       () => {
         expect(ecs.getPageContext()).toBe('other');
+        expect(ecs.canEntityReferToSkills()).toBe(false);
         spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
         expect(ecs.getPageContext()).toBe('story_editor');
         expect(ecs.canEntityReferToSkills()).toBe(false);
