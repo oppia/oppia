@@ -83,7 +83,8 @@ def create_enum(*sequential, **names):
 
 
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
-    """Gets the contents of a file, given a relative filepath from oppia/.
+    """Gets the contents of a file, given a relative filepath
+    from oppia.
 
     Args:
         filepath: str. A full path to the file.
@@ -614,12 +615,12 @@ def require_valid_name(name, name_type, allow_empty=False):
         allow_empty: bool. If True, empty strings are allowed.
 
     Raises:
-        Exception. Name isn't a string.
-        Exception. The length of the name_type isn't between
+        ValidationError. Name isn't a string.
+        ValidationError. The length of the name_type isn't between
             1 and 50.
-        Exception. Name starts or ends with whitespace.
-        Exception. Adjacent whitespace in name_type isn't collapsed.
-        Exception. Invalid character is present in name.
+        ValidationError. Name starts or ends with whitespace.
+        ValidationError. Adjacent whitespace in name_type isn't collapsed.
+        ValidationError. Invalid character is present in name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
@@ -659,10 +660,10 @@ def require_valid_url_fragment(name, name_type, allowed_length):
         allowed_length: int. Allowed length for the name.
 
     Raises:
-        Exception. Name is not a string.
-        Exception. Name is empty.
-        Exception. The length of the name_type is not correct.
-        Exception. Invalid character is present in the name.
+        ValidationError. Name is not a string.
+        ValidationError. Name is empty.
+        ValidationError. The length of the name_type is not correct.
+        ValidationError. Invalid character is present in the name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError(
@@ -689,6 +690,14 @@ def require_valid_thumbnail_filename(thumbnail_filename):
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
+
+        Raises:
+            ValidationError. Thumbnail filename is not a string.
+            ValidationError. Thumbnail filename does start with a dot.
+            ValidationError. Thumbnail filename includes slashes
+                or consecutive dots.
+            ValidationError. Thumbnail filename does not include an extension.
+            ValidationError. Thumbnail filename extension is not svg.
         """
     if thumbnail_filename is not None:
         if not isinstance(thumbnail_filename, python_utils.BASESTRING):
@@ -719,6 +728,10 @@ def require_valid_meta_tag_content(meta_tag_content):
 
         Args:
             meta_tag_content: str. The meta tag content to validate.
+
+        Raises:
+            ValidationError. Meta tag content is not a string.
+            ValidationError. Meta tag content is longer than expected.
         """
     if not isinstance(meta_tag_content, python_utils.BASESTRING):
         raise ValidationError(
@@ -737,8 +750,8 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         page_title_fragment_for_web: str. The page title fragment to validate.
 
     Raises:
-        Exception. Page title fragment is not a string.
-        Exception. Page title fragment is too lengthy.
+        ValidationError. Page title fragment is not a string.
+        ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
