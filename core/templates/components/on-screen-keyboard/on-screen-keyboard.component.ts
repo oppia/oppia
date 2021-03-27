@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Component for the on-screen keyboard used for math
+ * interactions.
+ */
+
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import constants from 'assets/constants';
@@ -19,109 +24,108 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 
-/**
- * @fileoverview Component for the on-screen keyboard used for math
- * interactions.
- */
-
 @Component({
   selector: 'on-screen-keyboard',
   templateUrl: './on-screen-keyboard.component.html'
 })
 export class OnScreenKeyboardComponent {
-  // engine;
-  // guppyInstance;
-  // functionsTab = constants.OSK_FUNCTIONS_TAB;
-  // lettersTab = constants.OSK_LETTERS_TAB;
-  // mainTab = constants.OSK_MAIN_TAB;
-  // greekSymbols = Object.values(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
-  // greekLetters = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
-  // currentTab = this.mainTab;
-  // lettersInKeyboardLayout = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
-  // functions = [
-  //   'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
-  //   'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
-  // interactionType;
-  // customLetters;
+  engine;
+  guppyInstance;
+  functionsTab = constants.OSK_FUNCTIONS_TAB;
+  lettersTab = constants.OSK_LETTERS_TAB;
+  mainTab = constants.OSK_MAIN_TAB;
+  greekSymbols = Object.values(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+  greekLetters = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+  currentTab = this.mainTab;
+  lettersInKeyboardLayout = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  functions = [
+    'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
+    'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
+  interactionType;
+  customLetters;
 
-  // constructor(
-  //   private deviceInfoService: DeviceInfoService,
-  //   private guppyInitializationService: GuppyInitializationService,
-  //   private urlInterpolationService: UrlInterpolationService
-  // ) {}
+  constructor(
+    private deviceInfoService: DeviceInfoService,
+    private guppyInitializationService: GuppyInitializationService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
-  // activateGuppy(): void {
-  //   this.guppyInstance.activate();
-  // }
 
-  // changeTab(newTab): void {
-  //   this.currentTab = newTab;
-  //   this.guppyInstance.activate();
-  // }
+  activateGuppy(): void {
+    this.guppyInstance.activate();
+  }
 
-  // getStaticImageUrl(imagePath): string {
-  //   return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  // }
+  changeTab(newTab): void {
+    this.currentTab = newTab;
+    this.guppyInstance.activate();
+  }
 
-  // insertString(str): void {
-  //   let index = this.greekSymbols.indexOf(str);
-  //   if (index !== -1) {
-  //     str = this.greekLetters[index];
-  //   }
-  //   this.engine.insert_string(str);
-  //   this.guppyInstance.activate();
-  // }
+  getStaticImageUrl(imagePath): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-  // insertSymbol(symbol): void {
-  //   this.engine.insert_symbol(symbol);
-  //   this.guppyInstance.activate();
-  // }
+  insertString(str): void {
+    let index = this.greekSymbols.indexOf(str);
+    if (index !== -1) {
+      str = this.greekLetters[index];
+    }
+    this.engine.insert_string(str);
+    this.guppyInstance.activate();
+  }
 
-  // backspace(): void {
-  //   this.engine.backspace();
-  //   this.guppyInstance.activate();
-  // }
+  insertSymbol(symbol): void {
+    this.engine.insert_symbol(symbol);
+    this.guppyInstance.activate();
+  }
 
-  // left(): void {
-  //   this.engine.left();
-  //   this.guppyInstance.activate();
-  // }
+  backspace(): void {
+    this.engine.backspace();
+    this.guppyInstance.activate();
+  }
 
-  // right(): void {
-  //   this.engine.right();
-  //   this.guppyInstance.activate();
-  // }
+  left(): void {
+    this.engine.left();
+    this.guppyInstance.activate();
+  }
 
-  // exponent(value): void {
-  //   this.engine.insert_string('exp');
-  //   this.engine.insert_string(value);
-  //   this.engine.right();
-  //   this.guppyInstance.activate();
-  // }
+  right(): void {
+    this.engine.right();
+    this.guppyInstance.activate();
+  }
 
-  // hideOSK(): void {
-  //   this.guppyInstance.setShowOSK(false);
-  // }
+  exponent(value): void {
+    this.engine.insert_string('exp');
+    this.engine.insert_string(value);
+    this.engine.right();
+    this.guppyInstance.activate();
+  }
 
-  // showOSK(): boolean {
-  //   if (
-  //     !this.deviceInfoService.isMobileUserAgent() ||
-  //         !this.deviceInfoService.hasTouchEvents()) {
-  //     return false;
-  //   }
-  //   let showOSK = this.guppyInitializationService.getShowOSK();
-  //   let activeGuppyObject = (
-  //     this.guppyInitializationService.findActiveGuppyObject());
-  //   if (showOSK && activeGuppyObject !== undefined) {
-  //     this.guppyInstance = activeGuppyObject.guppyInstance;
-  //     this.engine = this.guppyInstance.engine;
-  //     this.interactionType = GuppyInitializationService.interactionType;
-  //     this.customLetters =
-  //       this.guppyInitializationService.getCustomOskLetters();
-  //     return true;
-  //   }
-  //   return false;
-  // }
+  hideOSK(): void {
+    this.guppyInstance.setShowOSK(false);
+  }
+
+  showOSK(): boolean {
+    console.log('ShowOSK');
+    if (
+      !this.deviceInfoService.isMobileUserAgent() ||
+          !this.deviceInfoService.hasTouchEvents()) {
+      return false;
+    }
+    let showOSK = this.guppyInitializationService.getShowOSK();
+    let activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (showOSK && activeGuppyObject !== undefined) {
+      this.guppyInstance = activeGuppyObject.guppyInstance;
+      this.engine = this.guppyInstance.engine;
+      this.interactionType = GuppyInitializationService.interactionType;
+      this.customLetters =
+        this.guppyInitializationService.getCustomOskLetters();
+      console.log(true);
+      return true;
+    }
+    console.log(false);
+    return false;
+  }
 }
 
 angular.module('oppia').component('onScreenKeyboard',
