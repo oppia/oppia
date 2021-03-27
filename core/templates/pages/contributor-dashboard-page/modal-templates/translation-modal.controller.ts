@@ -165,8 +165,8 @@ angular.module('oppia').controller('TranslationModalController', [
       return originalElements.every(hasMatchingTranslatedElement);
     };
 
-    $scope.hasSomeDuplicateElements = function(originalElements,
-      translatedElements) {
+    $scope.hasSomeDuplicateElements = function(
+        originalElements, translatedElements) {
       if (originalElements.length === 0) {
         return false;
       }
