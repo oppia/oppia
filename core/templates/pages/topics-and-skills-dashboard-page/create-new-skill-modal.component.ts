@@ -43,7 +43,7 @@ export class CreateNewSkillModalComponent {
   skillDescriptionExists: boolean = true;
   conceptCardExplanationEditorIsShown: boolean = false;
   bindableDict = {displayedConceptCardExplanation: ''};
-  HTML_SCHEMA = { type: 'html' };
+  HTML_SCHEMA: {type: string} = { type: 'html' };
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     constants.MAX_CHARS_IN_SKILL_DESCRIPTION);
   newExplanationObject = null;
@@ -65,6 +65,10 @@ export class CreateNewSkillModalComponent {
 
   openConceptCardExplanationEditor(): void {
     this.conceptCardExplanationEditorIsShown = true;
+  }
+
+  getHtmlSchema(): { type: string } {
+    return this.HTML_SCHEMA;
   }
 
   setErrorMessageIfNeeded(): void {
@@ -89,7 +93,7 @@ export class CreateNewSkillModalComponent {
   updateSkillDescriptionAndCheckIfExists(): void {
     this.resetErrorMsg();
     this.skillEditorStateService.updateExistenceOfSkillDescription(
-      this.newSkillDescription, this._skillDescriptionExistsCallback
+      this.newSkillDescription, this._skillDescriptionExistsCallback.bind(this)
     );
     if (
       this.skillCreationService.getSkillDescriptionStatus() !==
@@ -132,100 +136,3 @@ export class CreateNewSkillModalComponent {
     this.ngbActiveModal.dismiss('cancel');
   }
 }
-
-
-// Function(
-//       $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
-//       RubricObjectFactory, SkillCreationService, SkillEditorStateService,
-//       SkillObjectFactory, SubtitledHtmlObjectFactory,
-//       COMPONENT_NAME_EXPLANATION, MAX_CHARS_IN_SKILL_DESCRIPTION,
-//       SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
-//     var rubrics = [
-//       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
-//       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
-//       RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
-//     ContextService.setImageSaveDestinationToLocalStorage();
-//     $scope.newSkillDescription = '';
-//     $scope.rubrics = rubrics;
-//     $scope.errorMsg = '';
-//     $scope.skillDescriptionExists = true;
-//     $scope.conceptCardExplanationEditorIsShown = false;
-//     $scope.bindableDict = {
-//       displayedConceptCardExplanation: ''
-//     };
-//     $scope.HTML_SCHEMA = {
-//       type: 'html'
-//     };
-//     $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
-//       MAX_CHARS_IN_SKILL_DESCRIPTION);
-//     $scope.newExplanationObject = null;
-
-//     $scope.openConceptCardExplanationEditor = function() {
-//       $scope.conceptCardExplanationEditorIsShown = true;
-//     };
-
-//     $scope.setErrorMessageIfNeeded = function() {
-//       if (
-//         !SkillObjectFactory.hasValidDescription(
-//           $scope.newSkillDescription)) {
-//         $scope.errorMsg = (
-//           'Please use a non-empty description consisting of ' +
-//           'alphanumeric characters, spaces and/or hyphens.');
-//       }
-//       if ($scope.skillDescriptionExists) {
-//         $scope.errorMsg = (
-//           'This description already exists. Please choose a ' +
-//             'new name or modify the existing skill.');
-//       }
-//     };
-
-//     $scope._skillDescriptionExistsCallback = function(skillDescriptionExists) {
-//       $scope.skillDescriptionExists = skillDescriptionExists;
-//       $scope.setErrorMessageIfNeeded();
-//     };
-//     $scope.updateSkillDescriptionAndCheckIfExists = function() {
-//       $scope.resetErrorMsg();
-//       SkillEditorStateService.updateExistenceOfSkillDescription(
-//         $scope.newSkillDescription, $scope._skillDescriptionExistsCallback
-//       );
-//       if (
-//         SkillCreationService.getSkillDescriptionStatus() !==
-//           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
-//         $scope.rubrics[1].setExplanations([$scope.newSkillDescription]);
-//         SkillCreationService.markChangeInSkillDescription();
-//       }
-//     };
-
-//     $scope.resetErrorMsg = function() {
-//       $scope.errorMsg = '';
-//     };
-
-//     $scope.saveConceptCardExplanation = function() {
-//       var explanationObject = SubtitledHtmlObjectFactory.createDefault(
-//         $scope.bindableDict.displayedConceptCardExplanation,
-//         COMPONENT_NAME_EXPLANATION);
-//       $scope.newExplanationObject = explanationObject.toBackendDict();
-//       $scope.bindableDict.displayedConceptCardExplanation = (
-//         explanationObject.html);
-//     };
-
-//     $scope.createNewSkill = function() {
-//       $scope.setErrorMessageIfNeeded();
-//       if ($scope.errorMsg !== '') {
-//         return;
-//       }
-//       $scope.saveConceptCardExplanation();
-//       $uibModalInstance.close({
-//         description: $scope.newSkillDescription,
-//         rubrics: $scope.rubrics,
-//         explanation: $scope.newExplanationObject
-//       });
-//     };
-
-//     $scope.cancel = function() {
-//       ImageLocalStorageService.flushStoredImagesData();
-//       SkillCreationService.resetSkillDescriptionStatusMarker();
-//       $uibModalInstance.dismiss('cancel');
-//     };
-//   }
-// ]);

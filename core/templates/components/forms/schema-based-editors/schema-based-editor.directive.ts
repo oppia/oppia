@@ -76,7 +76,7 @@ import { UpgradeComponent } from '@angular/upgrade/static';
 import { Schema } from 'services/schema-default-value.service';
 
 @Directive({
-  selector: 'schema-based-editor'
+  selector: 'oppia-schema-based-editor'
 })
 export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() schema: () => Schema;

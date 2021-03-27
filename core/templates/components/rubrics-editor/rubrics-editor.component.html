@@ -16,22 +16,22 @@
   </div>
 
   <div *ngIf="this.selectedRubricIndex != null">
-    <div *ngFor="let explanation of this.rubric.getExplanations(); index as i">
-      <div *ngIf="!this.explanationEditorIsOpen[this.rubric.getDifficulty()][i]">
+    <div *ngFor="let explanation of this.rubric.getExplanations(); index as idx">
+      <div *ngIf="!this.explanationEditorIsOpen[this.rubric.getDifficulty()][idx]">
         <div class="oppia-readonly-rule-tile"
-             ngClass="{'oppia-editable-section': this.isEditable()}">
+             [ngClass]="{'oppia-editable-section': this.isEditable()}">
           <div class="oppia-rule-preview">
-            <div class="oppia-click-to-start-editing" (click)="this.openExplanationEditor(this.rubric.getDifficulty(), i)">
+            <div class="oppia-click-to-start-editing" (click)="this.openExplanationEditor(this.rubric.getDifficulty(), idx)">
               <i *ngIf="this.isEditable()"
                  class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
                  title="Edit Rubric Explanation">&#xE254;
               </i>
             </div>
-            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && i === 0 && this.newSkillBeingCreated()"
+            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && idx === 0 && this.newSkillBeingCreated()"
                   class="oppia-placeholder">
             The skill description will be autofilled here
             </span>
-            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && i !== 0) || !this.newSkillBeingCreated())"
+            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && idx !== 0) || !this.newSkillBeingCreated())"
                   class="oppia-placeholder">
             This rubric has not yet been specified
             </span>
@@ -42,30 +42,30 @@
           </div>
         </div>
       </div>
-      <div *ngIf="this.explanationEditorIsOpen[this.rubric.getDifficulty()][i]">
+      <div *ngIf="this.explanationEditorIsOpen[this.rubric.getDifficulty()][idx]">
         <div class="oppia-rule-details-header">
-          <schema-based-editor class="protractor-test-rubric-explanation-text"
-                               [schema]="this.EXPLANATION_FORM_SCHEMA"
-                               [(localValue)]="this.editableExplanations[this.rubric.getDifficulty()][i]">
-          </schema-based-editor>
+          <oppia-schema-based-editor class="protractor-test-rubric-explanation-text"
+                                     [schema]="getSchema.bind(this)"
+                                     [(localValue)]="this.editableExplanations[this.rubric.getDifficulty()][idx]">
+          </oppia-schema-based-editor>
         </div>
 
         <div class="oppia-rule-save-cancel-buttons">
           <div>
             <button type="button"
                     class="btn btn-danger protractor-test-delete-rubric-explanation-button"
-                    (click)="this.deleteExplanation(this.rubric.z(), i)">
+                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)">
               Delete
             </button>
             <button type="button"
                     class="btn btn-outline-secondary rubric-cancel-button"
-                    (click)="this.cancelEditExplanation(this.rubric.getDifficulty(), i)">
+                    (click)="this.cancelEditExplanation(this.rubric.getDifficulty(), idx)">
               Cancel
             </button>
             <button type="button"
                     class="btn btn-success protractor-test-save-rubric-explanation-button"
-                    [disabled]="!this.isExplanationValid(this.rubric.getDifficulty(), i)"
-                    (click)="this.saveExplanation(this.rubric.getDifficulty(), i)">
+                    [disabled]="!this.isExplanationValid(this.rubric.getDifficulty(), idx)"
+                    (click)="this.saveExplanation(this.rubric.getDifficulty(), idx)">
               Save
             </button>
           </div>
@@ -115,5 +115,6 @@
   }
   .oppia-rule-save-cancel-buttons .rubric-cancel-button {
     border: 1px solid #999;
+    margin: 0 4px;
   }
 </style>

@@ -39,13 +39,14 @@ require(
   'create-new-subtopic-modal.controller.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
+require('pages/topic-editor-page/services/create-new-skill-modal.service');
 
 angular.module('oppia').factory('EntityCreationService', [
-  '$uibModal', 'SkillCreationService',
+  '$uibModal', 'CreateNewSkillModalService',
   'TopicEditorRoutingService', 'TopicEditorStateService',
   'UrlInterpolationService',
   function(
-      $uibModal, SkillCreationService,
+      $uibModal, CreateNewSkillModalService,
       TopicEditorRoutingService, TopicEditorStateService,
       UrlInterpolationService) {
     var createSubtopic = function(topic) {
@@ -71,7 +72,7 @@ angular.module('oppia').factory('EntityCreationService', [
 
     var createSkill = function() {
       var topicId = TopicEditorStateService.getTopic().getId();
-      SkillCreationService.createNewSkill([topicId]);
+      CreateNewSkillModalService.createNewSkill([topicId]);
     };
 
     return {

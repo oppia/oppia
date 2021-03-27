@@ -255,6 +255,7 @@ import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engi
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
+import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/create-new-skill-modal.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { AlertsService } from 'services/alerts.service';
 import { AppService } from 'services/app.service';
@@ -398,6 +399,7 @@ export const angularServices: [string, Type<{}>][] = [
     ContributionOpportunitiesBackendApiService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
   ['CountVectorizerService', CountVectorizerService],
+  ['CreateNewSkillModalService', CreateNewSkillModalService],
   ['CreatorDashboardBackendApiService', CreatorDashboardBackendApiService],
   ['CsrfTokenService', CsrfTokenService],
   ['CurrentInteractionService', CurrentInteractionService],
