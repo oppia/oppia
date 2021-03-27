@@ -16,86 +16,79 @@
  * @fileoverview Directive for coord two dim editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('third-party-imports/leaflet.import');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { icon, latLng, marker } from 'leaflet';
+@Component({
+  selector: 'coord-two-dim-editor',
+  templateUrl: './coord-two-dim-editor.directive.html',
+  styleUrls: []
+})
+export class CoordTwoDimEditorComponent implements OnInit {
+  @Input() value;
+  latLangValue;
+  mapEvents = {
+    map: {
+      enable: ['click'],
+      logic: 'emit'
+    },
+    markers: {
+      enable: ['dragend'],
+      logic: 'emit'
+    }
+  };
+  mapCenter = latLng(0, 0);
+  mapMarkers;
+  constructor(private urlInterpolationService: UrlInterpolationService) {}
 
-angular.module('oppia').directive('coordTwoDimEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
-    return {
-      controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
-        var ctrl = this;
-        var updateMarker = function(lat, lng) {
-          ctrl.mapMarkers.mainMarker.lat = lat;
-          ctrl.mapMarkers.mainMarker.lng = lng;
-        };
-        ctrl.$onInit = function() {
-          $scope.$on(
-            'leafletDirectiveMap.coordTwoDimEditor.click',
-            function(evt, args) {
-              var newLat = args.leafletEvent.latlng.lat;
-              var newLng = args.leafletEvent.latlng.lng;
-              ctrl.value = [newLat, newLng];
-              updateMarker(newLat, newLng);
-            });
+  leafletClick(e: any): void {
+    const newLat = e.leafletEvent.latlng.lat;
+    const newLng = e.leafletEvent.latlng.lng;
+    this.value = [newLat, newLng];
+    this.updateMarker(newLat, newLng);
+  }
 
-          $scope.$on(
-            'leafletDirectiveMarker.coordTwoDimEditor.dragend',
-            function(evt, args) {
-              ctrl.value = [args.model.lat, args.model.lng];
-            });
-          ctrl.mapCenter = {
-            lat: ctrl.value[0],
-            lng: ctrl.value[1],
-            zoom: 0
-          };
-          ctrl.mapMarkers = {
-            mainMarker: {
-              lat: ctrl.value[0],
-              lng: ctrl.value[1],
-              focus: true,
-              draggable: true,
-              icon: {
-                iconUrl: UrlInterpolationService.getExtensionResourceUrl(
-                  '/interactions/InteractiveMap/static/marker-icon.png'),
-                // The size of the icon image in pixels.
-                iconSize: [25, 41],
-                // The coordinates of the "tip" of the icon.
-                iconAnchor: [12, 41],
-                shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
-                  '/interactions/InteractiveMap/static/marker-shadow.png'),
-                // The size of the shadow image in pixels.
-                shadowSize: [41, 41],
-                // The coordinates of the "tip" of the shadow.
-                shadowAnchor: [13, 41],
-                // The URL to a retina sized version of the icon image.
-                // Used for Retina screen devices.
-                iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
-                  '/interactions/InteractiveMap/static/marker-icon-2x.png'),
-                shadowRetinaUrl:
-                UrlInterpolationService.getExtensionResourceUrl(
-                  '/interactions/InteractiveMap/static/marker-shadow.png')
-              }
-            }
-          };
-          ctrl.mapEvents = {
-            map: {
-              enable: ['click'],
-              logic: 'emit'
-            },
-            markers: {
-              enable: ['dragend'],
-              logic: 'emit'
-            }
-          };
-        };
-      }],
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        value: '='
-      },
-      template: require('./coord-two-dim-editor.directive.html'),
-    };
-  }]);
+  leafletMove(e: any): void {
+    this.value = [e.model.lat, e.model.lng];
+  }
+
+  private updateMarker(lat, lng) {
+    this.mapMarkers.mainMarker.lat = lat;
+    this.mapMarkers.mainMarker.lng = lng;
+  }
+
+  ngOnInit(): void {
+    this.mapCenter = latLng(this.value[0], this.value[1]);
+    this.mapMarkers = marker(latLng(this.value[0], this.value[1]), {
+      icon: icon({
+        iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-icon.png'),
+        // The size of the icon image in pixels.
+        iconSize: [25, 41],
+        // The coordinates of the "tip" of the icon.
+        iconAnchor: [12, 41],
+        shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-shadow.png'),
+        // The size of the shadow image in pixels.
+        shadowSize: [41, 41],
+        // The coordinates of the "tip" of the shadow.
+        shadowAnchor: [13, 41],
+        // The URL to a retina sized version of the icon image.
+        // Used for Retina screen devices.
+        iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+        shadowRetinaUrl:
+      this.urlInterpolationService.getExtensionResourceUrl(
+        '/interactions/InteractiveMap/static/marker-shadow.png')
+      }),
+      draggable: true
+    }
+    );
+  }
+}
+
+angular.module('oppia').directive(
+  'coordTwoDimEditor', downgradeComponent({
+    component: CoordTwoDimEditorComponent
+  }));

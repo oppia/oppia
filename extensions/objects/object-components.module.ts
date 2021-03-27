@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the object components.
+ * @fileoverview Module for the object componients.
  */
 import 'core-js/es7/reflect';
 import 'zone.js';
@@ -21,26 +21,38 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { AlgebraicExpressionEditor } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
+import { CodeStringEditorComponent } from './templates/code-string-editor.component';
+import { ThirdPartyComponentsModule } from 'components/third-party-components/third-party-components.module';
+import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.directive';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule
+    BrowserModule,
+    LeafletModule,
+    ThirdPartyComponentsModule
   ],
   declarations: [
     AlgebraicExpressionEditor,
-    BooleanEditorComponent
+    BooleanEditorComponent,
+    CodeStringEditorComponent,
+    CoordTwoDimEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditor,
-    BooleanEditorComponent
+    BooleanEditorComponent,
+    CodeStringEditorComponent,
+    CoordTwoDimEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditor,
-    BooleanEditorComponent
+    BooleanEditorComponent,
+    CodeStringEditorComponent,
+    CoordTwoDimEditorComponent
   ],
 })
 

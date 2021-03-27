@@ -48,7 +48,9 @@ angular.module('oppia').directive('objectEditor', [
       link: function(scope: ObjectEditorCustomScope, element) {
         const MIGRATED_EDITORS: string[] = [
           'algebraic-expression',
-          'boolean-editor'
+          'boolean',
+          'code-string',
+          'coord-two-dim'
         ];
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
@@ -71,7 +73,7 @@ angular.module('oppia').directive('objectEditor', [
           if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
             element.html(
               '<' + directiveName +
-              '-editor get-always-editable="getAlwaysEditable()"' +
+              '-editor [always-editable]="alwaysEditable"' +
               ' get-init-args="getInitArgs()" get-is-editable="' +
               'getIsEditable()" get-schema="getSchema()"' +
               '(value-changed)="updateValue($event)" [value]="value"></' +
