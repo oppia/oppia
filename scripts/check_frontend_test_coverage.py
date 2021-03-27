@@ -287,7 +287,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-misconceptions-editor.directive.ts',
     'skill-prerequisite-skills-editor.directive.ts',
     'skill-questions-tab.directive.ts',
-    'skill-rubrics-editor.directive.ts',
+    'skill-rubrics-editor.component.ts',
     'skill-selector-editor.directive.ts',
     'skill-selector.directive.ts',
     'SkillObjectFactory.ts',
