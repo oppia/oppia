@@ -83,7 +83,7 @@ export class PracticeTabComponent implements OnInit {
       }
     }
     if (skillIds.length > 0) {
-      this.questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+      this.questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         skillIds).then(questionCount => {
         this.questionsAreAvailable = questionCount > 0;
         this.questionsStatusCallIsComplete = true;
