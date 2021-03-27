@@ -86,7 +86,7 @@ export class CreateNewSkillModalComponent {
     }
   }
 
-  _skillDescriptionExistsCallback(skillDescriptionExists): void {
+  _skillDescriptionExistsCallback(skillDescriptionExists: boolean): void {
     this.skillDescriptionExists = skillDescriptionExists;
     this.setErrorMessageIfNeeded();
   }
