@@ -22,21 +22,27 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-extensions.module';
-import { ContinueExtensionsModule } from './Continue/continue-extensions.module';
+import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-interactions.module';
+import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
+import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
+import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     AlgebraicExpressionInputExtensionsModule,
-    ContinueExtensionsModule
+    ContinueExtensionsModule,
+    FractionInputInteractionModule,
+    GraphInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
   exports: [
+    AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule,
-    AlgebraicExpressionInputExtensionsModule
+    FractionInputInteractionModule,
+    GraphInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }

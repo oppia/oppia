@@ -27,6 +27,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 var gifFrames = require('gif-frames');
 var gifshot = require('gifshot');
@@ -34,12 +35,13 @@ var gifshot = require('gifshot');
 angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
   'CsrfTokenService', 'ImageLocalStorageService', 'ImagePreloaderService',
-  'ImageUploadHelperService', 'UrlInterpolationService',
-  'ALLOWED_IMAGE_FORMATS', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  'ImageUploadHelperService', 'SvgSanitizerService',
+  'UrlInterpolationService', 'ALLOWED_IMAGE_FORMATS',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $sce, AlertsService, AssetsBackendApiService, ContextService,
       CsrfTokenService, ImageLocalStorageService, ImagePreloaderService,
-      ImageUploadHelperService, UrlInterpolationService,
+      ImageUploadHelperService, SvgSanitizerService, UrlInterpolationService,
       ALLOWED_IMAGE_FORMATS, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     return {
       restrict: 'E',
@@ -765,7 +767,7 @@ angular.module('oppia').directive('filepathEditor', [
             });
           } else if (mimeType === 'data:image/svg+xml') {
             ctrl.invalidTagsAndAttributes = (
-              ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
+              SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
                 imageDataURI));
             var tags = ctrl.invalidTagsAndAttributes.tags;
             var attrs = ctrl.invalidTagsAndAttributes.attrs;

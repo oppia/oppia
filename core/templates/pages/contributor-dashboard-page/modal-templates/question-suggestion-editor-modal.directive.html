@@ -12,7 +12,7 @@
         </h3>
         <ul>
           <li ng-repeat="explanation in skill.getRubricExplanations(skillDifficultyString)">
-            <span ng-bind-html="explanation"></span>
+            <span ng-bind-html="explanation" class="d-block mt-1"></span>
           </li>
         </ul>
       </div>
@@ -58,5 +58,23 @@
   }
   .oppia-question-suggestion-editor-modal>.modal-header {
     padding-bottom: 0;
+  }
+  @media only screen and (max-width: 1023px) {
+    .oppia-question-editor-section {
+    padding: 0 75px;
+  }
+  }
+  @media only screen and (max-width: 767px) {
+    .oppia-question-editor-section {
+    padding: 0 50px;
+  }
+  }
+  @media only screen and (max-width: 510px) {
+    .oppia-question-editor-section {
+    padding: 0 25px;
+  }
+  .oppia-question-suggestion-editor-modal {
+    padding: 0;
+  }
   }
 </style>

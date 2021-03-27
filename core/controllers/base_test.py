@@ -51,6 +51,7 @@ import webapp2
 import webtest
 
 current_user_services = models.Registry.import_current_user_services()
+auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
@@ -314,7 +315,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator = user_services.UserActionsInfo(creator_user_id)
+        creator = user_services.get_user_actions_info(creator_user_id)
         editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
         exploration_id = '1_en_test_exploration'
         self.save_new_valid_exploration(
@@ -707,38 +708,46 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/plain')
 
 
-class LogoutPageTests(test_utils.GenericTestBase):
+class SessionBeginHandlerTests(test_utils.GenericTestBase):
+    """Tests for session handler."""
 
-    def test_logout_page(self):
-        """Tests for logout handler."""
+    def test_get(self):
+        call_counter = test_utils.CallCounter(lambda *_: None)
+
+        with self.swap(auth_services, 'establish_auth_session', call_counter):
+            self.get_html_response('/session_begin', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+
+class LogoutPageTests(test_utils.GenericTestBase):
+    """Tests for logout handler."""
+
+    def test_logout_page_calls_destroy_auth_session(self):
         exp_services.load_demo('0')
-        # Logout with valid query arg. This test only validates that the login
-        # cookies have expired after hitting the logout url.
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
-        response = self.get_html_response('/logout', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+        self.get_html_response('/explore/0')
+
+        call_counter = test_utils.CallCounter(lambda _: None)
+
+        with self.swap(auth_services, 'destroy_auth_session', call_counter):
+            # Logout with valid query arg. This test only validates that the
+            # login cookies have expired after hitting the logout url.
+            self.get_html_response('/logout', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
 
     def test_logout_page_with_redirect_url(self):
         exp_services.load_demo('0')
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
+        self.get_html_response('/explore/0')
+
         response = self.get_html_response(
             '/logout?redirect_url=community-library', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
         self.assertIn('community-library', response.headers['Location'])
 
     def test_logout_page_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
-            self.get_html_response(
-                '/logout', expected_status_int=302)
+            self.get_html_response('/logout', expected_status_int=302)
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -956,6 +965,15 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
     applied on them.
     """
 
+    # Following handlers are present in base.py where acl_decorators cannot be
+    # imported.
+    UNDECORATED_HANDLERS = frozenset([
+        'CsrfTokenHandler',
+        'Error404Handler',
+        'LogoutPage',
+        'SessionBeginHandler',
+    ])
+
     def test_every_method_has_decorator(self):
         handlers_checked = []
 
@@ -967,10 +985,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             else:
                 handler = route.handler
 
-            # Following handler are present in base.py where acl_decorators
-            # cannot be imported.
-            if (handler.__name__ in (
-                    ('CsrfTokenHandler', 'Error404Handler', 'LogoutPage'))):
+            if handler.__name__ in self.UNDECORATED_HANDLERS:
                 continue
 
             if handler.get != base.BaseHandler.get:

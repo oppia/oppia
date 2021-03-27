@@ -113,8 +113,8 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  fetchStoryData(
-      topicUrlFragment:string,
+  async fetchStoryDataAsync(
+      topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
@@ -124,7 +124,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  recordChapterCompletion(
+  async recordChapterCompletionAsync(
       topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string,

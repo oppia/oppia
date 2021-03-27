@@ -139,7 +139,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       $q.all([
         EditableExplorationBackendApiService.fetchApplyDraftExploration(
           explorationId),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
@@ -157,7 +157,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initQuestionPlayer = function(
         questionPlayerConfig, successCallback, errorCallback) {
       setQuestionPlayerMode();
-      QuestionBackendApiService.fetchQuestions(
+      QuestionBackendApiService.fetchQuestionsAsync(
         questionPlayerConfig.skillList,
         questionPlayerConfig.questionCount,
         questionPlayerConfig.questionsSortedByDifficulty
@@ -176,9 +176,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           explorationId);
       $q.all([
         explorationDataPromise,
-        PretestQuestionBackendApiService.fetchPretestQuestions(
+        PretestQuestionBackendApiService.fetchPretestQuestionsAsync(
           explorationId, storyUrlFragment),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
+        ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];

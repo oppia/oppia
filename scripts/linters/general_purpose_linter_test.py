@@ -54,7 +54,6 @@ FILE_IN_EXCLUDED_PATH = os.path.join(
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_EXPLORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_explore.js')
 INVALID_PAUSE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_pause.js')
-INVALID_SLEEP_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_sleep.js')
 INVALID_WAIT_FOR_ANGULAR_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_wait_for_angular.js')
 INVALID_FDESCRIBE_DDESCRIBE_FILEPATH = os.path.join(
@@ -114,7 +113,7 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
-INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
+CONSTANTS_FILEPATH = 'constants.ts'
 VALID_PY_IGNORE_PRAGMA_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py')
 
@@ -183,16 +182,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             ['Line 30: In tests, please do not use browser.pause().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_browser_sleep(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_SLEEP_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 30: In tests, please do not use browser.sleep().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -569,24 +558,55 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertEqual('Mandatory pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_invalid_dev_mode_in_constant_ts(self):
+    def test_invalid_dev_mode_in_constants_ts(self):
         def mock_readlines(unused_self, unused_filepath):
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
                 ' * @fileoverview Initializes constants for '
                 'the Oppia codebase.',
-                '"DEV_MODE": false\n',)
+                '"DEV_MODE": false,\n'
+                '"EMULATOR_MODE": true\n')
 
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
 
         with readlines_swap:
             linter = general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_DEV_MODE_IN_CONSTANT_FILEPATH], FILE_CACHE)
+                [CONSTANTS_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Please set the DEV_MODE variable in constants.ts'
-            'to true before committing.'], lint_task_report.trimmed_messages)
+        self.assertItemsEqual(
+            [
+                'constants.ts --> Please set the DEV_MODE variable in '
+                'constants.ts to true before committing.',
+            ],
+            lint_task_report.trimmed_messages
+        )
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_emulator_mode_in_constants_ts(self):
+        def mock_readlines(unused_self, unused_filepath):
+            return (
+                'Copyright 2020 The Oppia Authors. All Rights Reserved.',
+                ' * @fileoverview Initializes constants for '
+                'the Oppia codebase.',
+                '"DEV_MODE": true,\n'
+                '"EMULATOR_MODE": false\n')
+
+        readlines_swap = self.swap(
+            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+
+        with readlines_swap:
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [CONSTANTS_FILEPATH], FILE_CACHE)
+            lint_task_report = linter.check_bad_patterns()
+        self.assertItemsEqual(
+            [
+                'constants.ts --> Please set the EMULATOR_MODE variable in '
+                'constants.ts to true before committing.',
+            ],
+            lint_task_report.trimmed_messages
+        )
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

@@ -55,6 +55,10 @@ var suites = {
       'protractor_desktop/creatorDashboard.js'
     ],
 
+    emailDashboard: [
+      'protractor_desktop/emailDashboard.js'
+    ],
+
     embedding: [
       'protractor_desktop/embedding.js'
     ],
@@ -324,7 +328,8 @@ exports.config = {
         dest: '../protractor-screenshots',
         // Function to build filenames of screenshots.
         pathBuilder: function(currentSpec) {
-          return currentSpec.fullName;
+          let filename = currentSpec.fullName;
+          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
         },
         captureOnlyFailedSpecs: true,
         reportFailedUrl: true,

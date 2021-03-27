@@ -229,8 +229,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegexp(
             Exception,
-            'The given content_html does not match the content of the '
-            'exploration.'):
+            'The Exploration content has changed since this translation '
+            'was submitted.'):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -1285,7 +1285,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)

@@ -3,6 +3,9 @@
     <h3><[questionHeader]></h3>
     <h4 class="author-header">Submitted by <[authorName]></h4>
   </div>
+  <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>
 
 <div class="modal-body">
@@ -33,9 +36,12 @@
   <section ng-show="reviewable" class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
       Review message (required if rejecting):
-      <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
+      <textarea class="protractor-test-suggestion-review-message w-100" rows="3" ng-model="reviewMessage"></textarea>
     </div>
   </section>
+  <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
+    <strong>Review message: </strong><[reviewMessage]>
+  </div>
 </div>
 
 <div class="modal-footer">

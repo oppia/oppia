@@ -62,9 +62,14 @@ CONFIG_FILE_PATHS = (
     'webpack.dev.config.ts',
     'webpack.prod.config.ts')
 
-REQUIRED_STRINGS_CONSTANTS = {
-    'DEV_MODE: true': {
-        'message': 'Please set the DEV_MODE variable in constants.ts'
+BAD_STRINGS_CONSTANTS = {
+    '"DEV_MODE": false': {
+        'message': 'Please set the DEV_MODE variable in constants.ts '
+                   'to true before committing.',
+        'excluded_files': ()
+    },
+    '"EMULATOR_MODE": false': {
+        'message': 'Please set the EMULATOR_MODE variable in constants.ts '
                    'to true before committing.',
         'excluded_files': ()
     }
@@ -116,18 +121,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'\b(browser.pause)\('),
         'message': 'In tests, please do not use browser.pause().',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.sleep)\('),
-        'message': 'In tests, please do not use browser.sleep().',
-        'excluded_files': (
-            # TODO(#7622): Remove the file from the excluded list. Remove the
-            # TODO in core/tests/protractor_desktop/embedding.js pointing to the
-            # same issue. The following was placed due to a necessary sleep as
-            # a temporary measure to keep the embedding tests from failing.
-            'core/tests/protractor_desktop/embedding.js',
-        ),
         'excluded_dirs': ()
     },
     {
@@ -684,14 +677,15 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             error_messages.extend(bad_pattern_error_messages)
 
             if filepath == 'constants.ts':
-                for pattern in REQUIRED_STRINGS_CONSTANTS:
-                    if pattern not in file_content:
-                        failed = True
-                        error_message = ('%s --> %s' % (
-                            filepath,
-                            REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
-                        error_messages.append(error_message)
-                        total_error_count += 1
+                for pattern in BAD_STRINGS_CONSTANTS:
+                    for line in file_content:
+                        if pattern in line:
+                            failed = True
+                            error_message = ('%s --> %s' % (
+                                filepath,
+                                BAD_STRINGS_CONSTANTS[pattern]['message']))
+                            error_messages.append(error_message)
+                            total_error_count += 1
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 

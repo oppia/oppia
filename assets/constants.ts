@@ -5445,8 +5445,8 @@ export default {
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
-  "FIREBASE_CONFIG_API_KEY": "dev-api-key",
-  "FIREBASE_CONFIG_APP_ID": "dev-app-id",
+  "FIREBASE_CONFIG_API_KEY": "fake-api-key",
+  "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
   "FIREBASE_CONFIG_DATABASE_URL": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
@@ -5619,5 +5619,87 @@ export default {
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
 
-  "DEV_MODE": true
+  "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
+    {
+      "backend_id": "user_inactivity",
+      "backend_attr": "inactive_in_last_n_days",
+      "description": "Inactive in last n days",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "user_login_activity",
+      "backend_attr": "has_not_logged_in_for_n_days",
+      "description": "Has not logged in for n days",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "minimum_exp_created",
+      "backend_attr": "created_at_least_n_exps",
+      "description": "Has created at least n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "maximum_exp_created",
+      "backend_attr": "created_fewer_than_n_exps",
+      "description": "Has created fewer than n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "minimum_exp_edited",
+      "backend_attr": "edited_at_least_n_exps",
+      "description": "Has edited at least n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "maximum_exp_edited",
+      "backend_attr": "edited_fewer_than_n_exps",
+      "description": "Has edited fewer than n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    }
+  ],
+
+  "DEV_MODE": true,
+  "EMULATOR_MODE": true
 } as const;

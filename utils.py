@@ -22,6 +22,7 @@ import collections
 import datetime
 import hashlib
 import imghdr
+import itertools
 import json
 import os
 import random
@@ -988,56 +989,76 @@ def compute_list_difference(list_a, list_b):
     return list(set(list_a) - set(list_b))
 
 
-def is_local_server_environment():
-    """Returns wheter the app is being run locally in a development server.
-    More information can be found here:
-    https://cloud.google.com/appengine/docs/standard/python/tools/
-    using-local-server#detecting_application_runtime_environment
-
-    This is necessary because the DEV_MODE constant only differentiates between
-    local development and operations on the production server. However,
-    the e2e tests and the development server can operate with the flag
-    '--prod_env' flag which creates a simulated production environment; this use
-    case still falls under local development mode and requires the usage of
-    stubs to mock out important functionality of certain production APIs. For
-    this reason, we need this function to check if we are actually in the
-    production server.
-
-    Returns:
-        bool. Whether the current instance is running locally on a developer's
-        computer.
-    """
-    return (
-        'APPENGINE_RUNTIME' in os.environ and
-        'Development/' in os.environ['SERVER_SOFTWARE'])
-
-
-def is_appengine_cloud_environment():
-    """Returns whether the app is being run in production in the Google App
-    Engine Cloud.
-
-    More information can be found here:
-    https://cloud.google.com/appengine/docs/standard/python/tools/
-    using-local-server#detecting_application_runtime_environment
-
-    This is necessary because the DEV_MODE constant only differentiates between
-    local development and operations on the production server. However,
-    the e2e tests and the development server can operate with the flag
-    '--prod_env' flag which creates a simulated production environment; this use
-    case still falls under local development mode and requires the usage of
-    stubs to mock out important functionality of certain production APIs. For
-    this reason, we need this function to check if we are actually in the
-    production server.
-
-    Returns:
-        bool. Whether the current instance is running in production.
-    """
-    return (
-        'APPENGINE_RUNTIME' in os.environ and
-        'Google App Engine/' in os.environ['SERVER_SOFTWARE'])
-
-
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
 
     pass
+
+
+def grouper(iterable, chunk_len, fillvalue=None):
+    """Collect data into fixed-length chunks.
+
+    Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
+
+    Example:
+        grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+
+    Args:
+        iterable: iterable. Any kind of iterable object.
+        chunk_len: int. The chunk size of each group.
+        fillvalue: *. The value used to fill out the last chunk in case the
+            iterable is exhausted.
+
+    Returns:
+        iterable(iterable). A sequence of chunks over the input data.
+    """
+    # To understand how/why this works, please refer to the following
+    # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
+    args = [iter(iterable)] * chunk_len
+    return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
+
+
+def partition(iterable, predicate=bool, enumerated=False):
+    """Returns two generators which split the iterable based on the predicate.
+
+    NOTE: The predicate is called AT MOST ONCE per item.
+
+    Example:
+        is_even = lambda n: (n % 2) == 0
+        evens, odds = partition([10, 8, 1, 5, 6, 4, 3, 7], is_even)
+        assert list(evens) == [10, 8, 6, 4]
+        assert list(odds) == [1, 5, 3, 7]
+
+
+        logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
+        is_error = lambda msg: msg.startswith('ERROR: ')
+        errors, others = partition(logs, is_error, enumerated=True)
+
+        for i, error in errors:
+            raise Exception('Log index=%d failed for reason: %s' % (i, error))
+        for i, message in others:
+            logging.info('Log index=%d: %s' % (i, message))
+
+    Args:
+        iterable: iterable. Any kind of iterable object.
+        predicate: callable. A function which accepts an item and returns True
+            or False.
+        enumerated: bool. Whether the partitions should include their original
+            indices.
+
+    Returns:
+        tuple(iterable, iterable). Two distinct generators. The first generator
+        will hold values which passed the predicate. The second will hold the
+        values which did not. If enumerated is True, then the generators will
+        yield (index, item) pairs. Otherwise, the generators will yield items by
+        themselves.
+    """
+    if enumerated:
+        iterable = enumerate(iterable)
+        old_predicate = predicate
+        predicate = lambda pair: old_predicate(pair[1])
+    # Creates two distinct generators over the same iterable. Memory-efficient.
+    true_part, false_part = itertools.tee((i, predicate(i)) for i in iterable)
+    return (
+        (i for i, predicate_is_true in true_part if predicate_is_true),
+        (i for i, predicate_is_true in false_part if not predicate_is_true))
