@@ -72,7 +72,8 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.viewCompletedTranslationsModalOpen = false;
     $scope.translationsList=[];
     $scope.contentList=[];
-    $scope.loadingTranslatedText = false;
+    $scope.loadingTranslatedText = true;
+    $scope.noTranslationComplete= true;
     $scope.languageDescription = (
       TranslationLanguageService.getActiveLanguageDescription());
     TranslateTextService.init(
@@ -93,6 +94,9 @@ angular.module('oppia').controller('TranslationModalController', [
           TranslatedTextService.getTranslatedText());
         $scope.translationsList = TranslatedTextAndContent.translationsList;
         $scope.contentList = TranslatedTextAndContent.contentList;
+        if($scope.translationsList.length > 0){
+          $scope.noTranslationComplete =  false;
+        }
         $scope.loadingTranslatedText = false;  
       }
     )

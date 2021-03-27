@@ -1396,29 +1396,31 @@ class Exploration(python_utils.OBJECT):
 
         return state_names_to_content_id_mapping
 
-    def get_translated_text(self, language_code):
-        """To be written
+    def get_translated_text_and_content(self, language_code):
+        """Returns all the contents along with the corresponding
+        translations for which the process of the process of translation in 
+        the given language has been completed.
 
         Args:
             language_code: str. The language code in which translation is
                 required.
 
         Returns:
-            dict(str, dict(str, str)). A dict where state_name is the key and a
-            dict with content_id as the key and html content as value.
+            dict(str, list(str)). A dict where the key is type of data 
+            contained in the list i.e. translation or content and value 
+            is list of strings i.e. actual data.
         """
         completed_translations = []
         completed_translations_content = []
-        # print(self.get_content_html(state_name, content_id));
         for state_name, state in self.states.items():
-            translations_and_ids = state.get_translated_html_for_given_language(language_code)
-            for id, c in translations_and_ids:
-                completed_translations_content.append(self.get_content_html(state_name, id))
-                completed_translations.append(c)
-        #     if(abc[0]=="true"):
-        #         completed_translations_content.append(abc[1])
-        #         completed_translations.append(abc[2])
-        return [completed_translations_content, completed_translations]
+            translations_and_ids = state.get_translated_text_and_ids(language_code)
+            for id, translated_text in translations_and_ids:
+                completed_translations_content.append(
+                    self.get_content_html(state_name, id))
+                completed_translations.append(translated_text)
+        return {
+            'content': completed_translations_content, 
+            'translations': completed_translations}
 
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration

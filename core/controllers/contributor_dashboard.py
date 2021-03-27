@@ -261,7 +261,9 @@ class TranslatableTextHandler(base.BaseHandler):
 
 
 class TranslatedTextHandler(base.BaseHandler):
-    """Provides lessons content which has been translated to a given language."""
+    """Provides translated content for lessons in a given language which
+    can be used as a reference while translating.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -280,14 +282,15 @@ class TranslatedTextHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
         exp = exp_fetchers.get_exploration_by_id(exp_id)
-        translated_text_list = exp.get_translated_text(language_code)
+        translated_text_and_content = exp.get_translated_text_and_content(language_code)
         
         self.values = {
-            'translations_list': translated_text_list[1],
-            'content_list' : translated_text_list[0]
+            'content_list' : translated_text_and_content['content'],
+            'translations_list': translated_text_and_content['translations']
         }
 
         self.render_json(self.values)
+
 class UserContributionRightsDataHandler(base.BaseHandler):
     """Provides contribution rights of the logged in user in translation,
     voiceover and question category on the contributor dashboard.

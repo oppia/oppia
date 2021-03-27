@@ -3015,42 +3015,56 @@ class State(python_utils.OBJECT):
 
         return content_id_to_html
 
-    def get_translated_html_for_given_language(self, language_code):
-        """to be written properly
+    def get_translated_text_and_ids(self, language_code):
+        """returns all the html that has been translated in a 
+        a given language and their ids corresponding to translations
 
         Args:
             language_code: str. The abbreviated code of the language.
 
         Returns:
-            dict(str, str). A dict with key as content id and value as the
-            content html.
+            list(tuple(str, str)). A list of tuples with first element 
+            as content id and second element as the translation content html.
         """
-        return self._get_html_from_state(language_code)
-
-    def _get_html_from_state(self, language_code):
-        # print("printing state")
-        print(self.written_translations)
-        # print(dir(self.written_translations))
-        a = self.written_translations.get_content_ids_that_are_correctly_translated(language_code)
-        print(a)
+        translated_content_ids= (
+            self._get_translated_content_ids(language_code))
         translations_and_ids = []
-        for b in a:
+        for id in translated_content_ids:
             translations_and_ids.append(
-                [b, self.written_translations.translations_mapping[b][language_code].translation])
-        # print(self.content)
-        # print(dir(self.content))
-        # print(self.interaction)
-        # print(dir(self.interaction))
-        # translation_found = "false"
-        # translations_of_state = []
-        # translation = ""
-        # translation_ids_of_state = []
-        # for content_type in self.written_translations.translations_mapping:
-        #     for key in self.written_translations.translations_mapping[content_type]:
-        #         if(key==language_code):
-        #             translations_of_state.append(
-        #                 self.written_translations.translations_mapping[content_type][key].translation)
-        return translations_and_ids
+                self.get_translation_by_id_in_given_language(id, language_code))
+        return translations_and_ids 
+
+    def _get_translated_content_ids(self, language_code):
+        """returns a list of content_ids which have been translated
+        in the given language.
+        
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Return:
+            list(str). A list of strings of content ids that have been
+            translated in the given language.
+        """
+        return (self.written_translations
+            .get_content_ids_that_are_correctly_translated(language_code))
+
+    def get_translation_by_id_in_given_language(self, id, language_code):
+        """returns the translation corresponding to the given content id
+        in the given language
+
+        Args:
+            id: str. The content id of the completed translation in the 
+            given language.
+            language_code: str. The abbreviated code of the language.
+        
+        Returns:
+            tuple(str, list(str)) A tuple containing two elements. The
+            first element is the content id string and the second element
+            is the string containing the translated html.
+        """
+        translation = (self.written_translations.
+            translations_mapping[id][language_code].translation)
+        return (id, translation)
 
     def to_dict(self):
         """Returns a dict representing this State domain object.

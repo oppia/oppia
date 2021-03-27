@@ -52,13 +52,30 @@
             </span>
         </button>
       </div> 
-      <div class="oppia-completed-translations-row"
+      <div class="oppia-completed-translations-table"
            ng-if="viewCompletedTranslationsModalOpen">
-        <div ng-repeat = "content in contentList track by $index" ng-ig="!loadingTranslatedText">
-          <angular-html-bind html-data="content"></angular-html-bind>
-          <angular-html-bind html-data="translationsList[$index]"></angular-html-bind>
+        <div class="oppia-translations-and-content-row"
+             ng-if="!noTranslationComplete && !loadingTranslatedText">
+          <div class="oppia-completed-translations-table-heading">Original Content</div>
+          <div class="oppia-completed-translations-table-heading">Translated Content</div>
         </div>
-        The content and corresponding translations will be displayed here.
+        <div class="oppia-translations-and-content-row"
+             ng-if="!noTranslationComplete && !loadingTranslatedText"
+             ng-repeat = "content in contentList track by $index">
+          <div class="oppia-translations-and-content-column-left">
+            <angular-html-bind html-data="content" style="width: 100%"></angular-html-bind>
+          </div>
+          <div class="oppia-translations-and-content-column-right">
+            <angular-html-bind html-data="translationsList[$index]" style="width: 100%;"></angular-html-bind>
+          </div>
+        </div>
+        <div ng-if="noTranslationComplete && !loadingTranslatedText">
+          <p>No completed Translations are available</p>
+        </div>
+        <div ng-if="noTranslationComplete && loadingTranslatedText">
+          <p>Loading...</p>
+        </div>
+        
       </div>
     </div>
   </div>
@@ -174,11 +191,32 @@
     background-color: #009688;
     width: 100%;
   }
-  .oppia-completed-translations-row{
+  .oppia-completed-translations-table{
     margin-top: 10px;
   }
   .oppia-view-completed-translations-section{
     display: flex;
     flex-direction: column;
+  }
+  .oppia-translations-and-content-row{
+    display: flex;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+  }
+  .oppia-translations-and-content-column-left{
+    width: 50%;
+    padding: 12px;
+    padding-right: 6px;
+    border-right: 1px solid rgba(0,0,0,0.2);
+  }
+  .oppia-translations-and-content-column-right{
+    width: 50%;
+    padding: 12px;
+    padding-left: 6px;
+  }
+  .oppia-completed-translations-table-heading{
+    width: 50%;
+    font-weight: 700;
+    padding: 12px;
+    background-color: #ccc;
   }
 </style>

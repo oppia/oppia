@@ -16,51 +16,9 @@
  * @fileoverview A service for getting the completed translations from backend
  * 
  */
-
- export class StateAndContent {
-    constructor(
-      private _stateName: string,
-      private _contentID: string,
-      private _contentText: string) {}
-  
-    get stateName(): string {
-      return this._stateName;
-    }
-  
-    set stateName(newStateName: string) {
-      this._stateName = newStateName;
-    }
-  
-    get contentID(): string {
-      return this._contentID;
-    }
-  
-    set contentID(newContentID: string) {
-      this._contentID = newContentID;
-    }
-  
-    get contentText(): string {
-      return this._contentText;
-    }
-  
-    set contentText(newContentText: string) {
-      this._contentText = newContentText;
-    }
-  }
   
   angular.module('oppia').factory('TranslatedTextService', [
     '$http', function($http) {
-      const STARTING_INDEX = -1;
-      var stateWiseContents = null;
-      var stateWiseContentIds = {};
-      var stateAndContent = [];
-      var stateNamesList = [];
-      var activeExpId = null;
-      var activeExpVersion = null;
-      var activeIndex = STARTING_INDEX;
-      var activeStateName = null;
-      var activeContentId = null;
-      var activeContentText = null;
       var recievedTranslationsList = [];
       var recievedContentList = [];
       
@@ -74,15 +32,6 @@
   
       return {
         init: function(expId, languageCode, successCallback) {
-          stateWiseContents = null;
-          stateWiseContentIds = {};
-          stateNamesList = [];
-          stateAndContent = [];
-          activeIndex = STARTING_INDEX;
-  
-          activeExpId = expId;
-          activeExpVersion = null;
-  
           $http.get('/gettranslatedtexthandler', {
             params: {
               exp_id: expId,
@@ -92,13 +41,7 @@
             recievedTranslationsList = response.data.translations_list;
             recievedContentList = response.data.content_list;
             successCallback();
-            console.log("Successfully made the http request");
-            console.log(recievedContentList);
-            console.log(recievedTranslationsList);
           });
-          // recievedContentList = ['<p>Content 1</p>', '<p>Content 2</p>'];
-          // recievedTranslationsList = ['<p>Translation 1</p>', '<p>Translation 2</p>'];
-          // successCallback();
         },
         getTranslatedText: function() {
           return {
