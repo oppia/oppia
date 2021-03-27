@@ -256,19 +256,19 @@ describe('Context service', () => {
 
     it('should check that the community dashboard question editor is open',
       () => {
-        expect(ecs.getCommunityDashboardQuestionEditorIsOpen()).toBeFalse();
-        ecs.setCommunityDashboardQuestionEditorIsOpen();
-        expect(ecs.getCommunityDashboardQuestionEditorIsOpen()).toBeTrue();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
+        ecs.setContributorDashboardQuestionEditorIsOpen();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeTrue();
       }
     );
 
     it('should check that the community dashboard question editor is closed',
       () => {
-        expect(ecs.getCommunityDashboardQuestionEditorIsOpen()).toBeFalse();
-        ecs.setCommunityDashboardQuestionEditorIsOpen();
-        expect(ecs.getCommunityDashboardQuestionEditorIsOpen()).toBeTrue();
-        ecs.clearCommunityDashboardQuestionEditorIsOpen();
-        expect(ecs.getCommunityDashboardQuestionEditorIsOpen()).toBeFalse();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
+        ecs.setContributorDashboardQuestionEditorIsOpen();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeTrue();
+        ecs.clearContributorDashboardQuestionEditorIsOpen();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
       }
     );
 

@@ -36,7 +36,7 @@ export class ContextService {
   explorationIsLinkedToStory = false;
   explorationId = null;
   questionPlayerIsManuallySet = false;
-  communityDashboardQuestionEditorIsOpen = false;
+  contributorDashboardQuestionEditorIsOpen = false;
   questionId = null;
   editorContext = null;
   customEntityContext = null;
@@ -132,16 +132,16 @@ export class ContextService {
     return this.questionPlayerIsManuallySet;
   }
 
-  setCommunityDashboardQuestionEditorIsOpen(): void {
-    this.communityDashboardQuestionEditorIsOpen = true;
+  setContributorDashboardQuestionEditorIsOpen(): void {
+    this.contributorDashboardQuestionEditorIsOpen = true;
   }
 
-  clearCommunityDashboardQuestionEditorIsOpen(): void {
-    this.communityDashboardQuestionEditorIsOpen = false;
+  clearContributorDashboardQuestionEditorIsOpen(): void {
+    this.contributorDashboardQuestionEditorIsOpen = false;
   }
 
-  getCommunityDashboardQuestionEditorIsOpen(): boolean {
-    return this.communityDashboardQuestionEditorIsOpen;
+  getContributorDashboardQuestionEditorIsOpen(): boolean {
+    return this.contributorDashboardQuestionEditorIsOpen;
   }
 
   canEntityReferToSkills(): boolean {
@@ -151,7 +151,7 @@ export class ContextService {
       (
         this.getPageContext() === (
           ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD) &&
-          this.getCommunityDashboardQuestionEditorIsOpen()
+          this.getContributorDashboardQuestionEditorIsOpen()
       ) ||
       (
         this.getPageContext() === (
