@@ -397,7 +397,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
-            user_a = user_services.UserActionsInfo(user_a_id)
+            user_a = user_services.get_user_actions_info(user_a_id)
 
             # User A creates an exploration.
             self.save_new_valid_exploration(
@@ -640,7 +640,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
 
-        self.user_a = user_services.UserActionsInfo(self.user_a_id)
+        self.user_a = user_services.get_user_actions_info(self.user_a_id)
 
     def mock_get_statistics(self, exp_id, unused_version):
         current_completions = {

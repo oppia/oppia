@@ -2564,7 +2564,7 @@ title: Title
             owner_id: str. The user_id of the owner of the exploration.
             exploration_id: str. The ID of the new exploration.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
@@ -2636,7 +2636,7 @@ title: Title
             owner_id: str. The user_id of the owner of the collection.
             collection_id: str. ID of the collection to be published.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
