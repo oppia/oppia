@@ -2890,11 +2890,13 @@ class UserRolesPopulationOneOffJobTests(test_utils.GenericTestBase):
         return user_jobs_one_off.UserRolesPopulationOneOffJob.get_output(job_id)
 
     def test_job_updates_roles_field_with_role(self):
-        user_models.UserSettingsModel(
+        model = user_models.UserSettingsModel(
             id='user-id',
             email='email@email.com',
             normalized_username='username',
-            role='admin').update_timestamps().put()
+            role='admin')
+        model.update_timestamps()
+        model.put()
 
         old_user_model = user_models.UserSettingsModel.get('user-id')
         self.assertEqual(old_user_model.roles, [])
