@@ -86,12 +86,12 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.moreAvailable = textAndAvailability.more;
         $scope.loadingData = false;
       });
-    TranslatedTextService.init(
+    TranslatedTextService.getTranslationsAndContent(
       opportunity.id,
       TranslationLanguageService.getActiveLanguageCode(),
       function(){
         var TranslatedTextAndContent = (
-          TranslatedTextService.getTranslatedText());
+          TranslatedTextService.getTranslationsAndContentLists());
         $scope.translationsList = TranslatedTextAndContent.translationsList;
         $scope.contentList = TranslatedTextAndContent.contentList;
         if($scope.translationsList.length > 0){

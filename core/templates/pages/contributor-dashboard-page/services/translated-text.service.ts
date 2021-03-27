@@ -16,39 +16,47 @@
  * @fileoverview A service for getting the completed translations from backend
  * 
  */
-  
-  angular.module('oppia').factory('TranslatedTextService', [
-    '$http', function($http) {
-      var recievedTranslationsList = [];
-      var recievedContentList = [];
-      
-      const getTranslationsList = function(){
-        return recievedTranslationsList;
-      }
+  import { downgradeInjectable } from '@angular/upgrade/static';
+  import { Injectable } from '@angular/core';
+  import { HttpClient } from '@angular/common/http';
 
-      const getContentList = function(){
-        return recievedContentList;
-      }
-  
-      return {
-        init: function(expId, languageCode, successCallback) {
-          $http.get('/gettranslatedtexthandler', {
-            params: {
-              exp_id: expId,
-              language_code: languageCode
-            }
-          }).then(function(response) {
-            recievedTranslationsList = response.data.translations_list;
-            recievedContentList = response.data.content_list;
-            successCallback();
-          });
+  interface ITranslationsAndContentDict {
+    'content_list' : string[],
+    'translations_list': string[]
+  }
+
+  @Injectable({
+    providedIn: 'root'
+  })
+
+  export class TranslatedTextService {
+    constructor(
+      private http: HttpClient
+    ){}
+    recievedTranslationsList = [];
+    recievedContentList = [];
+    
+    getTranslationsAndContent(expId, languageCode, successCallback){
+      this.http.get<ITranslationsAndContentDict>('/gettranslatedtexthandler', {
+        params: {
+          exp_id: expId,
+          language_code: languageCode
         },
-        getTranslatedText: function() {
-          return {
-            translationsList: getTranslationsList(),
-            contentList: getContentList()
-          };
-        }
-      };
-    }]);
+        observe: 'response'
+      }).toPromise().then((response) => {
+        this.recievedTranslationsList = response.body.translations_list;
+        this.recievedContentList = response.body.content_list;
+        successCallback();
+      });
+    }
+    getTranslationsAndContentLists(){
+      return {
+        translationsList : this.recievedTranslationsList,
+        contentList : this.recievedContentList
+      }
+    }
+  }
+  angular.module('oppia').factory('TranslatedTextService', 
+    downgradeInjectable(TranslatedTextService));   
   
+    

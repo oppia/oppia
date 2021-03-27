@@ -63,10 +63,10 @@
              ng-if="!noTranslationComplete && !loadingTranslatedText"
              ng-repeat = "content in contentList track by $index">
           <div class="oppia-translations-and-content-column-left">
-            <angular-html-bind html-data="content" style="width: 100%"></angular-html-bind>
+            <angular-html-bind html-data="content"></angular-html-bind>
           </div>
           <div class="oppia-translations-and-content-column-right">
-            <angular-html-bind html-data="translationsList[$index]" style="width: 100%;"></angular-html-bind>
+            <angular-html-bind html-data="translationsList[$index]"></angular-html-bind>
           </div>
         </div>
         <div ng-if="noTranslationComplete && !loadingTranslatedText">
