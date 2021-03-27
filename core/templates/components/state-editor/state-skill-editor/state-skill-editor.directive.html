@@ -1,7 +1,7 @@
 <md-card class="oppia-editor-card-with-avatar" id="tutorialStateSkill">
   <div>
     <div class="oppia-exp-skill-card-header-container oppia-mobile-collapsible-card-header"
-      ng-click="toggleSkillEditor()">
+         ng-click="toggleSkillEditor()">
       <h3 class="oppia-exp-skill-card-header">
         Skill
       </h3>
@@ -12,22 +12,24 @@
     </div>
     <div class="oppia-add-skill-button-container" ng-if="skillCardIsShown">
       <div ng-if="!skillDescription">
-        <button type="button" class="btn btn-secondary oppia-add-skill-button protractor-test-open-add-skill-modal"
-          ng-click="addSkillModal()">
+        <button type="button"
+                class="btn btn-secondary oppia-add-skill-button protractor-test-open-add-skill-modal"
+                ng-click="addSkillModal()">
           + ADD SKILL
         </button>
       </div>
       <div ng-if="skillDescription">
-        <button type="button" class="btn btn-secondary oppia-change-skill-button protractor-test-open-add-skill-modal"
-          ng-click="addSkillModal()">
+        <button type="button"
+                class="btn btn-secondary oppia-change-skill-button protractor-test-open-add-skill-modal"
+                ng-click="addSkillModal()">
           CHANGE SKILL
         </button>
         <div class="skill-description-card" ng-if="skillDescription">
           <a ng-href="<[getSkillEditorUrl()]>" target="_blank" rel="noopener" class="skill-link"><[skillDescription]></a>
-            <span class="oppia-delete-response-button oppia-transition-200"
-              ng-click="deleteSkill()">
-              <i class="material-icons md-18">&#xE5CD;</i>
-            </span>
+          <span class="oppia-delete-response-button oppia-transition-200"
+                ng-click="deleteSkill()">
+            <i class="material-icons md-18">&#xE5CD;</i>
+          </span>
         </div>
       </div>
     </div>
@@ -85,8 +87,8 @@
   }
   state-skill-editor .skill-link:hover {
     color: black;
-    text-decoration: none;
     font-weight: 500;
+    text-decoration: none;
   }
   @media screen and (max-width: 768px) {
     state-skill-editor .oppia-exp-skill-card-header {
