@@ -283,11 +283,7 @@ class BaseHandler(webapp2.RequestHandler):
         super(BaseHandler, self).dispatch()
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """Base method to handle GET requests.
-
-        Raises:
-            PageNotFoundException. Page not found error (error code 404).
-        """
+        """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
         self._render_exception(
