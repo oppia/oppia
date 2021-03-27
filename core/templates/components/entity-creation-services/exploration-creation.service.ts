@@ -55,7 +55,7 @@ export class ExplorationCreationService {
     this.alertsService.clearWarnings();
     this.loaderService.showLoadingScreen('Creating exploration');
 
-    this.explorationCreationBackendApiService.registerNewExploration()
+    this.explorationCreationBackendApiService.registerNewExplorationAsync()
       .then((response) => {
         this.siteAnalyticsService.registerCreateNewExplorationEvent(
           response.explorationId);

@@ -18,12 +18,9 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 
-import { ExplorationCreationBackendApiService } from
-  // eslint-disable-next-line max-len
-  'components/entity-creation-services/exploration-creation-backend-api.service';
-
-describe('Collection Creation backend service', () => {
+describe('Collection Creation backend api service', () => {
   let explorationCreationBackendApiService:
   ExplorationCreationBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -50,7 +47,7 @@ describe('Collection Creation backend service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    explorationCreationBackendApiService.registerNewExploration().then(
+    explorationCreationBackendApiService.registerNewExplorationAsync().then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -70,7 +67,7 @@ describe('Collection Creation backend service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      explorationCreationBackendApiService.registerNewExploration().then(
+      explorationCreationBackendApiService.registerNewExplorationAsync().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

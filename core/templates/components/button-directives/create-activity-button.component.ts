@@ -28,7 +28,7 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { AppConstants } from 'app.constants';
 
  @Component({
-   selector: 'create-activity-bbutton',
+   selector: 'oppia-create-activity-button',
    templateUrl: './create-activity-button.component.html',
  })
 export class CreateActivityButtonComponent implements OnInit {
@@ -102,5 +102,5 @@ export class CreateActivityButtonComponent implements OnInit {
    }
 }
 angular.module('oppia').directive(
-  'createActivityButton', downgradeComponent(
+  'oppiaCreateActivityButton', downgradeComponent(
     {component: CreateActivityButtonComponent}));

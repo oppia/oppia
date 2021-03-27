@@ -53,7 +53,7 @@ export class ExplorationCreationBackendApiService {
       });
   }
 
-  async registerNewExploration(): Promise<ExplorationCreationResponse> {
+  async registerNewExplorationAsync(): Promise<ExplorationCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createExploration(resolve, reject);
     });
