@@ -153,8 +153,6 @@ class ValidateCommitType(beam.DoFn):
             ModelCommitTypeError. Error for commit_type validation.
         """
         model = jobs_utils.clone_model(input_model)
-        if not hasattr(model, 'commit_type'):
-            return
 
         if (model.commit_type not in
                 base_models.VersionedModel.COMMIT_TYPE_CHOICES):
@@ -193,16 +191,11 @@ class BaseModelValidator(beam.PTransform):
                 ValidateModelIdWithRegex(), self._get_model_id_regex())
         )
 
-        commit_type_validation_errors = (
-            not_deleted | beam.ParDo(ValidateCommitType())
-        )
-
         return (
             (
                 deletion_errors,
                 time_field_validation_errors,
-                model_id_validation_errors,
-                commit_type_validation_errors)
+                model_id_validation_errors)
             | beam.Flatten())
 
     def _get_model_id_regex(self):
