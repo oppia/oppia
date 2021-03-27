@@ -133,7 +133,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
                 [INVALID_MISSING_HTML_TAG_HTML_FILEPATH], FILE_CACHE
                 ).perform_all_lint_checks()
 
-    def test_custom_space_around_html_attribute(self):
+    def test_space_around_attribute_name_reports_correctly(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_SPACE_AROUND_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
@@ -143,7 +143,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)
 
-    def test_custom_space_innerhtml_attribute(self):
+    def test_space_around_attr_having_camel_case_name_reports_correctly(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
