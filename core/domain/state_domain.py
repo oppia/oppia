@@ -3025,25 +3025,32 @@ class State(python_utils.OBJECT):
             dict(str, str). A dict with key as content id and value as the
             content html.
         """
-        print("printing from state_domain.py")
         return self._get_html_from_state(language_code)
 
     def _get_html_from_state(self, language_code):
-        print("from _get_html_from_state function")
-        # for thing in self.written_translations.translations_mapping:
-        #     print("printing thing")
-        #     print(thing)
-        # s = "u'"+language_code+"'"
-        # print("printing s " + s)
-        translation_found = "false"
-        translation = ""
-        for key in self.written_translations.translations_mapping[u'content']:
-            print("printing keys")
-            if(key==language_code):
-                print("found translation")
-                translation_found = "true"
-                translation = self.written_translations.translations_mapping[u'content'][key].translation
-        return [translation_found, self.content.html, translation]
+        # print("printing state")
+        print(self.written_translations)
+        # print(dir(self.written_translations))
+        a = self.written_translations.get_content_ids_that_are_correctly_translated(language_code)
+        print(a)
+        translations_and_ids = []
+        for b in a:
+            translations_and_ids.append(
+                [b, self.written_translations.translations_mapping[b][language_code].translation])
+        # print(self.content)
+        # print(dir(self.content))
+        # print(self.interaction)
+        # print(dir(self.interaction))
+        # translation_found = "false"
+        # translations_of_state = []
+        # translation = ""
+        # translation_ids_of_state = []
+        # for content_type in self.written_translations.translations_mapping:
+        #     for key in self.written_translations.translations_mapping[content_type]:
+        #         if(key==language_code):
+        #             translations_of_state.append(
+        #                 self.written_translations.translations_mapping[content_type][key].translation)
+        return translations_and_ids
 
     def to_dict(self):
         """Returns a dict representing this State domain object.

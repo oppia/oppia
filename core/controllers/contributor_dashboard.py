@@ -268,7 +268,6 @@ class TranslatedTextHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles get requests. """
-        print("Correct Handler Called")
         language_code = self.request.get('language_code')
         exp_id = self.request.get('exp_id')
 
