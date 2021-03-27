@@ -69,6 +69,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -103,6 +105,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CreateNewSkillModalComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
@@ -112,6 +115,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
+    RubricsEditorComponent,
     SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
@@ -131,6 +135,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   entryComponents: [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CreateNewSkillModalComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
@@ -140,6 +145,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
+    RubricsEditorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
@@ -158,11 +164,13 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CreateNewSkillModalComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
     SchemaBasedEditorDirective,
     FocusOnDirective,
     PromoBarComponent,
+    RubricsEditorComponent,
     SharingLinksComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,

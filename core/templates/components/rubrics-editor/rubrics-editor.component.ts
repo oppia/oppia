@@ -16,8 +16,14 @@
  * @fileoverview Component for the rubric editor for skills.
  */
 
-import { Component, Input } from '@angular/core';
+
+require('components/entity-creation-services/skill-creation.service.ts');
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import constants from 'assets/constants';
+import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
+import { Rubric } from 'domain/skill/RubricObjectFactory';
+import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { ContextService } from 'services/context.service';
 
 @Component({
@@ -25,19 +31,134 @@ import { ContextService } from 'services/context.service';
   templateUrl: './rubrics-editor.component.html'
 })
 export class RubricsEditorComponent {
-  @Input() rubrics;
+  @Input() rubrics: Rubric[];
   @Input() newSkillBeingCreated: boolean;
-  @Input() onSaveRubric;
+  @Output() saveRubric: EventEmitter<any> = (
+    new EventEmitter());
+  skillDescriptionStatusValues = (
+    TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
+  skillDifficultyMedium = (
+    constants.SKILL_DIFFICULTY_MEDIUM);
+  explanationsMemento = {};
+  explanationEditorIsOpen = {};
+  editableExplanations = {};
+  selectedRubricIndex: number;
+  EXPLANATION_FORM_SCHEMA = {type: 'html',
+    ui_config: {}};
+  rubricsOptions: { id: number; difficulty: string; }[];
+  rubric;
 
   constructor(
     private contextService: ContextService,
+    private skillCreationService: SkillCreationService
   ) {}
+
+  isEditable(): boolean {
+    return true;
+  }
+
+  isExplanationEmpty(explanation): boolean {
+    return explanation === '<p></p>' || explanation === '';
+  }
+
+  openExplanationEditor(difficulty, index): void {
+    this.explanationEditorIsOpen[difficulty][index] = true;
+  }
+
+  isExplanationValid(difficulty, index): boolean {
+    return Boolean(this.editableExplanations[difficulty][index]);
+  }
+
+  saveExplanation(difficulty, index): void {
+    if (difficulty === this.skillDifficultyMedium && index === 0) {
+      this.skillCreationService.disableSkillDescriptionStatusMarker();
+    }
+    this.explanationEditorIsOpen[difficulty][index] = false;
+    let explanationHasChanged = (
+      this.editableExplanations[difficulty][index] !==
+      this.explanationsMemento[difficulty][index]);
+
+    if (explanationHasChanged) {
+      this.saveRubric.emit(
+        {difficulty:
+        difficulty, data: this.editableExplanations[difficulty]});
+      this.explanationsMemento[difficulty][index] = (
+        this.editableExplanations[difficulty][index]);
+    }
+  }
+
+  cancelEditExplanation(difficulty, index): void {
+    this.editableExplanations[difficulty][index] = (
+      this.explanationsMemento[difficulty][index]);
+    if (!this.editableExplanations[difficulty][index]) {
+      this.deleteExplanation(difficulty, index);
+    }
+    this.explanationEditorIsOpen[difficulty][index] = false;
+  }
+
+  addExplanationForDifficulty(difficulty): void {
+    this.editableExplanations[difficulty].push('');
+    this.saveRubric.emit(
+      {difficulty: difficulty, data: this.editableExplanations[difficulty]});
+    this.explanationsMemento[difficulty] = angular.copy(
+      this.editableExplanations[difficulty]);
+    this.explanationEditorIsOpen[
+      difficulty][
+      this.editableExplanations[difficulty].length - 1] = true;
+  }
+
+  deleteExplanation(difficulty, index): void {
+    if (difficulty === this.skillDifficultyMedium && index === 0) {
+      this.skillCreationService.disableSkillDescriptionStatusMarker();
+    }
+    this.explanationEditorIsOpen[difficulty][index] = false;
+    this.editableExplanations[difficulty].splice(index, 1);
+    this.saveRubric.emit({
+      difficulty: difficulty, data: this.editableExplanations[difficulty]});
+    this.explanationsMemento[difficulty] =
+    {...this.editableExplanations[difficulty]};
+  }
+
+
+  isAnyExplanationEmptyForDifficulty(difficulty): boolean {
+    for (var idx in this.explanationsMemento[difficulty]) {
+      if (
+        this.isExplanationEmpty(
+          this.explanationsMemento[difficulty][idx])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  ngOnInit(): void {
+    for (let idx in this.rubrics) {
+      let explanations = this.rubrics[idx].getExplanations();
+      let difficulty = this.rubrics[idx].getDifficulty();
+      this.explanationsMemento[difficulty] = {...explanations};
+      this.explanationEditorIsOpen[difficulty] = (
+        Array(explanations.length).fill(false));
+      this.editableExplanations[difficulty] = {...explanations};
+    }
+    this.selectedRubricIndex = null;
+    this.rubricsOptions = [
+      {id: 0, difficulty: 'Easy'},
+      {id: 1, difficulty: 'Medium'},
+      {id: 2, difficulty: 'Hard'}
+    ];
+    this.selectedRubricIndex = 1;
+    this.rubric = this.rubrics[1];
+  }
+
+  onRubricSelectionChange(): void {
+    this.rubric = this.rubrics[this.selectedRubricIndex];
+  }
 }
 
 angular.module('oppia').directive('rubricsEditor',
   downgradeComponent({ component: RubricsEditorComponent }));
 
-// require(
+// Require(
 //   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 // require('domain/utilities/url-interpolation.service.ts');
 // require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');

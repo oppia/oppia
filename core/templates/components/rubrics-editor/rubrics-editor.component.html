@@ -8,44 +8,45 @@
   </div>
   <div class="form-group">
     <span>
-      <select class="form-control rubric-options protractor-test-select-rubric-difficulty" ng-model="$ctrl.selectedRubricIndex"
-              ng-options="rubric.id as rubric.difficulty for rubric in $ctrl.rubricsOptions"  ng-change="$ctrl.onRubricSelectionChange()">
+      <select class="form-control rubric-options protractor-test-select-rubric-difficulty" [(ngModel)]="this.selectedRubricIndex"
+              (change)="this.onRubricSelectionChange()">
+        <option *ngFor="let option of this.rubricsOptions" [value]="option.id">{{ option.difficulty }}</option>
       </select>
     </span>
   </div>
 
-  <div ng-if="$ctrl.selectedRubricIndex != null">
-    <div ng-repeat="explanation in $ctrl.rubric.getExplanations() track by $index">
-      <div ng-if="!$ctrl.explanationEditorIsOpen[$ctrl.rubric.getDifficulty()][$index]">
+  <div *ngIf="this.selectedRubricIndex != null">
+    <div *ngFor="let explanation of this.rubric.getExplanations(); index as i">
+      <div *ngIf="!this.explanationEditorIsOpen[this.rubric.getDifficulty()][i]">
         <div class="oppia-readonly-rule-tile"
-             ng-class="{'oppia-editable-section': $ctrl.isEditable()}">
+             ngClass="{'oppia-editable-section': this.isEditable()}">
           <div class="oppia-rule-preview">
-            <div class="oppia-click-to-start-editing" ng-click="$ctrl.openExplanationEditor($ctrl.rubric.getDifficulty(), $index)">
-              <i ng-if="$ctrl.isEditable()"
-                 class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-rubric-explanation-<[$ctrl.rubric.getDifficulty()]>"
+            <div class="oppia-click-to-start-editing" (click)="this.openExplanationEditor(this.rubric.getDifficulty(), i)">
+              <i *ngIf="this.isEditable()"
+                 class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
                  title="Edit Rubric Explanation">&#xE254;
               </i>
             </div>
-            <span ng-if="$ctrl.isExplanationEmpty(explanation) && $ctrl.selectedRubricIndex === 1 && $index === 0 && $ctrl.newSkillBeingCreated()"
+            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && i === 0 && this.newSkillBeingCreated()"
                   class="oppia-placeholder">
             The skill description will be autofilled here
             </span>
-            <span ng-if="$ctrl.isExplanationEmpty(explanation) && ($ctrl.selectedRubricIndex !== 1 || ($ctrl.selectedRubricIndex === 1 && $index !== 0) || !$ctrl.newSkillBeingCreated())"
+            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && i !== 0) || !this.newSkillBeingCreated())"
                   class="oppia-placeholder">
             This rubric has not yet been specified
             </span>
-            <div class="protractor-test-rubric-explanation-<[$ctrl.rubric.getDifficulty()]>">
-              <angular-html-bind html-data="explanation">
-              </angular-html-bind>
+            <div class="protractor-test-rubric-explanation-{{this.rubric.getDifficulty()}}">
+              <angular-html-bind-wrapper [htmlData]="explanation">
+              </angular-html-bind-wrapper>
             </div>
           </div>
         </div>
       </div>
-      <div ng-if="$ctrl.explanationEditorIsOpen[$ctrl.rubric.getDifficulty()][$index]">
+      <div *ngIf="this.explanationEditorIsOpen[this.rubric.getDifficulty()][i]">
         <div class="oppia-rule-details-header">
           <schema-based-editor class="protractor-test-rubric-explanation-text"
-                               schema="$ctrl.EXPLANATION_FORM_SCHEMA"
-                               local-value="$ctrl.editableExplanations[$ctrl.rubric.getDifficulty()][$index]">
+                               [schema]="this.EXPLANATION_FORM_SCHEMA"
+                               [(localValue)]="this.editableExplanations[this.rubric.getDifficulty()][i]">
           </schema-based-editor>
         </div>
 
@@ -53,66 +54,66 @@
           <div>
             <button type="button"
                     class="btn btn-danger protractor-test-delete-rubric-explanation-button"
-                    ng-click="$ctrl.deleteExplanation($ctrl.rubric.getDifficulty(), $index)">
+                    (click)="this.deleteExplanation(this.rubric.z(), i)">
               Delete
             </button>
             <button type="button"
                     class="btn btn-outline-secondary rubric-cancel-button"
-                    ng-click="$ctrl.cancelEditExplanation($ctrl.rubric.getDifficulty(), $index)">
+                    (click)="this.cancelEditExplanation(this.rubric.getDifficulty(), i)">
               Cancel
             </button>
             <button type="button"
                     class="btn btn-success protractor-test-save-rubric-explanation-button"
-                    ng-disabled="!$ctrl.isExplanationValid($ctrl.rubric.getDifficulty(), $index)"
-                    ng-click="$ctrl.saveExplanation($ctrl.rubric.getDifficulty(), $index)">
+                    [disabled]="!this.isExplanationValid(this.rubric.getDifficulty(), i)"
+                    (click)="this.saveExplanation(this.rubric.getDifficulty(), i)">
               Save
             </button>
           </div>
         </div>
       </div>
     </div>
-    <button class="btn add-explanation-button skill-editor-add-btn protractor-test-add-explanation-button-<[$ctrl.rubric.getDifficulty()]>"
+    <button class="btn add-explanation-button skill-editor-add-btn protractor-test-add-explanation-button-{{this.rubric.getDifficulty()}}"
             type="button"
-            ng-click="$ctrl.addExplanationForDifficulty($ctrl.rubric.getDifficulty())"
-            ng-disabled="$ctrl.isAnyExplanationEmptyForDifficulty($ctrl.rubric.getDifficulty())">
+            (click)="this.addExplanationForDifficulty(this.rubric.getDifficulty())"
+            [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty())">
       + ADD EXPLANATION FOR DIFFICULTY
     </button>
   </div>
 </div>
 
 <style>
-  rubrics-editor .dropdown-option {
+  .dropdown-option {
     padding: 10px;
   }
 
-  rubrics-editor .helper-text {
+  .helper-text {
     color: #595959;
     font-size: 13px;
   }
 
-  rubrics-editor .dropdown {
+  .dropdown {
     display: inline-block;
   }
 
-  rubrics-editor .rubric-options {
+  .rubric-options {
     width: 200px;
   }
 
-  rubrics-editor .add-explanation-button {
+  .add-explanation-button {
     background-color: #058CA6;
     color: #FFFFFF;
     margin-top: 1vh;
   }
 
-  rubrics-editor .rubric-editor {
+  .rubric-editor {
     margin-right: 15px;
     margin-top: 2vh;
   }
 
-  rubrics-editor .oppia-rule-save-cancel-buttons {
+  .oppia-rule-save-cancel-buttons {
     text-align: right;
   }
-  rubrics-editor .oppia-rule-save-cancel-buttons .rubric-cancel-button {
+  .oppia-rule-save-cancel-buttons .rubric-cancel-button {
     border: 1px solid #999;
   }
 </style>

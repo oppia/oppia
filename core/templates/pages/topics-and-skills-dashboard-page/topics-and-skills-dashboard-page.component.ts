@@ -24,7 +24,7 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
-require('components/rubrics-editor/rubrics-editor.directive.ts');
+require('components/rubrics-editor/rubrics-editor.component.ts');
 
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');

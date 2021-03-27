@@ -27,20 +27,23 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    DynamicContentModule,
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent
   ],
   providers: [
+    SkillCreationService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
@@ -61,6 +64,14 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { AlertsService } from 'services/alerts.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

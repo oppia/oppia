@@ -30,6 +30,7 @@ import { WinnowingPreprocessingService } from 'classifiers/winnowing-preprocessi
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { CollectionCreationBackendService } from 'components/entity-creation-services/collection-creation-backend-api.service';
 import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
+import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
@@ -595,6 +596,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SidebarStatusService', SidebarStatusService],
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillBackendApiService', SkillBackendApiService],
+  ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
   ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
