@@ -98,7 +98,7 @@ class ValidateDeletedTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([expired_model])
-            | beam.ParDo(base_model_validator.ValidateDeleted())
+            | beam.ParDo(base_model_validator.ValidateDeletedModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -117,7 +117,7 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_model_validator.ValidateModelTimeFields())
+            | beam.ParDo(base_model_validator.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [
@@ -133,7 +133,7 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_model_validator.ValidateModelTimeFields())
+            | beam.ParDo(base_model_validator.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [
