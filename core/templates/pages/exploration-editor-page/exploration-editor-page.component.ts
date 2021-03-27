@@ -155,7 +155,6 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
-
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorPage', {
