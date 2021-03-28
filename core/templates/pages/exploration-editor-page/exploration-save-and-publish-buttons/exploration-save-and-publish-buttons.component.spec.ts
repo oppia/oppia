@@ -149,18 +149,16 @@ describe('Exploration save and publish buttons component', function() {
     $scope.$apply();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should initialize $scope properties after controller initialization',
     function() {
       expect($scope.saveIsInProcess).toBe(false);
       expect($scope.publishIsInProcess).toBe(false);
       expect($scope.loadingDotsAreShown).toBe(false);
     });
-
-  it('should show publish button when user can publish and exploration' +
-    ' is private', function() {
-    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
-    expect($scope.showPublishButton()).toBe(true);
-  });
 
   it('should save exploration when saving changes', function() {
     $scope.saveChanges();
@@ -268,5 +266,45 @@ describe('Exploration save and publish buttons component', function() {
       .returnValue(false);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
     expect($scope.isEditableOutsideTutorialMode()).toBe(false);
+  });
+
+  it('should display publish button when the exploration is unpublished',
+    function() {
+      $scope.explorationCanBePublished = false;
+
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
+      $scope.$apply();
+
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect($scope.explorationCanBePublished).toBe(true);
+    });
+
+  it('should fetch userExplorationPermissions when ' +
+    'showPublishExplorationModal is called', function() {
+    var userPermissions = {
+      canPublish: true
+    };
+    $scope.explorationCanBePublished = false;
+    spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+      .returnValue($q.resolve(userPermissions));
+
+    $scope.showPublishExplorationModal();
+    $scope.$apply();
+
+    expect($scope.publishIsInProcess).toBe(false);
+    expect($scope.loadingDotsAreShown).toBe(false);
+    expect(userExplorationPermissionsService.fetchPermissionsAsync)
+      .toHaveBeenCalled();
+    expect($scope.explorationCanBePublished).toBe(true);
+  });
+
+  it('should unsubscribe when onDestroy runs', function() {
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
+    ctrl.$onDestroy();
+
+    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });
