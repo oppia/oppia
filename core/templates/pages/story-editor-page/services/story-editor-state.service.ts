@@ -235,7 +235,7 @@ export class StoryEditorStateService {
     return this._classroomUrlFragment;
   }
 
-  changeStoryPublicationStatus(
+  changeStoryPublicationStatusAsync(
       newStoryStatusIsPublic: boolean,
       successCallback: (value?: Object) => void): boolean {
     if (!this._storyIsInitialized) {

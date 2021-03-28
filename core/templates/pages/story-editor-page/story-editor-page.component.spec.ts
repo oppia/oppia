@@ -115,7 +115,7 @@ describe('Story editor page', function() {
       url_fragment: 'story-url-fragment'
     });
     const MockEditableStoryBackendApiService = {
-      validateExplorations: async() => Promise.resolve([])
+      validateExplorationsAsync: () => Promise.resolve([])
     };
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
 
