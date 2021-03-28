@@ -21,7 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
-require('pages/contributor-dashboard-page/services/translated-text.service.ts');
+require('pages/contributor-dashboard-page/services/translated-text-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
@@ -35,12 +35,12 @@ angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'ENTITY_TYPE', 'TranslatedTextService',
+  'opportunity', 'ENTITY_TYPE', 'TranslatedTextBackendApiService',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
-      opportunity, ENTITY_TYPE, TranslatedTextService) {
+      opportunity, ENTITY_TYPE, TranslatedTextBackendApiService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -86,12 +86,12 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.moreAvailable = textAndAvailability.more;
         $scope.loadingData = false;
       });
-    TranslatedTextService.getTranslationsAndContent(
+    TranslatedTextBackendApiService.getTranslationsAndContent(
       opportunity.id,
-      TranslationLanguageService.getActiveLanguageCode(),
-      function(){
+      TranslationLanguageService.getActiveLanguageCode()).then(
+      () => {
         var TranslatedTextAndContent = (
-          TranslatedTextService.getTranslationsAndContentLists());
+          TranslatedTextBackendApiService.getTranslationsAndContentLists());
         $scope.translationsList = TranslatedTextAndContent.translationsList;
         $scope.contentList = TranslatedTextAndContent.contentList;
         if($scope.translationsList.length > 0){

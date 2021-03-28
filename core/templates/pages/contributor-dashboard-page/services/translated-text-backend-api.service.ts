@@ -29,15 +29,17 @@
     providedIn: 'root'
   })
 
-  export class TranslatedTextService {
+  export class TranslatedTextBackendApiService {
     constructor(
       private http: HttpClient
     ){}
     recievedTranslationsList = [];
     recievedContentList = [];
     
-    getTranslationsAndContent(expId, languageCode, successCallback){
-      this.http.get<ITranslationsAndContentDict>('/gettranslatedtexthandler', {
+    getTranslationsAndContent(expId, 
+                              languageCode):Promise<void>{
+      return this.http.get<ITranslationsAndContentDict>(
+        '/gettranslatedtexthandler', {
         params: {
           exp_id: expId,
           language_code: languageCode
@@ -46,7 +48,8 @@
       }).toPromise().then((response) => {
         this.recievedTranslationsList = response.body.translations_list;
         this.recievedContentList = response.body.content_list;
-        successCallback();
+      }, (errorResponse) => {
+        console.log(errorResponse);
       });
     }
     getTranslationsAndContentLists(){
@@ -56,7 +59,7 @@
       }
     }
   }
-  angular.module('oppia').factory('TranslatedTextService', 
-    downgradeInjectable(TranslatedTextService));   
+  angular.module('oppia').factory('TranslatedTextBackendApiService', 
+    downgradeInjectable(TranslatedTextBackendApiService));   
   
     
