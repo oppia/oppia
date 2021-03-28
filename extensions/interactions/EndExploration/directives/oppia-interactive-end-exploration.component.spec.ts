@@ -232,7 +232,7 @@ describe('EndExplorationValidationService', function() {
     it('should not check if any author-recommended explorations are' +
     ' invalid.', function() {
       expect(ctrl.isInEditorPage).toBe(false);
-      expect($httpBackend.flush).toThrow();
+      expect($httpBackend.flush).toThrowError();
       $httpBackend.verifyNoOutstandingRequest();
     });
   });
