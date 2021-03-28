@@ -1127,58 +1127,66 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class DeleteNonExistentExpsFromActivitiesOneOffJob(
+class DeleteNonExistentExpsFromUserModelsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that removes explorations that do not exist or that are private from
-    completed and incomplete activities models.
+    completed and incomplete activities models and from user
+    subscriptions model.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(
-            DeleteNonExistentExpsFromActivitiesOneOffJob, cls
+            DeleteNonExistentExpsFromUserModelsOneOffJob, cls
         ).enqueue(job_id, shard_count=16)
 
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
             user_models.CompletedActivitiesModel,
-            user_models.IncompleteActivitiesModel
+            user_models.IncompleteActivitiesModel,
+            user_models.UserSubscriptionsModel
         ]
 
     @staticmethod
-    def map(activities_model):
-        class_name = activities_model.__class__.__name__
-        exploration_ids = activities_model.exploration_ids
+    def map(model):
+        class_name = model.__class__.__name__
+        exploration_ids = model.exploration_ids
         exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
-            activities_model.exploration_ids)
-        exist_exploration_ids = [
+            model.exploration_ids)
+        existing_exploration_ids = [
             exp_id for exp_id, exp_rights_model
             in python_utils.ZIP(exploration_ids, exp_rights_models)
             if exp_rights_model is not None
         ]
 
         changed = False
-        if len(exist_exploration_ids) < len(exploration_ids):
+        if len(existing_exploration_ids) < len(exploration_ids):
             changed = True
             yield ('REMOVED_DELETED_EXPS - %s' % class_name, 1)
 
-        public_exploration_ids = [
-            exp_id for exp_id, exp_rights_model
-            in python_utils.ZIP(exploration_ids, exp_rights_models)
-            if exp_rights_model.status == constants.ACTIVITY_STATUS_PUBLIC
-        ]
+        if isinstance(model, (
+                user_models.CompletedActivitiesModel,
+                user_models.IncompleteActivitiesModel
+        )):
+            public_exploration_ids = [
+                exp_id for exp_id, exp_rights_model
+                in python_utils.ZIP(exploration_ids, exp_rights_models)
+                if exp_rights_model.status == constants.ACTIVITY_STATUS_PUBLIC
+            ]
 
-        if len(public_exploration_ids) < len(exist_exploration_ids):
-            changed = True
-            yield ('REMOVED_PRIVATE_EXPS - %s' % class_name, 1)
+            if len(public_exploration_ids) < len(existing_exploration_ids):
+                changed = True
+                yield ('REMOVED_PRIVATE_EXPS - %s' % class_name, 1)
+        else:
+            public_exploration_ids = existing_exploration_ids
 
         if changed:
-            activities_model.exploration_ids = public_exploration_ids
-            activities_model.update_timestamps(update_last_updated_time=False)
-            activities_model.put()
+            model.exploration_ids = public_exploration_ids
+            model.update_timestamps(update_last_updated_time=False)
+            model.put()
 
-        yield ('SUCCESS' % class_name, 1)
+        yield ('SUCCESS - %s' % class_name, 1)
 
     @staticmethod
     def reduce(key, values):
@@ -1214,6 +1222,65 @@ class DeleteNonExistentExpUserDataOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('SUCCESS_DELETED_EXPLORATION', 1)
         else:
             yield ('SUCCESS_KEPT', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class DeleteNonExistentExpUserContributionsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that removes deleted explorations form user contributions models
+    fields.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            DeleteNonExistentExpUserContributionsOneOffJob, cls
+        ).enqueue(job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserContributionsModel]
+
+    @staticmethod
+    def map(model):
+        created_exp_models = exp_models.ExplorationModel.get_multi(
+            model.created_exploration_ids)
+        existing_created_exp_ids = [
+            exp_id for exp_id, exp_model
+            in python_utils.ZIP(
+                model.created_exploration_ids, created_exp_models
+            ) if exp_model is not None
+        ]
+
+        changed = False
+        if len(existing_created_exp_ids) < len(model.created_exploration_ids):
+            changed = True
+            yield ('REMOVED_CREATED_DELETED_EXPS', 1)
+
+        edited_exp_models = exp_models.ExplorationModel.get_multi(
+            model.edited_exploration_ids)
+        existing_edited_exp_ids = [
+            exp_id for exp_id, exp_model
+            in python_utils.ZIP(
+                model.edited_exploration_ids, edited_exp_models
+            ) if exp_model is not None
+        ]
+
+        if len(existing_edited_exp_ids) < len(model.edited_exploration_ids):
+            changed = True
+            yield ('REMOVED_EDITED_DELETED_EXPS', 1)
+
+        if changed:
+            model.created_exploration_ids = existing_created_exp_ids
+            model.edited_exploration_ids = existing_edited_exp_ids
+            model.update_timestamps(update_last_updated_time=False)
+            model.put()
+
+        yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):

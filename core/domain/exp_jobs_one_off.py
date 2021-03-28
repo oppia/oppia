@@ -1013,7 +1013,9 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ExpSnapshotsContentDeletionJob(jobs.BaseMapReduceOneOffJobManager):
-    """"""
+    """Job that attempts to delete explorations that have no parent
+    ExplorationModel.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):

@@ -78,6 +78,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.XmlnsAttributeInExplorationMathSvgImagesAuditJob,
     exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
     exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
+    exp_jobs_one_off.ExpSnapshotsContentDeletionJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
     feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
@@ -119,6 +120,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.DescriptionLengthAuditOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    story_jobs_one_off.DeleteStoryCommitLogEntriesOneOffJob,
     suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
@@ -146,7 +148,10 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
     user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
-    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob
+    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob,
+    user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
+    user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
+    user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
