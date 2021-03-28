@@ -216,17 +216,19 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
     def _check_space_between_attributes_and_values(
             self, tag, attr, value, rendered_text, value_in_quotes):
-        """
-        Checks if there are any spaces between attributes and their values.
+        """Checks if there are any spaces between attributes and their values.
+
         Args:
             tag: str. The tag name of the HTML line.
             attr: str. The attribute name in the tag.
-            value. str. The value of the attribute.
-            rendered_text. str. The rendered text of the tag.
+            value: str. The value of the attribute.
+            rendered_text: str. The rendered text of the tag.
+            value_in_quotes: bool. Whether the given attribute value
+                is in double quotes.
         """
 
         attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
-        line_number, column_number = self.getpos()
+        line_number, _ = self.getpos()
         if rendered_text.find(attr) < 0:
             # Attribute names are case insensitive,
             # So attr name might not match the
@@ -242,9 +244,9 @@ class CustomHTMLParser(html.parser.HTMLParser):
         if rendered_text.find(expected_attr_assignment) < 0:
             self.failed = True
             error_message = (
-                    '%s --> Attribute %s for tag %s on line '
-                    '%s has unwanted white spaces around it' % (
-                        self.filepath, attr, tag, line_number))
+                '%s --> Attribute %s for tag %s on line '
+                '%s has unwanted white spaces around it' % (
+                    self.filepath, attr, tag, line_number))
             self.error_messages.append(error_message)
 
 
