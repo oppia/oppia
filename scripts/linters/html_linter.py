@@ -137,28 +137,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
                             tag, line_number))
                     self.error_messages.append(error_message)
 
-                # Check if there are any white spaces around
-                # attribute assignment.
-                attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
-                if rendered_text.find(attr) < 0:
-                    # Attribute names are case insensitive,
-                    # So attr name might not match the
-                    # actual attr name in tag.
-
-                    attr_pos = rendered_text.lower().find(attr)
-                    attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
-                    expected_attr_assignment = attr_val_structure.format(
-                        attr_name, value)
-                else:
-                    expected_attr_assignment = attr_val_structure.format(
-                        attr, value)
-                if rendered_text.find(expected_attr_assignment) < 0:
-                    self.failed = True
-                    error_message = (
-                        '%s --> Attribute %s for tag %s on line '
-                        '%s has unwanted white spaces around it' % (
-                            self.filepath, attr, tag, line_number))
-                    self.error_messages.append(error_message)
+                self._check_space_between_attributes_and_values(
+                    tag, attr, value, rendered_text, value_in_quotes)
 
         for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
@@ -233,6 +213,39 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.indentation_level += 1
             elif data_line.startswith(ending_block):
                 self.indentation_level -= 1
+
+    def _check_space_between_attributes_and_values(
+            self, tag, attr, value, rendered_text, value_in_quotes):
+        """
+        Checks if there are any spaces between attributes and their values.
+        Args:
+            tag: str. The tag name of the HTML line.
+            attr: str. The attribute name in the tag.
+            value. str. The value of the attribute.
+            rendered_text. str. The rendered text of the tag.
+        """
+
+        attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
+        line_number, column_number = self.getpos()
+        if rendered_text.find(attr) < 0:
+            # Attribute names are case insensitive,
+            # So attr name might not match the
+            # actual attr name in tag.
+
+            attr_pos = rendered_text.lower().find(attr)
+            attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
+            expected_attr_assignment = attr_val_structure.format(
+                attr_name, value)
+        else:
+            expected_attr_assignment = attr_val_structure.format(
+                attr, value)
+        if rendered_text.find(expected_attr_assignment) < 0:
+            self.failed = True
+            error_message = (
+                    '%s --> Attribute %s for tag %s on line '
+                    '%s has unwanted white spaces around it' % (
+                        self.filepath, attr, tag, line_number))
+            self.error_messages.append(error_message)
 
 
 class HTMLLintChecksManager(python_utils.OBJECT):
