@@ -42,7 +42,7 @@ module.exports = {
   create: function(context) {
     const fileName = context.getFilename();
     const componentsToCheck = ['component',
-    'controller', 'directive', 'factory', 'filter'];
+      'controller', 'directive', 'factory', 'filter'];
     let numComponents = 0;
 
     return {
@@ -50,7 +50,7 @@ module.exports = {
         if (!((fileName.endsWith('.js')) || (fileName.endsWith('.ts')))) {
           return;
         }
-        
+
         if (node.callee.type !== 'MemberExpression') {
           return;
         }

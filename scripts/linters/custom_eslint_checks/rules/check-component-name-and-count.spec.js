@@ -75,7 +75,7 @@ ruleTester.run('check-component-name-and-count', rule, {
       },
       {
         message: (
-        'Please ensure that there is exactly one component in the file.'),
+          'Please ensure that there is exactly one component in the file.'),
         type: null,
       }
       ]
