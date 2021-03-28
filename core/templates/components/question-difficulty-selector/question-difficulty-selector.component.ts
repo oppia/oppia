@@ -16,8 +16,7 @@
  * @fileoverview Component for the question difficulty selector.
  */
 
-
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
@@ -27,10 +26,15 @@ import { AppConstants } from 'app.constants';
   styleUrls: []
 })
 export class QuestionDifficultySelectorComponent implements OnInit {
+  scope: {
+    getSkillIdToRubricsObject: '&skillIdToRubricsObject',
+    skillWithDifficulty: '='
+  },
+  @Input() skillWithDifficulty: any;
   ngOnInit(): void {
-    $scope.availableDifficultyValues = [];
+    this.availableDifficultyValues = [];
             for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-              $scope.availableDifficultyValues.push(
+              this.availableDifficultyValues.push(
                 AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
             }
   }
