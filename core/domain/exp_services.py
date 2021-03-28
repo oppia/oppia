@@ -795,7 +795,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_SUBSCRIPTIONS,
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
     # Remove from activities.
     taskqueue_services.defer(
@@ -839,6 +839,9 @@ def delete_explorations_from_activities(exploration_ids):
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
     """
+    if not exploration_ids:
+        return
+
     model_classes = (
         user_models.CompletedActivitiesModel,
         user_models.IncompleteActivitiesModel,

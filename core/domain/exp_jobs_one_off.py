@@ -1012,7 +1012,7 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class ExpSnapshotsContentDeletionJob(jobs.BaseMapReduceOneOffJobManager):
+class ExpSnapshotsDeletionJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that attempts to delete explorations that have no parent
     ExplorationModel.
     """
@@ -1028,20 +1028,18 @@ class ExpSnapshotsContentDeletionJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(ExpSnapshotsContentDeletionJob, cls).enqueue(
-            job_id, shard_count=16)
+        super(ExpSnapshotsDeletionJob, cls).enqueue(job_id, shard_count=16)
 
     @staticmethod
-    def map(item):
-        exp_id = item.get_unversioned_instance_id()
-        exploration = exp_fetchers.get_exploration_by_id(
-            exp_id, strict=False)
-        if exploration is None:
-            exp_services.delete_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id, force_deletion=True)
-            yield ('SUCCESS_DELETED_EXP', 1)
+    def map(model):
+        class_name = model.__class__.__name__
+        exp_id = model.get_unversioned_instance_id()
+        exp_model = exp_models.ExplorationModel.get(exp_id, strict=False)
+        if exp_model is None:
+            model.delete()
+            yield ('SUCCESS_DELETED - %s' % class_name, 1)
         else:
-            yield ('SUCCESS NO ACTION', 1)
+            yield ('SUCCESS_PASS - %s' % class_name, 1)
 
     @staticmethod
     def reduce(key, values):
