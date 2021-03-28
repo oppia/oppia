@@ -384,6 +384,24 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/about');
     });
 
+    it('should check that the community dashboard question editor is open',
+      () => {
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
+        ecs.setContributorDashboardQuestionEditorIsOpen();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeTrue();
+      }
+    );
+
+    it('should check that the community dashboard question editor is closed',
+      () => {
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
+        ecs.setContributorDashboardQuestionEditorIsOpen();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeTrue();
+        ecs.clearContributorDashboardQuestionEditorIsOpen();
+        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
+      }
+    );
+
     it('should throw an error when trying to retrieve the exploration id',
       () => {
         expect(() => ecs.getExplorationId()).toThrowError(
