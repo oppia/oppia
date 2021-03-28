@@ -21,6 +21,9 @@ import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 
 describe('Classifier model', () => {
   let classifierFrozenModel = new TextClassifierFrozenModel();
+  // The model_json attribute in TextClassifierFrozenModel class can't be
+  // changed to camelcase since the class definition is automatically compiled
+  // with the help of protoc.
   classifierFrozenModel.model_json = JSON.stringify({
     KNN: {
       occurrence: 0,

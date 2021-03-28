@@ -23,6 +23,8 @@ import { Classifier } from 'domain/classifier/classifier.model';
 import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 
+import { AppConstants } from 'app.constants';
+
 interface StateClassifierMapping {
   [state: string]: Classifier;
 }
@@ -46,33 +48,44 @@ export class StateClassifierMappingService {
     this.stateClassifierMapping = {};
   }
 
+  static get ENABLE_ML_CLASSIFIERS(): boolean {
+    return AppConstants.ENABLE_ML_CLASSIFIERS;
+  }
+
   async initializeClassifierDataForState(stateName: string): Promise<void> {
-    this.stateClassifierMapping[stateName] = null;
-    this.loggerService.info('Fetching classifier data for ' + stateName);
-    try {
-      const classifier = (
-        await this.classifierDataService.getClassifierData(
-          this._explorationId, this._explorationVersion, stateName));
-      this.stateClassifierMapping[stateName] = classifier;
-    } catch (error) {
-      this.loggerService.error(
-        'Fetching classifier data for ' + stateName +
-        ' failed with error: ' + error);
+    if (StateClassifierMappingService.ENABLE_ML_CLASSIFIERS) {
+      this.stateClassifierMapping[stateName] = null;
+      this.loggerService.info('Fetching classifier data for ' + stateName);
+      try {
+        const classifier = (
+          await this.classifierDataService.getClassifierData(
+            this._explorationId, this._explorationVersion, stateName));
+        this.stateClassifierMapping[stateName] = classifier;
+      } catch (error) {
+        this.loggerService.error(
+          'Fetching classifier data for ' + stateName +
+          ' failed with error: ' + error);
+      }
     }
   }
 
   hasClassifierData(stateName: string): boolean {
+    if (!StateClassifierMappingService.ENABLE_ML_CLASSIFIERS) {
+      return false;
+    }
     return this.stateClassifierMapping &&
            stateName in this.stateClassifierMapping &&
            this.stateClassifierMapping[stateName] !== null;
   }
 
   getClassifier(stateName: string): Classifier {
-    if (this.hasClassifierData(stateName)) {
+    if (StateClassifierMappingService.ENABLE_ML_CLASSIFIERS &&
+        this.hasClassifierData(stateName)) {
       return this.stateClassifierMapping[stateName];
     }
   }
 
+  // NOTE TO DEVELOPERS: This method should only be used for tests.
   testOnlySetClassifierData(
       stateName: string, classifierData: Classifier): void {
     this.stateClassifierMapping[stateName] = classifierData;

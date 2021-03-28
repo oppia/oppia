@@ -183,7 +183,7 @@ MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The minimum number of training samples required for training a classifier.
-MIN_TOTAL_TRAINING_EXAMPLES = 10
+MIN_TOTAL_TRAINING_EXAMPLES = 50
 
 # The minimum number of assigned labels required for training a classifier.
 MIN_ASSIGNED_LABELS = 2

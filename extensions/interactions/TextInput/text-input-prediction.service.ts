@@ -43,6 +43,9 @@ export class TextInputPredictionService {
   }
 
   predict(classifierBuffer: ArrayBuffer, textInput: string): number {
+    // The model_json attribute in TextClassifierFrozenModel class can't be
+    // changed to camelcase since the class definition is automatically compiled
+    // with the help of protoc.
     const classifierData = JSON.parse(TextClassifierFrozenModel.deserialize(
       new Uint8Array(classifierBuffer)).model_json) as TextInputClassifierData;
     const cvVocabulary = classifierData.cv_vocabulary;

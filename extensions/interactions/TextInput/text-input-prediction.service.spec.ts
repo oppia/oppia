@@ -46,6 +46,9 @@ describe('Text Input Prediction Service', () => {
           window.__fixtures__['core/tests/data/text_classifier_results'];
       let predictedAnswerGroup = null;
       classifierFrozenModel = new TextClassifierFrozenModel();
+      // The model_json attribute in TextClassifierFrozenModel class can't be
+      // changed to camelcase since the class definition is automatically
+      // compiled with the help of protoc.
       classifierFrozenModel.model_json = JSON.stringify(classifierData);
 
       for (let i = 0; i < trainingData.length; i++) {
@@ -73,6 +76,9 @@ describe('Text Input Prediction Service', () => {
           window.__fixtures__['core/tests/data/text_input_training_data'];
       let correctPredictions = 0, totalAnswers = 0;
       classifierFrozenModel = new TextClassifierFrozenModel();
+      // The model_json attribute in TextClassifierFrozenModel class can't be
+      // changed to camelcase since the class definition is automatically
+      // compiled with the help of protoc.
       classifierFrozenModel.model_json = JSON.stringify(classifierData);
 
       // To keep things simple, we will calculate accuracy score

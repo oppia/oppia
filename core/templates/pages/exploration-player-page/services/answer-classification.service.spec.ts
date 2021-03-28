@@ -322,6 +322,9 @@ describe('Answer Classification Service', () => {
         cv_vocabulary: {}
       };
       let textClassifierModel = new TextClassifierFrozenModel();
+      // The model_json attribute in TextClassifierFrozenModel class can't be
+      // changed to camelcase since the class definition is automatically
+      // compiled with the help of protoc.
       textClassifierModel.model_json = JSON.stringify(modelJson);
       let testClassifier = new Classifier(
         'TestClassifier', textClassifierModel.serialize(), 1);

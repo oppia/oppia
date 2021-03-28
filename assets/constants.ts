@@ -5580,7 +5580,8 @@ export default {
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
-  // The bucket name used by gcs to store files when development server
+  // The bucket name used by app engine to store files in GCS when local
+  // development server is running. This should not be used when prod app
   // is running.
   "DEFAULT_GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 

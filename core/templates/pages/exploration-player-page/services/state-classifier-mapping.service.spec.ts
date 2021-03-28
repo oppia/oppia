@@ -24,97 +24,127 @@ import { StateClassifierMappingService } from
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 
 describe('State classifier mapping service', () => {
-  describe('Test correct retrieval of classifier details', () => {
-    let mappingService: StateClassifierMappingService;
-    let classifierFrozenModel = new TextClassifierFrozenModel();
-    classifierFrozenModel.model_json = JSON.stringify({
-      KNN: {
-        occurrence: 0,
-        K: 0,
-        T: 0,
-        top: 0,
-        fingerprint_data: {
-          0: {
-            'class': 0,
-            fingerprint: [[0]]
+  describe('Test that classifier data is fetched properly when ML is enabled',
+    () => {
+      let mappingService: StateClassifierMappingService;
+      let classifierFrozenModel = new TextClassifierFrozenModel();
+      // The model_json attribute in TextClassifierFrozenModel class can't be
+      // changed to camelcase since the class definition is automatically
+      // compiled with the help of protoc.
+      classifierFrozenModel.model_json = JSON.stringify({
+        KNN: {
+          occurrence: 0,
+          K: 0,
+          T: 0,
+          top: 0,
+          fingerprint_data: {
+            0: {
+              'class': 0,
+              fingerprint: [[0]]
+            }
+          },
+          token_to_id: {
+            a: 0
           }
         },
-        token_to_id: {
+        SVM: {
+          classes: [0],
+          kernel_params: {
+            kernel: 'string',
+            coef0: 0,
+            degree: 0,
+            gamma: 0
+          },
+          intercept: [0],
+          n_support: [0],
+          probA: [0],
+          support_vectors: [[0]],
+          probB: [0],
+          dual_coef: [[0]]
+        },
+        cv_vocabulary: {
           a: 0
         }
-      },
-      SVM: {
-        classes: [0],
-        kernel_params: {
-          kernel: 'string',
-          coef0: 0,
-          degree: 0,
-          gamma: 0
-        },
-        intercept: [0],
-        n_support: [0],
-        probA: [0],
-        support_vectors: [[0]],
-        probB: [0],
-        dual_coef: [[0]]
-      },
-      cv_vocabulary: {
-        a: 0
-      }
-    });
-
-    let classifierData = new Classifier(
-      'TestClassifier', classifierFrozenModel.serialize(), 1);
-
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [StateClassifierMappingService]
       });
 
-      mappingService = TestBed.get(StateClassifierMappingService);
+      let classifierData = new Classifier(
+        'TestClassifier', classifierFrozenModel.serialize(), 1);
+
+      beforeEach(() => {
+        TestBed.configureTestingModule({
+          imports: [HttpClientTestingModule],
+          providers: [StateClassifierMappingService]
+        });
+
+        mappingService = TestBed.get(StateClassifierMappingService);
+        spyOnProperty(
+          StateClassifierMappingService, 'ENABLE_ML_CLASSIFIERS', 'get')
+          .and.returnValue(true);
+      });
+
+      it('should return classifier data when it exists.', () => {
+        mappingService.init('0', 0);
+        var stateName = 'stateName1';
+
+        mappingService.testOnlySetClassifierData(stateName, classifierData);
+        var retrievedClassifier = mappingService.getClassifier(stateName);
+
+        expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
+        expect(retrievedClassifier.classifierData).toEqual(
+          classifierFrozenModel.serialize());
+        expect(retrievedClassifier.algorithmVersion).toEqual(1);
+      });
+
+      it('should return undefined when classifier data does not exist.', () => {
+        mappingService.init('0', 0);
+        var stateNameNonexistent = 'stateName2';
+        var nonExistentClassifier = mappingService.getClassifier(
+          stateNameNonexistent);
+        expect(nonExistentClassifier).toBe(undefined);
+      });
+
+      it('should return true when it has classifier data.', () => {
+        mappingService.init('0', 0);
+        var stateName = 'stateName1';
+        mappingService.testOnlySetClassifierData(stateName, classifierData);
+        expect(mappingService.hasClassifierData(stateName)).toBe(true);
+      });
+
+      it('should return false when it does not have classifier data .', () => {
+        mappingService.init('0', 0);
+        var stateNameNonexistent = 'stateName2';
+        expect(mappingService.hasClassifierData(
+          stateNameNonexistent)).toBe(false);
+      });
+
+      it('should not return correct classifier details when init is not ' +
+        'called', () => {
+        var stateName = 'stateName1';
+        var retrievedClassifier = mappingService.getClassifier(stateName);
+        expect(retrievedClassifier).toBe(undefined);
+      });
     });
 
-    it('should return classifier data when it exists.', () => {
-      mappingService.init('0', 0);
-      var stateName = 'stateName1';
+  describe('Test that classifier data is not fetched when ML is disabled',
+    () => {
+      let mappingService: StateClassifierMappingService;
+      beforeEach(() => {
+        TestBed.configureTestingModule({
+          imports: [HttpClientTestingModule],
+          providers: [StateClassifierMappingService]
+        });
 
-      mappingService.testOnlySetClassifierData(stateName, classifierData);
-      var retrievedClassifier = mappingService.getClassifier(stateName);
+        mappingService = TestBed.get(StateClassifierMappingService);
+        spyOnProperty(
+          StateClassifierMappingService, 'ENABLE_ML_CLASSIFIERS', 'get')
+          .and.returnValue(false);
+      });
 
-      expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
-      expect(retrievedClassifier.classifierData).toEqual(
-        classifierFrozenModel.serialize());
-      expect(retrievedClassifier.algorithmVersion).toEqual(1);
+      it('should not return classifier data.', () => {
+        mappingService.init('0', 0);
+        var stateName = 'stateName1';
+        expect(mappingService.hasClassifierData(stateName)).toBe(false);
+        expect(mappingService.getClassifier(stateName)).toBe(undefined);
+      });
     });
-
-    it('should return undefined when classifier data does not exist.', () => {
-      mappingService.init('0', 0);
-      var stateNameNonexistent = 'stateName2';
-      var nonExistentClassifier = mappingService.getClassifier(
-        stateNameNonexistent);
-      expect(nonExistentClassifier).toBe(undefined);
-    });
-
-    it('should return true when it has classifier data.', () => {
-      mappingService.init('0', 0);
-      var stateName = 'stateName1';
-      mappingService.testOnlySetClassifierData(stateName, classifierData);
-      expect(mappingService.hasClassifierData(stateName)).toBe(true);
-    });
-
-    it('should return false when it does not have classifier data .', () => {
-      mappingService.init('0', 0);
-      var stateNameNonexistent = 'stateName2';
-      expect(mappingService.hasClassifierData(
-        stateNameNonexistent)).toBe(false);
-    });
-
-    it('should not return correct classifier details when init is not ' +
-      'called', () => {
-      var stateName = 'stateName1';
-      var retrievedClassifier = mappingService.getClassifier(stateName);
-      expect(retrievedClassifier).toBe(undefined);
-    });
-  });
 });
