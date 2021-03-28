@@ -29,18 +29,18 @@ export class QuestionDifficultySelectorComponent implements OnInit {
 
   @Input() skillIdToRubricsObject: string;
   @Input() skillWithDifficulty: string;
-  availableDifficultyValues: Array<Object>;
+  availableDifficultyValues: Object[];
 
   ngOnInit(): void {
     this.availableDifficultyValues = [];
-            for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-              this.availableDifficultyValues.push(
-                AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
-            }
+    for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      this.availableDifficultyValues.push(
+      AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
+    }
   }
 }
-    
+
 angular.module('oppia').directive(
   'questionDifficultySelector', downgradeComponent({
    component: QuestionDifficultySelectorComponent
-}) as angular.IDirectiveFactory );
+  }) as angular.IDirectiveFactory );

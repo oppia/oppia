@@ -60,7 +60,7 @@ import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumb
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
-import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component'
+import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
 import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
