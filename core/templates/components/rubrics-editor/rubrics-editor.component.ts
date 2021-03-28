@@ -16,7 +16,7 @@
  * @fileoverview Component for the rubric editor for skills.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import constants from 'assets/constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
@@ -65,7 +65,8 @@ export class RubricsEditorComponent {
   rubric: Rubric;
 
   constructor(
-    private skillCreationService: SkillCreationService
+    private skillCreationService: SkillCreationService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   isEditable(): boolean {
@@ -86,6 +87,14 @@ export class RubricsEditorComponent {
 
   isExplanationValid(difficulty: string, index: number): boolean {
     return Boolean(this.editableExplanations[difficulty][index]);
+  }
+
+  updateExplanation($event: string, idx: number): void {
+    if (this.editableExplanations[this.rubric.getDifficulty()][idx] !==
+    $event) {
+      this.editableExplanations[this.rubric.getDifficulty()][idx] = $event;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   saveExplanation(difficulty: string, index: number): void {

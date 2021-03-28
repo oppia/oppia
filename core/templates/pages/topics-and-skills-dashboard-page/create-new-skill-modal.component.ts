@@ -16,7 +16,7 @@
  * @fileoverview Modal for the creating new skill.
  */
 
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
@@ -56,11 +56,19 @@ export class CreateNewSkillModalComponent {
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
     private skillObjectFactory: SkillObjectFactory,
-    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory
+    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.contextService.setImageSaveDestinationToLocalStorage();
+  }
+
+  updateExplanation($event: string): void {
+    if ($event !== this.bindableDict.displayedConceptCardExplanation) {
+      this.bindableDict.displayedConceptCardExplanation = $event;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   openConceptCardExplanationEditor(): void {
