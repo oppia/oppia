@@ -43,7 +43,7 @@ class Registry(python_utils.OBJECT):
         # Add new object instances to the registry.
         for name, clazz in inspect.getmembers(
                 objects, predicate=inspect.isclass):
-            if name.endswith('_test') or name == 'BaseObject':
+            if name == 'BaseObject':
                 continue
 
             ancestor_names = [

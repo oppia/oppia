@@ -3337,7 +3337,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'html', 'Test.', True)
         written_translation.validate()
 
-        with self.assertRaisesRegexp(TypeError, 'Invalid HTML'):
+        with self.assertRaisesRegexp(
+            AssertionError, 'Expected unicode HTML string, received 30'):
             with self.swap(written_translation, 'translation', 30):
                 written_translation.validate()
 

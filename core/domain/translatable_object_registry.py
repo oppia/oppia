@@ -27,19 +27,19 @@ class Registry(python_utils.OBJECT):
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.
-    translatable_objects_dict = {}
+    _translatable_objects_dict = {}
 
     @classmethod
     def _refresh_registry(cls):
         """Refreshes the registry by adding new translatable object classes
         to the registry.
         """
-        cls.translatable_objects_dict.clear()
+        cls._translatable_objects_dict.clear()
 
         # Add new object instances to the registry.
         for name, clazz in inspect.getmembers(
                 objects, predicate=inspect.isclass):
-            if name.endswith('_test') or name.startswith('Base'):
+            if name.startswith('Base'):
                 continue
 
             ancestor_names = [
@@ -50,7 +50,7 @@ class Registry(python_utils.OBJECT):
             # class's ancestors.
             if 'BaseTranslatableObject' not in ancestor_names:
                 continue
-            cls.translatable_objects_dict[clazz.__name__] = clazz
+            cls._translatable_objects_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_all_class_names(cls):
@@ -60,7 +60,7 @@ class Registry(python_utils.OBJECT):
             list(str). The full sorted list of translatable object class names.
         """
         cls._refresh_registry()
-        return sorted(cls.translatable_objects_dict.keys())
+        return sorted(cls._translatable_objects_dict.keys())
 
     @classmethod
     def get_object_class(cls, obj_type):
@@ -81,9 +81,9 @@ class Registry(python_utils.OBJECT):
             TypeError. The given obj_type does not correspond to a valid
                 translatable object class.
         """
-        if obj_type not in cls.translatable_objects_dict:
+        if obj_type not in cls._translatable_objects_dict:
             cls._refresh_registry()
-        if obj_type not in cls.translatable_objects_dict:
+        if obj_type not in cls._translatable_objects_dict:
             raise TypeError(
                 '\'%s\' is not a valid translatable object class.' % obj_type)
-        return cls.translatable_objects_dict[obj_type]
+        return cls._translatable_objects_dict[obj_type]
