@@ -16,7 +16,7 @@
  * @fileoverview Component for the translation modal.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -75,7 +75,9 @@ export class TranslationModalComponent {
     private readonly imageLocalStorageService: ImageLocalStorageService,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
-    private readonly translationLanguageService: TranslationLanguageService) {}
+    private readonly translationLanguageService: TranslationLanguageService,
+    private readonly changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     // We need to set the context here so that the rte fetches
@@ -125,6 +127,13 @@ export class TranslationModalComponent {
 
   isCopyModeActive(): boolean {
     return this.ckEditorCopyContentService.copyModeActive;
+  }
+
+  updateHtml($event: string): void {
+    if ($event !== this.activeWrittenTranslation.html) {
+      this.activeWrittenTranslation.html = $event;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   skipActiveTranslation(): void {
