@@ -149,6 +149,21 @@ angular.module('oppia').directive('learnerDashboardIcons', [
               $scope.disablePlaylistTooltip();
             }
           };
+
+          $scope.removeFromLearnerPlaylist = function(
+              activityId, activityTitle, activityType) {
+            LearnerPlaylistService.removeFromLearnerPlaylist(
+              activityId, activityTitle, activityType);
+            if (activityType === ACTIVITY_TYPE_EXPLORATION) {
+              /* eslint-disable-next-line max-len */
+              $scope.learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
+                activityId);
+            } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
+              /* eslint-disable-next-line max-len */
+              $scope.learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
+                activityId);
+            }
+          };
         }
       ]
     };
