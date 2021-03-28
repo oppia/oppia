@@ -127,6 +127,8 @@
     "extensions/classifiers/count-vectorizer.service.spec.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.spec.ts",
+    "extensions/interactions/base-interaction-validation.service.ts",
+    "extensions/interactions/base-validator.spec.ts",
     "extensions/interactions/Continue/directives/continue-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
@@ -142,8 +144,6 @@
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts",
-    "extensions/interactions/base-interaction-validation.service.ts",
-    "extensions/interactions/base-validator.spec.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts"
   ],
