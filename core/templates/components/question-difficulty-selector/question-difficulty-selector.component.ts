@@ -26,11 +26,11 @@ import { AppConstants } from 'app.constants';
   styleUrls: []
 })
 export class QuestionDifficultySelectorComponent implements OnInit {
-  scope: {
-    getSkillIdToRubricsObject: '&skillIdToRubricsObject',
-    skillWithDifficulty: '='
-  },
-  @Input() skillWithDifficulty: any;
+
+  @Input() skillIdToRubricsObject: string;
+  @Input() skillWithDifficulty: string;
+  availableDifficultyValues: Array<Object>;
+
   ngOnInit(): void {
     this.availableDifficultyValues = [];
             for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
