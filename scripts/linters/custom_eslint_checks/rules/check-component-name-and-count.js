@@ -20,7 +20,7 @@
 
 'use strict';
 
-module.exports ={
+module.exports = {
   meta: {
     type: 'problem',
     docs: {
@@ -41,13 +41,13 @@ module.exports ={
 
   create: function(context) {
     const fileName = context.getFilename();
-    const componentsToCheck = ['component','controller', 'directive', 'factory', 'filter'];
+    const componentsToCheck = ['component',
+    'controller', 'directive', 'factory', 'filter'];
     let numComponents = 0;
-    console.log(fileName);
-    
+
     return {
       CallExpression: function checkExpression(node) {
-        if(!((fileName.endsWith('.js')) || (fileName.endsWith('.ts')))) {
+        if (!((fileName.endsWith('.js')) || (fileName.endsWith('.ts')))) {
           return;
         }
         
@@ -57,9 +57,8 @@ module.exports ={
 
         if (componentsToCheck.includes(node.callee.property.name)) {
           numComponents++;
-          console.log(numComponents);
         }
-        if(numComponents>=2){
+        if (numComponents > 1) {
           context.report({
             node: node.callee,
             loc: node.callee.loc,

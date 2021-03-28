@@ -115,7 +115,7 @@
     "oppia/no-multiline-disable": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
-    "oppia/check-component-name-and-count": "error",
+    "oppia/check-component-name-and-chount": "error",
     "angular/di": [
       "error",
       "array"
