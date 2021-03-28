@@ -24,7 +24,7 @@ require(
   'end-exploration-validation.service.ts');
 require(
   'interactions/EndExploration/directives/' +
-  'oppia-interactive-end-exploration.directive.ts');
+  'oppia-interactive-end-exploration.component.ts');
 require(
   'interactions/EndExploration/directives/' +
   'oppia-response-end-exploration.directive.ts');
