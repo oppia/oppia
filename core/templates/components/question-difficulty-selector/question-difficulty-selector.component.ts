@@ -26,7 +26,6 @@ import { AppConstants } from 'app.constants';
   styleUrls: []
 })
 export class QuestionDifficultySelectorComponent implements OnInit {
-
   @Input() skillIdToRubricsObject: string;
   @Input() skillWithDifficulty: string;
   availableDifficultyValues: Object[];
@@ -35,12 +34,12 @@ export class QuestionDifficultySelectorComponent implements OnInit {
     this.availableDifficultyValues = [];
     for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
       this.availableDifficultyValues.push(
-      AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
+        AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
     }
   }
 }
 
 angular.module('oppia').directive(
   'questionDifficultySelector', downgradeComponent({
-   component: QuestionDifficultySelectorComponent
-  }) as angular.IDirectiveFactory );
+    component: QuestionDifficultySelectorComponent
+  }) as angular.IDirectiveFactory);
