@@ -54,22 +54,20 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
 // the browser is already on the login page.
 var login = async function(email, manualNavigation = true) {
   if (manualNavigation) {
-    // Use of element and action is not reliable, because we do not always begin
-    // on an Angular page. To forgive callers from non-Angular pages (e.g., the
-    // very first function call of a test), we use browser.driver instead.
-    // The full url is necessary.
-    await browser.driver.get(
-      general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+    await browser.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
-  await general.acceptPrompt(email);
+  var emailInput = element(by.css('.protractor-test-sign-in-email-input'));
+  await action.sendKeys('Email input', emailInput, email);
+
+  var signInButton = element(by.css('.protractor-test-sign-in-button'));
+  await action.click('Sign in button', signInButton);
 
   await waitFor.pageToFullyLoad();
 };
 
 var logout = async function() {
-  await browser.driver.get(
-    general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+  await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
   await waitFor.pageToFullyLoad();
 };
 

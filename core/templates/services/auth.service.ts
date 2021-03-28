@@ -57,27 +57,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
-    const email = prompt('Please enter the email address to sign-in with');
-    // We've configured the Firebase emulator to use email/password for user
-    // authentication. To save developers and end-to-end test authors the
-    // trouble of providing passwords, we always use the md5 hash of the email
-    // address instead. This will never be done in production, where the
-    // emulator DOES NOT run. Instead, production takes the user to the Google
-    // sign-in page, which eventually redirects them back to Oppia.
-    const password = await md5(email);
-    let creds: firebase.auth.UserCredential;
-    try {
-      creds = await this.angularFireAuth.signInWithEmailAndPassword(
-        email, password);
-    } catch (err) {
-      if (err.code === 'auth/user-not-found') {
-        creds = await this.angularFireAuth.createUserWithEmailAndPassword(
-          email, password);
-      } else {
-        throw err;
-      }
-    }
-    return creds;
+    return null;
   }
 
   async signOutAsync(): Promise<void> {
@@ -153,14 +133,42 @@ export class AuthService {
       ['localhost', 9099] : undefined;
   }
 
-  async handleRedirectResultAsync(): Promise<void> {
+  async handleRedirectResultAsync(): Promise<boolean> {
     const creds = await this.authServiceImpl.getRedirectResultAsync();
-    if (creds.user) {
+    if (creds?.user) {
       const idToken = await creds.user.getIdToken();
-      return this.authBackendApiService.beginSessionAsync(idToken);
+      this.authBackendApiService.beginSessionAsync(idToken);
+      return true;
     } else {
-      return Promise.reject(null);
+      return false;
     }
+  }
+
+  async signInWithEmail(email: string): Promise<void> {
+    if (!AuthService.firebaseEmulatorIsEnabled) {
+      throw new Error('signInWithEmail can only be called in emulator mode');
+    }
+    // We've configured the Firebase emulator to use email/password for user
+    // authentication. To save developers and end-to-end test authors the
+    // trouble of providing passwords, we always use the md5 hash of the email
+    // address instead. This will never be done in production, where the
+    // emulator DOES NOT run. Instead, production takes the user to the Google
+    // sign-in page, which eventually redirects them back to Oppia.
+    const password = await md5(email);
+    let creds: firebase.auth.UserCredential;
+    try {
+      creds = await this.angularFireAuth.signInWithEmailAndPassword(
+        email, password);
+    } catch (err) {
+      if (err.code === 'auth/user-not-found') {
+        creds = await this.angularFireAuth.createUserWithEmailAndPassword(
+          email, password);
+      } else {
+        throw err;
+      }
+    }
+    const idToken = await creds.user.getIdToken();
+    await this.authBackendApiService.beginSessionAsync(idToken);
   }
 
   async signInWithRedirectAsync(): Promise<void> {
