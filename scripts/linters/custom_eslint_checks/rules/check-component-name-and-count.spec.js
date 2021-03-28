@@ -24,36 +24,63 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester();
 ruleTester.run('check-component-name-and-count', rule, {
   valid: [
-    `angular.module('oppia').component('loadingMessage', {
-      template: require('./loading-message.component.html'),
-      bindings: {
-        message: '<'
-      }
-    });`
+    {
+      code:
+      `angular.module('oppia').component('testComponent', {
+        template: require('./test-component.component.html'),
+        bindings: {
+          message: '<'
+        }
+      });`,
+
+      filename: 'test-component-1.js'
+
+    },
+
+    {
+      code:
+      `angular.module('oppia').directive('testDirective', {
+        template: require('./test-component.component.html'),
+        bindings: {
+          message: '<'
+        }
+      });`,
+
+      filename: 'test-directive.html'
+
+    }
   ],
 
   invalid: [
     {
       code:
-      `angular.module('oppia').component('loadingMessage', {
+      `angular.module('oppia').component('loadingMessage1', {
         template: require('./loading-message.component.html'),
         bindings: {
           message: '<'
         }
       });
       
-      angular.module('oppia').component('loadingMessage', {
+      angular.module('oppia').component('loadingMessage2', {
         template: require('./loading-message.component.html'),
         bindings: {
           message: '<'
         }
       });`,
+      filename:'test-component-2.ts',
       errors: [{
         message: (
           'Please ensure that there is exactly one component in the file.'), 
         type: null,
-      }]
-    }
+      },
+      {
+        message: (
+          'Please ensure that there is exactly one component in the file.'),
+          type: null,
+      }
+    ]
+    },
+
   ]
 
 

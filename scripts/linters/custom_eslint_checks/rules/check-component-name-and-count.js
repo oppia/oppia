@@ -34,17 +34,17 @@ module.exports ={
     schema: [],
     messages: {
       multipleComponents: (
-        'Please ensure that there is exactly one' +
+        'Please ensure that there is exactly one ' +
         'component in the file.')
     }
   },
 
   create: function(context) {
-    const sourceCode = context.getSourceCode();
     const fileName = context.getFilename();
-    const componentsToCheck = ['controller', 'directive', 'factory', 'filter']
+    const componentsToCheck = ['component','controller', 'directive', 'factory', 'filter'];
     let numComponents = 0;
-    // console.info(fileName);
+    console.log(fileName);
+    
     return {
       CallExpression: function checkExpression(node) {
         if(!((fileName.endsWith('.js')) || (fileName.endsWith('.ts')))) {
@@ -54,15 +54,17 @@ module.exports ={
         if (node.callee.type !== 'MemberExpression') {
           return;
         }
+
         if (componentsToCheck.includes(node.callee.property.name)) {
           numComponents++;
-          if(numComponents>1){
-            context.report({
-              node: node.callee,
-              loc: node.callee.loc,
-              messageId: 'multipleComponents',
-            });
-          }
+          console.log(numComponents);
+        }
+        if(numComponents>=2){
+          context.report({
+            node: node.callee,
+            loc: node.callee.loc,
+            messageId: 'multipleComponents',
+          });
         }
       }
     };
