@@ -383,45 +383,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_js_and_ts_component_name_and_count(self):
-        """This function ensures that all JS/TS files have exactly
-        one component and and that the name of the component
-        matches the filename.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        # Select JS files which need to be checked.
-        name = 'JS and TS component name and count'
-        files_to_check = [
-            filepath for filepath in self.all_filepaths if not
-            filepath.endswith('App.ts')]
-        failed = False
-        error_messages = []
-        components_to_check = ['controller', 'directive', 'factory', 'filter']
-        for filepath in files_to_check:
-            component_num = 0
-            parsed_expressions = self.parsed_expressions_in_files[filepath]
-            for component in components_to_check:
-                if component_num > 1:
-                    break
-                for expression in parsed_expressions[component]:
-                    if not expression:
-                        continue
-                    component_num += 1
-                    # Check if the number of components in each file exceeds
-                    # one.
-                    if component_num > 1:
-                        error_message = (
-                            '%s -> Please ensure that there is exactly one '
-                            'component in the file.' % (filepath))
-                        failed = True
-                        error_messages.append(error_message)
-                        break
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
@@ -1021,7 +982,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         linter_stdout = []
 
-        linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
         linter_stdout.append(self._check_sorted_dependencies())
         linter_stdout.append(
