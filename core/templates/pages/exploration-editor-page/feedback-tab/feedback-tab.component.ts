@@ -39,19 +39,23 @@ require('services/user.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').component('feedbackTab', {
   template: require('./feedback-tab.component.html'),
   controller: [
     '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
-    'LoaderService', 'SuggestionModalForExplorationEditorService',
+    'FocusManagerService', 'LoaderService',
+    'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     function(
         $q, $rootScope, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
-        LoaderService, SuggestionModalForExplorationEditorService,
+        FocusManagerService, LoaderService,
+        SuggestionModalForExplorationEditorService,
         ThreadDataBackendApiService, ThreadStatusDisplayService,
         UrlInterpolationService, UserService) {
       var ctrl = this;
@@ -192,6 +196,7 @@ angular.module('oppia').component('feedbackTab', {
           ctrl.activeThread = thread;
           ThreadDataBackendApiService.markThreadAsSeenAsync(ctrl.activeThread);
           ctrl.tmpMessage.status = ctrl.activeThread.status;
+          FocusManagerService.setFocus('tmpMessageText');
           $rootScope.$apply();
         });
       };

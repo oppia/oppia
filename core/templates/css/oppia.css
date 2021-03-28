@@ -2011,6 +2011,7 @@ pre.oppia-pre-wrapped-text {
   transition: all 200ms;
 }
 
+.oppia-editable-section .oppia-editor-edit-icon:focus,
 .oppia-editable-section:hover .oppia-editor-edit-icon {
   opacity: 0.8;
 }

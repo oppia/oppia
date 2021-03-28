@@ -892,13 +892,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
 
-            # Enqueue the batch computation. (It is running on 0 events).
-            StartExplorationEventCounter._kickoff_batch_job()  # pylint: disable=protected-access
-            # Record an event while this job is in the queue. Simulate
-            # this by directly calling on_incoming_event(), because using
-            # StartExplorationEventHandler.record() would just put the event
-            # in the task queue, which we don't want to flush yet.
-            event_services.StartExplorationEventHandler._handle_event(  # pylint: disable=protected-access
+            # We will be handling the event for recording exploration start
+            # events by calling StartExplorationEventLogEntryModel. This
+            # will record an event while this job is in this queue.
+            stats_models.StartExplorationEventLogEntryModel.create(
                 self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id',
                 {}, feconf.PLAY_TYPE_NORMAL)
             StartExplorationEventCounter.on_incoming_event(
