@@ -77,7 +77,7 @@ def compile_and_check_typescript(config_path):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     error_messages = []
     for line in iter(process.stdout.readline, ''):
-        if not line.startswith('node_modules'):
+        if not line.decode('utf-8').startswith('node_modules'):
             error_messages.append(line)
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
