@@ -118,19 +118,9 @@ class EmailDashboardDataHandler(base.BaseHandler):
             for predicate in predicates
         }
 
-        for key, value in data.items():
+        for key, _ in data.items():
             if key not in predicate_schema.keys():
                 # Raise exception if key is not one of the allowed keys.
-                raise self.InvalidInputException('400 Invalid input for query.')
-            if (predicate_schema[key] == 'int' and not isinstance(value, int)):
-                # Raise exception if schema is int but value is not
-                # of type integer.
-                raise self.InvalidInputException('400 Invalid input for query.')
-            if (
-                    predicate_schema[key] == 'unicode' and
-                    not isinstance(value, str)):
-                # Raise exception if schema is unicode but value is not
-                # of type string.
                 raise self.InvalidInputException('400 Invalid input for query.')
 
 

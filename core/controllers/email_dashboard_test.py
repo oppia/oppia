@@ -147,28 +147,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'fake_key': 2
                 }}, csrf_token=csrf_token, expected_status_int=400)
 
-        self.post_json(
-            '/emaildashboarddatahandler', {
-                'data': {
-                    'has_not_logged_in_for_n_days': 2,
-                    'inactive_in_last_n_days': 5,
-                    'created_at_least_n_exps': 'invalid_value',
-                    'created_fewer_than_n_exps': 'None',
-                    'edited_at_least_n_exps': None,
-                    'created_collection': 'True',
-                    'used_logic_proof_interaction': 'False'
-                }}, csrf_token=csrf_token, expected_status_int=400)
-        self.post_json(
-            '/emaildashboarddatahandler', {
-                'data': {
-                    'has_not_logged_in_for_n_days': 2,
-                    'inactive_in_last_n_days': 5,
-                    'created_at_least_n_exps': 1,
-                    'created_fewer_than_n_exps': 2,
-                    'edited_at_least_n_exps': None,
-                    'created_collection': 3,
-                    'used_logic_proof_interaction': 1
-                }}, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
     def test_email_dashboard_page(self):
