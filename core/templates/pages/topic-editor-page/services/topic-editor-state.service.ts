@@ -455,7 +455,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||
                   changeList[i].cmd === 'delete_additional_story') {
-                EditableStoryBackendApiService.deleteStory(
+                EditableStoryBackendApiService.deleteStoryAsync(
                   changeList[i].story_id);
               }
             }
