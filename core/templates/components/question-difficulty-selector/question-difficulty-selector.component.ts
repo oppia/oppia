@@ -16,16 +16,27 @@
  * @fileoverview Controller for the question difficulty selector.
  */
 
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'question-difficulty-selector',
+  templateUrl: './question-difficulty-selector.component.html',
+  styleUrls: []
+})
+export class QuestionDifficultySelectorComponent implements OnInit {
+  ngOnInit(): void {
+  }
+}
+
+
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('questionDifficultySelector', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getSkillIdToRubricsObject: '&skillIdToRubricsObject',
-        skillWithDifficulty: '='
-      },
+      
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-difficulty-selector/' +
         'question-difficulty-selector.component.html'),
@@ -34,8 +45,8 @@ angular.module('oppia').directive('questionDifficultySelector', [
         function(
             $scope, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
           var ctrl = this;
-
-          ctrl.$onInit = function() {
+                 
+          ctrl.$onInit = function() { 
             $scope.availableDifficultyValues = [];
             for (var difficulty in SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
               $scope.availableDifficultyValues.push(
