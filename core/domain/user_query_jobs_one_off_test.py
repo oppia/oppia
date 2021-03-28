@@ -40,6 +40,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     EXP_ID_2 = 'exp_id_2'
     EXP_ID_3 = 'exp_id_3'
     EXP_ID_4 = 'exp_id_4'
+    COLLECTION_ID_1 = 'collection_id_1'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'b@example.com'
@@ -148,9 +149,12 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         user_d_settings = user_services.get_user_settings(self.user_d_id)
         user_d_settings.last_edited_an_exploration = (
             datetime.datetime.utcnow() - datetime.timedelta(days=2))
+        self.save_new_valid_collection(
+            self.COLLECTION_ID_1, self.user_d_id, exploration_id=self.EXP_ID_1)
 
         self.save_new_valid_exploration(
-            self.EXP_ID_3, self.user_e_id, end_state_name='End')
+            self.EXP_ID_3, self.user_e_id, end_state_name='End',
+            interaction_id='LogicProof')
         user_e_settings = user_services.get_user_settings(self.user_e_id)
         user_e_settings.last_created_an_exploration = (
             user_e_settings.last_created_an_exploration -
@@ -278,6 +282,46 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
 
         query = user_models.UserQueryModel.get(user_query_id)
         self.assertItemsEqual(query.user_ids, [self.user_a_id])
+
+    def test_user_has_created_collection(self):
+        user_query_id = user_query_services.save_new_user_query(
+            self.submitter_id, {
+                'created_collection': 'True'
+            })
+        self._run_one_off_job(user_query_id)
+
+        query = user_models.UserQueryModel.get(user_query_id)
+        self.assertItemsEqual(query.user_ids, [self.user_d_id])
+
+    def test_user_has_not_created_collection(self):
+        user_query_id = user_query_services.save_new_user_query(
+            self.submitter_id, {
+                'created_collection': 'False'
+            })
+        self._run_one_off_job(user_query_id)
+
+        query = user_models.UserQueryModel.get(user_query_id)
+        self.assertNotIn(self.user_d_id, query.user_ids)
+
+    def test_user_has_used_logic_proof_interaction(self):
+        user_query_id = user_query_services.save_new_user_query(
+            self.submitter_id, {
+                'used_logic_proof_interaction': 'True'
+            })
+        self._run_one_off_job(user_query_id)
+
+        query = user_models.UserQueryModel.get(user_query_id)
+        self.assertItemsEqual(query.user_ids, [self.user_e_id])
+
+    def test_user_has_not_used_logic_proof_interaction(self):
+        user_query_id = user_query_services.save_new_user_query(
+            self.submitter_id, {
+                'used_logic_proof_interaction': 'False'
+            })
+        self._run_one_off_job(user_query_id)
+
+        query = user_models.UserQueryModel.get(user_query_id)
+        self.assertNotIn(self.user_e_id, query.user_ids)
 
     def test_combination_of_query_params(self):
         user_query_1_id = user_query_services.save_new_user_query(

@@ -113,13 +113,24 @@ class EmailDashboardDataHandler(base.BaseHandler):
     def _validate(self, data):
         """Validator for data obtained from frontend."""
         predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-        possible_keys = [predicate['backend_attr'] for predicate in predicates]
+        predicate_schema = {
+            predicate['backend_attr']: predicate['schema']['type']
+            for predicate in predicates
+        }
 
         for key, value in data.items():
-            if (key not in possible_keys or not isinstance(value, int) or
-                    value < 0):
-                # Raise exception if key is not one of the allowed keys or
-                # corresponding value is not of type integer.
+            if key not in predicate_schema.keys():
+                # Raise exception if key is not one of the allowed keys.
+                raise self.InvalidInputException('400 Invalid input for query.')
+            if (predicate_schema[key] == 'int' and not isinstance(value, int)):
+                # Raise exception if schema is int but value is not
+                # of type integer.
+                raise self.InvalidInputException('400 Invalid input for query.')
+            if (
+                    predicate_schema[key] == 'unicode' and
+                    not isinstance(value, str)):
+                # Raise exception if schema is unicode but value is not
+                # of type string.
                 raise self.InvalidInputException('400 Invalid input for query.')
 
 
