@@ -484,8 +484,8 @@ def pip_install_to_system(package, version):
         package: str. The package name.
         version: str. The package version.
     """
-    _run_pip_command([
-        'install', _get_pip_versioned_package_string(package, version)])
+    _run_pip_command(
+        ['install', _get_pip_versioned_package_string(package, version)])
 
 
 def pip_install(
