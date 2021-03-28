@@ -61,45 +61,56 @@ describe('Collections', function() {
     await workflow.createAndPublishExploration(
       'First Exploration',
       'Languages',
-      'First Test Exploration.'
+      'First Test Exploration.',
+      'English',
+      true
     );
     firstExplorationId = await general.getExplorationIdFromEditor();
-
     await workflow.createAndPublishExploration(
       'Second Exploration',
       'Languages',
-      'Second Test Exploration.'
+      'Second Test Exploration.',
+      'English',
+      false
     );
     secondExplorationId = await general.getExplorationIdFromEditor();
-
     await workflow.createAndPublishExploration(
       'Third Exploration',
       'Languages',
-      'Third Test Exploration.'
+      'Third Test Exploration.',
+      'English',
+      false
     );
     thirdExplorationId = await general.getExplorationIdFromEditor();
-
     await workflow.createAndPublishExploration(
       'Fourth Exploration',
       'Languages',
-      'Fourth Test Exploration.'
+      'Fourth Test Exploration.',
+      'English',
+      false
     );
     fourthExplorationId = await general.getExplorationIdFromEditor();
     // Create searchable explorations.
     await workflow.createAndPublishExploration(
       'The Lazy Magician for CollectionSuiteTest',
       'Algorithms',
-      'discover the binary search algorithm'
+      'discover the binary search algorithm',
+      'English',
+      false
     );
     await workflow.createAndPublishExploration(
       'Root Linear Coefficient Theorem for CollectionSuiteTest',
       'Algebra',
-      'discover the Root Linear Coefficient Theorem'
+      'discover the Root Linear Coefficient Theorem',
+      'English',
+      false
     );
     await workflow.createAndPublishExploration(
       'Test Exploration for CollectionSuiteTest',
       'Languages',
-      'discover the Protractor Testing'
+      'discover the Protractor Testing',
+      'English',
+      false
     );
     await users.logout();
     await users.login('player@collections.com');
