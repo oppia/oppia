@@ -407,13 +407,19 @@ export interface NumericExpressionInputCustomizationArgs {
 
 export interface NumericInputCustomizationArgsBackendDict {
   placeholder: {
-    value: boolean;
+    value: SubtitledUnicodeBackendDict;
   };
+  input: {
+    value: boolean;
+  }
 }
 export interface NumericInputCustomizationArgs {
   placeholder: {
-    value: boolean;
+    value: SubtitledUnicode;
   };
+  input: {
+    value: boolean;
+  }
 }
 
 

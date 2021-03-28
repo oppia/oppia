@@ -71,6 +71,7 @@ import {
 import {
   SubtitledHtmlObjectFactory, SubtitledHtml
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { boolean } from 'mathjs';
 
 
 export interface InteractionBackendDict {
@@ -357,16 +358,19 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromNumericInputCustomizationArgsBackendDict(
-    caBackendDict: NumericInputCustomizationArgsBackendDict
+_createFromNumericInputCustomizationArgsBackendDict(
+  caBackendDict: NumericInputCustomizationArgsBackendDict
 ): NumericInputCustomizationArgs {
-  const { placeholder } = caBackendDict;
-  return {
-    placeholder/*: {
-      value: this.subtitledUnicodeFactory.createFromBackendDict(
-        placeholder.value)
-    }*/
-  };
+const { input, placeholder } = caBackendDict;
+return {
+  placeholder: {
+    value: this.subtitledUnicodeFactory.createFromBackendDict(
+      placeholder.value)
+  },
+  input: {
+    value: true
+  }
+};
 }
 
   _createFromRatioExpressionInputCustomizationArgsBackendDict(

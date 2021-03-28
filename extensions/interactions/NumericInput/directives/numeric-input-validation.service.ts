@@ -29,6 +29,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { number } from 'mathjs';
 
 @Injectable({
   providedIn: 'root'
@@ -38,20 +39,25 @@ export class NumericInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  /*ngOnInit(): void {
+    let ans: Number;
+  }*/
+  //ans: number;
+  isCustomizationArgTrue = number;
+
   getCustomizationArgsWarnings(
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
     //return [];
     let warningsList = [];
-
-    //let allowedLettersLimit = AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK;
-    if (customizationArgs.placeholder.value === true) {
-      warningsList.push({
-        type: AppConstants.WARNING_TYPES.ERROR,
-        message: (
-          'The input should be greater than or equal to 0')
-      });
+    this.isCustomizationArgTrue = function(): number {
+      if(customizationArgs.input.value === true){
+        this.ans = 1;
+      }
+      else {
+        this.ans = 0;
+      }
+      return this.ans;
     }
-
     return warningsList;
   }
 
@@ -59,7 +65,7 @@ export class NumericInputValidationService {
       stateName: string,
       customizationArgs: NumericInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+    let warningsList = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -176,6 +182,11 @@ export class NumericInputValidationService {
     if (value === undefined || value === null) {
       return 'Please enter a valid number.';
     }
+    
+    if (this.isCustomizationArgTrue() === 1 && value < 0) {
+      return 'The input should be greater than or equal to 0';
+    }
+
     let stringValue = null;
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.
