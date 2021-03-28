@@ -13,11 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the question difficulty selector.
+ * @fileoverview Component for the question difficulty selector.
  */
 
 
 import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'question-difficulty-selector',
@@ -26,34 +28,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class QuestionDifficultySelectorComponent implements OnInit {
   ngOnInit(): void {
+    $scope.availableDifficultyValues = [];
+            for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+              $scope.availableDifficultyValues.push(
+                AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
+            }
   }
 }
-
-
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('questionDifficultySelector', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-difficulty-selector/' +
-        'question-difficulty-selector.component.html'),
-      controller: [
-        '$scope', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
-        function(
-            $scope, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-          var ctrl = this;
-                 
-          ctrl.$onInit = function() { 
-            $scope.availableDifficultyValues = [];
-            for (var difficulty in SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-              $scope.availableDifficultyValues.push(
-                SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
-            }
-          };
-        }
-      ]
-    };
-  }]);
+    
+angular.module('oppia').directive(
+  'questionDifficultySelector', downgradeComponent({
+   component: QuestionDifficultySelectorComponent
+}) as angular.IDirectiveFactory );
