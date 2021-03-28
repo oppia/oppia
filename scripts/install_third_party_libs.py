@@ -186,7 +186,7 @@ def ensure_pip_library_is_installed(package, version, path):
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
         install_backend_python_libs.pip_install(
-            package, version, exact_lib_path)
+            '%s==%s' % (package, version), exact_lib_path)
 
 
 def ensure_system_python_libraries_are_installed(package, version):

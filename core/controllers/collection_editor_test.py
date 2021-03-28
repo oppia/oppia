@@ -45,8 +45,8 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.json_dict = {
             'version': 1,

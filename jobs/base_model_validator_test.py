@@ -169,3 +169,55 @@ class ValidateModelIdTests(BaseModelValidatorTests):
                 beam_testing_util.equal_to([
                     errors.ModelInvalidIdError(invalid_id_model)
                 ]))
+
+
+class ValidatePostCommitIsPrivateTests(BaseModelValidatorTests):
+    def test_validate_post_commit_is_private_when_status_is_public(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_commit_status = base_models.BaseCommitLogEntryModel(
+                id='123',
+                created_on=self.year_ago,
+                last_updated=self.now,
+                commit_type='invalid-type',
+                user_id='',
+                post_commit_status='public',
+                post_commit_is_private=True,
+                commit_cmds=[])
+            pcoll = p | beam.Create([invalid_commit_status])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidatePostCommitIsPrivate()))
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelInvalidCommitStatusError(
+                        invalid_commit_status)
+                ])
+            )
+
+    def test_validate_post_commit_is_private_when_status_is_private(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_commit_status = base_models.BaseCommitLogEntryModel(
+                id='123',
+                created_on=self.year_ago,
+                last_updated=self.now,
+                commit_type='invalid-type',
+                user_id='',
+                post_commit_status='private',
+                post_commit_is_private=False,
+                commit_cmds=[])
+            pcoll = p | beam.Create([invalid_commit_status])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidatePostCommitIsPrivate()))
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelInvalidCommitStatusError(
+                        invalid_commit_status)
+                ])
+            )
