@@ -33,7 +33,7 @@ require(
   'components/skill-selector/' +
   'questions-list-select-skill-modal.controller.ts');
 require(
-  'components/skill-selector/skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.component.ts');
 
 require(
   'components/question-directives/modal-templates/' +

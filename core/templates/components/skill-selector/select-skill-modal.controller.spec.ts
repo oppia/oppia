@@ -78,4 +78,12 @@ describe('Select Skill Modal Controller', function() {
       id: '2'
     });
   });
+
+  it('should set new selected skill', function() {
+    $scope.selectedSkillId = '2';
+    expect($scope.selectedSkillId).toBe('2');
+
+    $scope.setSelectedSkillId('1');
+    expect($scope.selectedSkillId).toBe('1');
+  });
 });

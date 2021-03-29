@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/skill-selector/skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.component.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
 require('services/context.service.ts');
 

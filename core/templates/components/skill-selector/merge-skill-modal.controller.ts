@@ -35,7 +35,7 @@ angular.module('oppia').controller('MergeSkillModalController', [
     $scope.categorizedSkills = categorizedSkills;
     $scope.allowSkillsFromOtherTopics = true;
     $scope.untriagedSkillSummaries = untriagedSkillSummaries;
-    $scope.selectedSkillId = '';
+    $scope.selectedSkillId = null;
     $scope.confirm = function() {
       $uibModalInstance.close(
         {
@@ -45,6 +45,9 @@ angular.module('oppia').controller('MergeSkillModalController', [
     };
     $scope.save = function() {
       $scope.confirm();
+    };
+    $scope.setSelectedSkillId = function(skillId: string) {
+      $scope.selectedSkillId = skillId;
     };
   }
 ]);

@@ -51,14 +51,22 @@ describe('Merge Skill Modal Controller', function() {
       expect($scope.skillSummaries).toBe(skillSummaries);
       expect($scope.categorizedSkills).toBe(categorizedSkills);
       expect($scope.allowSkillsFromOtherTopics).toBe(true);
-      expect($scope.selectedSkillId).toBe('');
+      expect($scope.selectedSkillId).toBe(null);
     });
 
   it('should merge skill on closing modal', function() {
     $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       skill: skill,
-      supersedingSkillId: ''
+      supersedingSkillId: null
     });
+  });
+
+  it('should set new selected skill', function() {
+    $scope.selectedSkillId = '2';
+    expect($scope.selectedSkillId).toBe('2');
+
+    $scope.setSelectedSkillId('1');
+    expect($scope.selectedSkillId).toBe('1');
   });
 });
