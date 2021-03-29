@@ -1,8 +1,8 @@
 <mat-radio-group ngModel="skillWithDifficulty._difficulty">
   <mat-radio-button ngFor="rubric in this.skillIdToRubricsObject[skillWithDifficulty.getId()]"
-                   ngIf="rubric.getExplanations().length > 0"
-                   ngValue="availableDifficultyValues[$index]"
-                   class="protractor-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}}">
+                    ngIf="rubric.getExplanations().length > 0"
+                    ngValue="availableDifficultyValues[$index]"
+                    class="protractor-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}}">
     <strong> {{rubric.getDifficulty()}} </strong>
     <mat-list>
       <mat-list-item class="pl-0" ngFor="explanation in rubric.getExplanations()">
