@@ -262,7 +262,7 @@ describe('Exploration rights service', function() {
   it('should save moderator change to backend', function() {
     $httpBackend.expectPUT('/createhandler/moderatorrights/12345').respond(
       200, sampleDataResults);
-    ers.saveModeratorChangeToBackend();
+    ers.saveModeratorChangeToBackendAsync();
     $httpBackend.flush();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
@@ -283,7 +283,7 @@ describe('Exploration rights service', function() {
     function() {
       $httpBackend.expectPUT('/createhandler/moderatorrights/12345')
         .respond(500);
-      ers.saveModeratorChangeToBackend();
+      ers.saveModeratorChangeToBackendAsync();
       $httpBackend.flush();
 
       expect(clearWarningsSpy).not.toHaveBeenCalled();
