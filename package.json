@@ -79,7 +79,7 @@
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.1",
     "karma-coverage-istanbul-reporter": "^3.0.0",
-    "karma-jasmine": "^4.0.0",
+    "karma-jasmine": "^4.0.1",
     "karma-json-fixtures-preprocessor": "^0.0.6",
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
