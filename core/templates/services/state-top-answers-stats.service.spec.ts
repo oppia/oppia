@@ -243,8 +243,7 @@ describe('StateTopAnswersStatsService', () => {
 
     stateTopAnswersStatsService.onStateAdded('Me Llamo');
 
-    expect(stateTopAnswersStatsService.getStateStats('Me Llamo'))
-      .toEqual([]);
+    expect(stateTopAnswersStatsService.getStateStats('Me Llamo')).toHaveSize(0);
   }));
 
   it('should throw when accessing a deleted state', fakeAsync(async() => {
