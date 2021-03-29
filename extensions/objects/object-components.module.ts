@@ -25,7 +25,6 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { AlgebraicExpressionEditor } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
-import { ThirdPartyComponentsModule } from 'components/third-party-components/third-party-components.module';
 import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.component';
 
 
@@ -33,8 +32,7 @@ import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.com
   imports: [
     CommonModule,
     BrowserModule,
-    LeafletModule,
-    ThirdPartyComponentsModule
+    LeafletModule
   ],
   declarations: [
     AlgebraicExpressionEditor,
