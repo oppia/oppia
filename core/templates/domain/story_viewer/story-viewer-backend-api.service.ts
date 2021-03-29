@@ -114,7 +114,7 @@ export class StoryViewerBackendApiService {
   }
 
   async fetchStoryDataAsync(
-      topicUrlFragment:string,
+      topicUrlFragment: string,
       classroomUrlFragment: string,
       storyUrlFragment: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {

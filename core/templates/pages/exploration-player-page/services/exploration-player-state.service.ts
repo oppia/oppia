@@ -157,7 +157,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initQuestionPlayer = function(
         questionPlayerConfig, successCallback, errorCallback) {
       setQuestionPlayerMode();
-      QuestionBackendApiService.fetchQuestions(
+      QuestionBackendApiService.fetchQuestionsAsync(
         questionPlayerConfig.skillList,
         questionPlayerConfig.questionCount,
         questionPlayerConfig.questionsSortedByDifficulty
@@ -176,7 +176,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           explorationId);
       $q.all([
         explorationDataPromise,
-        PretestQuestionBackendApiService.fetchPretestQuestions(
+        PretestQuestionBackendApiService.fetchPretestQuestionsAsync(
           explorationId, storyUrlFragment),
         ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),

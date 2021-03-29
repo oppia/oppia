@@ -311,6 +311,9 @@ class TopicSummaryModel(base_models.BaseModel):
     # uncategorized).
     total_skill_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total number of published chapters in the topic.
+    total_published_node_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of skills that are not part of any subtopic.
     uncategorized_skill_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
@@ -347,6 +350,8 @@ class TopicSummaryModel(base_models.BaseModel):
             'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_published_node_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'uncategorized_skill_count':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
