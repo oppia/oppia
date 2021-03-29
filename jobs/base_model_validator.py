@@ -207,9 +207,10 @@ class BaseModelValidator(beam.PTransform):
         return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 
 
-class BaseSnapshotMetadataModelValidator(beam.PTransform):
+class BaseSnapshotMetadataModelValidator(BaseModelValidator):
     """Composite beam Transform which returns a pipeline of validation
-    errors.
+    errors. It validates BaseSnapshotMetadataModel using validators of both
+    BaseModel and BaseSnapshotMetadataModel.
     """
 
     def expand(self, model_pipe):
@@ -223,10 +224,14 @@ class BaseSnapshotMetadataModelValidator(beam.PTransform):
             beam.PCollection. A collection of errors represented as
             key-value pairs.
         """
+
         not_deleted, _ = (
             model_pipe
             | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
         )
+
+        # validating as per BaseModelValidator
+        base_model_validator_errors = not_deleted | BaseModelValidator()
 
         commit_type_validation_errors = (
             not_deleted | beam.ParDo(ValidateCommitType())
@@ -238,6 +243,7 @@ class BaseSnapshotMetadataModelValidator(beam.PTransform):
 
         return (
             (
+                base_model_validator_errors,
                 commit_type_validation_errors,
                 post_commit_is_private_errors)
             | beam.Flatten())
