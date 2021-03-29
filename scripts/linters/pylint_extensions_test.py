@@ -3296,7 +3296,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
                 u"""
                 def sum(a,b):
 
-                    \"\"\" this  does something \"\"\"
+                    \"\"\" this returns sum of a and b \"\"\"
                     return a+b
                 """)
         node_empty_line_below_function_def.file = filename
@@ -3324,7 +3324,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""
                 def sum(a,b):
-                    \"\"\" this  does something \"\"\"
+                    \"\"\" this returns sum of a and b.\"\"\"
                     return a+b
                 """)
         node_no_empty_line_below_function_def.file = filename
@@ -3350,7 +3350,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
                 def sum(
                     a,b):
 
-                    \"\"\" this  does something \"\"\"
+                    \"\"\" this returns sum of a and b.\"\"\"
                     return a+b
                 """)
         node_empty_line_below_function_def.file = filename
@@ -3379,7 +3379,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
                 u"""
                 def sum(
                     a,b):
-                    \"\"\" this  does something \"\"\"
+                    \"\"\" this returns sum of a and b. \"\"\"
                     return a+b
                 """)
         node_no_empty_line_below_function_def.file = filename
@@ -3404,7 +3404,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
                 u"""
                 def sum(a,b):  #This returns the sum.
 
-                    \"\"\" this  does something \"\"\"
+                    \"\"\" this returns sum of a and b.\"\"\"
                     return a+b
                 """)
         node_empty_line_below_function_def.file = filename
@@ -3433,7 +3433,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""
                 def sum(a,b):  #This returns the sum.
-                    \"\"\" this  does something \"\"\"
+                    \"\"\" this returns sum of a and b.\"\"\"
                     return a+b
                 """)
         node_no_empty_line_below_function_def.file = filename
