@@ -34,8 +34,8 @@ export class OnScreenKeyboardComponent {
   functionsTab : string = constants.OSK_FUNCTIONS_TAB;
   lettersTab: string = constants.OSK_LETTERS_TAB;
   mainTab: string = constants.OSK_MAIN_TAB;
-  greekSymbols: string[] =
-  Object.values(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+  greekSymbols: string[] = Object.values(
+      constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
   greekLetters: string[] = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
   currentTab: string = this.mainTab;
   lettersInKeyboardLayout: string[] = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
