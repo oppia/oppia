@@ -32,7 +32,6 @@ import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
 
-import pip
 import pkg_resources
 
 
@@ -172,6 +171,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
 
     def test_wrong_pip_version_raises_import_error(self):
+        import pip
         with self.swap(pip, '__version__', '20.2.4'):
             self.assertRaisesRegexp(
                 ImportError, 'pip==20.3.4 is not installed',
