@@ -32,6 +32,7 @@ import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
 
+import pip
 import pkg_resources
 
 
@@ -169,6 +170,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         """
         sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
+
+    def test_wrong_pip_version_raises_import_error(self):
+        with self.swap(pip, '__version__', '20.2.4'):
+            self.assertRaisesRegexp(
+                ImportError, 'Please upgrade pip',
+                install_backend_python_libs.verify_pip_is_installed)
 
     def test_invalid_git_dependency_raises_an_exception(self):
         swap_requirements = self.swap(
@@ -466,13 +473,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 install_backend_python_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
-        self.assertEqual(
-            print_statements,
-            [
-                'Regenerating "requirements.txt" file...',
-                'All third-party Python libraries are already installed '
-                'correctly.'
-            ])
+        self.assertEqual(print_statements, [
+            'Checking if pip is installed on the local machine',
+            'Regenerating "requirements.txt" file...',
+            'All third-party Python libraries are already installed '
+            'correctly.'
+        ])
 
     def test_library_version_change_is_handled_correctly(self):
         directory_names = [

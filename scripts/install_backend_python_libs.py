@@ -31,6 +31,7 @@ import utils
 
 import pkg_resources
 
+OPPIA_REQUIRED_PIP_VERSION = '20.3.4'
 GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
@@ -403,16 +404,15 @@ def _get_possible_normalized_metadata_directory_names(
     }
 
 
-def _verify_pip_is_installed():
+def verify_pip_is_installed():
     """Verify that pip is installed.
 
     Raises:
         ImportError. Error importing pip.
     """
+    python_utils.PRINT('Checking if pip is installed on the local machine')
     try:
-        python_utils.PRINT('Checking if pip is installed on the local machine')
-        # Importing pip just to check if its installed.
-        import pip  #pylint: disable=unused-variable
+        import pip
     except ImportError as e:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
@@ -434,11 +434,16 @@ def _verify_pip_is_installed():
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e)
     else:
-        if pip.__version__ != '20.3.4':
+        if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
             raise ImportError(
-                'Oppia requires pip==20.3.4, but you are using %s. Please '
-                'update your verison by running pip install pip==20.3.1 (yes, '
-                'using pip to do this is OK).' % pip.__version__)
+                'Oppia requires pip==%s, but you have pip==%s installed. '
+                'Please upgrade pip by running:\n'
+                '\n'
+                '    pip install pip==%s\n'
+                '\n'
+                'NOTE: This is not a typo, pip is able to upgrade itself.' % (
+                    OPPIA_REQUIRED_PIP_VERSION, pip.__version__,
+                    OPPIA_REQUIRED_PIP_VERSION))
 
 
 def _run_pip_command(cmd_parts):
@@ -451,7 +456,7 @@ def _run_pip_command(cmd_parts):
     Raises:
         Exception. Error installing package.
     """
-    _verify_pip_is_installed()
+    verify_pip_is_installed()
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
@@ -643,6 +648,7 @@ def main():
     mismatches, regenerate the 'requirements.txt' file and correct the
     mismatches.
     """
+    verify_pip_is_installed()
     python_utils.PRINT('Regenerating "requirements.txt" file...')
     # Calls the script to regenerate requirements. The reason we cannot call the
     # regenerate requirements functionality inline is because the python script
