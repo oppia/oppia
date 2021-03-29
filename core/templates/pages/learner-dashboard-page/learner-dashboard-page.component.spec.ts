@@ -28,7 +28,7 @@ import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -38,6 +38,8 @@ describe('Learner dashboard page', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
+  var $timeout = null;
+  var $window = null;
   var $uibModal = null;
   var AlertsService = null;
   var CsrfTokenService = null;
@@ -46,13 +48,14 @@ describe('Learner dashboard page', function() {
   var LearnerDashboardBackendApiService = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
-
+  var focusManagerService = null;
+  var $flushPendingTasks = null;
   var profilePictureDataUrl = 'profile-picture-url';
   var userInfo = {
     getUsername: () => 'username1'
   };
   var learnerDashboardData = null;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -64,8 +67,12 @@ describe('Learner dashboard page', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
+      $window = $injector.get('$window');
+      $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
+      focusManagerService = $injector.get('FocusManagerService');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
@@ -290,6 +297,20 @@ describe('Learner dashboard page', function() {
       expect(ctrl.noActivity).toBe(false);
     });
 
+    it('should set focus on browse lesson btn', function() {
+      var spy = spyOn(ctrl, 'addFocusWithoutScroll');
+      $flushPendingTasks();
+      expect(spy).toHaveBeenCalledWith('ourLessonsBtn');
+    });
+
+    it('should scroll back to top of window after focusing', function() {
+      var focusSpy = spyOn(focusManagerService, 'setFocus');
+      var windowSpy = spyOn($window, 'scrollTo');
+      ctrl.addFocusWithoutScroll('ourLessonsBtn');
+      $timeout.flush();
+      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
+      expect(windowSpy).toHaveBeenCalled();
+    });
     it('should get static image url', function() {
       var imagePath = '/path/to/image.png';
       expect(ctrl.getStaticImageUrl(imagePath)).toBe(

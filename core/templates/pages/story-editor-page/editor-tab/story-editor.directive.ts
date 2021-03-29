@@ -37,7 +37,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
-
+require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
@@ -53,6 +53,7 @@ angular.module('oppia').directive('storyEditor', [
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'FocusManagerService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
         'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
@@ -60,6 +61,7 @@ angular.module('oppia').directive('storyEditor', [
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
+            FocusManagerService,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, WindowDimensionsService,
             WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
@@ -363,7 +365,10 @@ angular.module('oppia').directive('storyEditor', [
 
             ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryInitialized.subscribe(
-                () => _init()
+                () =>{
+                  _init();
+                  FocusManagerService.setFocus('metaTagInputField');
+                }
               ));
             ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryReinitialized.subscribe(

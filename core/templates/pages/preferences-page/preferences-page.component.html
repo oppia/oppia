@@ -43,7 +43,7 @@
         <label for="label-target-user-bio" class="col-lg-4 col-md-4 col-sm-4" translate="I18N_PREFERENCES_BIO"></label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <textarea id="label-target-user-bio"
-                    class="oppia-bio-border protractor-test-user-bio"
+                    class="oppia-bio-border protractor-test-user-bio oppia-autofocus"
                     ng-model="$ctrl.userBio"
                     ng-blur="$ctrl.saveUserBio($ctrl.userBio)"
                     ng-change="$ctrl.registerBioChanged()"
