@@ -58,7 +58,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=True)
     # Unique ID for the ticket this report is assigned to (see
     # AppFeedbackReportTicketModel for how this is constructed).
-    ticket_id = datastore_services.TextProperty(default=None, indexed=False)
+    ticket_id = datastore_services.StringProperty(required=False, indexed=True)
     # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
@@ -418,7 +418,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     github_issue_number = datastore_services.IntegerProperty(
         default=None, indexed=True)
     # Whether this ticket has been archived.
-    is_archived = datastore_services.BooleanProperty(
+    ticket_is_archived = datastore_services.BooleanProperty(
         required=True, indexed=False)
     # The datetime in UTC that the newest report in this ticket was created on,
     # to help with sorting tickets.
@@ -450,7 +450,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
             id=ticket_id, ticket_name=ticket_name,
-            github_issue_number=github_issue_number, is_archived=False,
+            github_issue_number=github_issue_number, ticket_is_archived=False,
             newest_report_timestamp=newest_report_timestamp,
             report_ids=report_ids)
         ticket_entity.update_timestamps()
@@ -499,7 +499,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'github_issue_number': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'is_archived': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ticket_is_archived': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'newest_report_timestamp': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'report_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -531,11 +531,11 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     ticket_id = datastore_services.StringProperty(required=True, indexed=True)
     # The platform that these statistics are for.
     platform = datastore_services.TextProperty(
-        required=True, indexed=False, choices=PLATFORM_CHOICES)
+        required=True, indexed=True, choices=PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model.
     stats_tracking_date = datastore_services.DateProperty(
-        required=True, indexed=False)
+        required=True, indexed=True)
     # JSON struct that maps the daily statistics for this ticket on the date
     # specified in stats_tracking_date. The JSON will look contain two keys:
     # daily_param_stats and daily_total_reports_submitted.
@@ -559,7 +559,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         required=True, indexed=False)
     # The schema version for parameter statistics in this entity.
     daily_ticket_stats_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=False)
+        required=True, indexed=True)
 
     @classmethod
     def create(
@@ -570,7 +570,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         Args:
             ticket_id: str. The ID for the ticket these stats aggregate on.
             platform: str. The platform the stats are aggregating for.
-            stats_tracking_date: date. The date in UTC that this entity is
+            stats_tracking_date: datetime.date. The date in UTC that this entity is
                 tracking stats for.
             daily_ticket_stats: dict. The daily stats for this entity, keyed
                 by the parameter witch each value mapping a parameter value to
@@ -586,7 +586,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             stats_tracking_date=stats_tracking_date,
             daily_ticket_stats=daily_ticket_stats,
             daily_ticket_stats_schema_version=(
-                feconf.CURRENT_APP_FEEDBACK_REPORT_DAILY_STATS_SCHEMA_VERSION))
+                feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION))
         stats_entity.update_timestamps()
         stats_entity.put()
         return entity_id

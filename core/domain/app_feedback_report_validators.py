@@ -40,24 +40,26 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [platform].[timestamp_in_sec].[random_hash]
-        regex_string = '^%s\\.\\d+\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
+        regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
             item.platform, item.submitted_on.second, base_models.ID_LENGTH)
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instance(cls):
-        # TODO(jcqli): Create domain object when implementing domain layer.
+    def _get_model_domain_object_instance(cls, item):
+        # TODO(Oppia-Android#3016): Create domain object when implementing domain layer.
         return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'ticket_id',
-                app_feedback_report_models.AppFeedbackReportTicketModel,
-                [item.ticket_id]
-            )
-        ]
+        external_references = []
+        if item.ticket_id:
+            external_references = [
+                base_model_validators.ExternalModelFetcherDetails(
+                    'ticket_id',
+                    app_feedback_report_models.AppFeedbackReportTicketModel,
+                    [item.ticket_id]
+                )]
+        return external_references
 
 
 class AppFeedbackReportTicketModelValidator(
@@ -66,15 +68,16 @@ class AppFeedbackReportTicketModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls):
-        # Valid id: [creation_datetime]:[hash(ticket_name)]:[random hash]
+        # Valid id: [creation_datetime_in_sec]:[hash(ticket_name)]:[random hash]
         regex_string = (
             '\\d+\\:[A-Za-z0-9]{1,%s}$\\:[A-Za-z0-9]{1,%s}$' % (
                 base_models.ID_LENGTH, base_models.ID_LENGTH))
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instance(cls):
-        # TODO(jcqli): Create domain object when implementing domain layer.
+    def _get_model_domain_object_instance(cls, item):
+        # TODO(Oppia-Android#3016): Create domain object when implementing
+        # domain layer.
         return None
 
     @classmethod
@@ -84,14 +87,9 @@ class AppFeedbackReportTicketModelValidator(
         stats_models = stats_model_class.get_stats_for_ticket(item.id)
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'ticketed_report_ids',
+                'report_ids',
                 app_feedback_report_models.AppFeedbackReportModel,
                 [item.report_ids]
-            ),
-            base_model_validators.ExternalModelFetcherDetails(
-                'ticket_stats_ids',
-                app_feedback_report_models.AppFeedbackReportStatsModel,
-                stats_models
             )
         ]
 
@@ -109,16 +107,16 @@ class AppFeedbackReportStatsModelValidator(
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instance(cls):
-        # TODO(jcqli): Create domain object when implementing domain layer.
+    def _get_model_domain_object_instance(cls, item):
+        # TODO(Oppia-Android#3016): Create domain object when implementing domain layer.
         return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'report_id',
-                app_feedback_report_models.AppFeedbackReportModel,
-                [item.report_ids]
+                'ticket_id',
+                app_feedback_report_models.AppFeedbackReportTicketModel,
+                [item.ticket_id]
             )
         ]

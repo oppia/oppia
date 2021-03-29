@@ -54,6 +54,7 @@ import { CollectionUpdateService } from 'domain/collection/collection-update.ser
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
+import { LearnerViewInfoBackendApiService } from 'pages/exploration-player-page/services/learner-view-info-backend-api.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
@@ -492,6 +493,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],
   ['LearnerParamsService', LearnerParamsService],
+  ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
