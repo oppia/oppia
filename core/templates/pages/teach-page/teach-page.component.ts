@@ -45,7 +45,7 @@ export interface Testimonial {
 export class TeachPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   classroomUrlFragment: string;
-  classroomUrl :string;
+  classroomUrl: string;
   displayedTestimonialId: number;
   testimonialCount: number;
   testimonials = [];
