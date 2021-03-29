@@ -468,7 +468,7 @@ def check_coverage_changes():
         file_name = stanza.file_name
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
-        if stanza.file_path.startswith("node_modules/"):
+        if stanza.file_path.startswith('node_modules/'):
             continue
         if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
