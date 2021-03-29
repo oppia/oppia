@@ -83,9 +83,7 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
         PLATFORM_WEB, REPORT_SUBMITTED_TIMESTAMP.second,
         'Over90Daysxx')
 
-    def setUp(self):
-        """Set up  models in datastore for use in testing."""
-        super(ScrubReportsOneOffJobTests, self).setUp()
+    def _add_current_reports():
         # Add report that should not be scrubbed.
         self.current_feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
@@ -114,6 +112,7 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
             self.TIMESTAMP_AT_90_DAYS)
         self.current_feedback_report_model.put()
 
+    def _add_expiring_reports():
         # Add reports that will be scrubbed.
         self.expiring_android_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
@@ -169,7 +168,51 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
             self.TIMESTAMP_OVER_90_DAYS)
         self.expiring_web_report_model.put()
 
+    def test_empty_model(self):
+        model_class = app_feedback_report_models.AppFeedbackReportModel
+        self.assertEqual(len(model_class.get_all()), 0)
+
+        job_id = (
+            app_feedback_report_jobs_one_off
+            .ScrubReportsOneOffJob.create_new())
+        (
+            app_feedback_report_jobs_one_off
+            .ScrubReportsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            app_feedback_report_jobs_one_off
+            .ScrubReportsOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+        self.assertEqual(len(model_class.get_all()), 0)
+
+    def test_scrubs_every_model(self):
+        self._add_current_reports()
+
+        job_id = (
+            app_feedback_report_jobs_one_off
+            .ScrubReportsOneOffJob.create_new())
+        (
+            app_feedback_report_jobs_one_off
+            .ScrubReportsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            app_feedback_report_jobs_one_off
+            .ScrubReportsOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+        current_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_AT_90_DAYS))
+        self.assertFalse(current_model is None)
+        self.assertTrue(current_model.scrubbed_by is None)
+
     def test_standard_operation(self):
+        self._add_current_reports()
+        self._add_expiring_reports()
+
         job_id = (
             app_feedback_report_jobs_one_off
             .ScrubReportsOneOffJob.create_new())

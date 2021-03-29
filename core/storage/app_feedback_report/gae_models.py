@@ -530,7 +530,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # The unique ticket ID that this entity is aggregating for.
     ticket_id = datastore_services.StringProperty(required=True, indexed=True)
     # The platform that these statistics are for.
-    platform = datastore_services.TextProperty(
+    platform = datastore_services.StringProperty(
         required=True, indexed=True, choices=PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model.
