@@ -855,7 +855,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
         output = self._run_one_off_job()
-        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38],[self.VALID_EXP_ID, 38]]]], output)
+        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], output)
 
         state3.update_interaction_id('ItemSelectionInput')
         state3.update_interaction_customization_args(customization_args_dict1)
@@ -878,8 +878,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInputInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Item Selection Input.
-         output = self._run_one_off_job()
-        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38],[self.VALID_EXP_ID, 38]]]], output)
+        output = self._run_one_off_job()
+        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations
@@ -890,7 +890,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1','State2'])
+        exploration.add_states(['State1', 'State2'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
