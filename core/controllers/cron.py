@@ -23,6 +23,7 @@ from core import jobs
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import activity_jobs_one_off
+from core.domain import app_feedback_report_jobs_one_off
 from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
@@ -270,3 +271,13 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                     admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+
+
+class CronScrubAppFeedbackReportsHandler(base.BaseHandler):
+    """Handler for scrubbing app feedback reports that are expiring."""
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests to scrub reports."""
+        job_class = app_feedback_report_jobs_one_off.ScrubReportsOneOffJob
+        job_class.enqueue(job_class.create_new())
