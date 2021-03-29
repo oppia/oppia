@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.0.9",
+  "version": "3.0.8",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -72,14 +72,14 @@
     "htmllint": "^0.8.0",
     "htmllint-cli": "github:oppia/htmllint-cli#01a8b74",
     "istanbul-instrumenter-loader": "^3.0.1",
-    "jasmine-core": "^3.6.0",
+    "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "^6.0.0",
     "jquery": "^3.4.0",
     "karma": "^6.0.0",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.1",
     "karma-coverage-istanbul-reporter": "^3.0.0",
-    "karma-jasmine": "^4.0.1",
+    "karma-jasmine": "^4.0.0",
     "karma-json-fixtures-preprocessor": "^0.0.6",
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
