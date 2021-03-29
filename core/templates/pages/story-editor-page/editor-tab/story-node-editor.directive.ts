@@ -20,7 +20,7 @@ require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('components/skill-selector/select-skill-modal.controller.ts');
 require(
-  'components/skill-selector/skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.component.ts');
 require(
   'pages/story-editor-page/modal-templates/' +
   'new-chapter-title-modal.controller.ts');
