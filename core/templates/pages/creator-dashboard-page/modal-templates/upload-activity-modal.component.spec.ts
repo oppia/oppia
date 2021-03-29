@@ -84,7 +84,9 @@ describe('Upload Activity Modal Component', () => {
       };
     });
     component.save();
-    expect(dismissSpy).toHaveBeenCalledWith();
+    expect(dismissSpy).toHaveBeenCalledWith({
+      yamlFile: file
+    });
   }));
 
   it('should not save activity when file is empty', fakeAsync(() => {
