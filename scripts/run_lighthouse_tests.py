@@ -218,8 +218,8 @@ def main(args=None):
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.
-        common.wait_for_port_to_be_open(feconf.ES_LOCALHOST_PORT)
-        common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
+        common.wait_for_port_to_be_in_use(GOOGLE_APP_ENGINE_PORT)
 
         run_lighthouse_puppeteer_script()
         run_lighthouse_checks(lighthouse_mode)
