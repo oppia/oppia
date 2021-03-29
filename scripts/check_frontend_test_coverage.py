@@ -58,7 +58,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'ck-editor-4-rte.directive.ts',
     'ck-editor-4-widgets.initializer.ts',
     'code-repl-prediction.service.ts',
-    'code-string-editor.directive.ts',
+    'code-string-editor.component.ts',
     'codemirror-mergeview.directive.ts',
     'collection-details-editor.directive.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
@@ -278,7 +278,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'score-ring.directive.ts',
     'select2-dropdown.directive.ts',
     'set-of-translatable-html-content-ids-editor.component.ts',
-    'set-of-unicode-string-editor.component.ts',
+    'set-of-unicode-string-editor.directive.ts',
     'shared.ts',
     'sharing-links.component.ts',
     'side-navigation-bar.directive.ts',
@@ -390,6 +390,7 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
                 'It\'s not possible to diff the test coverage correctly.')
         _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
+        self.file_path = match.group(1) 
 
         match = re.search(r'LF:(\d+)\n', stanza)
         if match is None:
@@ -467,7 +468,8 @@ def check_coverage_changes():
         file_name = stanza.file_name
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
-
+        if stanza.file_path.startswith("node_modules/"):
+            continue
         if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
                 errors += (
