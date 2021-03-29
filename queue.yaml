@@ -11,6 +11,7 @@ queue:
 - name: events
   rate: 5/s
 - name: one-off-jobs
-  rate: 10/s
+  rate: 500/s
+  bucket_size: 100
 - name: stats
   rate: 10/m
