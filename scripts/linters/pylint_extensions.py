@@ -2130,9 +2130,10 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
         below function definition.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or 
-            method definition in the AST.
+            node: astroid.scoped_nodes.FunctionDef. Node for a function
+                or method definition in the AST.
         """
+
         line_number = node.fromlineno
 
         for i in python_utils.RANGE(999):
