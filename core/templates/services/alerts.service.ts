@@ -60,7 +60,12 @@ export class AlertsService {
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
 
-  constructor(private log: LoggerService) {}
+  constructor(private log: LoggerService) {
+    // Since warnings and messages are static, clearing them in the constructor
+    // retain "instance-like" behavior.
+    this.clearWarnings();
+    this.clearMessages();
+  }
 
   /**
    * Adds a warning message.

@@ -17,7 +17,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
@@ -32,46 +32,59 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
   templateUrl: './login-page.component.html'
 })
 export class LoginPageComponent implements OnInit {
-  email: FormControl = null;
+  email = new FormControl('', [Validators.email]);
+  formGroup = new FormGroup({email: this.email});
 
   constructor(
       private alertsService: AlertsService, private authService: AuthService,
       private loaderService: LoaderService, private windowRef: WindowRef) {}
 
-  static get isEnabled(): boolean {
+  get enabled(): boolean {
     return AppConstants.ENABLE_LOGIN_PAGE;
   }
 
+  get emulatorModeIsEnabled(): boolean {
+    return AppConstants.EMULATOR_MODE;
+  }
+
   ngOnInit(): void {
-    if (!LoginPageComponent.isEnabled) {
+    if (!this.enabled) {
+      this.alertsService.addWarning(
+        'Sign-in is temporarily disabled. Please try again later.');
       this.redirectToHomePage();
       return;
     }
-    if (AuthService.firebaseEmulatorIsEnabled) {
-      this.email = new FormControl('', [Validators.email]);
+
+    if (this.emulatorModeIsEnabled) {
       this.email.setValue('');
-    } else {
-      this.loaderService.showLoadingScreen('Signing in');
-      this.authService.handleRedirectResultAsync().then(
-        redirectSucceeded => redirectSucceeded ?
-          this.redirectToSignUp() : this.authService.signInWithRedirectAsync(),
-        error => this.onSignInError(error));
+      return;
     }
+
+    this.loaderService.showLoadingScreen('Signing in');
+    this.authService.handleRedirectResultAsync().then(
+      redirectSucceeded => redirectSucceeded ?
+        this.redirectToSignUp() : this.authService.signInWithRedirectAsync(),
+      error => this.onSignInError(error));
   }
 
-  onClickSignInButton(): void {
+  async onClickSignInButtonAsync(email: string): Promise<void> {
     this.loaderService.showLoadingScreen('Signing in');
-    this.authService.signInWithEmail(this.email.value).then(
+    await this.authService.signInWithEmail(email).then(
       () => this.redirectToSignUp(), error => this.onSignInError(error));
   }
 
   private onSignInError(error: firebase.auth.Error): void {
     if (error.code === 'auth/user-disabled') {
       this.redirectToPendingAccountDeletionPage();
-    } else {
+      return;
+    }
+
+    this.alertsService.addWarning(error.message);
+    if (this.emulatorModeIsEnabled) {
       this.loaderService.hideLoadingScreen();
-      this.alertsService.addWarning(error.message);
       this.email.setValue('');
+    } else {
+      setTimeout(() => this.redirectToHomePage(), 2000);
     }
   }
 
