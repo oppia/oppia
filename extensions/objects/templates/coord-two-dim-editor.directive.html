@@ -2,9 +2,8 @@
   <div leaflet
        id="coordTwoDimEditor"
        class="oppia-coord-to-dim-editor-map"
-       [leafletCenter]="mapCenter"
-       (leafletClick)="leafletClick($event)"
-       (leafletMapMoveEnd)="leafletMove($event)">
+       [leafletOptions]="options"
+       (leafletClick)="leafletClick($event)">
        <div [leafletLayer]="mapMarkers"></div>
   </div>
 </div>

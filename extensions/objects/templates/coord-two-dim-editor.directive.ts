@@ -16,10 +16,10 @@
  * @fileoverview Directive for coord two dim editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { icon, latLng, marker } from 'leaflet';
+import { icon, latLng, LeafletEvent, LeafletMouseEvent, marker, tileLayer } from 'leaflet';
 @Component({
   selector: 'coord-two-dim-editor',
   templateUrl: './coord-two-dim-editor.directive.html',
@@ -27,6 +27,8 @@ import { icon, latLng, marker } from 'leaflet';
 })
 export class CoordTwoDimEditorComponent implements OnInit {
   @Input() value;
+  @Output() valueChanged: EventEmitter<[number, number]> = new EventEmitter<
+  [number, number]>();
   latLangValue;
   mapEvents = {
     map: {
@@ -40,51 +42,68 @@ export class CoordTwoDimEditorComponent implements OnInit {
   };
   mapCenter = latLng(0, 0);
   mapMarkers;
+  optionsSpec = {
+    layers: [{ url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: 'Open Street Map' }],
+    zoom: 0
+  };
+  options;
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 
-  leafletClick(e: any): void {
-    const newLat = e.leafletEvent.latlng.lat;
-    const newLng = e.leafletEvent.latlng.lng;
+  leafletClick(e: LeafletMouseEvent): void {
+    const newLat = e.latlng.lat;
+    const newLng = e.latlng.lng;
     this.value = [newLat, newLng];
     this.updateMarker(newLat, newLng);
+    this.valueChanged.emit([newLat, newLng]);
   }
 
-  leafletMove(e: any): void {
-    this.value = [e.model.lat, e.model.lng];
+  leafletMove(e: LeafletEvent): void {
+    this.value = [e.target._latlng.lat, e.target._latlng.lng];
+    this.valueChanged.emit([e.target._latlng.lat, e.target._latlng.lng]);
   }
 
   private updateMarker(lat, lng) {
-    this.mapMarkers.mainMarker.lat = lat;
-    this.mapMarkers.mainMarker.lng = lng;
+    const newMarker = marker(
+      [lat, lng],
+      {
+        icon: icon({
+          iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
+            '/interactions/InteractiveMap/static/marker-icon.png'),
+          // The size of the icon image in pixels.
+          iconSize: [25, 41],
+          // The coordinates of the "tip" of the icon.
+          iconAnchor: [12, 41],
+          shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
+            '/interactions/InteractiveMap/static/marker-shadow.png'),
+          // The size of the shadow image in pixels.
+          shadowSize: [41, 41],
+          // The coordinates of the "tip" of the shadow.
+          shadowAnchor: [13, 41],
+          // The URL to a retina sized version of the icon image.
+          // Used for Retina screen devices.
+          iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
+            '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+          shadowRetinaUrl:
+        this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-shadow.png')
+        }),
+        draggable: true
+      }
+    );
+    newMarker.on('dragend', (e) => this.leafletMove(e));
+    this.mapMarkers = newMarker;
   }
 
   ngOnInit(): void {
-    this.mapCenter = latLng(this.value[0], this.value[1]);
-    this.mapMarkers = marker(latLng(this.value[0], this.value[1]), {
-      icon: icon({
-        iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
-          '/interactions/InteractiveMap/static/marker-icon.png'),
-        // The size of the icon image in pixels.
-        iconSize: [25, 41],
-        // The coordinates of the "tip" of the icon.
-        iconAnchor: [12, 41],
-        shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
-          '/interactions/InteractiveMap/static/marker-shadow.png'),
-        // The size of the shadow image in pixels.
-        shadowSize: [41, 41],
-        // The coordinates of the "tip" of the shadow.
-        shadowAnchor: [13, 41],
-        // The URL to a retina sized version of the icon image.
-        // Used for Retina screen devices.
-        iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
-          '/interactions/InteractiveMap/static/marker-icon-2x.png'),
-        shadowRetinaUrl:
-      this.urlInterpolationService.getExtensionResourceUrl(
-        '/interactions/InteractiveMap/static/marker-shadow.png')
-      }),
-      draggable: true
-    }
-    );
+    this.options = {
+      layers: [tileLayer(
+        this.optionsSpec.layers[0].url,
+        { attribution: this.optionsSpec.layers[0].attribution }
+      )],
+      zoom: this.optionsSpec.zoom,
+      center: latLng([this.value[0], this.value[1]])
+    };
+    this.updateMarker(this.value[0], this.value[1]);
   }
 }
 
