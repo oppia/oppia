@@ -19,11 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppService } from 'services/app.service';
 import { Classifier } from 'domain/classifier/classifier.model';
 import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
-
-import { AppConstants } from 'app.constants';
 
 interface StateClassifierMapping {
   [state: string]: Classifier;
@@ -38,6 +37,7 @@ export class StateClassifierMappingService {
   stateClassifierMapping: StateClassifierMapping = null;
 
   constructor(
+    private appService: AppService,
     private classifierDataService: ClassifierDataBackendApiService,
     private loggerService: LoggerService) {}
 
@@ -48,12 +48,8 @@ export class StateClassifierMappingService {
     this.stateClassifierMapping = {};
   }
 
-  static get ENABLE_ML_CLASSIFIERS(): boolean {
-    return AppConstants.ENABLE_ML_CLASSIFIERS;
-  }
-
   async initializeClassifierDataForState(stateName: string): Promise<void> {
-    if (StateClassifierMappingService.ENABLE_ML_CLASSIFIERS) {
+    if (this.appService.isMachineLearningClassificationEnabled()) {
       this.stateClassifierMapping[stateName] = null;
       this.loggerService.info('Fetching classifier data for ' + stateName);
       try {
@@ -70,7 +66,7 @@ export class StateClassifierMappingService {
   }
 
   hasClassifierData(stateName: string): boolean {
-    if (!StateClassifierMappingService.ENABLE_ML_CLASSIFIERS) {
+    if (!this.appService.isMachineLearningClassificationEnabled()) {
       return false;
     }
     return this.stateClassifierMapping &&
@@ -79,7 +75,7 @@ export class StateClassifierMappingService {
   }
 
   getClassifier(stateName: string): Classifier {
-    if (StateClassifierMappingService.ENABLE_ML_CLASSIFIERS &&
+    if (this.appService.isMachineLearningClassificationEnabled() &&
         this.hasClassifierData(stateName)) {
       return this.stateClassifierMapping[stateName];
     }

@@ -1154,6 +1154,7 @@ export class UpgradedServices {
         upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
+        upgradedServices['AppService'],
         upgradedServices['ClassifierDataBackendApiService'],
         upgradedServices['LoggerService']);
     upgradedServices['StateInteractionStatsBackendApiService'] =

@@ -18,6 +18,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { AppService } from 'services/app.service';
 import { Classifier } from 'domain/classifier/classifier.model';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
@@ -27,6 +28,7 @@ describe('State classifier mapping service', () => {
   describe('Test that classifier data is fetched properly when ML is enabled',
     () => {
       let mappingService: StateClassifierMappingService;
+      let appService: AppService;
       let classifierFrozenModel = new TextClassifierFrozenModel();
       // The model_json attribute in TextClassifierFrozenModel class can't be
       // changed to camelcase since the class definition is automatically
@@ -77,8 +79,8 @@ describe('State classifier mapping service', () => {
         });
 
         mappingService = TestBed.get(StateClassifierMappingService);
-        spyOnProperty(
-          StateClassifierMappingService, 'ENABLE_ML_CLASSIFIERS', 'get')
+        appService = TestBed.get(AppService);
+        spyOn(appService, 'isMachineLearningClassificationEnabled')
           .and.returnValue(true);
       });
 
@@ -128,6 +130,7 @@ describe('State classifier mapping service', () => {
   describe('Test that classifier data is not fetched when ML is disabled',
     () => {
       let mappingService: StateClassifierMappingService;
+      let appService: AppService;
       beforeEach(() => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -135,8 +138,8 @@ describe('State classifier mapping service', () => {
         });
 
         mappingService = TestBed.get(StateClassifierMappingService);
-        spyOnProperty(
-          StateClassifierMappingService, 'ENABLE_ML_CLASSIFIERS', 'get')
+        appService = TestBed.get(AppService);
+        spyOn(appService, 'isMachineLearningClassificationEnabled')
           .and.returnValue(false);
       });
 
