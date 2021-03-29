@@ -780,6 +780,24 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
 
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob
+            .create_new())
+        interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob.enqueue(
+            job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for multiple choice
         interactions having choices length less than 30.
@@ -813,14 +831,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
-        job_id = start_multiple_item_interaction_lt_one_off_job(
-            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
-
-        actual_output = (
-            interaction_jobs_one_off
-            .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('SUCCESS', 1)
-        self.assertEqual(actual_output, expected_output)
+        output = self._run_one_off_job()
+        self.assertEqual([['SUCCESS', 1]], output)
 
         customization_args_dict2 = {
             'choices': {'value': [{
@@ -829,12 +841,6 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
             }, {
                 'html': '<p>This is value2 for MultipleChoiceInput</p>',
                 'content_id': 'ca_choices_1'
-            }, {
-                'html': '<p>This is value3 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_2'
-            }, {
-                'html': '<p>This is value4 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_3'
             }]},
             'showChoicesInShuffledOrder': {'value': True}
         }
@@ -848,15 +854,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleChoiceInteractionLimitOneOffJob job
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
-        job_id = start_multiple_item_interaction_lt_one_off_job(
-            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
-
-        actual_output = (
-            interaction_jobs_one_off
-            .MultipleItemInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', 38)
-
-        self.assertEqual(actual_output, expected_output)
+        output = self._run_one_off_job()
+        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38],[self.VALID_EXP_ID, 38]]]], output)
 
         state3.update_interaction_id('ItemSelectionInput')
         state3.update_interaction_customization_args(customization_args_dict1)
@@ -867,14 +866,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInputInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Item Selection Input.
-        job_id = start_multiple_item_interaction_lt_one_off_job(
-            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
-
-        actual_output = (
-            interaction_jobs_one_off
-            .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('SUCCESS', 1)
-        self.assertEqual(actual_output, expected_output)
+        output = self._run_one_off_job()
+        self.assertEqual([['SUCCESS', 1]], output)
 
         state4.update_interaction_id('ItemSelectionInput')
         state4.update_interaction_customization_args(customization_args_dict2)
@@ -885,14 +878,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Start MultipleItemInputInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Item Selection Input.
-        job_id = start_multiple_item_interaction_lt_one_off_job(
-            self, interaction_jobs_one_off.MultipleItemInteractionLtOneOffJob)
-
-        actual_output = (
-            interaction_jobs_one_off
-            .MultipleInputInteractionLtOneOffJob.get_output(job_id))
-        expected_output = ('LONGER THAN 30', 38)
-        self.assertEqual(actual_output, expected_output)
+         output = self._run_one_off_job()
+        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38],[self.VALID_EXP_ID, 38]]]], output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations
@@ -903,9 +890,10 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1'])
+        exploration.add_states(['State1','State2'])
 
         state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
 
         state1.update_interaction_id('MultipleChoiceInput')
 
@@ -932,10 +920,6 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
             MultipleItemInteractionLtOneOffJob)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State2'])
-
-        state2 = exploration.states['State2']
 
         state2.update_interaction_id('ItemSelectionInput')
 
