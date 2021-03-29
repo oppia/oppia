@@ -39,7 +39,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform].[timestamp_in_sec].[random_hash]
+        # Valid id: [platform].[timestamp_in_sec_int].[random_hash]
         regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
             item.platform, item.submitted_on.second, base_models.ID_LENGTH)
         return regex_string
@@ -69,7 +69,8 @@ class AppFeedbackReportTicketModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls):
-        # Valid id: [creation_datetime_in_sec]:[hash(ticket_name)]:[random hash]
+        # Valid id:
+        #   [creation_datetime_in_sec_int]:[hash(ticket_name)]:[random hash]
         regex_string = (
             '\\d+\\:[A-Za-z0-9]{1,%s}$\\:[A-Za-z0-9]{1,%s}$' % (
                 base_models.ID_LENGTH, base_models.ID_LENGTH))
@@ -100,7 +101,7 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform]:[ticket_id]:[date.seconds]
+        # Valid id: [platform]:[ticket_id]:[date_in_seconds_int]
         regex_string = '^%s\\:[A-Za-z0-9]{1,%s}$\\:%s\\.\\d+' % (
             item.platform, base_models.ID_LENGTH,
             item.stats_tracking_date.second)

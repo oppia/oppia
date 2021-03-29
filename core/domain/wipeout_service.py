@@ -506,6 +506,28 @@ def _generate_entity_to_pseudonymized_ids_mapping(entity_ids):
     }
 
 
+def _generate_entities_to_same_pseudonymized_id_mapping(
+        entity_ids, pseudonymized_id):
+    """Generate mapping from entity IDs to a single pseudonymized user ID.
+
+    Args:
+        entity_ids: list(str). List of entity IDs for which to generate new
+            pseudonymous user IDs. The IDs are of entities (e.g. models in
+            config, collection, skill, or suggestion) that were modified
+            in some way by the user who is currently being deleted.
+        pseudonymized_id: str. The pseudonymized ID to map each of the entities
+            to.
+
+    Returns:
+        dict(str, str). Mapping between the entity IDs and pseudonymous user
+        ID.
+    """
+    return {
+        entity_id: pseudonymized_id
+        for entity_id in entity_ids
+    }
+
+
 def _save_pseudonymizable_entity_mappings(
         pending_deletion_request, entity_category, entity_ids):
     """Save the entity mappings for some entity category into the pending
@@ -1013,23 +1035,36 @@ def _remove_user_id_from_contributors_in_summary_models(
 
 
 def _pseudonymize_app_feedback_report_models(pending_deletion_request):
-    """Pseudonymize the app feedback report models for the user with user_id
-    if they scrubbed a feedback report.
+    """Pseudonymize the app feedback report models for the user with user_id,
+    if they scrubbed a feedback report. If the user scrubs multiple reports,
+    they will be given the same pseudonym for each model entity.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
     """
+    model_class = app_feedback_report_models.AppFeedbackReportModel
     user_id = pending_deletion_request.user_id
-    app_feedback_report_model_class = (
-        app_feedback_report_models.AppFeedbackReportModel)
 
-    feedback_report_models = app_feedback_report_model_class.query(
-        app_feedback_report_model_class.scrubbed_by == user_id).fetch()
+    feedback_report_models = model_class.query(
+        model_class.scrubbed_by == user_id).fetch()
     report_ids = set([model.id for model in feedback_report_models])
 
-    _save_pseudonymizable_entity_mappings(
-        pending_deletion_request, models.NAMES.app_feedback_report, report_ids)
+    # Fill in any missing keys in the category's
+    # pseudonymizable_entity_mappings; this is the same as
+    # _save_pseudonymizable_entity_mappings(), but using the same
+    # pseudonym for each entity so that a user will have the same pseudonymized
+    # ID for each entity referencing them.
+    entity_category = models.NAMES.app_feedback_report
+    if (
+            entity_category not in
+            pending_deletion_request.pseudonymizable_entity_mappings):
+        pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            entity_category] = (
+                _generate_entities_to_same_pseudonymized_id_mapping(
+                    report_ids, pseudonymized_id))
+        save_pending_deletion_requests([pending_deletion_request])
 
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(feedback_report_models):
@@ -1043,25 +1078,21 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
                 user ID in the 'scrubbed_by' field that we want to pseudonymize.
         """
         for report_model in feedback_report_models:
-            if report_model.scrubbed_by == user_id:
-                report_model.scrubbed_by = (
-                    report_ids_to_pids[report_model.id]
-                )
-        app_feedback_report_model_class.update_timestamps_multi(
-            feedback_report_models)
-        app_feedback_report_model_class.put_multi(feedback_report_models)
+            report_model.scrubbed_by = (
+                report_ids_to_pids[report_model.id])
+        model_class.update_timestamps_multi(feedback_report_models)
+        model_class.put_multi(feedback_report_models)
 
     report_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
             models.NAMES.app_feedback_report])
+    
     for i in python_utils.RANGE(
-            0,
-            len(feedback_report_models),
+            0, len(feedback_report_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         _pseudonymize_models_transactional(
             feedback_report_models[
-                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
-        )
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
 
 
 def _pseudonymize_feedback_models(pending_deletion_request):

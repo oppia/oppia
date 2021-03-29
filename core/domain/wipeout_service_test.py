@@ -612,6 +612,9 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     REPORT_ID_2 = '%s.%s.%s' % (
         PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
         'randomInteger321')
+    REPORT_ID_3 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'differentInt')
     TICKET_ID = '%s.%s.%s' % (
         'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
     REPORT_TYPE_SUGGESTION = 'suggestion'
@@ -645,6 +648,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+
         app_feedback_report_models.AppFeedbackReportModel(
             id=self.REPORT_ID_1,
             platform=self.PLATFORM_ANDROID,
@@ -687,7 +691,29 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_3,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
 
     def test_user_is_pseudonymized_from_report(self):
@@ -695,18 +721,68 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         report_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
-                self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.app_feedback_report]
-        )
+                self.user_1_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
 
         # Verify user is pseudonymized.
         report_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.REPORT_ID_1)
-        )
+                self.REPORT_ID_1))
         self.assertEqual(
-            report_model.scrubbed_by, report_mappings[self.REPORT_ID_1]
-        )
+            report_model.scrubbed_by, report_mappings[self.REPORT_ID_1])
+
+    def test_same_pseudonym_used_for_same_user(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+        report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
+
+        # Verify pseudonym is the same for all report instances.
+        report_model_2 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_2))
+        report_model_3 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_3))
+        self.assertEqual(
+            report_model_2.scrubbed_by, report_mappings[self.REPORT_ID_2])
+        self.assertEqual(
+            report_model_3.scrubbed_by, report_mappings[self.REPORT_ID_3])
+
+        self.assertEqual(
+            report_model_2.scrubbed_by, report_model_3.scrubbed_by)
+
+    def test_different_users_have_different_pseudonyms(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+        user_1_report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
+        user_2_report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
+
+        # Verify pseudonyms are different for different users.
+        report_model_1 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_1))
+        report_model_2 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_2))
+        self.assertEqual(
+            report_model_1.scrubbed_by,
+            user_1_report_mappings[self.REPORT_ID_1])
+        self.assertEqual(
+            report_model_2.scrubbed_by,
+            user_2_report_mappings[self.REPORT_ID_2])
+        self.assertNotEqual(
+            report_model_1.scrubbed_by, report_model_2.scrubbed_by)
 
 
 class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
