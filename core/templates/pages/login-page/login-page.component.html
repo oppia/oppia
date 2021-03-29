@@ -35,7 +35,7 @@
 
       <mat-card-actions align="end">
         <button color="primary" type="submit" class="protractor-test-sign-in-button"
-                mat-raised-button [disabled]="">
+                mat-raised-button [disabled]="email.invalid || email.value === ''">
           Sign In
         </button>
       </mat-card-actions>
@@ -68,26 +68,14 @@
   .login-page .mat-form-field.mat-warn .mat-input-element {
     caret-color: #f44336;
   }
-  .login-page .mat-form-field.mat-focused .mat-form-field-ripple.mat-warn,
-  .login-page .mat-form-field.mat-form-field-invalid .mat-form-field-ripple,
-  .login-page .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
+  .login-page .mat-form-field.mat-focused .mat-form-field-ripple.mat-warn {
     background-color: #f44336;
   }
-  .login-page .mat-warn .mat-option.mat-selected:not(.mat-option-disabled),
-  .login-page .mat-button.mat-warn,
-  .login-page .mat-icon-button.mat-warn,
-  .login-page .mat-stroked-button.mat-warn,
+  .login-page .mat-form-field .mat-select.mat-select-invalid .mat-select-arrow,
   .login-page .mat-form-field.mat-focused .mat-form-field-label.mat-warn,
-  .login-page .mat-form-field-type-mat-native-select.mat-focused:not(.mat-form-field-invalid).mat-warn .mat-form-field-infix::after,
-  .login-page .mat-form-field.mat-form-field-invalid .mat-form-field-label,
-  .login-page .mat-form-field.mat-form-field-invalid .mat-form-field-label.mat-accent,
-  .login-page .mat-form-field.mat-form-field-invalid .mat-form-field-label .mat-form-field-required-marker,
-  .login-page .mat-error,
-  .login-page .mat-form-field-appearance-outline.mat-focused.mat-warn .mat-form-field-outline-thick,
-  .login-page .mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid .mat-form-field-outline-thick,
-  .login-page .mat-form-field-type-mat-native-select.mat-form-field-invalid .mat-form-field-infix::after,
   .login-page .mat-form-field.mat-focused.mat-warn .mat-select-arrow,
-  .login-page .mat-form-field .mat-select.mat-select-invalid .mat-select-arrow {
+  .login-page .mat-form-field-appearance-outline.mat-focused.mat-warn .mat-form-field-outline-thick,
+  .login-page .mat-form-field-type-mat-native-select.mat-focused:not(.mat-form-field-invalid).mat-warn .mat-form-field-infix::after {
     color: #f44336;
   }
 </style>
