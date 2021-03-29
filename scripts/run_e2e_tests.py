@@ -596,7 +596,8 @@ def main(args=None):
         output, return_code = run_tests(parsed_args)
         # Don't rerun passing tests.
         if return_code == 0:
-            flake_checker.report_pass(parsed_args.suite)
+            if flake_checker.check_if_on_ci():
+                flake_checker.report_pass(parsed_args.suite)
             break
         # Don't rerun off of CI.
         if not flake_checker.check_if_on_ci():
