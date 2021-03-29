@@ -31,7 +31,7 @@ import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 
-interface GroupedSkillSummaries {
+export interface GroupedSkillSummaries {
   current: {
     id: string,
     description: string,

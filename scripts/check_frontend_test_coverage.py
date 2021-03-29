@@ -289,7 +289,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-questions-tab.directive.ts',
     'skill-rubrics-editor.directive.ts',
     'skill-selector-editor.directive.ts',
-    'skill-selector.directive.ts',
+    'skill-selector.component.ts',
     'SkillObjectFactory.ts',
     'skills-list.directive.ts',
     'skills-mastery-list.directive.ts',
