@@ -433,6 +433,12 @@ def _verify_pip_is_installed():
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e)
+    else:
+        if pip.__version__ != '20.3.4':
+            raise ImportError(
+                'Oppia requires pip==20.3.4, but you are using %s. Please '
+                'update your verison by running pip install pip==20.3.1 (yes, '
+                'using pip to do this is OK).' % pip.__version__)
 
 
 def _run_pip_command(cmd_parts):
