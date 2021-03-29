@@ -2120,7 +2120,7 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
     msgs = {
         'C0034': (
             'Please remove the blank line(s) below the function definition.',
-            'remove-blank-lines-below-function-definiton.',
+            'no-blank-lines-below-function-definiton.',
             'Disallow blank lines below function definition.'
         ),
     }
@@ -2130,23 +2130,21 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
         below function definition.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node for a function or method
-                definition in the AST.
+            node: astroid.scoped_nodes.FunctionDef. Node for a function or 
+            method definition in the AST.
         """
-        c = 0
-        for i in python_utils.RANGE(len(node.root().file)):
-            c += 1
         line_number = node.fromlineno
-        for i in python_utils.RANGE(c):
+
+        for i in python_utils.RANGE(999):
             line = linecache.getline(node.root().file, line_number + i).strip()
-            if re.search(r':', line):
+            if ':' in line:
                 line_number += i
                 break
         line_after_function_def = linecache.getline(
             node.root().file, line_number + 1).strip()
-        if len(line_after_function_def.strip()) == 0:
+        if len(line_after_function_def) == 0:
             self.add_message(
-                'remove-blank-lines-below-function-definiton.', node=node)
+                'no-blank-lines-below-function-definiton.', node=node)
 
 
 def register(linter):

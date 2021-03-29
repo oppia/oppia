@@ -3307,7 +3307,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             node_empty_line_below_function_def)
 
         message = testutils.Message(
-            msg_id='remove-blank-lines-below-function-definiton.',
+            msg_id='no-blank-lines-below-function-definiton.',
             node=node_empty_line_below_function_def)
 
         with self.checker_test_object.assertAddsMessages(message):
@@ -3361,7 +3361,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             node_empty_line_below_function_def)
 
         message = testutils.Message(
-            msg_id='remove-blank-lines-below-function-definiton.',
+            msg_id='no-blank-lines-below-function-definiton.',
             node=node_empty_line_below_function_def)
 
         with self.checker_test_object.assertAddsMessages(message):
@@ -3415,7 +3415,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             node_empty_line_below_function_def)
 
         message = testutils.Message(
-            msg_id='remove-blank-lines-below-function-definiton.',
+            msg_id='no-blank-lines-below-function-definiton.',
             node=node_empty_line_below_function_def)
 
         with self.checker_test_object.assertAddsMessages(message):
