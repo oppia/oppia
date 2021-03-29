@@ -1,7 +1,7 @@
 runtime: python27
 api_version: 1
 threadsafe: false
-instance_class: F4_1G
+instance_class: F2
 # The "version" line is added here so that MR jobs can run locally (see issue
 # #6534 on oppia/oppia).
 version: default
