@@ -611,10 +611,6 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
-# User id for scrubber bot. This bot is used to represent the cron job that
-# scrubs expired app feedback reports.
-REPORT_SCRUBBER_BOT_ID = 'ReportScrubberBot'
-
 # User id and username for suggestion bot. This bot will be used to accept
 # suggestions automatically after a threshold time.
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
