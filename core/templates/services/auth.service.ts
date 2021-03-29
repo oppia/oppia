@@ -176,12 +176,8 @@ export class AuthService {
   }
 
   async signOutAsync(): Promise<void> {
-    // The latter calls to Oppia, the former calls to Firebase. There's no risk
-    // in running these simultaneously, we only care that they both complete.
-    await Promise.all([
-      this.authServiceImpl.signOutAsync(),
-      this.authBackendApiService.endSessionAsync(),
-    ]);
+    await this.authServiceImpl.signOutAsync();
+    await this.authBackendApiService.endSessionAsync();
   }
 }
 

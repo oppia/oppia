@@ -64,18 +64,15 @@
   .login-page .mat-form-field {
     width: 100%;
   }
-  .login-page .mat-form-field-invalid .mat-input-element,
-  .login-page .mat-form-field.mat-warn .mat-input-element {
+  .login-page /deep/ .mat-form-field-invalid .mat-input-element {
     caret-color: #f44336;
   }
-  .login-page .mat-form-field.mat-focused .mat-form-field-ripple.mat-warn {
-    background-color: #f44336;
-  }
-  .login-page .mat-form-field .mat-select.mat-select-invalid .mat-select-arrow,
-  .login-page .mat-form-field.mat-focused .mat-form-field-label.mat-warn,
-  .login-page .mat-form-field.mat-focused.mat-warn .mat-select-arrow,
-  .login-page .mat-form-field-appearance-outline.mat-focused.mat-warn .mat-form-field-outline-thick,
-  .login-page .mat-form-field-type-mat-native-select.mat-focused:not(.mat-form-field-invalid).mat-warn .mat-form-field-infix::after {
+  .login-page /deep/ .mat-error,
+  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-label {
     color: #f44336;
+  }
+  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple,
+  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
+    background-color: #f44336;
   }
 </style>
