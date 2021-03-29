@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the logout page.
  */
 
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 
 import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
 import { AlertsService } from 'services/alerts.service';
@@ -103,7 +103,7 @@ describe('Logout Page', function() {
     component = fixture.componentInstance;
   });
 
-  it('should call to signOutAsync and then redirect', fakeAsync(async() => {
+  it('should call to signOutAsync and then redirect', fakeAsync(() => {
     const signOutPromise = spyOnSignOutAsync();
 
     expect(windowRef.location).toBeNull();
@@ -117,6 +117,15 @@ describe('Logout Page', function() {
     flushMicrotasks();
 
     expect(windowRef.location).toEqual('/');
+  }));
+
+  it('should redirect to specified url', fakeAsync(() => {
+    windowRef.searchParams = '?redirect_url=/test';
+
+    component.ngOnInit();
+    flush();
+
+    expect(windowRef.location).toEqual('/test');
   }));
 
   it('should add warning on error and redirect anyway', fakeAsync(() => {
@@ -137,8 +146,18 @@ describe('Logout Page', function() {
     // We should still be on the same page for an opportunity to read the error.
     expect(windowRef.location).toBeNull();
 
-    tick(2000);
+    tick(3000);
 
     expect(windowRef.location).toEqual('/');
+  }));
+
+  it('should redirect to specified url after error', fakeAsync(() => {
+    windowRef.searchParams = '?redirect_url=/test';
+    authService.signOutAsync.and.rejectWith(new Error('uh-oh!'));
+
+    component.ngOnInit();
+    flush();
+
+    expect(windowRef.location).toEqual('/test');
   }));
 });

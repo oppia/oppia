@@ -41,13 +41,16 @@ export class LogoutPageComponent implements OnInit {
   }
 
   private redirect(): void {
-    this.windowRef.nativeWindow.location.assign('/');
+    const searchParams = (
+      new URLSearchParams(this.windowRef.nativeWindow.location.search));
+    const redirectUrl = searchParams.get('redirect_url') ?? '/';
+    this.windowRef.nativeWindow.location.assign(redirectUrl);
   }
 
   private onSignOutError(error: firebase.auth.Error): void {
     this.loaderService.hideLoadingScreen();
     this.alertsService.addWarning(error.message);
-    setTimeout(() => this.redirect(), 2000);
+    setTimeout(() => this.redirect(), 3000);
   }
 }
 
