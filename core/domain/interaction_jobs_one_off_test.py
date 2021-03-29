@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
+
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_jobs_one_off
@@ -855,7 +857,10 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
         output = self._run_one_off_job()
-        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], output)
+        self.assertEqual(
+            [['LONGER THAN 30', 
+            [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], 
+            output)
 
         state3.update_interaction_id('ItemSelectionInput')
         state3.update_interaction_customization_args(customization_args_dict1)
@@ -879,7 +884,10 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Item Selection Input.
         output = self._run_one_off_job()
-        self.assertEqual([['LONGER THAN 30', [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], output)
+        self.assertEqual(
+            [['LONGER THAN 30', 
+            [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], 
+            output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations
