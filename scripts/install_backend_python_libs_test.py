@@ -172,10 +172,21 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_wrong_pip_version_raises_import_error(self):
         import pip
-        with self.swap(pip, '__version__', '20.2.4'):
-            self.assertRaisesRegexp(
-                ImportError, 'pip==20.3.4 is not installed',
-                install_backend_python_libs.verify_pip_is_installed)
+
+        with self.swap_Popen, self.swap(pip, '__version__', '20.2.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [
+            ['pip', 'install', 'pip==20.3.4'],
+        ])
+
+    def test_correct_pip_version_does_nothing(self):
+        import pip
+
+        with self.swap_check_call, self.swap(pip, '__version__', '20.3.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [])
 
     def test_invalid_git_dependency_raises_an_exception(self):
         swap_requirements = self.swap(
