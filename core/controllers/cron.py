@@ -273,7 +273,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
             )
 
 
-class CronScrubAppFeedbackReportsHandlerHandler(base.BaseHandler):
+class CronScrubAppFeedbackReportsHandler(base.BaseHandler):
     """Handler for scrubbing app feedback reports that are expiring."""
 
     @acl_decorators.can_perform_cron_tasks
