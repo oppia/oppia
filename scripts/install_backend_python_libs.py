@@ -436,14 +436,12 @@ def verify_pip_is_installed():
     else:
         if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
             common.print_each_string_after_two_new_lines([
-                'Oppia requires pip==%s, but you have pip==%s installed. '
-                'Please upgrade pip by running:' % (
+                'Oppia requires pip==%s, but you have pip==%s installed.' % (
                     OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
-                '    pip install pip==%s' % OPPIA_REQUIRED_PIP_VERSION,
-                'NOTE: This is not a typo, pip is able to upgrade itself.'
+                'Upgrading pip on your behalf...',
             ])
-            raise ImportError(
-                'pip==%s is not installed' % OPPIA_REQUIRED_PIP_VERSION)
+            _run_pip_command(
+                ['install', 'pip==%s' % OPPIA_REQUIRED_PIP_VERSION])
 
 
 def _run_pip_command(cmd_parts):
@@ -456,7 +454,6 @@ def _run_pip_command(cmd_parts):
     Raises:
         Exception. Error installing package.
     """
-    verify_pip_is_installed()
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
@@ -495,6 +492,7 @@ def pip_install_to_system(package, version):
         package: str. The package name.
         version: str. The package version.
     """
+    verify_pip_is_installed()
     _run_pip_command(
         ['install', _get_pip_versioned_package_string(package, version)])
 
@@ -509,6 +507,8 @@ def pip_install(
         upgrade: bool. Whether to call pip with the --upgrade flag.
         no_dependencies: bool. Whether call the pip with --no-dependencies flag.
     """
+    verify_pip_is_installed()
+
     additional_pip_args = []
     if upgrade:
         additional_pip_args.append('--upgrade')
@@ -527,6 +527,7 @@ def _pip_install_requirements(install_path, requirements_path):
         install_path: str. The installation path for the packages.
         requirements_path: str. The path to the requirements file.
     """
+    verify_pip_is_installed()
     _run_pip_command([
         'install', '--target', install_path, '--no-dependencies',
         '-r', requirements_path, '--upgrade'
