@@ -437,7 +437,7 @@ export class StatsReportingService {
   }
 
   recordAnswerSubmitAction(
-      stateName:string, destStateName: string,
+      stateName: string, destStateName: string,
       interactionId: string, answer: string, feedback: string): void {
     this.playthroughService.recordAnswerSubmitAction(
       stateName, destStateName, interactionId, answer, feedback,

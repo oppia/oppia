@@ -208,7 +208,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.values['is_moderator'] = (
             user_services.is_at_least_moderator(self.user_id))
