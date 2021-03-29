@@ -309,8 +309,6 @@ describe('Login Page', () => {
       flushMicrotasks();
 
       expect(windowRef.location).toEqual('/signup?return_url=/admin');
-
-      flush();
     }));
   });
 });
