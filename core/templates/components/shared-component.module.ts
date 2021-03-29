@@ -88,6 +88,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CommonModule,
     BrowserModule,
     DynamicContentModule,
+    MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
