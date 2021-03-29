@@ -92,7 +92,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
                 audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
                 android_report_info=self.ANDROID_REPORT_INFO,
-            web_report_info=None))
+                web_report_info=None))
 
         self.job_class = (
             prod_validation_jobs.AppFeedbackReportModelAuditOneOffJob)
@@ -144,7 +144,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             'AppFeedbackReportModel\', '
             '[u\'Entity id invalid_entity_id: Entity id does not match regex '
             'pattern\']]'), (
-                u'[u\'fully-validated AppFeedbackReportModel\', 1]' )]
+                u'[u\'fully-validated AppFeedbackReportModel\', 1]')]
 
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -220,7 +220,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'suggestion': 1, 'issue': 1, 'crash': 1}},
         'daily_total_report_submitted': 3}
     STATS_ID = '%s:%s:%s' % (
-            PLATFORM_ANDROID, TICKET_ID, STATS_DATE_TIMESTAMP.isoformat())
+        PLATFORM_ANDROID, TICKET_ID, STATS_DATE_TIMESTAMP.isoformat())
 
     def setUp(self):
         super(AppFeedbackReportStatsModelValidatorTests, self).setUp()
@@ -265,27 +265,3 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
-    # def test_model_with_invalid_schema(self):
-    #     model_instance = app_feedback_report_models.AppFeedbackReportStatsModel(
-    #         id=self.STATS_ID,
-    #         ticket_id=self.TICKET_ID,
-    #         platform=self.PLATFORM_ANDROID,
-    #         stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-    #         daily_ticket_stats=self.DAILY_STATS,
-    #         daily_ticket_stats_schema_version=(
-    #             feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION + 1)
-    #     ).put()
-
-    #     expected_output = [(
-    #         u'[u\'failed validation check for schema version check of '
-    #         'AppFeedbackReportStatsModel\', '
-    #         '[u\'Entity id %s: schema version %s is greater than current '
-    #         'version %s\']]') % (
-    #             model_instance.id, model_instance.daily_ticket_stats_schema_version,
-    #             feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION), (
-    #             u'[u\'fully-validated AppFeedbackReportStatsModel\', 1]')]
-
-    #     self.run_job_and_check_output(
-    #         expected_output, sort=True, literal_eval=False)
-

@@ -46,8 +46,9 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing domain layer.
-        return None
+        # TODO(Oppia-Android#3016): Create domain object when implementing
+        # domain layer.
+        return item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -78,13 +79,12 @@ class AppFeedbackReportTicketModelValidator(
     def _get_model_domain_object_instance(cls, item):
         # TODO(Oppia-Android#3016): Create domain object when implementing
         # domain layer.
-        return None
+        return item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         stats_model_class = (
             app_feedback_report_models.AppFeedbackReportStatsModel)
-        stats_models = stats_model_class.get_stats_for_ticket(item.id)
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'report_ids',
@@ -108,8 +108,9 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing domain layer.
-        return None
+        # TODO(Oppia-Android#3016): Create domain object when implementing
+        # domain layer.
+        return item
 
     @classmethod
     def _get_external_id_relationships(cls, item):

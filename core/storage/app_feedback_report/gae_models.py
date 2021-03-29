@@ -236,61 +236,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'The id generator for AppFeedbackReportModel is producing too '
             'many collisions.')
 
-    @classmethod
-    def scrub_report(cls, report_id, scrubbed_by):
-        """Scrubs the instance of AppFeedbackReportModel with given ID, removing
-        any user-entered input in the entity.
-
-        Args:
-            report_id: str. The id of the model entity to scrub.
-            scrubbed_by: str. The id of the user or cron job that is intiating
-                scrubbing this report.
-        """
-        cls._scrub_report_in_transaction(report_id, scrubbed_by)
-
-    @classmethod
-    @transaction_services.run_in_transaction_wrapper
-    def _scrub_report_in_transaction(cls, report_id, scrubbed_by):
-        """See scrub_report for general documentaion of what this method does.
-        It's only safe to call this method from within a transaction.
-
-        Args:
-            report_id: str. The id of the model entity to scrub.
-            scrubbed_by: str. The id of the user or cron job that is intiating
-                scrubbing this report.
-        """
-        report_entity = cls.get_by_id(report_id)
-        if not report_entity:
-            raise Exception(
-                'The AppFeedbackReportModel trying to be scrubbed does not '
-                'exist.')
-        if report_entity.platform == PLATFORM_CHOICE_ANDROID:
-            scrubbed_report_info = cls._scrub_report_info(
-                report_entity.android_report_info)
-            report_entity.android_report_info = scrubbed_report_info
-        else:
-            scrubbed_report_info = cls._scrub_report_info(
-                report_entity.web_report_info)
-            report_entity.web_report_info = scrubbed_report_info
-        report_entity.scrubbed_by = scrubbed_by
-        report_entity.update_timestamps()
-        report_entity.put()
-
-    @staticmethod
-    def _scrub_report_info(report_info_dict):
-        """Scrubs the dictionary of any fields that contains input directly from
-        the user.
-
-        Args: report_info_dict: dict. The info dict collected in a report.
-
-        Returns: dict. The scrubbed report.
-        """
-        new_report_info = dict()
-        for key in report_info_dict:
-            if not REPORT_INFO_TO_REDACT.__contains__(key):
-                new_report_info[key] = report_info_dict[key]
-        return new_report_info
-
     @staticmethod
     def get_deletion_policy():
         """Model stores the user ID of who has scrubbed this report for auditing
@@ -530,7 +475,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # The unique ticket ID that this entity is aggregating for.
     ticket_id = datastore_services.StringProperty(required=True, indexed=True)
     # The platform that these statistics are for.
-    platform = datastore_services.TextProperty(
+    platform = datastore_services.StringProperty(
         required=True, indexed=True, choices=PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model.
@@ -570,8 +515,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         Args:
             ticket_id: str. The ID for the ticket these stats aggregate on.
             platform: str. The platform the stats are aggregating for.
-            stats_tracking_date: datetime.date. The date in UTC that this entity is
-                tracking stats for.
+            stats_tracking_date: datetime.date. The date in UTC that this entity
+                is tracking stats for.
             daily_ticket_stats: dict. The daily stats for this entity, keyed
                 by the parameter witch each value mapping a parameter value to
                 the number of reports that satisfy that parameter value.

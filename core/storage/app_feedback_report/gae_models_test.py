@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import types
 
+from core.domain import app_feedback_report_services as report_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -171,63 +172,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                     self.AUDIO_LANGUAGE_CODE_ENGLISH, self.ANDROID_REPORT_INFO,
                     None)
 
-    def test_scrub_android_report(self):
-        report_id = '%s.%s.%s' % (
-            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
-            'randomInteger123')
-        expected_report_dict = {
-            'package_version_code': 1,
-            'language_locale_code': 'en',
-            'entry_point_info': {
-                'entry_point_name': 'crash',
-            },
-            'text_size': 'MEDIUM_TEXT_SIZE',
-            'download_and_update_only_on_wifi': True,
-            'automatically_update_topics': False,
-            'is_admin': False
-        }
-
-        app_feedback_report_models.AppFeedbackReportModel.scrub_report(
-            report_id, 'scrubber_user')
-        scrubbed_report_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get(report_id))
-        self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
-        self.assertEqual(
-            scrubbed_report_model.android_report_info, expected_report_dict)
-
-    def test_scrub_web_report(self):
-        report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.create(
-                self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2,
-                self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-                self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-                self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-                self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
-                self.TEXT_LANGUAGE_CODE_ENGLISH,
-                self.AUDIO_LANGUAGE_CODE_ENGLISH, None, self.WEB_REPORT_INFO))
-
-        app_feedback_report_models.AppFeedbackReportModel.scrub_report(
-            report_id, 'scrubber_user')
-        scrubbed_report_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get(report_id))
-        expected_report_dict = {}
-
-        self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
-        self.assertEqual(
-            scrubbed_report_model.web_report_info, expected_report_dict)
-
-    def test_scrubbing_nonexistent_report_raise_exception(self):
-        fake_report_id = '%s.%s.%s' % (
-            self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
-            'randomInteger123')
-        # Test Exception for SentEmailModel.
-        with self.assertRaisesRegexp(
-            Exception,
-            'The AppFeedbackReportModel trying to be scrubbed does not '
-            'exist.'):
-            app_feedback_report_models.AppFeedbackReportModel.scrub_report(
-                fake_report_id, 'scrubber_user')
-
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(
@@ -281,7 +225,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         report_id = '%s.%s.%s' % (
             self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
             'randomInteger123')
-        model_class.scrub_report(
+        report_services.scrub_report(
             report_id, 'scrubber_user')
         self.assertTrue(model_class.has_reference_to_user_id('scrubber_user'))
         self.assertFalse(model_class.has_reference_to_user_id('id_x'))
