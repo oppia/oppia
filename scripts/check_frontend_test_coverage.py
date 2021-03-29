@@ -390,7 +390,7 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
                 'It\'s not possible to diff the test coverage correctly.')
         _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
-        self.file_path = match.group(1) 
+        self.file_path = match.group(1)
 
         match = re.search(r'LF:(\d+)\n', stanza)
         if match is None:

@@ -261,7 +261,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'SF:/opensource/oppia/anotherfile.ts\n'
             'LF:10\n'
             'LH:9\n'
-            'end_of_record\n',
+            'end_of_record\n'
             'SF:node_modules/oppia/thirdfile.ts\n'
             'LF:10\n'
             'LH:9\n'
