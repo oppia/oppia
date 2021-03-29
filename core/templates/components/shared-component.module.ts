@@ -67,6 +67,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -107,6 +108,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
+    LoadingMessageComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
@@ -129,7 +131,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    LazyLoadingComponent, LoadingDotsComponent, LoadingMessageComponent,
+    SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     TakeBreakModalComponent,
@@ -156,6 +159,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
+    LoadingMessageComponent,
     SharingLinksComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
