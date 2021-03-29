@@ -45,8 +45,9 @@ def _scrub_report_in_transaction(report_id, scrubbed_by):
 
     Args:
         report_id: str. The id of the model entity to scrub.
-        scrubbed_by: str. The id of the user or cron job that is intiating
-            scrubbing this report.
+        scrubbed_by: str. The id of the user that is initiating scrubbing of
+            this report, or a const feconf.REPORT_SCRUBBER_BOT_ID if scrubbed
+            by the cron job.
     """
     report_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
         report_id)

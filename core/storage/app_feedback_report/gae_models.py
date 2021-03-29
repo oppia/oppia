@@ -33,8 +33,8 @@ PLATFORM_CHOICE_ANDROID = 'android'
 PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 
-REPORT_INFO_TO_REDACT = [
-    'user_feedback_other_text_input', 'event_logs', 'logcat_logs']
+REPORT_INFO_TO_REDACT = (
+    'user_feedback_other_text_input', 'event_logs', 'logcat_logs')
 
 
 class AppFeedbackReportModel(base_models.BaseModel):
@@ -64,13 +64,13 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # the report was locally cached for a long time on an Android device.
     submitted_on = datastore_services.DateTimeProperty(
         required=True, indexed=True)
-    # The type of feedback for this report; choices are not specified as
-    # iterations of the report structure may introduce new types and we cannot
-    # rely on the backend updates to fully sync with the frontend report
+    # The type of feedback for this report; this can be an arbitrary string
+    # since iterations of the report structure may introduce new types and we
+    # cannot rely on the backend updates to fully sync with the frontend report
     # updates.
     report_type = datastore_services.StringProperty(required=True, indexed=True)
     # The category that this feedback is for.
-    category = datastore_services.TextProperty(required=True, indexed=False)
+    category = datastore_services.StringProperty(required=True, indexed=True)
     # The version of the app; on Android this is the package version name (e.g.
     # 1.0-release-arm...) and on web this is the release version (e.g. 3.0.8).
     platform_version = datastore_services.StringProperty(
@@ -97,12 +97,11 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=True)
 
     # The text language on Oppia set by the user in its ISO-639 language code;
-    # this is set by the user in Oppia's app preferences. Current languages on
-    # Android can be: EN, FR, HI, or ZH.
+    # this is set by the user in Oppia's app preferences.
     text_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
     # The audio language ISO-639 code on Oppia set by the user as declared in
-    # the app. Current supported languages: English, Hindi, and Hinglish.
+    # the app.
     audio_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
 
@@ -112,20 +111,14 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # The Android SDK version on the user's device.
     android_sdk_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
-    # The rest of the report info collected on Android. Using the JSON here
-    # allows us to iterate on the report structure without requiring backend
-    # updates each time the frontend structure is changed, allowing for better
-    # backwards compatibility with Android report structures, as well as
-    # greater specificity between web and Android feedback.
+    # The rest of the report info collected on Android.
     android_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info.
     android_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
 
-    # The rest of the web report info collected. Using a JSON here allows us to
-    # iterate on the report structure allows for better backwards
-    # compatibility and specificity between web and Android feedback.
+    # The rest of the web report info collected.
     web_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info.
@@ -357,13 +350,12 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     """
 
     # A name for the ticket given by the maintainer, limited to 100 characters.
-    # Tickets with the same ID must have the same name.
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
     # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
         default=None, indexed=True)
     # Whether this ticket has been archived.
-    ticket_is_archived = datastore_services.BooleanProperty(
+    archived = datastore_services.BooleanProperty(
         required=True, indexed=False)
     # The datetime in UTC that the newest report in this ticket was created on,
     # to help with sorting tickets.
@@ -395,7 +387,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
             id=ticket_id, ticket_name=ticket_name,
-            github_issue_number=github_issue_number, ticket_is_archived=False,
+            github_issue_number=github_issue_number, archived=False,
             newest_report_timestamp=newest_report_timestamp,
             report_ids=report_ids)
         ticket_entity.update_timestamps()
@@ -444,7 +436,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'github_issue_number': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'ticket_is_archived': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'archived': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'newest_report_timestamp': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'report_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
