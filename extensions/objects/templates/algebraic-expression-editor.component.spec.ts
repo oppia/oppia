@@ -74,6 +74,8 @@ describe('AlgebraicExpressionEditor', () => {
   }));
   beforeEach(() => {
     windowRef = TestBed.inject(WindowRef);
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    guppyInitializationService = TestBed.inject(GuppyInitializationService);
     fixture = TestBed.createComponent(
       AlgebraicExpressionEditor);
     component = fixture.componentInstance;

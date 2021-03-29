@@ -65,8 +65,7 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { ObjectComponentsModule } from 'interactions/../objects/object-components.module';
-
+import { ObjectComponentsModule } from 'objects/object-components.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
