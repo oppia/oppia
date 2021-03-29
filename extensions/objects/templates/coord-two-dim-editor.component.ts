@@ -43,7 +43,7 @@ export class CoordTwoDimEditorComponent implements OnInit {
   mapCenter = latLng(0, 0);
   mapMarkers;
   optionsSpec = {
-    layers: [{ url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: 'Open Street Map' }],
+    layers: [{ url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }],
     zoom: 0
   };
   options;
