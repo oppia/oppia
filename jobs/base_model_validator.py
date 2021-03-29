@@ -230,7 +230,6 @@ class BaseSnapshotMetadataModelValidator(BaseModelValidator):
             | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
         )
 
-        # validating as per BaseModelValidator
         base_model_validator_errors = not_deleted | BaseModelValidator()
 
         commit_type_validation_errors = (
