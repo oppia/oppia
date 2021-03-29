@@ -40,8 +40,8 @@ class ScrubReportsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        earliest_date = datetime.date.utcnow() - datetime.timedelta(days=90)
-        if item.creation_datetime.date() < earliest_date:
+        earliest_date = datetime.date.today() - datetime.timedelta(days=90)
+        if item.created_on.date() < earliest_date:
             app_feedback_report_models.AppFeedbackReportModel.scrub_report(
                 item.id, feconf.REPORT_SCRUBBER_BOT_ID)
 
