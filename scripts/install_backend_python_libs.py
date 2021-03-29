@@ -435,15 +435,15 @@ def verify_pip_is_installed():
         raise ImportError('Error importing pip: %s' % e)
     else:
         if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
-            raise ImportError(
+            common.print_each_string_after_two_new_lines([
                 'Oppia requires pip==%s, but you have pip==%s installed. '
-                'Please upgrade pip by running:\n'
-                '\n'
-                '    pip install pip==%s\n'
-                '\n'
-                'NOTE: This is not a typo, pip is able to upgrade itself.' % (
-                    OPPIA_REQUIRED_PIP_VERSION, pip.__version__,
-                    OPPIA_REQUIRED_PIP_VERSION))
+                'Please upgrade pip by running:' % (
+                    OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
+                '    pip install pip==%s' % OPPIA_REQUIRED_PIP_VERSION,
+                'NOTE: This is not a typo, pip is able to upgrade itself.'
+            ])
+            raise ImportError(
+                'pip==%s is not installed' % OPPIA_REQUIRED_PIP_VERSION)
 
 
 def _run_pip_command(cmd_parts):
