@@ -100,6 +100,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         returnDict.auto_tts_enabled,
         returnDict.preferred_language_codes,
         arePretestsAvailable ? function() {} : callback);
+      $rootScope.$applyAsync();
     };
 
     var initializePretestServices = function(pretestQuestionDicts, callback) {
@@ -147,6 +148,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         ExplorationFeaturesService.init(explorationData, featuresData);
         ExplorationEngineService.init(
           explorationData, null, null, null, null, callback);
+        $rootScope.$applyAsync();
         PlayerCorrectnessFeedbackEnabledService.init(
           explorationData.correctness_feedback_enabled);
         NumberAttemptsService.reset();
@@ -243,6 +245,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           setExplorationMode();
         }
         ExplorationEngineService.moveToExploration(callback);
+        $rootScope.$applyAsync();
       },
       getLanguageCode: function() {
         return currentEngineService.getLanguageCode();

@@ -135,6 +135,7 @@ angular.module('oppia').component('previewTab', {
       ctrl.loadPreviewState = function(stateName, manualParamChanges) {
         ExplorationEngineService.initSettingsFromEditor(
           stateName, manualParamChanges);
+        $rootScope.$applyAsync();
         ctrl.isExplorationPopulated = true;
       };
 
@@ -152,6 +153,7 @@ angular.module('oppia').component('previewTab', {
               function() {
                 ctrl.loadPreviewState(initStateNameForPreview, []);
               });
+            $rootScope.$applyAsync();
             PlayerCorrectnessFeedbackEnabledService.init(
               returnDict.correctness_feedback_enabled);
             NumberAttemptsService.reset();
