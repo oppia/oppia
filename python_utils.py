@@ -111,6 +111,9 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
 
     Returns:
         _io.TextIOWrapper. The file object.
+
+    Raises:
+        IOError. The file cannot be opened.
     """
     # The try/except is needed here to unify the errors because io.open in
     # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
