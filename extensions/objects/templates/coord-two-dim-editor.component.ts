@@ -22,7 +22,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { icon, latLng, LeafletEvent, LeafletMouseEvent, marker, tileLayer } from 'leaflet';
 @Component({
   selector: 'coord-two-dim-editor',
-  templateUrl: './coord-two-dim-editor.directive.html',
+  templateUrl: './coord-two-dim-editor.component.html',
   styleUrls: []
 })
 export class CoordTwoDimEditorComponent implements OnInit {
