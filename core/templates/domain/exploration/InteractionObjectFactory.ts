@@ -389,7 +389,7 @@ return {
   convertFromCustomizationArgsBackendDict(
       interactionId: string,
       caBackendDict: InteractionCustomizationArgsBackendDict
-  ) : InteractionCustomizationArgs {
+  ): InteractionCustomizationArgs {
     if (interactionId === null) {
       return {};
     }

@@ -35,8 +35,9 @@ var gifshot = require('gifshot');
 angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
   'CsrfTokenService', 'ImageLocalStorageService', 'ImagePreloaderService',
-  'ImageUploadHelperService', 'SvgSanitizerService', 'UrlInterpolationService',
-  'ALLOWED_IMAGE_FORMATS', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  'ImageUploadHelperService', 'SvgSanitizerService',
+  'UrlInterpolationService', 'ALLOWED_IMAGE_FORMATS',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $sce, AlertsService, AssetsBackendApiService, ContextService,
       CsrfTokenService, ImageLocalStorageService, ImagePreloaderService,

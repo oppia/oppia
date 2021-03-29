@@ -45,7 +45,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
-
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
@@ -88,6 +88,7 @@ describe('Exploration editor page component', function() {
   var mockEnterEditorForTheFirstTime = null;
   var registerAcceptTutorialModalEventSpy;
   var registerDeclineTutorialModalEventSpy;
+  var focusManagerService = null;
 
   var refreshGraphEmitter = new EventEmitter();
 
@@ -206,7 +207,8 @@ describe('Exploration editor page component', function() {
         StateEditorService,
         StateTopAnswersStatsBackendApiService,
         UserExplorationPermissionsService,
-        UrlInterpolationService
+        UrlInterpolationService,
+        FocusManagerService
       ]
     });
   });
@@ -242,6 +244,7 @@ describe('Exploration editor page component', function() {
     stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataBackendApiService');
     ueps = $injector.get('UserExplorationPermissionsService');
+    focusManagerService = $injector.get('FocusManagerService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage');
@@ -399,6 +402,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should navigate between tabs', () => {
+      var focusSpy = spyOn(ctrl, 'setFocusOnActiveTab');
       spyOn(rs, 'navigateToMainTab').and.stub();
       ctrl.selectMainTab();
       expect(rs.navigateToMainTab).toHaveBeenCalled();
@@ -426,10 +430,24 @@ describe('Exploration editor page component', function() {
       spyOn(rs, 'navigateToHistoryTab').and.stub();
       ctrl.selectHistoryTab();
       expect(rs.navigateToHistoryTab).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalledWith('history');
 
       spyOn(rs, 'navigateToFeedbackTab').and.stub();
       ctrl.selectFeedbackTab();
       expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalledWith('feedback');
+    });
+
+    it('should set focus on active tab', () => {
+      var focusSpy = spyOn(focusManagerService, 'setFocus');
+      ctrl.setFocusOnActiveTab('history');
+      expect(focusSpy).toHaveBeenCalledWith('usernameInputField');
+      ctrl.activeThread = true;
+      ctrl.setFocusOnActiveTab('feedback');
+      expect(focusSpy).toHaveBeenCalledWith('tmpMessageText');
+      ctrl.activeThread = false;
+      ctrl.setFocusOnActiveTab('feedback');
+      expect(focusSpy).toHaveBeenCalledWith('newThreadButton');
     });
 
     it('should show the user help modal for editor tutorial', () => {

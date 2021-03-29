@@ -26,27 +26,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
-import functools
 import json
 import re
 import string
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import customization_args_util
-from core.domain import expression_parser
-from core.domain import html_validation_service
-from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-from extensions import domain
 import feconf
 import python_utils
-import schema_utils
 import utils
-
-from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -191,6 +182,13 @@ def clean_math_expression(math_expression):
     for invalid_trig_fn, valid_trig_fn in inverse_trig_fns_mapping.items():
         math_expression = math_expression.replace(
             invalid_trig_fn, valid_trig_fn)
+
+    # Replacing comma used in place of a decimal point with a decimal point.
+    if re.match(r'\d+,\d+', math_expression):
+        math_expression = math_expression.replace(',', '.')
+
+    # Replacing \cdot with *.
+    math_expression = re.sub(r'\\cdot', '*', math_expression)
 
     return math_expression
 
@@ -472,6 +470,24 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
         self.old_to_new_state_names = {
             value: key for key, value in new_to_old_state_names.items()
         }
+
+
+class VersionedExplorationInteractionIdsMapping(python_utils.OBJECT):
+    """Domain object representing the mapping of state names to interaction ids
+    in an exploration.
+    """
+
+    def __init__(self, version, state_interaction_ids_dict):
+        """Initialises an VersionedExplorationInteractionIdsMapping domain
+        object.
+
+        Args:
+            version: int. The version of the exploration.
+            state_interaction_ids_dict: dict. A dict where each key-value pair
+                represents, respectively, a state name and an interaction id.
+        """
+        self.version = version
+        self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
 class Exploration(python_utils.OBJECT):
@@ -1492,12 +1508,13 @@ class Exploration(python_utils.OBJECT):
         return content_count
 
     @classmethod
-    def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
-        """Converts old states schema to the modern v1 schema. v1 contains the
-        schema version 1 and does not contain any old constructs, such as
-        widgets. This is a complete migration of everything previous to the
-        schema versioning update to the earliest versioned schema.
-        Note that the states_dict being passed in is modified in-place.
+    def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
+        """Converts from version 41 to 42. Version 42 changes rule input types
+        for DragAndDropSortInput and ItemSelectionInput interactions to better
+        support translations. Specifically, the rule inputs will store content
+        ids of the html rather than the raw html. Solution answers for
+        DragAndDropSortInput and ItemSelectionInput interactions are also
+        updated.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -1507,280 +1524,222 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        # Ensure widgets are renamed to be interactions.
-        for _, state_defn in states_dict.items():
-            if 'widget' not in state_defn:
+
+        def migrate_rule_inputs_and_answers(new_type, value, choices):
+            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
+            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
+            and DragAndDropHtmlString to TranslatableHtmlContentId. These
+            migrations are necessary to have rules work easily for multiple
+            languages; instead of comparing html for equality, we compare
+            content_ids for equality.
+
+            Args:
+                new_type: str. The type to migrate to.
+                value: *. The value to migrate.
+                choices: list(dict). The list of subtitled html dicts to extract
+                    content ids from.
+
+            Returns:
+                *. The migrated rule input.
+            """
+
+            def extract_content_id_from_choices(html):
+                """Given a html, find its associated content id in choices,
+                which is a list of subtitled html dicts.
+
+                Args:
+                    html: str. The html to find the content id of.
+
+                Returns:
+                    str. The content id of html.
+                """
+                for subtitled_html_dict in choices:
+                    if subtitled_html_dict['html'] == html:
+                        return subtitled_html_dict['content_id']
+                # If there is no match, we discard the rule input. The frontend
+                # will handle invalid content ids similar to how it handled
+                # non-matching html.
+                return feconf.INVALID_CONTENT_ID
+
+            if new_type == 'TranslatableHtmlContentId':
+                return extract_content_id_from_choices(value)
+            elif new_type == 'SetOfTranslatableHtmlContentIds':
+                return [
+                    migrate_rule_inputs_and_answers(
+                        'TranslatableHtmlContentId', html, choices
+                    ) for html in value
+                ]
+            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
+                return [
+                    migrate_rule_inputs_and_answers(
+                        'SetOfTranslatableHtmlContentIds', html_set, choices
+                    ) for html_set in value
+                ]
+
+        for state_dict in states_dict.values():
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id not in [
+                    'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
-            state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
-            state_defn['interaction']['id'] = copy.deepcopy(
-                state_defn['interaction']['widget_id'])
-            del state_defn['interaction']['widget_id']
-            if 'sticky' in state_defn['interaction']:
-                del state_defn['interaction']['sticky']
-            del state_defn['widget']
-        return states_dict
 
-    @classmethod
-    def _convert_states_v1_dict_to_v2_dict(cls, states_dict):
-        """Converts from version 1 to 2. Version 1 assumes the existence of an
-        implicit 'END' state, but version 2 does not. As a result, the
-        conversion process involves introducing a proper ending state for all
-        explorations previously designed under this assumption.
-        Note that the states_dict being passed in is modified in-place.
+            solution = state_dict['interaction']['solution']
+            choices = state_dict['interaction']['customization_args'][
+                'choices']['value']
+            if interaction_id == 'ItemSelectionInput':
+                # The solution type will be migrated from SetOfHtmlString to
+                # SetOfTranslatableHtmlContentIds.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
+                            'SetOfTranslatableHtmlContentIds',
+                            solution['correct_answer'],
+                            choices)
+                    )
+            if interaction_id == 'DragAndDropSortInput':
+                # The solution type will be migrated from ListOfSetsOfHtmlString
+                # to ListOfSetsOfTranslatableHtmlContentIds.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
+                            'ListOfSetsOfTranslatableHtmlContentIds',
+                            solution['correct_answer'],
+                            choices)
+                    )
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+            for answer_group_dict in state_dict['interaction']['answer_groups']:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    rule_inputs = rule_spec_dict['inputs']
 
-        Returns:
-            dict. The converted states_dict.
-        """
-        # The name of the implicit END state before the migration. Needed here
-        # to migrate old explorations which expect that implicit END state.
-        old_end_dest = 'END'
-
-        # Adds an explicit state called 'END' with an EndExploration to replace
-        # links other states have to an implicit 'END' state. Otherwise, if no
-        # states refer to a state called 'END', no new state will be introduced
-        # since it would be isolated from all other states in the graph and
-        # create additional warnings for the user. If they were not referring
-        # to an 'END' state before, then they would only be receiving warnings
-        # about not being able to complete the exploration. The introduction of
-        # a real END state would produce additional warnings (state cannot be
-        # reached from other states, etc.).
-        targets_end_state = False
-        has_end_state = False
-        for (state_name, sdict) in states_dict.items():
-            if not has_end_state and state_name == old_end_dest:
-                has_end_state = True
-
-            if not targets_end_state:
-                for handler in sdict['interaction']['handlers']:
-                    for rule_spec in handler['rule_specs']:
-                        if rule_spec['dest'] == old_end_dest:
-                            targets_end_state = True
-                            break
-
-        # Ensure any explorations pointing to an END state has a valid END
-        # state to end with (in case it expects an END state).
-        if targets_end_state and not has_end_state:
-            states_dict[old_end_dest] = {
-                'content': [{
-                    'type': 'text',
-                    'value': 'Congratulations, you have finished!'
-                }],
-                'interaction': {
-                    'id': 'EndExploration',
-                    'customization_args': {
-                        'recommendedExplorationIds': {
-                            'value': []
-                        }
-                    },
-                    'handlers': [{
-                        'name': 'submit',
-                        'rule_specs': [{
-                            'definition': {
-                                'rule_type': 'default'
-                            },
-                            'dest': old_end_dest,
-                            'feedback': [],
-                            'param_changes': []
-                        }]
-                    }],
-                },
-                'param_changes': []
-            }
+                    if interaction_id == 'ItemSelectionInput':
+                        # All rule inputs for ItemSelectionInput will be
+                        # migrated from SetOfHtmlString to
+                        # SetOfTranslatableHtmlContentIds.
+                        rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                            'SetOfTranslatableHtmlContentIds',
+                            rule_inputs['x'],
+                            choices)
+                    if interaction_id == 'DragAndDropSortInput':
+                        rule_types_with_list_of_sets = [
+                            'IsEqualToOrdering',
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                        ]
+                        if rule_type in rule_types_with_list_of_sets:
+                            # For rule type IsEqualToOrdering and
+                            # IsEqualToOrderingWithOneItemAtIncorrectPosition,
+                            # the x input will be migrated from
+                            # ListOfSetsOfHtmlStrings to
+                            # ListOfSetsOfTranslatableHtmlContentIds.
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                                'ListOfSetsOfTranslatableHtmlContentIds',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXAtPositionY':
+                            # For rule type HasElementXAtPositionY,
+                            # the x input will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId, and the y input will
+                            # remain as DragAndDropPositiveInt.
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                                'TranslatableHtmlContentId',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXBeforeElementY':
+                            # For rule type HasElementXBeforeElementY,
+                            # the x and y inputs will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId.
+                            for rule_input_name in ['x', 'y']:
+                                rule_inputs[rule_input_name] = (
+                                    migrate_rule_inputs_and_answers(
+                                        'TranslatableHtmlContentId',
+                                        rule_inputs[rule_input_name],
+                                        choices))
 
         return states_dict
 
     @classmethod
-    def _convert_states_v2_dict_to_v3_dict(cls, states_dict):
-        """Converts from version 2 to 3. Version 3 introduces a triggers list
-        within interactions.
-        Note that the states_dict being passed in is modified in-place.
+    def update_states_from_model(
+            cls, versioned_exploration_states, current_states_schema_version):
+        """Converts the states blob contained in the given
+        versioned_exploration_states dict from current_states_schema_version to
+        current_states_schema_version + 1.
+        Note that the versioned_exploration_states being passed in is modified
+        in-place.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
+            versioned_exploration_states: dict. A dict with two keys:
+                - states_schema_version: int. The states schema version for
+                    the exploration.
+                - states: dict. The dict of states which is contained in the
+                    exploration. The keys are state names and the values are
+                    dicts used to initialize a State domain object.
+            current_states_schema_version: int. The current states
+                schema version.
         """
-        # Ensure all states interactions have a triggers list.
-        for sdict in states_dict.values():
-            interaction = sdict['interaction']
-            if 'triggers' not in interaction:
-                interaction['triggers'] = []
+        versioned_exploration_states['states_schema_version'] = (
+            current_states_schema_version + 1)
 
-        return states_dict
+        conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
+            current_states_schema_version, current_states_schema_version + 1))
+        versioned_exploration_states['states'] = conversion_fn(
+            versioned_exploration_states['states'])
+
+    # The current version of the exploration YAML schema. If any backward-
+    # incompatible changes are made to the exploration schema in the YAML
+    # definitions, this version number must be changed and a migration process
+    # put in place.
+    CURRENT_EXP_SCHEMA_VERSION = 47
+    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
-    def _convert_states_v3_dict_to_v4_dict(cls, states_dict):
-        """Converts from version 3 to 4. Version 4 introduces a new structure
-        for rules by organizing them into answer groups instead of handlers.
-        This migration involves a 1:1 mapping from rule specs to answer groups
-        containing just that single rule. Default rules have their destination
-        state name and feedback copied to the default_outcome portion of an
-        interaction instance.
-        Note that the states_dict being passed in is modified in-place.
+    def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
+        """Converts a v46 exploration dict into a v47 exploration dict.
+        Changes rule input types for DragAndDropSortInput and ItemSelectionInput
+        interactions to better support translations. Specifically, the rule
+        inputs will store content ids of html rather than the raw html.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v46.
 
         Returns:
-            dict. The converted states_dict.
+            dict. The dict representation of the Exploration domain object,
+            following schema version v47.
         """
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            answer_groups = []
-            default_outcome = None
-            for handler in interaction['handlers']:
-                # Ensure the name is 'submit'.
-                if 'name' in handler and handler['name'] != 'submit':
-                    raise utils.ExplorationConversionError(
-                        'Error: Can only convert rules with a name '
-                        '\'submit\' in states v3 to v4 conversion process. '
-                        'Encountered name: %s' % handler['name'])
+        exploration_dict['schema_version'] = 47
 
-                # Each rule spec becomes a new answer group.
-                for rule_spec in handler['rule_specs']:
-                    group = {}
+        exploration_dict['states'] = cls._convert_states_v41_dict_to_v42_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 42
 
-                    # Rules don't have a rule_type key anymore.
-                    is_default_rule = False
-                    if 'rule_type' in rule_spec['definition']:
-                        rule_type = rule_spec['definition']['rule_type']
-                        is_default_rule = (rule_type == 'default')
-
-                        # Ensure the rule type is either default or atomic.
-                        if not is_default_rule and rule_type != 'atomic':
-                            raise utils.ExplorationConversionError(
-                                'Error: Can only convert default and atomic '
-                                'rules in states v3 to v4 conversion process. '
-                                'Encountered rule of type: %s' % rule_type)
-
-                    # Ensure the subject is answer.
-                    if ('subject' in rule_spec['definition'] and
-                            rule_spec['definition']['subject'] != 'answer'):
-                        raise utils.ExplorationConversionError(
-                            'Error: Can only convert rules with an \'answer\' '
-                            'subject in states v3 to v4 conversion process. '
-                            'Encountered subject: %s'
-                            % rule_spec['definition']['subject'])
-
-                    # The rule turns into the group's only rule. Rules do not
-                    # have definitions anymore. Do not copy the inputs and name
-                    # if it is a default rule.
-                    if not is_default_rule:
-                        definition = rule_spec['definition']
-                        group['rule_specs'] = [{
-                            'inputs': copy.deepcopy(definition['inputs']),
-                            'rule_type': copy.deepcopy(definition['name'])
-                        }]
-
-                    # Answer groups now have an outcome.
-                    group['outcome'] = {
-                        'dest': copy.deepcopy(rule_spec['dest']),
-                        'feedback': copy.deepcopy(rule_spec['feedback']),
-                        'param_changes': (
-                            copy.deepcopy(rule_spec['param_changes'])
-                            if 'param_changes' in rule_spec else [])
-                    }
-
-                    if is_default_rule:
-                        default_outcome = group['outcome']
-                    else:
-                        answer_groups.append(group)
-
-            try:
-                is_terminal = (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        interaction['id']
-                    ).is_terminal if interaction['id'] is not None else False)
-            except KeyError:
-                raise utils.ExplorationConversionError(
-                    'Trying to migrate exploration containing non-existent '
-                    'interaction ID: %s' % interaction['id'])
-            if not is_terminal:
-                interaction['answer_groups'] = answer_groups
-                interaction['default_outcome'] = default_outcome
-            else:
-                # Terminal nodes have no answer groups or outcomes.
-                interaction['answer_groups'] = []
-                interaction['default_outcome'] = None
-            del interaction['handlers']
-
-        return states_dict
+        return exploration_dict
 
     @classmethod
-    def _convert_states_v4_dict_to_v5_dict(cls, states_dict):
-        """Converts from version 4 to 5. Version 5 removes the triggers list
-        within interactions, and replaces it with a fallbacks list.
-        Note that the states_dict being passed in is modified in-place.
+    def _migrate_to_latest_yaml_version(cls, yaml_content):
+        """Return the YAML content of the exploration in the latest schema
+        format.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+            yaml_content: str. The YAML representation of the exploration.
 
         Returns:
-            dict. The converted states_dict.
+            tuple(dict, int). The dict 'exploration_dict' is the representation
+            of the Exploration and the 'initial_schema_version' is the initial
+            schema version provided in 'yaml_content'.
+
+        Raises:
+            InvalidInputException. The 'yaml_content' or the schema version
+                is not specified.
+            Exception. The exploration schema version is not valid.
         """
-        # Ensure all states interactions have a fallbacks list.
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            if 'triggers' in interaction:
-                del interaction['triggers']
-            if 'fallbacks' not in interaction:
-                interaction['fallbacks'] = []
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v5_dict_to_v6_dict(cls, states_dict):
-        """Converts from version 5 to 6. Version 6 introduces a list of
-        confirmed unclassified answers. Those are answers which are confirmed
-        to be associated with the default outcome during classification.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            if 'confirmed_unclassified_answers' not in interaction:
-                interaction['confirmed_unclassified_answers'] = []
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v6_dict_to_v7_dict(cls, states_dict):
-        """Converts from version 6 to 7. Version 7 forces all CodeRepl
-        interactions to use Python.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            if interaction['id'] == 'CodeRepl':
-                interaction['customization_args']['language']['value'] = (
-                    'python')
-
-        return states_dict
+        try:
+            exploration_dict = utils.dict_from_yaml(yaml_content)
+        except utils.InvalidInputException as e:
+            raise utils.InvalidInputException(
+                'Please ensure that you are uploading a YAML text file, not '
+                'a zip file. The YAML parser returned the following error: %s'
+                % e)
 
     # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
     # migration is completed.
@@ -4704,52 +4663,11 @@ class Exploration(python_utils.OBJECT):
             Exploration. The corresponding exploration domain object.
 
         Raises:
-            Exception. The initial schema version of exploration is less than
-                or equal to 9.
+            InvalidInputException. The initial schema version of exploration is
+                outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
+                CURRENT_EXP_SCHEMA_VERSION].
         """
-        migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id)
-        exploration_dict = migration_result[0]
-        initial_schema_version = migration_result[1]
-
-        if (initial_schema_version <=
-                cls.LAST_UNTITLED_SCHEMA_VERSION):
-            raise Exception(
-                'Expected a YAML version >= 10, received: %d' % (
-                    initial_schema_version))
-
-        exploration_dict['id'] = exploration_id
-        return Exploration.from_dict(exploration_dict)
-
-    @classmethod
-    def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
-        """Creates and returns exploration from a YAML text string. This is
-        for importing explorations using YAML schema version 9 or earlier.
-
-        Args:
-            exploration_id: str. The id of the exploration.
-            title: str. The exploration title.
-            category: str. The exploration category.
-            yaml_content: str. The YAML representation of the exploration.
-
-        Returns:
-            Exploration. The corresponding exploration domain object.
-
-        Raises:
-            Exception. The initial schema version of exploration is less than
-                or equal to 9.
-        """
-        migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id, title=title, category=category)
-        exploration_dict = migration_result[0]
-        initial_schema_version = migration_result[1]
-
-        if (initial_schema_version >
-                cls.LAST_UNTITLED_SCHEMA_VERSION):
-            raise Exception(
-                'Expected a YAML version <= 9, received: %d' % (
-                    initial_schema_version))
-
+        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

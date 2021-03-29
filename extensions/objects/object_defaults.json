@@ -22,6 +22,7 @@
     "MusicPhrase": [],
     "NonnegativeInt": 0,
     "NormalizedString": "",
+    "PositiveInt": 1,
     "Real": 0.0,
     "SetOfAlgebraicIdentifier": [],
     "SetOfTranslatableHtmlContentIds": [],

@@ -25,7 +25,6 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.domain import user_services
 import feconf
 import utils
@@ -99,7 +98,7 @@ class SkillRightsHandler(base.BaseHandler):
         """Returns whether the user can edit the description of a skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
             user_actions_info)
 
@@ -258,7 +257,7 @@ class FetchSkillsHandler(base.BaseHandler):
     def get(self):
         """Returns all skill IDs linked to some topic."""
 
-        skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
+        skill_ids = topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
 
         skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
 
