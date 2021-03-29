@@ -76,9 +76,16 @@ var sendKeys = async function(
   await inputElement.sendKeys(keys);
 };
 
+var getText = async function(elementName, element) {
+  await waitFor.visibilityOf(
+    element, `${elementName} is not visible for getText()`);
+  return await element.getText();
+};
+
 exports.clear = clear;
 exports.click = click;
 exports.select = select;
 exports.select2 = select2;
 exports.sendKeys = sendKeys;
 exports.waitForAutosave = waitForAutosave;
+exports.getText = getText;

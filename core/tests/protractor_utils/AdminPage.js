@@ -363,11 +363,20 @@ var AdminPage = function() {
   };
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
+    if (expectedUsernamesArray.length === 0) {
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'No results.',
+        'Toast with "No results." taking too long to appear');
+    } else {
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'Success.',
+        'Toast with "Success." taking too long to appear');
+    }
     var foundUsersArray = [];
     var usernames = await element.all(
       by.css('.protractor-test-roles-result-rows'))
       .map(async function(elm) {
-        var text = await elm.getText();
+        var text = await action.getText('Username on admin page', elm);
         return text;
       });
 
