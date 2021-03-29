@@ -18,7 +18,6 @@
 
 import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-
 import { AppConstants } from 'app.constants';
 
 @Component({
@@ -43,4 +42,4 @@ export class QuestionDifficultySelectorComponent implements OnInit {
 angular.module('oppia').directive(
   'questionDifficultySelector', downgradeComponent({
     component: QuestionDifficultySelectorComponent
-  }) as angular.IDirectiveFactory);
+  }));
