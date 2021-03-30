@@ -24,7 +24,6 @@ import datetime
 import re
 
 from constants import constants
-from core.domain import cron_services
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -480,11 +479,9 @@ class BaseModelValidator(python_utils.OBJECT):
         cls.errors.clear()
         date_now = datetime.datetime.utcnow()
         date_before_which_models_should_be_deleted = (
-            date_now -
-            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
-        )
+            date_now - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
         period_to_hard_delete_models_in_days = (
-            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
         if item.last_updated < date_before_which_models_should_be_deleted:
             cls._add_error(
                 'entity %s' % ERROR_CATEGORY_STALE_CHECK,

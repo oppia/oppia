@@ -23,6 +23,7 @@ import logging
 
 from core import jobs
 from core.platform import models
+import feconf
 
 import utils
 
@@ -32,8 +33,6 @@ from mapreduce import model as mapreduce_model
     models.NAMES.base_model, models.NAMES.job, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
-PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 # Only non-versioned models should be included in this list. Activities that
 # use versioned models should have their own delete functions.
 MODEL_CLASSES_TO_MARK_AS_DELETED = (user_models.UserQueryModel,)
@@ -70,7 +69,7 @@ def delete_models_marked_as_deleted():
     """
     date_now = datetime.datetime.utcnow()
     date_before_which_to_hard_delete = (
-        date_now - PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+        date_now - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
     for model_class in models.Registry.get_all_storage_model_classes():
         deleted_models = model_class.query(
             model_class.deleted == True  # pylint: disable=singleton-comparison
@@ -94,7 +93,7 @@ def mark_outdated_models_as_deleted():
     last updated more than four weeks ago.
     """
     date_before_which_to_mark_as_deleted = (
-        datetime.datetime.utcnow() - PERIOD_TO_MARK_MODELS_AS_DELETED)
+        datetime.datetime.utcnow() - feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
     models_to_mark_as_deleted = []
     for model_class in MODEL_CLASSES_TO_MARK_AS_DELETED:
         models_to_mark_as_deleted.extend(
