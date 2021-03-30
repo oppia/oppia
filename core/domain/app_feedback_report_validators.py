@@ -58,8 +58,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                 base_model_validators.ExternalModelFetcherDetails(
                     'ticket_id',
                     app_feedback_report_models.AppFeedbackReportTicketModel,
-                    [item.ticket_id]
-                )]
+                    [item.ticket_id])]
         return external_references
 
 
@@ -84,15 +83,11 @@ class AppFeedbackReportTicketModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        stats_model_class = (
-            app_feedback_report_models.AppFeedbackReportStatsModel)
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'report_ids',
                 app_feedback_report_models.AppFeedbackReportModel,
-                [item.report_ids]
-            )
-        ]
+                [item.report_ids])]
 
 
 class AppFeedbackReportStatsModelValidator(
@@ -119,6 +114,4 @@ class AppFeedbackReportStatsModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'ticket_id',
                 app_feedback_report_models.AppFeedbackReportTicketModel,
-                [item.ticket_id]
-            )
-        ]
+                [item.ticket_id])]
