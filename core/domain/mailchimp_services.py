@@ -33,7 +33,7 @@ def _get_mailchimp_class():
     """Returns the mailchimp api class. This is separated into a separate 
     function to facilitate testing. 
 
-    NOTE: No other functions should be added to this function.
+    NOTE: No other functionalities should be added to this function.
     """
     if not feconf.MAILCHIMP_API_KEY:
         raise Exception('Mailchimp API key is not available.')
