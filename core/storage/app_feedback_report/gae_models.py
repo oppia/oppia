@@ -353,7 +353,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
     # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
-        default=None, indexed=True)
+        required=False, indexed=True)
     # Whether this ticket has been archived.
     archived = datastore_services.BooleanProperty(
         required=True, indexed=False)
