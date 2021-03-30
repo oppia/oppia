@@ -84,164 +84,145 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
         'Over90Daysxx')
 
     def _add_current_reports():
-        # Add report that should not be scrubbed.
-        self.current_feedback_report_model = (
+        """Adds reports to the model that should not be scrubbed."""
+        current_feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.REPORT_ID_AT_90_DAYS,
-                platform=self.PLATFORM_ANDROID,
+                id=REPORT_ID_AT_90_DAYS,
+                platform=PLATFORM_ANDROID,
                 ticket_id='%s.%s.%s' % (
-                    'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                    'random_hash', TICKET_CREATION_TIMESTAMP.second,
                     '16CharString1234'),
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
+                submitted_on=REPORT_SUBMITTED_TIMESTAMP,
+                report_type=REPORT_TYPE_SUGGESTION,
+                category=CATEGORY_OTHER,
+                platform_version=PLATFORM_VERSION,
                 device_country_locale_code=(
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
-                android_device_model=self.ANDROID_DEVICE_MODEL,
-                android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
-                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                android_report_info=self.ANDROID_REPORT_INFO,
+                    DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+                android_device_model=ANDROID_DEVICE_MODEL,
+                android_sdk_version=ANDROID_SDK_VERSION,
+                entry_point=ENTRY_POINT_NAVIGATION_DRAWER,
+                text_language_code=TEXT_LANGUAGE_CODE_ENGLISH,
+                audio_language_code=AUDIO_LANGUAGE_CODE_ENGLISH,
+                android_report_info=ANDROID_REPORT_INFO,
                 android_report_info_schema_version=(
-                    self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
-            )
-        )
-        self.current_feedback_report_model.created_on = (
-            self.TIMESTAMP_AT_90_DAYS)
-        self.current_feedback_report_model.put()
+                    ANDROID_REPORT_INFO_SCHEMA_VERSION)))
+        current_feedback_report_model.created_on = TIMESTAMP_AT_90_DAYS
+        current_feedback_report_model.put()
 
     def _add_expiring_reports():
-        # Add reports that will be scrubbed.
-        self.expiring_android_report_model = (
+        """Adds reports to the model that should be scrubbed."""
+        expiring_android_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.ANDROID_REPORT_ID_OVER_90_DAYS,
-                platform=self.PLATFORM_ANDROID,
+                id=ANDROID_REPORT_ID_OVER_90_DAYS,
+                platform=PLATFORM_ANDROID,
                 ticket_id='%s.%s.%s' % (
-                    'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                    'random_hash', TICKET_CREATION_TIMESTAMP.second,
                     '16CharString1234'),
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
+                submitted_on=REPORT_SUBMITTED_TIMESTAMP,
+                report_type=REPORT_TYPE_SUGGESTION,
+                category=CATEGORY_OTHER,
+                platform_version=PLATFORM_VERSION,
                 device_country_locale_code=(
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
-                android_device_model=self.ANDROID_DEVICE_MODEL,
-                android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
-                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                android_report_info=self.ANDROID_REPORT_INFO,
+                    DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+                android_device_model=ANDROID_DEVICE_MODEL,
+                android_sdk_version=ANDROID_SDK_VERSION,
+                entry_point=ENTRY_POINT_NAVIGATION_DRAWER,
+                text_language_code=TEXT_LANGUAGE_CODE_ENGLISH,
+                audio_language_code=AUDIO_LANGUAGE_CODE_ENGLISH,
+                android_report_info=ANDROID_REPORT_INFO,
                 android_report_info_schema_version=(
-                    self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
-            )
-        )
-        self.expiring_android_report_model.created_on = (
-            self.TIMESTAMP_OVER_90_DAYS)
-        self.expiring_android_report_model.put()
+                    ANDROID_REPORT_INFO_SCHEMA_VERSION)))
+        expiring_android_report_model.created_on = TIMESTAMP_OVER_90_DAYS
+        expiring_android_report_model.put()
 
-        self.expiring_web_report_model = (
+        expiring_web_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.WEB_REPORT_ID_OVER_90_DAYS,
-                platform=self.PLATFORM_WEB,
+                id=WEB_REPORT_ID_OVER_90_DAYS,
+                platform=PLATFORM_WEB,
                 ticket_id='%s.%s.%s' % (
-                    'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                    'random_hash', TICKET_CREATION_TIMESTAMP.second,
                     '16CharString1234'),
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
+                submitted_on=REPORT_SUBMITTED_TIMESTAMP,
+                report_type=REPORT_TYPE_SUGGESTION,
+                category=CATEGORY_OTHER,
+                platform_version=PLATFORM_VERSION,
                 device_country_locale_code=(
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
-                android_device_model=self.ANDROID_DEVICE_MODEL,
-                android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
-                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                web_report_info=self.WEB_REPORT_INFO,
-                web_report_info_schema_version=(
-                    self.WEB_REPORT_INFO_SCHEMA_VERSION)
-            )
-        )
-        self.expiring_web_report_model.created_on = (
-            self.TIMESTAMP_OVER_90_DAYS)
-        self.expiring_web_report_model.put()
+                    DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+                android_device_model=ANDROID_DEVICE_MODEL,
+                android_sdk_version=ANDROID_SDK_VERSION,
+                entry_point=ENTRY_POINT_NAVIGATION_DRAWER,
+                text_language_code=TEXT_LANGUAGE_CODE_ENGLISH,
+                audio_language_code=AUDIO_LANGUAGE_CODE_ENGLISH,
+                web_report_info=WEB_REPORT_INFO,
+                web_report_info_schema_version=WEB_REPORT_INFO_SCHEMA_VERSION))
+        expiring_web_report_model.created_on = TIMESTAMP_OVER_90_DAYS
+        expiring_web_report_model.put()
 
     def test_empty_model(self):
         model_class = app_feedback_report_models.AppFeedbackReportModel
-        self.assertEqual(len(model_class.get_all()), 0)
+        assertEqual(len(model_class.get_all()), 0)
 
         job_id = (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.create_new())
-        (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.create_new())
+        app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.enqueue(job_id))
+        process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.get_output(job_id))
-        self.assertEqual(output, [])
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.get_output(
+                job_id))
+        assertEqual(output, [])
 
-        self.assertEqual(len(model_class.get_all()), 0)
+        assertEqual(len(model_class.get_all()), 0)
 
     def test_scrubs_every_model(self):
-        self._add_current_reports()
+        _add_current_reports()
 
         job_id = (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.create_new())
-        (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.create_new())
+        app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.enqueue(job_id))
+        process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.get_output(job_id))
-        self.assertEqual(output, [])
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.get_output(
+                job_id))
+        assertEqual(output, [])
 
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.REPORT_ID_AT_90_DAYS))
-        self.assertFalse(current_model is None)
-        self.assertTrue(current_model.scrubbed_by is None)
+                REPORT_ID_AT_90_DAYS))
+        assertFalse(current_model is None)
+        assertTrue(current_model.scrubbed_by is None)
 
     def test_standard_operation(self):
-        self._add_current_reports()
-        self._add_expiring_reports()
+        _add_current_reports()
+        _add_expiring_reports()
 
         job_id = (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.create_new())
-        (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.create_new())
+        app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.enqueue(job_id))
+        process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            app_feedback_report_jobs_one_off
-            .ScrubReportsOneOffJob.get_output(job_id))
-        self.assertEqual(output, [])
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.get_output(
+                job_id))
+        assertEqual(output, [])
 
         scrubbed_android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.ANDROID_REPORT_ID_OVER_90_DAYS))
-        self.assertFalse(scrubbed_android_model is None)
-        self.assertEqual(
+                ANDROID_REPORT_ID_OVER_90_DAYS))
+        assertFalse(scrubbed_android_model is None)
+        assertEqual(
             scrubbed_android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         scrubbed_web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.WEB_REPORT_ID_OVER_90_DAYS))
-        self.assertFalse(scrubbed_web_model is None)
-        self.assertEqual(
+                WEB_REPORT_ID_OVER_90_DAYS))
+        assertFalse(scrubbed_web_model is None)
+        assertEqual(
             scrubbed_web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.REPORT_ID_AT_90_DAYS))
-        self.assertFalse(current_model is None)
-        self.assertTrue(current_model.scrubbed_by is None)
+                REPORT_ID_AT_90_DAYS))
+        assertFalse(current_model is None)
+        assertTrue(current_model.scrubbed_by is None)
