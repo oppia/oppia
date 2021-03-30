@@ -57,8 +57,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
     scrubbed_by = datastore_services.StringProperty(
         required=False, indexed=True)
     # Unique ID for the ticket this report is assigned to (see
-    # AppFeedbackReportTicketModel for how this is constructed).
-    ticket_id = datastore_services.StringProperty(required=False, indexed=True)
+    # AppFeedbackReportTicketModel for how this is constructed). This defaults
+    # to None since initially, new reports received will not be assigned to a
+    # ticket.
+    ticket_id = datastore_services.StringProperty(default=None, indexed=True)
     # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
