@@ -20,177 +20,259 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import unittest
+import pickle
 
-from core.domain import cron_services
 from core.platform import models
+from core.tests import test_utils
+import feconf
 from jobs import base_model_validator_errors as errors
+from jobs import jobs_utils
+import python_utils
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
-
-
-class MockModel(base_models.BaseModel):
-    pass
+base_models, user_models = (
+    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
 
 
-class ValidatorErrorTestBase(unittest.TestCase):
+class FooError(errors.ModelValidationErrorBase):
+    """A simple test-only error."""
+
+    def __init__(self, model):
+        super(FooError, self).__init__(model)
+        self.message = 'foo'
+
+
+class BarError(errors.ModelValidationErrorBase):
+    """A simple test-only error."""
+
+    def __init__(self, model):
+        super(BarError, self).__init__(model)
+        self.message = 'bar'
+
+
+class ModelValidatorErrorTestBase(test_utils.TestBase):
     """Base class for validator error tests."""
 
+    NOW = datetime.datetime.utcnow()
+    YEAR_AGO = NOW - datetime.timedelta(weeks=52)
+    YEAR_LATER = NOW + datetime.timedelta(weeks=52)
+
+
+class ModelValidationErrorBaseTests(ModelValidatorErrorTestBase):
+
     def setUp(self):
-        self.now = datetime.datetime.utcnow()
-        self.year_ago = self.now - datetime.timedelta(weeks=52)
-        self.year_later = self.now + datetime.timedelta(weeks=52)
+        super(ModelValidationErrorBaseTests, self).setUp()
+        self.model = base_models.BaseModel(id='123')
 
+    def test_message(self):
+        error = FooError(self.model)
 
-class ModelValidationErrorTests(ValidatorErrorTestBase):
-    def setUp(self):
-        super(ModelValidationErrorTests, self).setUp()
-        self.model = MockModel(
-            id='123',
-            created_on=self.year_ago,
-            last_updated=self.now)
-        self.error = errors.ModelValidationError(self.model)
+        self.assertEqual(error.message, 'FooError in BaseModel(id="123"): foo')
 
-    def test_set_base_message(self):
-        self.assertEqual(self.error.base_message, 'Entity id 123:')
+    def test_message_raises_not_implemented_error_if_not_assigned_a_value(self):
+        class ErrorWithoutMessage(errors.ModelValidationErrorBase):
+            """Subclass that does not assign a value to self.message."""
 
-    def test_message_raises_not_implemented_error(self):
-        self.assertRaises(
+            pass
+
+        error = ErrorWithoutMessage(self.model)
+
+        self.assertRaisesRegexp(
             NotImplementedError,
-            callableObj=(lambda: self.error.message))
+            'self.message must be assigned a value in __init__',
+            lambda: error.message)
 
-    def test_repr_returns_key(self):
+    def test_message_raises_type_error_if_reassigned_a_value(self):
+        class ErrorWithUpdateMessageMethod(errors.ModelValidationErrorBase):
+            """Subclass that tries to reassign to self.message in a method."""
+
+            def __init__(self, model):
+                super(ErrorWithUpdateMessageMethod, self).__init__(model)
+                self.message = 'initial message'
+
+            def update_message(self):
+                """Tries to reassign self.message."""
+                self.message = 'updated message'
+
+        error = ErrorWithUpdateMessageMethod(self.model)
+
         self.assertEqual(
-            errors.ModelInvalidIdError(
-                self.model).__repr__(),
-            'ModelInvalidIdError: '
-            'Entity id 123: Entity id does not match regex pattern')
-
-    def test_eq_when_classes_are_different(self):
+            error.message,
+            'ErrorWithUpdateMessageMethod in BaseModel(id="123"): initial '
+            'message')
+        self.assertRaisesRegexp(
+            TypeError, 'self.message must be assigned to exactly once',
+            error.update_message)
         self.assertEqual(
-            errors.ModelInvalidIdError(self.model).__eq__(
-                errors.ModelExpiredError(self.model)),
-            NotImplemented)
+            error.message,
+            'ErrorWithUpdateMessageMethod in BaseModel(id="123"): initial '
+            'message')
 
-    def test_eq_when_classes_are_same(self):
-        model_two = MockModel(
+    def test_message_raises_type_error_if_assigned_a_non_string_value(self):
+        class ErrorWithIntMessage(errors.ModelValidationErrorBase):
+            """Subclass that tries to assign an int value to self.message."""
+
+            def __init__(self, model):
+                super(ErrorWithIntMessage, self).__init__(model)
+                self.message = 123
+
+        self.assertRaisesRegexp(
+            TypeError, 'self.message must be a string',
+            lambda: ErrorWithIntMessage(self.model))
+
+    def test_message_raises_value_error_if_assigned_an_empty_value(self):
+        class ErrorWithEmptyMessage(errors.ModelValidationErrorBase):
+            """Subclass that tries to assign an empty value to self.message."""
+
+            def __init__(self, model):
+                super(ErrorWithEmptyMessage, self).__init__(model)
+                self.message = ''
+
+        self.assertRaisesRegexp(
+            ValueError, 'self.message must be a non-empty string',
+            lambda: ErrorWithEmptyMessage(self.model))
+
+    def test_str(self):
+        self.assertEqual(
+            repr(FooError(self.model)), 'FooError in BaseModel(id="123"): foo')
+        self.assertEqual(
+            python_utils.UNICODE(FooError(self.model)),
+            'FooError in BaseModel(id="123"): foo')
+
+    def test_equality_between_different_types(self):
+        self.assertNotEqual(FooError(self.model), BarError(self.model))
+
+    def test_equality_between_same_types_and_same_values(self):
+        self.assertEqual(
+            FooError(self.model),
+            FooError(jobs_utils.clone_model(self.model)))
+
+    def test_equality_between_same_types_and_different_values(self):
+        self.assertNotEqual(
+            FooError(self.model),
+            FooError(jobs_utils.clone_model(self.model, id='987')))
+
+    def test_hashable(self):
+        set_of_errors = {
+            FooError(self.model),
+            FooError(jobs_utils.clone_model(self.model)),
+        }
+        self.assertEqual(len(set_of_errors), 1)
+
+    def test_pickling_base_class_raises_not_implemented_error(self):
+        self.assertRaisesRegexp(
+            NotImplementedError,
+            'self.message must be assigned a value in __init__',
+            lambda: pickle.dumps(errors.ModelValidationErrorBase(self.model)))
+
+    def test_pickling_sub_classes(self):
+        foo_error, bar_error = FooError(self.model), BarError(self.model)
+
+        pickled_foo_error, pickled_bar_error = (
+            pickle.dumps(foo_error), pickle.dumps(bar_error))
+        unpickled_foo_error, unpickled_bar_error = (
+            pickle.loads(pickled_foo_error), pickle.loads(pickled_bar_error))
+
+        self.assertEqual(foo_error, unpickled_foo_error)
+        self.assertEqual(bar_error, unpickled_bar_error)
+        self.assertNotEqual(unpickled_foo_error, unpickled_bar_error)
+
+
+class InconsistentTimestampsErrorTests(ModelValidatorErrorTestBase):
+
+    def test_message(self):
+        model = base_models.BaseModel(
             id='123',
-            created_on=self.year_ago,
-            last_updated=self.now)
+            created_on=self.NOW,
+            last_updated=self.YEAR_AGO)
+        error = errors.InconsistentTimestampsError(model)
 
-        self.assertTrue(
-            errors.ModelInvalidIdError(self.model).__eq__(
-                errors.ModelInvalidIdError(model_two)))
+        self.assertEqual(
+            error.message,
+            'InconsistentTimestampsError in BaseModel(id="123"): created_on=%r '
+            'is later than last_updated=%r' % (self.NOW, self.YEAR_AGO))
 
-    def test_ne_when_classes_are_same(self):
-        model_two = MockModel(
+
+class InvalidCommitStatusErrorTests(ModelValidatorErrorTestBase):
+
+    def test_message_for_private_post_commit_status(self):
+        model = base_models.BaseCommitLogEntryModel(
             id='123',
-            created_on=self.year_ago,
-            last_updated=self.now)
-
-        self.assertFalse(
-            errors.ModelInvalidIdError(self.model).__ne__(
-                errors.ModelInvalidIdError(model_two)))
-
-    def test_hash(self):
-        test_err = errors.ModelInvalidIdError(self.model)
-        expected_hash = hash((
-            test_err.__class__, test_err.key, test_err.message))
-        self.assertEqual(test_err.__hash__(), expected_hash)
-
-
-class ModelTimestampRelationshipErrorTests(ValidatorErrorTestBase):
-    def test_model_timestamp_relationship_error(self):
-        model = MockModel(
-            id='123',
-            created_on=self.now,
-            last_updated=self.year_ago)
-        error = errors.ModelTimestampRelationshipError(model)
-
-        msg = (
-            'Entity id %s: The created_on field has a value %s which '
-            'is greater than the value %s of last_updated field'
-            % (model.id, model.created_on, model.last_updated))
-        self.assertEqual(error.message, msg)
-
-
-class ModelMutatedDuringJobErrorTests(ValidatorErrorTestBase):
-    def test_model_mutated_during_job_error(self):
-        model = MockModel(
-            id='124',
-            created_on=self.now,
-            last_updated=self.year_later)
-        error = errors.ModelMutatedDuringJobError(model)
-
-        msg = (
-            'Entity id %s: The last_updated field has a value %s which '
-            'is greater than the time when the job was run'
-            % (model.id, model.last_updated))
-
-        self.assertEqual(error.message, msg)
-
-
-class ModelInvalidIdErrorTests(ValidatorErrorTestBase):
-    def test_model_invalid_id_error(self):
-        model = MockModel(
-            id='123@?!*',
-            created_on=self.year_ago,
-            last_updated=self.now)
-        error = errors.ModelInvalidIdError(model)
-
-        msg = (
-            'Entity id %s: Entity id does not match regex pattern'
-            % (model.id))
-
-        self.assertEqual(error.message, msg)
-
-
-class ModelExpiredErrorTests(ValidatorErrorTestBase):
-    def test_model_expired_error(self):
-        model = MockModel(
-            id='123',
-            deleted=True,
-            created_on=self.year_ago,
-            last_updated=self.year_ago)
-
-        error = errors.ModelExpiredError(model)
-
-        days = cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days
-        msg = (
-            'Entity id %s: Model marked as deleted is older than %s days'
-            % (model.id, days))
-
-        self.assertEqual(error.message, msg)
-
-
-class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
-    def test_model_invalid_commit_status(self):
-        model1 = base_models.BaseCommitLogEntryModel(
-            id='123',
-            created_on=self.year_ago,
-            last_updated=self.now,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
             commit_type='invalid-type',
             user_id='',
             post_commit_status='private',
             post_commit_is_private=False,
             commit_cmds=[])
-        error1 = errors.ModelInvalidCommitStatusError(model1)
-        model2 = base_models.BaseCommitLogEntryModel(
-            id=124,
-            created_on=self.year_ago,
-            last_updated=self.now,
+        error = errors.InvalidCommitStatusError(model)
+
+        self.assertEqual(
+            error.message,
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
+            'post_commit_status="private" but post_commit_is_private=False')
+
+    def test_message_for_public_post_commit_status(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
             commit_type='invalid-type',
             user_id='',
             post_commit_status='public',
             post_commit_is_private=True,
             commit_cmds=[])
-        error2 = errors.ModelInvalidCommitStatusError(model2)
-        msg1 = (
-            'Entity id %s: Post commit status is private but '
-            'post_commit_is_private is False' % model1.id)
-        msg2 = (
-            'Entity id %s: Post commit status is public but '
-            'post_commit_is_private is True' % model2.id)
-        self.assertEqual(error1.message, msg1)
-        self.assertEqual(error2.message, msg2)
+        error = errors.InvalidCommitStatusError(model)
+
+        self.assertEqual(
+            error.message,
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
+            'post_commit_status="public" but post_commit_is_private=True')
+
+
+class ModelMutatedDuringJobErrorTests(ModelValidatorErrorTestBase):
+
+    def test_message(self):
+        model = base_models.BaseModel(
+            id='123',
+            created_on=self.NOW,
+            last_updated=self.YEAR_LATER)
+        error = errors.ModelMutatedDuringJobError(model)
+
+        self.assertEqual(
+            error.message,
+            'ModelMutatedDuringJobError in BaseModel(id="123"): '
+            'last_updated=%r is later than the validation job\'s start time' % (
+                model.last_updated))
+
+
+class InvalidIdErrorTests(ModelValidatorErrorTestBase):
+
+    def test_message(self):
+        regex = '[a-z0-9]+'
+        model = base_models.BaseModel(
+            id='?!"',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW)
+        error = errors.InvalidIdError(model, regex)
+
+        self.assertEqual(
+            error.message,
+            r'InvalidIdError in BaseModel(id="?!\""): id does not match the '
+            r'expected regex="[a-z0-9]+"')
+
+
+class ModelExpiredErrorTests(ModelValidatorErrorTestBase):
+
+    def test_message(self):
+        model = base_models.BaseModel(
+            id='123',
+            deleted=True,
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_AGO)
+        error = errors.ModelExpiredError(model)
+
+        self.assertEqual(
+            error.message,
+            'ModelExpiredError in BaseModel(id="123"): deleted=True when older '
+            'than %d days' % (
+                feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))

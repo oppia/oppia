@@ -92,8 +92,8 @@ def normalize_against_schema(
         # Importing this at the top of the file causes a circular dependency.
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
-        from core.domain import obj_services
-        obj_class = obj_services.Registry.get_object_class_by_type(
+        from core.domain import object_registry
+        obj_class = object_registry.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
