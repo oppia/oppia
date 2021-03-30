@@ -263,12 +263,11 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         'daily_total_report_submitted': 3}
     STATS_ID = '%s:%s:%s' % (
         PLATFORM_ANDROID, TICKET_ID, STATS_DATE_TIMESTAMP.isoformat())
-    
+
     # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     REPORT_ID = '%s.%s.%s' % (
-            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.second,
-            'randomInteger123')
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.second, 'randomInteger123')
 
     def setUp(self):
         super(AppFeedbackReportStatsModelValidatorTests, self).setUp()

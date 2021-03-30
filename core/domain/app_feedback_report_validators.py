@@ -49,8 +49,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         # TODO(Oppia-Android#3016): Create domain object when implementing
         # domain layer. Below assert function is to pass linter checks ("item
         # is not used")
-        assert(item)
-        pass
+        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -83,8 +82,7 @@ class AppFeedbackReportTicketModelValidator(
         # TODO(Oppia-Android#3016): Create domain object when implementing
         # domain layer. Below assert function is to pass linter checks ("item
         # is not used")
-        assert(item)
-        pass
+        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -111,8 +109,7 @@ class AppFeedbackReportStatsModelValidator(
         # TODO(Oppia-Android#3016): Create domain object when implementing
         # domain layer. Below assert function is to pass linter checks ("item
         # is not used")
-        assert(item)
-        pass
+        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):

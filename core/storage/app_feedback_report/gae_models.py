@@ -384,8 +384,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        creation_timestamp = datetime.datetime.utcnow()
-        ticket_id = cls._generate_id(creation_timestamp, ticket_name)
+        ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
             id=ticket_id, ticket_name=ticket_name,
             github_issue_number=github_issue_number, archived=False,
@@ -393,19 +392,16 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             report_ids=report_ids)
         # Manually set created_on timestamp so it matches the timestamp used in
         # the id.
-        ticket_entity.created_on = creation_timestamp
         ticket_entity.update_timestamps()
         ticket_entity.put()
         return ticket_id
 
     @classmethod
-    def _generate_id(cls, creation_timestamp, ticket_name):
+    def _generate_id(cls, ticket_name):
         """Generates key for the instance of AppFeedbackReportTicketModel
         class in the required format with the arguments provided.
 
         Args:
-            creation_timestamp: datetime.datetime. The timestamp for initiating
-                creating this ticket entity.
             ticket_name: str. The name assigned to the ticket on creation.
 
         Returns:
@@ -422,7 +418,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                creation_timestamp.second, name_hash, random_hash)
+                datetime.datetime.utcnow().second, name_hash, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
