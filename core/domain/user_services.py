@@ -28,6 +28,7 @@ import re
 from constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import mailchimp_services
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
@@ -1786,8 +1787,8 @@ def update_email_preferences(
     if email_preferences_model is None:
         email_preferences_model = user_models.UserEmailPreferencesModel(
             id=user_id)
+        email_preferences_model.site_updates = False
 
-    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
     email_preferences_model.feedback_message_notifications = (
@@ -1796,6 +1797,9 @@ def update_email_preferences(
         can_receive_subscription_email)
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
+
+    mailchimp_services.add_or_update_mailchimp_user_status(
+        user_id, get_email_from_user_id(user_id), can_receive_email_updates)
 
 
 def get_email_preferences(user_id):

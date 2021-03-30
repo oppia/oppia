@@ -26,6 +26,7 @@ from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import mailchimp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import role_services
@@ -170,6 +171,8 @@ def pre_delete_user(user_id):
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
             user_id, False, False, False, False)
+        mailchimp_services.permanently_delete_user_from_list(
+            user_settings.email)
 
     date_now = datetime.datetime.utcnow()
     date_before_which_username_should_be_saved = (

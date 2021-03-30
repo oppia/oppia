@@ -25,6 +25,7 @@ from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_services
+from core.domain import mailchimp_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -61,6 +62,40 @@ import python_utils
 ])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+def empty_function(*_):
+    """Empty function to mock
+    mailchimp_services.permanently_delete_user_from_list which consists of just
+    an API call which is separately tested.
+    """
+    pass
+
+
+def swapped_add_or_update_function(
+        user_id, _user_email, can_receive_email_updates):
+    """Mock function that just updates the UserPreferencesModel without
+    calling the mailchimp api for testing.
+
+    Args:
+        user_id: str. The ID of the user.
+        _user_email: str. Email ID of the user.
+        can_receive_email_updates: bool. Whether the user can receive
+            email updates.
+    """
+    email_preferences_model = user_models.UserEmailPreferencesModel.get(
+        user_id, strict=False)
+    email_preferences_model.site_updates = can_receive_email_updates
+    email_preferences_model.update_timestamps()
+    email_preferences_model.put()
+
+
+setattr(
+    mailchimp_services, 'permanently_delete_user_from_list',
+    empty_function)
+setattr(
+    mailchimp_services, 'add_or_update_mailchimp_user_status',
+    swapped_add_or_update_function)
 
 
 class WipeoutServiceHelpersTests(test_utils.GenericTestBase):

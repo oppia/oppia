@@ -414,6 +414,15 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+# Audience ID of the mailing list for Oppia in Mailchimp.
+MAILCHIMP_AUDIENCE_ID = 'be3edb3e4b'
+
+# Mailchimp API Key.
+MAILCHIMP_API_KEY = None
+
+# Mailchimp username.
+MAILCHIMP_USERNAME = None
+
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.

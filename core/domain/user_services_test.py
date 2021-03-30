@@ -29,6 +29,7 @@ from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import mailchimp_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.domain import user_domain
@@ -434,13 +435,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
+        empty_function = lambda *args: None
+        swap_mailchimp_function = self.swap(
+            mailchimp_services, 'add_or_update_mailchimp_user_status',
+            empty_function)
         # The user retrieves their email preferences. This initializes
         # a UserEmailPreferencesModel instance with the default values.
-        user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        with swap_mailchimp_function:
+            user_services.update_email_preferences(
+                user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEqual(
@@ -450,10 +456,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
+        swap_mailchimp_function = self.swap(
+            mailchimp_services, 'add_or_update_mailchimp_user_status',
+            empty_function)
         # The user sets their membership email preference to False.
-        user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False,
-            False)
+        with swap_mailchimp_function:
+            user_services.update_email_preferences(
+                user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False,
+                False)
 
         email_preferences = user_services.get_email_preferences(user_id)
 
@@ -2593,17 +2603,39 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
+
+        def swapped_add_or_update_function(
+                user_id, _user_email, can_receive_email_updates):
+            """Mock function that just updates the UserPreferencesModel without
+            calling the mailchimp api for testing.
+
+            Args:
+                user_id: str. The ID of the user.
+                _user_email: str. Email ID of the user.
+                can_receive_email_updates: bool. Whether the user can receive
+                    email updates.
+            """
+            email_preferences_model = user_models.UserEmailPreferencesModel(
+                id=user_id)
+            email_preferences_model.site_updates = can_receive_email_updates
+            email_preferences_model.update_timestamps()
+            email_preferences_model.put()
+
+        swap_mailchimp_function = self.swap(
+            mailchimp_services, 'add_or_update_mailchimp_user_status',
+            swapped_add_or_update_function)
         # Ensure that these reviewers want email updates.
-        user_services.update_email_preferences(
-            self.question_reviewer_id, True,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-        user_services.update_email_preferences(
-            self.translator_id, True,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        with swap_mailchimp_function:
+            user_services.update_email_preferences(
+                self.question_reviewer_id, True,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            user_services.update_email_preferences(
+                self.translator_id, True,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         reviewer_ids_to_notify = (
             user_services.get_reviewer_user_ids_to_notify())
@@ -2621,17 +2653,24 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
-        # Ensure that these reviewers do not want email updates.
-        user_services.update_email_preferences(
-            self.question_reviewer_id, False,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-        user_services.update_email_preferences(
-            self.translator_id, False,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        empty_function = lambda *args: None
+        swap_mailchimp_function = self.swap(
+            mailchimp_services, 'add_or_update_mailchimp_user_status',
+            empty_function)
+
+        with swap_mailchimp_function:
+            # Ensure that these reviewers do not want email updates.
+            user_services.update_email_preferences(
+                self.question_reviewer_id, False,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            user_services.update_email_preferences(
+                self.translator_id, False,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         reviewer_ids_to_notify = (
             user_services.get_reviewer_user_ids_to_notify())
