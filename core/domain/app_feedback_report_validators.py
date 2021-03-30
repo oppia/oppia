@@ -39,7 +39,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform].[timestamp_in_sec_int].[random_hash]
+        # Valid id: [platform].[submission_timestamp_in_sec_int].[random_hash]
         regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
             item.platform, item.submitted_on.second, base_models.ID_LENGTH)
         return regex_string
@@ -47,8 +47,10 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer.
-        return item
+        # domain layer. Below assert function is to pass linter checks ("item
+        # is not used")
+        assert(item)
+        pass
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -67,19 +69,22 @@ class AppFeedbackReportTicketModelValidator(
     """Class for validating AppFeedbackReportTicketModel."""
 
     @classmethod
-    def _get_model_id_regex(cls):
+    def _get_model_id_regex(cls, item):
         # Valid id:
-        #   [creation_datetime_in_sec_int]:[hash(ticket_name)]:[random hash]
+        #   [ticket_creation_datetime_in_sec]:[hash(ticket_name)]:[random hash]
         regex_string = (
-            '\\d+\\:[A-Za-z0-9]{1,%s}$\\:[A-Za-z0-9]{1,%s}$' % (
-                base_models.ID_LENGTH, base_models.ID_LENGTH))
+            '^%s\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
+                item.created_on.second, base_models.ID_LENGTH,
+                base_models.ID_LENGTH))
         return regex_string
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer.
-        return item
+        # domain layer. Below assert function is to pass linter checks ("item
+        # is not used")
+        assert(item)
+        pass
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -87,7 +92,7 @@ class AppFeedbackReportTicketModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'report_ids',
                 app_feedback_report_models.AppFeedbackReportModel,
-                [item.report_ids])]
+                item.report_ids)]
 
 
 class AppFeedbackReportStatsModelValidator(
@@ -96,17 +101,18 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform]:[ticket_id]:[date_in_seconds_int]
-        regex_string = '^%s\\:[A-Za-z0-9]{1,%s}$\\:%s\\.\\d+' % (
-            item.platform, base_models.ID_LENGTH,
-            item.stats_tracking_date.second)
+        # Valid id: [platform]:[ticket_id]:[date_in_isoformat]
+        regex_string = '^%s\\:%s\\:%s' % (
+            item.platform, item.ticket_id, item.stats_tracking_date.isoformat())
         return regex_string
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer.
-        return item
+        # domain layer. Below assert function is to pass linter checks ("item
+        # is not used")
+        assert(item)
+        pass
 
     @classmethod
     def _get_external_id_relationships(cls, item):
