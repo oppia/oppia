@@ -33,6 +33,8 @@ import { LazyLoadingComponent } from
   './common-layout-directives/common-elements/lazy-loading.component';
 import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
+import { LoadingMessageComponent } from 
+ '../base-components/loading-message.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SkillMasteryViewerComponent } from
@@ -107,6 +109,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
+    LoadingMessageComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
@@ -129,7 +132,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    LazyLoadingComponent, LoadingDotsComponent, LoadingMessageComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     TakeBreakModalComponent,

@@ -15,10 +15,17 @@
 /**
  * @fileoverview Component for showing the loading screen with a message.
  */
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+  @Component({
+  selector: 'loading-message',
+  templateUrl: './loading-message.component.html',
+  styleUrls: []
+})
+export class LoadingMessageComponent {
+  @Input() message : string;
+} 
 
-angular.module('oppia').component('loadingMessage', {
-  template: require('./loading-message.component.html'),
-  bindings: {
-    message: '<'
-  }
-});
+angular.module('oppia').directive(
+  'loadingMessage', downgradeComponent(
+    {component: LoadingMessageComponent}));
