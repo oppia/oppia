@@ -57,8 +57,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
     scrubbed_by = datastore_services.StringProperty(
         required=False, indexed=True)
     # Unique ID for the ticket this report is assigned to (see
-    # AppFeedbackReportTicketModel for how this is constructed).
-    ticket_id = datastore_services.StringProperty(required=False, indexed=True)
+    # AppFeedbackReportTicketModel for how this is constructed). This defaults
+    # to None since initially, new reports received will not be assigned to a
+    # ticket.
+    ticket_id = datastore_services.StringProperty(default=None, indexed=True)
     # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
@@ -97,11 +99,11 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=True)
 
     # The text language on Oppia set by the user in its ISO-639 language code;
-    # this is set by the user in Oppia's app preferences.
+    # this is set by the user in Oppia's app preferences on all platforms.
     text_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The audio language ISO-639 code on Oppia set by the user as declared in
-    # the app.
+    # The audio language ISO-639 code on Oppia set by the user; this is set in
+    # Oppia's app preferences on all platforms.
     audio_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
 
@@ -111,17 +113,21 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # The Android SDK version on the user's device.
     android_sdk_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
-    # The rest of the report info collected on Android.
+    # The rest of the report info collected on Android; None if the platform is
+    # 'web'.
     android_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
-    # The schema version for the feedback report info.
+    # The schema version for the feedback report info; None if the platform is
+    # 'web'.
     android_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
 
-    # The rest of the web report info collected.
+    # The rest of the web report info collected; None if the platform is
+    # 'android'.
     web_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
-    # The schema version for the feedback report info.
+    # The schema version for the feedback report info; None if the platform is
+    # 'android'.
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
 
