@@ -4301,7 +4301,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_data_formats_are_correct_and_complete(self):
         translatable_class_names_in_data_formats = sorted(
             state_domain.WrittenTranslation.
-            DATA_FORMAT_TO_TRANSLATABLE_OBJ_CLASS_NAME.values())
+            DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
         self.assertEqual(
             translatable_class_names_in_data_formats,
             translatable_object_registry.Registry.get_all_class_names())

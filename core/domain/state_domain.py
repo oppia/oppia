@@ -1433,7 +1433,7 @@ class WrittenTranslation(python_utils.OBJECT):
     DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
     DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
-    DATA_FORMAT_TO_TRANSLATABLE_OBJ_CLASS_NAME = {
+    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE = {
         DATA_FORMAT_HTML: 'TranslatableHtml',
         DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
         DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
@@ -1446,7 +1446,7 @@ class WrittenTranslation(python_utils.OBJECT):
 
         Args:
             data_format: str. One of the keys in
-                DATA_FORMAT_TO_TRANSLATABLE_OBJ_CLASS_NAME. Indicates the
+                DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE. Indicates the
                 type of the field (html, unicode, etc.).
             translation: str|list(str). A user-submitted string or list of
                 strings that matches the given data format.
@@ -1495,12 +1495,12 @@ class WrittenTranslation(python_utils.OBJECT):
                 are invalid.
         """
         if self.data_format not in (
-                self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_CLASS_NAME):
+                self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
 
         translatable_class_name = (
-            self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_CLASS_NAME[self.data_format])
+            self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[self.data_format])
         translatable_obj_class = (
             translatable_object_registry.Registry.get_object_class(
                 translatable_class_name))
