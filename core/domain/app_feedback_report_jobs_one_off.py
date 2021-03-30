@@ -22,6 +22,7 @@ from __future__ import unicode_literals # pylint: disable=import-only-modules
 import datetime
 
 from core import jobs
+from core.domain import app_feedback_report_services
 from core.platform import models
 import feconf
 
@@ -42,7 +43,7 @@ class ScrubReportsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         earliest_date = datetime.date.today() - datetime.timedelta(days=90)
         if item.created_on.date() < earliest_date:
-            app_feedback_report_models.AppFeedbackReportModel.scrub_report(
+            app_feedback_report_services.scrub_report(
                 item.id, feconf.REPORT_SCRUBBER_BOT_ID)
 
     @staticmethod
