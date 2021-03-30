@@ -177,6 +177,8 @@ describe('Settings Tab Component', () => {
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
+      spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+        .returnValue($q.resolve(userPermissions));
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
@@ -421,7 +423,12 @@ describe('Settings Tab Component', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('Email body')
       });
-      spyOn(explorationRightsService, 'saveModeratorChangeToBackend');
+      spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
+        .callFake((emailBody) => {
+          return $q.resolve();
+        });
+      ctrl.canUnpublish = false;
+      ctrl.canReleaseOwnership = false;
 
       $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
         draft_email_body: 'Draf message'
@@ -430,8 +437,12 @@ describe('Settings Tab Component', () => {
       $httpBackend.flush();
       $scope.$apply();
 
-      expect(explorationRightsService.saveModeratorChangeToBackend)
-        .toHaveBeenCalledWith('Email body', jasmine.any(Function));
+      expect(explorationRightsService.saveModeratorChangeToBackendAsync)
+        .toHaveBeenCalledWith('Email body');
+      expect(userExplorationPermissionsService.fetchPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canUnpublish).toBe(true);
+      expect(ctrl.canReleaseOwnership).toBe(true);
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
@@ -490,7 +501,7 @@ describe('Settings Tab Component', () => {
       ctrl.editRole('Username1', 'editor');
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
-        'Username1', 'editor', jasmine.any(Function));
+        'Username1', 'editor');
       expect(ctrl.isRolesFormOpen).toBe(false);
     });
 
@@ -567,7 +578,7 @@ describe('Settings Tab Component', () => {
       ctrl.toggleViewabilityIfPrivate();
 
       expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
-        true, jasmine.any(Function));
+        true);
     });
 
     it('should refresh settings tab when refreshSettingsTab event occurs',
@@ -642,7 +653,6 @@ describe('Settings Tab Component', () => {
         'Introduction']);
 
       explorationCategoryService.init('Astrology');
-
       routerService.refreshSettingsTabEmitter = new EventEmitter();
       $scope = $rootScope.$new();
       ctrl = $componentController('settingsTab', {
@@ -672,6 +682,32 @@ describe('Settings Tab Component', () => {
       expect(ctrl.basicSettingIsShown).toEqual(true);
       ctrl.toggleCards('settings');
       expect(ctrl.basicSettingIsShown).toEqual(true);
+    });
+
+    it('should display Unpublish button', function() {
+      ctrl.canUnpublish = false;
+      expect(ctrl.canUnpublish).toBe(false);
+
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
+      $scope.$apply();
+
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canUnpublish).toBe(true);
+    });
+
+    it('should display Transfer ownership button', function() {
+      ctrl.canReleaseOwnership = false;
+      expect(ctrl.canReleaseOwnership).toBe(false);
+
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
+      $scope.$apply();
+
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canReleaseOwnership).toBe(true);
     });
   });
 });

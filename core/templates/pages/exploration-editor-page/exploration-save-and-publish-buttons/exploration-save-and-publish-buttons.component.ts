@@ -16,15 +16,15 @@
  * @fileoverview Directive for the exploration save & publish buttons.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-rights-backend-api.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
@@ -44,6 +44,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationWarningsService, UserExplorationPermissionsService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
       };
@@ -97,8 +98,13 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.loadingDotsAreShown = true;
       };
 
-      var hideLoadingDots = function() {
+      var hideLoadingAndUpdatePermission = function() {
         $scope.loadingDotsAreShown = false;
+        UserExplorationPermissionsService.fetchPermissionsAsync()
+          .then(function(permissions) {
+            $scope.explorationCanBePublished = permissions.canPublish;
+            $scope.$applyAsync();
+          });
       };
 
       $scope.showPublishExplorationModal = function() {
@@ -106,7 +112,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.loadingDotsAreShown = true;
 
         ExplorationSaveService.showPublishExplorationModal(
-          showLoadingDots, hideLoadingDots)
+          showLoadingDots, hideLoadingAndUpdatePermission)
           .then(function() {
             $scope.publishIsInProcess = false;
             $scope.loadingDotsAreShown = false;
@@ -119,7 +125,8 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
-        ExplorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
+        ExplorationSaveService.saveChanges(
+          showLoadingDots, hideLoadingAndUpdatePermission)
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
@@ -131,13 +138,28 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = false;
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
+        $scope.explorationCanBePublished = false;
 
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
-            $scope.showPublishButton = function() {
-              return permissions.canPublish && $scope.isPrivate();
-            };
+            $scope.explorationCanBePublished = permissions.canPublish;
           });
+        ctrl.directiveSubscriptions.add(
+          UserExplorationPermissionsService.onUserExplorationPermissionsFetched
+            .subscribe(
+              () => {
+                UserExplorationPermissionsService.getPermissionsAsync()
+                  .then(function(permissions) {
+                    $scope.explorationCanBePublished = permissions.canPublish;
+                    $scope.$applyAsync();
+                  });
+              }
+            )
+        );
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

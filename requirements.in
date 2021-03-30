@@ -3,7 +3,7 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam==2.24.0
+apache-beam[gcp]==2.24.0
 backports.functools-lru-cache==1.6.1
 beautifulSoup4==4.9.1
 bleach==3.1.5
