@@ -565,7 +565,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=self.TICKET_ID,
-                stats_tracking_date=tracking_datetime.date,
+                stats_tracking_date=tracking_datetime.date(),
                 daily_ticket_stats=self.DAILY_STATS))
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
@@ -589,7 +589,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=self.TICKET_ID,
-                stats_tracking_date=tracking_datetime.date,
+                stats_tracking_date=tracking_datetime.date(),
                 daily_ticket_stats=self.DAILY_STATS))
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
