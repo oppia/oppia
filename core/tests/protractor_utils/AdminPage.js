@@ -376,7 +376,8 @@ var AdminPage = function() {
     var usernames = await element.all(
       by.css('.protractor-test-roles-result-rows'))
       .map(async function(elm) {
-        var text = await action.getText('Username on admin page', elm);
+        var text = await action.getText(
+          'Username in roles list on admin page', elm);
         return text;
       });
 
