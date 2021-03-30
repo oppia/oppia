@@ -88,7 +88,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         '/components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'ContextService', 
+        '$scope', '$uibModal', 'AlertsService', 'ContextService',
         'EditabilityService', 'ExplorationHtmlFormatterService',
         'InteractionDetailsCacheService',
         'ResponsesService', 'StateContentService',
@@ -96,7 +96,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
-            $scope, $uibModal, AlertsService, ContextService, 
+            $scope, $uibModal, AlertsService, ContextService,
             EditabilityService, ExplorationHtmlFormatterService,
             InteractionDetailsCacheService,
             ResponsesService, StateContentService,
@@ -113,6 +113,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           // interaction preview.
           $scope.submitAnswer = function() {};
           $scope.adjustPageHeight = function() {};
+          $scope.interactionIsDisabled = false;
 
           $scope.getCurrentInteractionName = function() {
             return (
@@ -145,6 +146,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateCustomizationArgsService.savedMemento;
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
+            $scope.interactionIsDisabled = (
+              $scope.interactionId === 'EndExploration' &&
+              ContextService.isExplorationLinkedToStory());
           };
 
           var _updateAnswerChoices = function() {
@@ -218,14 +222,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             );
           };
 
-          $scope.isInteractionDisabled = function() {
-            return (
-              StateInteractionIdService.displayed === 'EndExploration' &&
-              ContextService.isExplorationLinkedToStory());
-          };
-
           $scope.openInteractionCustomizerModal = function() {
-            if ($scope.isInteractionDisabled()) {
+            if ($scope.interactionIsDisabled) {
               return;
             }
             if (EditabilityService.isEditable()) {
