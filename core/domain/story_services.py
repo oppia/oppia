@@ -26,10 +26,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
-import android_validation_constants
 from constants import constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -334,11 +334,6 @@ def validate_explorations_for_story(exp_ids, raise_error):
             explorations before adding them to a story.
         ValidationError. All explorations in a story should be of the same
             category.
-        ValidationError. Invalid language found for exploration.
-        ValidationError. Expected no exploration to have parameter values in it.
-        ValidationError. Invalid interaction in exploration.
-        ValidationError. RTE content in state of exploration with ID is not
-            supported on mobile.
     """
     validation_error_messages = []
 
@@ -390,63 +385,8 @@ def validate_explorations_for_story(exp_ids, raise_error):
                 if raise_error:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
-            if (
-                    exp.language_code not in
-                    android_validation_constants.SUPPORTED_LANGUAGES):
-                error_string = (
-                    'Invalid language %s found for exploration '
-                    'with ID %s.' % (exp.language_code, exp_id))
-                if raise_error:
-                    raise utils.ValidationError(error_string)
-                validation_error_messages.append(error_string)
-
-            if exp.param_specs or exp.param_changes:
-                error_string = (
-                    'Expected no exploration to have parameter '
-                    'values in it. Invalid exploration: %s' % exp.id)
-                if raise_error:
-                    raise utils.ValidationError(error_string)
-                validation_error_messages.append(error_string)
-
-            if not exp.correctness_feedback_enabled:
-                error_string = (
-                    'Expected all explorations to have correctness feedback '
-                    'enabled. Invalid exploration: %s' % exp.id)
-                if raise_error:
-                    raise utils.ValidationError(error_string)
-                validation_error_messages.append(error_string)
-
-            for state_name in exp.states:
-                state = exp.states[state_name]
-                if not state.interaction.is_supported_on_android_app():
-                    error_string = (
-                        'Invalid interaction %s in exploration '
-                        'with ID: %s.' % (state.interaction.id, exp.id))
-                    if raise_error:
-                        raise utils.ValidationError(error_string)
-                    validation_error_messages.append(error_string)
-
-                if not state.is_rte_content_supported_on_android():
-                    error_string = (
-                        'RTE content in state %s of exploration '
-                        'with ID %s is not supported on mobile.'
-                        % (state_name, exp.id))
-                    if raise_error:
-                        raise utils.ValidationError(error_string)
-                    validation_error_messages.append(error_string)
-
-                if state.interaction.id == 'EndExploration':
-                    recommended_exploration_ids = (
-                        state.interaction.customization_args[
-                            'recommendedExplorationIds'].value)
-                    if len(recommended_exploration_ids) != 0:
-                        error_string = (
-                            'Exploration with ID: %s contains exploration '
-                            'recommendations in its EndExploration interaction.'
-                            % (exp.id))
-                        if raise_error:
-                            raise utils.ValidationError(error_string)
-                        validation_error_messages.append(error_string)
+            validation_error_messages.extend(
+                exp_services.validate_exploration_for_story(exp, raise_error))
 
     return validation_error_messages
 
