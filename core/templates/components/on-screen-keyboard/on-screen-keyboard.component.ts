@@ -31,7 +31,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 export class OnScreenKeyboardComponent {
   engine;
   guppyInstance;
-  functionsTab : string = constants.OSK_FUNCTIONS_TAB;
+  functionsTab: string = constants.OSK_FUNCTIONS_TAB;
   lettersTab: string = constants.OSK_LETTERS_TAB;
   mainTab: string = constants.OSK_MAIN_TAB;
   greekSymbols: string[] = Object.values(
