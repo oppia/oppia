@@ -434,10 +434,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['login'],
       filename: 'login-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Login to Oppia'
-      },
+      meta: defaultMeta,
       template: commonPrefix + '/pages/login-page/login-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -445,10 +442,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['logout'],
       filename: 'logout-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Logout of Oppia'
-      },
+      meta: defaultMeta,
       template: commonPrefix + '/pages/logout-page/logout-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
