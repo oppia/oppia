@@ -34,7 +34,7 @@ import constants from 'assets/constants';
 })
 export class AboutPageComponent implements OnInit {
   classroomUrlFragment: string;
-  classroomUrl :string;
+  classroomUrl: string;
   userIsLoggedIn: boolean;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
