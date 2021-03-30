@@ -37,6 +37,7 @@ Key = ndb.Key
 
 BooleanProperty = ndb.BooleanProperty
 DateProperty = ndb.DateProperty
+ComputedProperty = ndb.ComputedProperty
 DateTimeProperty = ndb.DateTimeProperty
 FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
