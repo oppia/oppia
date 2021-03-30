@@ -859,7 +859,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         output = self._run_one_off_job()
         fail = 'LONGER THAN 30'
         self.assertEqual(
-            [[fail, [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], 
+            [[fail, [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]],
             output)
 
         state3.update_interaction_id('ItemSelectionInput')
@@ -885,7 +885,7 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Item Selection Input.
         output = self._run_one_off_job()
         self.assertEqual(
-            [[fail, [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]], 
+            [[fail, [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]],
             output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
