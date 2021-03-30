@@ -33,6 +33,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    migrate-question-difficulty-selector-directive
     MatListModule,
     MatProgressSpinnerModule,
     MatRadioModule
@@ -42,7 +43,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    migrate-question-difficulty-selector-directive
     MatListModule,
+    develop
     MatProgressSpinnerModule,
     MatRadioModule
   ]
