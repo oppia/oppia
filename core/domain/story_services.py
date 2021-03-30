@@ -26,8 +26,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
@@ -562,6 +562,9 @@ def _is_story_published_and_present_in_topic(story):
 def update_story(
         committer_id, story_id, change_list, commit_message):
     """Updates a story. Commits changes.
+
+    # NOTE: This function should not be called on its own. Access it
+    # through `topic_services.update_story_and_topic_summary`.
 
     Args:
         committer_id: str. The id of the user who is performing the update

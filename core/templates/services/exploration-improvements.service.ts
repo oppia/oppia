@@ -27,9 +27,7 @@ import { NeedsGuidingResponsesTask } from
   'domain/improvements/needs-guiding-response-task.model';
 import { State } from 'domain/state/StateObjectFactory';
 
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-rights-backend-api.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -136,7 +134,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     };
 
     return {
-      initAsync(): Promise<void> {
+      async initAsync(): Promise<void> {
         if (!initializationHasStarted) {
           initializationHasStarted = true;
           doInitAsync().then(resolveInitPromise, rejectInitPromise);

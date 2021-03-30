@@ -203,7 +203,7 @@ def cleanup():
     common.stop_redis_server()
 
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
-        if not common.wait_for_port_to_be_closed(port):
+        if not common.wait_for_port_to_not_be_in_use(port):
             raise RuntimeError(
                 'Port {} failed to close within {} seconds.'.format(
                     port, common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
@@ -217,7 +217,7 @@ def is_oppia_server_already_running():
         bool. Whether there is a running Oppia instance.
     """
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
-        if common.is_port_open(port):
+        if common.is_port_in_use(port):
             python_utils.PRINT(
                 'There is already a server running on localhost:%s.'
                 'Please terminate it before running the end-to-end tests.'
@@ -549,9 +549,9 @@ def run_tests(args):
         python_utils.PRINT('Waiting for servers to come up...')
 
         # Wait for the servers to come up.
-        common.wait_for_port_to_be_open(feconf.ES_LOCALHOST_PORT)
-        common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
-        common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
+        common.wait_for_port_to_be_in_use(WEB_DRIVER_PORT)
+        common.wait_for_port_to_be_in_use(GOOGLE_APP_ENGINE_PORT)
         python_utils.PRINT('Servers have come up.')
         python_utils.PRINT(
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
