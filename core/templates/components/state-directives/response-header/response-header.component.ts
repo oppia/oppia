@@ -80,7 +80,8 @@ export class ResponseHeaderComponent {
   }
 
   deleteResponse(evt: Event): void {
-    this.onDeleteFn(this.index, evt);
+    this.onDeleteFn;
+    (this.index, evt);
   }
   ngOnInit(): void {
     this.editabilityService = new EditabilityService;
@@ -90,4 +91,3 @@ export class ResponseHeaderComponent {
 angular.module('oppia').directive(
   'responseHeader', downgradeComponent(
     {component: ResponseHeaderComponent}));
-
