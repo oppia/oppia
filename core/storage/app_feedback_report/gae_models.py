@@ -49,6 +49,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
     string representation of a random int.
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The platform (web or Android) that the report is sent from and that the
     # feedback corresponds to.
     platform = datastore_services.StringProperty(
@@ -183,10 +186,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
         web_schema_version = None
         if platform == PLATFORM_CHOICE_ANDROID:
             android_schema_version = (
-                feconf.CURRENT_APP_FEEDBACK_REPORT_ANDROID_SCHEMA_VERSION)
+                feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)
         else:
             web_schema_version = (
-                feconf.CURRENT_APP_FEEDBACK_REPORT_WEB_SCHEMA_VERSION)
+                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION)
         report_entity = cls(
             id=entity_id, platform=platform, submitted_on=submitted_on,
             report_type=report_type, category=category,
@@ -250,27 +253,28 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'platform': base_models.EXPORT_POLICY.EXPORTED,
             'scrubbed_by': base_models.EXPORT_POLICY.EXPORTED,
             'ticket_id': base_models.EXPORT_POLICY.EXPORTED,
-            'submitted_on': (
-                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT),
+            'submitted_on': base_models.EXPORT_POLICY.EXPORTED,
             'report_type': base_models.EXPORT_POLICY.EXPORTED,
             'category': base_models.EXPORT_POLICY.EXPORTED,
             'platform_version': base_models.EXPORT_POLICY.EXPORTED,
-            'device_country_locale_code': base_models.EXPORT_POLICY.EXPORTED,
-            'android_device_model': base_models.EXPORT_POLICY.EXPORTED,
-            'android_sdk_version': base_models.EXPORT_POLICY.EXPORTED,
-            'entry_point': base_models.EXPORT_POLICY.EXPORTED,
-            'entry_point_topic_id': base_models.EXPORT_POLICY.EXPORTED,
-            'entry_point_story_id': base_models.EXPORT_POLICY.EXPORTED,
-            'entry_point_exploration_id': base_models.EXPORT_POLICY.EXPORTED,
-            'entry_point_subtopic_id': base_models.EXPORT_POLICY.EXPORTED,
-            'text_language_code': base_models.EXPORT_POLICY.EXPORTED,
-            'audio_language_code': base_models.EXPORT_POLICY.EXPORTED,
-            'android_report_info': base_models.EXPORT_POLICY.EXPORTED,
+            'device_country_locale_code': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'android_device_model': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'android_sdk_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point_story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point_exploration_id': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'entry_point_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'text_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'audio_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'android_report_info': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'android_report_info_schema_version':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'web_report_info': base_models.EXPORT_POLICY.EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'web_report_info': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'web_report_info_schema_version':
-                base_models.EXPORT_POLICY.EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -292,30 +296,13 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
         for report_model in report_models:
             user_data[report_model.id] = {
+                'scrubbed_by': report_model.scrubbed_by,
                 'platform': report_model.platform,
                 'ticket_id': report_model.ticket_id,
-                'submitted_on': report_model.submitted_on,
+                'submitted_on': report_model.submitted_on.isoformat(),
                 'report_type': report_model.report_type,
                 'category': report_model.category,
-                'platform_version': report_model.platform_version,
-                'device_country_locale_code': (
-                    report_model.device_country_locale_code),
-                'android_device_model': report_model.android_device_model,
-                'android_sdk_version': report_model.android_sdk_version,
-                'entry_point': report_model.entry_point,
-                'entry_point_topic_id': report_model.entry_point_story_id,
-                'entry_point_story_id': report_model.entry_point_story_id,
-                'entry_point_exploration_id': (
-                    report_model.entry_point_exploration_id),
-                'entry_point_subtopic_id': report_model.entry_point_subtopic_id,
-                'text_language_code': report_model.text_language_code,
-                'audio_language_code': report_model.audio_language_code,
-                'android_report_info': report_model.android_report_info,
-                'android_report_info_schema_version': (
-                    report_model.android_report_info_schema_version),
-                'web_report_info': report_model.web_report_info,
-                'web_report_info_schema_version': (
-                    report_model.web_report_info_schema_version)
+                'platform_version': report_model.platform_version
             }
         return user_data
 
