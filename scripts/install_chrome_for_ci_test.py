@@ -48,11 +48,11 @@ class InstallChromeTests(test_utils.GenericTestBase):
                 (['sudo', 'apt-get', 'install', 'libappindicator3-1'],),
                 (['curl', '-L', '-o', CHROME_DEB_FILE, URL],),
                 ([
-                    'sudo' 'sed' '-i'
-                    '\'s|HERE/chrome\"|HERE/chrome\" '
-                    '--disable-setuid-sandbox|g\'',
+                    'sudo', 'sed', '-i',
+                    's|HERE/chrome\\"|HERE/chrome\\" '
+                    '--disable-setuid-sandbox|g',
                     '/opt/google/chrome/google-chrome'],),
-                (['sudo' 'dpkg' '-i', CHROME_DEB_FILE],),
+                (['sudo', 'dpkg', '-i', CHROME_DEB_FILE],),
             ])
 
         with run_cmd_swap:

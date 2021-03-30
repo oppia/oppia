@@ -139,12 +139,12 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e navigation test
           command: |
@@ -171,12 +171,12 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e publication test
           command: |
@@ -201,12 +201,12 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e file upload features test
           command: |
@@ -237,12 +237,12 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e topics and skills dashboard test
           command: |

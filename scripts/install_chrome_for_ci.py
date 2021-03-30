@@ -50,10 +50,10 @@ def install_chrome(version):
         'curl', '-L', '-o', CHROME_DEB_FILE,
         URL_TEMPLATE.format(version)])
     _ = common.run_cmd([
-        'sudo' 'sed' '-i'
-        '\'s|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g\'',
+        'sudo', 'sed', '-i',
+        's|HERE/chrome\\"|HERE/chrome\\" --disable-setuid-sandbox|g',
         '/opt/google/chrome/google-chrome'])
-    _ = common.run_cmd(['sudo' 'dpkg' '-i', CHROME_DEB_FILE])
+    _ = common.run_cmd(['sudo', 'dpkg', '-i', CHROME_DEB_FILE])
 
 
 def get_chrome_version():
