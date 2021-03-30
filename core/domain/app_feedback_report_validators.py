@@ -24,7 +24,6 @@ import datetime
 from core.domain import base_model_validators
 from core.platform import models
 import feconf
-import utils
 
 (
     base_models, app_feedback_report_models
@@ -74,12 +73,12 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         """
         if item.platform == app_feedback_report_models.PLATFORM_CHOICE_ANDROID:
             if item.android_report_info_schema_version > (
-                feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
+                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: android report schema version %s is greater than'
-                    ' current version %s' % (
+                    'Entity id %s: android report schema version %s is greater '
+                    'than current version %s' % (
                         item.id, item.android_report_info_schema_version,
                         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION))
         elif item.web_report_info_schema_version > (
@@ -165,7 +164,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         """
         ticket_model_references = (
             field_name_to_external_model_references['ticket_id'])
-    
+
         for ticket_model_reference in ticket_model_references:
             ticket_model = ticket_model_reference.model_instance
             if ticket_model is None or ticket_model.deleted:
@@ -226,7 +225,7 @@ class AppFeedbackReportTicketModelValidator(
 
         Args:
             item: datastore_services.Model. AppFeedbackReportTicketModel to
-            validate.
+                validate.
         """
         current_datetime = datetime.datetime.utcnow()
         if item.newest_report_timestamp > current_datetime:
@@ -269,7 +268,7 @@ class AppFeedbackReportTicketModelValidator(
         """
         report_model_references = (
             field_name_to_external_model_references['report_ids'])
-    
+
         for report_model_reference in report_model_references:
             report_model = report_model_reference.model_instance
             if report_model is None or report_model.deleted:
@@ -322,8 +321,8 @@ class AppFeedbackReportStatsModelValidator(
         current stats schema.
 
         Args:
-            item: datastore_services.Model. AppFeedbackReportStatsModel to 
-            validate.
+            item: datastore_services.Model. AppFeedbackReportStatsModel to
+                validate.
         """
         if item.daily_ticket_stats_schema_version > (
                 feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION):
@@ -343,7 +342,7 @@ class AppFeedbackReportStatsModelValidator(
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
-            validate.
+                validate.
         """
         current_datetime = datetime.datetime.utcnow()
         if item.stats_tracking_date > current_datetime.date():
@@ -386,7 +385,7 @@ class AppFeedbackReportStatsModelValidator(
         """
         ticket_id_references = (
             field_name_to_external_model_references['ticket_id'])
-    
+
         for ticket_id_reference in ticket_id_references:
             ticket_model = ticket_id_reference.model_instance
             if ticket_model is None or ticket_model.deleted:

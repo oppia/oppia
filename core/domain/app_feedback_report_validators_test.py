@@ -417,8 +417,8 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for newest_report_timestamp '
                 'datetime check of AppFeedbackReportTicketModel\', '
-                '[u\'Entity id %s: The newest_report_timestamp field has a value'
-                ' %s which is greater than the time when the job was '
+                '[u\'Entity id %s: The newest_report_timestamp field has a '
+                'value %s which is greater than the time when the job was '
                 'run\']]') % (
                     model_entity.id, model_entity.newest_report_timestamp)]
 
