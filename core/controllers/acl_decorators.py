@@ -1119,6 +1119,53 @@ def can_voiceover_exploration(handler):
     return test_can_voiceover
 
 
+def can_assign_voiceartist(handler):
+    """Decorator to check whether the user can assign voiceartist in
+    given exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a user
+        has permission to assign voiceartist to a given exploration.
+    """
+
+    def test_can_assign_voiceartist(self, exploration_id, **kwargs):
+        """Checks if the user can assign voiceartist to the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            PageNotFoundException. The page is not found.
+            UnauthorizedUserException. The user does not have credentials to
+                voiceover an exploration.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_assign_voiceartist_in_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to assign voiceartist to'
+                ' this exploration.')
+    test_can_assign_voiceartist.__wrapped__ = True
+
+    return test_can_assign_voiceartist
+
 def can_save_exploration(handler):
     """Decorator to check whether user can save exploration.
 

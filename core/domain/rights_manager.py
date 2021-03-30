@@ -565,6 +565,32 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
+def check_can_assign_voiceartist_in_activity(user, activity_rights):
+    """Check whether the user can assign voicearttist to activity.
+
+    Args:
+        user: UserActionInfo. Object having user_id, role, and actions for
+            given user.
+        activity_rights: AcitivityRights or None. Rights object for the given
+            activity.
+
+    Returns:
+        bool. Whether the user can assign voiceartist.
+    """
+
+    if activity_rights is None:
+        return False
+
+    if (activity_rights.community_owned and
+            role_services.ACTION_CAN_ASSIGN_VOICEARTIST):
+        return True
+    elif (activity_rights.is_published() and
+            role_services.ACTION_CAN_ASSIGN_VOICEARTIST):
+        return True
+    else:
+        return False
+
+
 def check_can_save_activity(user, activity_rights):
     """Checks whether the user can save given activity.
 
