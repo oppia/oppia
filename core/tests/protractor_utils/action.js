@@ -84,8 +84,8 @@ var sendKeys = async function(
 
 exports.clear = clear;
 exports.click = click;
+exports.getText = getText;
 exports.select = select;
 exports.select2 = select2;
 exports.sendKeys = sendKeys;
 exports.waitForAutosave = waitForAutosave;
-exports.getText = getText;
