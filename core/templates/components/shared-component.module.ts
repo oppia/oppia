@@ -70,6 +70,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -114,6 +115,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     LoadingDotsComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    ResponseHeaderComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -139,6 +141,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
+    ResponseHeaderComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -165,6 +168,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
     SharingLinksComponent,
+    ResponseHeaderComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,

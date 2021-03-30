@@ -50,11 +50,11 @@
                 <a ng-click="changeActiveHintIndex($index)"
                    class="oppia-rule-tab protractor-test-hint-tab"
                    ng-class="{'oppia-rule-tab-active': StateHintsService.getActiveHintIndex() === $index}">
-                  <response-header index="$index"
-                                   summary="getHintSummary(hint)"
-                                   short-summary="getHintSummary(hint)"
-                                   is-active="$index === StateHintsService.getActiveHintIndex()"
-                                   on-delete-fn="deleteHint">
+                  <response-header [index]="$index"
+                                   (summary)="getHintSummary(hint)"
+                                   (short-summary)="getHintSummary(hint)"
+                                   [is-active]="$index === StateHintsService.getActiveHintIndex()"
+                                   [on-delete-fn]="deleteHint">
                   </response-header>
                 </a>
 
