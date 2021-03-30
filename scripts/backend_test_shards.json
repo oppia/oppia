@@ -128,7 +128,8 @@
         "core.domain.user_services_test",
         "core.domain.fs_services_test",
         "core.domain.feedback_jobs_continuous_test",
-        "core.domain.recommendations_services_test"
+        "core.domain.recommendations_services_test",
+        "core.domain.mailchimp_services_test"
     ],
     "6": [
         "core.domain.object_registry_test",
