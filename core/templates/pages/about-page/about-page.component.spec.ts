@@ -34,7 +34,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, params: Object | undefined): string {
     return value;
   }
 }

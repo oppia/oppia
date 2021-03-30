@@ -42,6 +42,7 @@ def clone_model(model, **new_values):
     """
     # Reference implementation: https://stackoverflow.com/a/2712401/4859885.
     cls = model.__class__
+    model_id = new_values.pop('id', model.id)
     props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
     props.update(new_values)
-    return cls(id=model.id, **props)
+    return cls(id=model_id, **props)
