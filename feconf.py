@@ -178,6 +178,9 @@ IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
 MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -211,10 +214,10 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The current version of the Android feedback report info blob schema.
-CURRENT_APP_FEEDBACK_REPORT_ANDROID_SCHEMA_VERSION = 1
+CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the web feedback report info blob schema.
-CURRENT_APP_FEEDBACK_REPORT_WEB_SCHEMA_VERSION = 1
+CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the app feedback report daily stats blob schema.
 CURRENT_REPORT_STATS_SCHEMA_VERSION = 1

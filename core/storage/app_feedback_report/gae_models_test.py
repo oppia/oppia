@@ -179,7 +179,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_export_data_nontrivial(self):
-        stored_data = (
+        exported_data = (
             app_feedback_report_models.AppFeedbackReportModel.export_data(
                 self.USER_ID))
 
@@ -188,31 +188,16 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             'randomInteger123')
         expected_data = {
             report_id: {
+                'scrubbed_by': self.USER_ID,
                 'platform': self.PLATFORM_ANDROID,
                 'ticket_id': self.TICKET_ID,
-                'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP_1,
+                'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP_1.isoformat(),
                 'report_type': self.REPORT_TYPE_SUGGESTION,
                 'category': self.CATEGORY_OTHER,
-                'platform_version': self.PLATFORM_VERSION,
-                'device_country_locale_code': (
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
-                'android_device_model': self.ANDROID_DEVICE_MODEL,
-                'android_sdk_version': self.ANDROID_SDK_VERSION,
-                'entry_point': self.ENTRY_POINT_NAVIGATION_DRAWER,
-                'entry_point_topic_id': None,
-                'entry_point_exploration_id': None,
-                'entry_point_story_id': None,
-                'entry_point_subtopic_id': None,
-                'text_language_code': self.TEXT_LANGUAGE_CODE_ENGLISH,
-                'audio_language_code': self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                'android_report_info': self.ANDROID_REPORT_INFO,
-                'android_report_info_schema_version': (
-                    self.ANDROID_REPORT_INFO_SCHEMA_VERSION),
-                'web_report_info': None,
-                'web_report_info_schema_version': None
+                'platform_version': self.PLATFORM_VERSION
             }
         }
-        self.assertEqual(stored_data, expected_data)
+        self.assertEqual(exported_data, expected_data)
 
     def test_get_lowest_supported_role(self):
         model = app_feedback_report_models.AppFeedbackReportModel
