@@ -45,14 +45,8 @@ commands:
     description: "Install Chrome"
     steps:
       - run:
-          name:  Install chrome version 88.0.4324.96-1
-          command: |
-            sudo apt-get update
-            sudo apt-get install lsb-release
-            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_88.0.4324.96-1_amd64.deb
-            sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-            sudo dpkg -i google-chrome.deb
-            google-chrome --version
+          name: Install chrome
+          command: python -m scripts.install_chrome_for_ci
 
   merge_target_branch:
     description: "Merge to target branch"
