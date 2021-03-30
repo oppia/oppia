@@ -748,7 +748,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             parent_user_id=self.PROFILE_ID_1
         ).put()
 
-        # Set-up for AppFeedbackReportModel scrubbed by user
+        # Set-up for AppFeedbackReportModel scrubbed by user.
         app_feedback_report_models.AppFeedbackReportModel(
             id='%s.%s.%s' % (
                 self.PLATFORM_ANDROID,
@@ -1465,18 +1465,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_user_auth_details = {}
         expected_app_feedback_report = {
             '%s.%s.%s' % (
-                self.PLATFORM_ANDROID,
-                self.REPORT_SUBMITTED_TIMESTAMP.second,
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
                 'randomInteger123'): {
-                'scrubbed_by': self.USER_ID_1,
-                'platform': self.PLATFORM_ANDROID,
-                'ticket_id': self.TICKET_ID,
-                'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
-                'report_type': self.REPORT_TYPE_SUGGESTION,
-                'category': self.CATEGORY_OTHER,
-                'platform_version': self.PLATFORM_VERSION
-            }
-        }
+                    'scrubbed_by': self.USER_ID_1,
+                    'platform': self.PLATFORM_ANDROID,
+                    'ticket_id': self.TICKET_ID,
+                    'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+                    'report_type': self.REPORT_TYPE_SUGGESTION,
+                    'category': self.CATEGORY_OTHER,
+                    'platform_version': self.PLATFORM_VERSION}}
 
         expected_user_data = {
             'user_stats': expected_stats_data,
