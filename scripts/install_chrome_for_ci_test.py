@@ -72,8 +72,8 @@ class InstallChromeTests(test_utils.GenericTestBase):
         with run_cmd_swap:
             with self.assertRaisesRegexp(
                 subprocess.CalledProcessError,
-                "Command 'sudo apt-get update' returned non-zero exit "
-                "status 1"
+                'Command \'sudo apt-get update\' returned non-zero exit '
+                'status 1'
             ):
                 install_chrome_for_ci.install_chrome(DOWNLOAD_VERSION)
 
@@ -108,8 +108,8 @@ class GetChromeVersionTests(test_utils.GenericTestBase):
         with run_cmd_swap:
             with self.assertRaisesRegexp(
                 subprocess.CalledProcessError,
-                "Command 'google-chrome --version' returned non-zero exit "
-                "status 1"
+                'Command \'google-chrome --version\' returned non-zero exit '
+                'status 1'
             ):
                 install_chrome_for_ci.get_chrome_version()
 

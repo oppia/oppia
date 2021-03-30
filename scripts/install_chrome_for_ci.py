@@ -22,12 +22,10 @@ was installed.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import argparse
 import re
-import subprocess
 
-from scripts import common
 import python_utils
+from scripts import common
 
 
 CHROME_VERSION = '88.0.4324.96-1'
