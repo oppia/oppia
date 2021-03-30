@@ -178,6 +178,9 @@ IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
 MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -214,6 +217,9 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # incompatible changes are made to the stats blob schema in the data store,
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
+
+# The earliest supported version of the exploration states blob schema.
+EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
@@ -1146,6 +1152,10 @@ ROLE_EDITOR = 'editor'
 ROLE_VOICE_ARTIST = 'voice artist'
 ROLE_VIEWER = 'viewer'
 ROLE_NONE = 'none'
+
+# The list of entity types that do not require entity specific access control
+# when viewing respective suggestions.
+ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS = [ENTITY_TYPE_SKILL]
 
 # The allowed list of roles which can be used in change_role command.
 ALLOWED_ACTIVITY_ROLES = [
