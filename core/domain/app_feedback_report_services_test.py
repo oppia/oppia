@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import app_feedback_report_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -83,22 +84,21 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         model_class = app_feedback_report_models.AppFeedbackReportModel
         self.web_report_id = model_class.create(
-                self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP,
-                self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-                self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-                self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-                self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
-                self.TEXT_LANGUAGE_CODE_ENGLISH,
-                self.AUDIO_LANGUAGE_CODE_ENGLISH, None, self.WEB_REPORT_INFO)
+            self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP,
+            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
+            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            None, self.WEB_REPORT_INFO)
         self.android_report_id = model_class.create(
-                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP,
-                self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-                self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-                self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-                self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
-                self.TEXT_LANGUAGE_CODE_ENGLISH,
-                self.AUDIO_LANGUAGE_CODE_ENGLISH, self.ANDROID_REPORT_INFO,
-                None)
+            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP,
+            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
+            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            self.ANDROID_REPORT_INFO, None)
 
     def test_scrub_android_report(self):
         expected_report_dict = {
@@ -113,7 +113,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             'is_admin': False
         }
 
-        app_feedback_report_models.AppFeedbackReportModel.scrub_report(
+        app_feedback_report_services.scrub_report(
             self.android_report_id, 'scrubber_user')
         scrubbed_report_model = (
             app_feedback_report_models.AppFeedbackReportModel.get(
@@ -123,7 +123,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             scrubbed_report_model.android_report_info, expected_report_dict)
 
     def test_scrub_web_report(self):
-        app_feedback_report_models.AppFeedbackReportModel.scrub_report(
+        app_feedback_report_services.scrub_report(
             self.web_report_id, 'scrubber_user')
         scrubbed_report_model = (
             app_feedback_report_models.AppFeedbackReportModel.get(
@@ -143,5 +143,5 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'The AppFeedbackReportModel trying to be scrubbed does not '
             'exist.'):
-            app_feedback_report_models.AppFeedbackReportModel.scrub_report(
+            app_feedback_report_services.scrub_report(
                 fake_report_id, 'scrubber_user')

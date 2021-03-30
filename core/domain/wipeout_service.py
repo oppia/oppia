@@ -1086,7 +1086,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     report_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
             models.NAMES.app_feedback_report])
-    
+
     for i in python_utils.RANGE(
             0, len(feedback_report_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):

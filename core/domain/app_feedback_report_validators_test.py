@@ -112,7 +112,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
 
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id=self.TICKET_ID, ticket_name='example ticket',
-            github_issue_number=None, ticket_is_archived=False,
+            github_issue_number=None, archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
             report_ids=[self.report_id]).put()
 
@@ -160,6 +160,30 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.second,
         'randomInteger123')]
     TICKET_NAME = 'example ticket name'
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 22
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
     def setUp(self):
         super(AppFeedbackReportTicketModelValidatorTests, self).setUp()
@@ -170,25 +194,43 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
                 ticket_name=self.TICKET_NAME,
-                github_issue_number=None, ticket_is_archived=False,
+                github_issue_number=None,
                 newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_ids=self.REPORT_IDS_LIST
-            ))
+                report_ids=self.REPORT_IDS_LIST))
+        app_feedback_report_models.AppFeedbackReportModel(
+            id='%s.%s.%s' % (
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
+                'randomInteger123'),
+            platform=self.PLATFORM_ANDROID,
+            ticket_id=self.ticket_id,
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
 
         self.job_class = (
             prod_validation_jobs.AppFeedbackReportTicketModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [
-            u'[u\'fully-validated AppFeedbackReporTicketModel\', 1]']
+            u'[u\'fully-validated AppFeedbackReportTicketModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_fails_with_invalid_id(self):
         app_feedback_report_models.AppFeedbackReportTicketModel(
-            id='invalid_entity_id',
-            ticket_name=self.TICKET_NAME,
-            github_issue_number=None,
+            id='invalid_entity_id', ticket_name=self.TICKET_NAME,
+            github_issue_number=None, archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
             report_ids=self.REPORT_IDS_LIST
         ).put()
@@ -222,6 +264,11 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     STATS_ID = '%s:%s:%s' % (
         PLATFORM_ANDROID, TICKET_ID, STATS_DATE_TIMESTAMP.isoformat())
 
+    # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    REPORT_ID = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.second, 'randomInteger123')
+
     def setUp(self):
         super(AppFeedbackReportStatsModelValidatorTests, self).setUp()
 
@@ -235,6 +282,11 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 stats_tracking_date=self.STATS_DATE_TIMESTAMP,
                 daily_ticket_stats=self.DAILY_STATS
             ))
+        app_feedback_report_models.AppFeedbackReportTicketModel(
+            id=self.TICKET_ID, ticket_name='example ticket',
+            github_issue_number=None, archived=False,
+            newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_ids=[self.REPORT_ID]).put()
 
         self.job_class = (
             prod_validation_jobs.AppFeedbackReportStatsModelAuditOneOffJob)

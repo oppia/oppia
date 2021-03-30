@@ -146,6 +146,8 @@
         "core.domain.job_validators_test"
     ],
     "8": [
+        "core.domain.app_feedback_report_services_test",
+        "core.domain.app_feedback_report_validators_test",
         "core.domain.taskqueue_services_test",
         "core.domain.collection_jobs_one_off_test",
         "core.domain.email_services_test",

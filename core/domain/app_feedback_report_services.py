@@ -56,7 +56,7 @@ def _scrub_report_in_transaction(report_id, scrubbed_by):
             'The AppFeedbackReportModel trying to be scrubbed does not '
             'exist.')
     if report_entity.platform == (
-        app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
+            app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
         scrubbed_report_info = _scrub_report_info(
             report_entity.android_report_info)
         report_entity.android_report_info = scrubbed_report_info
