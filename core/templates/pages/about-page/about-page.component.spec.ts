@@ -157,7 +157,6 @@ describe('About Page', () => {
 
     expect(component.userIsLoggedIn).toBe(false);
     expect(component.classroomUrl).toBe('/learn/math');
-    expect(component.loginUrl).toBe('/_ah/login');
   });
 
   it('should show and hide loading screen with the correct text', () =>

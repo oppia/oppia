@@ -35,7 +35,6 @@ import constants from 'assets/constants';
 export class AboutPageComponent implements OnInit {
   classroomUrlFragment: string;
   classroomUrl :string;
-  loginUrl: string;
   userIsLoggedIn: boolean;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -67,7 +66,6 @@ export class AboutPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.userIsLoggedIn = false;
-    this.loginUrl = '/_ah/login';
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
