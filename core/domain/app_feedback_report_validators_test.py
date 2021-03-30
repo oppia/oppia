@@ -569,7 +569,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 daily_ticket_stats=self.DAILY_STATS))
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-                self.entity_id))
+                entity_id))
         self.expected_output.append(
             (
                 u'[u\'failed validation check for stats_tracking_date '
@@ -593,7 +593,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 daily_ticket_stats=self.DAILY_STATS))
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-                self.entity_id))
+                entity_id))
         self.expected_output.append(
             (
                 u'[u\'failed validation check for stats_tracking_date '
