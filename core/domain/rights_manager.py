@@ -770,6 +770,9 @@ def _assign_role(
             rights_domain.ROLE_VIEWER
     ]:
         raise Exception('Invalid role: %s' % new_role)
+    # TODO(#12369): Currently, only exploration allows reassigning users to
+    # any role. We are expecting to remove the below check and allow this
+    # function to assign any role in general once the collection is removed.
     if allow_assigning_any_role:
         old_role = activity_rights.assign_new_role(assignee_id, new_role)
 

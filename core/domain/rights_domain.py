@@ -268,7 +268,7 @@ class ActivityRights(python_utils.OBJECT):
                     'This user already owns this exploration.')
             elif old_role == ROLE_EDITOR:
                 raise Exception(
-                    'This user already can edit this exploartion.')
+                    'This user already can edit this exploration.')
             elif old_role == ROLE_VOICE_ARTIST:
                 raise Exception(
                     'This user already can voiceover this exploration.')
