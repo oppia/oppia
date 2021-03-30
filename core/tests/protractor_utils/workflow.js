@@ -59,8 +59,8 @@ var checkForAddTitleWarning = async function() {
 var triggerTitleOnBlurEvent = async function() {
   var tstExpTitI = element(by.css('.protractor-test-exploration-title-input'));
   await action.click('Test Exploration Title Input', tstExpTitI);
-  var tstExpObjI = element(by.css('.protractor-test-exploration-objective-input'));
-  await action.click('Test Exploration Objective Input', tstExpObjI);
+  var tstExOI = element(by.css('.protractor-test-exploration-objective-input'));
+  await action.click('Test Exploration Objective Input', tstExOI);
 };
 
 // Open edit roles.
@@ -146,7 +146,7 @@ var publishExploration = async function() {
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   await prePublicationButtonElem.isPresent();
-  await action.click('Pre Publication Button Element', prePublicationButtonElem);
+  await action.click('PrePublication Button Element', prePublicationButtonElem);
 
 
   await waitFor.invisibilityOf(
