@@ -557,6 +557,47 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
 
+    def test_model_fails_with_stats_tracking_date_greater_than_current_datetime(
+            self):
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                self.entity_id))
+        model_entity.stats_tracking_date = (
+            datetime.datetime.utcnow() + datetime.timedelta(days=2))
+        model_entity.update_timestamps()
+        model_entity.put()
+        output = [
+            (
+                u'[u\'failed validation check for stats_tracking_date '
+                'datetime check of AppFeedbackReportStatsModel\', '
+                '[u\'Entity id %s: The stats_tracking_date field has a '
+                'value %s which is greater than the time when the job was '
+                'run\']]') % (
+                    model_entity.id, model_entity.stats_tracking_date)]
+
+        self.run_job_and_check_output(
+            output, sort=False, literal_eval=False)
+
+    def test_model_fails_with_stats_tracking_date_less_than_earliest_datetime(
+            self):
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                self.entity_id))
+        model_entity.stats_tracking_date = (
+            EARLIEST_VALID_DATETIME - datetime.timedelta(days=2))
+        model_entity.update_timestamps()
+        model_entity.put()
+        output = [
+            (
+                u'[u\'failed validation check for stats_tracking_date '
+                'datetime check of AppFeedbackReportStatsModel\', [u\'Entity '
+                'id %s: The stats_tracking_date field has a value %s which '
+                'is less than the earliest possible submission date\']]') % (
+                    model_entity.id, model_entity.stats_tracking_date)]
+
+        self.run_job_and_check_output(
+            output, sort=False, literal_eval=False)
+
     def test_model_validation_with_invalid_external_references(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
