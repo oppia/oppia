@@ -89,6 +89,11 @@ export class ContentTranslationLanguageService {
     allContentLanguageCodesInExploration.push(explorationLanguageCode);
     allContentLanguageCodesInExploration.forEach(
       (languageCode: string) => {
+        // TODO(#12341): Change getContentanguageDescription to instead refer to
+        // the list of languages that we support written translations for. (Note
+        // that this is not the same as "getContentLanguageDescription", because
+        // the latter refers to the language that the exploration is written
+        // in.)
         let languageDescription =
             this.languageUtilService.getContentLanguageDescription(
               languageCode);

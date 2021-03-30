@@ -23,6 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
+import { ContextService } from 'services/context.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { PlayerPositionService } from
@@ -43,6 +44,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
+    private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private ngbModal: NgbModal,
@@ -69,8 +71,12 @@ export class ContentLanguageSelectorComponent implements OnInit {
         newLanguageCode);
       this.selectedLanguageCode = newLanguageCode;
     }
-    this.imagePreloaderService.restartImagePreloader(
-      this.playerTranscriptService.getCard(0).getStateName());
+
+    // Image preloading is disabled in the exploration editor preview mode.
+    if (!this.contextService.isInExplorationEditorPage()) {
+      this.imagePreloaderService.restartImagePreloader(
+        this.playerTranscriptService.getCard(0).getStateName());
+    }
 
     return this.selectedLanguageCode;
   }

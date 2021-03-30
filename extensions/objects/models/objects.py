@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from constants import constants
-from core.domain import html_cleaner
 import python_utils
 import schema_utils
 
@@ -61,87 +60,6 @@ class BaseObject(python_utils.OBJECT):
             TypeError. The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.get_schema())
-
-
-class BaseTranslatableObject(BaseObject):
-    """Base translatable object class.
-
-    This is a superclass for objects that are translatable and thus require a
-    content id. This class enforces that the object is a dictionary with a
-    content id field. The schema of the actual value is determined by the
-    _value_schema property.
-    """
-
-    # The key name in the translatable object corresponding to the translatable
-    # value. This field must be populated by subclasses.
-    _value_key_name = None
-    """The schema of the translatable value. This field must be populated
-    by subclasses."""
-    _value_schema = None
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Returns a method that normalizes the values of the object.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                ormalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-        """
-        raise NotImplementedError(
-            'Subclasses of BaseTranslatableObject should implement '
-            '_normalize_value().')
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the full object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        if cls._value_key_name is None or cls._value_schema is None:
-            raise NotImplementedError(
-                'The _value_key_name and _value_schema for this class must '
-                'both be set.')
-        return {
-            'type': 'dict',
-            'properties': [{
-                'name': 'contentId',
-                # The default content id is none. However, it should be
-                # populated before being saved. The normalize() method has
-                # validation checks for this.
-                'schema': {'type': 'unicode_or_none'}
-            }, {
-                'name': cls._value_key_name,
-                'schema': copy.deepcopy(cls._value_schema),
-            }]
-        }
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object.
-
-        Args:
-            raw: dict. A Python object to be validated against the schema,
-                normalizing if necessary.
-
-        Returns:
-            dict. The normalized object.
-
-        Raises:
-            TypeError. Error while normalizing.
-        """
-        if not isinstance(raw['contentId'], python_utils.BASESTRING):
-            raise TypeError(
-                'Expected content id to be a string, received %s' %
-                raw['contentId'])
-
-        return schema_utils.normalize_against_schema(
-            cls._normalize_value(raw),
-            cls.get_schema())
 
 
 class Boolean(BaseObject):
@@ -249,7 +167,7 @@ class Html(BaseObject):
         }
 
 
-# TODO(#11433): Migrate SubtitledUnicode to TranslatableUnicode.
+# TODO(#11433): Migrate SubtitledUnicode to TranslatableUnicodeString.
 class SubtitledUnicode(BaseObject):
     """SubtitledUnicode class."""
 
@@ -1633,159 +1551,6 @@ class CustomOskLetters(BaseObject):
         }
 
 
-class TranslatableUnicode(BaseTranslatableObject):
-    """Class for translatable unicode strings."""
-
-    _value_key_name = 'unicodeStr'
-    _value_schema = UnicodeString.get_schema()
-
-    default_value = {
-        'contentId': None,
-        'unicodeStr': ''
-    }
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatable object.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                normalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-
-        Raises:
-            TypeError. The Python object cannot be normalized.
-        """
-        if not isinstance(raw['unicodeStr'], python_utils.BASESTRING):
-            raise TypeError(
-                'Invalid unicode string: %s' % raw['unicodeStr'])
-
-        return raw
-
-
-class TranslatableHtml(BaseTranslatableObject):
-    """Class for translatable HTML strings."""
-
-    _value_key_name = 'html'
-    _value_schema = Html.get_schema()
-
-    default_value = {
-        'contentId': None,
-        'html': ''
-    }
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatable value.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                normalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-
-        Raises:
-            TypeError. The Python object cannot be normalized.
-        """
-        if not isinstance(raw['html'], python_utils.BASESTRING):
-            raise TypeError('Invalid HTML: %s' % raw['html'])
-
-        raw['html'] = html_cleaner.clean(raw['html'])
-
-        return raw
-
-
-class TranslatableSetOfNormalizedString(BaseTranslatableObject):
-    """Class for translatable sets of NormalizedStrings."""
-
-    _value_key_name = 'normalizedStrSet'
-    _value_schema = SetOfNormalizedString.get_schema()
-
-    default_value = {
-        'contentId': None,
-        'normalizedStrSet': []
-    }
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatable value.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                normalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-
-        Raises:
-            TypeError. The Python object cannot be normalized.
-        """
-        if not isinstance(raw['normalizedStrSet'], list):
-            raise TypeError(
-                'Invalid unicode string set: %s' % raw['normalizedStrSet'])
-
-        for normalized_str in raw['normalizedStrSet']:
-            if not isinstance(normalized_str, python_utils.BASESTRING):
-                raise TypeError(
-                    'Invalid content unicode: %s' % normalized_str)
-
-        normalized_str_set = set(raw['normalizedStrSet'])
-        if len(normalized_str_set) != len(raw['normalizedStrSet']):
-            raise TypeError(
-                'Duplicate unicode found '
-                'in set: %s' % raw['normalizedStrSet'])
-
-        return raw
-
-
-class TranslatableSetOfUnicodeString(BaseTranslatableObject):
-    """Class for translatable sets of UnicodeStrings."""
-
-    _value_key_name = 'unicodeStrSet'
-    _value_schema = SetOfUnicodeString.get_schema()
-
-    default_value = {
-        'contentId': None,
-        'unicodeStrSet': []
-    }
-
-    @staticmethod
-    def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatable object.
-
-        Args:
-            raw: *. A translatable Python object whose values are to be
-                normalized.
-
-        Returns:
-            dict. A normalized translatable Python object with its values
-            normalized.
-
-        Raises:
-            TypeError. The Python object cannot be normalized.
-        """
-        if not isinstance(raw['unicodeStrSet'], list):
-            raise TypeError(
-                'Invalid unicode string set: %s' % raw['unicodeStrSet'])
-
-        for unicode_str in raw['unicodeStrSet']:
-            if not isinstance(unicode_str, python_utils.BASESTRING):
-                raise TypeError(
-                    'Invalid content unicode: %s' % unicode_str)
-
-        if len(set(raw['unicodeStrSet'])) != len(raw['unicodeStrSet']):
-            raise TypeError(
-                'Duplicate unicode found in set: %s' % raw['unicodeStrSet'])
-
-        return raw
-
-
 class TranslatableHtmlContentId(BaseObject):
     """A TranslatableHtml content id."""
 
@@ -1838,3 +1603,109 @@ class ListOfSetsOfTranslatableHtmlContentIds(BaseObject):
             'type': 'list',
             'items': SetOfTranslatableHtmlContentIds.get_schema()
         }
+
+
+class BaseTranslatableObject(BaseObject):
+    """Base translatable object class.
+
+    This is a superclass for objects that are translatable and thus require a
+    content id. This class enforces that the object is a dictionary with a
+    content id field. The schema of the actual value is determined by the
+    _value_schema property.
+    """
+
+    # The key name in the translatable object corresponding to the translatable
+    # value. This field must be populated by subclasses.
+    _value_key_name = None
+    # The schema of the translatable value. This field must be populated by
+    # subclasses.
+    _value_schema = None
+    # The default value of the object. This field must be populated by
+    # subclasses.
+    default_value = None
+
+    @classmethod
+    def normalize_value(cls, value):
+        """Normalizes the translatable value of the object.
+
+        Args:
+            value: *. The translatable part of the Python object (corresponding
+                to the non-content-id field) which is to be normalized.
+
+        Returns:
+            *. The normalized value.
+        """
+        if cls._value_key_name is None or cls._value_schema is None:
+            raise NotImplementedError(
+                'The _value_key_name and _value_schema for this class must '
+                'both be set.')
+        return schema_utils.normalize_against_schema(value, cls._value_schema)
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the full object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        if cls._value_key_name is None or cls._value_schema is None:
+            raise NotImplementedError(
+                'The _value_key_name and _value_schema for this class must '
+                'both be set.')
+        return {
+            'type': 'dict',
+            'properties': [{
+                'name': 'contentId',
+                # The default content id is none. However, it should be
+                # populated before being saved. The normalize() method has
+                # validation checks for this.
+                'schema': {'type': 'unicode'}
+            }, {
+                'name': cls._value_key_name,
+                'schema': copy.deepcopy(cls._value_schema),
+            }]
+        }
+
+
+class TranslatableUnicodeString(BaseTranslatableObject):
+    """Class for translatable unicode strings."""
+
+    _value_key_name = 'unicodeStr'
+    _value_schema = UnicodeString.get_schema()
+    default_value = {
+        'contentId': None,
+        'unicodeStr': '',
+    }
+
+
+class TranslatableHtml(BaseTranslatableObject):
+    """Class for translatable HTML strings."""
+
+    _value_key_name = 'html'
+    _value_schema = Html.get_schema()
+    default_value = {
+        'contentId': None,
+        'html': '',
+    }
+
+
+class TranslatableSetOfNormalizedString(BaseTranslatableObject):
+    """Class for translatable sets of NormalizedStrings."""
+
+    _value_key_name = 'normalizedStrSet'
+    _value_schema = SetOfNormalizedString.get_schema()
+    default_value = {
+        'contentId': None,
+        'normalizedStrSet': [],
+    }
+
+
+class TranslatableSetOfUnicodeString(BaseTranslatableObject):
+    """Class for translatable sets of UnicodeStrings."""
+
+    _value_key_name = 'unicodeStrSet'
+    _value_schema = SetOfUnicodeString.get_schema()
+    default_value = {
+        'contentId': None,
+        'unicodeStrSet': [],
+    }
