@@ -63,6 +63,8 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/truncate-and-capitalize.pipe';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+
 
 // Services.
 import { AuthService } from 'services/auth.service';
@@ -124,6 +126,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
+    SortByPipe,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
     PromoBarComponent,
@@ -178,8 +181,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TruncateAndCapitalizePipe,
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
+    SortByPipe,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
+    LoadingDotsComponent,
     PromoBarComponent,
   ],
 })

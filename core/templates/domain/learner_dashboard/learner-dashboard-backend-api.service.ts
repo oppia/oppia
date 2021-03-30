@@ -70,6 +70,12 @@ interface LearnerDashboardData {
   subscriptionList: ProfileSummary[];
 }
 
+interface AddMessagePayload {
+  'updated_status': boolean,
+  'updated_subject': string,
+  'text': string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -129,6 +135,28 @@ export class LearnerDashboardBackendApiService {
 
   async fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
     return this._fetchLearnerDashboardDataAsync();
+  }
+
+  async addNewMessageAsync(url: string, payload: AddMessagePayload): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.post<void>(url, payload).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResonse => {
+          reject(errorResonse.error.error);
+        });
+    });
+  }
+
+  async onClickThreadAsync(threadDataUrl: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.get<Object>(
+        threadDataUrl).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
   }
 }
 

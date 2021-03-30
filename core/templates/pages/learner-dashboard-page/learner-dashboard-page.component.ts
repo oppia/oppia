@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,501 +14,539 @@
 
 
 /**
- * @fileoverview Component for the creator dashboard.
+ * @fileoverview Component for the learner dashboard.
  */
+
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
+import { AppConstants } from 'app.constants';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { FeedbackThreadSummary } from 'domain/feedback_thread/feedback-thread-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
+import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import { AlertsService } from 'services/alerts.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { LoaderService } from 'services/loader.service';
+import { UserService } from 'services/user.service';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.component.ts');
-require('components/summary-tile/collection-summary-tile.component.ts');
-require('components/summary-tile/exploration-summary-tile.component.ts');
-require('filters/string-utility-filters/truncate.filter.ts');
-require(
-  'pages/learner-dashboard-page/modal-templates/' +
-  'remove-activity-from-learner-dashboard-modal.controller.ts');
+@Component({
+  selector: 'learner-dashboard-page',
+  templateUrl: './learner-dashboard-page.component.html',
+  styleUrls: [],
+  animations: [
 
-require('directives/angular-html-bind.directive.ts');
-require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-status-display.service.ts');
-require(
-  'pages/learner-dashboard-page/suggestion-modal/' +
-  'suggestion-modal-for-learner-dashboard.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
-require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+  ],
 
-require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
-angular.module('oppia').component('learnerDashboardPage', {
-  template: require('./learner-dashboard-page.component.html'),
-  controller: [
-    '$http', '$q', '$rootScope', '$uibModal',
-    'AlertsService', 'DateTimeFormatService', 'DeviceInfoService',
-    'LearnerDashboardBackendApiService', 'LoaderService',
-    'SuggestionModalForLearnerDashboardService',
-    'ThreadStatusDisplayService', 'UrlInterpolationService',
-    'UserService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
-    'FATAL_ERROR_CODES', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
-    'LEARNER_DASHBOARD_SECTION_I18N_IDS',
-    'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
-    'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
-    function(
-        $http, $q, $rootScope, $uibModal,
-        AlertsService, DateTimeFormatService, DeviceInfoService,
-        LearnerDashboardBackendApiService, LoaderService,
-        SuggestionModalForLearnerDashboardService,
-        ThreadStatusDisplayService, UrlInterpolationService,
-        UserService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
-        FATAL_ERROR_CODES, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-        LEARNER_DASHBOARD_SECTION_I18N_IDS,
-        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
-        SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
-      var ctrl = this;
-      var threadIndex = null;
+  // .animation('.menu-sub-section', function() {
+  //   var NG_HIDE_CLASS = 'ng-hide';
+  //   return {
+  //     beforeAddClass: function(element, className, done) {
+  //       if (className === NG_HIDE_CLASS) {
+  //         element.slideUp(done);
+  //       }
+  //     },
+  //     removeClass: function(element, className, done) {
+  //       if (className === NG_HIDE_CLASS) {
+  //         element.hide().slideDown(done);
+  //       }
+  //     }
+  //   };
+  // });
+  // encapsulation: ViewEncapsulation.None
+})
+export class LearnerDashboardPageComponent implements OnInit {
+  threadIndex: number;
 
-      ctrl.setActiveSection = function(newActiveSectionName) {
-        ctrl.activeSection = newActiveSectionName;
-        if (ctrl.activeSection ===
-          LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
-          ctrl.feedbackThreadActive === true) {
-          ctrl.feedbackThreadActive = false;
-        }
-      };
+  // constant.
+  EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
+    LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
+  SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
+    LearnerDashboardPageConstants.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS);
+  FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
+    LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+  LEARNER_DASHBOARD_SECTION_I18N_IDS = (
+    LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
+  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
+    LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+  PAGE_SIZE = 8;
+  Math = window.Math;
+  username: string = '';
 
-      ctrl.setActiveSubsection = function(newActiveSubsectionName) {
-        ctrl.activeSubsection = newActiveSubsectionName;
-      };
+  isCurrentExpSortDescending: boolean;
+  isCurrentSubscriptionSortDescending: boolean;
+  isCurrentFeedbackSortDescending: boolean;
+  currentExpSortType: string;
+  currentSubscribersSortType: string;
+  currentFeedbackThreadsSortType: string;
+  startIncompleteExpIndex: number;
+  startCompletedExpIndex: number;
+  startIncompleteCollectionIndex: number;
+  startCompletedCollectionIndex: number;
+  //list.
+  completedExplorationsList: LearnerExplorationSummary[];
+  completedCollectionsList: CollectionSummary[];
+  incompleteExplorationsList: LearnerExplorationSummary[];
+  incompleteCollectionsList: CollectionSummary[];
+  subscriptionsList: ProfileSummary[];
+  //number.
+  numberNonexistentIncompleteExplorations: number;
+  numberNonexistentIncompleteCollections: number;
+  numberNonexistentCompletedExplorations: number;
+  numberNonexistentCompletedCollections: number;
+  numberNonexistentExplorationsFromPlaylist: number;
+  numberNonexistentCollectionsFromPlaylist: number;
+  completedToIncompleteCollections: string[];
+  threadSummaries: FeedbackThreadSummary[];
+  numberOfUnreadThreads: number;
+  explorationPlaylist: LearnerExplorationSummary[];
+  collectionPlaylist: CollectionSummary[];
+  activeSection: string;
+  activeSubsection: string;
+  feedbackThreadActive: boolean;
 
-      ctrl.getExplorationUrl = function(explorationId) {
-        return '/explore/' + explorationId;
-      };
-
-      ctrl.getCollectionUrl = function(collectionId) {
-        return '/collection/' + collectionId;
-      };
-
-      ctrl.checkMobileView = function() {
-        return DeviceInfoService.isMobileDevice();
-      };
-
-      ctrl.getVisibleExplorationList = function(startCompletedExpIndex) {
-        return ctrl.completedExplorationsList.slice(
-          startCompletedExpIndex, Math.min(
-            startCompletedExpIndex + ctrl.PAGE_SIZE,
-            ctrl.completedExplorationsList.length));
-      };
-
-      ctrl.showUsernamePopover = function(subscriberUsername) {
-        // The popover on the subscription card is only shown if the length
-        // of the subscriber username is greater than 10 and the user hovers
-        // over the truncated username.
-        if (subscriberUsername.length > 10) {
-          return 'mouseenter';
-        } else {
-          return 'none';
-        }
-      };
-
-      ctrl.goToPreviousPage = function(section, subsection) {
-        if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-          if (subsection === (
-            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-            ctrl.startIncompleteExpIndex = Math.max(
-              ctrl.startIncompleteExpIndex - ctrl.PAGE_SIZE, 0);
-          } else if (
-            subsection === (
-              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-            ctrl.startIncompleteCollectionIndex = Math.max(
-              ctrl.startIncompleteCollectionIndex - ctrl.PAGE_SIZE, 0);
-          }
-        } else if (
-          section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
-          if (subsection === (
-            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-            ctrl.startCompletedExpIndex = Math.max(
-              ctrl.startCompletedExpIndex - ctrl.PAGE_SIZE, 0);
-          } else if (
-            subsection === (
-              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-            ctrl.startCompletedCollectionIndex = Math.max(
-              ctrl.startCompletedCollectionIndex - ctrl.PAGE_SIZE, 0);
-          }
-        }
-      };
-
-      ctrl.goToNextPage = function(section, subsection) {
-        if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-          if (subsection === (
-            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-            if (ctrl.startIncompleteExpIndex +
-              ctrl.PAGE_SIZE <= ctrl.incompleteExplorationsList.length) {
-              ctrl.startIncompleteExpIndex += ctrl.PAGE_SIZE;
-            }
-          } else if (
-            subsection === (
-              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-            if (ctrl.startIncompleteCollectionIndex +
-              ctrl.PAGE_SIZE <=
-                ctrl.incompleteCollectionsList.length) {
-              ctrl.startIncompleteCollectionIndex += ctrl.PAGE_SIZE;
-            }
-          }
-        } else if (
-          section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
-          if (subsection === (
-            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-            if (ctrl.startCompletedExpIndex +
-              ctrl.PAGE_SIZE <= ctrl.completedExplorationsList.length) {
-              ctrl.startCompletedExpIndex += ctrl.PAGE_SIZE;
-            }
-          } else if (
-            subsection === (
-              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-            if (ctrl.startCompletedCollectionIndex +
-              ctrl.PAGE_SIZE <= ctrl.completedCollectionsList.length) {
-              ctrl.startCompletedCollectionIndex += ctrl.PAGE_SIZE;
-            }
-          }
-        }
-      };
-
-      ctrl.setExplorationsSortingOptions = function(sortType) {
-        if (sortType === ctrl.currentExpSortType) {
-          ctrl.isCurrentExpSortDescending =
-            !ctrl.isCurrentExpSortDescending;
-        } else {
-          ctrl.currentExpSortType = sortType;
-        }
-      };
-
-      ctrl.setSubscriptionSortingOptions = function(sortType) {
-        if (sortType === ctrl.currentSubscribersSortType) {
-          ctrl.isCurrentSubscriptionSortDescending = (
-            !ctrl.isCurrentSubscriptionSortDescending);
-        } else {
-          ctrl.currentSubscribersSortType = sortType;
-        }
-      };
-
-      ctrl.setFeedbackSortingOptions = function(sortType) {
-        if (sortType === ctrl.currentFeedbackThreadsSortType) {
-          ctrl.isCurrentFeedbackSortDescending = (
-            !ctrl.isCurrentFeedbackSortDescending);
-        } else {
-          ctrl.currentFeedbackThreadsSortType = sortType;
-        }
-      };
-
-      ctrl.getValueOfExplorationSortKey = function(exploration) {
-        // This function is passed as a custom comparator function to
-        // `orderBy`, so that special cases can be handled while sorting
-        // explorations.
-        if (ctrl.currentExpSortType ===
-            EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
-          return null;
-        } else {
-          return exploration[ctrl.currentExpSortType];
-        }
-      };
-
-      ctrl.getValueOfSubscriptionSortKey = function(subscription) {
-        // This function is passed as a custom comparator function to
-        // `orderBy`, so that special cases can be handled while sorting
-        // subscriptions.
-        var value = subscription[ctrl.currentSubscribersSortType];
-        if (ctrl.currentSubscribersSortType ===
-            SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.IMPACT.key) {
-          value = (value || 0);
-        }
-        return value;
-      };
-
-      ctrl.onClickThread = function(
-          threadStatus, explorationId, threadId, explorationTitle) {
-        ctrl.loadingFeedbacks = true;
-        var threadDataUrl = UrlInterpolationService.interpolateUrl(
-          '/learnerdashboardthreadhandler/<threadId>', {
-            threadId: threadId
-          });
-        ctrl.explorationTitle = explorationTitle;
-        ctrl.feedbackThreadActive = true;
-        ctrl.threadStatus = threadStatus;
-        ctrl.explorationId = explorationId;
-        ctrl.threadId = threadId;
-
-        for (var index = 0; index < ctrl.threadSummaries.length; index++) {
-          if (ctrl.threadSummaries[index].threadId === threadId) {
-            threadIndex = index;
-            var threadSummary = ctrl.threadSummaries[index];
-            if (!threadSummary.lastMessageIsRead) {
-              ctrl.numberOfUnreadThreads -= 1;
-            }
-            threadSummary.markTheLastTwoMessagesAsRead();
-          }
-        }
-
-        $http.get(threadDataUrl).then(function(response) {
-          var messageSummaryDicts = response.data.message_summary_list;
-          ctrl.messageSummaries = [];
-          for (index = 0; index < messageSummaryDicts.length; index++) {
-            ctrl.messageSummaries.push(
-              FeedbackMessageSummary.createFromBackendDict(
-                messageSummaryDicts[index]));
-          }
-          ctrl.loadingFeedbacks = false;
-        });
-      };
-
-      ctrl.showAllThreads = function() {
-        ctrl.feedbackThreadActive = false;
-        threadIndex = null;
-      };
-
-      ctrl.addNewMessage = function(threadId, newMessage) {
-        var url = UrlInterpolationService.interpolateUrl(
-          '/threadhandler/<threadId>', {
-            threadId: threadId
-          });
-        var payload = {
-          updated_status: null,
-          updated_subject: null,
-          text: newMessage
-        };
-        ctrl.messageSendingInProgress = true;
-        $http.post(url, payload).then(function() {
-          ctrl.threadSummary = ctrl.threadSummaries[threadIndex];
-          ctrl.threadSummary.appendNewMessage(
-            newMessage, ctrl.username);
-          ctrl.messageSendingInProgress = false;
-          ctrl.newMessage.text = null;
-          var newMessageSummary = (
-            FeedbackMessageSummary.createNewMessage(
-              ctrl.threadSummary.totalMessageCount, newMessage,
-              ctrl.username, ctrl.profilePictureDataUrl));
-          ctrl.messageSummaries.push(newMessageSummary);
-        });
-      };
-
-      ctrl.showSuggestionModal = function(
-          newContent, oldContent, description) {
-        SuggestionModalForLearnerDashboardService.showSuggestionModal(
-          'edit_exploration_state_content',
-          {
-            newContent: newContent,
-            oldContent: oldContent,
-            description: description
-          }
-        );
-      };
-
-      ctrl.openRemoveActivityModal = function(
-          sectionNameI18nId, subsectionName, activity) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/learner-dashboard-page/modal-templates/' +
-            'remove-activity-from-learner-dashboard-modal.template.html'),
-          backdrop: 'static',
-          resolve: {
-            sectionNameI18nId: function() {
-              return sectionNameI18nId;
-            },
-            subsectionName: function() {
-              return subsectionName;
-            },
-            activity: function() {
-              return activity;
-            }
-          },
-          controller: 'RemoveActivityFromLearnerDashboardModalController'
-        }).result.then(function() {
-          if (sectionNameI18nId ===
-              LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-            if (subsectionName ===
-                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-              var index = ctrl.incompleteExplorationsList.findIndex(
-                exp => exp.id === activity.id);
-              if (index !== -1) {
-                ctrl.incompleteExplorationsList.splice(index, 1);
-              }
-            } else if (subsectionName ===
-                      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-              var index = ctrl.incompleteCollectionsList.findIndex(
-                collection => collection.id === activity.id);
-              if (index !== -1) {
-                ctrl.incompleteCollectionsList.splice(index, 1);
-              }
-            }
-          } else if (sectionNameI18nId ===
-                    LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-            if (subsectionName ===
-                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-              var index = ctrl.explorationPlaylist.findIndex(
-                exp => exp.id === activity.id);
-              if (index !== -1) {
-                ctrl.explorationPlaylist.splice(index, 1);
-              }
-            } else if (subsectionName ===
-                      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-              var index = ctrl.collectionPlaylist.findIndex(
-                collection => collection.id === activity.id);
-              if (index !== -1) {
-                ctrl.collectionPlaylist.splice(index, 1);
-              }
-            }
-          }
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      ctrl.getLabelClass = function(status) {
-        return ThreadStatusDisplayService.getLabelClass(status);
-      };
-      ctrl.getHumanReadableStatus = function(status) {
-        return ThreadStatusDisplayService.getHumanReadableStatus(status);
-      };
-      ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-        return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-          millisSinceEpoch);
-      };
-      ctrl.$onInit = function() {
-        ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
-          EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
-        ctrl.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
-          SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS);
-        ctrl.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
-          FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
-        ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS = (
-          LEARNER_DASHBOARD_SECTION_I18N_IDS);
-        ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
-          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
-        ctrl.getStaticImageUrl = function(imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        };
-        ctrl.PAGE_SIZE = 8;
-        ctrl.Math = window.Math;
-        UserService.getProfileImageDataUrlAsync().then(
-          function(dataUrl) {
-            ctrl.profilePictureDataUrl = dataUrl;
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-
-        LoaderService.showLoadingScreen('Loading');
-        ctrl.username = '';
-        var userInfoPromise = UserService.getUserInfoAsync();
-        userInfoPromise.then(function(userInfo) {
-          ctrl.username = userInfo.getUsername();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-
-        var dashboardDataPromise = (
-          LearnerDashboardBackendApiService.fetchLearnerDashboardDataAsync());
-        dashboardDataPromise.then(
-          function(responseData) {
-            ctrl.isCurrentExpSortDescending = true;
-            ctrl.isCurrentSubscriptionSortDescending = true;
-            ctrl.isCurrentFeedbackSortDescending = true;
-            ctrl.currentExpSortType = (
-              EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key);
-            ctrl.currentSubscribersSortType = (
-              SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.USERNAME.key);
-            ctrl.currentFeedbackThreadsSortType = (
-              FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
-            ctrl.startIncompleteExpIndex = 0;
-            ctrl.startCompletedExpIndex = 0;
-            ctrl.startIncompleteCollectionIndex = 0;
-            ctrl.startCompletedCollectionIndex = 0;
-            ctrl.completedExplorationsList = (
-              responseData.completedExplorationsList);
-            ctrl.completedCollectionsList = (
-              responseData.completedCollectionsList);
-            ctrl.incompleteExplorationsList = (
-              responseData.incompleteExplorationsList);
-            ctrl.incompleteCollectionsList = (
-              responseData.incompleteCollectionsList);
-            ctrl.subscriptionsList = responseData.subscriptionList;
-            ctrl.numberNonexistentIncompleteExplorations = (
-              responseData.numberOfNonexistentActivities
-                .incompleteExplorations);
-            ctrl.numberNonexistentIncompleteCollections = (
-              responseData.numberOfNonexistentActivities.incompleteCollections);
-            ctrl.numberNonexistentCompletedExplorations = (
-              responseData.numberOfNonexistentActivities.completedExplorations);
-            ctrl.numberNonexistentCompletedCollections = (
-              responseData.numberOfNonexistentActivities.completedCollections);
-            ctrl.numberNonexistentExplorationsFromPlaylist = (
-              responseData.numberOfNonexistentActivities.explorationPlaylist);
-            ctrl.numberNonexistentCollectionsFromPlaylist = (
-              responseData.numberOfNonexistentActivities.collectionPlaylist);
-            ctrl.completedToIncompleteCollections = (
-              responseData.completedToIncompleteCollections);
-            ctrl.threadSummaries = responseData.threadSummaries;
-            ctrl.numberOfUnreadThreads =
-              responseData.numberOfUnreadThreads;
-            ctrl.explorationPlaylist = responseData.explorationPlaylist;
-            ctrl.collectionPlaylist = responseData.collectionPlaylist;
-            ctrl.activeSection =
-              LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
-            ctrl.activeSubsection = (
-              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
-            ctrl.feedbackThreadActive = false;
-
-            ctrl.noExplorationActivity = (
-              (ctrl.completedExplorationsList.length === 0) &&
-                (ctrl.incompleteExplorationsList.length === 0));
-            ctrl.noCollectionActivity = (
-              (ctrl.completedCollectionsList.length === 0) &&
-                (ctrl.incompleteCollectionsList.length === 0));
-            ctrl.noActivity = (
-              (ctrl.noExplorationActivity) && (ctrl.noCollectionActivity) &&
-              (ctrl.explorationPlaylist.length === 0) &&
-              (ctrl.collectionPlaylist.length === 0));
-          },
-          function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              AlertsService.addWarning(
-                'Failed to get learner dashboard data');
-            }
-          }
-        );
-
-        $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-          LoaderService.hideLoadingScreen();
-        });
-
-        ctrl.loadingFeedbacks = false;
-
-        ctrl.newMessage = {
-          text: ''
-        };
-      };
-    }
-  ]
-}).animation('.menu-sub-section', function() {
-  var NG_HIDE_CLASS = 'ng-hide';
-  return {
-    beforeAddClass: function(element, className, done) {
-      if (className === NG_HIDE_CLASS) {
-        element.slideUp(done);
-      }
-    },
-    removeClass: function(element, className, done) {
-      if (className === NG_HIDE_CLASS) {
-        element.hide().slideDown(done);
-      }
-    }
+  noExplorationActivity: boolean;
+  noCollectionActivity: boolean;
+  removeIconIsActive: boolean[];
+  noActivity: boolean;
+  messageSendingInProgress: boolean;
+  profilePictureDataUrl: string;
+  newMessage: {
+    'text': string
   };
-});
+  loadingFeedbacks: boolean;
+  explorationTitle: string;
+  threadStatus: string;
+  explorationId: string;
+  threadId: string;
+  messageSummaries: FeedbackMessageSummary[];
+  threadSummary: FeedbackThreadSummary;
+  constructor(
+    private learnerDashboardBackendApiService:
+      LearnerDashboardBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private threadStatusDisplayService: ThreadStatusDisplayService,
+    private suggestionModalForLearnerDashboardService:
+      SuggestionModalForLearnerDashboardService,
+    private alertsService: AlertsService,
+    private deviceInfoService: DeviceInfoService,
+    private dateTimeFormatService: DateTimeFormatService,
+    private loaderService: LoaderService,
+    private userService: UserService,
+    private ngbModal: NgbModal,
+    ){}
+
+  ngOnInit(){
+    this.userService.getProfileImageDataUrlAsync().then(
+      dataUrl => {
+        this.profilePictureDataUrl = dataUrl;
+      });
+
+    this.loaderService.showLoadingScreen('Loading');
+
+    let userInfoPromise = this.userService.getUserInfoAsync();
+    userInfoPromise.then(userInfo => {
+      this.username = userInfo.getUsername();
+    });
+
+    let dashboardDataPromise = (
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync());
+    dashboardDataPromise.then(
+      responseData => {
+        this.isCurrentExpSortDescending = true;
+        this.isCurrentSubscriptionSortDescending = true;
+        this.isCurrentFeedbackSortDescending = true;
+        this.currentExpSortType = (LearnerDashboardPageConstants
+          .EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key);
+        this.currentSubscribersSortType = (LearnerDashboardPageConstants
+          .SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.USERNAME.key);
+        this.currentFeedbackThreadsSortType = (LearnerDashboardPageConstants
+          .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
+        this.startIncompleteExpIndex = 0;
+        this.startCompletedExpIndex = 0;
+        this.startIncompleteCollectionIndex = 0;
+        this.startCompletedCollectionIndex = 0;
+        this.completedExplorationsList = (
+          responseData.completedExplorationsList);
+        this.completedCollectionsList = (
+          responseData.completedCollectionsList);
+        this.incompleteExplorationsList = (
+          responseData.incompleteExplorationsList);
+        this.incompleteCollectionsList = (
+          responseData.incompleteCollectionsList);
+        this.subscriptionsList = responseData.subscriptionList;
+        this.numberNonexistentIncompleteExplorations = (
+          responseData.numberOfNonexistentActivities
+            .incompleteExplorations);
+        this.numberNonexistentIncompleteCollections = (
+          responseData.numberOfNonexistentActivities.incompleteCollections);
+        this.numberNonexistentCompletedExplorations = (
+          responseData.numberOfNonexistentActivities.completedExplorations);
+        this.numberNonexistentCompletedCollections = (
+          responseData.numberOfNonexistentActivities.completedCollections);
+        this.numberNonexistentExplorationsFromPlaylist = (
+          responseData.numberOfNonexistentActivities.explorationPlaylist);
+        this.numberNonexistentCollectionsFromPlaylist = (
+          responseData.numberOfNonexistentActivities.collectionPlaylist);
+        this.completedToIncompleteCollections = (
+          responseData.completedToIncompleteCollections);
+        this.threadSummaries = responseData.threadSummaries;
+        this.numberOfUnreadThreads =
+          responseData.numberOfUnreadThreads;
+        this.explorationPlaylist = responseData.explorationPlaylist;
+        this.collectionPlaylist = responseData.collectionPlaylist;
+        this.activeSection = (LearnerDashboardPageConstants
+          .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE);
+        this.activeSubsection = (LearnerDashboardPageConstants
+          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
+        this.feedbackThreadActive = false;
+
+        this.noExplorationActivity = (
+          (this.completedExplorationsList.length === 0) &&
+            (this.incompleteExplorationsList.length === 0));
+        this.noCollectionActivity = (
+          (this.completedCollectionsList.length === 0) &&
+            (this.incompleteCollectionsList.length === 0));
+        this.noActivity = (
+          (this.noExplorationActivity) && (this.noCollectionActivity) &&
+          (this.explorationPlaylist.length === 0) &&
+          (this.collectionPlaylist.length === 0));
+      }, errorResponse => {
+        if (AppConstants
+            .FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard data');
+        }
+      }
+    );
+  
+
+    Promise.all([userInfoPromise, dashboardDataPromise]).then(() => {
+      this.loaderService.hideLoadingScreen();
+    });
+
+    this.loadingFeedbacks = false;
+
+    this.newMessage = {
+      text: ''
+    }
+  }
+    
+  getStaticImageUrl(imagePath) {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+  
+  setActiveSection(newActiveSectionName) {
+    this.activeSection = newActiveSectionName;
+    if (this.activeSection ===
+      LearnerDashboardPageConstants
+      .LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
+      this.feedbackThreadActive === true) {
+      this.feedbackThreadActive = false;
+    }
+  }
+
+  setActiveSubsection(newActiveSubsectionName) {
+    this.activeSubsection = newActiveSubsectionName;
+  }
+
+  getExplorationUrl(explorationId) {
+    return '/explore/' + explorationId;
+  }
+
+  getCollectionUrl(collectionId) {
+    return '/collection/' + collectionId;
+  }
+
+  checkMobileView() {
+    return this.deviceInfoService.isMobileDevice();
+  }
+
+  getVisibleExplorationList(startCompletedExpIndex) {
+    return this.completedExplorationsList.slice(
+      startCompletedExpIndex, Math.min(
+        startCompletedExpIndex + this.PAGE_SIZE,
+        this.completedExplorationsList.length));
+  }
+
+  showUsernamePopover(subscriberUsername) {
+    // The popover on the subscription card is only shown if the length
+    // of the subscriber username is greater than 10 and the user hovers
+    // over the truncated username.
+    if (subscriberUsername.length > 10) {
+      return 'mouseenter';
+    } else {
+      return 'none';
+    }
+  }
+
+  goToPreviousPage(section, subsection) {
+    if (section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+      if (subsection === (
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        this.startIncompleteExpIndex = Math.max(
+          this.startIncompleteExpIndex - this.PAGE_SIZE, 0);
+      } else if (
+        subsection === (
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+        this.startIncompleteCollectionIndex = Math.max(
+          this.startIncompleteCollectionIndex - this.PAGE_SIZE, 0);
+      }
+    } else if (
+      section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
+      if (subsection === (
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        this.startCompletedExpIndex = Math.max(
+          this.startCompletedExpIndex - this.PAGE_SIZE, 0);
+      } else if (
+        subsection === (
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+        this.startCompletedCollectionIndex = Math.max(
+          this.startCompletedCollectionIndex - this.PAGE_SIZE, 0);
+      }
+    }
+  }
+
+  goToNextPage(section, subsection) {
+    if (section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+      if (subsection === (
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        if (this.startIncompleteExpIndex +
+          this.PAGE_SIZE <= this.incompleteExplorationsList.length) {
+          this.startIncompleteExpIndex += this.PAGE_SIZE;
+        }
+      } else if (
+        subsection === (
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+        if (this.startIncompleteCollectionIndex +
+          this.PAGE_SIZE <=
+            this.incompleteCollectionsList.length) {
+          this.startIncompleteCollectionIndex += this.PAGE_SIZE;
+        }
+      }
+    } else if (
+      section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
+      if (subsection === (
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        if (this.startCompletedExpIndex +
+          this.PAGE_SIZE <= this.completedExplorationsList.length) {
+          this.startCompletedExpIndex += this.PAGE_SIZE;
+        }
+      } else if (
+        subsection === (
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+        if (this.startCompletedCollectionIndex +
+          this.PAGE_SIZE <= this.completedCollectionsList.length) {
+          this.startCompletedCollectionIndex += this.PAGE_SIZE;
+        }
+      }
+    }
+  }
+
+  setExplorationsSortingOptions(sortType) {
+    if (sortType === this.currentExpSortType) {
+      this.isCurrentExpSortDescending =
+        !this.isCurrentExpSortDescending;
+    } else {
+      this.currentExpSortType = sortType;
+    }
+  }
+
+  setSubscriptionSortingOptions(sortType) {
+    if (sortType === this.currentSubscribersSortType) {
+      this.isCurrentSubscriptionSortDescending = (
+        !this.isCurrentSubscriptionSortDescending);
+    } else {
+      this.currentSubscribersSortType = sortType;
+    }
+  }
+
+  setFeedbackSortingOptions(sortType) {
+    if (sortType === this.currentFeedbackThreadsSortType) {
+      this.isCurrentFeedbackSortDescending = (
+        !this.isCurrentFeedbackSortDescending);
+    } else {
+      this.currentFeedbackThreadsSortType = sortType;
+    }
+  }
+
+  getValueOfExplorationSortKey(exploration) {
+    // This  is passed as a custom comparator  to
+    // `orderBy`, so that special cases can be handled while sorting
+    // explorations.
+    if (this.currentExpSortType ===
+      LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
+      return 'default';
+    } else {
+      return this.currentExpSortType;
+    }
+  }
+
+  getValueOfSubscriptionSortKey(subscription) {
+    // This  is passed as a custom comparator  to
+    // `orderBy`, so that special cases can be handled while sorting
+    // subscriptions.
+    let value = subscription[this.currentSubscribersSortType];
+    if (this.currentSubscribersSortType ===
+      LearnerDashboardPageConstants.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.IMPACT.key) {
+      value = (value || 0);
+    }
+    return value;
+  }
+
+  onClickThread(
+      threadStatus, explorationId, threadId, explorationTitle) {
+    this.loadingFeedbacks = true;
+    let threadDataUrl = this.urlInterpolationService.interpolateUrl(
+      '/learnerdashboardthreadhandler/<threadId>', {
+        threadId: threadId
+      });
+    this.explorationTitle = explorationTitle;
+    this.feedbackThreadActive = true;
+    this.threadStatus = threadStatus;
+    this.explorationId = explorationId;
+    this.threadId = threadId;
+
+    for (let index = 0; index < this.threadSummaries.length; index++) {
+      if (this.threadSummaries[index].threadId === threadId) {
+        this.threadIndex = index;
+        let threadSummary = this.threadSummaries[index];
+        if (!threadSummary.lastMessageIsRead) {
+          this.numberOfUnreadThreads -= 1;
+        }
+        threadSummary.markTheLastTwoMessagesAsRead();
+      }
+    }
+
+    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl).then((response) => {
+      let messageSummaryDicts = response.message_summary_list;
+      this.messageSummaries = [];
+      for (let index = 0; index < messageSummaryDicts.length; index++) {
+        this.messageSummaries.push(
+          FeedbackMessageSummary.createFromBackendDict(
+            messageSummaryDicts[index]));
+      }
+      this.loadingFeedbacks = false;
+    });
+  }
+
+  showAllThreads() {
+    this.feedbackThreadActive = false;
+    this.threadIndex = null;
+  }
+
+  addNewMessage(threadId, newMessage) {
+    let url = this.urlInterpolationService.interpolateUrl(
+      '/threadhandler/<threadId>', {
+        threadId: threadId
+      });
+    let payload = {
+      updated_status: null,
+      updated_subject: null,
+      text: newMessage
+    };
+    this.messageSendingInProgress = true;
+    this.learnerDashboardBackendApiService.addNewMessageAsync(url, payload).then(() => {
+      this.threadSummary = this.threadSummaries[this.threadIndex];
+      this.threadSummary.appendNewMessage(
+        newMessage, this.username);
+      this.messageSendingInProgress = false;
+      this.newMessage.text = null;
+      let newMessageSummary = (
+        FeedbackMessageSummary.createNewMessage(
+          this.threadSummary.totalMessageCount, newMessage,
+          this.username, this.profilePictureDataUrl));
+      this.messageSummaries.push(newMessageSummary);
+    });
+  }
+
+  showSuggestionModal(
+      newContent, oldContent, description) {
+    this.suggestionModalForLearnerDashboardService.showSuggestionModal(
+      'edit_exploration_state_content',
+      {
+        newContent: newContent,
+        oldContent: oldContent,
+        description: description
+      }
+    );
+  }
+
+  openRemoveActivityModal(
+      sectionNameI18nId, subsectionName, activity) {
+    const modelRef = this.ngbModal.open(
+      LearnerPlaylistModalComponent, {backdrop: true});
+    modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
+    modelRef.componentInstance.subsectionName = subsectionName;
+    modelRef.componentInstance.activity = activity;
+    modelRef.result.then((playlistUrl) => {
+      if (sectionNameI18nId ===
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+        if (subsectionName ===
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+          let index = this.incompleteExplorationsList.findIndex(
+            exp => exp.id === activity.id);
+          if (index !== -1) {
+            this.incompleteExplorationsList.splice(index, 1);
+          }
+        } else if (subsectionName ===
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+          let index = this.incompleteCollectionsList.findIndex(
+            collection => collection.id === activity.id);
+          if (index !== -1) {
+            this.incompleteCollectionsList.splice(index, 1);
+          }
+        }
+      } else if (sectionNameI18nId ===
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+        if (subsectionName ===
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+          let index = this.explorationPlaylist.findIndex(
+            exp => exp.id === activity.id);
+          if (index !== -1) {
+            this.explorationPlaylist.splice(index, 1);
+          }
+        } else if (subsectionName ===
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+          let index = this.collectionPlaylist.findIndex(
+            collection => collection.id === activity.id);
+          if (index !== -1) {
+            this.collectionPlaylist.splice(index, 1);
+          }
+        }
+      }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  getLabelClass(status) {
+    return this.threadStatusDisplayService.getLabelClass(status);
+  }
+
+  getHumanReadableStatus(status) {
+    return this.threadStatusDisplayService.getHumanReadableStatus(status);
+  }
+
+  getLocaleAbbreviatedDatetimeString(millisSinceEpoch) {
+    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch);
+  }
+}
+
+angular.module('oppia').directive(
+  'learnerDashboardPage', downgradeComponent(
+    {component: LearnerDashboardPageComponent}));
+// dont forget animations
