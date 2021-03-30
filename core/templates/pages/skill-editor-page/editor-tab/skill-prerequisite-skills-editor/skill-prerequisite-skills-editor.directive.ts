@@ -18,7 +18,7 @@
 
 require('components/skill-selector/select-skill-modal.controller.ts');
 require(
-  'components/skill-selector/skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.component.ts');
 
 require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
