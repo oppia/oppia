@@ -23,14 +23,14 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('EndExplorationValidationService', function() {
-  let ctrl = null;
-  let $httpBackend = null;
-  let $q = null;
-  let $rootScope = null;
-  let $scope = null;
-  let ContextService = null;
-  let ReadOnlyCollectionBackendApiService = null;
-  let UrlService = null;
+  let ctrl;
+  let $httpBackend;
+  let $q;
+  let $rootScope;
+  let $scope;
+  let ContextService;
+  let ReadOnlyCollectionBackendApiService;
+  let UrlService;
 
   const httpResponse = {
     summaries: [{
@@ -59,7 +59,7 @@ describe('EndExplorationValidationService', function() {
 
   importAllAngularServices();
 
-  describe('Valid exploration Id provided', function() {
+  describe('Valid exploration id provided', function() {
     const explorationIds = ['0'];
     const requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds));
@@ -182,7 +182,7 @@ describe('EndExplorationValidationService', function() {
     });
   });
 
-  describe('Testinf if conditions', function() {
+  describe('Testing if conditions', function() {
     const explorationIds = ['0', '1'];
 
     beforeEach(angular.mock.module('oppia', function($provide) {
