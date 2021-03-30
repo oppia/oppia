@@ -383,7 +383,7 @@ angular.module('oppia').directive('adminRolesTab', [
           });
         };
 
-        ctrl.clearViewData = function() {
+        ctrl.clearResults = function() {
           ctrl.contributionReviewersDataFetched = false;
           ctrl.resultRolesVisible = false;
           ctrl.userRolesResult = {};
