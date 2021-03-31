@@ -30,19 +30,12 @@
        [ngStyle]="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
        *ngIf="noActivity">
     <div class="col-sm-2"
-<<<<<<< HEAD
          [ngStyle]="checkMobileView() ? {'text-align': 'center'} : {'text-align': 'left'}">
       <div class="h-100" *ngIf="!checkMobileView()"></div>
       <img [src]="getStaticImageUrl('/general/collection_mascot.svg')"
            [ngClass]="{'oppia-learner-dashboard-mascot-mobile': checkMobileView()}"
-           class="oppia-learner-dashboard-mascot">
-=======
-         ng-style="$ctrl.checkMobileView() ? {'text-align': 'center'} : {'text-align': 'left'}">
-      <div class="h-100" ng-if="!$ctrl.checkMobileView()"></div>
-      <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>"
-           ng-class="{'oppia-learner-dashboard-mascot-mobile': $ctrl.checkMobileView()}"
-           class="oppia-learner-dashboard-mascot" alt="">
->>>>>>> upstream/develop
+           class="oppia-learner-dashboard-mascot"
+           alt="">
     </div>
 
     <div class="col-sm-8">
@@ -53,15 +46,9 @@
         <p class="oppia-learner-dashboard-intro-card-message oppia-learner-dashboard-intro-card-message-part-2"
            [innerHTML]="'I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO' | translate">
         </p>
-<<<<<<< HEAD
         <a class="btn oppia-learner-dashboard-intro-button oppia-transition-200 protractor-mobile-test-learner-dashboard-intro-button"
            [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
            [href]="community-library">
-=======
-        <a class="btn oppia-learner-dashboard-intro-button oppia-transition-200 protractor-mobile-test-learner-dashboard-intro-button oppia-autofocus"
-           translate="I18N_ACTION_BROWSE_LESSONS"
-           ng-href="/community-library" focus-on="ourLessonsBtn">
->>>>>>> upstream/develop
         </a>
       </blockquote>
     </div>
@@ -243,14 +230,8 @@
               </p>
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
-<<<<<<< HEAD
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
                  [href]="community-library">
-=======
-                 translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 focus-on="ourLessonsBtn">
->>>>>>> upstream/develop
               </a>
             </div>
           </mat-card>

@@ -154,7 +154,8 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.userService.getProfileImageDataUrlAsync().then(
       dataUrl => {
         this.profilePictureDataUrl =
-          JSON.stringify(this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl));
+          JSON.stringify(
+            this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl));
       });
 
     this.loaderService.showLoadingScreen('Loading');
