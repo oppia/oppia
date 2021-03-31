@@ -245,7 +245,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
             attr_pos_mapping[attr] = attr_positions
         try:
             attr_pos = attr_pos_mapping[attr].pop(0)
-        except Exception as e:
+        except Exception:
             error_message = (
                 '%s --> Attribute %s for tag %s on line '
                 '%s failed while popping' % (
