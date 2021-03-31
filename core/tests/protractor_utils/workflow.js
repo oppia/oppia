@@ -58,17 +58,22 @@ var checkForAddTitleWarning = async function() {
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
-  var tstExpTitI = element(by.css('.protractor-test-exploration-title-input'));
-  await action.click('Test Exploration Title Input', tstExpTitI);
-  var tstExOI = element(by.css('.protractor-test-exploration-objective-input'));
-  await action.click('Test Exploration Objective Input', tstExOI);
+  var testExplorationTitleInput = element(
+    by.css('.protractor-test-exploration-title-input'));
+  await action.click('Test Exploration Title Input', testExplorationTitleInput);
+  var testExplorationObjectiveInput = element(
+    by.css('.protractor-test-exploration-objective-input'));
+  await action.click(
+    'Test Exploration Objective Input', testExplorationObjectiveInput);
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
   var testEditRoles = element(by.css('.protractor-test-edit-roles'));
   await action.click('Test Edit Roles', testEditRoles);
-  await element(by.css('.protractor-test-role-username')).sendKeys(
+  await action.sendKeys(
+    'Username input',
+    element(by.css('.protractor-test-role-username')),
     'Chuck Norris');
 };
 
@@ -140,8 +145,9 @@ var publishExploration = async function() {
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-publish-exploration')));
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
-  var tstPubExp = element(by.css('.protractor-test-publish-exploration'));
-  await action.click('Test Publish Exploration', tstPubExp);
+  var testPublishExploration = element(
+    by.css('.protractor-test-publish-exploration'));
+  await action.click('Test Publish Exploration', testPublishExploration);
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
