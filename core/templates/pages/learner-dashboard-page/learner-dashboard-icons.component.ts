@@ -163,7 +163,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
 
   removeFromLearnerPlaylist(
       activityId: string, activityTitle: string, activityType: string): void {
-    this.learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
+    this.learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
       activityId, activityTitle, activityType,
       this.learnerDashboardActivityIds);
   }

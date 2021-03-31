@@ -20,7 +20,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { SafeResourceUrl } from '@angular/platform-browser';
 
 import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
 import { AppConstants } from 'app.constants';
@@ -30,6 +30,7 @@ import { FeedbackThreadSummary } from 'domain/feedback_thread/feedback-thread-su
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
@@ -40,6 +41,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { PngSanitizerService } from 'services/png-sanitizer.service';
 import { UserService } from 'services/user.service';
+
 
 @Component({
   selector: 'learner-dashboard-page',
@@ -144,6 +146,8 @@ export class LearnerDashboardPageComponent implements OnInit {
     private deviceInfoService: DeviceInfoService,
     private dateTimeFormatService: DateTimeFormatService,
     private loaderService: LoaderService,
+    private learnerPlaylistBackendApiService:
+      LearnerPlaylistBackendApiService,
     private userService: UserService,
     private ngbModal: NgbModal,
     private pngSanitizerService : PngSanitizerService 
@@ -488,13 +492,11 @@ export class LearnerDashboardPageComponent implements OnInit {
   }
 
   openRemoveActivityModal(
-      sectionNameI18nId, subsectionName, activity) {
-    const modelRef = this.ngbModal.open(
-      LearnerPlaylistModalComponent, {backdrop: true});
-    modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
-    modelRef.componentInstance.subsectionName = subsectionName;
-    modelRef.componentInstance.activity = activity;
-    modelRef.result.then((playlistUrl) => {
+      sectionNameI18nId, subsectionName, activity: LearnerExplorationSummary): void {
+    this.learnerPlaylistBackendApiService.removeActivityModal(
+        sectionNameI18nId, subsectionName,
+        activity.id, activity.title)
+    .then(() => {
       if (sectionNameI18nId ===
         LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
         if (subsectionName ===
@@ -530,10 +532,6 @@ export class LearnerDashboardPageComponent implements OnInit {
           }
         }
       }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
     });
   }
 

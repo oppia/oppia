@@ -40,6 +40,6 @@ export class LearnerDashboardSuggestionModalComponent {
 }
 
 angular.module('oppia').directive(
-  'learnerPlaylistModalComponent',
+  'learnerDashboardSuggestionModalComponent',
   downgradeComponent(
     {component: LearnerDashboardSuggestionModalComponent}));

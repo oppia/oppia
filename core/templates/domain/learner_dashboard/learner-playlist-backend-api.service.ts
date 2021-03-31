@@ -26,6 +26,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
+import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import { Promise } from 'q';
 
 interface LearnerPlaylistResponseObject {
   'belongs_to_completed_or_incomplete_list': boolean
@@ -90,7 +92,9 @@ export class LearnerPlaylistBackendApiService {
     return this.successfullyAdded;
   }
 
-  removeFromLearnerPlaylist(
+  // This function will open a modal to remove an exploration
+  // from the 'Play Later' list in the Library Page.
+  removeFromLearnerPlaylistModal(
       activityId: string, activityTitle: string, activityType: string,
       learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
     const modelRef = this.ngbModal.open(
@@ -112,6 +116,30 @@ export class LearnerPlaylistBackendApiService {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
+    });
+  }
+
+  // This function will open a modal to remove an exploration
+  // from the given list either 'Play Later' or 'In Progress'
+  // in Learner Dashboard Page.
+  removeActivityModal(
+      sectionNameI18nId: string, subsectionName: string,
+      activityId: string, activityTitle: string): Promise<void>{
+  const modelRef = this.ngbModal.open(
+    RemoveActivityModalComponent, {backdrop: true});
+  modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
+  modelRef.componentInstance.subsectionName = subsectionName;
+  modelRef.componentInstance.activityId = activityId;
+  modelRef.componentInstance.activityTitle = activityTitle;
+  return Promise((resolve, reject) => {
+    modelRef.result.then((playlistUrl) => {
+      // eslint-disable-next-line dot-notation
+      resolve(this.http.delete<void>(playlistUrl).toPromise());
+      },() => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+      });
     });
   }
 }

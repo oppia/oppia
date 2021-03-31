@@ -52,6 +52,7 @@ import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
+import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
 // Directives.
 import { FocusOnDirective } from '../directives/focus-on.directive';
@@ -129,6 +130,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SortByPipe,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
+    RemoveActivityModalComponent,
     PromoBarComponent,
   ],
 
@@ -151,6 +153,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
+    RemoveActivityModalComponent,
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -184,6 +187,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SortByPipe,
     LearnerDashboardIconsComponent,
     LearnerPlaylistModalComponent,
+    RemoveActivityModalComponent,
     LoadingDotsComponent,
     PromoBarComponent,
   ],

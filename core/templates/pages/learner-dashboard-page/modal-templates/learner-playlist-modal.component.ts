@@ -20,8 +20,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
-import constants from 'assets/constants';
 
 @Component({
   selector: 'learner-playlist-modal',
@@ -29,10 +27,11 @@ import constants from 'assets/constants';
   styleUrls: []
 })
 export class LearnerPlaylistModalComponent implements OnInit {
-  @Input() sectionNameI18nId: string;
-  @Input() subsectionName: string;
-  @Input() activity: any;
+  @Input() activityId: string;
   @Input() activityTitle: string;
+  @Input() activityType: string;
+
+  sectionNameI18nId: string;
   removeFromLearnerPlaylistUrl: string;
 
   constructor(
@@ -41,41 +40,13 @@ export class LearnerPlaylistModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    let activityType = '';
-    if (this.subsectionName ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-      activityType = constants.ACTIVITY_TYPE_EXPLORATION;
-    } else if (this.subsectionName ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-                .COLLECTIONS) {
-      activityType = constants.ACTIVITY_TYPE_COLLECTION;
-    } else {
-      throw new Error('Subsection name is not valid.');
-    }
-
-    let removeActivityUrlPrefix = '';
-    if (this.sectionNameI18nId ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-      removeActivityUrlPrefix =
-        '/learnerplaylistactivityhandler/';
-    } else if (this.sectionNameI18nId ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-      removeActivityUrlPrefix =
-        '/learnerincompleteactivityhandler/';
-    } else {
-      throw new Error('Section name is not valid.');
-    }
-
+    this.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
     this.removeFromLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/learnerplaylistactivityhandler/' +
         '<activityType>/<activityId>', {
-          activityType: activityType,
-          activityId: this.activity.id
+          activityType: this.activityType,
+          activityId: this.activityId
         }));
   }
 
