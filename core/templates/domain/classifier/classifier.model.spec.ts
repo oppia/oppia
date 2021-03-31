@@ -59,7 +59,7 @@ describe('Classifier model', () => {
       a: 0
     }
   });
-  let classifierBuffer : Uint8Array =
+  let classifierBuffer: Uint8Array =
     classifierFrozenModel.serialize() as Uint8Array;
 
   it('should create a new classifier', () => {

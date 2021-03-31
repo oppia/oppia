@@ -84,7 +84,7 @@ export class ClassifierDataBackendApiService {
 
   private async getClassifierMetaData(
       explorationId: string, explorationVersion: number,
-      stateName:string): Promise<ClassifierMetaData> {
+      stateName: string): Promise<ClassifierMetaData> {
     return new Promise((resolve, reject) => {
       this.http.get<ClassifierMetaDataBackendDict>(
         '/ml/trainedclassifierhandler', {
