@@ -571,6 +571,7 @@ angular.module('oppia').directive('filepathEditor', [
             var newImageData = getCroppedImageData(
               ctrl.data.metadata.uploadedImageData,
               x1, y1, width, height);
+            validateProcessedFilesize(newImageData);
 
             newImageFile = (
               ImageUploadHelperService.convertImageDataToImageFile(
@@ -640,12 +641,22 @@ angular.module('oppia').directive('filepathEditor', [
           // Do not allow to decrease size below 10%.
           ctrl.imageResizeRatio = Math.max(
             0.1, ctrl.imageResizeRatio - amount / 100);
+          const dimensions = ctrl.calculateTargetImageDimensions();
+          const imageDataURI = ctrl.data.metadata.uploadedImageData;
+          const resampledImageData = getResampledImageData(
+            imageDataURI, dimensions.width, dimensions.height);
+          validateProcessedFilesize(resampledImageData);
         };
 
         ctrl.increaseResizePercent = function(amount) {
           // Do not allow to increase size above 100% (only downsize allowed).
           ctrl.imageResizeRatio = Math.min(
             1, ctrl.imageResizeRatio + amount / 100);
+          const dimensions = ctrl.calculateTargetImageDimensions();
+          const imageDataURI = ctrl.data.metadata.uploadedImageData;
+          const resampledImageData = getResampledImageData(
+            imageDataURI, dimensions.width, dimensions.height);
+          validateProcessedFilesize(resampledImageData);
         };
 
         ctrl.calculateTargetImageDimensions = function() {
@@ -684,6 +695,10 @@ angular.module('oppia').directive('filepathEditor', [
                 x2: dimensions.width,
                 y2: dimensions.height
               };
+              const imageDataURI = ctrl.data.metadata.uploadedImageData;
+              const resampledImageData = getResampledImageData(
+                imageDataURI, dimensions.width, dimensions.height);
+              validateProcessedFilesize(resampledImageData);
               $scope.$apply();
             };
             img.src = <string>((<FileReader>e.target).result);
@@ -713,6 +728,16 @@ angular.module('oppia').directive('filepathEditor', [
 
         ctrl.discardUploadedFile = function() {
           ctrl.resetFilePathEditor();
+        };
+
+        const validateProcessedFilesize = function(resampledImageData) {
+          const imageSize = atob(
+            resampledImageData.replace('data:image/png;base64,', '')).length;
+          // The processed image can sometimes be larger than 100 KB. This is
+          // because the output of HTMLCanvasElement.toDataURL() operation in
+          // getResampledImageData() is browser specific and can vary in size.
+          // See https://stackoverflow.com/a/9777037.
+          ctrl.processedImageIsTooLarge = imageSize > HUNDRED_KB_IN_BYTES;
         };
 
         ctrl.saveUploadedFile = function() {
@@ -783,14 +808,8 @@ angular.module('oppia').directive('filepathEditor', [
           } else {
             const resampledImageData = getResampledImageData(
               imageDataURI, dimensions.width, dimensions.height);
-            const imageSize = atob(
-              resampledImageData.replace('data:image/png;base64,', '')).length;
-            // The processed image can sometimes be larger than 100 KB. This is
-            // because the output of HTMLCanvasElement.toDataURL() operation in
-            // getResampledImageData() is browser specific and can vary in size.
-            // See https://stackoverflow.com/a/9777037.
-            if (imageSize > HUNDRED_KB_IN_BYTES) {
-              ctrl.processedImageIsTooLarge = true;
+            validateProcessedFilesize(resampledImageData);
+            if (ctrl.processedImageIsTooLarge) {
               return;
             }
             resampledFile = (
