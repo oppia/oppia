@@ -499,13 +499,10 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],
   ['LearnerParamsService', LearnerParamsService],
-<<<<<<< HEAD
   ['LearnerPlaylistBackendApiService', LearnerPlaylistBackendApiService],
   ['SuggestionModalForLearnerDashboardService',
     SuggestionModalForLearnerDashboardService],
-=======
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
->>>>>>> upstream/develop
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
