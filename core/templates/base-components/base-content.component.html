@@ -42,7 +42,9 @@
               <div class="navbar-container">
                 <ng-content select="navbar-pre-logo-action" class="oppia-base-content-pre-logo-container"></ng-content>
                 <top-navigation-bar [headerText]="getHeaderText"
-                                    [subheaderText]="getSubheaderText">
+                                    [subheaderText]="getSubheaderText"
+                                    [toggle]="toggleSidebar.bind(this)"
+                                    >
                 </top-navigation-bar>
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
                   <ng-content select="navbar-breadcrumb" class="mr-auto"></ng-content>
@@ -73,7 +75,7 @@
             </div>
           </div>
 
-          <side-navigation-bar></side-navigation-bar>
+          <side-navigation-bar [display]="isSidebarShown()"></side-navigation-bar>
         </div>
       </div>
     </div>

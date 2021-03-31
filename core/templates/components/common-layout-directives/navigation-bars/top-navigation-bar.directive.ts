@@ -39,6 +39,7 @@ angular.module('oppia').directive('topNavigationBar', [
       scope: {
         headerText: '=',
         subheaderText: '=',
+        toggle: '&'
       },
       template: require('./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
@@ -137,7 +138,10 @@ angular.module('oppia').directive('topNavigationBar', [
             return SidebarStatusService.isSidebarShown();
           };
           ctrl.toggleSidebar = function() {
-            SidebarStatusService.toggleSidebar();
+            // SidebarStatusService.toggleSidebar();
+            // $scope.update = !$scope.update;
+            $scope.toggle();
+            $rootScope.$applyAsync();
           };
 
           ctrl.navigateToClassroomPage = function(classroomUrl) {
@@ -364,6 +368,7 @@ export class TopNavigationBarComponent extends UpgradeComponent {
   @Input() subheaderText: string;
   @Output() subheaderTextChange: EventEmitter<string> = (
     new EventEmitter());
+  @Input() toggle: () => void;
 
   constructor(elementRef: ElementRef, injector: Injector) {
     super('topNavigationBar', elementRef, injector);

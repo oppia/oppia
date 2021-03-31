@@ -92,6 +92,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
 import { HammerGestureConfig } from '@angular/platform-browser';
 import * as hammer from 'hammerjs';
+import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
+import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = <unknown>{
@@ -155,6 +157,7 @@ const toastrConfig = {
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
+    SideNavigationBarWrapperComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
@@ -165,6 +168,7 @@ const toastrConfig = {
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TopNavigationBarComponent,
+    TopNavigationBarWrapperComponent,
     TranslatePipe,
     TruncatePipe,
     WarningsAndAlertsComponent,
@@ -186,6 +190,7 @@ const toastrConfig = {
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SideNavigationBarComponent,
+    SideNavigationBarWrapperComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
@@ -193,6 +198,7 @@ const toastrConfig = {
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
   ],
 
@@ -215,6 +221,7 @@ const toastrConfig = {
     LoadingMessageComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
+    SideNavigationBarWrapperComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
@@ -223,6 +230,7 @@ const toastrConfig = {
     ThumbnailDisplayComponent,
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     TranslatePipe,
     WarningsAndAlertsComponent,
     PromoBarComponent

@@ -16,7 +16,7 @@
  * @fileoverview Component for the side navigation bar.
  */
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -26,6 +26,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   templateUrl: './side-navigation-bar.component.html'
 })
 export class SideNavigationBarComponent {
+  @Input() display: boolean;
   currentUrl: string;
   classroomSubmenuIsShown: boolean = false;
 
@@ -44,35 +45,8 @@ export class SideNavigationBarComponent {
 
   toggleClassroomSubmenu(): void {
     this.classroomSubmenuIsShown = !this.classroomSubmenuIsShown;
-    console.log('Side Navigation Bar created');
   }
 }
 
 angular.module('oppia').directive('sideNavigationBar',
   downgradeComponent({ component: SideNavigationBarComponent }));
-
-// require('domain/utilities/url-interpolation.service.ts');
-
-// angular.module('oppia').directive('sideNavigationBar', [
-//   'UrlInterpolationService', function(UrlInterpolationService) {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       bindToController: {},
-//       template: require('./side-navigation-bar.directive.html'),
-//       controllerAs: '$ctrl',
-//       controller: ['$window', function($window) {
-//         var ctrl = this;
-//         ctrl.getStaticImageUrl = function(imagePath) {
-//           return UrlInterpolationSerkvice.getStaticImageUrl(imagePath);
-//         };
-//         ctrl.$onInit = function() {
-//           ctrl.currentUrl = $window.location.pathname;
-//           ctrl.classroomSubmenuIsShown = false;
-//         };
-//         ctrl.toggleClassroomSubmenu = function() {
-//           ctrl.classroomSubmenuIsShown = !ctrl.classroomSubmenuIsShown;
-//         };
-//       }]
-//     };
-//   }]);

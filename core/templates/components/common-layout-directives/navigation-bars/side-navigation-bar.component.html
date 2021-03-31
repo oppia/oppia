@@ -82,9 +82,26 @@
   .classroom-submenu {
     padding: 0 0 1em 18px;
   }
+  .oppia-sidebar-menu-open {
+  box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  height: 110vh;
+  overflow-y: scroll;
+  -ms-transform: translate(0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
+  }
+  .oppia-sidebar-menu-open::after {
+    height: 0;
+    opacity: 0;
+    -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+    transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+    width: 0;
+  }
 </style>
 
-<nav class="oppia-sidebar-menu oppia-sidebar-menu-transition">
+<nav class="oppia-sidebar-menu oppia-sidebar-menu-transition"
+  [ngClass]="{'oppia-sidebar-menu-open': display}">
   <div class="oppia-sidebar-header">
     <div class="oppia-sidebar-logo-container">
     </div>

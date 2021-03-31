@@ -38,6 +38,8 @@ export class BaseContentComponent {
   mobileNavOptionsAreShown: boolean = false;
   iframed: boolean;
   DEV_MODE = constants.DEV_MODE;
+  getHeaderText: () => string;
+  getSubheaderText: () => string;
 
   constructor(
     private windowRef: WindowRef,
@@ -47,7 +49,7 @@ export class BaseContentComponent {
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
-    private urlService: UrlService
+    private urlService: UrlService,
   ) {}
 
   ngOnInit(): void {
@@ -64,6 +66,18 @@ export class BaseContentComponent {
       (message: string) => this.loadingMessage = message
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
+
+    this.getHeaderText = () => {
+      return this.pageTitleService.getPageTitleForMobileView();
+    };
+
+    this.getSubheaderText = () => {
+      return this.pageTitleService.getPageSubtitleForMobileView();
+    };
+  }
+
+  toggleSidebar(): void {
+    this.sidebarStatusService.toggleSidebar();
   }
 
   isSidebarShown(): boolean {
@@ -97,111 +111,7 @@ export class BaseContentComponent {
     mainContentElement.scrollIntoView();
     mainContentElement.focus();
   }
-
-  getHeaderText(): string {
-    return this.pageTitleService.getPageTitleForMobileView();
-  }
-
-  getSubheaderText(): string {
-    return this.pageTitleService.getPageSubtitleForMobileView();
-  }
 }
 
 angular.module('oppia').directive('baseContent',
   downgradeComponent({ component: BaseContentComponent }));
-
-// require('base-components/loading-message.component.ts');
-// require('base-components/warnings-and-alerts.component.ts');
-// require('pages/OppiaFooterDirective.ts');
-
-// require('services/bottom-navbar-status.service.ts');
-// require('services/contextual/url.service.ts');
-// require('services/keyboard-shortcut.service.ts');
-// require('services/page-title.service.ts');
-// require('services/stateful/background-mask.service.ts');
-
-// angular.module('oppia').directive('baseContent', [
-//   function() {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       bindToController: {
-//         backButtonShown: '<'
-//       },
-//       transclude: {
-//         breadcrumb: '?navbarBreadcrumb',
-//         preLogoAction: '?navbarPreLogoAction',
-//         content: 'content',
-//         footer: '?pageFooter',
-//         navOptions: '?navOptions',
-//         mobileNavOptions: '?mobileNavOptions',
-//       },
-//       template: require('./base-content.directive.html'),
-//       controllerAs: '$ctrl',
-//       controller: ['$rootScope', '$scope', '$window', 'BackgroundMaskService',
-//         'BottomNavbarStatusService', 'KeyboardShortcutService',
-//         'LoaderService', 'PageTitleService', 'SidebarStatusService',
-//         'UrlService',
-//         function(
-//             $rootScope, $scope, $window, BackgroundMaskService,
-//             BottomNavbarStatusService, KeyboardShortcutService,
-//             LoaderService, PageTitleService, SidebarStatusService,
-//             UrlService) {
-//           // Mimic redirection behaviour in the backend (see issue #7867 for
-//           // details).
-//           if ($window.location.hostname === 'oppiaserver.appspot.com') {
-//             $window.location.href = (
-//               'https://oppiatestserver.appspot.com' +
-//               $window.location.pathname +
-//               $window.location.search +
-//               $window.location.hash);
-//           }
-
-//           $scope.getHeaderText = () => {
-//             return PageTitleService.getPageTitleForMobileView();
-//           };
-
-//           $scope.getSubheaderText = () => {
-//             return PageTitleService.getPageSubtitleForMobileView();
-//           };
-
-//           var ctrl = this;
-//           ctrl.loadingMessage = '';
-//           ctrl.mobileNavOptionsAreShown = false;
-//           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
-//           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
-//           ctrl.toggleMobileNavOptions = () => {
-//             ctrl.mobileNavOptionsAreShown = !ctrl.mobileNavOptionsAreShown;
-//           };
-//           ctrl.isBackgroundMaskActive = () => (
-//             BackgroundMaskService.isMaskActive());
-//           ctrl.skipToMainContent = function() {
-//             var mainContentElement = document.getElementById(
-//               'oppia-main-content');
-
-//             if (!mainContentElement) {
-//               throw new Error('Variable mainContentElement is undefined.');
-//             }
-//             mainContentElement.tabIndex = -1;
-//             mainContentElement.scrollIntoView();
-//             mainContentElement.focus();
-//           };
-//           ctrl.$onInit = function() {
-//             ctrl.iframed = UrlService.isIframed();
-
-//             ctrl.isBottomNavbarShown = () => {
-//               return BottomNavbarStatusService.isBottomNavbarEnabled();
-//             };
-
-//             ctrl.DEV_MODE = $rootScope.DEV_MODE;
-//             LoaderService.onLoadingMessageChange.subscribe(
-//               (message: string) => this.loadingMessage = message
-//             );
-//           };
-
-//           KeyboardShortcutService.bindNavigationShortcuts();
-//         }
-//       ]
-//     };
-//   }
-// ]);
