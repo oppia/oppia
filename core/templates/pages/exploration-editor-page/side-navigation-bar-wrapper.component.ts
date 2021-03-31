@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for usage of side-navigation-bar 
+ * @fileoverview Component for usage of side-navigation-bar
  * directly in *mainpage.html files
  */
 

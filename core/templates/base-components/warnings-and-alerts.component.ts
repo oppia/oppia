@@ -18,7 +18,6 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { MessageObject } from 'components/common-layout-directives/common-elements/alert-message.component';
 import { AlertsService } from 'services/alerts.service';
 
 @Component({

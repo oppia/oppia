@@ -52,6 +52,7 @@
 # replace @arpit1912 with @darksun27 after 2021-04-10.
 /core/templates/components/shared-component.module.ts @srijanreddy98 @arpit1912
 /core/templates/services/loader.service*.ts @srijanreddy98 @arpit1912
+/core/templates/components/common-layout-directives/common-elements/alert-message.component.ts @srijanreddy98 @arpit1912
 /core/templates/components/material.module.ts @srijanreddy98 @arpit1912
 /core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @arpit1912
 /core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @arpit1912
