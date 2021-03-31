@@ -89,7 +89,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'create-activity-button.directive.ts',
     'csrf-token.service.ts',
     'current-interaction.service.ts',
-    'drag-and-drop-positive-int-editor.directive.ts',
+    'drag-and-drop-positive-int-editor.component.ts',
     'editable-collection-backend-api.service.ts',
     'editable-story-backend-api.service.ts',
     'email-dashboard-data.service.ts',
@@ -494,7 +494,7 @@ def check_coverage_changes():
                 ' name and add the new file name in the denylist in'
                 ' the file scripts/check_frontend_test_coverage.py.\n'
                 .format(test_name))
-
+    with open('log.txt', 'w') as f: f.write(errors)
     if errors:
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('Frontend Coverage Checks Not Passed.')

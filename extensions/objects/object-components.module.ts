@@ -26,6 +26,8 @@ import { AlgebraicExpressionEditor } from './templates/algebraic-expression-edit
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
 import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.component';
+import { CustomOskLettersEditorComponent } from './templates/custom-osk-letters-editor.component';
+import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop-positive-int-editor.component';
 
 
 @NgModule({
@@ -38,19 +40,25 @@ import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.com
     AlgebraicExpressionEditor,
     BooleanEditorComponent,
     CodeStringEditorComponent,
-    CoordTwoDimEditorComponent
+    CoordTwoDimEditorComponent,
+    CustomOskLettersEditorComponent,
+    DragAndDropPositiveIntEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditor,
     BooleanEditorComponent,
     CodeStringEditorComponent,
-    CoordTwoDimEditorComponent
+    CoordTwoDimEditorComponent,
+    CustomOskLettersEditorComponent,
+    DragAndDropPositiveIntEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditor,
     BooleanEditorComponent,
     CodeStringEditorComponent,
-    CoordTwoDimEditorComponent
+    CoordTwoDimEditorComponent,
+    CustomOskLettersEditorComponent,
+    DragAndDropPositiveIntEditorComponent
   ],
 })
 

@@ -50,7 +50,9 @@ angular.module('oppia').directive('objectEditor', [
           'algebraic-expression',
           'boolean',
           'code-string',
-          'coord-two-dim'
+          'coord-two-dim',
+          'custom-osk-letters',
+          'drag-and-drop-positive-int' p
         ];
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
@@ -74,7 +76,7 @@ angular.module('oppia').directive('objectEditor', [
             element.html(
               '<' + directiveName +
               '-editor [always-editable]="alwaysEditable"' +
-              ' get-init-args="getInitArgs()" get-is-editable="' +
+              ' [init-args]="initArgs" get-is-editable="' +
               'getIsEditable()" get-schema="getSchema()"' +
               '(value-changed)="updateValue($event)" [value]="value"></' +
               directiveName + '-editor>');
