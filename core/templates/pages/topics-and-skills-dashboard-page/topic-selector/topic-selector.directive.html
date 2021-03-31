@@ -1,7 +1,7 @@
 <div class="list-group">
-	<div class="selected-topics-list" ng-if="topicsSelected.length !== 0"><b>Topics selected:</b> {{ topicsSelected.join(", ") }}</div>
-	<span><input type="text" placeholder="Search topics" ng-model="searchTopics"><i class="material-icons">&#xe8b6;</i></span>
-	<br>
+  <div class="selected-topics-list" ng-if="topicsSelected.length !== 0"><b>Topics selected:</b> {{ topicsSelected.join(", ") }}</div>
+  <span><input type="text" placeholder="Search topics" ng-model="searchTopics"><i class="material-icons">&#xe8b6;</i></span>
+  <br>
   <a class="list-group-item protractor-test-topics-list-item"
      ng-repeat="topicSummary in topicSummaries | filter:searchTopics"
      ng-click="selectOrDeselectTopic(topicSummary.id)"
@@ -12,9 +12,9 @@
   </a>
 </div>
 <style>
-	.selected-topics-list {
-		border-radius: 3px;
-		padding: 5px 0px;
-		margin-bottom: 15px;
-	}
+  .selected-topics-list {
+    border-radius: 3px;
+    margin-bottom: 15px;
+    padding: 5px 0;
+  }
 </style>

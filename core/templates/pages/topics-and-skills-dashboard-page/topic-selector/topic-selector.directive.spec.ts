@@ -83,14 +83,14 @@ describe('Topic selector Directive', function() {
 
   it('should allow select and deselect the topics', function() {
     ctrl.$onInit();
-    $scope.selectOrDeselectTopic(topicSummaries[0].id, 0);
+    $scope.selectOrDeselectTopic(topicSummaries[0].id);
     expect(selectedTopicIds).toEqual([topicSummaries[0].id]);
     expect(topicSummaries[0].isSelected).toEqual(true);
-    $scope.selectOrDeselectTopic(topicSummaries[1].id, 1);
+    $scope.selectOrDeselectTopic(topicSummaries[1].id);
     expect(selectedTopicIds).toEqual(
       [topicSummaries[0].id, topicSummaries[1].id]);
     expect(topicSummaries[1].isSelected).toEqual(true);
-    $scope.selectOrDeselectTopic(topicSummaries[0].id, 0);
+    $scope.selectOrDeselectTopic(topicSummaries[0].id);
     expect(selectedTopicIds).toEqual([topicSummaries[1].id]);
     expect(topicSummaries[0].isSelected).toEqual(false);
   });
