@@ -35,6 +35,9 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import { SkillSelectorComponent } from
+  './skill-selector/skill-selector.component';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -86,6 +89,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   imports: [
     CommonModule,
     BrowserModule,
+    MaterialModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
@@ -103,6 +107,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    FilterForMatchingSubstringPipe,
     FocusOnDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -110,6 +115,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
+    SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
@@ -132,6 +138,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -155,8 +162,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    FilterForMatchingSubstringPipe,
     FocusOnDirective,
     SharingLinksComponent,
+    SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,

@@ -18,7 +18,7 @@
 
 require('components/skill-selector/merge-skill-modal.controller.ts');
 require(
-  'components/skill-selector/skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'assign-skill-to-topic-modal.controller.ts');
