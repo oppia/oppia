@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,6 +92,95 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         super(ScrubAppFeedbackReportsOneOffJobTests, self).setUp()
         self.job_class = (
             app_feedback_report_jobs_one_off.ScrubAppFeedbackReportsOneOffJob)
+
+    def test_job_on_current_and_expired_reports_only_scrubs_expired(self):
+        self._add_current_reports()
+        self._add_expiring_reports()
+        self._run_one_off_job()
+
+        scrubbed_android_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
+        self._verify_report_is_scrubbed(
+            scrubbed_android_model, feconf.REPORT_SCRUBBER_BOT_ID)
+
+        scrubbed_web_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.WEB_REPORT_ID_OVER_MAX_DAYS))
+        self._verify_report_is_scrubbed(
+            scrubbed_web_model, feconf.REPORT_SCRUBBER_BOT_ID)
+
+        current_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_AT_MAX_DAYS))
+        self._verify_report_is_not_scrubbed(current_model)
+
+        self.assertIsNone(self.job_class.reduce('key', 'values'))
+
+    def test_job_with_no_reports_in_storage_does_not_scrub_storage(self):
+        current_models_query = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
+        current_models = current_models_query.fetch()
+        self.assertEqual(len(current_models), 0)
+        self._run_one_off_job()
+
+        stored_models_query = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
+        stored_models = stored_models_query.fetch()
+        self.assertEqual(len(stored_models), 0)
+
+    def test_job_on_no_models_does_not_scrub_models(self):
+        self._add_current_reports()
+        self._run_one_off_job()
+
+        current_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_AT_MAX_DAYS))
+        self._verify_report_is_not_scrubbed(current_model)
+
+    def test_job_on_all_expired_models_updates_all_models(self):
+        self._add_expiring_reports()
+        self._run_one_off_job()
+
+        android_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
+        web_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.WEB_REPORT_ID_OVER_MAX_DAYS))
+
+        self._verify_report_is_scrubbed(
+            android_model, feconf.REPORT_SCRUBBER_BOT_ID)
+        self._verify_report_is_scrubbed(
+            web_model, feconf.REPORT_SCRUBBER_BOT_ID)
+
+    def test_job_on_already_scrubbed_models_does_not_scrub_models(self):
+        self._add_scrubbed_report()
+        self._run_one_off_job()
+
+        scrubbed_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.SCRUBBED_REPORT_ID))
+
+        self._verify_report_is_scrubbed(scrubbed_model, 'scrubber_user')
+
+    def _run_one_off_job(self):
+        # Helper function to create, enqueue, and process a new job instance.
+        job_id = self.job_class.create_new()
+        self.job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = self.job_class.get_output(job_id)
+        self.assertEqual(output, [])
+
+    def _verify_report_is_scrubbed(self, model_entity, scrubber):
+        self.assertIsNotNone(model_entity)
+        self.assertEqual(
+            model_entity.scrubbed_by, scrubber)
+
+    def _verify_report_is_not_scrubbed(self, model_entity):
+        self.assertIsNotNone(model_entity)
+        self.assertIsNone(model_entity.scrubbed_by)
 
     def _add_current_reports(self):
         """Adds reports to the model that should not be scrubbed."""
@@ -195,110 +284,3 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION)))
         expiring_android_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_android_report_model.put()
-
-    def test_scrub_on_current_and_expired_reports_only_scrubs_expired(self):
-        self._add_current_reports()
-        self._add_expiring_reports()
-
-        job_id = self.job_class.create_new()
-        self.job_class.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = self.job_class.get_output(job_id)
-        self.assertEqual(output, [])
-
-        scrubbed_android_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
-        self.assertIsNotNone(scrubbed_android_model)
-        self.assertEqual(
-            scrubbed_android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
-
-        scrubbed_web_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.WEB_REPORT_ID_OVER_MAX_DAYS))
-        self.assertIsNotNone(scrubbed_web_model)
-        self.assertEqual(
-            scrubbed_web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
-
-        current_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.REPORT_ID_AT_MAX_DAYS))
-        self.assertIsNotNone(current_model)
-        self.assertIsNone(current_model.scrubbed_by)
-        self.assertIsNone(self.job_class.reduce('key', 'values'))
-
-    def test_scrub_with_no_reports_in_storage_does_not_change_storage(self):
-        current_models_query = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
-        current_models = current_models_query.fetch()
-        self.assertEqual(len(current_models), 0)
-
-        job_id = self.job_class.create_new()
-        self.job_class.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = self.job_class.get_output(job_id)
-        self.assertEqual(output, [])
-
-        stored_models_query = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
-        stored_models = stored_models_query.fetch()
-        self.assertEqual(len(stored_models), 0)
-
-    def test_scrub_on_no_models_does_not_change_models(self):
-        self._add_current_reports()
-
-        job_id = self.job_class.create_new()
-        self.job_class.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = self.job_class.get_output(job_id)
-        self.assertEqual(output, [])
-
-        current_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.REPORT_ID_AT_MAX_DAYS))
-        self.assertIsNotNone(current_model)
-        self.assertIsNone(current_model.scrubbed_by)
-
-    def test_scrub_on_all_expired_models_updates_all_models(self):
-        self._add_expiring_reports()
-
-        job_id = self.job_class.create_new()
-        self.job_class.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = self.job_class.get_output(job_id)
-        self.assertEqual(output, [])
-
-        android_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
-        self.assertIsNotNone(android_model)
-        self.assertEqual(
-            android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
-
-        web_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.WEB_REPORT_ID_OVER_MAX_DAYS))
-        self.assertIsNotNone(web_model)
-        self.assertEqual(web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
-
-    def test_scrub_on_already_scrubbed_models_does_not_change_models(self):
-        self._add_scrubbed_report()
-
-        job_id = self.job_class.create_new()
-        self.job_class.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = self.job_class.get_output(job_id)
-        self.assertEqual(output, [])
-
-        scrubbed_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.SCRUBBED_REPORT_ID))
-        self.assertIsNotNone(scrubbed_model)
-        self.assertNotEqual(
-            scrubbed_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
-        self.assertEqual(scrubbed_model.scrubbed_by, 'scrubber_user')
