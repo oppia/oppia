@@ -45,11 +45,9 @@ export class SortByPipe implements PipeTransform {
         .sort((a, b) => {
           if (a[sortKey] < b[sortKey]) {
             return -1;
-          }
-          else if (a[sortKey] > b[sortKey]) {
+          } else if (a[sortKey] > b[sortKey]) {
             return 1;
-          }
-          else {
+          } else {
             return 0;
           }
         });
