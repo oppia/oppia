@@ -70,9 +70,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
     submitted_on = datastore_services.DateTimeProperty(
         required=True, indexed=True)
     # The type of feedback for this report; this can be an arbitrary string
-    # since future iterations of the report structure may introduce new types and we
-    # cannot rely on the backend updates to fully sync with the frontend report
-    # updates.
+    # since future iterations of the report structure may introduce new types
+    # and we cannot rely on the backend updates to fully sync with the frontend
+    # report updates.
     report_type = datastore_services.StringProperty(required=True, indexed=True)
     # The category that this feedback is for. Possible categories include:
     # suggestion_feature, suggestion_language, suggestion_other,
