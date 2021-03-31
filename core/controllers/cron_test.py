@@ -237,7 +237,7 @@ class CronJobTests(test_utils.GenericTestBase):
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
         self.assertEqual(len(all_jobs), 1)
         self.assertEqual(
-            all_jobs[0].job_type, 'ScrubReportsOneOffJob')
+            all_jobs[0].job_type, 'ScrubAppFeedbackReportsOneOffJob')
 
     def test_clean_data_items_of_completed_map_reduce_jobs(self):
         observed_log_messages = []

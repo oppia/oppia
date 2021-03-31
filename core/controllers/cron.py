@@ -279,5 +279,6 @@ class CronScrubAppFeedbackReportsHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests to scrub reports."""
-        job_class = app_feedback_report_jobs_one_off.ScrubReportsOneOffJob
+        job_class = (
+            app_feedback_report_jobs_one_off.ScrubAppFeedbackReportsOneOffJob)
         job_class.enqueue(job_class.create_new())

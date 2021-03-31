@@ -125,7 +125,8 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
         latest_datetime = datetime.datetime.utcnow() - (
-            datetime.timedelta(days=90))
+            datetime.timedelta(
+                days=feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS))
         if item.created_on < latest_datetime and not item.scrubbed_by:
             model_class = app_feedback_report_models.AppFeedbackReportModel
             cls._add_error(

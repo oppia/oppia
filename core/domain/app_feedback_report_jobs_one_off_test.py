@@ -30,15 +30,17 @@ import feconf
     models.NAMES.app_feedback_report])
 
 
-class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
+class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
     # Timestamp in sec since epoch for Dec 28 2020 23:02:16 GMT.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1609196540)
-    TIMESTAMP_AT_90_DAYS = (
-        datetime.datetime.utcnow() - datetime.timedelta(days=90))
-    TIMESTAMP_OVER_90_DAYS = (
-        datetime.datetime.utcnow() - datetime.timedelta(days=100))
+    TIMESTAMP_AT_MAX_DAYS = (
+        datetime.datetime.utcnow() - datetime.timedelta(
+            days=feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS))
+    TIMESTAMP_OVER_MAX_DAYS = (
+        datetime.datetime.utcnow() - datetime.timedelta(
+            days=feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS + 10))
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_ID = '%s.%s.%s' % (
@@ -73,21 +75,26 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
     WEB_REPORT_INFO_SCHEMA_VERSION = 1
 
-    REPORT_ID_AT_90_DAYS = '%s.%s.%s' % (
+    REPORT_ID_AT_MAX_DAYS = '%s.%s.%s' % (
         PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.second,
-        'At90Daysxxxx')
-    ANDROID_REPORT_ID_OVER_90_DAYS = '%s.%s.%s' % (
+        'AtMaxDaysxxx')
+    ANDROID_REPORT_ID_OVER_MAX_DAYS = '%s.%s.%s' % (
         PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.second,
-        'Over90Daysxx')
-    WEB_REPORT_ID_OVER_90_DAYS = '%s.%s.%s' % (
+        'OverMaxDaysx')
+    WEB_REPORT_ID_OVER_MAX_DAYS = '%s.%s.%s' % (
         PLATFORM_WEB, REPORT_SUBMITTED_TIMESTAMP.second,
-        'Over90Daysxx')
+        'OverMaxDaysx')
+    
+    def setUp(self):
+        super(ScrubAppFeedbackReportsOneOffJobTests, self).setUp()
+        self.job_class = (
+            app_feedback_report_jobs_one_off.ScrubAppFeedbackReportsOneOffJob)
 
     def _add_current_reports(self):
         """Adds reports to the model that should not be scrubbed."""
         current_feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.REPORT_ID_AT_90_DAYS,
+                id=self.REPORT_ID_AT_MAX_DAYS,
                 platform=self.PLATFORM_ANDROID,
                 ticket_id='%s.%s.%s' % (
                     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
@@ -96,7 +103,7 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.PLATFORM_VERSION,
-                device_country_locale_code=(
+                android_device_country_locale_code=(
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
@@ -106,14 +113,14 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 android_report_info=self.ANDROID_REPORT_INFO,
                 android_report_info_schema_version=(
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION)))
-        current_feedback_report_model.created_on = self.TIMESTAMP_AT_90_DAYS
+        current_feedback_report_model.created_on = self.TIMESTAMP_AT_MAX_DAYS
         current_feedback_report_model.put()
 
     def _add_expiring_reports(self):
         """Adds reports to the model that should be scrubbed."""
         expiring_android_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.ANDROID_REPORT_ID_OVER_90_DAYS,
+                id=self.ANDROID_REPORT_ID_OVER_MAX_DAYS,
                 platform=self.PLATFORM_ANDROID,
                 ticket_id='%s.%s.%s' % (
                     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
@@ -122,7 +129,7 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.PLATFORM_VERSION,
-                device_country_locale_code=(
+                android_device_country_locale_code=(
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
@@ -132,12 +139,12 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 android_report_info=self.ANDROID_REPORT_INFO,
                 android_report_info_schema_version=(
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION)))
-        expiring_android_report_model.created_on = self.TIMESTAMP_OVER_90_DAYS
+        expiring_android_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_android_report_model.put()
 
         expiring_web_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.WEB_REPORT_ID_OVER_90_DAYS,
+                id=self.WEB_REPORT_ID_OVER_MAX_DAYS,
                 platform=self.PLATFORM_WEB,
                 ticket_id='%s.%s.%s' % (
                     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
@@ -146,7 +153,7 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.PLATFORM_VERSION,
-                device_country_locale_code=(
+                android_device_country_locale_code=(
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
@@ -156,51 +163,45 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 web_report_info=self.WEB_REPORT_INFO,
                 web_report_info_schema_version=(
                     self.WEB_REPORT_INFO_SCHEMA_VERSION)))
-        expiring_web_report_model.created_on = self.TIMESTAMP_OVER_90_DAYS
+        expiring_web_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_web_report_model.put()
 
     def test_scrubs_no_models(self):
         self._add_current_reports()
 
-        job_id = (
-            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.create_new())
-        app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.enqueue(job_id)
+        job_id = self.job_class.create_new()
+        self.job_class.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        output = (
-            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.get_output(
-                job_id))
+        output = self.job_class.get_output(job_id)
         self.assertEqual(output, [])
 
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.REPORT_ID_AT_90_DAYS))
+                self.REPORT_ID_AT_MAX_DAYS))
         self.assertFalse(current_model is None)
         self.assertTrue(current_model.scrubbed_by is None)
 
     def test_scrubs_all_models(self):
         self._add_expiring_reports()
 
-        job_id = (
-            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.create_new())
-        app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.enqueue(job_id)
+        job_id = self.job_class.create_new()
+        self.job_class.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        output = (
-            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.get_output(
-                job_id))
+        output = self.job_class.get_output(job_id)
         self.assertEqual(output, [])
 
         android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.ANDROID_REPORT_ID_OVER_90_DAYS))
+                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
         self.assertFalse(android_model is None)
         self.assertEqual(
             android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.WEB_REPORT_ID_OVER_90_DAYS))
+                self.WEB_REPORT_ID_OVER_MAX_DAYS))
         self.assertFalse(web_model is None)
         self.assertEqual(web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
@@ -208,35 +209,30 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
         self._add_current_reports()
         self._add_expiring_reports()
 
-        job_id = (
-            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.create_new())
-        app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.enqueue(job_id)
+        job_id = self.job_class.create_new()
+        self.job_class.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        output = (
-            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.get_output(
-                job_id))
+        output = self.job_class.get_output(job_id)
         self.assertEqual(output, [])
 
         scrubbed_android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.ANDROID_REPORT_ID_OVER_90_DAYS))
+                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
         self.assertFalse(scrubbed_android_model is None)
         self.assertEqual(
             scrubbed_android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         scrubbed_web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.WEB_REPORT_ID_OVER_90_DAYS))
+                self.WEB_REPORT_ID_OVER_MAX_DAYS))
         self.assertFalse(scrubbed_web_model is None)
         self.assertEqual(
             scrubbed_web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.REPORT_ID_AT_90_DAYS))
+                self.REPORT_ID_AT_MAX_DAYS))
         self.assertFalse(current_model is None)
         self.assertTrue(current_model.scrubbed_by is None)
-        self.assertIsNone(
-            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.reduce(
-                'key', 'values'))
+        self.assertIsNone(self.job_class.reduce('key', 'values'))

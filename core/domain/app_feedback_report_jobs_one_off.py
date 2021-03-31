@@ -30,7 +30,7 @@ import feconf
     models.NAMES.app_feedback_report])
 
 
-class ScrubReportsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class ScrubAppFeedbackReportsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that scrubs reports that have been held in
     storage for over 90 days.
     """
@@ -41,7 +41,8 @@ class ScrubReportsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        earliest_date = datetime.date.today() - datetime.timedelta(days=90)
+        earliest_date = datetime.date.today() - datetime.timedelta(
+            days=feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS)
         if item.created_on.date() < earliest_date:
             app_feedback_report_services.scrub_report(
                 item.id, feconf.REPORT_SCRUBBER_BOT_ID)
