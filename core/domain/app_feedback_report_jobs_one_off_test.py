@@ -228,6 +228,24 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(current_model.scrubbed_by)
         self.assertIsNone(self.job_class.reduce('key', 'values'))
 
+    def test_scrubs_with_no_reports_in_storage_does_not_change_storage(self):
+        current_models_query = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
+        current_models = current_models_query.fetch()
+        self.assertEqual(len(current_models), 0)
+
+        job_id = self.job_class.create_new()
+        self.job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = self.job_class.get_output(job_id)
+        self.assertEqual(output, [])
+
+        stored_models_query = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
+        stored_models = stored_models_query.fetch()
+        self.assertEqual(len(stored_models), 0)
+
     def test_scrubs_on_no_models_does_not_change_models(self):
         self._add_current_reports()
 
