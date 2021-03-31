@@ -32,7 +32,8 @@ angular.module('oppia').directive('selectTopics', [
       controller: ['$scope', function($scope) {
         var ctrl = this;
         $scope.selectOrDeselectTopic = function(topicId) {
-          var topic = $scope.topicSummaries.find(topic => topic.id === topicId);
+          var topic = $scope.topicSummaries.find(
+            topic => topic.id === topicId);
           var index = $scope.topicSummaries.indexOf(topic);
           if (!$scope.topicSummaries[index].isSelected) {
             $scope.selectedTopicIds.push(topicId);
@@ -40,7 +41,8 @@ angular.module('oppia').directive('selectTopics', [
             $scope.topicsSelected.push($scope.topicSummaries[index].name);
           } else {
             var idIndex = $scope.selectedTopicIds.indexOf(topicId);
-            var nameIndex = $scope.topicsSelected.indexOf($scope.topicSummaries[index].name);
+            var nameIndex = $scope.topicsSelected.indexOf(
+              $scope.topicSummaries[index].name);
             $scope.selectedTopicIds.splice(idIndex, 1);
             $scope.topicSummaries[index].isSelected = false;
             $scope.topicsSelected.splice(nameIndex, 1);
