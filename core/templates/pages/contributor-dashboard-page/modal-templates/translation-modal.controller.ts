@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an 'AS-IS' BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -126,12 +126,29 @@ angular.module('oppia').controller('TranslationModalController', [
       ],
       ar:
       [
-        'استعمال الألقاب الدالة على الاحترام مثل: سيدي، سيدتي.',
-        'استعمال نفس الصيغة المستعملة في ' +
-        'النص الإنجليزية من حيث البناء للمعلوم أو البناء للمجهول.',
-        ' استعمال علامات الترقيم بشكل صحيح ومناسب. واتباع المنهج المتبع في' +
-        ' النص الإنجليزي من حيث التظليل، الاقتباس،' +
-        ' علامات التنصيص، نقاط التعداد، وغيرها.',
+        'In Oppia, we prefer to use simple words that can be easily' +
+        ' understood by children. For example, we use “تابع قائلًا”' +
+        ' instead of “أردف قائلًا”. Furthermore, the English words that' +
+        ' are used in the Arab society regularly can be translated as' +
+        ' follows; Arabic word (The regularly used English word). For' +
+        ' example, we can translate the word cupcakes this way;' +
+        ' كعك القوالب الصغيرة (cupcakes). ',
+        'Use respectful ways and formal prefixes to address people.' +
+        ' For example, use “سيدي” and “سيدتي”. ',
+        'If the name has a meaning in Arabic, or in English, such' +
+        ' as Baker or Crumb, always use words that indicate that they' +
+        ' are names before writing the name itself. For example,' +
+        ' you can use one of the following words depending on the' +
+        ' context; “السيد، السيدة، العم، الجد، الجدة، الآنسة.”',
+        'Use the same voice (active or passive) as in the' +
+        ' original English Text',
+        'Preserve punctuation and bolding. If the original' +
+        ' content has bold text, make sure it is bold in Arabic' +
+        ' as well. If there are bullet points, double quotes, etc.,' +
+        ' make sure that the translated content also has' +
+        ' bullet points and double quotes.',
+        'Use the hyperlinks to different cards as shown in' +
+        ' the original English Text.',
       ]
     };
     $scope.languageDescription = (
