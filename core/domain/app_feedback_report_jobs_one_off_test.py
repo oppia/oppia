@@ -210,22 +210,22 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         scrubbed_android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
-        self.assertFalse(scrubbed_android_model is None)
+        self.assertIsNotNone(scrubbed_android_model)
         self.assertEqual(
             scrubbed_android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         scrubbed_web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.WEB_REPORT_ID_OVER_MAX_DAYS))
-        self.assertFalse(scrubbed_web_model is None)
+        self.assertIsNotNone(scrubbed_web_model)
         self.assertEqual(
             scrubbed_web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.REPORT_ID_AT_MAX_DAYS))
-        self.assertFalse(current_model is None)
-        self.assertTrue(current_model.scrubbed_by is None)
+        self.assertIsNotNone(current_model)
+        self.assertIsNone(current_model.scrubbed_by)
         self.assertIsNone(self.job_class.reduce('key', 'values'))
 
     def test_scrubs_on_no_models_does_not_change_models(self):
@@ -241,8 +241,8 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.REPORT_ID_AT_MAX_DAYS))
-        self.assertFalse(current_model is None)
-        self.assertTrue(current_model.scrubbed_by is None)
+        self.assertIsNotNone(current_model)
+        self.assertIsNone(current_model.scrubbed_by)
 
     def test_scrubs_on_all_models_updates_all_models(self):
         self._add_expiring_reports()
@@ -257,14 +257,14 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
-        self.assertFalse(android_model is None)
+        self.assertIsNotNone(android_model)
         self.assertEqual(
             android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
         web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.WEB_REPORT_ID_OVER_MAX_DAYS))
-        self.assertFalse(web_model is None)
+        self.assertIsNotNone(web_model)
         self.assertEqual(web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
     def test_scrubs_on_already_scrubbed_models_does_not_change_models(self):
@@ -280,7 +280,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         scrubbed_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.SCRUBBED_REPORT_ID))
-        self.assertFalse(scrubbed_model is None)
+        self.assertIsNotNone(scrubbed_model)
         self.assertNotEqual(
             scrubbed_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
         self.assertEqual(scrubbed_model.scrubbed_by, 'scrubber_user')
