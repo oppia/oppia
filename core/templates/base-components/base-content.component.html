@@ -68,19 +68,19 @@
               <div [hidden]="loadingMessage">
                 <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
                 <ng-container *ngTemplateOutlet="footerTpl"></ng-container>
-                </div>
               </div>
             </div>
           </div>
-
-          <oppia-side-navigation-bar [display]="isSidebarShown()"></oppia-side-navigation-bar>
         </div>
+
+        <oppia-side-navigation-bar [display]="isSidebarShown()"></oppia-side-navigation-bar>
       </div>
     </div>
+  </div>
 
-    <div *ngIf="DEV_MODE" class="oppia-dev-mode protractor-test-dev-mode">
-      Dev Mode
-    </div>
+  <div *ngIf="DEV_MODE" class="oppia-dev-mode protractor-test-dev-mode">
+    Dev Mode
+  </div>
 </main>
 
 <style>
