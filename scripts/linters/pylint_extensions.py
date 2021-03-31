@@ -2121,7 +2121,7 @@ class StringConcatenationChecker(checkers.BaseChecker):
     name = 'string-concatenation'
     priority = -1
     msgs = {
-        'C0035': (
+        'C0034': (
             'at string %s, use string interpolation (\'string1%%s\' %% string2)'
             ' rather than string concatenation (\'string1\' + \'string2\').',
             'string-concatenation',
@@ -2130,9 +2130,9 @@ class StringConcatenationChecker(checkers.BaseChecker):
     }
 
     def visit_binop(self, node):
-        """Called for every '+' operator to prohibit usage of string
-         concatenation.
-
+        """ Called for every '+' operator to prohibit usage of string
+         concatenation. It covers only those cases where at least one of the
+         operands is astroid.nodes.Const.
         Args:
             node: astroid.node.BinOp. Node to access module content.
         """
