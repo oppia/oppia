@@ -239,21 +239,11 @@ class CustomHTMLParser(html.parser.HTMLParser):
             for match in re.finditer(re.escape(attr), rendered_text.lower()):
                 start, end = match.start(), match.end()
                 # Checks if the match is an attr or a substring.
-                if (rendered_text[start - 1] == ' '
+                if (rendered_text[start - 1] in [' ', '"']
                         and rendered_text[end] in [' ', '=']):
                     attr_positions.append(start)
             attr_pos_mapping[attr] = attr_positions
-        try:
-            attr_pos = attr_pos_mapping[attr].pop(0)
-        except Exception:
-            error_message = (
-                '%s --> Attribute %s for tag %s on line '
-                '%s failed while popping' % (
-                    self.filepath, attr, tag, line_number))
-            self.failed = True
-            self.error_messages.append(error_message)
-            return
-
+        attr_pos = attr_pos_mapping[attr].pop(0)
         rendered_attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
         attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
         expected_attr_assignment = attr_val_structure.format(
