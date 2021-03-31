@@ -28,5 +28,5 @@ export class LoadingMessageComponent {
 
 angular.module('oppia').directive(
   'loadingMessage', downgradeComponent(
-    {component: LoadingMessageComponent
-}));
+    {component: LoadingMessageComponent}));
+
