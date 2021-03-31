@@ -38,10 +38,14 @@ import { LoadingDotsComponent } from './common-layout-directives/common-elements
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from './common-layout-directives/common-elements/sharing-links.component';
 import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
+import { SkillSelectorComponent } from './skill-selector/skill-selector.component';
+
 import { ProfileLinkImageComponent } from 'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
+
+
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
@@ -65,10 +69,12 @@ import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/trunca
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -88,6 +94,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   imports: [
     CommonModule,
     BrowserModule,
+    MaterialModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
@@ -107,13 +114,16 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
+    FilterForMatchingSubstringPipe,
     FocusOnDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
+    OnScreenKeyboardComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
+    SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
@@ -142,8 +152,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -171,8 +183,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    OnScreenKeyboardComponent,
     SharingLinksComponent,
+    SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
