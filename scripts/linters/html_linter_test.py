@@ -54,6 +54,8 @@ INVALID_SPACE_AROUND_ATTRIBUTE_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_space_around_attribute.html')
 INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_space_around_innerhtml_attribute.html')
+INVALID_SPACE_AROUND_DUPLICATE_ATTRIBUTE_HTML_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_space_around_duplicate_attribute.html')
 
 
 class CustomHTMLParserTests(test_utils.LinterTestBase):
@@ -143,12 +145,22 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)
 
-    def test_space_around_attr_having_camel_case_name_reports_correctly(self):
+    def test_space_around_attr_having_camelcase_name_reports_correctly(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_SPACE_AROUND_INNERHTML_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
         ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Attribute [innerhtml] for tag h1 on line 5 ',
+            'has unwanted white spaces around it'
+        ], lint_task_report.trimmed_messages)
+        self.assertTrue(lint_task_report)
+
+    def test_space_around_duplicate_attr_reports_correctly(self):
+        lint_task_report = html_linter.HTMLLintChecksManager(
+            [INVALID_SPACE_AROUND_DUPLICATE_ATTRIBUTE_HTML_FILEPATH], FILE_CACHE
+        ).check_html_tags_and_attributes()
+        self.assert_same_list_elements([
+            'Attribute class for tag div on line 4 ',
             'has unwanted white spaces around it'
         ], lint_task_report.trimmed_messages)
         self.assertTrue(lint_task_report)

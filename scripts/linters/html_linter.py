@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import html.parser
 import os
+import re
 import subprocess
 
 import python_utils
@@ -71,6 +72,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         expected_indentation = self.indentation_level * self.indentation_width
         tag_line = self.file_lines[line_number - 1].lstrip()
         opening_tag = '<' + tag
+        attr_pos_mapping = {}
 
         # Check the indentation for content of style tag.
         if tag_line.startswith(opening_tag) and tag == 'style':
@@ -138,7 +140,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     self.error_messages.append(error_message)
 
                 self._check_space_between_attributes_and_values(
-                    tag, attr, value, rendered_text, value_in_quotes)
+                    tag, attr, value, rendered_text,
+                    value_in_quotes, attr_pos_mapping)
 
         for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
@@ -215,8 +218,9 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.indentation_level -= 1
 
     def _check_space_between_attributes_and_values(
-            self, tag, attr, value, rendered_text, value_in_quotes):
-        """Checks if there are any spaces between attributes and their values.
+            self, tag, attr, value, rendered_text,
+            value_in_quotes, attr_pos_mapping):
+        """Checks if there are any spaces between attributes and their value.
 
         Args:
             tag: str. The tag name of the HTML line.
@@ -225,23 +229,26 @@ class CustomHTMLParser(html.parser.HTMLParser):
             rendered_text: str. The rendered text of the tag.
             value_in_quotes: bool. Whether the given attribute value
                 is in double quotes.
+            attr_pos_mapping: dict. Mapping between attribute and their
+                starting positions in the tag.
         """
-
-        attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
         line_number, _ = self.getpos()
-        if rendered_text.find(attr) < 0:
-            # Attribute names are case insensitive,
-            # So attr name might not match the
-            # actual attr name in tag.
-
-            attr_pos = rendered_text.lower().find(attr)
-            attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
-            expected_attr_assignment = attr_val_structure.format(
-                attr_name, value)
-        else:
-            expected_attr_assignment = attr_val_structure.format(
-                attr, value)
-        if rendered_text.find(expected_attr_assignment) < 0:
+        if attr not in attr_pos_mapping:
+            attr_positions = []
+            # Finds the positions of the attribute in the tag.
+            for match in re.finditer(re.escape(attr), rendered_text.lower()):
+                start, end = match.start(), match.end()
+                # Checks if the match is an attr or a substring
+                if (rendered_text[start-1] == ' '
+                        and rendered_text[end] in [' ', '=']):
+                    attr_positions.append(start)
+            attr_pos_mapping[attr] = attr_positions
+        attr_pos = attr_pos_mapping[attr].pop(0)
+        rendered_attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
+        attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
+        expected_attr_assignment = attr_val_structure.format(
+                 rendered_attr_name, value)
+        if not rendered_text.startswith(expected_attr_assignment, attr_pos):
             self.failed = True
             error_message = (
                 '%s --> Attribute %s for tag %s on line '
