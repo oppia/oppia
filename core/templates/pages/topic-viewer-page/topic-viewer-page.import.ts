@@ -34,7 +34,7 @@ require('Polyfills.ts');
 // main module the elements are attached to.
 require('pages/topic-viewer-page/topic-viewer-page.module.ts');
 require('App.ts');
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require('base-components/oppia-root.directive.ts');
 
 require(

@@ -16,7 +16,7 @@
  * @fileoverview Component for the Oppia profile page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'pages/signup-page/modal-templates/license-explanation-modal.controller.ts');
 require(

@@ -16,7 +16,7 @@
  * @fileoverview Module for the splash page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -54,7 +54,7 @@ import { SplashPageComponent } from './splash-page.component';
       deps: [PlatformFeatureService],
       multi: true
     }
-  ]
+  ],
 })
 class SplashPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

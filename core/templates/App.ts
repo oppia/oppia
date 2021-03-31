@@ -31,13 +31,13 @@ require('components/button-directives/create-activity-button.directive.ts');
 require('components/button-directives/social-buttons.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'alert-message.directive.ts');
+  'alert-message.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'promo-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'side-navigation-bar.directive.ts');
+  'side-navigation-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');

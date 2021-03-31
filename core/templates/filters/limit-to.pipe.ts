@@ -13,27 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for warning and alerts.
+ * @fileoverview limitTo filter for Oppia.
  */
 
-require('services/alerts.service.ts');
+import { Pipe, PipeTransform } from '@angular/core';
 
-angular.module('oppia').directive('warningsAndAlerts', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./warnings-and-alerts.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['AlertsService',
-        function(AlertsService) {
-          var ctrl = this;
-          ctrl.$onInit = function() {
-            ctrl.AlertsService = AlertsService;
-          };
-        }
-      ]
-    };
+@Pipe({
+  name: 'limitTo'
+})
+export class LimiToPipe implements PipeTransform {
+  transform(value: string, limit: number): string {
+    return value.length > limit ? value.slice(0, limit - 1) : value;
   }
-]);
+}

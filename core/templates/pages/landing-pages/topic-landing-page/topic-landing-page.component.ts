@@ -16,7 +16,7 @@
  * @fileoverview Component for landing page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';

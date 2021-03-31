@@ -16,7 +16,7 @@
  * @fileoverview Component for oppia email dashboard page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 
 require('services/user.service.ts');
 

@@ -38,14 +38,9 @@ angular.module('oppia').directive('topNavigationBar', [
       restrict: 'E',
       scope: {
         headerText: '=',
-        subheaderText: '='
+        subheaderText: '=',
       },
-      bindToController: {
-        backButtonShown: '<'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/navigation-bars/top-navigation' +
-        '-bar.directive.html'),
+      template: require('./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$timeout', '$translate', '$window',
@@ -355,3 +350,22 @@ angular.module('oppia').directive('topNavigationBar', [
       ]
     };
   }]);
+
+import { Directive, Input, Output, EventEmitter, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'top-navigation-bar'
+})
+export class TopNavigationBarComponent extends UpgradeComponent {
+  @Input() headerText: string;
+  @Output() headerTextChange: EventEmitter<string> = (
+    new EventEmitter());
+  @Input() subheaderText: string;
+  @Output() subheaderTextChange: EventEmitter<string> = (
+    new EventEmitter());
+
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('topNavigationBar', elementRef, injector);
+  }
+}

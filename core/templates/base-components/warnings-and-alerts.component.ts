@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for showing the loading screen with a message.
+ * @fileoverview Component for warning and alerts.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { MessageObject } from 'components/common-layout-directives/common-elements/alert-message.component';
+import { AlertsService } from 'services/alerts.service';
 
 @Component({
-  selector: 'loading-message',
-  templateUrl: './loading-message.component.html'
+  selector: 'oppia-warnings-and-alerts',
+  templateUrl: './warnings-and-alerts.component.html'
 })
-export class LoadingMessageComponent {
-  @Input() message: string;
+export class WarningsAndAlertsComponent {
+  constructor(
+    private alertsService: AlertsService
+  ) {}
 }
 
-angular.module('oppia').directive('loadingMessage',
-  downgradeComponent({ component: LoadingMessageComponent }));
+angular.module('oppia').directive('oppiaWarningsAndAlerts',
+  downgradeComponent({ component: WarningsAndAlertsComponent }));

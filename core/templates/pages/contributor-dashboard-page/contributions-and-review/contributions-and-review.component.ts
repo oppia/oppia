@@ -18,7 +18,7 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(

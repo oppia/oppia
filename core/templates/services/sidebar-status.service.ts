@@ -55,8 +55,11 @@ export class SidebarStatusService {
   }
   toggleSidebar(): void {
     if (!this.sidebarIsShown) {
+      console.log('sidebar-status service');
+      console.log('opening');
       this._openSidebar();
     } else {
+      console.log('closing');
       this._closeSidebar();
     }
   }

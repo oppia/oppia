@@ -16,7 +16,7 @@
  * @fileoverview Component for the stewards landing page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 
 angular.module('oppia').component('stewardsLandingPage', {
   template: require('./stewards-landing-page.component.html'),

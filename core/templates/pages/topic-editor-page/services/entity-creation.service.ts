@@ -18,7 +18,7 @@
  * an entity.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
     'background-banner.component.ts');

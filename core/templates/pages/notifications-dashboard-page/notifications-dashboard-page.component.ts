@@ -16,7 +16,7 @@
  * @fileoverview Component for the user's notifications dashboard.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 
 require('services/date-time-format.service.ts');
 require('services/contextual/window-ref.service.ts');

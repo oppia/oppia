@@ -23,7 +23,7 @@ import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -64,10 +64,18 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { ToastrModule } from 'ngx-toastr';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
+import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
+import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
+import { LimiToPipe } from 'filters/limit-to.pipe';
+import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
+import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.directive';
+import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
+import { BaseContentComponent } from '../base-components/base-content.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -82,6 +90,31 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   {provide: AngularFireAuth, useValue: null},
 ];
 
+import { HammerGestureConfig } from '@angular/platform-browser';
+import * as hammer from 'hammerjs';
+
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = <unknown>{
+    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
+    pinch: { enable: false },
+    rotate: { enable: false }
+  };
+}
+
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
@@ -91,27 +124,37 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    ToastrModule.forRoot(toastrConfig),
     ...firebaseAuthModules,
   ],
 
   providers: [
     ...firebaseAuthProviders,
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
+    }
   ],
 
   declarations: [
+    AlertMessageComponent,
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    BaseContentComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
+    OppiaFooterDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    LimiToPipe,
     LoadingDotsComponent,
     LoadingMessageComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
+    SideNavigationBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
@@ -121,14 +164,18 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarComponent,
     TranslatePipe,
     TruncatePipe,
+    WarningsAndAlertsComponent,
     PromoBarComponent
   ],
 
   entryComponents: [
+    AlertMessageComponent,
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    BaseContentComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, LoadingMessageComponent,
@@ -138,6 +185,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
+    SideNavigationBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
@@ -145,6 +193,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    WarningsAndAlertsComponent,
   ],
 
   exports: [
@@ -155,20 +204,27 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     // Components, directives, and pipes.
+    AlertMessageComponent,
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    BaseContentComponent,
     ExplorationSummaryTileDirective,
     FocusOnDirective,
+    OppiaFooterDirective,
+    LimiToPipe,
     LoadingMessageComponent,
     SharingLinksComponent,
+    SideNavigationBarComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
+    WarningsAndAlertsComponent,
     PromoBarComponent
   ],
 })
