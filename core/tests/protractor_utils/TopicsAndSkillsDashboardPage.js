@@ -301,6 +301,7 @@ var TopicsAndSkillsDashboardPage = function() {
       await action.click('Create Skill button', createSkillButtonSecondary);
     }
 
+    await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       skillNameField,
       'Create Skill modal takes too long to appear.');
@@ -312,8 +313,6 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
     var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
-    await action.click(
-      'Skill review material input', skillReviewMaterialInput);
     await action.sendKeys(
       'Skill Review Material Field', skillReviewMaterialInput, reviewMaterial);
 
