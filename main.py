@@ -61,6 +61,7 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
+from core.controllers import voiceover_admin
 from core.domain import user_services
 from core.platform import models
 import feconf

@@ -582,10 +582,10 @@ def check_can_assign_voiceartist_in_activity(user, activity_rights):
         return False
 
     if (activity_rights.community_owned and
-            role_services.ACTION_CAN_ASSIGN_VOICEARTIST):
+            role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
         return True
     elif (activity_rights.is_published() and
-            role_services.ACTION_CAN_ASSIGN_VOICEARTIST):
+            role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
         return True
     else:
         return False

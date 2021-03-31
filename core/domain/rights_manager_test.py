@@ -41,6 +41,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup('f@example.com', 'F')
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -51,9 +52,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
+        self.user_id_voiceover_admin = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_c = user_services.get_user_actions_info(self.user_id_c)
@@ -64,6 +68,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_admin)
         self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
+        self.user_voiceover_admin = user_services.get_user_actions_info(
+            self.user_id_voiceover_admin)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
 
@@ -118,6 +124,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
+        self.assertTrue(
+            rights_manager.check_can_assign_voiceartist_in_activity(
+                self.user_voiceover_admin, exp_rights))
+        # self.assertFalse(
+        #     rights_manager.check_can_assign_voiceartist_in_activity(
+        #         self.user_admin, exp_rights))
 
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
@@ -850,7 +862,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.EXP_ID_FOR_COLLECTION)
         # Ensure User B is not an editor of the exploration within the
         # collection.
-        self.assertFalse(rights_manager.check_can_access_activity(
+        self.assertFalse(rights_activity_rightsmanager.check_can_access_activity(
             self.user_b, exp_for_collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_for_collection_rights))

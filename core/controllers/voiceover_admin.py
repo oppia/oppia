@@ -21,6 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import exp_fetchers
+from core.domain import rights_manager
+from core.domain import user_services
 import feconf
 
 
@@ -29,7 +32,30 @@ class VoiceartistAssignmentHandler(base.BaseHandler):
 
     @acl_decorators.can_assign_voiceartist
     def post(self, entity_type, entity_id):
+        """  todo add docstring """
+        exploartion = exp_fetchers.get_exploration_by_id(entity_id)
 
-        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+        voice_artist = self.payload.get('username')
+        voice_artist_id = user_services.get_user_id_from_username(
+            voice_artist)
+        if voice_artist_id is None:
             raise self.InvalidInputException(
-                'No change was made to this exploration.')
+                'Invalid voice artist name')
+        rights_manager.assign_role_for_exploration(
+            self.user, entity_id, voice_artist_id, rights_domain.ROLE_VOICE_ARTIST)
+
+        self.render_json({})
+
+    @acl_decorators.can_assign_voiceartist
+    def delete(self, entity_type, entity_id):
+        exploartion = exp_fetchers.get_exploration_by_id(exploration_id)
+
+        voice_artist = self.request.get('voice_artist')
+        voice_artist_id = user_services.get_user_id_from_username(
+            voice_artist)
+        if voice_artist_id is None:
+            raise self.InvalidInputException(
+                'Invalid voice artist name')
+        rights_manager.deassign_role_for_exploration(
+            self.user, exploration_id, voice_artist_id, 'voice artist')
+        self.render_json({})

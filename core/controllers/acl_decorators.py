@@ -1131,7 +1131,7 @@ def can_assign_voiceartist(handler):
         has permission to assign voiceartist to a given exploration.
     """
 
-    def test_can_assign_voiceartist(self, exploration_id, **kwargs):
+    def test_can_assign_voiceartist(self, entity_type, entity_id, **kwargs):
         """Checks if the user can assign voiceartist to the exploration.
 
         Args:
@@ -1151,13 +1151,13 @@ def can_assign_voiceartist(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
+            entity_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_assign_voiceartist_in_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, entity_type, entity_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to assign voiceartist to'
