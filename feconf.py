@@ -223,7 +223,7 @@ CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
 CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the app feedback report daily stats blob schema.
-CURRENT_REPORT_STATS_SCHEMA_VERSION = 1
+CURRENT_APP_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
@@ -619,7 +619,7 @@ MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
 # User id for scrubber bot. This bot is used to represent the cron job that
 # scrubs expired app feedback reports.
-REPORT_SCRUBBER_BOT_ID = 'ReportScrubberBot'
+APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID = 'AppFeedbackReportScrubberBot'
 
 # User id and username for suggestion bot. This bot will be used to accept
 # suggestions automatically after a threshold time.

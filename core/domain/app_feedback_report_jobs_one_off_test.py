@@ -109,7 +109,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
                 self.REPORT_ID_AT_MAX_DAYS))
 
         self._verify_report_is_scrubbed(
-            scrubbed_model, feconf.REPORT_SCRUBBER_BOT_ID)
+            scrubbed_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
         self._verify_report_is_not_scrubbed(current_model)
 
     def test_job_with_no_reports_in_storage_does_not_scrub_storage(self):
@@ -146,9 +146,9 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
                 self.WEB_REPORT_ID_OVER_MAX_DAYS))
 
         self._verify_report_is_scrubbed(
-            android_model, feconf.REPORT_SCRUBBER_BOT_ID)
+            android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
         self._verify_report_is_scrubbed(
-            web_model, feconf.REPORT_SCRUBBER_BOT_ID)
+            web_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
     def test_job_on_already_scrubbed_models_does_not_scrub_models(self):
         self._add_scrubbed_report()
@@ -167,7 +167,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
         self._verify_report_is_scrubbed(
-            scrubbed_android_model, feconf.REPORT_SCRUBBER_BOT_ID)
+            scrubbed_android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
         self._add_expiring_web_report()
         self._run_one_off_job()
@@ -176,10 +176,10 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.WEB_REPORT_ID_OVER_MAX_DAYS))
         self._verify_report_is_scrubbed(
-            scrubbed_web_model, feconf.REPORT_SCRUBBER_BOT_ID)
+            scrubbed_web_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
         # Check that the originally-scrubbed model is still valid.
         self._verify_report_is_scrubbed(
-            scrubbed_android_model, feconf.REPORT_SCRUBBER_BOT_ID)
+            scrubbed_android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
     def _run_one_off_job(self):
         # Helper function to create, enqueue, and process a new job instance.
