@@ -141,7 +141,9 @@
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
-    "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts"
+    "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts",
+    "extensions/interactions/NumericInput/directives/numeric-input-rules.service.ts",
+    "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts"
   ],
   "include": ["typings/*.ts"]
 }

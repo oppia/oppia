@@ -27,7 +27,7 @@ import string
 import struct
 
 from constants import constants
-from core.domain import obj_services
+from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
 import feconf
@@ -95,8 +95,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 if ca_spec['schema']['obj_type'] == 'SanitizedUrl':
                     self.assertEqual(ca_spec['default_value'], '')
                 else:
-                    obj_class = obj_services.Registry.get_object_class_by_type(
-                        ca_spec['schema']['obj_type'])
+                    obj_class = (
+                        object_registry.Registry.get_object_class_by_type(
+                            ca_spec['schema']['obj_type']))
                     self.assertEqual(
                         ca_spec['default_value'],
                         obj_class.normalize(ca_spec['default_value']))
