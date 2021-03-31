@@ -72,6 +72,7 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -114,6 +115,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
+    OnScreenKeyboardComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -140,6 +142,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
@@ -171,6 +174,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
     PromoBarComponent,
+    OnScreenKeyboardComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
