@@ -31,18 +31,24 @@ angular.module('oppia').directive('selectTopics', [
         'topic-selector.directive.html'),
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        $scope.selectOrDeselectTopic = function(topicId, index) {
+        $scope.selectOrDeselectTopic = function(topicId) {
+          var topic = $scope.topicSummaries.find(topic => topic.id === topicId);
+          var index = $scope.topicSummaries.indexOf(topic);
           if (!$scope.topicSummaries[index].isSelected) {
             $scope.selectedTopicIds.push(topicId);
             $scope.topicSummaries[index].isSelected = true;
+            $scope.topicsSelected.push($scope.topicSummaries[index].name);
           } else {
             var idIndex = $scope.selectedTopicIds.indexOf(topicId);
+            var nameIndex = $scope.topicsSelected.indexOf($scope.topicSummaries[index].name);
             $scope.selectedTopicIds.splice(idIndex, 1);
             $scope.topicSummaries[index].isSelected = false;
+            $scope.topicsSelected.splice(nameIndex, 1);
           }
         };
         ctrl.$onInit = function() {
           $scope.topicSummaries = $scope.getTopicSummaries();
+          $scope.topicsSelected = [];
         };
       }
       ]
