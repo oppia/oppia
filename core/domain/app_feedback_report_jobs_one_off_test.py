@@ -211,3 +211,6 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 self.REPORT_ID_AT_90_DAYS))
         self.assertFalse(current_model is None)
         self.assertTrue(current_model.scrubbed_by is None)
+        self.assertIsNone(
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.reduce(
+                'key', 'values'))

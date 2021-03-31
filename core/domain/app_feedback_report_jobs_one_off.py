@@ -47,7 +47,7 @@ class ScrubReportsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 item.id, feconf.REPORT_SCRUBBER_BOT_ID)
 
     @staticmethod
-    def reduce(key, value):
+    def reduce(key, values):
         # Scrubbing occurs in the map() function so that nothing is done in the
         # reduce() function.
         pass
