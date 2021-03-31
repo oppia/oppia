@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for Alert Messages
+ * @fileoverview Component for Alert Messages
  */
 
 import { Component, Input } from '@angular/core';
