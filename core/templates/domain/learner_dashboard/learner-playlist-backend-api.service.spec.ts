@@ -167,7 +167,7 @@ describe('Learner playlist Backend Api service ', () => {
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve('success')});
       });
-      learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
+      learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
         '0', 'title', 'exploration', learnerDashboardActivityIds);
       expect(modalSpy).toHaveBeenCalled();
     });
@@ -190,7 +190,7 @@ describe('Learner playlist Backend Api service ', () => {
         collection_playlist_ids: []
       });
 
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
+    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
       '0', 'title', 'exploration', learnerDashboardActivityIds);
     flushMicrotasks();
 
@@ -217,7 +217,7 @@ describe('Learner playlist Backend Api service ', () => {
         collection_playlist_ids: ['0', '1', '2']
       });
 
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
+    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
       '0', 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
 
@@ -245,7 +245,7 @@ describe('Learner playlist Backend Api service ', () => {
         collection_playlist_ids: ['0', '1', '2']
       });
 
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylist(
+    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
       activityId, 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
 
