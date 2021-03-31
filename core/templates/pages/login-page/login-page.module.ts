@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@ import { LoginPageComponent } from 'pages/login-page/login-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
-
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -46,29 +44,29 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [
     LoginPageComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
   ],
   entryComponents: [
     LoginPageComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 class LoginPageModule {
   ngDoBootstrap() {}
@@ -76,11 +74,10 @@ class LoginPageModule {
 
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia').requires.push(downgradeModule(extraProviders => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(LoginPageModule);
+angular.module('oppia').requires.push(downgradeModule(providers => {
+  return platformBrowserDynamic(providers).bootstrapModule(LoginPageModule);
 }));
 
 angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent
+  component: OppiaAngularRootComponent,
 }) as angular.IDirectiveFactory);

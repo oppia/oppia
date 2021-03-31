@@ -19,8 +19,8 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import firebase from 'firebase/app';
-import { AlertsService } from 'services/alerts.service';
 
+import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 import { LoaderService } from 'services/loader.service';

@@ -56,7 +56,6 @@ export class LoginPageComponent implements OnInit {
     }
 
     if (this.emulatorModeIsEnabled) {
-      this.email.setValue('');
       return;
     }
 
@@ -80,8 +79,8 @@ export class LoginPageComponent implements OnInit {
     }
 
     this.alertsService.addWarning(error.message);
+    this.loaderService.hideLoadingScreen();
     if (this.emulatorModeIsEnabled) {
-      this.loaderService.hideLoadingScreen();
       this.email.setValue('');
     } else {
       setTimeout(() => this.redirectToHomePage(), 2000);

@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,69 +16,56 @@
  * @fileoverview Module for the logout page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { LogoutPageComponent } from './logout-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
+
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [
     LogoutPageComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
   ],
   entryComponents: [
     LogoutPageComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 class LogoutPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(LogoutPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFn);
-
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia').requires.push(downgradedModule);
+angular.module('oppia').requires.push(downgradeModule(providers => {
+  return platformBrowserDynamic(providers).bootstrapModule(LogoutPageModule);
+}));
 
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
+  component: OppiaAngularRootComponent,
+}) as angular.IDirectiveFactory);
