@@ -45,7 +45,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     report.
 
     The id of each model instance is determined by concatenating the platform,
-    the timestamp of the report's creation date (in sec since epoch, in UTC),
+    the timestamp of the report's submission date (in sec since epoch, in UTC),
     and a hash of a string representation of a random int.
     """
 
