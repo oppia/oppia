@@ -38,7 +38,7 @@ import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { PngSanitizerService } from 'services/png-sanitizer.service';
 import { UserService } from 'services/user.service';
 
 @Component({
@@ -146,13 +146,13 @@ export class LearnerDashboardPageComponent implements OnInit {
     private loaderService: LoaderService,
     private userService: UserService,
     private ngbModal: NgbModal,
-    private sanitizer: DomSanitizer
+    private pngSanitizerService : PngSanitizerService 
     ) {}
 
   ngOnInit(){
     this.userService.getProfileImageDataUrlAsync().then(
       dataUrl => {
-        this.profilePictureDataUrl = this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
+        this.profilePictureDataUrl = this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl);
       });
 
     this.loaderService.showLoadingScreen('Loading');
@@ -433,8 +433,8 @@ export class LearnerDashboardPageComponent implements OnInit {
       }
     }
 
-    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl).then((response) => {
-      let messageSummaryDicts = response.message_summary_list;
+    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl).then((message_summary_list) => {
+      let messageSummaryDicts = message_summary_list;
       this.messageSummaries = [];
       for (let index = 0; index < messageSummaryDicts.length; index++) {
         this.messageSummaries.push(
@@ -551,7 +551,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   }
 
   getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
+    return this.pngSanitizerService.getTrustedPngResourceUrl(base64ImageData);
   }
 }
 

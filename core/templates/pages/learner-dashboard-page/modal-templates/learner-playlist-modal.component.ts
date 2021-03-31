@@ -42,29 +42,33 @@ export class LearnerPlaylistModalComponent implements OnInit {
 
   ngOnInit(): void {
     let activityType = '';
-        if (this.subsectionName ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-          activityType = constants.ACTIVITY_TYPE_EXPLORATION;
-        } else if (this.subsectionName ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-                    .COLLECTIONS) {
-          activityType = constants.ACTIVITY_TYPE_COLLECTION;
-        } else {
-          throw new Error('Subsection name is not valid.');
-        }
+    if (this.subsectionName ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+      activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+    } else if (this.subsectionName ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+                .COLLECTIONS) {
+      activityType = constants.ACTIVITY_TYPE_COLLECTION;
+    } else {
+      throw new Error('Subsection name is not valid.');
+    }
 
-        let removeActivityUrlPrefix = '';
-        if (this.sectionNameI18nId ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-          removeActivityUrlPrefix =
-            '/learnerplaylistactivityhandler/';
-        } else if (this.sectionNameI18nId ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-          removeActivityUrlPrefix =
-            '/learnerincompleteactivityhandler/';
-        } else {
-          throw new Error('Section name is not valid.');
-        }
+    let removeActivityUrlPrefix = '';
+    if (this.sectionNameI18nId ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+      removeActivityUrlPrefix =
+        '/learnerplaylistactivityhandler/';
+    } else if (this.sectionNameI18nId ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+      removeActivityUrlPrefix =
+        '/learnerincompleteactivityhandler/';
+    } else {
+      throw new Error('Section name is not valid.');
+    }
 
     this.removeFromLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(

@@ -41,6 +41,7 @@ import {
   CreatorSummaryBackendDict,
   ProfileSummary,
 } from 'domain/user/profile-summary.model';
+import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
@@ -137,7 +138,8 @@ export class LearnerDashboardBackendApiService {
     return this._fetchLearnerDashboardDataAsync();
   }
 
-  async addNewMessageAsync(url: string, payload: AddMessagePayload): Promise<void> {
+  async addNewMessageAsync(
+      url: string, payload: AddMessagePayload): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(url, payload).toPromise()
         .then(response => {
@@ -148,11 +150,12 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async onClickThreadAsync(threadDataUrl: string): Promise<any> {
+  async onClickThreadAsync(
+      threadDataUrl: string): Promise<FeedbackMessageSummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this.http.get<Object>(
+      this.http.get<FeedbackMessageSummaryBackendDict[]>(
         threadDataUrl).toPromise().then(response => {
-        resolve(response);
+        resolve(response['message_summary_list']);
       }, errorResponse => {
         reject(errorResponse.error.error);
       });

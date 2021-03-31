@@ -32,7 +32,7 @@ import { FeedbackThreadSummary } from
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
-describe('Learner dashboard page', function() {
+xdescribe('Learner dashboard page', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
