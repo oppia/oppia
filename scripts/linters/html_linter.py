@@ -238,7 +238,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
             # Finds the positions of the attribute in the tag.
             for match in re.finditer(re.escape(attr), rendered_text.lower()):
                 start, end = match.start(), match.end()
-                # Checks if the match is an attr or a substring.
+                # Appends the position only if it is an attribute.
+                # It will not append the position if it is a substring.
                 if (rendered_text[start - 1] in [' ', '"']
                         and rendered_text[end] in [' ', '=']):
                     attr_positions.append(start)
