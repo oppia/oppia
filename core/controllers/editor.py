@@ -70,7 +70,7 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests.
 
         Args:
-            unused_exploration_id: Gets the data for the exploration overview page. (Unused).
+            unused_exploration_id: str. Gets the data for the exploration editor page. (Unused).
         """
 
         self.render_template('exploration-editor-page.mainpage.html')
@@ -86,7 +86,8 @@ class ExplorationHandler(EditorHandler):
         """Handles GET requests.
 
         Args:
-            exploration_id: Runs the data for the exploration overview page."""
+            exploration_id: str. Returns the data for the exploration editor page.
+        """
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
@@ -123,7 +124,8 @@ class ExplorationHandler(EditorHandler):
         """Handles PUT requests.
 
         Args:
-            exploration_id: Updates properties of the given exploration."""
+            exploration_id: str. Updates properties of the given exploration.
+        """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
@@ -175,7 +177,7 @@ class ExplorationHandler(EditorHandler):
         """Deletes the given exploration.
 
         Args:
-            exploration_id: Deletes the data for the exploration overview page.
+            exploration_id: str. Deletes the data for the exploration editor page.
         """
 
         log_debug_string = '(%s) %s tried to delete exploration %s' % (
@@ -203,7 +205,8 @@ class UserExplorationPermissionsHandler(EditorHandler):
         """Handles GET Requests.
 
         Args:
-            exploration_id: Gets the user permissions for an exploration."""
+            exploration_id: str. Gets the user permissions for an exploration.
+        """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         self.values.update({
@@ -236,7 +239,8 @@ class ExplorationRightsHandler(EditorHandler):
         """Handles PUT Requests.
 
         Args:
-            exploration_id: Updates the editing rights for the given exploration."""
+            exploration_id: str. Updates the editing rights for the given exploration.
+        """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
@@ -332,7 +336,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         Unpublishes the given exploration, and sends an email to all its owners.
 
         Args:
-            exploration_id: exploration_id: str. The exploration id.
+            exploration_id: str. The exploration id.
         """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         email_body = self.payload.get('email_body')
@@ -569,7 +573,7 @@ class StateInteractionStatsHandler(EditorHandler):
 
         Args:
             exploration_id: str. The exploration id.
-            escaped_state_name: str State Name ( Escaped ).
+            escaped_state_name: str. State Name ( Escaped ).
         """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -746,7 +750,7 @@ class StartedTutorialEventHandler(EditorHandler):
         """Handles POST requests.
 
         Args:
-            unused_exploration_id: The Exploration id (Unused).
+            unused_exploration_id: str. The Exploration id (Unused).
         """
         user_services.record_user_started_state_editor_tutorial(self.user_id)
         self.render_json({})
@@ -760,7 +764,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles PUT requests for draft updation.
 
         Args:
-            exploration_id: The Exploration id (Unused).
+            exploration_id: str. The Exploration id (Unused).
         """
         # Raise an Exception if the draft change list fails non-strict
         # validation.
@@ -932,7 +936,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
         Args:
             entity_type: type of the entity.
-            entity_id: id of entity.
+            entity_id: str. id of entity.
         """
 
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:

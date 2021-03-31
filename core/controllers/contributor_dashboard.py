@@ -52,7 +52,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         """Handles GET requests.
         
         Args:
-            opportunity_type: str. Type of Opportunity.
+            opportunity_type: Type of Opportunity.
         """
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
