@@ -32,7 +32,7 @@ def scrub_report(report_id, scrubbed_by):
 
     Args:
         report_id: str. The id of the model entity to scrub.
-        scrubbed_by: str. The id of the user or cron job that is intiating
+        scrubbed_by: str. The id of the user or cron job that is initiating
             scrubbing this report.
     """
     _scrub_report_in_transaction(report_id, scrubbed_by)
@@ -71,7 +71,9 @@ def _scrub_report_in_transaction(report_id, scrubbed_by):
 
 def _scrub_report_info(report_info_dict):
     """Scrubs the dictionary of any fields that contains input directly from
-    the user.
+    the user. Scrubbing a report removes any information specific to the user's
+    app instance, such as open text inputted by the user or any event logs
+    recorded by the user's device.
 
     Args:
         report_info_dict: dict. The info dict collected in a report.
