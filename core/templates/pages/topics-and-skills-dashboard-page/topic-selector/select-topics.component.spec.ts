@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SelectTopicsComponent } from './select-topics.component';
-
 /**
  * @fileoverview Unit tests for the select topics component
  */
+
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SelectTopicsComponent } from './select-topics.component';
 
 describe('Topic Selector Component', () => {
   let fixture: ComponentFixture<SelectTopicsComponent>;
