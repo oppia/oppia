@@ -27,13 +27,13 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 def scrub_report(report_id, scrubbed_by):
-    """Scrubs the instance of AppFeedbackReportModel with given ID, removing
+    """Scrubs the instance of AppFeedbackReportModel with the given ID, removing
     any user-entered input in the entity.
 
     Args:
         report_id: str. The id of the model entity to scrub.
-        scrubbed_by: str. The id of the user or cron job that is initiating
-            scrubbing this report.
+        scrubbed_by: str. The id of the user or a const
+            feconf.REPORT_SCRUBBER_BOT_ID if scrubbed by the cron job.
     """
     _scrub_report_in_transaction(report_id, scrubbed_by)
 
