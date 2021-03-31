@@ -622,7 +622,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
-    ANDROID_SDK_VERSION = 22
+    ANDROID_SDK_VERSION = 28
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
@@ -660,7 +660,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -681,7 +681,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -702,7 +702,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -781,6 +781,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         self.assertEqual(
             report_model_2.scrubbed_by,
             user_2_report_mappings[self.REPORT_ID_2])
+
         self.assertNotEqual(
             report_model_1.scrubbed_by, report_model_2.scrubbed_by)
 
@@ -814,7 +815,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
-    ANDROID_SDK_VERSION = 22
+    ANDROID_SDK_VERSION = 28
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
@@ -853,7 +854,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -874,7 +875,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -908,7 +909,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,

@@ -45,8 +45,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
     report.
 
     The id of each model instance is determined by concatenating the platform,
-    the timestamp of the reports (in ms since epoch, in UTC), and a hash of a
-    string representation of a random int.
+    the timestamp of the report's submission date (in sec since epoch, in UTC),
+    and a hash of a string representation of a random int.
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -70,28 +70,27 @@ class AppFeedbackReportModel(base_models.BaseModel):
     submitted_on = datastore_services.DateTimeProperty(
         required=True, indexed=True)
     # The type of feedback for this report; this can be an arbitrary string
-    # since iterations of the report structure may introduce new types and we
-    # cannot rely on the backend updates to fully sync with the frontend report
-    # updates.
+    # since future iterations of the report structure may introduce new types
+    # and we cannot rely on the backend updates to fully sync with the frontend
+    # report updates.
     report_type = datastore_services.StringProperty(required=True, indexed=True)
-    # The category that this feedback is for.
+    # The category that this feedback is for. Possible categories include:
+    # suggestion_feature, suggestion_language, suggestion_other,
+    # issue_lesson_question, issue_general_language, issue_audio_language,
+    # issue_text_language, issue_topics, issue_profile, issue_other, crash.
     category = datastore_services.StringProperty(required=True, indexed=True)
     # The version of the app; on Android this is the package version name (e.g.
-    # 1.0-release-arm...) and on web this is the release version (e.g. 3.0.8).
+    # 0.1-alpha-abcdef1234) and on web this is the release version (e.g. 3.0.8).
     platform_version = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The user's country locale represented as a ISO-3166 code; the locale is
-    # determined by the user's Android device settings.
-    device_country_locale_code = datastore_services.StringProperty(
-        required=True, indexed=True)
     # The entry point location that the user is accessing the feedback report
-    # from on both web & Android devices. On Android, this could be
+    # from on both web & Android devices. Possible entry points include:
     # navigation_drawer, lesson_player, revision_card, or crash.
     entry_point = datastore_services.StringProperty(required=True, indexed=True)
     # Additional topic / story / exploration IDs that may be collected depending
-    # on  the entry_point used to send the report; lesson player will have
-    # topic_id, story_id, and exploration_id, while revision card while have
-    # topic_id and subtopic_id.
+    # on the entry_point used to send the report; a lesson player entry point
+    # will have topic_id, story_id, and exploration_id, while revision cards
+    # will have topic_id and subtopic_id.
     entry_point_topic_id = datastore_services.StringProperty(
         required=False, indexed=True)
     entry_point_story_id = datastore_services.StringProperty(
@@ -100,7 +99,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=True)
     entry_point_subtopic_id = datastore_services.StringProperty(
         required=False, indexed=True)
-
     # The text language on Oppia set by the user in its ISO-639 language code;
     # this is set by the user in Oppia's app preferences on all platforms.
     text_language_code = datastore_services.StringProperty(
@@ -109,7 +107,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # Oppia's app preferences on all platforms.
     audio_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
-
+    # The user's country locale represented as a ISO-3166 code; the locale is
+    # determined by the user's Android device settings.
+    android_device_country_locale_code = datastore_services.StringProperty(
+        required=False, indexed=True)
     # The Android device model used to submit the report.
     android_device_model = datastore_services.StringProperty(
         required=False, indexed=True)
@@ -124,7 +125,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # 'web'.
     android_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=False)
-
     # The rest of the web report info collected; None if the platform is
     # 'android'.
     web_report_info = datastore_services.JsonProperty(
@@ -137,11 +137,12 @@ class AppFeedbackReportModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, platform, submitted_on, report_type, category,
-            platform_version, device_country_locale_code, android_sdk_version,
-            android_device_model, entry_point, entry_point_topic_id,
-            entry_point_story_id, entry_point_exploration_id,
-            entry_point_subtopic_id, text_language_code, audio_language_code,
-            android_report_info, web_report_info):
+            platform_version, android_device_country_locale_code,
+            android_sdk_version, android_device_model, entry_point,
+            entry_point_topic_id, entry_point_story_id,
+            entry_point_exploration_id, entry_point_subtopic_id,
+            text_language_code, audio_language_code, android_report_info,
+            web_report_info):
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
@@ -152,19 +153,19 @@ class AppFeedbackReportModel(base_models.BaseModel):
             category: str. The category the report is providing feedback on.
             platform_version: str. The version of Oppia that the report was
                 submitted on.
-            device_country_locale_code: str. The ISO-3166 code for the user's
-                country locale.
+            android_device_country_locale_code: str|None. The ISO-3166 code for
+                the user's country locale or None if its a web report.
             android_sdk_version: int|None. The SDK version running when on the
                 device or None if its a web report.
             android_device_model: str|None. The device model of the Android
-                devie, or None if it's a web report.
+                device, or None if it's a web report.
             entry_point: str. The entry point used to start the report.
             entry_point_topic_id: str|None. The current topic ID depending on
                 the type of entry point used.
             entry_point_story_id: str|None. The current story ID depending on
                 the type of entry point used.
             entry_point_exploration_id: str|None. The current exploration ID
-                dependingon the type of entry point used.
+                depending on the type of entry point used.
             entry_point_subtopic_id: str|None. The current subtopic ID depending
                 on the type of entry point used.
             text_language_code: str. The ISO-639 language code for the text
@@ -194,7 +195,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
             id=entity_id, platform=platform, submitted_on=submitted_on,
             report_type=report_type, category=category,
             platform_version=platform_version,
-            device_country_locale_code=device_country_locale_code,
+            android_device_country_locale_code=(
+                android_device_country_locale_code),
             android_sdk_version=android_sdk_version,
             android_device_model=android_device_model, entry_point=entry_point,
             entry_point_topic_id=entry_point_topic_id,
@@ -257,7 +259,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'report_type': base_models.EXPORT_POLICY.EXPORTED,
             'category': base_models.EXPORT_POLICY.EXPORTED,
             'platform_version': base_models.EXPORT_POLICY.EXPORTED,
-            'device_country_locale_code': (
+            'android_device_country_locale_code': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'android_device_model': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'android_sdk_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -438,7 +440,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model doesn't contain any user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @staticmethod
@@ -469,10 +471,10 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     stats_tracking_date = datastore_services.DateProperty(
         required=True, indexed=True)
     # JSON struct that maps the daily statistics for this ticket on the date
-    # specified in stats_tracking_date. The JSON will look contain two keys:
+    # specified in stats_tracking_date. The JSON will contain two keys:
     # daily_param_stats and daily_total_reports_submitted.
     # The daily_param_stats will map each param_name (defined below
-    # by the const ALLOWED_STATS_PARAM_NAMES) to a dictionary of all the
+    # by a domain const ALLOWED_STATS_PARAM_NAMES) to a dictionary of all the
     # possible param_values for that parameter and the number of reports
     # submitted on that day that satisfy that param value":
     #
@@ -551,11 +553,12 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         """Fetches the stats for a single ticket.
 
         Args:
-            ticket_id: str. The id of the ticket to get stats for.
+            ticket_id: str. The ID of the ticket to get stats for.
 
         Returns:
-            list(AppFeedbackReportStatsModel). A list of IDs for the stats of
-            the specified ticket.
+            list(str). A list of IDs corresponding to
+            AppFeedbackReportStatsModel entities that record stats on the
+            ticket.
         """
         return cls.query(cls.ticket_id == ticket_id).fetch()
 
@@ -580,7 +583,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model doesn't contain any user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @staticmethod
