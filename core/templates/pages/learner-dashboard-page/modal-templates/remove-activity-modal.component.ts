@@ -26,8 +26,7 @@ import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/lear
 
 @Component({
   selector: 'remove-activity-modal',
-  templateUrl: './remove-activity-modal.component',
-  styleUrls: []
+  templateUrl: './remove-activity-modal.component.html',
 })
 export class RemoveActivityModalComponent implements OnInit {
   @Input() sectionNameI18nId: string;
