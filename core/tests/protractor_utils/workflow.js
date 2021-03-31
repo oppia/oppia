@@ -26,6 +26,7 @@ var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage = require('./SkillEditorPage');
+const { browser } = require('protractor');
 
 var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
@@ -178,6 +179,8 @@ var createAndPublishExploration = async function(
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   await explorationEditorPage.navigateToSettingsTab();
+  await browser.refresh();
+  await waitFor.pageToFullyLoad();
   await explorationEditorSettingsTab.setTitle(title);
   await explorationEditorSettingsTab.setCategory(category);
   await explorationEditorSettingsTab.setObjective(objective);
@@ -219,6 +222,8 @@ var createAndPublishTwoCardExploration = async function(
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   await explorationEditorPage.navigateToSettingsTab();
+  await browser.refresh();
+  await waitFor.pageToFullyLoad();
   await explorationEditorSettingsTab.setTitle(title);
   await explorationEditorSettingsTab.setCategory(category);
   await explorationEditorSettingsTab.setObjective(objective);
@@ -322,13 +327,10 @@ var uploadImage = async function(
   await action.click('Image Clickable Element', imageClickableElement);
 
   if (resetExistingImage) {
-    expect(await thumbnailResetButton.isPresent()).toBe(true);
     await waitFor.elementToBeClickable(
       thumbnailResetButton,
       'Topic thumbnail reset button taking too long to appear.');
     await action.click('Thumbnail Reset Button', thumbnailResetButton);
-  } else {
-    expect(await thumbnailResetButton.isPresent()).toBe(false);
   }
 
   absPath = path.resolve(__dirname, imgPath);
