@@ -155,7 +155,6 @@ var publishExploration = async function() {
   await prePublicationButtonElem.isPresent();
   await action.click('PrePublication Button Element', prePublicationButtonElem);
 
-
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
@@ -333,14 +332,18 @@ var uploadImage = async function(
   await action.click('Image Clickable Element', imageClickableElement);
 
   if (resetExistingImage) {
+    expect(await thumbnailResetButton.isPresent()).toBe(true);
     await waitFor.elementToBeClickable(
       thumbnailResetButton,
       'Topic thumbnail reset button taking too long to appear.');
     await action.click('Thumbnail Reset Button', thumbnailResetButton);
+  } else {
+    expect(await thumbnailResetButton.isPresent()).toBe(false);
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  return await imageUploadInput.sendKeys(absPath);
+  // Return await imageUploadInput.sendKeys(absPath);
+  return await action.sendKeys(imageUploadInput, absPath);
 };
 
 var submitImage = async function(
