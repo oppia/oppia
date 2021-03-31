@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-class GuppyObject {
+export class GuppyObject {
   divId = null;
   guppyInstance = null;
   constructor(divId: string, guppyInstance: Guppy) {
