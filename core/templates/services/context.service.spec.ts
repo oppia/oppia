@@ -22,9 +22,38 @@ import { TestBed } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+class MockWindowRef {
+  _window = {
+    location: {
+      _pathname: '/explore/123',
+      _href: '',
+      get pathname(): string {
+        return this._pathname;
+      },
+      set pathname(val: string) {
+        this._pathname = val;
+      },
+      get href(): string {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      }
+    }
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
 describe('Context service', () => {
   let ecs: ContextService = null;
   let urlService: UrlService = null;
+  let windowRef: MockWindowRef;
 
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
@@ -40,11 +69,6 @@ describe('Context service', () => {
     });
 
     it('should correctly retrieve the exploration id', () => {
-      expect(ecs.getExplorationId()).toBe('123');
-    });
-
-    it('should correctly retrieve the exploration id cached before', () => {
-      expect(ecs.getExplorationId()).toBe('123');
       expect(ecs.getExplorationId()).toBe('123');
     });
 
@@ -427,6 +451,27 @@ describe('Context service', () => {
       ecs.setCustomEntityContext('other', '100');
       expect(ecs.getEntityId()).toBe('100');
       expect(ecs.getEntityType()).toBe('other');
+    });
+  });
+
+  describe('behavior in exploration edge cases', () => {
+    beforeEach(() => {
+      windowRef = new MockWindowRef();
+      TestBed.configureTestingModule({
+        providers: [
+          UrlInterpolationService,
+          { provide: WindowRef, useValue: windowRef },
+        ],
+      });
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+    });
+
+    it('should retrieve the exploration id cached before', () => {
+      windowRef.nativeWindow.location.pathname = '/explore/456';
+      expect(ecs.getExplorationId()).toBe('456');
+      windowRef.nativeWindow.location.pathname = '/explore/789';
+      expect(ecs.getExplorationId()).toBe('456');
     });
   });
 });
