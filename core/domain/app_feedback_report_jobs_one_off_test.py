@@ -197,12 +197,12 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
         self.assertFalse(android_model is None)
         self.assertEqual(
             android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
-    
+
         web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.WEB_REPORT_ID_OVER_90_DAYS))
         self.assertFalse(web_model is None)
-        self.assertTrue(web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
+        self.assertEqual(web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
     def test_standard_operation(self):
         self._add_current_reports()
