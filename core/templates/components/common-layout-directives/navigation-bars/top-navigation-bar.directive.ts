@@ -138,10 +138,7 @@ angular.module('oppia').directive('topNavigationBar', [
             return SidebarStatusService.isSidebarShown();
           };
           ctrl.toggleSidebar = function() {
-            // SidebarStatusService.toggleSidebar();
-            // $scope.update = !$scope.update;
             $scope.toggle();
-            $rootScope.$applyAsync();
           };
 
           ctrl.navigateToClassroomPage = function(classroomUrl) {

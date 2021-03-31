@@ -22,7 +22,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
-  selector: 'side-navigation-bar',
+  selector: 'oppia-side-navigation-bar',
   templateUrl: './side-navigation-bar.component.html'
 })
 export class SideNavigationBarComponent {
@@ -48,5 +48,5 @@ export class SideNavigationBarComponent {
   }
 }
 
-angular.module('oppia').directive('sideNavigationBar',
+angular.module('oppia').directive('oppiaSideNavigationBar',
   downgradeComponent({ component: SideNavigationBarComponent }));

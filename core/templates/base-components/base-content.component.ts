@@ -29,7 +29,7 @@ import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 
 @Component({
-  selector: 'base-content',
+  selector: 'oppia-base-content',
   templateUrl: './base-content.component.html'
 })
 export class BaseContentComponent {
@@ -113,5 +113,5 @@ export class BaseContentComponent {
   }
 }
 
-angular.module('oppia').directive('baseContent',
+angular.module('oppia').directive('oppiaBaseContent',
   downgradeComponent({ component: BaseContentComponent }));

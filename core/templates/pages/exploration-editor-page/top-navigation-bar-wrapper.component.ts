@@ -3,7 +3,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 
 @Component({
-  selector: 'top-navigation-wrapper',
+  selector: 'oppia-top-navigation-wrapper',
   template: '<top-navigation-bar [toggle]="this.toggleSidebar.bind(this)">' +
   '</top-navigation-bar>'
 })
@@ -17,5 +17,5 @@ export class TopNavigationBarWrapperComponent {
   }
 }
 
-angular.module('oppia').directive('topNavigationWrapper',
+angular.module('oppia').directive('oppiaTopNavigationWrapper',
   downgradeComponent({ component: TopNavigationBarWrapperComponent }));
