@@ -2130,9 +2130,10 @@ class StringConcatenationChecker(checkers.BaseChecker):
     }
 
     def visit_binop(self, node):
-        """ Called for every '+' operator to prohibit usage of string
+        """Called for every '+' operator to prohibit usage of string
          concatenation. It covers only those cases where at least one of the
          operands is astroid.nodes.Const.
+
         Args:
             node: astroid.node.BinOp. Node to access module content.
         """
