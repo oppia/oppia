@@ -238,8 +238,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
             # Finds the positions of the attribute in the tag.
             for match in re.finditer(re.escape(attr), rendered_text.lower()):
                 start, end = match.start(), match.end()
-                # Checks if the match is an attr or a substring
-                if (rendered_text[start-1] == ' '
+                # Checks if the match is an attr or a substring.
+                if (rendered_text[start - 1] == ' '
                         and rendered_text[end] in [' ', '=']):
                     attr_positions.append(start)
             attr_pos_mapping[attr] = attr_positions
@@ -247,7 +247,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         rendered_attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
         attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
         expected_attr_assignment = attr_val_structure.format(
-                 rendered_attr_name, value)
+            rendered_attr_name, value)
         if not rendered_text.startswith(expected_attr_assignment, attr_pos):
             self.failed = True
             error_message = (
