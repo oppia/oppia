@@ -32,7 +32,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
-fdescribe('Learner dashboard page', function() {
+xdescribe('Learner dashboard page', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
