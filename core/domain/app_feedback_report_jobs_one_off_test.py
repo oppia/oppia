@@ -196,7 +196,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         expiring_android_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_android_report_model.put()
 
-    def test_standard_operation(self):
+    def test_scrub_on_current_and_expired_reports_only_scrubs_expired(self):
         self._add_current_reports()
         self._add_expiring_reports()
 
@@ -228,7 +228,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(current_model.scrubbed_by)
         self.assertIsNone(self.job_class.reduce('key', 'values'))
 
-    def test_scrubs_with_no_reports_in_storage_does_not_change_storage(self):
+    def test_scrub_with_no_reports_in_storage_does_not_change_storage(self):
         current_models_query = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
         current_models = current_models_query.fetch()
@@ -246,7 +246,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         stored_models = stored_models_query.fetch()
         self.assertEqual(len(stored_models), 0)
 
-    def test_scrubs_on_no_models_does_not_change_models(self):
+    def test_scrub_on_no_models_does_not_change_models(self):
         self._add_current_reports()
 
         job_id = self.job_class.create_new()
@@ -262,7 +262,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNotNone(current_model)
         self.assertIsNone(current_model.scrubbed_by)
 
-    def test_scrubs_on_all_models_updates_all_models(self):
+    def test_scrub_on_all_expired_models_updates_all_models(self):
         self._add_expiring_reports()
 
         job_id = self.job_class.create_new()
@@ -285,7 +285,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNotNone(web_model)
         self.assertEqual(web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
-    def test_scrubs_on_already_scrubbed_models_does_not_change_models(self):
+    def test_scrub_on_already_scrubbed_models_does_not_change_models(self):
         self._add_scrubbed_report()
 
         job_id = self.job_class.create_new()
